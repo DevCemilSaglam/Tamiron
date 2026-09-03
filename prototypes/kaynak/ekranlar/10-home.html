@@ -1,78 +1,161 @@
-<!-- ekran: home · İÇERİDEKİ ARAÇLAR (EKRANLAR.md §1)
-     Liste = TESLİM EDİLMEMİŞ KAYITLAR. Başka tanım yok (K-004).
+<!-- ekran: home · ANA MENÜ
+     03.09 — Cemil: "Yine anasayfada buttonlar olmalı. En üstte Sesli
+     İşlem buttonu, Araç kaydı, araçlar, servis kaydı ekle, servis
+     kayıtları, müşteriler, muhasebe olacak. Yine buttonların yanında
+     mikrofon buttonu olacak."
 
-     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .btn .btn-primary
-     .btn-lg · .search-box · .tl-item (kayıt satırı) · .bos-durum
-     · .notice. Yeni bileşen yazılmadı. -->
+     ANA EKRAN LİSTE DEĞİL, MENÜ. Önceki hâlinde ana ekran "içerideki
+     araçlar" listesiydi; o liste kaybolmadı, kendi ekranına geçti
+     (Servis kayıtları · içeride süzgeci açık gelir).
+
+     HER SATIRIN SAĞ UCUNDA MİKROFON: iş hem dokunarak hem söyleyerek
+     başlatılabiliyor. Mikrofonu tek bir ekrana hapsetmek, sesle
+     başlamak isteyen ustayı önce gözle aramaya zorluyordu.
+
+     BİLEŞENLER v1'DEN: .greeting · .menu-list .menu-row .main
+     .ic-badge .txt .lbl .sub .mic · .btn .btn-primary .btn-lg
+     · .notice. Yeni bileşen yazılmadı (K-008). -->
 <section class="screen" id="screen-home">
 
-  <div class="screen-head">
-    <span class="eyebrow">
-      <svg class="ico ico-sm"><use href="#i-car"></use></svg> İçerideki araçlar
-      <span class="eb-say" id="homeSay"></span>
-    </span>
+  <div class="greeting">
+    <h1 id="selam">Hayırlı işler, usta</h1>
+    <p>Mikrofona basıp <b>plaka söyleyebilir</b>, ne yapılacağını <b>yazdırabilirsin</b>.</p>
   </div>
 
-  <button class="btn btn-primary btn-lg" data-git="ruhsat">
-    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+  <!-- EN ÜSTTE SESLİ İŞLEM: tek düğme, tek iş. Altındaki menü
+       "ne yapacağımı biliyorum" yolu; bu düğme "söylüyorum, sen bul". -->
+  <button class="btn btn-primary btn-lg" data-git="ses">
+    <svg class="ico"><use href="#i-mic"></use></svg> Sesli işlem
   </button>
 
-  <div class="search-box" id="homeArama">
-    <svg class="ico"><use href="#i-search"></use></svg>
-    <input type="search" id="homeQ" placeholder="Plaka ara…" autocomplete="off" aria-label="Plaka ara" />
-    <button class="clear" id="homeQTemiz" aria-label="Aramayı temizle">
-      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
-    </button>
-  </div>
-
-  <div id="homeListe"></div>
-
   <div id="homeHatirlatma"></div>
+
+  <nav class="menu-list" aria-label="Ana menü">
+
+    <div class="menu-row">
+      <button class="main" data-git="ruhsat">
+        <span class="ic-badge"><svg class="ico"><use href="#i-camera"></use></svg></span>
+        <span class="txt"><span class="lbl">Araç kaydı</span>
+          <span class="sub">Ruhsatı çek · yeni araç</span></span>
+      </button>
+      <button class="mic" data-sesle="arac-kaydi" aria-label="Araç kaydı — plakayı sesle söyle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="araclar">
+        <span class="ic-badge"><svg class="ico"><use href="#i-car"></use></svg></span>
+        <span class="txt"><span class="lbl">Araçlar</span>
+          <span class="sub" id="menuAraclarAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="araclar" aria-label="Araçlarda sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="ruhsat">
+        <span class="ic-badge"><svg class="ico"><use href="#i-plus"></use></svg></span>
+        <span class="txt"><span class="lbl">Servis kaydı ekle</span>
+          <span class="sub">Araç geldi · iş açılıyor</span></span>
+      </button>
+      <button class="mic" data-sesle="servis-ekle" aria-label="Servis kaydı — sesle aç">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="kayitlar">
+        <span class="ic-badge"><svg class="ico"><use href="#i-clipboard-list"></use></svg></span>
+        <span class="txt"><span class="lbl">Servis kayıtları</span>
+          <span class="sub" id="menuKayitlarAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="kayitlar" aria-label="Servis kayıtlarında sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="musteriler">
+        <span class="ic-badge"><svg class="ico"><use href="#i-users"></use></svg></span>
+        <span class="txt"><span class="lbl">Müşteriler</span>
+          <span class="sub" id="menuMusterilerAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="musteriler" aria-label="Müşterilerde sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="muhasebe">
+        <span class="ic-badge"><svg class="ico"><use href="#i-receipt"></use></svg></span>
+        <span class="txt"><span class="lbl">Muhasebe</span>
+          <span class="sub" id="menuMuhasebeAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="muhasebe" aria-label="Muhasebe — sesle sor">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+  </nav>
 
 </section>
 
 <script>
+/* SELAMLAMA SAATE BAKAR. Cemil, 01.09: "saat 13, bana günaydın mesajı
+   veriyor... hayırlı işler, usta şeklinde olmalı." Sabit metin
+   kullanıcının gününü yanlış okur; kişiselleşmiş gibi görünüp
+   yanılmak, hiç selamlamamaktan kötüdür. */
+function selamMetni(saat) {
+  if (saat < 6) return 'Hayırlı işler, usta';       /* gece vardiyası */
+  if (saat < 11) return 'Günaydın, usta';
+  if (saat < 18) return 'Hayırlı işler, usta';
+  return 'Hayırlı akşamlar, usta';
+}
+
 Ekran.tanim('home', {
   ciz: function () {
-    var q = norm((document.getElementById('homeQ') || {}).value || '');
-    var liste = icerideki().filter(function (k) {
-      return !q || norm(k.plaka).indexOf(q) >= 0;
-    });
+    document.getElementById('selam').textContent = selamMetni(new Date().getHours());
 
-    var say = document.getElementById('homeSay');
-    if (say) say.textContent = liste.length + (q ? ' bulundu' : ' araç');
+    /* Menü satırlarının alt yazıları SAYIYI söyler — usta ekranı
+       açmadan içeride ne olduğunu görsün. */
+    var ic = icerideki().length;
+    document.getElementById('menuAraclarAlt').textContent =
+      ARACLAR.length + ' araç kayıtlı';
+    document.getElementById('menuKayitlarAlt').textContent =
+      ic ? ic + ' araç içeride · ' + KAYITLAR.length + ' kayıt'
+         : KAYITLAR.length + ' kayıt · içeride araç yok';
+    document.getElementById('menuMusterilerAlt').textContent =
+      musteriler().length + ' müşteri';
+    document.getElementById('menuMuhasebeAlt').textContent =
+      'Bugün ' + tutar(bugunTahsilat()) + ' ₺ · ' +
+      tutar(veresiyeToplami()) + ' ₺ veresiye';
 
-    document.getElementById('homeArama').classList.toggle('filled', !!q);
-
-    document.getElementById('homeListe').innerHTML = liste.length
-      ? liste.map(kayitSatiriHtml).join('')
-      : (q
-          ? bosDurumHtml('i-search', 'Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
-          : bosDurumHtml('i-circle-check', 'İçeride araç yok',
-              'Hepsi teslim edilmiş. Yeni iş için yukarıdan ruhsatı çek.'));
-
-    /* Bakım hatırlatması — ayrı ekran değil, bir uyarı şeridi
-       (T-17, K-002). Ustaya bugün kimi arayacağını söyler. */
+    /* Bakım hatırlatması ana ekranda KALIYOR (T-17, K-002): menüye
+       dönüşse de ustanın "bugün kimi arayacağım" sorusu ilk ekranda
+       cevaplanmalı. Çekmecedeki rozetle aynı kaynaktan besleniyor. */
     var h = KAYITLAR.filter(function (k) {
-      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
+      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
+             tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
     });
     document.getElementById('homeHatirlatma').innerHTML = h.length
       ? '<div class="notice warn">' +
-          '<svg class="ico n-ic"><use href="#i-clock"></use></svg>' +
-          '<span class="n-body"><b>' + h.length + ' araç bakım zamanına yaklaştı.</b> ' +
-          h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
+          '<span class="n-body"><b>' + h.length + ' aracın</b> bakım zamanı geldi — ' +
+            h.map(function (k) { return k.plaka; }).join(', ') + '</span>' +
         '</div>'
       : '';
   }
 });
 
-document.addEventListener('input', function (e) {
-  if (e.target && e.target.id === 'homeQ') Ekran.tazele();
-});
+/* Mikrofonlar sesli işleme, NE İÇİN basıldığı bilgisiyle gider.
+   "Araçlarda ara" ile "servis kaydı aç" aynı ekranı açıyor ama
+   ekran ne beklediğini biliyor. */
 document.addEventListener('click', function (e) {
-  if (e.target.closest && e.target.closest('#homeQTemiz')) {
-    document.getElementById('homeQ').value = '';
-    Ekran.tazele();
-  }
+  var m = e.target.closest('[data-sesle]');
+  if (!m) return;
+  SESLI_NIYET = m.getAttribute('data-sesle');
+  Ekran.ac('ses');
 });
 </script>

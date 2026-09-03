@@ -81,3 +81,12 @@ document.addEventListener('click', function (e) {
   ACIK_KAYIT = parseInt(t.getAttribute('data-kayit'), 10);
   Ekran.ac('kayit');
 });
+
+/* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
+   listesinde de. Iki ekrana ayri yazmak nesneyi ikiye bolerdi. */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-arac]');
+  if (!t) return;
+  ACIK_PLAKA = t.getAttribute('data-arac');
+  Ekran.ac('arac');
+});

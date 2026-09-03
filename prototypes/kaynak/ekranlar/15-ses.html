@@ -1,0 +1,300 @@
+<!-- ekran: ses · SESLİ İŞLEM
+     03.09 — Cemil: "Sesli işlem buttonunda kaydettiği ile işleme
+     çevireceğiz."
+
+     BURADA ASIL İŞ TANIMA DEĞİL, TANIMADAN SONRASI. Motor bir gün
+     doğru metni verecek; asıl soru o metinle NE YAPILACAĞI. Ekran
+     dört hâl gösteriyor:
+       dinliyor → duyuldu → NE YAPILACAĞI ANLAŞILDI → onay
+     Üçüncü adım olmadan ses, arama kutusundan farksız kalır.
+
+     ⚠️ ONAYSIZ HİÇBİR ŞEY YAPILMIYOR. Yanlış duyulan bir cümlenin
+     kaydı kendiliğinden açması, ustayı sesten tamamen soğutur.
+     Anlaşılan işlem YAZIYLA gösterilir, usta onaylar.
+
+     TANIMA MOTORU YOK (A-S1): örnek cümleler üstünden davranış
+     gösteriliyor. Gerçek motor RUHSAT-OKUMA.md'deki gibi ayrı bir
+     karara bağlı.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .ses-sahne
+     .ses-orb .ses-durum .ses-aciklama .ses-duyulan · .cip-grup .cip
+     · .notice · .btn · .plate-hint. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-ses">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-mic"></use></svg> Sesli işlem
+      <span class="eb-say" id="sesNiyet"></span>
+    </span>
+  </div>
+
+  <div class="card">
+    <div class="ses-sahne">
+      <button class="ses-orb" id="sesOrb" aria-label="Dinlemeyi başlat">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+      <div class="ses-durum" id="sesDurum">Dokun ve söyle</div>
+      <div class="ses-aciklama" id="sesAciklama">
+        Plakayı ve ne yapılacağını söylemen yeter.
+      </div>
+      <div class="ses-duyulan" id="sesDuyulan" hidden></div>
+    </div>
+    <div id="sesGovde"></div>
+  </div>
+
+  <p class="plate-hint" style="text-align:center">
+    Tanıma motoru henüz bağlı değil. Aşağıdaki örneklerden birine
+    dokunursan, söylenmiş gibi işler.
+  </p>
+  <div class="cip-grup" id="sesOrnekler" role="group" aria-label="Örnek cümleler"></div>
+
+</section>
+
+<script>
+/* Örnekler GERÇEK CÜMLELER — ustanın kurduğu gibi, düzgün değil.
+   Sonuncusu bilerek kayıtsız plaka: tanınmayan durumu da göstermek
+   gerekiyor, yoksa ekran yalnız iyi günü anlatır. */
+var SES_ORNEK = [
+  '34 ABC 123 triger seti değişecek',
+  '06 TMR 07 bakıma geldi kilometre 88 bin',
+  '35 KLM 45 teslim ettim nakit aldım',
+  '99 ZZ 9999 fren balatası'
+];
+
+var sesDurumu = 'bos';      /* bos · dinliyor · anlasildi · anlasilmadi */
+var sesCumle = '';
+var sesIslem = null;
+
+/* ---- ÇÖZÜMLEME: cümle → işlem ----
+   Küçük ve okunur tutuldu; gerçek motor geldiğinde değişecek olan
+   BURASI, ekran değil. */
+function sesCozumle(c) {
+  var metin = (c || '').trim();
+
+  /* Plaka: "34 ABC 123" ya da "06 TMR 07". Boşluklar kaçabilir. */
+  var m = metin.toLocaleUpperCase('tr')
+               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
+  if (!m) return { tur: 'plakasiz', metin: metin };
+
+  var plaka = m[1] + ' ' + m[2] + ' ' + m[3];
+  var kalan = metin.slice(0, m.index) + metin.slice(m.index + m[0].length);
+  kalan = kalan.replace(/\s+/g, ' ').trim();
+  var d = norm(kalan);
+  var arac = aracBul(plaka);
+
+  if (!arac) return { tur: 'bilinmeyen-arac', plaka: plaka, is: kalan };
+
+  /* TESLİM cümlesi — ödeme yolu da söylenmişse yakalanır. */
+  if (d.indexOf('teslim') >= 0) {
+    var acik = icerideki().filter(function (k) { return k.plaka === plaka; })[0];
+    if (!acik) return { tur: 'teslim-edilecek-kayit-yok', plaka: plaka, arac: arac };
+    var yol = d.indexOf('nakit') >= 0 ? 'nakit'
+            : d.indexOf('kart') >= 0 ? 'kart'
+            : d.indexOf('havale') >= 0 ? 'havale' : null;
+    return { tur: 'teslim', plaka: plaka, arac: arac, kayit: acik, odeme: yol };
+  }
+
+  /* BAKIM mı TAMİRAT mı — kelimeden. Km söylendiyse alınır. */
+  var tur = (d.indexOf('bakim') >= 0 || d.indexOf('periyodik') >= 0) ? 'bakim' : 'tamirat';
+  var km = '';
+  var kmE = d.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
+            d.match(/(?:km|kilometre)\s*(\d[\d.]*)\s*(bin)?/);
+  if (kmE) {
+    km = kmE[1].replace(/\./g, '');
+    if ((kmE[2] || '') === 'bin') km = String(parseInt(km, 10) * 1000);
+    km = parseInt(km, 10).toLocaleString('tr-TR');
+  }
+  /* Km ve tür kelimeleri iş tarifinden çıkarılır — "bakıma geldi
+     kilometre 88 bin" cümlesinin şikâyeti "bakıma geldi" değil. */
+  var is = kalan.replace(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/gi, '')
+                .replace(/(km|kilometre)\s*(\d[\d.]*)\s*(bin)?/gi, '')
+                .replace(/\s+/g, ' ').trim();
+
+  return { tur: 'servis-ac', plaka: plaka, arac: arac, isTuru: tur, km: km, is: is };
+}
+
+/* ---- ANLAŞILANI YAZIYLA GÖSTER ---- */
+function sesOzet(o) {
+  if (o.tur === 'servis-ac') {
+    return {
+      baslik: 'Servis kaydı açılacak',
+      satirlar: [
+        ['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model],
+        ['İş türü', TUR_AD[o.isTuru]],
+        ['Ne istiyor', o.is || '— (sonra yazılır)']
+      ].concat(o.km ? [['Kilometre', o.km + ' km']] : []),
+      eylem: 'Kaydı aç'
+    };
+  }
+  if (o.tur === 'teslim') {
+    return {
+      baslik: 'Araç teslim edilecek',
+      satirlar: [
+        ['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model],
+        ['Tutar', tutar(kayitToplami(o.kayit)) + ' ₺'],
+        ['Ödeme', o.odeme ? ({ nakit: 'Nakit', kart: 'Kart', havale: 'Havale' })[o.odeme]
+                          : '— (teslim ekranında seçilecek)']
+      ],
+      eylem: o.odeme ? 'Teslim et' : 'Teslim ekranını aç'
+    };
+  }
+  if (o.tur === 'bilinmeyen-arac') {
+    return {
+      baslik: 'Bu araç kayıtlı değil',
+      satirlar: [['Duyulan plaka', o.plaka]],
+      eylem: 'Ruhsatı çek'
+    };
+  }
+  if (o.tur === 'teslim-edilecek-kayit-yok') {
+    return {
+      baslik: 'Bu araç zaten içeride değil',
+      satirlar: [['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model]],
+      eylem: 'Aracın geçmişini aç'
+    };
+  }
+  return null;
+}
+
+function sesCiz() {
+  var orb = document.getElementById('sesOrb');
+  var durum = document.getElementById('sesDurum');
+  var acik = document.getElementById('sesAciklama');
+  var duy = document.getElementById('sesDuyulan');
+  var gov = document.getElementById('sesGovde');
+
+  orb.className = 'ses-orb' +
+    (sesDurumu === 'dinliyor' ? ' dinliyor'
+     : sesDurumu === 'anlasildi' ? ' tamam'
+     : sesDurumu === 'anlasilmadi' ? ' hata' : '');
+
+  duy.hidden = !sesCumle;
+  if (sesCumle) {
+    duy.innerHTML = '<span class="sd-lbl">Duyulan</span>' + sesCumle;
+  }
+
+  var n = document.getElementById('sesNiyet');
+  n.textContent = SESLI_NIYET ? ({
+    'arac-kaydi': 'araç kaydı', 'araclar': 'araçlarda ara',
+    'servis-ekle': 'servis kaydı', 'kayitlar': 'kayıtlarda ara',
+    'musteriler': 'müşterilerde ara', 'muhasebe': 'muhasebe'
+  })[SESLI_NIYET] || '' : '';
+
+  if (sesDurumu === 'bos') {
+    durum.textContent = 'Dokun ve söyle';
+    acik.textContent = 'Plakayı ve ne yapılacağını söylemen yeter.';
+    gov.innerHTML = '';
+    return;
+  }
+  if (sesDurumu === 'dinliyor') {
+    durum.textContent = 'Dinliyorum…';
+    acik.textContent = 'Bitince duraklaman yeter.';
+    gov.innerHTML = '';
+    return;
+  }
+  if (sesDurumu === 'anlasilmadi') {
+    durum.textContent = 'Plakayı seçemedim';
+    acik.textContent = 'Cümlede plaka duymadım. Tekrar söyler misin?';
+    gov.innerHTML = '<div class="notice warn">' +
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+      '<span class="n-body">Yanlış anladıysam <b>hiçbir şey yapmadım</b> — ' +
+      'kayıt açılmadı, bir şey değişmedi.</span></div>';
+    return;
+  }
+
+  /* anlasildi */
+  var o = sesOzet(sesIslem);
+  durum.textContent = o.baslik;
+  acik.textContent = 'Doğruysa onayla, değilse tekrar söyle.';
+  gov.innerHTML =
+    '<div class="tutar-serit">' +
+      o.satirlar.map(function (s) {
+        return '<div class="tutar-sat"><span>' + s[0] + '</span>' +
+               '<span class="tv">' + s[1] + '</span></div>';
+      }).join('') +
+    '</div>' +
+    '<div class="btn-row" style="margin-top:14px">' +
+      '<button class="btn btn-ghost" id="sesVazgec">' +
+        '<svg class="ico"><use href="#i-x"></use></svg> Tekrar söyle</button>' +
+      '<button class="btn btn-primary" id="sesOnayla">' +
+        '<svg class="ico"><use href="#i-check"></use></svg> ' + o.eylem + '</button>' +
+    '</div>';
+}
+
+/* ---- ONAYLANAN İŞLEMİ YAP ----
+   Buradaki her dal, elle de yapılabilen bir iş. Ses yeni bir yetenek
+   açmıyor, VAR OLANI kısaltıyor — yedi işin dışına çıkmıyor. */
+function sesUygula(o) {
+  if (o.tur === 'servis-ac') {
+    var yeni = {
+      id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
+      km: o.isTuru === 'bakim' ? o.km : '',
+      sikayet: o.is || '', acilis: '03.09.2026',
+      teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
+    Ekran.ac('kayit');
+    return;
+  }
+  if (o.tur === 'teslim') {
+    ACIK_KAYIT = o.kayit.id;
+    Ekran.ac('teslim');
+    /* Ödeme yolu söylendiyse teslim ekranında SEÇİLİ gelir ama
+       teslim düğmesine usta basar — teslim geri alınamaz (EKRANLAR §5). */
+    if (o.odeme) {
+      var d = document.querySelector('#tsOdeme [data-odeme="' + o.odeme + '"]');
+      if (d) d.click();
+      balon('Ödeme "' + o.odeme + '" seçildi — teslimi sen onayla.', false, 3200);
+    }
+    return;
+  }
+  if (o.tur === 'bilinmeyen-arac') { Ekran.ac('ruhsat'); return; }
+  if (o.tur === 'teslim-edilecek-kayit-yok') {
+    ACIK_PLAKA = o.plaka; Ekran.ac('arac'); return;
+  }
+}
+
+Ekran.tanim('ses', {
+  ciz: function () {
+    /* Ekran her açılışta TEMİZ: önceki cümle sonrakine sızmasın. */
+    sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+    document.getElementById('sesOrnekler').innerHTML = SES_ORNEK.map(function (c, i) {
+      return '<button class="cip" data-ornek="' + i + '">' + c + '</button>';
+    }).join('');
+    sesCiz();
+  }
+});
+
+function sesDuy(cumle) {
+  sesCumle = cumle;
+  sesDurumu = 'dinliyor';
+  sesCiz();
+  /* Kısa bir gecikme: "dinliyor" hâli görülmeden sonuç düşerse
+     kullanıcı ne olduğunu anlamıyor. */
+  setTimeout(function () {
+    sesIslem = sesCozumle(cumle);
+    sesDurumu = (sesIslem.tur === 'plakasiz') ? 'anlasilmadi' : 'anlasildi';
+    sesCiz();
+  }, 900);
+}
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var o = t.getAttribute('data-ornek');
+  if (o !== null) { sesDuy(SES_ORNEK[parseInt(o, 10)]); return; }
+
+  if (t.id === 'sesOrb') {
+    if (sesDurumu === 'dinliyor') return;
+    balon('Tanıma motoru bağlı değil — aşağıdaki örneklerden birine dokun.', true, 2800);
+    return;
+  }
+  if (t.id === 'sesVazgec') {
+    sesDurumu = 'bos'; sesCumle = ''; sesIslem = null; sesCiz(); return;
+  }
+  if (t.id === 'sesOnayla' && sesIslem) { sesUygula(sesIslem); return; }
+});
+</script>

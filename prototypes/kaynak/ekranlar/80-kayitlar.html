@@ -1,0 +1,93 @@
+<!-- ekran: kayitlar · SERVİS KAYITLARI
+     Eski ana ekranın devamı. Ana ekran menüye dönünce "içerideki
+     araçlar" listesi buraya taşındı ve genişledi: artık teslim
+     edilmişler de görünüyor.
+
+     SÜZGEÇ İÇERİDE AÇIK GELİR. Ustanın günlük sorusu "içeride ne var";
+     geçmiş ikinci sorudur. Ekran açıldığında birinci soruyu cevaplar.
+
+     ⚠️ SÜZGEÇ DURUM DEĞİLDİR. K-004 duruyor: tek durum alanı
+     teslimTarihi. "İçeride" ve "teslim edilmiş" bu alandan TÜRETİLİYOR,
+     kayda yazılan bir durum değil.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .cip-grup .cip
+     · .search-box · .tl-item (ortak kayitSatiriHtml) · .bos-durum.
+     Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-kayitlar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Servis kayıtları
+      <span class="eb-say" id="kytSay"></span>
+    </span>
+  </div>
+
+  <div class="cip-grup" id="kytSuzgec" role="group" aria-label="Süzgeç"></div>
+
+  <div class="search-box" id="kytArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="kytQ" placeholder="Plaka ya da yapılan iş…"
+           autocomplete="off" aria-label="Kayıtlarda ara" />
+    <button class="clear" id="kytQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="kytListe"></div>
+
+</section>
+
+<script>
+var KYT_SUZGEC = [
+  { k: 'iceride', ad: 'İçeride' },
+  { k: 'teslim', ad: 'Teslim edilmiş' },
+  { k: 'hepsi', ad: 'Hepsi' }
+];
+var kytSecili = 'iceride';        /* günlük soru önce cevaplanır */
+
+Ekran.tanim('kayitlar', {
+  ciz: function () {
+    var q = norm((document.getElementById('kytQ') || {}).value || '');
+
+    var liste = KAYITLAR.filter(function (k) {
+      if (kytSecili === 'iceride' && k.teslimTarihi) return false;
+      if (kytSecili === 'teslim' && !k.teslimTarihi) return false;
+      if (!q) return true;
+      return norm(k.plaka + ' ' + (k.sikayet || '')).indexOf(q) >= 0;
+    });
+    /* En yenisi üstte — usta dünü değil bugünü arıyor. */
+    liste = liste.slice().reverse();
+
+    document.getElementById('kytSuzgec').innerHTML = KYT_SUZGEC.map(function (s) {
+      return '<button class="cip" data-suzgec="' + s.k + '" aria-pressed="' +
+        (kytSecili === s.k) + '">' + s.ad + '</button>';
+    }).join('');
+
+    document.getElementById('kytSay').textContent =
+      liste.length + (q ? ' bulundu' : ' kayıt');
+    document.getElementById('kytArama').classList.toggle('filled', !!q);
+
+    document.getElementById('kytListe').innerHTML = liste.length
+      ? liste.map(kayitSatiriHtml).join('')
+      : bosDurumHtml(
+          kytSecili === 'iceride' ? 'i-circle-check' : 'i-clipboard-list',
+          q ? 'Eşleşen kayıt yok'
+            : kytSecili === 'iceride' ? 'İçeride araç yok' : 'Kayıt yok',
+          q ? 'Plakanın ya da işin bir kısmını yazman yeter.'
+            : kytSecili === 'iceride'
+              ? 'Hepsi teslim edilmiş. Yeni iş için "Servis kaydı ekle".'
+              : 'Henüz teslim edilmiş bir iş yok.');
+  }
+});
+
+document.addEventListener('click', function (e) {
+  var s = e.target.closest('[data-suzgec]');
+  if (s) { kytSecili = s.getAttribute('data-suzgec'); Ekran.tazele(); }
+  if (e.target.closest('#kytQTemiz')) {
+    document.getElementById('kytQ').value = ''; Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'kytQ') Ekran.tazele();
+});
+</script>

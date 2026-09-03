@@ -1,0 +1,94 @@
+<!-- ekran: araclar · KAYITLI ARAÇLAR
+     03.09'da menüden geldi. Ana ekran menüye dönünce "hangi araçlar
+     kayıtlı" sorusunun gidecek yeri kalmamıştı.
+
+     ARAÇ ≠ İÇERİDEKİ ARAÇ. Burası kayıtlı araçların tamamı; içeride
+     olup olmadığı satırda ROZETLE söyleniyor. İki liste yapmak yerine
+     tek liste + işaret: usta "Mégane nerede" diye sorunca tek yere
+     bakıyor.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .search-box
+     · .tl-item .tl-ic .tl-body .tl-title .tl-sub .tl-foot · .pill
+     · .bos-durum. Yeni bileşen yazılmadı.
+
+     ÜZERİNDE YOK: araç ekleme formu (ruhsattan gelir) · renk · VIN
+     · kontrol tarihleri · silme. -->
+<section class="screen" id="screen-araclar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçlar
+      <span class="eb-say" id="arcSay"></span>
+    </span>
+  </div>
+
+  <div class="search-box" id="arcArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="arcQ" placeholder="Plaka, marka ya da sahip…"
+           autocomplete="off" aria-label="Araçlarda ara" />
+    <button class="clear" id="arcQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="arcListe"></div>
+
+</section>
+
+<script>
+Ekran.tanim('araclar', {
+  ciz: function () {
+    var q = norm((document.getElementById('arcQ') || {}).value || '');
+    /* Arama plakada, markada, modelde VE SAHİPTE çalışır — usta
+       plakayı değil adı hatırlıyor olabilir. */
+    var liste = ARACLAR.filter(function (a) {
+      if (!q) return true;
+      return norm(a.plaka + ' ' + a.marka + ' ' + a.model + ' ' +
+                  (a.sahipAd || '')).indexOf(q) >= 0;
+    });
+
+    document.getElementById('arcSay').textContent =
+      liste.length + (q ? ' bulundu' : ' araç');
+    document.getElementById('arcArama').classList.toggle('filled', !!q);
+
+    document.getElementById('arcListe').innerHTML = liste.length
+      ? liste.map(function (a) {
+          var ic = icerideki().filter(function (k) { return k.plaka === a.plaka; })[0];
+          var sayi = aracKayitlari(a.plaka).length;
+          return '<div class="tl-item' + (ic ? ' t-tamirat' : '') + '"' +
+              ' data-arac="' + a.plaka + '" role="button" tabindex="0">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-car"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title">' +
+                '<span class="tl-tip">' + a.marka + ' ' + a.model + '</span>' +
+                plakaHtml(a.plaka) +
+              '</div>' +
+              '<div class="tl-sub">' + (a.sahipAd || 'sahip yazılmamış') +
+                (a.motor ? ' · ' + a.motor : '') + '</div>' +
+              '<div class="tl-foot">' +
+                (ic ? '<span class="pill accent">içeride</span>' : '') +
+                '<span class="tl-date">' + sayi + ' kayıt</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('')
+      : bosDurumHtml('i-car',
+          q ? 'Eşleşen araç yok' : 'Kayıtlı araç yok',
+          q ? 'Plakanın ya da sahibin bir kısmını yazman yeter.'
+            : 'İlk aracı "Araç kaydı"ndan ruhsatı çekerek ekle.');
+  }
+});
+
+/* [data-arac] davranisi 03-nesne.js'te — plaka iki ekranda tiklaniyor
+   (araclar, musteriler) ve ORTAK NESNE KURALI davranisin da ortak
+   olmasini soyluyor. */
+document.addEventListener('click', function (e) {
+  if (e.target.closest('#arcQTemiz')) {
+    document.getElementById('arcQ').value = ''; Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'arcQ') Ekran.tazele();
+});
+</script>

@@ -129,3 +129,48 @@ function fiyatiBekleyen(k) {
     return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
   });
 }
+
+/* ---- MÜŞTERİ: ayrı tablo değil, ARAÇTAN TÜRETİLİR ----
+   VERI-MODELI'nde Customer YOK; müşteri aracın üstünde duruyor
+   (sahipAd + sahipTel). Menüye "Müşteriler" gelince yeni tablo
+   açmadan aynı veriden liste çıkıyor: bir sahip birden fazla araca
+   sahipse tek satır olur, araçları altında toplanır. */
+function musteriler() {
+  var harita = {};
+  ARACLAR.forEach(function (a) {
+    var ad = (a.sahipAd || '').trim();
+    if (!ad) return;                      /* sahibi yazılmamış araç listede yok */
+    var anahtar = norm(ad) + '|' + (a.sahipTel || '');
+    if (!harita[anahtar]) {
+      harita[anahtar] = { ad: ad, tel: a.sahipTel || '', araclar: [] };
+    }
+    harita[anahtar].araclar.push(a);
+  });
+  return Object.keys(harita).map(function (k) { return harita[k]; })
+    .sort(function (x, y) { return x.ad.localeCompare(y.ad, 'tr'); });
+}
+
+/* ---- MUHASEBENİN HAMMADDESİ ----
+   Kapsam Cemil'in kararını bekliyor ("sonra geçeceğiz"). Bu iki sorgu
+   HİÇBİR YENİ ALAN İSTEMİYOR: teslimdeki ödeme yolu ve satır fiyatları
+   zaten kayıtlı. "Almadım" bir ödeme yoludur, yani veresiye de veri. */
+function bugunTahsilat() {
+  var b = ('0' + BUGUN.getDate()).slice(-2) + '.' +
+          ('0' + (BUGUN.getMonth() + 1)).slice(-2) + '.' + BUGUN.getFullYear();
+  return KAYITLAR.filter(function (k) {
+    return k.teslimTarihi === b && k.odemeYolu && k.odemeYolu !== 'almadim';
+  }).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+}
+function veresiyeToplami() {
+  return KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; })
+    .reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+}
+function odemeDagilimi() {
+  var d = { nakit: 0, kart: 0, havale: 0, almadim: 0 };
+  KAYITLAR.forEach(function (k) {
+    if (k.teslimTarihi && k.odemeYolu && d[k.odemeYolu] !== undefined) {
+      d[k.odemeYolu] += kayitToplami(k);
+    }
+  });
+  return d;
+}

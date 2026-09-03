@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-03 19:33
+  Üretim: 2026-09-03 20:00
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -1442,6 +1442,83 @@ alanları ::before ile büyür. Ölçüm (30.08,
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
 }
 
+/* ============================================================
+   ANA MENU · DIKEY SATIRLAR (main + mic birlesik) — v1'den AYNEN
+   ------------------------------------------------------------
+   03.09, Cemil: "Yine anasayfada buttonlar olmali... Yine buttonlarin
+   yaninda mikrofon buttonu olacak."
+   Satirin SAG UCU mikrofon: her is hem dokunarak hem soyleyerek
+   baslatilabiliyor. Mikrofonu ayri bir ekrana koymak, sesle
+   baslamak isteyen ustayi once gozle aramaya zorluyordu.
+   ============================================================ */
+.menu-list { display: flex; flex-direction: column; gap: 9px; }
+.menu-row {
+  display: flex; align-items: stretch;
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden;
+  transition: border-color .15s, transform .15s, box-shadow .15s;
+}
+.menu-row:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.menu-row .main {
+  flex: 1; display: flex; align-items: center; gap: 13px;
+  padding: 12px 14px; background: transparent; border: none;
+  color: var(--text); text-align: left; min-width: 0;
+  /* 44 px dokunma hedefi — v1'de yaziliydi ama kurala baglanmamisti. */
+  min-height: 44px;
+}
+.menu-row .main:hover { background: var(--nav-hover); }
+.menu-row .ic-badge {
+  width: 42px; height: 42px; flex: none; border-radius: var(--radius-md);
+  background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+}
+.menu-row .ic-badge .ico { width: 24px; height: 24px; }
+.menu-row .txt { display: flex; flex-direction: column; gap: 1px; min-width: 0; }
+.menu-row .lbl { font-family: var(--font-display); font-weight: 600; font-size: 16.5px; }
+.menu-row .sub { font-size: 12.5px; color: var(--muted); }
+.menu-row .mic {
+  width: 56px; flex: none; display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-left: 1px solid var(--line); color: var(--accent);
+}
+.menu-row .mic .ico { width: 24px; height: 24px; }
+.menu-row .mic:hover { background: var(--accent-soft); }
+.menu-row .mic:active { transform: scale(.94); }
+
+/* Selamlama — saate gore degisir (Cemil, 01.09: "saat 13, bana gunaydin
+   mesaji veriyor... hayirli isler usta seklinde olmali"). */
+.greeting { display: flex; flex-direction: column; gap: 3px; }
+.greeting h1 { font-size: 23px; font-weight: 700; font-family: var(--font-display); }
+.greeting p { margin: 0; color: var(--muted); font-size: 14px; }
+
+/* ---------- SESLI ISLEM — v1'den AYNEN ---------- */
+.ses-sahne { display: flex; flex-direction: column; align-items: center;
+  padding: 24px 0 18px; }
+.ses-orb { position: relative; width: 96px; height: 96px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--accent-soft); color: var(--accent); border: none; }
+.ses-orb .ico { width: 38px; height: 38px; }
+.ses-orb.dinliyor::before, .ses-orb.dinliyor::after {
+  content: ''; position: absolute; inset: 0; border-radius: 50%;
+  border: 2px solid var(--accent); animation: sesDalga 2s ease-out infinite; }
+.ses-orb.dinliyor::after { animation-delay: 1s; }
+@keyframes sesDalga { from { transform: scale(1); opacity: .55; }
+                      to   { transform: scale(1.65); opacity: 0; } }
+.ses-orb.hata { background: var(--crit-bg); color: var(--crit); }
+.ses-orb.tamam { background: var(--ok-bg); color: var(--ok); }
+@media (prefers-reduced-motion: reduce) {
+  .ses-orb.dinliyor::before, .ses-orb.dinliyor::after { animation: none; }
+}
+.ses-durum { margin-top: 14px; font-family: var(--font-display);
+  font-size: 17px; font-weight: 700; text-align: center; }
+.ses-aciklama { margin-top: 5px; font-size: 13.5px; color: var(--muted);
+  text-align: center; max-width: 30ch; }
+.ses-duyulan { margin-top: 16px; padding: 11px 14px; border-radius: var(--radius-md);
+  background: var(--surface-2); font-size: 15px; font-style: italic;
+  text-align: center; max-width: 100%; overflow-wrap: anywhere; }
+.ses-duyulan .sd-lbl { display: block; margin-bottom: 4px; font-style: normal;
+  font-size: 11px; font-weight: 700; letter-spacing: .08em;
+  text-transform: uppercase; color: var(--faint); }
+
 
 /* ===== ekran: 30-kayit.html ===== */
 /* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
@@ -1533,36 +1610,159 @@ alanları ::before ile büyür. Ölçüm (30.08,
   <div id="kurulumYuva"></div>
 
   
-<!-- ekran: home · İÇERİDEKİ ARAÇLAR (EKRANLAR.md §1)
-     Liste = TESLİM EDİLMEMİŞ KAYITLAR. Başka tanım yok (K-004).
+<!-- ekran: home · ANA MENÜ
+     03.09 — Cemil: "Yine anasayfada buttonlar olmalı. En üstte Sesli
+     İşlem buttonu, Araç kaydı, araçlar, servis kaydı ekle, servis
+     kayıtları, müşteriler, muhasebe olacak. Yine buttonların yanında
+     mikrofon buttonu olacak."
 
-     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .btn .btn-primary
-     .btn-lg · .search-box · .tl-item (kayıt satırı) · .bos-durum
-     · .notice. Yeni bileşen yazılmadı. -->
+     ANA EKRAN LİSTE DEĞİL, MENÜ. Önceki hâlinde ana ekran "içerideki
+     araçlar" listesiydi; o liste kaybolmadı, kendi ekranına geçti
+     (Servis kayıtları · içeride süzgeci açık gelir).
+
+     HER SATIRIN SAĞ UCUNDA MİKROFON: iş hem dokunarak hem söyleyerek
+     başlatılabiliyor. Mikrofonu tek bir ekrana hapsetmek, sesle
+     başlamak isteyen ustayı önce gözle aramaya zorluyordu.
+
+     BİLEŞENLER v1'DEN: .greeting · .menu-list .menu-row .main
+     .ic-badge .txt .lbl .sub .mic · .btn .btn-primary .btn-lg
+     · .notice. Yeni bileşen yazılmadı (K-008). -->
 <section class="screen" id="screen-home">
+
+  <div class="greeting">
+    <h1 id="selam">Hayırlı işler, usta</h1>
+    <p>Mikrofona basıp <b>plaka söyleyebilir</b>, ne yapılacağını <b>yazdırabilirsin</b>.</p>
+  </div>
+
+  <!-- EN ÜSTTE SESLİ İŞLEM: tek düğme, tek iş. Altındaki menü
+       "ne yapacağımı biliyorum" yolu; bu düğme "söylüyorum, sen bul". -->
+  <button class="btn btn-primary btn-lg" data-git="ses">
+    <svg class="ico"><use href="#i-mic"></use></svg> Sesli işlem
+  </button>
+
+  <div id="homeHatirlatma"></div>
+
+  <nav class="menu-list" aria-label="Ana menü">
+
+    <div class="menu-row">
+      <button class="main" data-git="ruhsat">
+        <span class="ic-badge"><svg class="ico"><use href="#i-camera"></use></svg></span>
+        <span class="txt"><span class="lbl">Araç kaydı</span>
+          <span class="sub">Ruhsatı çek · yeni araç</span></span>
+      </button>
+      <button class="mic" data-sesle="arac-kaydi" aria-label="Araç kaydı — plakayı sesle söyle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="araclar">
+        <span class="ic-badge"><svg class="ico"><use href="#i-car"></use></svg></span>
+        <span class="txt"><span class="lbl">Araçlar</span>
+          <span class="sub" id="menuAraclarAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="araclar" aria-label="Araçlarda sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="ruhsat">
+        <span class="ic-badge"><svg class="ico"><use href="#i-plus"></use></svg></span>
+        <span class="txt"><span class="lbl">Servis kaydı ekle</span>
+          <span class="sub">Araç geldi · iş açılıyor</span></span>
+      </button>
+      <button class="mic" data-sesle="servis-ekle" aria-label="Servis kaydı — sesle aç">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="kayitlar">
+        <span class="ic-badge"><svg class="ico"><use href="#i-clipboard-list"></use></svg></span>
+        <span class="txt"><span class="lbl">Servis kayıtları</span>
+          <span class="sub" id="menuKayitlarAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="kayitlar" aria-label="Servis kayıtlarında sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="musteriler">
+        <span class="ic-badge"><svg class="ico"><use href="#i-users"></use></svg></span>
+        <span class="txt"><span class="lbl">Müşteriler</span>
+          <span class="sub" id="menuMusterilerAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="musteriler" aria-label="Müşterilerde sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
+      <button class="main" data-git="muhasebe">
+        <span class="ic-badge"><svg class="ico"><use href="#i-receipt"></use></svg></span>
+        <span class="txt"><span class="lbl">Muhasebe</span>
+          <span class="sub" id="menuMuhasebeAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="muhasebe" aria-label="Muhasebe — sesle sor">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+  </nav>
+
+</section>
+
+<!-- ekran: ses · SESLİ İŞLEM
+     03.09 — Cemil: "Sesli işlem buttonunda kaydettiği ile işleme
+     çevireceğiz."
+
+     BURADA ASIL İŞ TANIMA DEĞİL, TANIMADAN SONRASI. Motor bir gün
+     doğru metni verecek; asıl soru o metinle NE YAPILACAĞI. Ekran
+     dört hâl gösteriyor:
+       dinliyor → duyuldu → NE YAPILACAĞI ANLAŞILDI → onay
+     Üçüncü adım olmadan ses, arama kutusundan farksız kalır.
+
+     ⚠️ ONAYSIZ HİÇBİR ŞEY YAPILMIYOR. Yanlış duyulan bir cümlenin
+     kaydı kendiliğinden açması, ustayı sesten tamamen soğutur.
+     Anlaşılan işlem YAZIYLA gösterilir, usta onaylar.
+
+     TANIMA MOTORU YOK (A-S1): örnek cümleler üstünden davranış
+     gösteriliyor. Gerçek motor RUHSAT-OKUMA.md'deki gibi ayrı bir
+     karara bağlı.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .ses-sahne
+     .ses-orb .ses-durum .ses-aciklama .ses-duyulan · .cip-grup .cip
+     · .notice · .btn · .plate-hint. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-ses">
 
   <div class="screen-head">
     <span class="eyebrow">
-      <svg class="ico ico-sm"><use href="#i-car"></use></svg> İçerideki araçlar
-      <span class="eb-say" id="homeSay"></span>
+      <svg class="ico ico-sm"><use href="#i-mic"></use></svg> Sesli işlem
+      <span class="eb-say" id="sesNiyet"></span>
     </span>
   </div>
 
-  <button class="btn btn-primary btn-lg" data-git="ruhsat">
-    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
-  </button>
-
-  <div class="search-box" id="homeArama">
-    <svg class="ico"><use href="#i-search"></use></svg>
-    <input type="search" id="homeQ" placeholder="Plaka ara…" autocomplete="off" aria-label="Plaka ara" />
-    <button class="clear" id="homeQTemiz" aria-label="Aramayı temizle">
-      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
-    </button>
+  <div class="card">
+    <div class="ses-sahne">
+      <button class="ses-orb" id="sesOrb" aria-label="Dinlemeyi başlat">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+      <div class="ses-durum" id="sesDurum">Dokun ve söyle</div>
+      <div class="ses-aciklama" id="sesAciklama">
+        Plakayı ve ne yapılacağını söylemen yeter.
+      </div>
+      <div class="ses-duyulan" id="sesDuyulan" hidden></div>
+    </div>
+    <div id="sesGovde"></div>
   </div>
 
-  <div id="homeListe"></div>
-
-  <div id="homeHatirlatma"></div>
+  <p class="plate-hint" style="text-align:center">
+    Tanıma motoru henüz bağlı değil. Aşağıdaki örneklerden birine
+    dokunursan, söylenmiş gibi işler.
+  </p>
+  <div class="cip-grup" id="sesOrnekler" role="group" aria-label="Örnek cümleler"></div>
 
 </section>
 
@@ -1854,6 +2054,175 @@ alanları ::before ile büyür. Ölçüm (30.08,
 
 </section>
 
+<!-- ekran: araclar · KAYITLI ARAÇLAR
+     03.09'da menüden geldi. Ana ekran menüye dönünce "hangi araçlar
+     kayıtlı" sorusunun gidecek yeri kalmamıştı.
+
+     ARAÇ ≠ İÇERİDEKİ ARAÇ. Burası kayıtlı araçların tamamı; içeride
+     olup olmadığı satırda ROZETLE söyleniyor. İki liste yapmak yerine
+     tek liste + işaret: usta "Mégane nerede" diye sorunca tek yere
+     bakıyor.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .search-box
+     · .tl-item .tl-ic .tl-body .tl-title .tl-sub .tl-foot · .pill
+     · .bos-durum. Yeni bileşen yazılmadı.
+
+     ÜZERİNDE YOK: araç ekleme formu (ruhsattan gelir) · renk · VIN
+     · kontrol tarihleri · silme. -->
+<section class="screen" id="screen-araclar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçlar
+      <span class="eb-say" id="arcSay"></span>
+    </span>
+  </div>
+
+  <div class="search-box" id="arcArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="arcQ" placeholder="Plaka, marka ya da sahip…"
+           autocomplete="off" aria-label="Araçlarda ara" />
+    <button class="clear" id="arcQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="arcListe"></div>
+
+</section>
+
+<!-- ekran: kayitlar · SERVİS KAYITLARI
+     Eski ana ekranın devamı. Ana ekran menüye dönünce "içerideki
+     araçlar" listesi buraya taşındı ve genişledi: artık teslim
+     edilmişler de görünüyor.
+
+     SÜZGEÇ İÇERİDE AÇIK GELİR. Ustanın günlük sorusu "içeride ne var";
+     geçmiş ikinci sorudur. Ekran açıldığında birinci soruyu cevaplar.
+
+     ⚠️ SÜZGEÇ DURUM DEĞİLDİR. K-004 duruyor: tek durum alanı
+     teslimTarihi. "İçeride" ve "teslim edilmiş" bu alandan TÜRETİLİYOR,
+     kayda yazılan bir durum değil.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .cip-grup .cip
+     · .search-box · .tl-item (ortak kayitSatiriHtml) · .bos-durum.
+     Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-kayitlar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Servis kayıtları
+      <span class="eb-say" id="kytSay"></span>
+    </span>
+  </div>
+
+  <div class="cip-grup" id="kytSuzgec" role="group" aria-label="Süzgeç"></div>
+
+  <div class="search-box" id="kytArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="kytQ" placeholder="Plaka ya da yapılan iş…"
+           autocomplete="off" aria-label="Kayıtlarda ara" />
+    <button class="clear" id="kytQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="kytListe"></div>
+
+</section>
+
+<!-- ekran: musteriler · MÜŞTERİLER
+     03.09'da menüden geldi.
+
+     ⚠️ MÜŞTERİ TABLOSU YOK VE AÇILMADI. VERI-MODELI'nde Customer
+     kasıtlı olarak yok — müşteri aracın üstünde duruyor (sahipAd,
+     sahipTel). Bu ekran o veriden TÜRETİYOR: aynı ad+telefon tek
+     satırda toplanıyor, araçları altında sıralanıyor.
+
+     Neden tablo açılmadı: v1'de Party/Contact/VehicleContact üç
+     tablolu bir müşteri dünyası vardı ve tamircinin "karmaşık" dediği
+     yığının içindeydi. Ekran gerekliydi, tablo değil.
+
+     BUNUN BEDELİ AÇIK: aynı kişinin iki aracında adı farklı yazılmışsa
+     iki müşteri görünür. Birleştirme yok. Tamirci bundan şikâyet
+     ederse tablo o zaman konuşulur (A-M1).
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .search-box
+     · .tl-item .tl-ic .tl-body .tl-title .tl-sub .tl-foot · .plate
+     · .bos-durum. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-musteriler">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-users"></use></svg> Müşteriler
+      <span class="eb-say" id="msSay"></span>
+    </span>
+  </div>
+
+  <div class="search-box" id="msArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="msQ" placeholder="Ad, telefon ya da plaka…"
+           autocomplete="off" aria-label="Müşterilerde ara" />
+    <button class="clear" id="msQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="msListe"></div>
+
+</section>
+
+<!-- ekran: muhasebe · PARA
+     03.09'da menüden geldi.
+
+     ⚠️ KAPSAM HENÜZ KARARA BAĞLANMADI. Cemil: "Ayrıca muhasebe alanını
+     da yapacağız" · kapsam sorulunca "sonra geçeceğiz". Bu ekran o
+     kararı BEKLERKEN, hiçbir yeni alan ve hiçbir yeni tablo istemeden
+     ne gösterilebileceğini gösteriyor.
+
+     TEK HAMMADDE ZATEN KAYITLI: teslimdeki ödeme yolu (nakit · kart ·
+     havale · ALMADIM) ve satırlardaki fiyat. "Almadım" bir ödeme
+     yoludur — veresiye bu yüzden uydurma bir alan değil, var olan
+     verinin okunması.
+
+     ÜZERİNDE YOK ve karar verilmeden yazılmayacak: gider girişi ·
+     kâr hesabı · cari hesap · tahsilat kaydı · fatura/KDV · dönem
+     kapanışı. Bunların her biri ustadan YENİ VERİ ister; istediği veri
+     girilmezse rakam yalan söyler.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
+     · .tutar-serit .tutar-sat .tutar-sat.genel .tv · .tl-item
+     · .notice · .bos-durum. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-muhasebe">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Muhasebe
+    </span>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Bugün
+    </div>
+    <div class="tutar-serit" id="muhBugun"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme yoluna göre
+    </div>
+    <div class="tutar-serit" id="muhDagilim"></div>
+  </div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg> Alınamayan (veresiye)
+  </div>
+  <div id="muhVeresiye"></div>
+
+  <div id="muhKapsam"></div>
+
+</section>
+
 
   <!-- ================= ÇEKMECE =================
        v1'in bileşenleri, v2'nin içeriği. Üç bölüm:
@@ -1974,6 +2343,9 @@ alanları ::before ile büyür. Ölçüm (30.08,
   <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
   <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></symbol>
   <symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></symbol>
+  <!-- 03.09 · ana menu geri gelince (Cemil: "Yine anasayfada buttonlar
+       olmali"). v1'den aynen. -->
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
 
 </svg>
 
@@ -2007,6 +2379,9 @@ window.addEventListener('unhandledrejection', function (e) {
    Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
 var ACIK_KAYIT = null;
 var ACIK_PLAKA = null;
+/* Sesli isleme NE ICIN gidildigi. Ayni ekran farkli beklentilerle
+   aciliyor: "arac kaydi" plaka bekler, "araclar" arama bekler. */
+var SESLI_NIYET = null;
 
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
@@ -2118,6 +2493,14 @@ function balon(metin, dinliyor, sure) {
 }
 
 /* ---- ortak biçimleyiciler ---- */
+/* "03.09.2026" -> Date. Cekmece'nin icinde ozeldi; ana ekran da
+   hatirlatma tarihi karsilastirinca ORTAK NESNE KURALI devreye girdi:
+   iki yerde iki ayri cozumleyici, iki ayri hata demektir. */
+function tariheCevir(g) {
+  var p = (g || '').split('.');
+  return new Date(+p[2], (+p[1] || 1) - 1, +p[0] || 1);
+}
+
 function tutar(n) {
   return (n || 0).toLocaleString('tr-TR');
 }
@@ -2266,11 +2649,6 @@ var Cekmece = (function () {
     });
   }
 
-  function tariheCevir(g) {
-    var p = (g || '').split('.');
-    return new Date(+p[2], (+p[1] || 1) - 1, +p[0] || 1);
-  }
-
   function cizBildirimler() {
     var liste = bekleyenHatirlatmalar();
     var bol = document.getElementById('notifSection');
@@ -2328,12 +2706,15 @@ document.addEventListener('DOMContentLoaded', function () {
   bagla('brandHome', function () { Ekran.ac('home'); });
   bagla('temaBtn', function () { Tema.dondur(); });
 
-  /* ARA — yeni ekran AÇMIYOR. Ana ekrandaki arama kutusuna götürüp
-     odaklıyor; ekran bütçesi 6'da kalıyor. */
+  /* ARA — ARAÇLAR ekranının kendi arama kutusuna götürür.
+     Önce ana ekrandaki kutuya götürüyordu; ana ekran menüye dönünce
+     o kutu kalktı ve düğme ölü bir id arıyor kaldı. Denetimin OLU-ID
+     testi yakaladı: bir ekranı değiştirmek, ona dokunan HER YERİ
+     değiştirir. */
   var araya = function () {
     Cekmece.kapa();
-    Ekran.ac('home');
-    var k = document.getElementById('homeQ');
+    Ekran.ac('araclar');
+    var k = document.getElementById('arcQ');
     if (k) { k.focus(); k.select(); }
   };
   bagla('araBtn', araya);
@@ -2517,6 +2898,51 @@ function fiyatiBekleyen(k) {
   });
 }
 
+/* ---- MÜŞTERİ: ayrı tablo değil, ARAÇTAN TÜRETİLİR ----
+   VERI-MODELI'nde Customer YOK; müşteri aracın üstünde duruyor
+   (sahipAd + sahipTel). Menüye "Müşteriler" gelince yeni tablo
+   açmadan aynı veriden liste çıkıyor: bir sahip birden fazla araca
+   sahipse tek satır olur, araçları altında toplanır. */
+function musteriler() {
+  var harita = {};
+  ARACLAR.forEach(function (a) {
+    var ad = (a.sahipAd || '').trim();
+    if (!ad) return;                      /* sahibi yazılmamış araç listede yok */
+    var anahtar = norm(ad) + '|' + (a.sahipTel || '');
+    if (!harita[anahtar]) {
+      harita[anahtar] = { ad: ad, tel: a.sahipTel || '', araclar: [] };
+    }
+    harita[anahtar].araclar.push(a);
+  });
+  return Object.keys(harita).map(function (k) { return harita[k]; })
+    .sort(function (x, y) { return x.ad.localeCompare(y.ad, 'tr'); });
+}
+
+/* ---- MUHASEBENİN HAMMADDESİ ----
+   Kapsam Cemil'in kararını bekliyor ("sonra geçeceğiz"). Bu iki sorgu
+   HİÇBİR YENİ ALAN İSTEMİYOR: teslimdeki ödeme yolu ve satır fiyatları
+   zaten kayıtlı. "Almadım" bir ödeme yoludur, yani veresiye de veri. */
+function bugunTahsilat() {
+  var b = ('0' + BUGUN.getDate()).slice(-2) + '.' +
+          ('0' + (BUGUN.getMonth() + 1)).slice(-2) + '.' + BUGUN.getFullYear();
+  return KAYITLAR.filter(function (k) {
+    return k.teslimTarihi === b && k.odemeYolu && k.odemeYolu !== 'almadim';
+  }).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+}
+function veresiyeToplami() {
+  return KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; })
+    .reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+}
+function odemeDagilimi() {
+  var d = { nakit: 0, kart: 0, havale: 0, almadim: 0 };
+  KAYITLAR.forEach(function (k) {
+    if (k.teslimTarihi && k.odemeYolu && d[k.odemeYolu] !== undefined) {
+      d[k.odemeYolu] += kayitToplami(k);
+    }
+  });
+  return d;
+}
+
 
 /* ===== betik/03-nesne.js ===== */
 /* ============ ORTAK NESNELER ============
@@ -2603,51 +3029,322 @@ document.addEventListener('click', function (e) {
   Ekran.ac('kayit');
 });
 
+/* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
+   listesinde de. Iki ekrana ayri yazmak nesneyi ikiye bolerdi. */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-arac]');
+  if (!t) return;
+  ACIK_PLAKA = t.getAttribute('data-arac');
+  Ekran.ac('arac');
+});
+
 
 /* ===== ekran: 10-home.html ===== */
 (function () {
+/* SELAMLAMA SAATE BAKAR. Cemil, 01.09: "saat 13, bana günaydın mesajı
+   veriyor... hayırlı işler, usta şeklinde olmalı." Sabit metin
+   kullanıcının gününü yanlış okur; kişiselleşmiş gibi görünüp
+   yanılmak, hiç selamlamamaktan kötüdür. */
+function selamMetni(saat) {
+  if (saat < 6) return 'Hayırlı işler, usta';       /* gece vardiyası */
+  if (saat < 11) return 'Günaydın, usta';
+  if (saat < 18) return 'Hayırlı işler, usta';
+  return 'Hayırlı akşamlar, usta';
+}
+
 Ekran.tanim('home', {
   ciz: function () {
-    var q = norm((document.getElementById('homeQ') || {}).value || '');
-    var liste = icerideki().filter(function (k) {
-      return !q || norm(k.plaka).indexOf(q) >= 0;
-    });
+    document.getElementById('selam').textContent = selamMetni(new Date().getHours());
 
-    var say = document.getElementById('homeSay');
-    if (say) say.textContent = liste.length + (q ? ' bulundu' : ' araç');
+    /* Menü satırlarının alt yazıları SAYIYI söyler — usta ekranı
+       açmadan içeride ne olduğunu görsün. */
+    var ic = icerideki().length;
+    document.getElementById('menuAraclarAlt').textContent =
+      ARACLAR.length + ' araç kayıtlı';
+    document.getElementById('menuKayitlarAlt').textContent =
+      ic ? ic + ' araç içeride · ' + KAYITLAR.length + ' kayıt'
+         : KAYITLAR.length + ' kayıt · içeride araç yok';
+    document.getElementById('menuMusterilerAlt').textContent =
+      musteriler().length + ' müşteri';
+    document.getElementById('menuMuhasebeAlt').textContent =
+      'Bugün ' + tutar(bugunTahsilat()) + ' ₺ · ' +
+      tutar(veresiyeToplami()) + ' ₺ veresiye';
 
-    document.getElementById('homeArama').classList.toggle('filled', !!q);
-
-    document.getElementById('homeListe').innerHTML = liste.length
-      ? liste.map(kayitSatiriHtml).join('')
-      : (q
-          ? bosDurumHtml('i-search', 'Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
-          : bosDurumHtml('i-circle-check', 'İçeride araç yok',
-              'Hepsi teslim edilmiş. Yeni iş için yukarıdan ruhsatı çek.'));
-
-    /* Bakım hatırlatması — ayrı ekran değil, bir uyarı şeridi
-       (T-17, K-002). Ustaya bugün kimi arayacağını söyler. */
+    /* Bakım hatırlatması ana ekranda KALIYOR (T-17, K-002): menüye
+       dönüşse de ustanın "bugün kimi arayacağım" sorusu ilk ekranda
+       cevaplanmalı. Çekmecedeki rozetle aynı kaynaktan besleniyor. */
     var h = KAYITLAR.filter(function (k) {
-      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
+      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
+             tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
     });
     document.getElementById('homeHatirlatma').innerHTML = h.length
       ? '<div class="notice warn">' +
-          '<svg class="ico n-ic"><use href="#i-clock"></use></svg>' +
-          '<span class="n-body"><b>' + h.length + ' araç bakım zamanına yaklaştı.</b> ' +
-          h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
+          '<span class="n-body"><b>' + h.length + ' aracın</b> bakım zamanı geldi — ' +
+            h.map(function (k) { return k.plaka; }).join(', ') + '</span>' +
         '</div>'
       : '';
   }
 });
 
-document.addEventListener('input', function (e) {
-  if (e.target && e.target.id === 'homeQ') Ekran.tazele();
-});
+/* Mikrofonlar sesli işleme, NE İÇİN basıldığı bilgisiyle gider.
+   "Araçlarda ara" ile "servis kaydı aç" aynı ekranı açıyor ama
+   ekran ne beklediğini biliyor. */
 document.addEventListener('click', function (e) {
-  if (e.target.closest && e.target.closest('#homeQTemiz')) {
-    document.getElementById('homeQ').value = '';
-    Ekran.tazele();
+  var m = e.target.closest('[data-sesle]');
+  if (!m) return;
+  SESLI_NIYET = m.getAttribute('data-sesle');
+  Ekran.ac('ses');
+});
+})();
+
+/* ===== ekran: 15-ses.html ===== */
+(function () {
+/* Örnekler GERÇEK CÜMLELER — ustanın kurduğu gibi, düzgün değil.
+   Sonuncusu bilerek kayıtsız plaka: tanınmayan durumu da göstermek
+   gerekiyor, yoksa ekran yalnız iyi günü anlatır. */
+var SES_ORNEK = [
+  '34 ABC 123 triger seti değişecek',
+  '06 TMR 07 bakıma geldi kilometre 88 bin',
+  '35 KLM 45 teslim ettim nakit aldım',
+  '99 ZZ 9999 fren balatası'
+];
+
+var sesDurumu = 'bos';      /* bos · dinliyor · anlasildi · anlasilmadi */
+var sesCumle = '';
+var sesIslem = null;
+
+/* ---- ÇÖZÜMLEME: cümle → işlem ----
+   Küçük ve okunur tutuldu; gerçek motor geldiğinde değişecek olan
+   BURASI, ekran değil. */
+function sesCozumle(c) {
+  var metin = (c || '').trim();
+
+  /* Plaka: "34 ABC 123" ya da "06 TMR 07". Boşluklar kaçabilir. */
+  var m = metin.toLocaleUpperCase('tr')
+               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
+  if (!m) return { tur: 'plakasiz', metin: metin };
+
+  var plaka = m[1] + ' ' + m[2] + ' ' + m[3];
+  var kalan = metin.slice(0, m.index) + metin.slice(m.index + m[0].length);
+  kalan = kalan.replace(/\s+/g, ' ').trim();
+  var d = norm(kalan);
+  var arac = aracBul(plaka);
+
+  if (!arac) return { tur: 'bilinmeyen-arac', plaka: plaka, is: kalan };
+
+  /* TESLİM cümlesi — ödeme yolu da söylenmişse yakalanır. */
+  if (d.indexOf('teslim') >= 0) {
+    var acik = icerideki().filter(function (k) { return k.plaka === plaka; })[0];
+    if (!acik) return { tur: 'teslim-edilecek-kayit-yok', plaka: plaka, arac: arac };
+    var yol = d.indexOf('nakit') >= 0 ? 'nakit'
+            : d.indexOf('kart') >= 0 ? 'kart'
+            : d.indexOf('havale') >= 0 ? 'havale' : null;
+    return { tur: 'teslim', plaka: plaka, arac: arac, kayit: acik, odeme: yol };
   }
+
+  /* BAKIM mı TAMİRAT mı — kelimeden. Km söylendiyse alınır. */
+  var tur = (d.indexOf('bakim') >= 0 || d.indexOf('periyodik') >= 0) ? 'bakim' : 'tamirat';
+  var km = '';
+  var kmE = d.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
+            d.match(/(?:km|kilometre)\s*(\d[\d.]*)\s*(bin)?/);
+  if (kmE) {
+    km = kmE[1].replace(/\./g, '');
+    if ((kmE[2] || '') === 'bin') km = String(parseInt(km, 10) * 1000);
+    km = parseInt(km, 10).toLocaleString('tr-TR');
+  }
+  /* Km ve tür kelimeleri iş tarifinden çıkarılır — "bakıma geldi
+     kilometre 88 bin" cümlesinin şikâyeti "bakıma geldi" değil. */
+  var is = kalan.replace(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/gi, '')
+                .replace(/(km|kilometre)\s*(\d[\d.]*)\s*(bin)?/gi, '')
+                .replace(/\s+/g, ' ').trim();
+
+  return { tur: 'servis-ac', plaka: plaka, arac: arac, isTuru: tur, km: km, is: is };
+}
+
+/* ---- ANLAŞILANI YAZIYLA GÖSTER ---- */
+function sesOzet(o) {
+  if (o.tur === 'servis-ac') {
+    return {
+      baslik: 'Servis kaydı açılacak',
+      satirlar: [
+        ['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model],
+        ['İş türü', TUR_AD[o.isTuru]],
+        ['Ne istiyor', o.is || '— (sonra yazılır)']
+      ].concat(o.km ? [['Kilometre', o.km + ' km']] : []),
+      eylem: 'Kaydı aç'
+    };
+  }
+  if (o.tur === 'teslim') {
+    return {
+      baslik: 'Araç teslim edilecek',
+      satirlar: [
+        ['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model],
+        ['Tutar', tutar(kayitToplami(o.kayit)) + ' ₺'],
+        ['Ödeme', o.odeme ? ({ nakit: 'Nakit', kart: 'Kart', havale: 'Havale' })[o.odeme]
+                          : '— (teslim ekranında seçilecek)']
+      ],
+      eylem: o.odeme ? 'Teslim et' : 'Teslim ekranını aç'
+    };
+  }
+  if (o.tur === 'bilinmeyen-arac') {
+    return {
+      baslik: 'Bu araç kayıtlı değil',
+      satirlar: [['Duyulan plaka', o.plaka]],
+      eylem: 'Ruhsatı çek'
+    };
+  }
+  if (o.tur === 'teslim-edilecek-kayit-yok') {
+    return {
+      baslik: 'Bu araç zaten içeride değil',
+      satirlar: [['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model]],
+      eylem: 'Aracın geçmişini aç'
+    };
+  }
+  return null;
+}
+
+function sesCiz() {
+  var orb = document.getElementById('sesOrb');
+  var durum = document.getElementById('sesDurum');
+  var acik = document.getElementById('sesAciklama');
+  var duy = document.getElementById('sesDuyulan');
+  var gov = document.getElementById('sesGovde');
+
+  orb.className = 'ses-orb' +
+    (sesDurumu === 'dinliyor' ? ' dinliyor'
+     : sesDurumu === 'anlasildi' ? ' tamam'
+     : sesDurumu === 'anlasilmadi' ? ' hata' : '');
+
+  duy.hidden = !sesCumle;
+  if (sesCumle) {
+    duy.innerHTML = '<span class="sd-lbl">Duyulan</span>' + sesCumle;
+  }
+
+  var n = document.getElementById('sesNiyet');
+  n.textContent = SESLI_NIYET ? ({
+    'arac-kaydi': 'araç kaydı', 'araclar': 'araçlarda ara',
+    'servis-ekle': 'servis kaydı', 'kayitlar': 'kayıtlarda ara',
+    'musteriler': 'müşterilerde ara', 'muhasebe': 'muhasebe'
+  })[SESLI_NIYET] || '' : '';
+
+  if (sesDurumu === 'bos') {
+    durum.textContent = 'Dokun ve söyle';
+    acik.textContent = 'Plakayı ve ne yapılacağını söylemen yeter.';
+    gov.innerHTML = '';
+    return;
+  }
+  if (sesDurumu === 'dinliyor') {
+    durum.textContent = 'Dinliyorum…';
+    acik.textContent = 'Bitince duraklaman yeter.';
+    gov.innerHTML = '';
+    return;
+  }
+  if (sesDurumu === 'anlasilmadi') {
+    durum.textContent = 'Plakayı seçemedim';
+    acik.textContent = 'Cümlede plaka duymadım. Tekrar söyler misin?';
+    gov.innerHTML = '<div class="notice warn">' +
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+      '<span class="n-body">Yanlış anladıysam <b>hiçbir şey yapmadım</b> — ' +
+      'kayıt açılmadı, bir şey değişmedi.</span></div>';
+    return;
+  }
+
+  /* anlasildi */
+  var o = sesOzet(sesIslem);
+  durum.textContent = o.baslik;
+  acik.textContent = 'Doğruysa onayla, değilse tekrar söyle.';
+  gov.innerHTML =
+    '<div class="tutar-serit">' +
+      o.satirlar.map(function (s) {
+        return '<div class="tutar-sat"><span>' + s[0] + '</span>' +
+               '<span class="tv">' + s[1] + '</span></div>';
+      }).join('') +
+    '</div>' +
+    '<div class="btn-row" style="margin-top:14px">' +
+      '<button class="btn btn-ghost" id="sesVazgec">' +
+        '<svg class="ico"><use href="#i-x"></use></svg> Tekrar söyle</button>' +
+      '<button class="btn btn-primary" id="sesOnayla">' +
+        '<svg class="ico"><use href="#i-check"></use></svg> ' + o.eylem + '</button>' +
+    '</div>';
+}
+
+/* ---- ONAYLANAN İŞLEMİ YAP ----
+   Buradaki her dal, elle de yapılabilen bir iş. Ses yeni bir yetenek
+   açmıyor, VAR OLANI kısaltıyor — yedi işin dışına çıkmıyor. */
+function sesUygula(o) {
+  if (o.tur === 'servis-ac') {
+    var yeni = {
+      id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
+      km: o.isTuru === 'bakim' ? o.km : '',
+      sikayet: o.is || '', acilis: '03.09.2026',
+      teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
+    Ekran.ac('kayit');
+    return;
+  }
+  if (o.tur === 'teslim') {
+    ACIK_KAYIT = o.kayit.id;
+    Ekran.ac('teslim');
+    /* Ödeme yolu söylendiyse teslim ekranında SEÇİLİ gelir ama
+       teslim düğmesine usta basar — teslim geri alınamaz (EKRANLAR §5). */
+    if (o.odeme) {
+      var d = document.querySelector('#tsOdeme [data-odeme="' + o.odeme + '"]');
+      if (d) d.click();
+      balon('Ödeme "' + o.odeme + '" seçildi — teslimi sen onayla.', false, 3200);
+    }
+    return;
+  }
+  if (o.tur === 'bilinmeyen-arac') { Ekran.ac('ruhsat'); return; }
+  if (o.tur === 'teslim-edilecek-kayit-yok') {
+    ACIK_PLAKA = o.plaka; Ekran.ac('arac'); return;
+  }
+}
+
+Ekran.tanim('ses', {
+  ciz: function () {
+    /* Ekran her açılışta TEMİZ: önceki cümle sonrakine sızmasın. */
+    sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+    document.getElementById('sesOrnekler').innerHTML = SES_ORNEK.map(function (c, i) {
+      return '<button class="cip" data-ornek="' + i + '">' + c + '</button>';
+    }).join('');
+    sesCiz();
+  }
+});
+
+function sesDuy(cumle) {
+  sesCumle = cumle;
+  sesDurumu = 'dinliyor';
+  sesCiz();
+  /* Kısa bir gecikme: "dinliyor" hâli görülmeden sonuç düşerse
+     kullanıcı ne olduğunu anlamıyor. */
+  setTimeout(function () {
+    sesIslem = sesCozumle(cumle);
+    sesDurumu = (sesIslem.tur === 'plakasiz') ? 'anlasilmadi' : 'anlasildi';
+    sesCiz();
+  }, 900);
+}
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var o = t.getAttribute('data-ornek');
+  if (o !== null) { sesDuy(SES_ORNEK[parseInt(o, 10)]); return; }
+
+  if (t.id === 'sesOrb') {
+    if (sesDurumu === 'dinliyor') return;
+    balon('Tanıma motoru bağlı değil — aşağıdaki örneklerden birine dokun.', true, 2800);
+    return;
+  }
+  if (t.id === 'sesVazgec') {
+    sesDurumu = 'bos'; sesCumle = ''; sesIslem = null; sesCiz(); return;
+  }
+  if (t.id === 'sesOnayla' && sesIslem) { sesUygula(sesIslem); return; }
 });
 })();
 
@@ -3147,6 +3844,244 @@ Ekran.tanim('arac', {
       : bosDurumHtml('i-clipboard-list', 'Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
 
     document.getElementById('arNot').textContent = a.not || 'Not yok.';
+  }
+});
+})();
+
+/* ===== ekran: 70-araclar.html ===== */
+(function () {
+Ekran.tanim('araclar', {
+  ciz: function () {
+    var q = norm((document.getElementById('arcQ') || {}).value || '');
+    /* Arama plakada, markada, modelde VE SAHİPTE çalışır — usta
+       plakayı değil adı hatırlıyor olabilir. */
+    var liste = ARACLAR.filter(function (a) {
+      if (!q) return true;
+      return norm(a.plaka + ' ' + a.marka + ' ' + a.model + ' ' +
+                  (a.sahipAd || '')).indexOf(q) >= 0;
+    });
+
+    document.getElementById('arcSay').textContent =
+      liste.length + (q ? ' bulundu' : ' araç');
+    document.getElementById('arcArama').classList.toggle('filled', !!q);
+
+    document.getElementById('arcListe').innerHTML = liste.length
+      ? liste.map(function (a) {
+          var ic = icerideki().filter(function (k) { return k.plaka === a.plaka; })[0];
+          var sayi = aracKayitlari(a.plaka).length;
+          return '<div class="tl-item' + (ic ? ' t-tamirat' : '') + '"' +
+              ' data-arac="' + a.plaka + '" role="button" tabindex="0">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-car"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title">' +
+                '<span class="tl-tip">' + a.marka + ' ' + a.model + '</span>' +
+                plakaHtml(a.plaka) +
+              '</div>' +
+              '<div class="tl-sub">' + (a.sahipAd || 'sahip yazılmamış') +
+                (a.motor ? ' · ' + a.motor : '') + '</div>' +
+              '<div class="tl-foot">' +
+                (ic ? '<span class="pill accent">içeride</span>' : '') +
+                '<span class="tl-date">' + sayi + ' kayıt</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('')
+      : bosDurumHtml('i-car',
+          q ? 'Eşleşen araç yok' : 'Kayıtlı araç yok',
+          q ? 'Plakanın ya da sahibin bir kısmını yazman yeter.'
+            : 'İlk aracı "Araç kaydı"ndan ruhsatı çekerek ekle.');
+  }
+});
+
+/* [data-arac] davranisi 03-nesne.js'te — plaka iki ekranda tiklaniyor
+   (araclar, musteriler) ve ORTAK NESNE KURALI davranisin da ortak
+   olmasini soyluyor. */
+document.addEventListener('click', function (e) {
+  if (e.target.closest('#arcQTemiz')) {
+    document.getElementById('arcQ').value = ''; Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'arcQ') Ekran.tazele();
+});
+})();
+
+/* ===== ekran: 80-kayitlar.html ===== */
+(function () {
+var KYT_SUZGEC = [
+  { k: 'iceride', ad: 'İçeride' },
+  { k: 'teslim', ad: 'Teslim edilmiş' },
+  { k: 'hepsi', ad: 'Hepsi' }
+];
+var kytSecili = 'iceride';        /* günlük soru önce cevaplanır */
+
+Ekran.tanim('kayitlar', {
+  ciz: function () {
+    var q = norm((document.getElementById('kytQ') || {}).value || '');
+
+    var liste = KAYITLAR.filter(function (k) {
+      if (kytSecili === 'iceride' && k.teslimTarihi) return false;
+      if (kytSecili === 'teslim' && !k.teslimTarihi) return false;
+      if (!q) return true;
+      return norm(k.plaka + ' ' + (k.sikayet || '')).indexOf(q) >= 0;
+    });
+    /* En yenisi üstte — usta dünü değil bugünü arıyor. */
+    liste = liste.slice().reverse();
+
+    document.getElementById('kytSuzgec').innerHTML = KYT_SUZGEC.map(function (s) {
+      return '<button class="cip" data-suzgec="' + s.k + '" aria-pressed="' +
+        (kytSecili === s.k) + '">' + s.ad + '</button>';
+    }).join('');
+
+    document.getElementById('kytSay').textContent =
+      liste.length + (q ? ' bulundu' : ' kayıt');
+    document.getElementById('kytArama').classList.toggle('filled', !!q);
+
+    document.getElementById('kytListe').innerHTML = liste.length
+      ? liste.map(kayitSatiriHtml).join('')
+      : bosDurumHtml(
+          kytSecili === 'iceride' ? 'i-circle-check' : 'i-clipboard-list',
+          q ? 'Eşleşen kayıt yok'
+            : kytSecili === 'iceride' ? 'İçeride araç yok' : 'Kayıt yok',
+          q ? 'Plakanın ya da işin bir kısmını yazman yeter.'
+            : kytSecili === 'iceride'
+              ? 'Hepsi teslim edilmiş. Yeni iş için "Servis kaydı ekle".'
+              : 'Henüz teslim edilmiş bir iş yok.');
+  }
+});
+
+document.addEventListener('click', function (e) {
+  var s = e.target.closest('[data-suzgec]');
+  if (s) { kytSecili = s.getAttribute('data-suzgec'); Ekran.tazele(); }
+  if (e.target.closest('#kytQTemiz')) {
+    document.getElementById('kytQ').value = ''; Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'kytQ') Ekran.tazele();
+});
+})();
+
+/* ===== ekran: 90-musteriler.html ===== */
+(function () {
+Ekran.tanim('musteriler', {
+  ciz: function () {
+    var q = norm((document.getElementById('msQ') || {}).value || '');
+    var liste = musteriler().filter(function (m) {
+      if (!q) return true;
+      var alan = m.ad + ' ' + m.tel + ' ' +
+                 m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
+      return norm(alan).indexOf(q) >= 0;
+    });
+
+    document.getElementById('msSay').textContent =
+      liste.length + (q ? ' bulundu' : ' müşteri');
+    document.getElementById('msArama').classList.toggle('filled', !!q);
+
+    document.getElementById('msListe').innerHTML = liste.length
+      ? liste.map(function (m) {
+          /* Aracına dokunulunca araç ekranı açılır — müşterinin kendi
+             ekranı YOK ve gerekmiyor; bilgi zaten aracın üstünde. */
+          return '<div class="tl-item">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-user"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
+              '<div class="tl-sub mono">' + (m.tel || 'telefon yok') + '</div>' +
+              '<div class="tl-foot">' +
+                /* Plaka .cip icinde: cip zaten 44 px dokunma hedefi.
+                   Cıplak span 28 px kaliyordu, denetim yakaladi. */
+                m.araclar.map(function (a) {
+                  return '<button class="cip" data-arac="' + a.plaka +
+                    '" aria-label="' + a.plaka + ' aracini ac">' +
+                    plakaHtml(a.plaka) + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('')
+      : bosDurumHtml('i-users',
+          q ? 'Eşleşen müşteri yok' : 'Müşteri yok',
+          q ? 'Adın, telefonun ya da plakanın bir kısmını yazman yeter.'
+            : 'Müşteri, aracın sahibi olarak kaydediliyor. Araç kaydında ad yazınca burada görünür.');
+  }
+});
+
+document.addEventListener('click', function (e) {
+  if (e.target.closest('#msQTemiz')) {
+    document.getElementById('msQ').value = ''; Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'msQ') Ekran.tazele();
+});
+})();
+
+/* ===== ekran: 95-muhasebe.html ===== */
+(function () {
+var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almadım' };
+
+Ekran.tanim('muhasebe', {
+  ciz: function () {
+    var bugun = bugunTahsilat();
+    document.getElementById('muhBugun').innerHTML =
+      '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
+        KAYITLAR.filter(function (k) { return k.teslimTarihi === '03.09.2026'; }).length +
+        ' araç</span></div>' +
+      '<div class="tutar-sat genel"><span>Tahsil edilen</span>' +
+        '<span class="tv">' + tutar(bugun) + ' ₺</span></div>';
+
+    var d = odemeDagilimi();
+    document.getElementById('muhDagilim').innerHTML =
+      ['nakit', 'kart', 'havale'].map(function (y) {
+        return '<div class="tutar-sat"><span>' + ODEME_AD[y] + '</span>' +
+               '<span class="tv">' + tutar(d[y]) + ' ₺</span></div>';
+      }).join('') +
+      '<div class="tutar-sat genel"><span>Toplam tahsilat</span><span class="tv">' +
+        tutar(d.nakit + d.kart + d.havale) + ' ₺</span></div>';
+
+    /* Veresiye LİSTE olarak veriliyor, tek rakam olarak değil: ustanın
+       sorusu "ne kadar alacağım" değil, "kimden alacağım". */
+    var borclular = KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; });
+    document.getElementById('muhVeresiye').innerHTML = borclular.length
+      ? borclular.map(function (k) {
+          var a = aracBul(k.plaka);
+          return '<div class="tl-item t-tamirat" data-kayit="' + k.id + '"' +
+              ' role="button" tabindex="0">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-wallet"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title">' +
+                '<span class="tl-tip">' + (a && a.sahipAd ? a.sahipAd : 'sahip yazılmamış') +
+                '</span>' + plakaHtml(k.plaka) +
+              '</div>' +
+              '<div class="tl-sub">' + (k.sikayet || '—') + '</div>' +
+              '<div class="tl-foot">' +
+                '<span class="pill warn">alınmadı</span>' +
+                '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' +
+                (k.teslimTarihi ? '<span class="tl-date">' + k.teslimTarihi + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+        '<div class="tutar-serit">' +
+          '<div class="tutar-sat genel"><span>Toplam alacak</span><span class="tv">' +
+            tutar(veresiyeToplami()) + ' ₺</span></div>' +
+        '</div>'
+      : bosDurumHtml('i-circle-check', 'Alınamayan yok',
+          'Teslim edilen her işin parası alınmış.');
+
+    /* KAPSAM AÇIK OLDUĞU İÇİN EKRANDA DA YAZIYOR. Bir ekranın
+       "burası yarım" demesi, yarım olduğunu saklamasından iyidir. */
+    document.getElementById('muhKapsam').innerHTML =
+      '<div class="notice">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+        '<span class="n-body"><b>Kapsam kararı bekliyor.</b> Buradaki üç rakam ' +
+        'hiçbir yeni alan istemeden, teslimdeki ödeme yolundan çıkıyor. ' +
+        'Gider, kâr ve cari hesap için ustanın <b>her gideri girmesi</b> gerekir — ' +
+        'girilmezse rakam yalan söyler. Bu yüzden yazılmadı.</span>' +
+      '</div>';
   }
 });
 })();

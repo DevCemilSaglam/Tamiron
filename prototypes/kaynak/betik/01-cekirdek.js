@@ -25,6 +25,9 @@ window.addEventListener('unhandledrejection', function (e) {
    Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
 var ACIK_KAYIT = null;
 var ACIK_PLAKA = null;
+/* Sesli isleme NE ICIN gidildigi. Ayni ekran farkli beklentilerle
+   aciliyor: "arac kaydi" plaka bekler, "araclar" arama bekler. */
+var SESLI_NIYET = null;
 
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
@@ -136,6 +139,14 @@ function balon(metin, dinliyor, sure) {
 }
 
 /* ---- ortak biçimleyiciler ---- */
+/* "03.09.2026" -> Date. Cekmece'nin icinde ozeldi; ana ekran da
+   hatirlatma tarihi karsilastirinca ORTAK NESNE KURALI devreye girdi:
+   iki yerde iki ayri cozumleyici, iki ayri hata demektir. */
+function tariheCevir(g) {
+  var p = (g || '').split('.');
+  return new Date(+p[2], (+p[1] || 1) - 1, +p[0] || 1);
+}
+
 function tutar(n) {
   return (n || 0).toLocaleString('tr-TR');
 }
@@ -284,11 +295,6 @@ var Cekmece = (function () {
     });
   }
 
-  function tariheCevir(g) {
-    var p = (g || '').split('.');
-    return new Date(+p[2], (+p[1] || 1) - 1, +p[0] || 1);
-  }
-
   function cizBildirimler() {
     var liste = bekleyenHatirlatmalar();
     var bol = document.getElementById('notifSection');
@@ -346,12 +352,15 @@ document.addEventListener('DOMContentLoaded', function () {
   bagla('brandHome', function () { Ekran.ac('home'); });
   bagla('temaBtn', function () { Tema.dondur(); });
 
-  /* ARA — yeni ekran AÇMIYOR. Ana ekrandaki arama kutusuna götürüp
-     odaklıyor; ekran bütçesi 6'da kalıyor. */
+  /* ARA — ARAÇLAR ekranının kendi arama kutusuna götürür.
+     Önce ana ekrandaki kutuya götürüyordu; ana ekran menüye dönünce
+     o kutu kalktı ve düğme ölü bir id arıyor kaldı. Denetimin OLU-ID
+     testi yakaladı: bir ekranı değiştirmek, ona dokunan HER YERİ
+     değiştirir. */
   var araya = function () {
     Cekmece.kapa();
-    Ekran.ac('home');
-    var k = document.getElementById('homeQ');
+    Ekran.ac('araclar');
+    var k = document.getElementById('arcQ');
     if (k) { k.focus(); k.select(); }
   };
   bagla('araBtn', araya);

@@ -1,0 +1,94 @@
+<!-- ekran: musteriler · MÜŞTERİLER
+     03.09'da menüden geldi.
+
+     ⚠️ MÜŞTERİ TABLOSU YOK VE AÇILMADI. VERI-MODELI'nde Customer
+     kasıtlı olarak yok — müşteri aracın üstünde duruyor (sahipAd,
+     sahipTel). Bu ekran o veriden TÜRETİYOR: aynı ad+telefon tek
+     satırda toplanıyor, araçları altında sıralanıyor.
+
+     Neden tablo açılmadı: v1'de Party/Contact/VehicleContact üç
+     tablolu bir müşteri dünyası vardı ve tamircinin "karmaşık" dediği
+     yığının içindeydi. Ekran gerekliydi, tablo değil.
+
+     BUNUN BEDELİ AÇIK: aynı kişinin iki aracında adı farklı yazılmışsa
+     iki müşteri görünür. Birleştirme yok. Tamirci bundan şikâyet
+     ederse tablo o zaman konuşulur (A-M1).
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .search-box
+     · .tl-item .tl-ic .tl-body .tl-title .tl-sub .tl-foot · .plate
+     · .bos-durum. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-musteriler">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-users"></use></svg> Müşteriler
+      <span class="eb-say" id="msSay"></span>
+    </span>
+  </div>
+
+  <div class="search-box" id="msArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="msQ" placeholder="Ad, telefon ya da plaka…"
+           autocomplete="off" aria-label="Müşterilerde ara" />
+    <button class="clear" id="msQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="msListe"></div>
+
+</section>
+
+<script>
+Ekran.tanim('musteriler', {
+  ciz: function () {
+    var q = norm((document.getElementById('msQ') || {}).value || '');
+    var liste = musteriler().filter(function (m) {
+      if (!q) return true;
+      var alan = m.ad + ' ' + m.tel + ' ' +
+                 m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
+      return norm(alan).indexOf(q) >= 0;
+    });
+
+    document.getElementById('msSay').textContent =
+      liste.length + (q ? ' bulundu' : ' müşteri');
+    document.getElementById('msArama').classList.toggle('filled', !!q);
+
+    document.getElementById('msListe').innerHTML = liste.length
+      ? liste.map(function (m) {
+          /* Aracına dokunulunca araç ekranı açılır — müşterinin kendi
+             ekranı YOK ve gerekmiyor; bilgi zaten aracın üstünde. */
+          return '<div class="tl-item">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-user"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
+              '<div class="tl-sub mono">' + (m.tel || 'telefon yok') + '</div>' +
+              '<div class="tl-foot">' +
+                /* Plaka .cip icinde: cip zaten 44 px dokunma hedefi.
+                   Cıplak span 28 px kaliyordu, denetim yakaladi. */
+                m.araclar.map(function (a) {
+                  return '<button class="cip" data-arac="' + a.plaka +
+                    '" aria-label="' + a.plaka + ' aracini ac">' +
+                    plakaHtml(a.plaka) + '</button>';
+                }).join('') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('')
+      : bosDurumHtml('i-users',
+          q ? 'Eşleşen müşteri yok' : 'Müşteri yok',
+          q ? 'Adın, telefonun ya da plakanın bir kısmını yazman yeter.'
+            : 'Müşteri, aracın sahibi olarak kaydediliyor. Araç kaydında ad yazınca burada görünür.');
+  }
+});
+
+document.addEventListener('click', function (e) {
+  if (e.target.closest('#msQTemiz')) {
+    document.getElementById('msQ').value = ''; Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'msQ') Ekran.tazele();
+});
+</script>

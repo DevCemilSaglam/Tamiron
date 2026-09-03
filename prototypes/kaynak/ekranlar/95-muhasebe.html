@@ -1,0 +1,118 @@
+<!-- ekran: muhasebe · PARA
+     03.09'da menüden geldi.
+
+     ⚠️ KAPSAM HENÜZ KARARA BAĞLANMADI. Cemil: "Ayrıca muhasebe alanını
+     da yapacağız" · kapsam sorulunca "sonra geçeceğiz". Bu ekran o
+     kararı BEKLERKEN, hiçbir yeni alan ve hiçbir yeni tablo istemeden
+     ne gösterilebileceğini gösteriyor.
+
+     TEK HAMMADDE ZATEN KAYITLI: teslimdeki ödeme yolu (nakit · kart ·
+     havale · ALMADIM) ve satırlardaki fiyat. "Almadım" bir ödeme
+     yoludur — veresiye bu yüzden uydurma bir alan değil, var olan
+     verinin okunması.
+
+     ÜZERİNDE YOK ve karar verilmeden yazılmayacak: gider girişi ·
+     kâr hesabı · cari hesap · tahsilat kaydı · fatura/KDV · dönem
+     kapanışı. Bunların her biri ustadan YENİ VERİ ister; istediği veri
+     girilmezse rakam yalan söyler.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
+     · .tutar-serit .tutar-sat .tutar-sat.genel .tv · .tl-item
+     · .notice · .bos-durum. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-muhasebe">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Muhasebe
+    </span>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Bugün
+    </div>
+    <div class="tutar-serit" id="muhBugun"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme yoluna göre
+    </div>
+    <div class="tutar-serit" id="muhDagilim"></div>
+  </div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg> Alınamayan (veresiye)
+  </div>
+  <div id="muhVeresiye"></div>
+
+  <div id="muhKapsam"></div>
+
+</section>
+
+<script>
+var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almadım' };
+
+Ekran.tanim('muhasebe', {
+  ciz: function () {
+    var bugun = bugunTahsilat();
+    document.getElementById('muhBugun').innerHTML =
+      '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
+        KAYITLAR.filter(function (k) { return k.teslimTarihi === '03.09.2026'; }).length +
+        ' araç</span></div>' +
+      '<div class="tutar-sat genel"><span>Tahsil edilen</span>' +
+        '<span class="tv">' + tutar(bugun) + ' ₺</span></div>';
+
+    var d = odemeDagilimi();
+    document.getElementById('muhDagilim').innerHTML =
+      ['nakit', 'kart', 'havale'].map(function (y) {
+        return '<div class="tutar-sat"><span>' + ODEME_AD[y] + '</span>' +
+               '<span class="tv">' + tutar(d[y]) + ' ₺</span></div>';
+      }).join('') +
+      '<div class="tutar-sat genel"><span>Toplam tahsilat</span><span class="tv">' +
+        tutar(d.nakit + d.kart + d.havale) + ' ₺</span></div>';
+
+    /* Veresiye LİSTE olarak veriliyor, tek rakam olarak değil: ustanın
+       sorusu "ne kadar alacağım" değil, "kimden alacağım". */
+    var borclular = KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; });
+    document.getElementById('muhVeresiye').innerHTML = borclular.length
+      ? borclular.map(function (k) {
+          var a = aracBul(k.plaka);
+          return '<div class="tl-item t-tamirat" data-kayit="' + k.id + '"' +
+              ' role="button" tabindex="0">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-wallet"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title">' +
+                '<span class="tl-tip">' + (a && a.sahipAd ? a.sahipAd : 'sahip yazılmamış') +
+                '</span>' + plakaHtml(k.plaka) +
+              '</div>' +
+              '<div class="tl-sub">' + (k.sikayet || '—') + '</div>' +
+              '<div class="tl-foot">' +
+                '<span class="pill warn">alınmadı</span>' +
+                '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' +
+                (k.teslimTarihi ? '<span class="tl-date">' + k.teslimTarihi + '</span>' : '') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+        '<div class="tutar-serit">' +
+          '<div class="tutar-sat genel"><span>Toplam alacak</span><span class="tv">' +
+            tutar(veresiyeToplami()) + ' ₺</span></div>' +
+        '</div>'
+      : bosDurumHtml('i-circle-check', 'Alınamayan yok',
+          'Teslim edilen her işin parası alınmış.');
+
+    /* KAPSAM AÇIK OLDUĞU İÇİN EKRANDA DA YAZIYOR. Bir ekranın
+       "burası yarım" demesi, yarım olduğunu saklamasından iyidir. */
+    document.getElementById('muhKapsam').innerHTML =
+      '<div class="notice">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+        '<span class="n-body"><b>Kapsam kararı bekliyor.</b> Buradaki üç rakam ' +
+        'hiçbir yeni alan istemeden, teslimdeki ödeme yolundan çıkıyor. ' +
+        'Gider, kâr ve cari hesap için ustanın <b>her gideri girmesi</b> gerekir — ' +
+        'girilmezse rakam yalan söyler. Bu yüzden yazılmadı.</span>' +
+      '</div>';
+  }
+});
+</script>
