@@ -323,3 +323,125 @@ Ana yol yedi adım, 10–13 dokunuş olarak duruyor.
 | **A-11** | **Müşteri vazgeçerse ne olur?** Tamirci bundan hiç bahsetmedi, K-003 red panelini kaldırdı. Kayıt yalnız işçilikle mi teslim edilir, yoksa "yapılmadı" diye mi kapanır? Öneri: **teslim edilir** — araç çıkıyorsa iş bitmiştir, satırlar ne ise odur |
 | **A-12** | Kol B'de **cevaplar ne kadar bekletilir?** Bir parçacı hiç dönmezse kayıt takılı mı kalır? Öneri: takılmaz — usta gelen cevapla ilerler |
 | **A-13** | Kol D'deki *"sonradan"* hâlinde gelen fiyat kayıtta kalıyor. Bu **rakam müşteriye görünmeli mi**? (Ustanın alabileceği fiyat) Öneri: hayır |
+
+---
+
+# TAMİRAT / BAKIM — ayrım ve hatırlatma
+
+> Dayanak: **K-006** (iki ayrı tür) · **K-002** (km kaydedilir, hatırlatma ay üzerinden)
+> Tamirci: *"Tamirat ve bakım iki ayrı durum var. Bakımda km önemli. Tekrar bakım geldiğinde bilgi sms olarak göndermeliyiz."* (T-15, T-16, T-17)
+
+---
+
+## 1 · Ayrım nerede tutuluyor
+
+Servis kaydında **tek alan**: `tur` = `tamirat` | `bakim`.
+
+Adım 1'de, kayıt açılırken **iki büyük düğmeyle** seçilir. Ayrı kayıt türü, ayrı tablo, alt kırılım **yok**.
+
+---
+
+## 2 · Ne farkediyor
+
+| | Tamirat | Bakım |
+|---|---|---|
+| **km alanı** | Yok | **Var ve istenir** |
+| **Hatırlatma** | Kurulmaz | **Teslimde kurulur** |
+| **Teslim ekranında** | Özet gider | Özet + *"6 ay sonra hatırlatılacak"* |
+| **Araç kartında** | Geçmiş satırı | Geçmiş satırı + **son bakım km'si** |
+
+**Farkın tamamı bu.** Ekran değişmiyor, akış değişmiyor — bir alan çıkıyor, bir hatırlatma kuruluyor.
+
+---
+
+## 3 · km — neden var, ne işe yarıyor
+
+Km **bir kez yazılır** ve **hiç güncellenmez**. Araç dükkânda değilken kimse bize km göndermiyor; takip edilebilir bir şey değil (K-002).
+
+Ama yazılınca üç yerde işe yarıyor:
+
+1. **Araç kartında geçmiş:** *"Geçen bakım 15.03.2026'da 142.000 km'de yapılmış."* Usta bir sonraki gelişte buna bakar.
+2. **Hatırlatma mesajında:** *"Son bakımınız 142.000 km'de yapılmıştı."* — mesaja **inandırıcılık** katar, maliyeti sıfırdır.
+3. **İki bakım arasındaki km farkı:** aracın ne kadar kullanıldığını söyler. Usta *"bu araç çok gidiyor, 4 ayda çağıralım"* diyebilir.
+
+> Üçü de **yazılmış bir sayının** ürünü. Hiçbiri km *takibi* gerektirmiyor.
+
+---
+
+## 4 · Hatırlatma — ne zaman, nasıl
+
+### Kurulma
+
+**Teslim anında** (Adım 7), kayıt `bakim` ise:
+
+```
+hatirlatmaTarihi  =  teslim tarihi + periyot
+hatirlatmaGonderildi = false
+```
+
+**Ayrı bir "hatırlatma" varlığı yok** — servis kaydında iki alan. En az veri kuralı (7. iş).
+
+### Periyot nereden geliyor
+
+| Kaynak | Ne zaman |
+|---|---|
+| Dükkân ayarı — **varsayılan 6 ay** | Her bakımda otomatik |
+| Kayıtta elle değiştirilebilir | Usta *"bu araç çok gidiyor, 4 ay"* derse |
+
+**Cemil onayına açık (A-3):** varsayılan 6 ay mı?
+
+### Tetiklenme
+
+Günde bir kez çalışan bir tarama:
+
+```
+bakım kayıtları
+  · hatirlatmaTarihi <= bugün
+  · hatirlatmaGonderildi = false
+  · aracın telefonu var
+  · araçta DAHA YENİ bir bakım kaydı yok
+        ↓
+   SMS gönder → hatirlatmaGonderildi = true
+```
+
+**Mesai saatinde gönderilir.** Sabahın üçünde SMS atmak bu kullanıcı kitlesinde iyi karşılanmaz.
+
+### ⚠️ Eskiyen hatırlatma — kolay kaçırılan kural
+
+Araç **hatırlatma tarihinden önce** bakıma gelirse eski hatırlatma **anlamsızlaşır.** Gönderilirse müşteri *"daha geçen ay geldim"* der.
+
+> **Kural:** Aynı araca yeni bir **bakım** kaydı açılınca, o aracın **gönderilmemiş bakım hatırlatmaları düşer.** Tarama zaten *"daha yeni bakım kaydı yok"* koşuluyla bunu sağlıyor — ama kural açıkça yazılı olmalı, yoksa ilk düzenlemede kaybolur.
+
+### Gönderilmeme hâlleri
+
+Hatırlatma **sessizce atlanır**, hata üretmez:
+
+| Hâl | Ne olur |
+|---|---|
+| Telefon yok | Atlanır |
+| Araç yeniden bakıma gelmiş | Düşer |
+| İYS izni yok | **Gönderilemez** — yasal kısıt (10. iş) |
+
+---
+
+## 5 · Mesajın içeriği
+
+Kısa, sade, tek iş. Tamircinin müşterisi teknolojiden uzak olabilir (T-18) — mesaj da öyle olmalı.
+
+> **Ahmet Usta Oto Servis**
+> 34 ABC 123 plakalı aracınızın bakım zamanı geldi.
+> Son bakım: 15.03.2026 · 142.000 km
+> Randevu için: 0532 000 00 00
+
+Ne yok: link tıklama zorunluluğu, kampanya, indirim kuponu, uzun metin.
+
+---
+
+## 6 · AÇIK
+
+| Kod | Karar |
+|---|---|
+| **A-3** | Bakım periyodu varsayılanı **6 ay** mı? |
+| **A-17** | Aynı müşterinin **birden fazla aracı** varsa ayrı ayrı mı SMS gider? Öneri: **evet, ayrı** — plaka mesajın konusudur |
+| **A-18** | Müşteri hatırlatmaya **cevap yazarsa** ne olur? SMS tek yönlü; öneri: **kapsam dışı**, telefonla arar |
+| **A-19** | Hatırlatma **kaç gün önceden** gitsin — tam gününde mi, birkaç gün önce mi? Öneri: **tam gününde**, sadeliği bozmasın |
