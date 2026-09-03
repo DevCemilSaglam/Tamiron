@@ -1156,3 +1156,26 @@ alanları ::before ile büyür. Ölçüm (30.08,
   font-family: var(--font-mono); font-variant-numeric: tabular-nums;
 }
 .icon-btn .badge:empty { display: none; }
+
+/* KALEM SATIRI ICINDEKI ALANLAR — koyu temada BEYAZ kaliyordu.
+   .field input kurali --field-bg veriyor ama bu ikisi .field icinde
+   degil, dogrudan .kalem'in cocugu; tarayicinin varsayilan beyaz
+   zemini duruyordu. Acik temada goze carpmiyor, koyu temada ekranin
+   ortasinda iki beyaz kutu. Iki temayi da cizmek gerekiyor, birini
+   cizip otekine bakmamak degil (03.09). */
+.kalem input.k-ad,
+.kalem input.k-tutar {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--field-bg);
+  color: var(--text);
+  padding: 8px 10px;
+}
+.kalem input.k-ad::placeholder,
+.kalem input.k-tutar::placeholder { color: var(--faint); }
+.kalem input.k-ad:focus,
+.kalem input.k-tutar:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
