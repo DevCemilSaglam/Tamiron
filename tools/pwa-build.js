@@ -56,11 +56,22 @@ const guvenliAlan = `<style>
    max() ile taban bosluk garanti ediliyor; yukseklik prototipin
    kendi 72px'i uzerine ekleniyor (onceden 60px'e eziliyordu).
    31.08: topbar 68 -> 72 px (Cemil: navigasyon biraz daha buyuk). */
-.ust-cubuk { padding-top: max(env(safe-area-inset-top), 10px); }
-.govde { padding-bottom: max(env(safe-area-inset-bottom), 40px); }
-@supports (height: 100dvh) { .cihaz { min-height: 100dvh; } }
+.topbar { padding-top: max(env(safe-area-inset-top), 10px); }
+.device { padding-bottom: max(env(safe-area-inset-bottom), 40px); }
+@supports (height: 100dvh) { .device { min-height: 100dvh; } }
 </style>
 `;
+/* SEÇİCİ DENETİMİ — bu blok kabuğun sınıf adlarına BAĞIMLI ve bağımlılık
+   sessiz: kabuk yeniden yazılınca kurallar hiçbir şeyi tutmaz, iOS'ta
+   header çentiğe yapışır ve kimse fark etmez. 03.09'da tam bu oldu
+   (.ust-cubuk/.cihaz kaldı, kabuk .topbar/.device'a döndü). */
+['topbar', 'device'].forEach(function (s) {
+  if (html.indexOf('class="' + s) === -1 && html.indexOf(' ' + s + '"') === -1) {
+    console.error('HATA: kabukta ."' + s + '" sinifi yok; guvenli alan kurallari bosa duser.');
+    process.exitCode = 1;
+  }
+});
+
 html = html.replace('</head>', guvenliAlan + '</head>');
 
 /* ---------- 5) kurulum dugmesi (kabuktaki yuvaya) ----------

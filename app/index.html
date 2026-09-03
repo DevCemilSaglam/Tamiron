@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-03 18:09
+  Üretim: 2026-09-03 18:57
 -->
 
 <html lang="tr" data-theme="light">
@@ -223,128 +223,1090 @@ button { min-height: var(--dokun); cursor: pointer; }
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
+/* Rakam kolonları hizalı — plaka, tutar, km, yıl */
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
 /* İkon — currentColor ile boyanır, token rengine uyar */
 .ico { width: 24px; height: 24px; flex: none; }
-.ico-lg { width: 32px; height: 32px; }
 
 
 /* ===== stil/02-kabuk.css ===== */
-/* ============ KABUK ============
-   Sabit üst çubuk + kayan gövde. Çekmece ve footer YOK
-   (TASARIM-SISTEMI v2.0). */
+/* ============ KABUK — v2 farkları ============
+   .device .topbar .topbar-left .topbar-nav .icon-btn .brand-logo
+   .screen .toast — HEPSİ 03-bilesen.css'te, v1'den devralındı.
+   Burada YALNIZ v2'ye özgü olan durur.
 
-.cihaz {
+   v2 farkı: çekmece ve footer yok, o yüzden .device tam yüksekliği
+   ekrana bırakır ve tek kayan alan .screen olur. */
+
+.device { height: 100dvh; }
+
+/* Geri tuşu işlevsizken GİZLENMEZ, silikleşir — düzen zıplamasın
+   (v1 kuralı; v1'de disabled + pointer-events:none ile yapılıyordu). */
+.icon-btn[disabled] { opacity: .35; pointer-events: none; }
+
+/* Ekran gövdesi tek kayan alan. */
+.screen.active { flex: 1; overflow-y: auto; }
+
+
+/* ===== stil/03-bilesen.css ===== */
+taşımamakla aynı
+   şey — belge duruyordu,
+görünüş yabancıydı.
+
+   Elenenler yalnız v2'de KARŞILIĞI OLMAYANLAR: çekmece · footer ·
+   rail · dört ziyaret tipi · durum rozetleri · bildirim listesi.
+
+   YENİ BİLEŞEN YAZMADAN ÖNCE burada var mı diye bakılır. */
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}/* ---------- LUCIDE İKON tabanı ---------- */
+.ico {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}.ico-sm {
+  width: 18px;
+  height: 18px;
+}/* Telefon çerçevesi — masaüstünde ortada bir "cihaz" gibi */
+.device {
   max-width: 460px;
   margin: 0 auto;
-  min-height: 100dvh;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
   display: flex;
   flex-direction: column;
-  background: var(--bg);
-}
-
-.ust-cubuk {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  box-shadow: var(--shadow);
+}/* ============================================================
+   ÜST BAR — her ekranda TUTARLI/standart (geri + logo)
+   ============================================================ */
+.topbar {
+  /* Yukseklik ic ogeye gore: logo ve icon-btn 44px;
+  60px'te ust/alt 8px
+     kaliyordu ve sikisik goruunuyordu (Cemil 30.08) -> 12px nefes. */
+  flex: none;
+  position: relative;
+  z-index: 30;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  background: color-mix(in srgb, var(--bg) 92%, transparent);
-  backdrop-filter: blur(8px);
+  gap: 12px;
+  /* 31.08: Cemil "navigasyon biraz daha buyuk olabilir" dedi. Ekran
+     basliklari kalktigi icin ustte yer acildi;
+  dugmeler 44 -> 48 px. */
+  height: 72px;
+  padding: 0 16px;
+  background: var(--bg);
   border-bottom: 1px solid var(--line);
-}
-
-.marka {
-  flex: 1;
-  font-family: var(--font-display);
-  font-weight: 800;
-  font-size: var(--tip-lg);
-  letter-spacing: .01em;
-  color: var(--primary);
-}
-
-.ust-btn {
+}.brand-logo {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+}/* Logo yüksekliği = icon-btn yüksekliği (40px); butonlarla aynı ölçek */
+/* Secici SVG etiketine degil SINIFA baglandi: .logo-mark hicbir kurala
+   bagli degildi,
+denetim "tanimsiz sinif" olarak isaretledi. */
+/* Logo,
+icon-btn ile AYNI yukseklikte kalmali (K-A-D5 hizasi):
+   dugmeler 48 px oldu,
+logo da 48 px. */
+.brand-logo .logo-mark {
+  height: 48px;
+  width: auto;
+  max-width: 100%;
+  display: block;
+}.topbar .spacer {
+  flex: 1 1 8px;
+  min-width: 8px;
+}.topbar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  flex: 0 1 auto;
+  min-width: 0;
+}.topbar-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+}/* Standart ikon-buton (header sağ grubu + drawer) */
+.icon-btn {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 48px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--dokun);
-  height: var(--dokun);
   border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
   background: var(--surface);
   color: var(--text);
-}
-.ust-btn:hover { border-color: var(--primary); }
-
-/* Geri tuşu işlevsizken GİZLENMEZ, silikleşir — düzen zıplamasın
-   (TASARIM-SISTEMI, v1'den taşınan kural). */
-.ust-btn[disabled] { opacity: .35; pointer-events: none; }
-
-.govde {
-  flex: 1;
-  padding: 16px 14px 40px;
-}
-
-/* Ekranlar: yalnız biri görünür. */
-.screen { display: none; }
-.screen.acik { display: block; }
-
-/* ---- balon (toast) ---- */
-.balon-kap {
-  position: fixed;
-  left: 50%;
-  bottom: 20px;
-  transform: translateX(-50%);
-  z-index: 60;
+  border-radius: var(--radius-pill);
+  transition: background .15s, transform .1s;
+}.icon-btn:hover {
+  background: var(--nav-hover);
+}.icon-btn:active {
+  transform: scale(.94);
+}.icon-btn:disabled,
+.icon-btn[aria-disabled="true"] {
+  opacity: .35;
+  cursor: not-allowed;
+  pointer-events: none;
+}.icon-btn .ico {
+  width: 23px;
+  height: 23px;
+}.icon-btn.avatar {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .02em;
+}.icon-btn.avatar:hover {
+  filter: brightness(1.04);
+  background: var(--accent-soft);
+}/* ============================================================
+   EKRAN GÖVDESİ
+   ============================================================ */
+.screen {
+  display: none;
+  flex-direction: column;
+  padding: 12px 16px 24px;
+  gap: 14px;
+  animation: fade .24s ease;
+}.screen.active {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}/* .screen bir flex SUTUN ve kaydirma kabi. Cocuklarinin kuculmesi
+   HER ZAMAN hatadir: kutu icerikten kisa kalir,
+icerik gorunmez.
+   Not seridi 2 px'e,
+akordiyon 2 px'e inmisti (31.08). Tek tek
+   yamamak yerine sinifin kokunu kapatiyoruz. */
+.screen > * {
+  flex-shrink: 0;
+}/* Tek satir kaldi: dikey bosluk kucultuldu ki kontroller yukari gelsin. */
+.screen-head {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: min(420px, calc(100vw - 28px));
-  pointer-events: none;
-}
-.balon {
-  background: var(--text);
-  color: var(--bg);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  font-size: var(--tip-sm);
-  box-shadow: var(--shadow);
-}
-.balon.uyari { background: var(--crit); color: var(--surface); }
-
-
-/* ===== ekran: 10-home.html ===== */
-.ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
-.ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
-
-.iskelet-not {
-  background: var(--surface-2);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
+  gap: 5px;
+  margin-bottom: -4px;
+}.screen-head h1 {
+  font-size: 28px;
+  font-weight: 700;
+}.screen-head p {
+  margin: 0;
   color: var(--muted);
-  font-size: var(--tip-sm);
-  margin-bottom: 18px;
-}
+  font-size: 15px;
+}/* Ekran basliklari (h1) ve aciklamalari (p) KALKTI (Cemil,
+31.08):
+   "sayfalarda baslik ve aciklama istemiyorum,
+kontroller ustte olsun".
+   Eyebrow artik ekranin TEK baslik satiri — biraz buyudu ve dinamik
+   sayaci (.eb-say) yaninda tasiyor. */
+.eyebrow {
+  /* Bazi ekranlarda satirda hem PLAKA hem sayac var (fiyat ekrani
+     434 px istiyordu) — sarmasina izin verilir. */
+  display: flex;
+  align-items: center;
+  gap: 7px 9px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}.eyebrow .ico-sm {
+  width: 17px;
+  height: 17px;
+}.eyebrow .eb-say {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}.eyebrow .eb-say:empty {
+  display: none;
+}/* ---------- KART / YÜZEY ---------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: 18px;
+}.card.raised {
+  box-shadow: var(--shadow);
+}/* ALT BASLIKLAR RENKLI (Cemil,
+01.09): gri degil birincil renk.
+   Sayfa taranirken bolum baslari once goze carpsin. */
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 12px;
+}/* Baslik ile altindaki ipucu 4 px kaliyordu (olcum). */
+.section-label + /* Ipucu metni notr gri degil — kendi tokeni var. */
+.plate-hint {
+  margin-top: 2px;
+  margin-bottom: 4px;
+}/* ---------- PLAKA GİRİŞ ---------- */
+.plate-input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: center;
+}.plate-field {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  width: 100%;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  padding: 6px;
+}.plate-field .tr-tag {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 0 10px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+}.plate-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 26px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  min-width: 0;
+  padding: 10px 4px;
+}.plate-field input::placeholder {
+  color: var(--faint);
+  letter-spacing: 1px;
+}/* ---------- BUTONLAR (standart set) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 15px 18px;
+  font-size: 16.5px;
+  font-weight: 600;
+  width: 100%;
+  transition: background .15s, filter .15s, transform .1s, border-color .15s;
+}.btn:active {
+  transform: scale(.985);
+}.btn .ico {
+  width: 22px;
+  height: 22px;
+}/* Butonlar SIGMAZSA ALT SATIRA iner. Onceden "flex:1 1 0; min-width:0"
+   idi: butonlar sifira kadar daralabildigi icin satir hic dolmuyor,
+wrap devreye girmiyor,
+nowrap yuzunden yazi disari tasiyordu —
+   "+ Parca" ile "+ Iscilik" ic ice goruntusu (Cemil,
+01.09). */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}.btn-row .btn {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: max-content;
+  white-space: nowrap;
+}/* .btn tabanında width:100% var (tek buton tam genislik olsun diye);
+   satir icinde bu,
+her butonu ayri satira dusuruyordu. */
 
-/* Ana eylem — T-18: büyük, tek, tartışmasız */
-.ana-btn {
+/* ---------- ARAÇ KARTI ---------- */
+/* ---------- PLAKA — TEK BİLEŞEN,
+HER YERDE AYNI ----------
+   Gerçek TR plakasının dili: mavi çerçeve + solda mavi "TR" bloğu + mono numara.
+   Üç boyut: .plate-sm (liste/etiket) · varsayılan (metin içi) · .plate-lg (ekran başlığı). */
+.plate {
+  display: inline-flex;
+  align-items: stretch;
+  flex: none;
+  overflow: hidden;
+  vertical-align: middle;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+}.plate .plate-tr {
+  display: flex;
+  align-items: center;
+  flex: none;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .04em;
+  padding: 0 7px;
+}.plate .plate-no {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: .08em;
+  color: var(--text);
+  padding: 5px 10px;
+}.tl-item {
+  /* position: relative — ayri bir blokta duruyordu; sağlık denetimi
+     "iki kez kurucu tanimlanmis" dedi, tek yere alindi (03.09). */
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}/* Kayit satirlari BITISIKTI: acik islerde,
+bildirimde,
+arac gecmisinde
+   alt alta yapisiyorlardi (olcum: 0 px). */
+.tl-item + .tl-item {
+  margin-top: 10px;
+}.tl-item .tl-title + .tl-sub {
+  margin-top: 5px;
+}/* HER satırda sol kenar şeridi = ZİYARET TİPİ (zemin nötr kalır).
+   Şerit TİPİ söyler,
+rozet DURUMU — ikisi karışmaz.
+   Zemin neden boyanmıyor: satır zemini semantik yumuşak renge (ör. --warn-bg)
+   boyanınca aynı ailenin rozeti görünmez oluyordu. */
+.tl-item {
+  border-left: 3px solid var(--line);
+  padding-left: 10px;
+}/* ŞERİT = DURUM (Cemil,
+31.08). Önceki kural şeridi TİPE bağlıyordu;
+   bir listede "hangisi bekliyor" sorusu "hangisi bakım" sorusundan daha
+   sık soruluyor. Tip bilgisi kaybolmuyor: İKON tipi taşımaya devam ediyor. */
+.tl-item.d-ok {
+  border-left-color: var(--ok);
+}.tl-item.d-warn {
+  border-left-color: var(--warn);
+}.tl-item.d-crit {
+  border-left-color: var(--crit);
+}.tl-item.d-info {
+  border-left-color: var(--info);
+}.tl-item.d-accent {
+  border-left-color: var(--accent);
+}.tl-item.d-muted {
+  border-left-color: var(--line);
+}/* SATIR ŞERİDİ = TÜR (v1 kuralı,
+v2'de iki değerle sürüyor).
+   v1'de dört ziyaret tipi vardı ve --tip-* token'ları bunlardan
+   türüyordu; K-006 ile tür ikiye indi,
+token'lar kalktı,
+renkler
+   doğrudan kaynağından alınıyor: bakım teal,
+tamirat mavi.
+   Zemin BOYANMAZ — boyanırsa aynı ailenin rozeti görünmez olur. */
+.tl-item.t-bakim { border-left: 3px solid var(--accent); }.tl-item.t-tamirat { border-left: 3px solid var(--primary); }.tl-item.t-bakim .tl-ic {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}.tl-item.t-tamirat .tl-ic {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+}.tl-ic {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}.tl-ic.ok {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 35%, var(--line));
+}.tl-ic.accent {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}.tl-ic.warn {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 40%, var(--line));
+}.tl-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}/* 1) İşin tipi / başlığı */
+.tl-title {
+  font-weight: 600;
+}/* 2) Detay satırı */
+.tl-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+}/* 3) Alt şerit: solda DURUM,
+sağda TARİH */
+/* Alt satirda artik UC oge olabiliyor (durum + sorumlu + tarih).
+   Sarmayinca ucuncusu tasiyordu; tarih hep en sagda kalsin diye
+   margin-left:auto ile itiliyor. */
+.tl-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 4px;
+}.tl-foot .tl-date {
+  margin-left: auto;
+  white-space: nowrap;
+}.tl-date {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-left: auto;
+}/* ---------- ROZETLER / DURUM ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+}.pill .ico-sm {
+  width: 14px;
+  height: 14px;
+}.pill.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}.pill.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}.pill.crit {
+  background: var(--crit-bg);
+  color: var(--crit);
+}.pill.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}.pill.info {
+  background: var(--info-bg);
+  color: var(--info);
+}.pill.muted {
+  background: var(--surface-2);
+  color: var(--muted);
+}/* ---------- FORM ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}.field label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+}/* Form alanlari: .field sarmalayicisi olsun ya da olmasin ayni gorunur.
+   (Not alanlari section-label ile geldigi icin .field icinde degil.) */
+.field input,
+.field select,
+.field textarea,
+textarea {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  /* METIN ALANLARININ ZEMINI kendi tokeninde: beyaz/notr gri degil,
+     hafif tinted (Cemil, 01.09 "text bosluklari da renkli olabilir"). */
+  background: var(--field-bg);
+  color: var(--text);
+  padding: 13px 14px;
+  font-size: 16px;
+  font-family: var(--font-body);
   width: 100%;
-  min-height: 76px;
+}.field textarea,
+textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.5;
+}.field input:focus,
+.field select:focus,
+.field textarea:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}.field-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}/* Form satirlari kart icinde alt alta gelince yapisiyordu. */
+.field-2 + .field-2,
+.field-2 + .field,
+.field + .field-2 {
+  margin-top: 14px;
+}.plate-hint + .field-2,
+.plate-hint + .field {
+  margin-top: 12px;
+}/* ---------- DİNLEME göstergesi ---------- */
+/* Plaka alani altindaki canli ipucu (format / gecerlilik) */
+/* İpucu satırı: BOŞKEN YER TUTMAZ — doğrulama gelince araya girer.
+   (Plaka ekranında tek ipucu olduğu için orada yeri sabit tutulur.) */
+.plate-hint {
+  font-size: 13px;
+  color: var(--hint);
+  line-height: 1.45;
+}.plate-hint:empty {
+  display: none;
+}.plate-hint.ok {
+  color: var(--ok);
+  font-weight: 600;
+}.plate-hint.warn {
+  color: var(--warn);
+  font-weight: 600;
+}/* Sarti saglanmayan birincil buton — gorunur ama pasif (kabuk kurali: gizleme,
+solda birak) */
+.btn.is-off {
+  opacity: .45;
+  cursor: not-allowed;
+}/* Bölüm başlığının sağındaki eylem (ör. sesle doldur mikrofonu) */
+/* Baslik + eylem: baslik KISALIR,
+eylem butonu kisalmaz — yoksa
+   "Yapilacak isler / Fotograftan" satiri tasiyordu (olcum: 381 > 373). */
+.section-label.with-action {
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}.section-label .lbl-txt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}.mic-round.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+}.mic-round.ghost:hover {
+  background: var(--accent-soft);
+  filter: none;
+}.mic-round {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
   border: 0;
-  border-radius: var(--radius-lg);
-  background: var(--primary);
-  color: var(--on-primary);
-  font-family: var(--font-display);
-  font-size: var(--tip-lg);
+  background: var(--accent);
+  color: var(--on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}.mic-round:hover {
+  filter: brightness(1.06);
+}.mic-round .ico {
+  width: 20px;
+  height: 20px;
+}/* ---------- LİSTE EKRANLARI (Araçlar / Kişiler) ---------- */
+.search-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}.search-box .ico {
+  width: 20px;
+  height: 20px;
+  color: var(--faint);
+  flex: none;
+}.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: var(--text);
+  font-family: var(--font-body);
+}.search-box input::placeholder {
+  color: var(--faint);
+}.search-box .clear {
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}.search-box.filled .clear {
+  display: flex;
+}.search-box .clear:hover {
+  color: var(--text);
+}.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
+/* Parca ve iscilik satirlari BITISIKTI (Cemil,
+01.09). */
+.kalem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}/* URUN ADI USTTE TEK SATIR,
+FIYAT ALTTA (Cemil,
+01.09) — urun ismi
+   uzun olabiliyor; ad ile fiyat yan yanayken ad kirpiliyordu.
+   Satir: [tip] [ad............] [sil]
+                [fiyat] [rozet] */
+.kalem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}.kalem .k-tutar-satir {
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}.kalem .k-tip {
+  font-size: 10.5px;
   font-weight: 700;
+  letter-spacing: .04em;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}.kalem .k-tip.parca {
+  background: var(--accent-soft);
+  color: var(--accent);
+}.kalem .k-tip.iscilik {
+  background: var(--info-bg);
+  color: var(--info);
+}/* Ad TEK SATIR: uzun urun adi satiri buyutmesin,
+kirpilsin. */
+.kalem .k-ad {
+  min-width: 0;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}.kalem .k-tutar {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+}/* Satır içi düzenlenebilir alanlar da 44 px dokunma hedefi olmalı
+   (Cemil: "44 px olsun. Kurala her yerde uyalım isterim").
+   Bu alanlar liste BOŞKEN görünmediği için önceki denetimlerde kaçmıştı. */
+.kalem input.k-ad,
+.kalem input.k-tutar {
+  min-height: 44px;
+}/* .k-sil BAGIMSIZ olmali: stil .kalem'e kilitliyken hasar listesinde,
+fiyat detayinda ve fotodan liste ekraninda tarayicinin varsayilan
+   dugmesi (BEYAZ KUTU) olarak ciziliyordu. */
+.k-sil {
+  /* position: relative — ::before ile buyuyen 44 px dokunma alani
+     bunu gerektiriyor; ayri blokta durdugu icin denetim "iki kez
+     kurucu tanimlanmis" diyordu (03.09). */
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}.k-sil:hover {
+  color: var(--crit);
+  background: var(--crit-bg);
+}.kalem-bos {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14.5px;
+}/* Toplam şeridi — müşteriye söylenen rakam */
+.tutar-serit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}.tutar-sat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}.tutar-sat .tv {
+  font-family: var(--font-mono);
+  color: var(--text);
+}.tutar-sat.genel {
+  font-size: 17px;
+  color: var(--text);
+  font-weight: 600;
+  margin-top: 4px;
+}.tutar-sat.genel .tv {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+}.notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 14.5px;
+  line-height: 1.42;
+}.notice .n-ic {
+  flex: none;
+}.notice.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}.notice.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}.notice.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}.notice .n-body {
+  color: var(--text);
+}.notice .n-body b {
+  color: inherit;
+  font-weight: 700;
+}.notice.ok .n-body b {
+  color: var(--ok);
+}.notice.warn .n-body b {
+  color: var(--warn);
+}.notice.accent .n-body b {
+  color: var(--accent);
+}/* Secili servis kaydi (bilgilendirmede hangi is uzerinde calisiyoruz). */
+.tl-item.secili {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}/* ---------- TOAST (sahte sesli komut) ---------- */
+/* BALON (toast)
+   Onceden background:var(--text) / color:var(--bg) idi — ters kontrast.
+   Koyu temada BEYAZ balon cikiyordu ve arayuzun geri kalanindan kopuktu
+   (Cemil 31.08). Artik yuzey renginde: kartlarla ayni dil,
+ince kenarlik
+   ve golge ile one cikiyor. */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translate(-50%, 12px);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  padding: 12px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 14.5px;
+  font-weight: 600;
   box-shadow: var(--shadow);
+  z-index: 60;
+  max-width: calc(100% - 40px);
+}.toast.show {
+  display: inline-flex;
+  animation: toastIn .2s ease forwards;
+}/* DINLEME hali marka aksaniyla ayrilir — sesli islem ozel bir durum,
+sradan bir bildirimle ayni gorunmemeli. */
+.toast.dinliyor {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  /* YAZI --text kalir: --accent-soft uzerine --accent kontrasti acik temada
+     yalniz 3.1 cikiyordu (WCAG AA metin icin 4.5 ister). Marka rengini
+     ZEMIN, KENARLIK ve NOKTA tasiyor;
+  okunabilirlik bozulmuyor. */
+  color: var(--text);
+}.toast .dot-live {
+  background: var(--accent);
+}.kalem.ke-sartli {
+  opacity: .8;
+}.tutar-sat.belki .tv {
+  color: var(--warn);
+}.tutar-sat.sartli {
+  color: var(--faint);
+}.tutar-sat.sartli .tv {
+  color: var(--faint);
+}/* ---- BOŞ DURUM ----
+   İki ayrı hâl var ve karıştırılmamalı:
+   · "hiç veri yok"      → ilk kullanım; YOL GÖSTERİR,
+eylem düğmesi taşır
+   · "arama sonucu boş"  → veri var ama eşleşmedi; NE ile aranabileceğini söyler */
+.bos-durum {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 34px 20px;
+}.bos-durum .bd-ikon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  margin-bottom: 6px;
+  background: var(--surface-2);
+  color: var(--faint);
+}.bos-durum .bd-ikon .ico {
+  width: 24px;
+  height: 24px;
+}.bos-durum .bd-baslik {
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  font-weight: 600;
+}.bos-durum .bd-aciklama {
+  font-size: 13.5px;
+  color: var(--muted);
+  max-width: 30ch;
+  line-height: 1.5;
+}.bos-durum .btn {
+  margin-top: 12px;
+}.bos-durum.iyi .bd-ikon {
+  background: var(--ok-bg);
+  color: var(--ok);
+}/* Cip grubu — sure secimiyle ayni desen,
+baska yerlerde de kullanilir. */
+.cip-grup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}.cip {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}.cip[aria-pressed="true"] {
+  background: var(--nav-on-bg);
+  border-color: var(--primary);
+  color: var(--primary);
+}.tutar-sat.indirim .tv {
+  color: var(--crit);
+}/* Alis ve fark satirlari DUKKAN ICIN — musteri belgesinde cizilmez. */
+.tutar-sat.kar {
+  color: var(--faint);
+  font-size: 13px;
+}.tutar-sat.kar .tv {
+  color: var(--muted);
+}/* ---- servis kaydı satırı: TİP solda,
+PLAKA sağa yaslı ---- */
+.tl-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}.tl-title .tl-tip {
+  flex: 1;
+  min-width: 0;
+}.tl-title .plate {
+  margin-left: auto;
+  flex: none;
+}/* açık işlerde randevu şeridi */
+.pill.randevu {
+  background: var(--nav-on-bg);
+  color: var(--primary);
+}.tl-date.gecikme {
+  color: var(--crit);
+  font-weight: 700;
+}.arac-bas .plate {
+  align-self: flex-start;
+}/* ---- servis kaydı özeti (liste görünümünde tek satır) ---- */
+.tl-sub.tl-ozet {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}/* İÇERİDE olan araç / müşterisi — kenarlık farklı {
+  border-color: var(--accent);
+  border-width: 2px;
+  padding: 12px 13px;
+}/* ---- kalem listesi ve tutar şeridi (v1) ----
+   İlk çıkarmada .k-* ve .tv seçicileri aile listesinde
+   yoktu ve atlanmıştı; kalem satırı stilsiz kalıyordu. */
+.kalem .k-tip {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  ;
+}.kalem .k-tip.parca {
+  background: var(--accent-soft);
+  color: var(--accent);
+  ;
+}.kalem .k-tip.iscilik {
+  background: var(--info-bg);
+  color: var(--info);
+  ;
+}/* Ad TEK SATIR: uzun urun adi satiri buyutmesin,
+kirpilsin. */
+.kalem .k-ad {
+  min-width: 0;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  ;
+}.kalem .k-tutar {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+}/* ---------- DOKUNMA HEDEFİ DÜZELTMELERİ (K-024 · en az 44px) ----------
+   GÖRSEL AĞIRLIK ≠ DOKUNMA ALANI: ikincil eylemler küçük GÖRÜNMEYE devam eder,
+alanları ::before ile büyür. Ölçüm (30.08,
+.k-sil::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, 44px);
+  height: 44px;
+  /* görünmez — yalnız dokunma alanı */;
+}.kalem .k-tutar-satir {
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  ;
+}.tutar-sat .tv {
+  font-family: var(--font-mono);
+  color: var(--text);
+  ;
+}.tutar-sat.genel .tv {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  ;
+}.tutar-sat.belki .tv {
+  color: var(--warn);
+  ;
+}.tutar-sat.sartli .tv {
+  color: var(--faint);
+  ;
+}.tutar-sat.indirim .tv {
+  color: var(--crit);
+  ;
+}.tutar-sat.kar .tv {
+  color: var(--muted);
+  ;
+}.kalem-bos {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14.5px;
+  ;
+}/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
+/* Parca ve iscilik satirlari BITISIKTI (Cemil,
+01.09). */
+.kalem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  ;
+}/* ---------- ARAC BASLIGI — v1'den (03.09'da gozden kacmisti) ----------
+   30-kayit ve 60-arac ekranlari bu siniflari kullaniyordu ama kurallar
+   tasinmamisti; kunye stilsiz ciziliyordu. */
+.arac-bas { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }.arac-bas .veh-title { margin-top: 9px; }.veh-title { font-family: var(--font-display); font-weight: 700; font-size: 23px; margin-top: 12px; }.veh-title .yr { color: var(--muted); font-weight: 500; }/* Detaylar TEK SERIT (tasarsa yatay kaydir; alta inmez) */
+.spec-strip {
+  display: flex; align-items: center; gap: 9px; margin-top: 3px;
+  overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}.spec-strip::-webkit-scrollbar { display: none; }.spec-val { font-size: 14px; color: var(--text); font-weight: 600; flex: none; }.spec-sep { color: var(--faint); flex: none; }
+
+/* ---------- BUTON VARYANTLARI + KUCUK PLAKA — v1'den ----------
+   03.09'da taşınmadıkları fark edildi: .btn taşınmış ama .btn-primary,
+   .btn-ghost, .btn-lg ve .plate-sm taşınmamıştı; ana düğmeler
+   ZEMİNSİZ, liste plakaları BÜYÜK çiziliyordu. Sağlık denetiminin
+   TANIMSIZ-SINIF testi yakaladı. */
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover { background: var(--primary-strong); }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { background: var(--nav-hover); }
+.btn-lg { padding: 17px; font-size: 17.5px; }
+.plate-sm { border-width: 1.5px; }
+.plate-sm .plate-tr { font-size: 9.5px; padding: 0 5px; }
+.plate-sm .plate-no { font-size: 12.5px; padding: 3px 7px; letter-spacing: .06em; }
+
+
+/* ===== ekran: 30-kayit.html ===== */
+/* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
+   içi henüz doldurulmamışken bile dokunma hedefinden küçük olamaz.
+   Denetim boş haldeyken 38 px ölçmüştü. */
+#kayitKunye { min-height: var(--dokun); }
+
+/* KİM GETİRDİ — bilgi alanı değil, ileride kimin ödeyeceğini
+   belirleyen anahtar (K-005). Kalem satırının altında, v1'in .cip
+   bileşeniyle; kendi görünümünü uydurmuyor. */
+.k-getiren {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12px;
+  color: var(--muted);
 }
+
+/* ===== ekran: 40-parca-sor.html ===== */
+/* Mesaj METNİN KENDİSİ — satır sonları korunmalı, yoksa parça listesi
+   tek satıra yapışıp okunmaz olur. v1'in .notice'ına takılan tek delta. */
+.notice .n-body.ps-mesaj { white-space: pre-wrap; }
 
 </style>
 <style>
@@ -354,27 +1316,45 @@ button { min-height: var(--dokun); cursor: pointer; }
    max() ile taban bosluk garanti ediliyor; yukseklik prototipin
    kendi 72px'i uzerine ekleniyor (onceden 60px'e eziliyordu).
    31.08: topbar 68 -> 72 px (Cemil: navigasyon biraz daha buyuk). */
-.ust-cubuk { padding-top: max(env(safe-area-inset-top), 10px); }
-.govde { padding-bottom: max(env(safe-area-inset-bottom), 40px); }
-@supports (height: 100dvh) { .cihaz { min-height: 100dvh; } }
+.topbar { padding-top: max(env(safe-area-inset-top), 10px); }
+.device { padding-bottom: max(env(safe-area-inset-bottom), 40px); }
+@supports (height: 100dvh) { .device { min-height: 100dvh; } }
 </style>
 </head>
 <body>
 
 <!-- ================= KABUK =================
-     TASARIM-SISTEMI v2.0: sabit header + ekran gövdesi.
-     ÇEKMECE YOK, FOOTER YOK — altı ekran var, hepsine ana ekrandan
-     ya da akışın kendisinden ulaşılıyor (T-18: iç içe menü yok). -->
-<div class="cihaz">
+     v1'in üst barı AYNEN: logo solda (ana ekrana döner), geri sağda.
+     Çekmece yok — v2'de altı ekran var ve hepsine ana ekrandan ya da
+     akışın kendisinden ulaşılıyor (T-18: iç içe menü yok). O yüzden
+     v1'deki hamburger düğmesi de yok; onun dışında üst bar aynı. -->
+<div class="device">
 
-  <header class="ust-cubuk">
-    <button class="ust-btn" data-git="home" aria-label="Ana ekrana dön">
-      <svg class="ico" aria-hidden="true"><use href="#i-ev"></use></svg>
-    </button>
-    <span class="marka">TAMİRON</span>
-    <button class="ust-btn" id="geriBtn" aria-label="Geri">
-      <svg class="ico" aria-hidden="true"><use href="#i-geri"></use></svg>
-    </button>
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="brand-logo" id="brandHome" role="button" tabindex="0" title="Ana menü" aria-label="Ana menü">
+      <!-- brand/tamiron-logo.svg — TEK blok; tema farkı yalnız --logo-word (A-D3) -->
+      <svg class="logo-mark" viewBox="60 126 906 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tamiron">
+        <path fill="var(--logo-nut)" d="M652.186 277.714C653.102 272.919 654.622 268.096 655.889 263.373C659.288 250.698 667.657 214.645 674.195 205.218C675.74 202.991 678.438 201.301 680.769 199.968C689.093 195.208 737.202 183.042 747.888 181.491C751.565 180.957 756.421 180.559 759.993 181.603C762.603 182.365 765.393 184.913 767.417 186.724C774.844 193.367 812.956 232.623 816.454 239.108C821.311 248.112 817.355 259.019 814.746 268.051C810.508 281.707 803.134 315.09 796.187 325.193C794.516 327.623 791.418 329.59 788.851 330.929C780.04 335.522 732.933 347.934 722.087 349.466C718.634 349.954 714.083 350.176 710.723 349.093C707.458 348.041 703.87 344.888 701.326 342.592C694.417 336.357 657.491 297.389 654.511 290.92C652.504 286.564 651.832 282.482 652.186 277.714ZM747.972 294.721C757.269 286.345 763.114 274.887 760.237 262.252C754.909 238.859 723.838 225.761 705.829 244.339C702.774 247.49 701.275 249.936 699.047 253.614C690.393 282.26 721.366 307.008 747.972 294.721Z"/>
+        <path fill="var(--logo-nut-shade)" d="M800.729 279.073C801.64 276.847 807.845 265.924 809.409 264.801L809.356 266.79C810.674 267.773 812.921 267.794 814.746 268.051C810.508 281.707 803.134 315.09 796.187 325.193C794.516 327.623 791.418 329.59 788.851 330.929C780.04 335.522 732.933 347.934 722.087 349.466C718.634 349.954 714.083 350.176 710.723 349.093C707.458 348.041 703.87 344.888 701.326 342.592C694.417 336.357 657.491 297.389 654.511 290.92C652.504 286.564 651.832 282.482 652.186 277.714C661.78 284.145 669.956 293.169 678.91 299.959C680.037 301.491 683.882 304.624 685.451 306.007C693.492 313.092 699.216 318.082 709.302 322.281C725.684 329.007 744.056 329.005 760.437 322.275C779.053 314.583 793.164 297.281 800.729 279.073Z"/>
+        <path fill="var(--logo-nut-tint)" d="M652.186 277.714C653.102 272.919 654.622 268.096 655.889 263.373C659.288 250.698 667.657 214.645 674.195 205.218C675.74 202.991 678.438 201.301 680.769 199.968C689.093 195.208 737.202 183.042 747.888 181.491C751.565 180.957 756.421 180.559 759.993 181.603C762.603 182.365 765.393 184.913 767.417 186.724C774.844 193.367 812.956 232.623 816.454 239.108C821.311 248.112 817.355 259.019 814.746 268.051C812.921 267.794 810.674 267.773 809.356 266.79L809.409 264.801C807.845 265.924 801.64 276.847 800.729 279.073C799.461 276.126 802.037 265.019 801.989 261.033C801.682 235.767 787.36 211.892 764.331 200.948C731.168 185.187 690.907 198.695 675 231.945C667.045 248.556 666.078 267.662 672.316 284.992C673.789 289.125 678.891 298.19 678.91 299.959C669.956 293.169 661.78 284.145 652.186 277.714Z"/>
+        <path fill="var(--logo-nut-shade)" d="M699.047 253.614C698.43 252.699 697.067 250.708 697.176 249.592C699.745 223.511 732.951 210.178 754.761 222.478C761.211 226.116 766.403 231.156 770.263 237.414C775.829 246.551 777.613 257.499 775.234 267.931C772.687 278.625 759.63 295.623 747.972 294.721C757.269 286.345 763.114 274.887 760.237 262.252C754.909 238.859 723.838 225.761 705.829 244.339C702.774 247.49 701.275 249.936 699.047 253.614Z"/>
+        <path fill="var(--logo-word)" d="M412.547 189.129C423.964 189.386 435.384 189.466 446.803 189.369C445.98 203.561 446.867 226.232 446.912 241.157L446.908 340.491L413.398 340.568C413.311 320.064 413.337 299.56 413.475 279.057C413.552 268.402 414.024 257.72 413.951 247.13C412.78 249.233 411.63 251.885 410.652 254.11C404.357 268.444 396.325 283.227 390.843 297.821L370.967 298.101C362.93 281.185 355.463 264.015 347.457 247.121C347.47 251.685 347.591 256.248 347.821 260.806C348.403 287.365 348.636 313.93 348.52 340.495L314.51 340.512C315.172 334.98 314.989 326.237 314.994 320.479L314.998 289.509L314.908 189.301C326.337 189.521 338.453 189.343 349.934 189.357C360.339 211.173 370.148 232.773 380.845 254.477C388.382 239.044 395.804 223.556 403.111 208.013C404.842 204.38 410.656 191.351 412.547 189.129Z"/>
+        <path fill="var(--logo-word)" d="M538.342 189.245C547.987 189.179 557.879 189.257 567.536 189.419C581.136 189.647 596.056 187.92 609.32 191.049C637.463 197.688 643.002 227.999 637.137 252.419C634.277 264.288 626.953 270.507 616.935 276.268C622.432 290.508 628.702 304.149 634.772 318.126C637.769 325.027 641.753 333.407 644.108 340.446L607.533 340.481L604.509 332.767C597.897 315.488 590.059 298.208 583.613 280.966C576.81 280.809 569.825 280.96 563.009 281.025C562.757 300.843 562.758 320.664 563.013 340.482L528.857 340.488C529.13 332.776 529.072 324.237 528.925 316.518C528.121 274.42 530.095 231.466 528.752 189.461L538.342 189.245ZM563.016 253.133C573.81 253.211 594.37 255.258 601.782 248.873C607.979 239.604 608.779 220.453 594.731 218.098C584.973 216.462 572.992 217.65 562.929 217.42C562.884 228.065 562.498 242.716 563.016 253.133Z"/>
+        <path fill="var(--logo-word)" d="M917.831 189.217C928.514 189.376 939.159 189.149 949.88 189.432C949.583 202.832 949.875 217.257 949.893 230.723L949.848 300.906C949.845 308.051 950.532 335.135 949.307 340.465L916.095 340.503C901.881 311.43 885.486 281.008 870.51 252.139C871.756 280.184 871.067 312.091 871.141 340.489L837.454 340.486C838.164 332.549 837.861 321.022 837.857 312.813L837.514 258.301C837.456 239.806 838.063 221.31 837.862 202.809C837.814 198.295 837.921 193.887 837.551 189.374C849.314 189.285 861.077 189.297 872.839 189.411C886.997 217.073 901.786 247.651 916.845 274.653C916.452 269.477 916.2 190.014 916.491 189.456L917.831 189.217Z"/>
+        <path fill="var(--logo-word)" d="M213.097 189.211C228.598 188.792 245.27 189.102 260.859 189.126L300.934 340.515L264.202 340.547C261.838 329.737 259.497 319.524 257.369 308.61C257.202 307.79 256.942 306.991 256.702 306.188C254.593 305.703 245.981 305.882 243.322 305.888L216.697 305.959C213.997 317.029 211.557 329.261 209.087 340.482L173.105 340.452C173.989 335.623 176.585 327.111 177.879 322.092L189.514 277.757L206.903 211.15C207.687 208.193 212.035 191.05 213.097 189.211ZM223.13 277.771L237.062 277.61L250.32 277.623C246.18 263.644 243.882 246.764 240.039 232.504C239.364 229.998 237.503 221.202 236.378 219.239C231.74 238.005 227.257 258.801 223.13 277.771Z"/>
+        <path fill="var(--logo-word)" d="M174.797 189.263L180.987 189.147C181.013 198.069 180.785 209.086 181.393 217.819C170.117 217.392 156.505 217.732 145.045 217.671C144.687 247.547 145.406 277.807 145.028 307.727C144.889 318.734 145.43 329.359 145.071 340.476L110.453 340.503C110.727 331.408 110.657 322.038 110.666 312.921L110.49 217.585C98.4416 217.54 86.3935 217.565 74.3459 217.659L74.152 189.375C107.672 189.062 141.123 189.902 174.797 189.263Z"/>
+        <path fill="var(--logo-word)" d="M470.641 189.367C482.019 189.289 493.397 189.334 504.774 189.505C505.264 223.87 504.954 259.07 504.91 293.482L504.9 324.006C504.913 328.13 505.239 336.341 504.796 339.993L504.021 340.511L470.605 340.542C471.122 332.678 470.848 321.978 470.853 313.877L470.684 261.582L470.865 213.682C470.871 205.984 471.119 196.873 470.641 189.367Z"/>
+        <path fill="var(--logo-nut)" d="M470.654 138.45L504.293 138.434C504.753 147.648 504.432 162.63 504.15 171.931C493.051 171.828 481.951 171.834 470.852 171.952C471.008 161.74 471.144 148.517 470.654 138.45Z"/>
+      </svg>
+      </span>
+    </div>
+    <span class="spacer"></span>
+    <div class="topbar-nav">
+      <button class="icon-btn" id="geriBtn" aria-label="Geri" title="Geri">
+        <svg class="ico"><use href="#i-chevron-left"></use></svg>
+      </button>
+    </div>
   </header>
 
   <!-- PWA kurulum düğmesi buraya enjekte edilir (tools/pwa-build.js).
@@ -385,75 +1365,365 @@ button { min-height: var(--dokun); cursor: pointer; }
   <p id="kurNot" style="display:none;margin:6px 14px 0;color:var(--muted);font-size:var(--tip-sm)">Ana ekrana eklenir, tam ekran açılır.</p>
   <p id="kurDurum" style="margin:6px 14px 0;color:var(--faint);font-size:var(--tip-xs);line-height:1.7"></p></div>
 
-  <main class="govde" id="govde">
-    
-<!-- ekran: home · İçerideki araçlar (EKRANLAR.md §1)
-     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak.
-     Buradaki amaç derlemenin, gezinmenin ve denetimin çalıştığını
-     göstermek. -->
+  
+<!-- ekran: home · İÇERİDEKİ ARAÇLAR (EKRANLAR.md §1)
+     Liste = TESLİM EDİLMEMİŞ KAYITLAR. Başka tanım yok (K-004).
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .btn .btn-primary
+     .btn-lg · .search-box · .tl-item (kayıt satırı) · .bos-durum
+     · .notice. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-home">
 
-  <h1 class="ekran-bas">İçerideki araçlar</h1>
-  <p class="ekran-alt" id="homeSay">—</p>
-
-  <div class="iskelet-not">
-    <strong>İskelet.</strong> Ekranların içeriği 13. işte yazılacak.
-    Bu ekranın işi şimdilik derlemenin ve gezinmenin çalıştığını göstermek.
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-car"></use></svg> İçerideki araçlar
+      <span class="eb-say" id="homeSay"></span>
+    </span>
   </div>
 
-  <button class="ana-btn" data-git="ruhsat">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
-    <span>Ruhsatı çek</span>
+  <button class="btn btn-primary btn-lg" data-git="ruhsat">
+    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
   </button>
+
+  <div class="search-box" id="homeArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="homeQ" placeholder="Plaka ara…" autocomplete="off" aria-label="Plaka ara" />
+    <button class="clear" id="homeQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <div id="homeListe"></div>
+
+  <div id="homeHatirlatma"></div>
 
 </section>
 
-<!-- ekran: ruhsat · Ruhsatı çek (EKRANLAR.md §2)
-     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak. -->
+<!-- ekran: ruhsat · RUHSATI ÇEK (EKRANLAR.md §2 · Akış Adım 1)
+     "Ruhsatı çekti, kayıt açıldı." (T-3)
+
+     ARAŞTIRMADAN GELEN İKİ ŞEY (RUHSAT-OKUMA.md):
+     · TELEFON ruhsatta YOK — ayrı alan, ZORUNLU DEĞİL (A-29)
+     · TC kimlik no ve adres ruhsatta VAR ama OKUNMAZ, SAKLANMAZ
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card .card.raised
+     · .plate-input-wrap .plate-field .tr-tag · .field .field-2
+     · .plate-hint · .cip-grup .cip · .btn. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-ruhsat">
 
-  <h1 class="ekran-bas">Ruhsatı çek</h1>
-  <p class="ekran-alt">Telefonu ruhsata tut — bilgiler kendiliğinden dolar.</p>
-
-  <div class="iskelet-not">
-    <strong>İskelet.</strong> Bu ekran 13. işte yazılacak.
-    Araştırmadan gelen iki not burada uygulanacak:
-    <b>telefon alanı</b> eklenecek (ruhsatta yok, A-29) ve
-    <b>TC kimlik no ile adres saklanmayacak</b>.
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-camera"></use></svg> Ruhsatı çek
+    </span>
   </div>
 
-  <button class="ana-btn" data-git="home">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-geri"></use></svg>
-    <span>Ana ekrana dön</span>
+  <button class="btn btn-primary btn-lg" id="ruhsatCek">
+    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+  </button>
+
+  <p class="plate-hint" style="text-align:center">
+    Ruhsat yoksa ya da okunmuyorsa
+    <button class="btn btn-ghost" id="ruhsatElle" style="margin-top:8px">
+      <svg class="ico"><use href="#i-file-text"></use></svg> Plakayı yaz
+    </button>
+  </p>
+
+  <div id="ruhsatSonuc" hidden>
+
+    <!-- PLAKA EN ÜSTTE VE BÜYÜK: yanlış okunursa kayıt YANLIŞ ARACA
+         bağlanır. Doğrulanan tek alan bu (RUHSAT-OKUMA §5). -->
+    <div class="card raised">
+      <div class="plate-input-wrap">
+        <div class="plate-field">
+          <span class="tr-tag">TR</span>
+          <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123"
+                 autocomplete="off" spellcheck="false" aria-label="Plaka" />
+        </div>
+        <div class="plate-hint" id="rPlakaIpucu" role="status"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">
+        <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç
+      </div>
+      <div class="field-2">
+        <div class="field"><label for="rMarka">Marka</label><input id="rMarka" /></div>
+        <div class="field"><label for="rModel">Model</label><input id="rModel" /></div>
+      </div>
+      <div class="field-2">
+        <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
+        <div class="field"><label for="rMotor">Motor</label><input id="rMotor" /></div>
+      </div>
+
+      <div class="field">
+        <label for="rTel">Telefon</label>
+        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
+        <div class="plate-hint">Ruhsatta yazmaz — isteğe bağlı. Bakım hatırlatması ve özet buraya gider.</div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-wrench"></use></svg> Ne için geldi?
+    </div>
+    <div class="cip-grup" id="turGrup" role="group" aria-label="İş türü">
+      <button class="cip" id="turTamirat" aria-pressed="false">Tamirat</button>
+      <button class="cip" id="turBakim" aria-pressed="false">Bakım</button>
+    </div>
+
+    <!-- Km YALNIZ BAKIMDA (K-002). Bir kez yazılır, güncellenmez. -->
+    <div class="field" id="kmAlan" hidden>
+      <label for="rKm">Kilometre</label>
+      <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
+      <div class="plate-hint">Göstergeden oku. Bir sonraki bakımda işine yarar.</div>
+    </div>
+
+    <button class="btn btn-primary btn-lg" id="kaydiAc" disabled>
+      <svg class="ico"><use href="#i-check"></use></svg> Kaydı aç
+    </button>
+
+  </div>
+
+</section>
+
+<!-- ekran: kayit · SERVİS KAYDI (EKRANLAR.md §3) — ÜRÜNÜN KALBİ
+     Akışın dört adımı burada: 2 ne istiyor · 4 fiyat geldi ·
+     5 parça geldi (kim getirdi) · 6 iş yapıldı.
+     Kayıt TESLİM EDİLENE KADAR AÇIK ve satır eklenebilir (K-003).
+
+     BİLEŞENLER v1'DEN: .card · .section-label .with-action .lbl-txt
+     · .mic-round · .field · .kalem .k-tip .k-ad .k-tutar .k-sil
+     · .tutar-serit .tutar-sat .tv · .btn .btn-row · .cip
+     · .arac-bas .plate-lg. Yeni bileşen yazılmadı.
+
+     ÜZERİNDE YOK: durum rozeti · kesinlik kademeleri · garanti süresi
+     · katalog seçici · fiyat karşılaştırma · onay bekleme durumu
+     · red paneli · kabul formu · iskonto mekanizması. -->
+<section class="screen" id="screen-kayit">
+
+  <div class="screen-head">
+    <span class="eyebrow" id="kayitBaslik"></span>
+  </div>
+
+  <!-- Künyeye dokununca ARAÇ açılır: geçmiş, son bakım ve
+       "parçayı geçen sefer kim getirmişti" orada (K-005). -->
+  <div class="card" id="kayitKunye" data-arac-ac="1" role="button" tabindex="0"
+       aria-label="Aracın geçmişini aç"></div>
+
+  <div class="card">
+    <div class="section-label with-action">
+      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne istiyor?</span>
+      <button class="mic-round" id="kSikayetMik" aria-label="Sesle söyle" title="Sesle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+    <div class="field">
+      <input id="kSikayet" placeholder="ör. triger seti değişecek" autocomplete="off" aria-label="Ne istiyor" />
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılanlar
+    </div>
+
+    <div class="kalem-list" id="kSatirlar"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="kParcaEkle">
+        <svg class="ico"><use href="#i-plus"></use></svg> Parça
+      </button>
+      <button class="btn btn-ghost" id="kIscilikEkle">
+        <svg class="ico"><use href="#i-plus"></use></svg> İşçilik
+      </button>
+    </div>
+
+    <div class="tutar-serit" id="kToplam"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" data-git="parca-sor">
+      <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
+    </button>
+    <button class="btn btn-ghost" id="kOnayIste">
+      <svg class="ico"><use href="#i-message-square"></use></svg> Onay iste
+    </button>
+  </div>
+
+  <button class="btn btn-primary btn-lg" data-git="teslim">
+    <svg class="ico"><use href="#i-wallet"></use></svg> Teslim et
   </button>
 
 </section>
 
-  </main>
+<!-- ekran: parca-sor · PARÇA FİYATI SOR (EKRANLAR.md §4)
+     Akış Adım 3–4. Tamirci: "Yedek parçacıdan fiyat alırken, ruhsatı
+     ve gereken parçaları gönderiyor." (T-12)
+
+     WHATSAPP.md ÖNERİSİ (A yolu) UYGULANDI: mesajı biz hazırlıyoruz,
+     usta KENDİ WhatsApp'ından gönderiyor. Cevabı okuyamıyoruz — usta
+     gelen fiyatı elle giriyor. Karşılığında hiçbir kurulum yok:
+     Meta hesabı, işletme doğrulaması, şablon onayı gerekmiyor.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
+     · .kalem-list .kalem .k-tip .k-ad · .cip-grup .cip
+     · .notice .n-ic .n-body · .btn .btn-primary .btn-lg · .plate-hint.
+     Yeni bileşen yazılmadı (03.09 — "Tasarım eskisi gibi devam etmeli").
+
+     ÜZERİNDE YOK: parça arama · katalog · OEM kodu girme alanı
+     (usta kodu bilmiyor — S7) · fiyat karşılaştırma tablosu. -->
+<section class="screen" id="screen-parca-sor">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça fiyatı sor
+    </span>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-package"></use></svg> Sorulacak parçalar
+    </div>
+    <div class="kalem-list" id="psParcalar"></div>
+  </div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-user"></use></svg> Kime sorulacak?
+  </div>
+  <div class="cip-grup" id="psParcacilar" role="group" aria-label="Parçacı seç"></div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Gidecek mesaj
+  </div>
+  <div class="notice accent">
+    <span class="n-ic"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg></span>
+    <span class="n-body ps-mesaj" id="psMesaj"></span>
+  </div>
+
+  <button class="btn btn-primary btn-lg" id="psGonder" disabled>
+    <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
+  </button>
+
+  <p class="plate-hint" style="text-align:center">
+    Cevap kendi WhatsApp'ına gelir. Gelen fiyatı servis kaydındaki
+    satıra yazman yeter.
+  </p>
+
+</section>
+
+<!-- ekran: teslim · TESLİM ET (EKRANLAR.md §5)
+     Akış Adım 7. Tamircinin dördüncü isteği: "teslim ettiğinde
+     ödemeyi nasıl aldığını bilmek."
+
+     AYRI EKRAN, ÇÜNKÜ AYRI AN. Servis kaydıyla birleştirilirse
+     yanlışlıkla teslim edilir ve teslim geri alınamaz.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .arac-bas
+     .plate-lg .veh-title .spec-strip · .tutar-serit .tutar-sat.genel
+     .tv · .cip-grup .cip · .btn .btn-primary .btn-lg · .notice.
+     Yeni bileşen yazılmadı.
+
+     ÜZERİNDE YOK: kısmi ödeme takibi · taksit planı · cari hesap
+     · borç yaşlandırma · teslim alan kişi seçimi · fatura. -->
+<section class="screen" id="screen-teslim">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Teslim et
+    </span>
+  </div>
+
+  <div class="card">
+    <div id="tsKunye"></div>
+    <div class="tutar-serit" id="tsTutar"></div>
+  </div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme nasıl alındı?
+  </div>
+  <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu"></div>
+
+  <button class="btn btn-primary btn-lg" id="tsTeslim" disabled>
+    <svg class="ico"><use href="#i-check"></use></svg> Teslim et
+  </button>
+
+  <div id="tsNot"></div>
+
+</section>
+
+<!-- ekran: arac · ARAÇ (EKRANLAR.md §6) — akış dışı, başvuru
+     Akışın hiçbir adımı buradan geçmez. Neden var: K-005'in işe
+     yaraması için. "Bu parçayı geçen sefer müşteri getirmişti"
+     bilgisi araç ikinci kez geldiğinde KARŞIYA ÇIKMALI, yoksa
+     tartışma çıkar.
+
+     BİLEŞENLER v1'DEN: .card · .arac-bas .plate-lg .veh-title
+     .spec-strip · .section-label · .notice · .tl-item (ortak
+     kayitSatiriHtml) · .plate-hint. Yeni bileşen yazılmadı.
+
+     GEÇMİŞ SATIRI ORTAK NESNE: ana ekranla aynı kayitSatiriHtml.
+     Burada plaka gizleniyor (zaten aracın kendi sayfası).
+
+     ÜZERİNDE YOK: kontrol tarihleri (muayene/sigorta/kasko)
+     · yaklaşan kontroller · belge arşivi · ayrı müşteri ekranı. -->
+<section class="screen" id="screen-arac">
+
+  <div class="card">
+    <div id="arKunye"></div>
+  </div>
+
+  <div id="arBakim"></div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş
+  </div>
+  <div id="arGecmis"></div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Not
+  </div>
+  <p class="plate-hint" id="arNot"></p>
+
+</section>
+
 
 </div>
 
-<div class="balon-kap" id="balonKap" role="status" aria-live="polite"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <!-- ================= İKONLAR (Lucide · inline sprite) ================= -->
 <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
-  <defs>
-    <g id="ikon-taban" fill="none" stroke="currentColor" stroke-width="2"
-       stroke-linecap="round" stroke-linejoin="round"></g>
-  </defs>
-    <!-- Lucide · inline sprite. currentColor ile boyanır (K-023).
-       Dış bağımlılık yok. Yeni ikon buraya eklenir. -->
-  <symbol id="i-ev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
-  <symbol id="i-geri" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
-  <symbol id="i-arac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2v-4l-2-5H5L3 13v4h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></symbol>
-  <symbol id="i-kamera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
-  <symbol id="i-ara" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
-  <symbol id="i-ekle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
-  <symbol id="i-tamam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
-  <symbol id="i-mikrofon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10a7 7 0 0 1-14 0M12 19v3"/></symbol>
-  <symbol id="i-parca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.3 9 5.2v9.4l-9 5.2-9-5.2V9.5z" transform="translate(4.5)"/></symbol>
-  <symbol id="i-para" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
-  <symbol id="i-ayar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+    <!-- Lucide · inline sprite — v1'den AYNEN devralindi.
+       currentColor ile boyanir, tema rengine uyar. Dis bagimlilik yok.
+       Yeni ikon gerekirse once v1'de var mi diye bakilir. -->
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.5 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></symbol>
+  <symbol id="i-package" viewBox="0 0 24 24"><path d="m7.5 4.27 9 5.15"/><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="M12 22V12"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+  <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
+  <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-cog" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-message-square" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-wrench" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-receipt" viewBox="0 0 24 24"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/></symbol>
+  <symbol id="i-clipboard-list" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-search-check" viewBox="0 0 24 24"><path d="m8 11 2 2 4-4"/><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-scan-barcode" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 7v10"/><path d="M12 7v10"/><path d="M16 7v10"/></symbol>
 
 </svg>
 
@@ -483,6 +1753,11 @@ window.addEventListener('unhandledrejection', function (e) {
     (e.reason && e.reason.message ? e.reason.message : e.reason));
 });
 
+/* Hangi servis kaydi acik — ekranlar arasi tek paylasilan durum.
+   Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
+var ACIK_KAYIT = null;
+var ACIK_PLAKA = null;
+
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
   var gecmis = [];
@@ -498,17 +1773,31 @@ var Ekran = (function () {
     var el = document.getElementById('screen-' + ad);
     if (!el) { console.warn('Ekran yok: ' + ad); return false; }
     var hepsi = document.querySelectorAll('.screen');
-    for (var i = 0; i < hepsi.length; i++) hepsi[i].classList.remove('acik');
-    el.classList.add('acik');
+    /* v1 sozlesmesi: gorunur ekran .active — bilesen CSS'i ve denetim
+       bu ada gore yazilmis, degistirilmez. */
+    for (var i = 0; i < hepsi.length; i++) hepsi[i].classList.remove('active');
+    el.classList.add('active');
     acik = ad;
     var k = kayit[ad];
     if (k && typeof k.ciz === 'function') {
       try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); }
     }
-    document.querySelector('.govde').scrollTop = 0;
+    el.scrollTop = 0;
     window.scrollTo(0, 0);
     geriTazele();
     return true;
+  }
+
+  /* Acik ekrani yeniden cizer — KAYDIRMAYI VE ODAGI BOZMADAN.
+     goster() sayfayi basa atar; arama kutusunda her tusta basa
+     atlamak ekrani kullanilamaz yapardi. */
+  function tazele() {
+    if (!acik) return;
+    var k = kayit[acik];
+    var el = document.getElementById('screen-' + acik);
+    if (k && el && typeof k.ciz === 'function') {
+      try { k.ciz(el); } catch (e) { console.error('ciz(' + acik + '):', e); }
+    }
   }
 
   function ac(ad) {
@@ -527,7 +1816,7 @@ var Ekran = (function () {
     if (b) b.disabled = gecmis.length === 0;
   }
 
-  return { tanim: tanim, ac: ac, geri: geri, goster: goster,
+  return { tanim: tanim, ac: ac, geri: geri, goster: goster, tazele: tazele,
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
            geriVarMi: function () { return gecmis.length > 0; } };
@@ -549,14 +1838,18 @@ document.addEventListener('click', function (e) {
 });
 
 /* ---- balon ---- */
-function balon(metin, uyari, sure) {
-  var kap = document.getElementById('balonKap');
-  if (!kap) return;
-  var d = document.createElement('div');
-  d.className = 'balon' + (uyari ? ' uyari' : '');
-  d.textContent = metin;
-  kap.appendChild(d);
-  setTimeout(function () { d.remove(); }, sure || 2600);
+/* v1'in balonu: TEK oge, .show ile acilir. Yigin degil — ust uste
+   balon birikmesi v1'de bilerek yapilmamisti. */
+var balonSayaci = null;
+function balon(metin, dinliyor, sure) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.innerHTML = (dinliyor ? '<span class="dot-live"></span>' : '') +
+                '<span>' + metin + '</span>';
+  t.classList.toggle('dinliyor', !!dinliyor);
+  t.classList.add('show');
+  if (balonSayaci) clearTimeout(balonSayaci);
+  balonSayaci = setTimeout(function () { t.classList.remove('show'); }, sure || 2600);
 }
 
 /* ---- ortak biçimleyiciler ---- */
@@ -579,45 +1872,697 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* ===== betik/02-veri.js ===== */
 /* ============ SAHTE VERİ ============
-   Backend yok. Alanlar VERI-MODELI.md ile birebir — modelde olmayan
-   alan buraya da girmez.
+   Backend yok. Alanlar VERI-MODELI.md ile BİREBİR — modelde olmayan
+   alan buraya da girmez. Modelde olmayan bir alana ihtiyaç duyulursa
+   önce VERI-MODELI.md açılır.
 
-   ⚠️ İSKELET: 13. işte gerçek örnek veriyle genişletilecek. */
+   ⚠️ Ruhsatta TC kimlik no ve adres VAR ama burada YOK
+   (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir). */
 
-/* Vehicle — VERI-MODELI §1 */
+var BUGUN = new Date(2026, 8, 3);   /* prototipin "bugün"ü — TEK KAYNAK */
+
+/* ---- Vehicle (VERI-MODELI §1) ---- */
 var ARACLAR = [
   { plaka: '34 ABC 123', marka: 'Renault', model: 'Mégane', yil: '2018',
     motor: '1.5 dCi', vin: 'VF1RFB00858123456',
-    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: '' },
+    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: 'Arka cam kolu kırık — müşteri biliyor.' },
   { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
     motor: '1.4 Fire', vin: 'NM4358004ZT129041',
     sahipAd: 'Hasan Demir', sahipTel: '0542 331 90 07', not: '' },
   { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
     motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
-    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' }
+    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' },
+  { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
+    motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
+    sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41', not: '' }
 ];
 
-/* Supplier — VERI-MODELI §4. İki alan: ad + telefon. */
+/* ---- ServiceRecord (VERI-MODELI §2) ----
+   `tur`: repair | maintenance (K-006)
+   `teslimTarihi` DOLUYSA araç çıkmıştır — TEK DURUM ALANI (K-004).
+   `Total` alanı YOK: satırlardan hesaplanır. */
+var KAYITLAR = [
+  { id: 1, plaka: '34 ABC 123', tur: 'tamirat', km: '',
+    sikayet: 'Triger seti değişecek',
+    acilis: '03.09.2026', teslimTarihi: null,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
+        marka: '', kod: '', tanim: 'tanimlanamadi' }
+    ] },
+
+  { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
+    sikayet: 'Periyodik bakım',
+    acilis: '02.09.2026', teslimTarihi: null,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Motor yağı', fiyat: 1900, alis: 1450, kimGetirdi: 'tamirci',
+        marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
+      { tip: 'parca', ad: 'Yağ filtresi', fiyat: 260, alis: 180, kimGetirdi: 'tamirci',
+        marka: 'Mann', kod: 'W 71180', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+    ] },
+
+  { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
+    sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
+    acilis: '01.09.2026', teslimTarihi: null,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
+        marka: '', kod: '', tanim: 'tanimlanamadi' },
+      { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: 0, kimGetirdi: '' }
+    ] },
+
+  /* Teslim edilmiş — ana ekranda GÖRÜNMEZ, araç geçmişinde görünür */
+  { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
+    sikayet: 'Periyodik bakım',
+    acilis: '15.03.2026', teslimTarihi: '15.03.2026',
+    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
+        marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: 0, kimGetirdi: '' }
+    ] }
+];
+
+/* ---- Supplier (VERI-MODELI §4) — iki alan ---- */
 var PARCACILAR = [
   { ad: 'Öz Yedek Parça', tel: '0532 111 22 33' },
-  { ad: 'Ahmet Oto Yedek Parça', tel: '0533 444 55 66' }
+  { ad: 'Ahmet Oto Yedek Parça', tel: '0533 444 55 66' },
+  { ad: 'Ankara Bosch Bayi', tel: '0312 222 33 44' }
 ];
+
+/* ---- Shop (VERI-MODELI §8) ---- */
+var DUKKAN = {
+  ad: 'Ahmet Usta Oto Servis',
+  adres: 'Ostim OSB, Ankara',
+  tel: '0532 000 00 00',
+  bakimPeriyoduAy: 6            /* A-3 — Cemil onayına açık */
+};
+
+/* ---- Sorgular (tek yerde; ekranlar kendi filtresini yazmaz) ---- */
+function aracBul(plaka) {
+  for (var i = 0; i < ARACLAR.length; i++) if (ARACLAR[i].plaka === plaka) return ARACLAR[i];
+  return null;
+}
+function kayitBul(id) {
+  for (var i = 0; i < KAYITLAR.length; i++) if (KAYITLAR[i].id === id) return KAYITLAR[i];
+  return null;
+}
+/* İÇERİDEKİ = teslim edilmemiş. Başka tanım yok (K-004). */
+function icerideki() {
+  return KAYITLAR.filter(function (k) { return !k.teslimTarihi; });
+}
+function aracKayitlari(plaka) {
+  return KAYITLAR.filter(function (k) { return k.plaka === plaka; });
+}
+function kayitToplami(k) {
+  return (k.satirlar || []).reduce(function (t, s) { return t + (s.fiyat || 0); }, 0);
+}
+/* Parçası sorulmuş ama fiyatı gelmemiş — DURUM DEĞİL, veriden türetilir
+   (K-004 notu, A-4). */
+function fiyatiBekleyen(k) {
+  return (k.satirlar || []).some(function (s) {
+    return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
+  });
+}
+
+
+/* ===== betik/03-nesne.js ===== */
+/* ============ ORTAK NESNELER ============
+   BİR NESNE BİR YERDE ÇİZİLİR. Plaka üç ekranda görünüyor; üç kez
+   yazılırsa üç kez ayrışır.
+
+   ⚠️ İMZALAR v1'DEN. plakaHtml(plaka, boyut) ve bosDurum(ikon,
+   baslik, aciklama, eylem, sinif) v1'de bu şekildeydi; adı ya da
+   parametre sırası değiştirilirse taşınan CSS ve alışkanlık kırılır.
+   03.09 — Cemil: "Tasarım eskisi gibi devam etmeli." */
+
+/* ---- PLAKA — gerçek TR plakasının dili, her yerde aynı ---- */
+function plakaHtml(plaka, boyut) {
+  return '<span class="plate ' + (boyut || 'plate-sm') + '">' +
+         '<span class="plate-tr">TR</span>' +
+         '<span class="plate-no">' + plaka + '</span></span>';
+}
+
+/* ---- BOŞ DURUM — kuru "sonuç yok" değil, ne yapılacağını söyler ---- */
+function bosDurumHtml(ikon, baslik, aciklama, eylem, sinif) {
+  return '<div class="bos-durum' + (sinif ? ' ' + sinif : '') + '">' +
+    '<span class="bd-ikon"><svg class="ico"><use href="#' + ikon + '"></use></svg></span>' +
+    '<span class="bd-baslik">' + baslik + '</span>' +
+    '<span class="bd-aciklama">' + aciklama + '</span>' +
+    (eylem || '') +
+  '</div>';
+}
+
+/* ---- SERVİS KAYDI SATIRI ----
+   v1'in .tl-item zaman tüneli satırı. Ana ekranda ve araç kartında
+   AYNI nesne. v1'de dört ziyaret tipi vardı; v2'de iki tür var
+   (K-006), o yüzden sol ikon ve şerit iki değer alıyor. */
+var TUR_IKON = { tamirat: 'i-wrench', bakim: 'i-clock' };
+var TUR_AD = { tamirat: 'Tamirat', bakim: 'Bakım' };
+
+function kayitSatiriHtml(k, s) {
+  s = s || {};
+  var a = aracBul(k.plaka);
+  var bekliyor = fiyatiBekleyen(k);
+  /* K-005'İN ASIL İŞE YARADIĞI YER: "bu parçayı geçen sefer müşteri
+     getirmişti" bilgisi satırın KENDİSİNE ait, ekrana değil. Araç
+     geçmişinde de ana listede de aynı yerde görünmeli — yoksa
+     araç ikinci kez geldiğinde tartışma çıkar. */
+  var musteriParcalari = (k.satirlar || []).filter(function (l) {
+    return l.tip === 'parca' && l.kimGetirdi === 'musteri';
+  });
+  /* Şerit ve ikon rengi TÜRÜ söyler (v1 kuralı). Durum rozeti yok —
+     v2'de tek durum var ve o da teslim (K-004). */
+  return '<div class="tl-item t-' + (k.tur === 'bakim' ? 'bakim' : 'tamirat') + '"' +
+      ' data-kayit="' + k.id + '" role="button" tabindex="0">' +
+    '<span class="tl-ic">' +
+      '<svg class="ico ico-sm"><use href="#' + TUR_IKON[k.tur] + '"></use></svg></span>' +
+    '<div class="tl-body">' +
+      '<div class="tl-title">' +
+        '<span class="tl-tip">' + TUR_AD[k.tur] + '</span>' +
+        (s.plaka === false ? '' : plakaHtml(k.plaka)) +
+      '</div>' +
+      '<div class="tl-sub">' + (k.sikayet || '—') + '</div>' +
+      (a ? '<div class="tl-sub">' + a.marka + ' ' + a.model + '</div>' : '') +
+      '<div class="tl-foot">' +
+        (bekliyor
+          ? '<span class="pill warn"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> parçası bekleniyor</span>'
+          : '') +
+        (s.tutar !== false && kayitToplami(k)
+          ? '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' : '') +
+        (k.teslimTarihi ? '<span class="tl-date">' + k.teslimTarihi + '</span>' : '') +
+      '</div>' +
+      (musteriParcalari.length
+        ? '<div class="tl-foot"><span class="pill muted">parçayı müşteri getirmişti: ' +
+            musteriParcalari.map(function (l) { return l.ad || 'parça'; }).join(', ') +
+          '</span></div>'
+        : '') +
+    '</div>' +
+  '</div>';
+}
+
+/* ---- ORTAK NESNENİN DAVRANIŞI DA ORTAK ----
+   Satır iki ekranda kullanılıyor; tıklamayı her ekrana ayrı yazmak
+   nesneyi ikiye bölmek olurdu. */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-kayit]');
+  if (!t) return;
+  ACIK_KAYIT = parseInt(t.getAttribute('data-kayit'), 10);
+  Ekran.ac('kayit');
+});
 
 
 /* ===== ekran: 10-home.html ===== */
 (function () {
 Ekran.tanim('home', {
   ciz: function () {
-    var el = document.getElementById('homeSay');
-    if (el) el.textContent = ARACLAR.length + ' araç içeride';
+    var q = norm((document.getElementById('homeQ') || {}).value || '');
+    var liste = icerideki().filter(function (k) {
+      return !q || norm(k.plaka).indexOf(q) >= 0;
+    });
+
+    var say = document.getElementById('homeSay');
+    if (say) say.textContent = liste.length + (q ? ' bulundu' : ' araç');
+
+    document.getElementById('homeArama').classList.toggle('filled', !!q);
+
+    document.getElementById('homeListe').innerHTML = liste.length
+      ? liste.map(kayitSatiriHtml).join('')
+      : (q
+          ? bosDurumHtml('i-search', 'Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
+          : bosDurumHtml('i-circle-check', 'İçeride araç yok',
+              'Hepsi teslim edilmiş. Yeni iş için yukarıdan ruhsatı çek.'));
+
+    /* Bakım hatırlatması — ayrı ekran değil, bir uyarı şeridi
+       (T-17, K-002). Ustaya bugün kimi arayacağını söyler. */
+    var h = KAYITLAR.filter(function (k) {
+      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
+    });
+    document.getElementById('homeHatirlatma').innerHTML = h.length
+      ? '<div class="notice warn">' +
+          '<svg class="ico n-ic"><use href="#i-clock"></use></svg>' +
+          '<span class="n-body"><b>' + h.length + ' araç bakım zamanına yaklaştı.</b> ' +
+          h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
+        '</div>'
+      : '';
+  }
+});
+
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'homeQ') Ekran.tazele();
+});
+document.addEventListener('click', function (e) {
+  if (e.target.closest && e.target.closest('#homeQTemiz')) {
+    document.getElementById('homeQ').value = '';
+    Ekran.tazele();
   }
 });
 })();
 
 /* ===== ekran: 20-ruhsat.html ===== */
 (function () {
+var rTur = null;
+
+/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı). */
+function plakaBicim(ham) {
+  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
+  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
+  var kalan = t.slice(il.length);
+  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
+  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
+  return [il, harf, rakam].filter(Boolean).join(' ');
+}
+function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+
+function ruhsatDurum() {
+  var p = plakaBicim(document.getElementById('rPlaka').value);
+  var ip = document.getElementById('rPlakaIpucu');
+  if (p && !plakaGecerli(p)) {
+    ip.textContent = 'Plaka eksik — ör. 34 ABC 123';
+    ip.className = 'plate-hint warn';
+  } else {
+    var a = aracBul(p);
+    ip.textContent = a ? a.marka + ' ' + a.model + ' — bu araç kayıtlı' : '';
+    ip.className = 'plate-hint';
+  }
+  document.getElementById('kaydiAc').disabled = !(plakaGecerli(p) && rTur);
+}
+
+function turSec(t) {
+  rTur = t;
+  document.getElementById('turTamirat').setAttribute('aria-pressed', String(t === 'tamirat'));
+  document.getElementById('turBakim').setAttribute('aria-pressed', String(t === 'bakim'));
+  document.getElementById('kmAlan').hidden = (t !== 'bakim');
+  ruhsatDurum();
+}
+
 Ekran.tanim('ruhsat', {
-  ciz: function () { /* 13. işte doldurulacak */ }
+  ciz: function (kok) {
+    /* Ekran her açılışta TEMİZ başlar — yarım kalmış kayıt sonrakine
+       sızmasın. */
+    rTur = null;
+    kok.querySelector('#ruhsatSonuc').hidden = true;
+    ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rTel', 'rKm'].forEach(function (id) {
+      var e = document.getElementById(id); if (e) e.value = '';
+    });
+    turSec(null);
+  }
+});
+
+/* ---- sahte okuma ----
+   Gerçek okuma bir servise bağlanacak (RUHSAT-OKUMA.md C yolu).
+   Burada ekranın DAVRANIŞI gösteriliyor: alanlar dolar, HEPSİ
+   DÜZELTİLEBİLİR, hiçbiri kendiliğinden kaydedilmez. */
+var RUHSAT_ORNEK = [
+  { plaka: '41 P 3873', marka: 'Hyundai', model: 'i20', yil: '2020', motor: '1.4 MPI' },
+  { plaka: '06 BFT 41', marka: 'Ford', model: 'Focus', yil: '2017', motor: '1.5 TDCi' }
+];
+var ruhsatSira = 0;
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.id === 'ruhsatCek') {
+    var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
+    ruhsatSira++;
+    document.getElementById('rPlaka').value = r.plaka;
+    document.getElementById('rMarka').value = r.marka;
+    document.getElementById('rModel').value = r.model;
+    document.getElementById('rYil').value = r.yil;
+    document.getElementById('rMotor').value = r.motor;
+    document.getElementById('ruhsatSonuc').hidden = false;
+    ruhsatDurum();
+    balon('Okundu — yanlış varsa düzelt.');
+  }
+
+  if (t.id === 'ruhsatElle') {
+    document.getElementById('ruhsatSonuc').hidden = false;
+    document.getElementById('rPlaka').focus();
+    ruhsatDurum();
+  }
+
+  if (t.id === 'turTamirat') turSec('tamirat');
+  if (t.id === 'turBakim') turSec('bakim');
+
+  if (t.id === 'kaydiAc') {
+    var p = plakaBicim(document.getElementById('rPlaka').value);
+    if (!aracBul(p)) {
+      ARACLAR.push({
+        plaka: p,
+        marka: document.getElementById('rMarka').value,
+        model: document.getElementById('rModel').value,
+        yil: document.getElementById('rYil').value,
+        motor: document.getElementById('rMotor').value,
+        vin: '', sahipAd: '',
+        sahipTel: document.getElementById('rTel').value,
+        not: ''
+      });
+    }
+    var yeni = {
+      id: KAYITLAR.length + 1, plaka: p, tur: rTur,
+      km: rTur === 'bakim' ? document.getElementById('rKm').value : '',
+      sikayet: '', acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    Ekran.ac('kayit');
+  }
+});
+
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'rPlaka') {
+    e.target.value = plakaBicim(e.target.value);
+    try { e.target.setSelectionRange(e.target.value.length, e.target.value.length); } catch (x) {}
+    ruhsatDurum();
+  }
+});
+})();
+
+/* ===== ekran: 30-kayit.html ===== */
+(function () {
+function kayitToplamCiz(k) {
+  document.getElementById('kToplam').innerHTML =
+    '<div class="tutar-sat genel"><span>Toplam</span>' +
+    '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
+}
+
+function kayitCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+
+  document.getElementById('kayitBaslik').innerHTML =
+    '<svg class="ico ico-sm"><use href="#' + TUR_IKON[k.tur] + '"></use></svg> ' + TUR_AD[k.tur];
+
+  document.getElementById('kayitKunye').innerHTML =
+    '<div class="arac-bas">' + plakaHtml(k.plaka, 'plate-lg') +
+      '<div class="veh-title">' + (a ? a.marka + ' ' + a.model : '') +
+        (a && a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+      '<div class="spec-strip">' +
+        (a && a.motor ? '<span class="spec-val">' + a.motor + '</span>' : '') +
+        (k.tur === 'bakim' && k.km
+          ? '<span class="spec-sep">·</span><span class="spec-val mono">' + k.km + ' km</span>' : '') +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('kSikayet').value = k.sikayet || '';
+
+  document.getElementById('kSatirlar').innerHTML = (k.satirlar || []).length
+    ? k.satirlar.map(function (s, i) {
+        return '<div class="kalem">' +
+          '<span class="k-tip ' + (s.tip === 'parca' ? 'parca' : 'iscilik') + '">' +
+            (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</span>' +
+          '<input class="k-ad" value="' + (s.ad || '').replace(/"/g, '&quot;') +
+            '" data-satir-ad="' + i + '" placeholder="' +
+            (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') + '" aria-label="Satır adı" />' +
+          '<button class="k-sil" data-satir-sil="' + i + '" aria-label="Satırı kaldır">' +
+            '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>' +
+          '<span class="k-tutar-satir">' +
+            '<input class="k-tutar mono" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
+              '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="fiyat" aria-label="Tutar" />' +
+          '</span>' +
+          (s.tip === 'parca'
+            ? '<span class="k-getiren">Parçayı kim getirdi?' +
+                '<button class="cip" data-getiren="' + i + '|tamirci" aria-pressed="' +
+                  (s.kimGetirdi === 'tamirci') + '">Tamirci</button>' +
+                '<button class="cip" data-getiren="' + i + '|musteri" aria-pressed="' +
+                  (s.kimGetirdi === 'musteri') + '">Müşteri</button>' +
+              '</span>'
+            : '') +
+        '</div>';
+      }).join('')
+    : '<p class="kalem-bos">Henüz bir şey yazılmadı — parça ya da işçilik ekle.</p>';
+
+  kayitToplamCiz(k);
+}
+
+Ekran.tanim('kayit', { ciz: kayitCiz });
+
+document.addEventListener('click', function (e) {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var t = e.target.closest('button, [data-arac-ac]');
+  if (!t) return;
+
+  if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
+
+  if (t.id === 'kParcaEkle') {
+    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
+                      kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
+    Ekran.tazele();
+  }
+  if (t.id === 'kIscilikEkle') {
+    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
+    Ekran.tazele();
+  }
+  if (t.id === 'kSikayetMik') {
+    k.sikayet = 'Triger seti değişecek';
+    balon('Duyduğumu yazdım — kontrol et.', true, 2600);
+    Ekran.tazele();
+  }
+  /* K-003: onay bir AKIŞ değil, bir EYLEM. Kayıt beklemeye geçmez,
+     durum değişmez — mesaj gider, iş yürümeye devam eder. */
+  if (t.id === 'kOnayIste') {
+    var a = aracBul(k.plaka);
+    balon((a && a.sahipTel) ? 'Özet gönderildi — ' + a.sahipTel
+                            : 'Telefon yok; özet gönderilemedi.', false, 3000);
+  }
+
+  var sil = t.getAttribute('data-satir-sil');
+  if (sil !== null) { k.satirlar.splice(parseInt(sil, 10), 1); Ekran.tazele(); }
+
+  var g = t.getAttribute('data-getiren');
+  if (g) {
+    var p = g.split('|');
+    k.satirlar[parseInt(p[0], 10)].kimGetirdi = p[1];
+    /* Müşteri getirdiyse satır fiyatsız kalır (S2, K-005). */
+    if (p[1] === 'musteri') k.satirlar[parseInt(p[0], 10)].fiyat = 0;
+    Ekran.tazele();
+  }
+});
+
+document.addEventListener('input', function (e) {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k || !e.target || !e.target.getAttribute) return;
+
+  if (e.target.id === 'kSikayet') { k.sikayet = e.target.value; return; }
+
+  var ad = e.target.getAttribute('data-satir-ad');
+  if (ad !== null) { k.satirlar[parseInt(ad, 10)].ad = e.target.value; return; }
+
+  var f = e.target.getAttribute('data-satir-fiyat');
+  if (f !== null) {
+    k.satirlar[parseInt(f, 10)].fiyat =
+      parseInt((e.target.value || '').replace(/[^0-9]/g, ''), 10) || 0;
+    /* Yalnız toplamı tazele — alanı yeniden çizmek imleci kaçırır. */
+    kayitToplamCiz(k);
+  }
+});
+})();
+
+/* ===== ekran: 40-parca-sor.html ===== */
+(function () {
+var psSecili = null;
+
+function psParcaListesi(k) {
+  /* Yalnız TAMİRCİNİN alacağı ve fiyatı henüz belli olmayan parçalar.
+     Müşterinin getireceği parçanın fiyatını sormanın anlamı yok. */
+  return (k.satirlar || []).filter(function (s) {
+    return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
+  });
+}
+
+function psCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+  var parcalar = psParcaListesi(k);
+
+  document.getElementById('psParcalar').innerHTML = parcalar.length
+    ? parcalar.map(function (s) {
+        return '<div class="kalem">' +
+          '<span class="k-tip parca">PARÇA</span>' +
+          '<span class="k-ad">' + (s.ad || 'adı yazılmamış parça') + '</span>' +
+        '</div>';
+      }).join('')
+    : bosDurumHtml('i-package', 'Sorulacak parça yok',
+        'Servis kaydında fiyatı belli olmayan bir parça olmalı.');
+
+  document.getElementById('psParcacilar').innerHTML = PARCACILAR.map(function (p, i) {
+    return '<button class="cip" data-parcaci="' + i + '" aria-pressed="' +
+      (psSecili === i) + '">' + p.ad + '</button>';
+  }).join('');
+
+  /* Mesajın gövdesi DÜZ METİN — parçacıya giden şey bu, biçim değil. */
+  var satirlar = parcalar.map(function (s) { return '· ' + (s.ad || '?'); }).join('\n');
+  document.getElementById('psMesaj').textContent =
+    (a ? a.marka + ' ' + a.model + ' ' + a.yil + ' · ' + a.motor + '\n' : '') +
+    k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
+    '\n\n📎 ruhsat fotoğrafı eklenecek';
+
+  document.getElementById('psGonder').disabled = (psSecili === null || !parcalar.length);
+}
+
+Ekran.tanim('parca-sor', {
+  ciz: function () { psSecili = null; psCiz(); }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var p = t.getAttribute('data-parcaci');
+  if (p !== null) { psSecili = parseInt(p, 10); psCiz(); }
+
+  if (t.id === 'psGonder' && psSecili !== null) {
+    balon(PARCACILAR[psSecili].ad + ' — WhatsApp açılıyor, mesaj hazır.', false, 3000);
+    Ekran.ac('kayit');
+  }
+});
+})();
+
+/* ===== ekran: 50-teslim.html ===== */
+(function () {
+/* "ALMADIM" BİR ÖDEME YOLUDUR. Veresiye gerçek ve teslimi
+   bekletmemeli (EKRANLAR.md §5). */
+var ODEME_YOLLARI = [
+  { k: 'nakit', ad: 'Nakit' },
+  { k: 'kart', ad: 'Kart' },
+  { k: 'havale', ad: 'Havale' },
+  { k: 'almadim', ad: 'Almadım' }
+];
+var tsSecili = null;
+
+function tsCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+
+  /* Künye SERVİS KAYDIYLA AYNI — hangi aracı teslim ettiğini
+     tanıdığı görünümden okusun, yeni bir düzen öğrenmesin. */
+  document.getElementById('tsKunye').innerHTML =
+    '<div class="arac-bas">' + plakaHtml(k.plaka, 'plate-lg') +
+      '<div class="veh-title">' + (a ? a.marka + ' ' + a.model : '') +
+        (a && a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+      '<div class="spec-strip">' +
+        '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
+        (a && a.motor
+          ? '<span class="spec-sep">·</span><span class="spec-val">' + a.motor + '</span>' : '') +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('tsTutar').innerHTML =
+    /* Rakam BİR KEZ yazılır. Üstte aynı tutarı tekrar etmek "iki ayrı
+       rakam mı?" sorusunu doğuruyordu; üst satır yalnız neyin
+       toplandığını söyler. */
+    '<div class="tutar-sat"><span>' + (k.satirlar || []).length + ' satır</span>' +
+      (fiyatiBekleyen(k)
+        ? '<span class="pill warn">fiyatı girilmemiş satır var</span>' : '') +
+    '</div>' +
+    '<div class="tutar-sat genel"><span>Alınacak</span>' +
+      '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
+
+  document.getElementById('tsOdeme').innerHTML = ODEME_YOLLARI.map(function (o) {
+    return '<button class="cip" data-odeme="' + o.k + '" aria-pressed="' +
+      (tsSecili === o.k) + '">' + o.ad + '</button>';
+  }).join('');
+
+  document.getElementById('tsTeslim').disabled = !tsSecili;
+
+  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın. */
+  document.getElementById('tsNot').innerHTML = (k.tur === 'bakim')
+    ? '<div class="notice accent">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
+        '<span class="n-body">Teslimden sonra <b>' + DUKKAN.bakimPeriyoduAy +
+          ' ay</b> sonrası için bakım hatırlatması kurulacak.</span>' +
+      '</div>'
+    : '';
+}
+
+Ekran.tanim('teslim', {
+  ciz: function () { tsSecili = null; tsCiz(); }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var o = t.getAttribute('data-odeme');
+  if (o) { tsSecili = o; tsCiz(); }
+
+  if (t.id === 'tsTeslim' && tsSecili) {
+    var k = kayitBul(ACIK_KAYIT);
+    var a = aracBul(k.plaka);
+    k.teslimTarihi = '03.09.2026';        /* TEK DURUM ALANI — K-004 */
+    k.odemeYolu = tsSecili;
+
+    /* Bakımsa hatırlatma KURULUR (K-002). Ay üzerinden — km takip
+       edilemiyor, edilen tek şey zaman. */
+    if (k.tur === 'bakim') {
+      var d = new Date(BUGUN.getTime());
+      d.setMonth(d.getMonth() + DUKKAN.bakimPeriyoduAy);
+      k.hatirlatmaTarihi = ('0' + d.getDate()).slice(-2) + '.' +
+                           ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+      k.hatirlatmaGonderildi = false;
+    }
+
+    balon(k.plaka + ' teslim edildi.' +
+      (a && a.sahipTel ? ' Özet gönderildi.' : ' Telefon yok, özet gönderilemedi.'),
+      false, 3200);
+    ACIK_KAYIT = null;
+    Ekran.ac('home');
+  }
+});
+})();
+
+/* ===== ekran: 60-arac.html ===== */
+(function () {
+Ekran.tanim('arac', {
+  ciz: function () {
+    var a = aracBul(ACIK_PLAKA);
+    if (!a) return;
+
+    document.getElementById('arKunye').innerHTML =
+      '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
+        '<div class="veh-title">' + a.marka + ' ' + a.model +
+          (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+        '<div class="spec-strip">' +
+          (a.motor ? '<span class="spec-val">' + a.motor + '</span>' : '') +
+          '<span class="spec-sep">·</span>' +
+          '<span class="spec-val">' + (a.sahipAd || 'sahip yazılmamış') + '</span>' +
+          '<span class="spec-sep">·</span>' +
+          '<span class="spec-val">' + (a.sahipTel || 'telefon yok') + '</span>' +
+        '</div>' +
+      '</div>';
+
+    /* Son bakım + bir sonraki hatırlatma. km burada işe yarıyor:
+       "geçen bakım 142.500'de yapılmış" (K-002). */
+    var bakimlar = aracKayitlari(a.plaka).filter(function (k) {
+      return k.tur === 'bakim' && k.teslimTarihi;
+    });
+    var son = bakimlar[bakimlar.length - 1];
+    document.getElementById('arBakim').innerHTML = son
+      ? '<div class="notice accent">' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
+          '<span class="n-body">Son bakım <b>' + son.teslimTarihi + '</b>' +
+            (son.km ? ' · ' + son.km + ' km' : '') +
+            (son.hatirlatmaTarihi
+              ? '<br>Hatırlatma: <b>' + son.hatirlatmaTarihi + '</b>' : '') +
+          '</span>' +
+        '</div>'
+      : '';
+
+    var kayitlar = aracKayitlari(a.plaka);
+    document.getElementById('arGecmis').innerHTML = kayitlar.length
+      ? kayitlar.map(function (k) { return kayitSatiriHtml(k, { plaka: false }); }).join('')
+      : bosDurumHtml('i-clipboard-list', 'Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
+
+    document.getElementById('arNot').textContent = a.not || 'Not yok.';
+  }
 });
 })();
 
@@ -689,7 +2634,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>efa3d1c1</b><br>' +
+      'Sürüm <b>219310e4</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
