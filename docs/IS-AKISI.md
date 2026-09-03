@@ -206,3 +206,120 @@ Tamircinin dört isteğinden dördüncüsü buydu: *"teslim ettiğinde ödemeyi 
 | **A-9** | 3. adım atlandığında usta fiyatı **nereye** yazıyor — satırın üstüne mi, ayrı alana mı? |
 | **A-10** | Parçacı cevabı geldiğinde usta **nasıl haberdar oluyor** — bildirim mi, listede rozet mi? |
 | **A-4** | *"Parça bekliyor"* kayıtlar listede türetilerek gösterilsin mi (K-004 notu) — **bu akışta 3–4. adımda takılı kayıtlar demek** |
+
+---
+
+# İSTİSNA KOLLARI
+
+> **Kural:** Bir kol ana yola ancak **var olan bir adımın içinden** bağlanabilir. Yeni adım ekleyemez, yeni ekran açmak zorunda değildir. Ana yol yedi adım olarak kalır.
+>
+> Tamircinin *"karmaşık geldi"* dediği şey buydu: v1'de istisnalar ana yola **adım olarak** girmişti.
+
+---
+
+## Kol A · Teşhis — müşteri ne istediğini bilmiyor (%20)
+
+**Nereden bağlanıyor:** Adım 2 · *"Ne istiyor"*
+**Nerede bitiyor:** Adım 2 — aynı yerde, aynı satırla
+
+| | |
+|---|---|
+| Ana yolda | Müşteri söyler → usta yazar |
+| Bu kolda | Müşteri anlatır → **usta bakar** → usta yazar |
+
+**Ekran açmıyor.** Adım 2'nin alanı serbest metin: ana yolda müşterinin dediği yazılıyor, bu kolda ustanın gördüğü. Çıktı **aynı**: kayda bir satır.
+
+> **Şikâyet ve tespit ayrı alanlar DEĞİL.** v1'de iki ayrı akordiyon vardı (*"müşteri ne diyor"* / *"usta ilk izlenimi"*). Tamirci böyle bir ayrım istemedi. Tek alan; usta ne yazacağını bilir.
+
+**Farkı:** Araç lifte kalkar, zaman geçer. Bu **süre farkıdır, adım farkı değildir** — sistemde karşılığı yok.
+
+---
+
+## Kol B · Büyük iş — birden fazla firmadan fiyat (T-11)
+
+**Nereden bağlanıyor:** Adım 3 · *"Parçacıya sor"*
+**Nerede bitiyor:** Adım 4 · *"Fiyat geldi"*
+
+Tamirci: *"Büyük bir iş ise genelde parçalar farklı firmalardan araştırılabiliyor."* → **istisna**, ana yol değil.
+
+| | |
+|---|---|
+| Ana yolda | Bir parçacı seçilir |
+| Bu kolda | **Birden fazla** parçacı seçilir |
+| Adım 4'te | Cevaplar **yan yana** düşer, usta birini seçer |
+
+**Ekran açmıyor** — aynı ekranda çoklu seçim. Cevaplar aynı satırın altında biriktiği için ayrı bir "karşılaştırma ekranı" gerekmiyor.
+
+> v1'de bu bir **ekran ailesiydi** (fiyat karşılaştırma tablosu, en uygun seçili, teklif detayı). Tamirci bunu ana iş sanmamızı düzeltti.
+
+---
+
+## Kol C · Ek iş — bu bir kol bile değil (T-10)
+
+**Nereden bağlanıyor:** Adım 6 · *"İş yapıldı"*
+**Nerede bitiyor:** Aynı yerde
+
+> *"Trigger değiştirilirken, örnek olarak balata da eskidi ise balata değişim teklifi sunuyor tamirci müşteriye. **Fakat bunlar akış olarak değil.** Yani serviste güncelleme yapılabiliyor."*
+
+**Ana yolun zaten var olan davranışı:** kayıt teslim edilene kadar açıktır, satır eklenir (K-003). Ek iş için özel bir şey yapılmıyor — **yapılmaması** gerekiyor.
+
+Parça gerekiyorsa Adım 3–4'e geri dönülür. Bu bir geri dönüş, yeni bir yol değil.
+
+---
+
+## Kol D · Parçayı müşteri getirdi (T-7, T-8)
+
+**Nereden bağlanıyor:** Adım 5 · *"Parça geldi — kim getirdi?"*
+**Nerede bitiyor:** Adım 6
+
+İki giriş noktası var:
+
+1. **Baştan belli** — müşteri *"parçayı ben alırım"* der → Adım 3–4 hiç olmaz, doğrudan Adım 5
+2. **Sonradan** — fiyat söylenir, müşteri *"ucuza buldum, kendim alayım"* der → Adım 4'ten Adım 5'e geçilir, gelen fiyat **kayıtta kalır** (ne kadara alabileceği bilgisi değerli)
+
+| | |
+|---|---|
+| Satır | Fiyatsız ya da 0 ₺ (S2) |
+| `kimGetirdi` | `musteri` (K-005) |
+| Sonucu | Sorun çıkarsa **tekrar işçilik alınır** — araç ikinci kez geldiğinde bu bilgi karşıya çıkar |
+
+**Ekran açmıyor** — Adım 5'teki iki düğmeden biri.
+
+---
+
+## Kol E · Onay isteme (K-003)
+
+**Nereden bağlanıyor:** Kayıt açıkken **her an**
+**Nerede bitiyor:** Hiçbir yerde — **akış onayı beklemez**
+
+> *"Müşteri onay vermek zorunda değil. Tamirciye sözlü olarak söylemiş olabilir. Onay iste diye ayrıca bir alan olabilir."*
+
+Tek düğme: **"Onay iste"** → müşteriye özet gider. Cevap gelirse kayda düşer, gelmezse hiçbir şey olmaz. **Kayıt beklemede kalmaz, durum değişmez** (K-004: tek durum var, o da teslim).
+
+> Bu, kolların en önemlisi — çünkü **kol olmayan** bir şey. v1'de onay bir akıştı ve ekranların dörtte birini tutuyordu.
+
+---
+
+## Kolların ana yola maliyeti
+
+| Kol | Yeni ekran | Yeni adım | Ana yola eklediği |
+|---|---|---|---|
+| A · Teşhis | — | — | Yok (aynı alan) |
+| B · Büyük iş | — | — | Adım 3'te çoklu seçim |
+| C · Ek iş | — | — | Yok (zaten var) |
+| D · Müşteri parçası | — | — | Adım 5'te ikinci düğme |
+| E · Onay isteme | — | — | Bir düğme |
+
+**Beş kolun toplam maliyeti: sıfır yeni ekran, sıfır yeni adım.**
+
+Ana yol yedi adım, 10–13 dokunuş olarak duruyor.
+
+---
+
+## Kollarla ilgili AÇIK
+
+| Kod | Karar |
+|---|---|
+| **A-11** | **Müşteri vazgeçerse ne olur?** Tamirci bundan hiç bahsetmedi, K-003 red panelini kaldırdı. Kayıt yalnız işçilikle mi teslim edilir, yoksa "yapılmadı" diye mi kapanır? Öneri: **teslim edilir** — araç çıkıyorsa iş bitmiştir, satırlar ne ise odur |
+| **A-12** | Kol B'de **cevaplar ne kadar bekletilir?** Bir parçacı hiç dönmezse kayıt takılı mı kalır? Öneri: takılmaz — usta gelen cevapla ilerler |
+| **A-13** | Kol D'deki *"sonradan"* hâlinde gelen fiyat kayıtta kalıyor. Bu **rakam müşteriye görünmeli mi**? (Ustanın alabileceği fiyat) Öneri: hayır |
