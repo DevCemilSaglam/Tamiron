@@ -29,6 +29,10 @@ var ACIK_PLAKA = null;
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
   var gecmis = [];
+  /* v1'in header'inda ILERI dugmesi vardi (Cemil 03.09: "Header ayni
+     sekilde"). Ileri yigini geri'ye basildikca dolar, YENI bir ekran
+     acilinca temizlenir — tarayicinin kurali, ogrenilmis davranis. */
+  var ileriYigin = [];
   var acik = null;
 
   function tanim(ad, o) {
@@ -71,20 +75,31 @@ var Ekran = (function () {
   function ac(ad) {
     if (ad === acik) return;
     if (acik) gecmis.push(acik);
+    ileriYigin.length = 0;      /* yeni yol acildi — ileri gecmisi olur */
     goster(ad);
   }
 
   function geri() {
     if (!gecmis.length) return;
+    if (acik) ileriYigin.push(acik);
     goster(gecmis.pop());
+  }
+
+  function ileri() {
+    if (!ileriYigin.length) return;
+    if (acik) gecmis.push(acik);
+    goster(ileriYigin.pop());
   }
 
   function geriTazele() {
     var b = document.getElementById('geriBtn');
     if (b) b.disabled = gecmis.length === 0;
+    var f = document.getElementById('ileriBtn');
+    if (f) f.disabled = ileriYigin.length === 0;
   }
 
-  return { tanim: tanim, ac: ac, geri: geri, goster: goster, tazele: tazele,
+  return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
+           goster: goster, tazele: tazele,
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
            geriVarMi: function () { return gecmis.length > 0; } };
@@ -130,9 +145,258 @@ function norm(s) {
     .replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
 }
 
+/* ============ TEMA — ÜÇ HÂL ============
+   Cemil, 03.09: "Tema konusu da devam edecek."
+
+   Üç hâl var, iki değil: SİSTEM · AÇIK · KOYU. Sistem hâli gerçek bir
+   seçenektir — telefonu akşam koyuya geçen usta, uygulamanın da
+   geçmesini bekler. v1'de köke sabit data-theme="light" yazılıydı ve
+   bu, sistem tercihini sessizce eziyordu.
+
+   Seçim yoksa kökte data-theme YOKTUR; tokens.css'in
+   prefers-color-scheme bloğu devreye girer. */
+var Tema = (function () {
+  var SIRA = ['sistem', 'acik', 'koyu'];
+  var ANAHTAR = 'tamiron-tema';
+  var secim = 'sistem';
+
+  function sistemKoyuMu() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  }
+
+  function uygula() {
+    var k = document.documentElement;
+    if (secim === 'sistem') k.removeAttribute('data-theme');
+    else k.setAttribute('data-theme', secim === 'koyu' ? 'dark' : 'light');
+    ciz();
+  }
+
+  function ciz() {
+    var btn = document.getElementById('temaBtn');
+    if (!btn) return;
+    /* Düğme BİR SONRAKİ hâli değil, ŞU ANKİ hâli söyler — v1'de
+       "Koyu tema" yazan düğme koyu temadayken de öyle yazıyordu ve
+       hangi hâlde olduğu okunamıyordu. */
+    var etiket = { sistem: 'Telefona uy', acik: 'Açık tema', koyu: 'Koyu tema' }[secim];
+    var ikon = (secim === 'koyu' || (secim === 'sistem' && sistemKoyuMu())) ? 'i-moon' : 'i-sun';
+    document.getElementById('temaEtiket').textContent = etiket;
+    document.getElementById('temaIkon').innerHTML = '<use href="#' + ikon + '"></use>';
+    btn.setAttribute('aria-label', 'Tema: ' + etiket + ' — değiştirmek için dokun');
+    var ip = document.getElementById('temaIpucu');
+    if (ip) {
+      ip.textContent = secim === 'sistem'
+        ? 'Şu an telefonun ayarını izliyor (' + (sistemKoyuMu() ? 'koyu' : 'açık') + ').'
+        : 'Telefonun ayarından bağımsız.';
+    }
+  }
+
+  function dondur() {
+    secim = SIRA[(SIRA.indexOf(secim) + 1) % SIRA.length];
+    try { localStorage.setItem(ANAHTAR, secim); } catch (e) {}
+    uygula();
+  }
+
+  function baslat() {
+    try {
+      var s = localStorage.getItem(ANAHTAR);
+      if (SIRA.indexOf(s) !== -1) secim = s;
+    } catch (e) {}      /* gizli sekmede localStorage atar — tema yine çalışsın */
+    uygula();
+    /* Sistem hâlindeyken telefon temasını değiştirirse ikon/ipucu
+       kendiliğinden güncellensin. */
+    if (window.matchMedia) {
+      var mq = window.matchMedia('(prefers-color-scheme: dark)');
+      var d = function () { if (secim === 'sistem') ciz(); };
+      if (mq.addEventListener) mq.addEventListener('change', d);
+      else if (mq.addListener) mq.addListener(d);
+    }
+  }
+
+  return { baslat: baslat, dondur: dondur, secimi: function () { return secim; } };
+})();
+
+/* ============ ÇEKMECE ============
+   K-009 ile geri geldi. Sağdan açılır, karartma üstüne biner.
+   ERİŞİLEBİLİRLİK v1'den: aria-hidden + inert (arkadaki ekran
+   klavyeye kapanır), ESC kapatır, odak çekmeceye girer ve
+   kapanınca menü düğmesine döner. */
+var Cekmece = (function () {
+  var acikMi = false;
+
+  function ogeler() {
+    return {
+      c: document.getElementById('drawer'),
+      k: document.getElementById('drawerOverlay'),
+      b: document.getElementById('menuBtn')
+    };
+  }
+
+  /* ARKA PLAN KLAVYEYE KAPANIR. Yalnız çekmeceyi görünür yapmak
+     yetmiyor: sekme tuşu arkadaki ekranın düğmelerinde gezinmeye
+     devam ediyordu. Denetimin DRAWER-ODAK-SIZINTISI testi tam bu
+     hatayı otomatikleştiriyor ve ilk yazımda yakaladı. */
+  function arkaPlan(kapali) {
+    var ust = document.querySelector('.topbar');
+    if (ust) { if (kapali) ust.setAttribute('inert', ''); else ust.removeAttribute('inert'); }
+    var ekranlar = document.querySelectorAll('.screen');
+    for (var i = 0; i < ekranlar.length; i++) {
+      if (kapali) ekranlar[i].setAttribute('inert', '');
+      else ekranlar[i].removeAttribute('inert');
+    }
+  }
+
+  function ac() {
+    var o = ogeler();
+    if (!o.c || acikMi) return;
+    acikMi = true;
+    o.c.classList.add('open');
+    o.k.classList.add('open');
+    o.c.removeAttribute('inert');
+    o.c.setAttribute('aria-hidden', 'false');
+    o.b.setAttribute('aria-expanded', 'true');
+    arkaPlan(true);
+    cizBildirimler();
+    cizPeriyot();
+    var ilk = o.c.querySelector('button, [tabindex]');
+    if (ilk) ilk.focus();
+  }
+
+  function kapa() {
+    var o = ogeler();
+    if (!o.c || !acikMi) return;
+    acikMi = false;
+    o.c.classList.remove('open');
+    o.k.classList.remove('open');
+    o.c.setAttribute('inert', '');
+    o.c.setAttribute('aria-hidden', 'true');
+    arkaPlan(false);
+    o.b.setAttribute('aria-expanded', 'false');
+    o.b.focus();
+  }
+
+  /* BİLDİRİM = BAKIM HATIRLATMASI (yedinci iş). Uydurulmuş bildirim
+     yok: yalnız tarihi gelmiş ve henüz gönderilmemiş hatırlatmalar. */
+  function bekleyenHatirlatmalar() {
+    if (typeof KAYITLAR === 'undefined') return [];
+    return KAYITLAR.filter(function (k) {
+      return k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
+             tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
+    });
+  }
+
+  function tariheCevir(g) {
+    var p = (g || '').split('.');
+    return new Date(+p[2], (+p[1] || 1) - 1, +p[0] || 1);
+  }
+
+  function cizBildirimler() {
+    var liste = bekleyenHatirlatmalar();
+    var bol = document.getElementById('notifSection');
+    var rozet = document.getElementById('menuBadge');
+    if (rozet) rozet.textContent = liste.length ? String(liste.length) : '';
+    if (!bol) return;
+    bol.hidden = liste.length === 0;
+    document.getElementById('notifCount').textContent = String(liste.length);
+    document.getElementById('notifList').innerHTML = liste.map(function (k) {
+      var a = (typeof aracBul === 'function') ? aracBul(k.plaka) : null;
+      return '<button class="notif-item" data-hatirlatma="' + k.id + '">' +
+        '<span class="ni-ic warn"><svg class="ico ico-sm">' +
+          '<use href="#i-calendar-clock"></use></svg></span>' +
+        '<span class="ni-body">' +
+          '<span class="ni-title">Bakım zamanı geldi</span>' +
+          '<span class="ni-sub">' + k.plaka +
+            (a ? ' · ' + a.marka + ' ' + a.model : '') + '</span>' +
+        '</span>' +
+      '</button>';
+    }).join('');
+  }
+
+  /* Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
+     A-3 hâlâ açık; varsayılan 6 ay. */
+  function cizPeriyot() {
+    var g = document.getElementById('periyotGrup');
+    if (!g || typeof DUKKAN === 'undefined') return;
+    g.innerHTML = [3, 6, 12].map(function (ay) {
+      return '<button class="cip" data-periyot="' + ay + '" aria-pressed="' +
+        (DUKKAN.bakimPeriyoduAy === ay) + '">' + ay + ' ay</button>';
+    }).join('');
+  }
+
+  return { ac: ac, kapa: kapa, ciz: cizBildirimler,
+           acikMi: function () { return acikMi; } };
+})();
+
+/* Denetimin 14. testi (DRAWER-ODAK-SIZINTISI) v1'in adlarini ariyor.
+   Cekmece v2'de modul icinde; test yeniden yazilmasin diye kopru. */
+function openDrawer() { Cekmece.ac(); }
+function closeDrawer() { Cekmece.kapa(); }
+
 /* ---- açılış ---- */
 document.addEventListener('DOMContentLoaded', function () {
-  var g = document.getElementById('geriBtn');
-  if (g) g.addEventListener('click', function () { Ekran.geri(); });
+  var bagla = function (id, fn) {
+    var e = document.getElementById(id);
+    if (e) e.addEventListener('click', fn);
+  };
+
+  bagla('geriBtn', function () { Ekran.geri(); });
+  bagla('ileriBtn', function () { Ekran.ileri(); });
+  bagla('menuBtn', function () { Cekmece.ac(); });
+  bagla('drawerClose', function () { Cekmece.kapa(); });
+  bagla('drawerOverlay', function () { Cekmece.kapa(); });
+  bagla('brandHome', function () { Ekran.ac('home'); });
+  bagla('temaBtn', function () { Tema.dondur(); });
+
+  /* ARA — yeni ekran AÇMIYOR. Ana ekrandaki arama kutusuna götürüp
+     odaklıyor; ekran bütçesi 6'da kalıyor. */
+  var araya = function () {
+    Cekmece.kapa();
+    Ekran.ac('home');
+    var k = document.getElementById('homeQ');
+    if (k) { k.focus(); k.select(); }
+  };
+  bagla('araBtn', araya);
+  bagla('drawerAra', araya);
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && Cekmece.acikMi()) Cekmece.kapa();
+  });
+
+  /* Çekmece içinden gezinince çekmece kapanmalı — açık kalırsa
+     kullanıcı gittiği ekranı göremez. */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-git], [data-hatirlatma], [data-periyot]');
+    if (!t || !Cekmece.acikMi()) return;
+
+    var hp = t.getAttribute('data-periyot');
+    if (hp) {
+      DUKKAN.bakimPeriyoduAy = parseInt(hp, 10);
+      Cekmece.ciz();
+      var g = document.getElementById('periyotGrup');
+      if (g) {
+        var cipler = g.querySelectorAll('[data-periyot]');
+        for (var i = 0; i < cipler.length; i++) {
+          cipler[i].setAttribute('aria-pressed',
+            String(+cipler[i].getAttribute('data-periyot') === DUKKAN.bakimPeriyoduAy));
+        }
+      }
+      balon('Bakım periyodu ' + hp + ' ay oldu.');
+      return;                        /* ayar çekmecede kalır, kapatmaz */
+    }
+
+    var hb = t.getAttribute('data-hatirlatma');
+    if (hb) {
+      ACIK_KAYIT = parseInt(hb, 10);
+      var kk = (typeof kayitBul === 'function') ? kayitBul(ACIK_KAYIT) : null;
+      if (kk) { ACIK_PLAKA = kk.plaka; }
+      Cekmece.kapa();
+      Ekran.ac('arac');
+      return;
+    }
+
+    Cekmece.kapa();
+  });
+
+  Tema.baslat();
   Ekran.goster('home');
+  Cekmece.ciz();          /* rozet açılışta doğru sayıyı göstersin */
 });

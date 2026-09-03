@@ -1,5 +1,8 @@
 <!doctype html>
-<html lang="tr" data-theme="light">
+<!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
+     (tokens.css'teki prefers-color-scheme bloğu). Buraya "light"
+     yazmak, kullanıcının sistem tercihini sessizce eziyordu. -->
+<html lang="tr">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -14,14 +17,30 @@
 <body>
 
 <!-- ================= KABUK =================
-     v1'in üst barı AYNEN: logo solda (ana ekrana döner), geri sağda.
-     Çekmece yok — v2'de altı ekran var ve hepsine ana ekrandan ya da
-     akışın kendisinden ulaşılıyor (T-18: iç içe menü yok). O yüzden
-     v1'deki hamburger düğmesi de yok; onun dışında üst bar aynı. -->
+     v1'in ÜST BARI AYNEN, hiçbir düğmesi eksik değil (Cemil, 03.09:
+     "Header aynı şekilde tutmamız gerekiyordu"):
+       solda  menü (rozetli) + logo
+       sağda  ara · geri · ileri
+
+     ÇEKMECE GERİ GELDİ (K-009). TASARIM-SISTEMI v2.0'da "çekmece yok"
+     yazıyordu; tema anahtarının evi oydu ve kalkınca temanın gideceği
+     yer kalmamıştı.
+
+     ÇEKMECENİN İÇİ v2'NİN: v1'de on yedi menü maddesi vardı ve çoğu
+     v2'de olmayan ekranlara gidiyordu. Burada yalnız yedi işe hizmet
+     eden üç yol var; ara düğmesi de yeni ekran açmıyor, ana ekranın
+     kendi arama kutusuna götürüyor (ekran bütçesi 6'da kalıyor). -->
 <div class="device">
 
   <header class="topbar">
     <div class="topbar-left">
+      <button class="icon-btn" id="menuBtn" aria-label="Menü" aria-haspopup="true"
+              aria-expanded="false" aria-controls="drawer" title="Menü">
+        <svg class="ico"><use href="#i-menu"></use></svg>
+        <!-- Rozet = BUGÜN GELMİŞ bakım hatırlatması sayısı (yedinci iş).
+             Boşken .badge:empty ile gizlenir; sahte sayı göstermez. -->
+        <span class="badge" id="menuBadge" aria-hidden="true"></span>
+      </button>
       <span class="brand-logo" id="brandHome" role="button" tabindex="0" title="Ana menü" aria-label="Ana menü">
       <!-- brand/tamiron-logo.svg — TEK blok; tema farkı yalnız --logo-word (A-D3) -->
       <svg class="logo-mark" viewBox="60 126 906 236" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tamiron">
@@ -40,11 +59,17 @@
       </span>
     </div>
     <span class="spacer"></span>
-    <div class="topbar-nav">
+    <nav class="topbar-nav" aria-label="Gezinme">
+      <button class="icon-btn" id="araBtn" aria-label="Ara" title="Ara">
+        <svg class="ico"><use href="#i-search"></use></svg>
+      </button>
       <button class="icon-btn" id="geriBtn" aria-label="Geri" title="Geri">
         <svg class="ico"><use href="#i-chevron-left"></use></svg>
       </button>
-    </div>
+      <button class="icon-btn" id="ileriBtn" aria-label="İleri" title="İleri">
+        <svg class="ico"><use href="#i-chevron-right"></use></svg>
+      </button>
+    </nav>
   </header>
 
   <!-- PWA kurulum düğmesi buraya enjekte edilir (tools/pwa-build.js).
@@ -52,6 +77,81 @@
   <div id="kurulumYuva"></div>
 
   <!-- @@EKRANLAR@@ -->
+
+  <!-- ================= ÇEKMECE =================
+       v1'in bileşenleri, v2'nin içeriği. Üç bölüm:
+         BİLDİRİMLER  bakım hatırlatmaları (yedinci iş) — başlık dahil
+                      yalnız hatırlatma varken görünür
+         BÖLÜMLER     yedi işe hizmet eden üç yol; hiçbiri yeni ekran değil
+         AYARLAR      bakım periyodu (K-002) + tema
+
+       ÜZERİNDE YOK: kullanıcı/oturum (v2'de yetki yok) · stok · mal
+       kabul · tahsilat · muhasebe · müşteriler · yaklaşan kontroller.
+       v1'de bunların hepsi vardı ve tamircinin "karmaşık" dediği
+       yığındı. -->
+  <div class="drawer-overlay" id="drawerOverlay"></div>
+  <aside class="drawer" id="drawer" role="dialog" aria-modal="true"
+         aria-label="Menü" aria-hidden="true" inert>
+    <div class="drawer-head">
+      <span class="drawer-title">Menü</span>
+      <button class="icon-btn" id="drawerClose" aria-label="Menüyü kapat" title="Kapat">
+        <svg class="ico"><use href="#i-x"></use></svg>
+      </button>
+    </div>
+    <div class="drawer-body">
+
+      <section id="notifSection" hidden>
+        <div class="drawer-sec-label">
+          <svg class="ico ico-sm"><use href="#i-bell"></use></svg> Bildirimler
+          <span class="notif-count" id="notifCount">0</span>
+        </div>
+        <div class="notif-list" id="notifList"></div>
+        <hr class="divider" />
+      </section>
+
+      <div class="drawer-sec-label">
+        <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç ve iş
+      </div>
+      <button class="drawer-item" data-git="ruhsat">
+        <span class="di-ic"><svg class="ico"><use href="#i-camera"></use></svg></span>
+        Araç girişi
+      </button>
+      <button class="drawer-item" data-git="home">
+        <span class="di-ic"><svg class="ico"><use href="#i-clipboard-list"></use></svg></span>
+        İçerideki araçlar
+      </button>
+      <button class="drawer-item" id="drawerAra">
+        <span class="di-ic"><svg class="ico"><use href="#i-search"></use></svg></span>
+        Plaka ara
+      </button>
+
+      <hr class="divider" />
+
+      <div class="drawer-sec-label">
+        <svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar
+      </div>
+
+      <!-- Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
+           Native <select> KULLANILMAZ (tema uygulanmaz); v1'in .cip'i. -->
+      <div class="setting-row">
+        <span class="sr-txt">
+          <span class="sr-label">Bakım periyodu</span>
+          <span class="sr-sub">Teslimden sonra ne kadar süre için hatırlatma kurulsun</span>
+        </span>
+      </div>
+      <div class="cip-grup" id="periyotGrup" role="group" aria-label="Bakım periyodu"></div>
+
+      <div class="setting-row">
+        <span class="sr-label">Tema</span>
+        <button class="theme-toggle" id="temaBtn" aria-label="Tema değiştir" title="Tema değiştir">
+          <svg class="ico" id="temaIkon"><use href="#i-moon"></use></svg>
+          <span id="temaEtiket">Koyu tema</span>
+        </button>
+      </div>
+      <p class="plate-hint" style="padding:0 12px 6px" id="temaIpucu"></p>
+
+    </div>
+  </aside>
 
 </div>
 

@@ -60,7 +60,11 @@ var KAYITLAR = [
       { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: 0, kimGetirdi: '' }
     ] },
 
-  /* Teslim edilmiş — ana ekranda GÖRÜNMEZ, araç geçmişinde görünür */
+  /* Teslim edilmiş — ana ekranda GÖRÜNMEZ, araç geçmişinde görünür.
+     HATIRLATMASI GEÇMİŞTE: 15.03'te teslim edilmiş, 6 ay sonrası
+     15.09'du ama tarih 03.09 — henüz gelmedi, rozet çıkmaz.
+     Vadesi GELMİŞ bir hatırlatma aşağıda (id 5) duruyor; yoksa
+     yedinci iş prototipte hiç görünmüyordu. */
   { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
     sikayet: 'Periyodik bakım',
     acilis: '15.03.2026', teslimTarihi: '15.03.2026',
@@ -69,6 +73,18 @@ var KAYITLAR = [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
       { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: 0, kimGetirdi: '' }
+    ] },
+
+  /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
+     Menü rozeti ve çekmecedeki bildirim bu kayıttan besleniyor. */
+  { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
+    sikayet: 'Periyodik bakım',
+    acilis: '20.02.2026', teslimTarihi: '20.02.2026',
+    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
+        marka: '', kod: '', tanim: 'tanimlanamadi' },
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
     ] }
 ];
 

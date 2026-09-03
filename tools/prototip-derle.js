@@ -125,6 +125,27 @@ while ((h = hedefRe.exec(tumMetin))) {
   }
 }
 
+/* derleme denetimi 5: TANIMSIZ TOKEN
+   03.09 — `--nav-hover` her yerde kullanılıyordu ama tokens.css'te
+   TANIMLI DEĞİLDİ. Tanımsız var() geçersizdir: bildirim düşer, hover
+   hiçbir şey yapmaz ve hata mesajı çıkmaz. Ölü ikon referansıyla aynı
+   sınıf — sessiz bozulma. Yalnız kendi token'larımız (--x) denetlenir;
+   yedek değeri olan var(--x, y) kullanımı zaten güvenlidir. */
+{
+  const tanimli = new Set();
+  const tanimRe = /(--[\w-]+)\s*:/g;
+  let td;
+  while ((td = tanimRe.exec(css))) tanimli.add(td[1]);
+
+  const kullanimRe2 = /var\(\s*(--[\w-]+)\s*([,)])/g;
+  const eksikToken = new Set();
+  let tk;
+  while ((tk = kullanimRe2.exec(css))) {
+    if (tk[2] === ')' && !tanimli.has(tk[1])) eksikToken.add(tk[1]);
+  }
+  eksikToken.forEach(t => uyarilar.push(`var(${t}) — böyle bir token tanımlı değil`));
+}
+
 /* ---- 5. ikonlar ---- */
 const ikonYol = path.join(KAYNAK, 'ikonlar.svg');
 const ikonlar = fs.existsSync(ikonYol) ? oku(ikonYol) : '';

@@ -498,6 +498,19 @@ function stilMetni() {
   });
 })();
 
+  /* 26) YETIM VERI — kayit, olmayan bir araca bagli (03.09.2026)
+     Bir bakim kaydini elle eklerken plakasini ARACLAR'da olmayan bir
+     plaka yazdim. Ekran patlamiyor, yalnizca marka/model bos ciziliyor
+     ve neden bos oldugu hicbir yerde yazmiyor. Sessiz bozulma. */
+  if (typeof KAYITLAR !== 'undefined' && typeof ARACLAR !== 'undefined') {
+    var plakalar = ARACLAR.map(function (a) { return a.plaka; });
+    KAYITLAR.forEach(function (k) {
+      if (plakalar.indexOf(k.plaka) === -1) {
+        ek('YETIM-VERI', '(veri)', 'kayit #' + k.id + ' -> "' + k.plaka + '" ARACLAR icinde yok');
+      }
+    });
+  }
+
   showScreen('home');
   console.log('SAGLIK DENETIMI — '+ekranlar.length+' ekran, '+b.length+' bulgu');
   b.forEach(function(x){

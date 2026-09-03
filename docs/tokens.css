@@ -90,7 +90,14 @@
   --on-accent:      #FFFFFF;
   --highlight:            var(--brand-orange);   /* üçüncü vurgu (turuncu) */
 
-  /* sol menü — zemine karışır (ayrı koyu blok DEĞİL) */
+  /* Dokunulan yüzeyin geri bildirimi (icon-btn, çekmece satırı, ghost buton).
+     03.09: bu token KULLANILIYORDU ama TANIMSIZDI — tanımsız var()
+     geçersizdir, hover hiçbir şey yapmıyordu ve kimse fark etmemişti.
+     Derlemeye "tanımsız token" denetimi eklendi. */
+  --nav-hover:   color-mix(in srgb, var(--text) 6%, transparent);
+  --nav-on-bg:   color-mix(in srgb, var(--primary) 12%, transparent); /* SEÇİLİ öğe dolgusu (.cip) */
+  --info:        var(--primary);   /* bilgi / nötr — İŞÇİLİK rozeti */
+  --info-bg:     #E4EBF7;
 
   --crit: var(--sem-crit);  --crit-bg: #FBE7E2;
   --warn: var(--sem-warn);  --warn-bg: #F6EDD9;
@@ -123,6 +130,10 @@
   --accent-soft:    #0F2A28;
   --on-accent:      #04201C;
   --highlight:            var(--brand-orange-bright);
+  --nav-hover:   color-mix(in srgb, #fff 6%, transparent);
+  --nav-on-bg:   color-mix(in srgb, var(--primary) 22%, transparent);
+  --info:        var(--primary);
+  --info-bg:     #111E33;
 
   --crit: var(--sem-crit-dark);  --crit-bg: #2A1512;
   --warn: var(--sem-warn-dark);  --warn-bg: #241C0E;
@@ -148,5 +159,8 @@
     --shadow-sm:0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
     --scrim: rgba(0,0,0,.62);
+    --nav-hover: color-mix(in srgb, #fff 6%, transparent);
+    --nav-on-bg: color-mix(in srgb, var(--primary) 22%, transparent);
+    --info: var(--primary); --info-bg: #111E33;
   }
 }

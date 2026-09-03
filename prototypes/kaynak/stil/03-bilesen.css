@@ -1049,3 +1049,110 @@ alanları ::before ile büyür. Ölçüm (30.08,
    kadar genis kalir. */
 .kalem .k-tutar-satir { flex-wrap: wrap; }
 .kalem input.k-tutar { min-width: 0; }
+
+/* ============================================================
+   ÇEKMECE (DRAWER) + OVERLAY — v1'den AYNEN geri (03.09.2026)
+   ------------------------------------------------------------
+   TASARIM-SISTEMI v2.0'da "ÇEKMECE YOK" yazıyordu. Cemil geri aldı:
+   "Header aynı şekilde tutmamız gerekiyordu. Tema konusu da devam
+   edecek." Tema anahtarının evi zaten çekmeceydi; çekmece kalkınca
+   temanın gideceği yer kalmamıştı. K-009.
+
+   İÇERİK v2'nin: v1'in on yedi menü maddesi v2'de olmayan ekranlara
+   gidiyordu. Buradaki kurallar v1'in, doldurdukları v2'nin.
+   ============================================================ */
+.drawer-overlay {
+  position: absolute; inset: 0; z-index: 45;
+  background: var(--scrim);
+  opacity: 0; visibility: hidden; transition: opacity .22s ease, visibility .22s ease;
+}
+.drawer-overlay.open { opacity: 1; visibility: visible; }
+.drawer {
+  position: absolute; top: 0; right: 0; z-index: 46;
+  height: 100%; width: 82%; max-width: 320px;
+  background: var(--surface); border-left: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  display: flex; flex-direction: column;
+  transform: translateX(100%); transition: transform .24s ease;
+  overscroll-behavior: contain;
+}
+.drawer.open { transform: translateX(0); }
+.drawer-head {
+  flex: none; display: flex; align-items: center; justify-content: space-between;
+  height: 68px; padding: 0 12px 0 18px; border-bottom: 1px solid var(--line);
+}
+.drawer-title { font-family: var(--font-display); font-weight: 700; font-size: 19px; }
+.drawer-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 14px 12px; display: flex; flex-direction: column; gap: 4px; }
+.drawer-item {
+  display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+  padding: 13px 12px; border: none; background: transparent; color: var(--text);
+  border-radius: var(--radius-md); font-size: 16px; font-weight: 500;
+  transition: background .15s;
+}
+.drawer-item:hover { background: var(--nav-hover); }
+.drawer-item:active { background: var(--accent-soft); }
+.drawer-item .di-ic {
+  width: 40px; height: 40px; flex: none; border-radius: var(--radius-md);
+  background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+}
+.drawer-sec-label {
+  font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--muted); display: flex; align-items: center; gap: 7px;
+  padding: 6px 12px 4px;
+}
+#notifSection .drawer-sec-label {
+  position: sticky; top: 0; background: var(--surface);
+  z-index: 10; margin: -4px -4px 4px; padding: 8px 12px; border-radius: 0;
+}
+.divider { height: 1px; background: var(--line); border: none; margin: 18px 0 14px; }
+.drawer .divider { margin: 10px 8px; }
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; }
+.setting-row .sr-label { font-size: 15.5px; font-weight: 500; }
+.setting-row .sr-sub { display: block; font-size: 12.5px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+.setting-row .sr-txt { min-width: 0; }
+.theme-toggle {
+  display: inline-flex; align-items: center; gap: 8px; flex: none;
+  border: 1px solid var(--line); background: var(--surface); color: var(--text);
+  border-radius: var(--radius-pill); padding: 8px 14px 8px 12px; font-size: 14px; font-weight: 600;
+  /* 44 px dokunma hedefi — v1'de bu satır yoktu ve denetim yakalardı. */
+  min-height: 44px;
+  transition: background .15s, transform .1s;
+}
+.theme-toggle:hover { background: var(--nav-hover); }
+.theme-toggle:active { transform: scale(.97); }
+.theme-toggle .ico { width: 18px; height: 18px; color: var(--accent); }
+
+/* Çekmece · bildirimler */
+.notif-count {
+  min-width: 20px; height: 18px; padding: 0 6px; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--crit); color: var(--on-primary); border-radius: var(--radius-pill);
+  font-size: 11px; font-weight: 700; font-family: var(--font-mono); letter-spacing: 0;
+}
+.notif-list { display: flex; flex-direction: column; gap: 8px; padding: 4px 4px 2px; }
+.notif-item {
+  position: relative; display: flex; gap: 11px; align-items: flex-start;
+  width: 100%; text-align: left; padding: 11px 12px;
+  border: none; background: var(--accent-soft); border-radius: var(--radius-md);
+}
+.notif-item .ni-ic { flex: none; margin-top: 1px; }
+.notif-item .ni-ic.ok { color: var(--ok); }
+.notif-item .ni-ic.warn { color: var(--warn); }
+.notif-item .ni-body { min-width: 0; flex: 1; }
+/* v1'de bunlar div'di; burada <button> icinde <span> oldular ve satir
+   basi kayboldu -- baslik ile plaka yan yana yapisiyordu. Blok
+   yapmak sart, "v1'den aynen" almak yetmiyor. */
+.notif-item .ni-title { display: block; font-weight: 600; font-size: 14.5px; color: var(--text); }
+.notif-item .ni-sub { display: block; margin-top: 2px; font-size: 12.5px; color: var(--muted); font-family: var(--font-mono); }
+
+/* Menü düğmesinin rozeti */
+.icon-btn .badge {
+  position: absolute; top: -3px; right: -3px;
+  min-width: 17px; height: 17px; padding: 0 4px; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--crit); color: var(--on-primary); border: 2px solid var(--bg);
+  border-radius: var(--radius-pill); font-size: 10.5px; font-weight: 700; line-height: 1;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+}
+.icon-btn .badge:empty { display: none; }
