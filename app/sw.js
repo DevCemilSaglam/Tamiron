@@ -3,7 +3,7 @@
    Strateji: kurulumda tum varliklari onbellege al; sonra ONBELLEK-ONCE, ag yedek.
    SURUM build sirasinda tools/pwa-build.js tarafindan damgalanir; degisince
    eski onbellek silinir ve yeni surum yuklenir. */
-const SURUM = 'f5f54344';
+const SURUM = 'a5f9f93a';
 const ONBELLEK = 'tamiron-' + SURUM;
 
 const VARLIKLAR = [
