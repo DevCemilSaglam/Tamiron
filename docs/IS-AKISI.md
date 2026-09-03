@@ -432,8 +432,15 @@ Kısa, sade, tek iş. Tamircinin müşterisi teknolojiden uzak olabilir (T-18) �
 > 34 ABC 123 plakalı aracınızın bakım zamanı geldi.
 > Son bakım: 15.03.2026 · 142.000 km
 > Randevu için: 0532 000 00 00
+> Ret için B İPTAL yaz 4045'e gönder
 
 Ne yok: link tıklama zorunluluğu, kampanya, indirim kuponu, uzun metin.
+
+> ⚠️ **Son satır yasal zorunluluk, süs değil.** 6563 sayılı Kanun m.8: alıcı
+> her zaman ve gerekçesiz reddedebilmeli, ret **kolay ve ücretsiz** olmalı,
+> **3 iş günü** içinde durdurulmalı. Bakım hatırlatması için *onay* muafiyeti
+> var (`arastirma/SMS-VE-IYS.md` §0) ama **ret hakkı muafiyet dışı.**
+> Bu satır 10. iş araştırmasında eklendi — ilk taslakta yoktu.
 
 ---
 
