@@ -25,7 +25,7 @@
   <div class="card">
     <div class="section-label with-action">
       <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne istiyor?</span>
-      <button class="mic-round" id="kSikayetMik" aria-label="Sesle söyle" title="Sesle">
+      <button class="mic-round" id="kSikayetMik" aria-label="Ne istediğini sesle yaz" title="Sesle">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -47,6 +47,13 @@
       </button>
       <button class="btn btn-ghost" id="kIscilikEkle">
         <svg class="ico"><use href="#i-plus"></use></svg> İşçilik
+      </button>
+      <!-- SERVİS KAYDI AÇIKKEN SESLİ İŞLEM (Cemil, 03.09: "Servis kaydı
+           açıkken yine sesli işlem yapabilir, balata örneği gibi").
+           Eli yağlı ustanın satır eklemek için klavyeye gitmesi
+           gerekmiyor: "balata da değişecek" demesi yetiyor. -->
+      <button class="btn btn-ghost" id="kSesleEkle">
+        <svg class="ico"><use href="#i-mic"></use></svg> Sesle ekle
       </button>
     </div>
 
@@ -181,10 +188,11 @@ document.addEventListener('click', function (e) {
     k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
     Ekran.tazele();
   }
-  if (t.id === 'kSikayetMik') {
-    k.sikayet = 'Triger seti değişecek';
-    balon('Duyduğumu yazdım — kontrol et.', true, 2600);
-    Ekran.tazele();
+  if (t.id === 'kSikayetMik' || t.id === 'kSesleEkle') {
+    /* İkisi de sesli işleme gider; bağlam "açık kayıt" olduğu için
+       ekran örneklerini ona göre gösteriyor ("balata da değişecek"). */
+    sesleAc('kayit-icinde');
+    return;
   }
   /* K-003: onay bir AKIŞ değil, bir EYLEM. Kayıt beklemeye geçmez,
      durum değişmez — mesaj gider, iş yürümeye devam eder. */

@@ -41,6 +41,16 @@
     <div class="tutar-serit" id="muhDagilim"></div>
   </div>
 
+  <div class="section-label with-action">
+    <span class="lbl-txt">
+      <svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Giderler
+    </span>
+    <button class="mic-round" id="muhSesleGider" aria-label="Gideri sesle ekle" title="Sesle ekle">
+      <svg class="ico"><use href="#i-mic"></use></svg>
+    </button>
+  </div>
+  <div id="muhGiderler"></div>
+
   <div class="section-label">
     <svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg> Alınamayan (veresiye)
   </div>
@@ -103,16 +113,49 @@ Ekran.tanim('muhasebe', {
       : bosDurumHtml('i-circle-check', 'Alınamayan yok',
           'Teslim edilen her işin parası alınmış.');
 
+    /* ---- GİDERLER ----
+       K-013'te gider girişi "usta her gideri girmez" diye
+       ertelenmişti. Cemil sesle girişi isteyince itiraz zayıfladı:
+       "2400 TL elektrik faturası ekle" demek FORM DOLDURMAK DEĞİL.
+       Yine de tek yönlü: girilen gider görünür, girilmeyen görünmez —
+       ekran bunu saklamıyor (K-014). */
+    document.getElementById('muhGiderler').innerHTML = GIDERLER.length
+      ? GIDERLER.slice().reverse().map(function (g) {
+          return '<div class="tl-item">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-receipt"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title"><span class="tl-tip">' + g.aciklama + '</span></div>' +
+              '<div class="tl-foot">' +
+                '<span class="tl-date">' + g.tarih + '</span>' +
+                '<span class="tl-date">' + tutar(g.tutar) + ' ₺</span>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+        '<div class="tutar-serit">' +
+          '<div class="tutar-sat genel"><span>Toplam gider</span><span class="tv">' +
+            tutar(giderToplami()) + ' ₺</span></div>' +
+        '</div>'
+      : bosDurumHtml('i-receipt', 'Gider yazılmamış',
+          'Mikrofona basıp "2400 TL elektrik faturası ekle" demen yeter.');
+
     /* KAPSAM AÇIK OLDUĞU İÇİN EKRANDA DA YAZIYOR. Bir ekranın
        "burası yarım" demesi, yarım olduğunu saklamasından iyidir. */
     document.getElementById('muhKapsam').innerHTML =
       '<div class="notice">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
-        '<span class="n-body"><b>Kapsam kararı bekliyor.</b> Buradaki üç rakam ' +
-        'hiçbir yeni alan istemeden, teslimdeki ödeme yolundan çıkıyor. ' +
-        'Gider, kâr ve cari hesap için ustanın <b>her gideri girmesi</b> gerekir — ' +
-        'girilmezse rakam yalan söyler. Bu yüzden yazılmadı.</span>' +
+        '<span class="n-body"><b>Kapsam kararı bekliyor.</b> Tahsilat rakamları ' +
+        'hiçbir yeni alan istemeden teslimdeki ödeme yolundan çıkıyor; ' +
+        'giderler ise <b>girildiği kadar</b> doğru. Kâr ve cari hesap bu yüzden ' +
+        'hesaplanmıyor — eksik giderle çıkan kâr, kârdan kötüdür.</span>' +
       '</div>';
+  }
+});
+
+document.addEventListener('click', function (e) {
+  if (e.target.closest('#muhSesleGider')) {
+    sesleAc('muhasebe');
   }
 });
 </script>

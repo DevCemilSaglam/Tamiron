@@ -1,0 +1,242 @@
+<!-- ekran: mesaj · MÜŞTERİYE MESAJ
+     03.09 — Cemil: "Müşteriye mesaj yaz ekranı kullanılabilir. Sesle
+     işlem yapılabilir. x plaka sahibine whatsapp mesajı gönder gibi
+     bir işlem olabilir."
+
+     WHATSAPP.md'DEKİ A YOLU: mesajı BİZ hazırlıyoruz, usta KENDİ
+     WhatsApp'ından gönderiyor. Karşılığında hiçbir kurulum yok —
+     Meta hesabı, işletme doğrulaması, şablon onayı gerekmiyor.
+     Parça sorma ekranı da aynı yolu kullanıyor; iki yerde iki ayrı
+     yöntem olsaydı biri mutlaka bozuk kalırdı.
+
+     ÜÇ ŞABLON, ÜÇÜ DE YEDİ İŞTEN BİRİNE BAĞLI:
+       özet        → "müşteriye özet gönder" (altıncı iş)
+       hazır       → teslim öncesi haber
+       hatırlatma  → "bakım hatırlat" (yedinci iş)
+     Serbest mesaj da yazılabilir; şablon başlangıç noktası.
+
+     ÜZERİNDE YOK: toplu mesaj · kampanya · gönderim geçmişi ·
+     okundu bilgisi · mesaj şablonu düzenleyici.
+
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
+     · .search-box · .tl-item · .cip-grup .cip · .field · .notice
+     · .btn · .plate · .tel-link. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-mesaj">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Müşteriye mesaj
+    </span>
+  </div>
+
+  <div id="msjSecim">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-users"></use></svg> Kime?
+    </div>
+    <div class="search-box" id="msjArama">
+      <svg class="ico"><use href="#i-search"></use></svg>
+      <input type="search" id="msjQ" placeholder="Plaka, ad ya da telefon…"
+             autocomplete="off" aria-label="Müşteri ara" />
+      <button class="clear" id="msjQTemiz" aria-label="Aramayı temizle">
+        <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+      </button>
+    </div>
+    <div id="msjListe"></div>
+  </div>
+
+  <div id="msjYazim" hidden>
+    <div class="card" id="msjKunye"></div>
+
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne yazılsın?
+    </div>
+    <div class="cip-grup" id="msjSablon" role="group" aria-label="Mesaj şablonu"></div>
+
+    <div class="card">
+      <div class="section-label with-action">
+        <span class="lbl-txt">Mesaj</span>
+        <button class="mic-round" id="msjMik" aria-label="Sesle yazdır" title="Sesle">
+          <svg class="ico"><use href="#i-mic"></use></svg>
+        </button>
+      </div>
+      <div class="field">
+        <textarea id="msjMetin" rows="6" aria-label="Mesaj metni"></textarea>
+      </div>
+    </div>
+
+    <div id="msjUyari"></div>
+
+    <button class="btn btn-primary btn-lg" id="msjGonder">
+      <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
+    </button>
+    <button class="btn btn-ghost" id="msjBaskasi">
+      <svg class="ico"><use href="#i-users"></use></svg> Başka müşteri seç
+    </button>
+  </div>
+
+</section>
+
+<script>
+var msjPlaka = null;
+var msjSablonSecili = 'ozet';
+
+var MSJ_SABLON = [
+  { k: 'ozet', ad: 'İşin özeti' },
+  { k: 'hazir', ad: 'Aracınız hazır' },
+  { k: 'hatirlatma', ad: 'Bakım hatırlatması' }
+];
+
+function msjMetinUret(plaka, sablon) {
+  var a = aracBul(plaka);
+  if (!a) return '';
+  var basi = (a.sahipAd ? a.sahipAd + ' Bey/Hanım, ' : 'Merhaba, ');
+  var arac = a.marka + ' ' + a.model + ' (' + plaka + ')';
+
+  if (sablon === 'hazir') {
+    return basi + arac + ' hazır, teslim alabilirsiniz.\n\n' +
+           DUKKAN.ad + '\n' + DUKKAN.tel;
+  }
+  if (sablon === 'hatirlatma') {
+    var sb = sonBakim(plaka);
+    var ek = sb ? 'Son bakımı ' + sb.teslimTarihi +
+                  (sb.km ? ' · ' + sb.km + ' km' : '') + ' idi. ' : '';
+    return basi + arac + ' için bakım zamanı geldi. ' + ek +
+           'Uygun olduğunuzda bekleriz.\n\n' + DUKKAN.ad + '\n' + DUKKAN.tel;
+  }
+  /* özet — açık ya da son kayıttan üretilir */
+  var k = icerideki().filter(function (x) { return x.plaka === plaka; })[0] ||
+          aracKayitlari(plaka).slice(-1)[0];
+  if (!k) return basi + arac + ' için henüz bir kayıt yok.';
+  var satirlar = (k.satirlar || []).map(function (s) {
+    return '· ' + (s.ad || '—') + (s.fiyat ? ' — ' + tutar(s.fiyat) + ' ₺' : '');
+  }).join('\n');
+  return basi + arac + ' için yapılanlar:\n' + (satirlar || '· —') +
+         '\n\nToplam: ' + tutar(kayitToplami(k)) + ' ₺\n\n' +
+         DUKKAN.ad + '\n' + DUKKAN.tel;
+}
+
+function msjSecimCiz() {
+  var q = norm((document.getElementById('msjQ') || {}).value || '');
+  var liste = musteriler().filter(function (m) {
+    if (!q) return true;
+    var alan = m.ad + ' ' + m.tel + ' ' +
+               m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
+    return norm(alan).indexOf(q) >= 0;
+  });
+  document.getElementById('msjArama').classList.toggle('filled', !!q);
+
+  document.getElementById('msjListe').innerHTML = liste.length
+    ? liste.map(function (m) {
+        return m.araclar.map(function (a) {
+          return '<div class="tl-item" data-mesaj-plaka="' + a.plaka + '"' +
+              ' role="button" tabindex="0">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-user"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span>' +
+                plakaHtml(a.plaka) + '</div>' +
+              '<div class="tl-sub">' + a.marka + ' ' + a.model + '</div>' +
+              '<div class="tl-foot">' +
+                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
+                       : '<span class="pill warn">telefon yok</span>') +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      }).join('')
+    : bosDurumHtml('i-users', 'Eşleşen müşteri yok',
+        'Adın, telefonun ya da plakanın bir kısmını yazman yeter.');
+}
+
+function msjYazimCiz() {
+  var a = aracBul(msjPlaka);
+  if (!a) return;
+
+  document.getElementById('msjKunye').innerHTML =
+    '<div class="arac-bas">' + plakaHtml(msjPlaka, 'plate-lg') +
+      '<div class="veh-title">' + (a.sahipAd || 'sahip yazılmamış') + '</div>' +
+      '<div class="spec-strip"><span class="spec-val">' +
+        a.marka + ' ' + a.model + '</span></div>' +
+    '</div>' +
+    (a.sahipTel
+      ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '">' +
+          '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' + a.sahipTel + '</a>'
+      : '');
+
+  document.getElementById('msjSablon').innerHTML = MSJ_SABLON.map(function (s) {
+    return '<button class="cip" data-sablon="' + s.k + '" aria-pressed="' +
+      (msjSablonSecili === s.k) + '">' + s.ad + '</button>';
+  }).join('');
+
+  /* TELEFON YOKSA GÖNDERİLEMEZ ve bu ÖNCEDEN söylenir — düğmeye
+     bastıktan sonra öğrenmek, ustayı boşuna uğraştırır. */
+  document.getElementById('msjUyari').innerHTML = a.sahipTel ? '' :
+    '<div class="notice warn">' +
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+      '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
+      'önce araç kaydına telefon yaz.</span></div>';
+  document.getElementById('msjGonder').disabled = !a.sahipTel;
+}
+
+Ekran.tanim('mesaj', {
+  ciz: function () {
+    /* Ses buraya hedef bırakmış olabilir. Okunur ve TEMİZLENİR;
+       bırakılsa bir sonraki açılışa sızardı. */
+    if (MESAJ_HEDEF) {
+      msjPlaka = MESAJ_HEDEF.plaka;
+      msjSablonSecili = MESAJ_HEDEF.sablon || 'ozet';
+      MESAJ_HEDEF = null;
+      document.getElementById('msjMetin').value = msjMetinUret(msjPlaka, msjSablonSecili);
+    }
+    var yaziyor = !!msjPlaka;
+    document.getElementById('msjSecim').hidden = yaziyor;
+    document.getElementById('msjYazim').hidden = !yaziyor;
+    if (yaziyor) msjYazimCiz(); else msjSecimCiz();
+  }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button, [data-mesaj-plaka]');
+  if (!t) return;
+
+  var p = t.getAttribute('data-mesaj-plaka');
+  if (p) {
+    msjPlaka = p; msjSablonSecili = 'ozet';
+    document.getElementById('msjMetin').value = msjMetinUret(p, 'ozet');
+    Ekran.tazele(); return;
+  }
+
+  var s = t.getAttribute('data-sablon');
+  if (s) {
+    msjSablonSecili = s;
+    document.getElementById('msjMetin').value = msjMetinUret(msjPlaka, s);
+    Ekran.tazele(); return;
+  }
+
+  if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
+  if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }
+
+  if (t.id === 'msjMik') {
+    sesleAc('mesaj'); return;
+  }
+
+  if (t.id === 'msjGonder') {
+    var a = aracBul(msjPlaka);
+    if (!a || !a.sahipTel) return;
+    /* Şablon "hatırlatma" ise hatırlatma GÖNDERİLDİ sayılır — yedinci
+       işin döngüsü burada kapanıyor, yoksa aynı uyarı her gün çıkardı. */
+    if (msjSablonSecili === 'hatirlatma') {
+      aracKayitlari(msjPlaka).forEach(function (k) {
+        if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
+      });
+    }
+    balon('WhatsApp açılıyor — ' + a.sahipTel + ', mesaj hazır.', false, 3200);
+    msjPlaka = null;
+    Ekran.ac('home');
+  }
+});
+
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'msjQ') Ekran.tazele();
+});
+</script>

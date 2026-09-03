@@ -30,6 +30,7 @@ function bosDurumHtml(ikon, baslik, aciklama, eylem, sinif) {
    (K-006), o yüzden sol ikon ve şerit iki değer alıyor. */
 var TUR_IKON = { tamirat: 'i-wrench', bakim: 'i-clock' };
 var TUR_AD = { tamirat: 'Tamirat', bakim: 'Bakım' };
+var ODEME_ETIKET = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Alınmadı' };
 
 function kayitSatiriHtml(k, s) {
   s = s || {};
@@ -54,13 +55,38 @@ function kayitSatiriHtml(k, s) {
         (s.plaka === false ? '' : plakaHtml(k.plaka)) +
       '</div>' +
       '<div class="tl-sub">' + (k.sikayet || '—') + '</div>' +
-      (a ? '<div class="tl-sub">' + a.marka + ' ' + a.model + '</div>' : '') +
+      /* SATIR DAHA ÇOK ŞEY SÖYLÜYOR (Cemil, 03.09: "servis kaydına
+         girmeden birçok bilgiye ulaşabilsin"). Ortak nesne olduğu için
+         bu detay üç listede birden düzeliyor; her listeye ayrı yazmak
+         üç ayrı görünüm demek olurdu. */
+      '<div class="tl-veri">' +
+        (a ? '<span><b>' + a.marka + ' ' + a.model + '</b>' +
+             (a.yil ? ' ' + a.yil : '') + '</span>' : '') +
+        (a && a.sahipAd ? '<span>' + a.sahipAd + '</span>' : '') +
+        (k.km ? '<span><b>' + k.km + '</b> km</span>' : '') +
+        ((k.satirlar || []).length
+          ? '<span><b>' + k.satirlar.length + '</b> satır</span>' : '') +
+        '<span>Açılış <b>' + (k.acilis || '—') + '</b></span>' +
+      '</div>' +
+      /* Telefon LİSTEDE aranabilir: usta "kimi arayacağım" sorusunun
+         cevabını satırda görüp oradan arıyor (v1'deki gibi). */
+      (a && a.sahipTel
+        ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '"' +
+            ' data-tel="1" aria-label="' + (a.sahipAd || 'sahibini') + ' ara">' +
+            '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +
+            a.sahipTel + '</a>'
+        : '') +
       '<div class="tl-foot">' +
         (bekliyor
           ? '<span class="pill warn"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> parçası bekleniyor</span>'
           : '') +
+        (k.teslimTarihi
+          ? '<span class="pill ok">teslim edildi</span>'
+          : '<span class="pill accent">içeride</span>') +
         (s.tutar !== false && kayitToplami(k)
           ? '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' : '') +
+        (k.odemeYolu
+          ? '<span class="tl-date">' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) + '</span>' : '') +
         (k.teslimTarihi ? '<span class="tl-date">' + k.teslimTarihi + '</span>' : '') +
       '</div>' +
       (musteriParcalari.length
@@ -76,6 +102,10 @@ function kayitSatiriHtml(k, s) {
    Satır iki ekranda kullanılıyor; tıklamayı her ekrana ayrı yazmak
    nesneyi ikiye bölmek olurdu. */
 document.addEventListener('click', function (e) {
+  /* Telefon bağlantısı satırın İÇİNDE ama satırın işi değil: numaraya
+     dokunan aramak istiyor, kaydı açmak değil. Bu kontrol olmadan
+     arama başlıyor VE kayıt ekranı açılıyordu. */
+  if (e.target.closest('[data-tel]')) { e.stopPropagation(); return; }
   var t = e.target.closest('[data-kayit]');
   if (!t) return;
   ACIK_KAYIT = parseInt(t.getAttribute('data-kayit'), 10);
@@ -85,6 +115,7 @@ document.addEventListener('click', function (e) {
 /* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
    listesinde de. Iki ekrana ayri yazmak nesneyi ikiye bolerdi. */
 document.addEventListener('click', function (e) {
+  if (e.target.closest('[data-tel]')) { e.stopPropagation(); return; }
   var t = e.target.closest('[data-arac]');
   if (!t) return;
   ACIK_PLAKA = t.getAttribute('data-arac');

@@ -16,6 +16,10 @@
     </span>
   </div>
 
+  <!-- Sesten gelen bilgi burada özetlenir: usta söylediğini ikinci kez
+       yazmasın, ama neyin yazıldığını da görsün. -->
+  <div id="ruhsatSesOzet"></div>
+
   <button class="btn btn-primary btn-lg" id="ruhsatCek">
     <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
   </button>
@@ -87,6 +91,9 @@
 
 <script>
 var rTur = null;
+/* Sesin taşıdığı ama ruhsatta karşılığı olmayanlar: sahip adı ve
+   yapılacak iş. Kayıt açılırken kullanılıyor. */
+var rSesNotu = null;
 
 /* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı). */
 function plakaBicim(ham) {
@@ -131,6 +138,36 @@ Ekran.tanim('ruhsat', {
       var e = document.getElementById(id); if (e) e.value = '';
     });
     turSec(null);
+
+    /* SESTEN GELEN ÖN DOLGU (Cemil, 03.09: "Servis kaydı ekle
+       sayfasında, yapılan işlemleri, plakayı, sahibini, numarasını vb
+       söyleyecek. Sonra ruhsatı çekmesini isteyeceğiz.")
+
+       Usta söylediğini İKİNCİ KEZ yazmasın: ses ne duyduysa buraya
+       taşındı, ruhsat çekilince marka/model/motor üstüne yazılacak.
+       Not okunur ve TEMİZLENİR. */
+    if (RUHSAT_ONDOLGU) {
+      var o = RUHSAT_ONDOLGU; RUHSAT_ONDOLGU = null;
+      document.getElementById('ruhsatSonuc').hidden = false;
+      if (o.plaka) document.getElementById('rPlaka').value = o.plaka;
+      if (o.sahipTel) document.getElementById('rTel').value = o.sahipTel;
+      if (o.km) document.getElementById('rKm').value = o.km;
+      rSesNotu = { sahipAd: o.sahipAd || '', is: o.is || '' };
+      if (o.tur) turSec(o.tur);
+      ruhsatDurum();
+      document.getElementById('ruhsatSesOzet').innerHTML =
+        '<div class="notice accent">' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-mic"></use></svg></span>' +
+          '<span class="n-body">Söylediklerin yazıldı' +
+            (o.sahipAd ? ' · sahibi <b>' + o.sahipAd + '</b>' : '') +
+            (o.is ? ' · iş <b>' + o.is + '</b>' : '') +
+            '.<br>Şimdi <b>ruhsatı çek</b> — marka, model ve motor kendiliğinden dolacak.' +
+          '</span>' +
+        '</div>';
+    } else {
+      rSesNotu = null;
+      document.getElementById('ruhsatSesOzet').innerHTML = '';
+    }
   }
 });
 
@@ -179,7 +216,7 @@ document.addEventListener('click', function (e) {
         model: document.getElementById('rModel').value,
         yil: document.getElementById('rYil').value,
         motor: document.getElementById('rMotor').value,
-        vin: '', sahipAd: '',
+        vin: '', sahipAd: (rSesNotu && rSesNotu.sahipAd) || '',
         sahipTel: document.getElementById('rTel').value,
         not: ''
       });
@@ -187,7 +224,10 @@ document.addEventListener('click', function (e) {
     var yeni = {
       id: KAYITLAR.length + 1, plaka: p, tur: rTur,
       km: rTur === 'bakim' ? document.getElementById('rKm').value : '',
-      sikayet: '', acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      /* Sesle söylenen iş şikâyet olarak düşer — usta aynı cümleyi
+         servis kaydında tekrar yazmasın. */
+      sikayet: (rSesNotu && rSesNotu.is) || '',
+      acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
     };
     KAYITLAR.push(yeni);

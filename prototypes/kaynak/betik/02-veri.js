@@ -12,15 +12,27 @@ var BUGUN = new Date(2026, 8, 3);   /* prototipin "bugün"ü — TEK KAYNAK */
 var ARACLAR = [
   { plaka: '34 ABC 123', marka: 'Renault', model: 'Mégane', yil: '2018',
     motor: '1.5 dCi', vin: 'VF1RFB00858123456',
+    renk: 'Gri', yakit: 'Dizel', motorNo: 'K9K872C123456',
+    silindir: '1461', guc: '110', koltuk: '5', ilkTescil: '14.06.2018',
+    depo: '50',
     sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: 'Arka cam kolu kırık — müşteri biliyor.' },
   { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
     motor: '1.4 Fire', vin: 'NM4358004ZT129041',
+    renk: 'Beyaz', yakit: 'Benzin', motorNo: '843A1000098765',
+    silindir: '1368', guc: '95', koltuk: '5', ilkTescil: '02.03.2021',
+    depo: '45',
     sahipAd: 'Hasan Demir', sahipTel: '0542 331 90 07', not: '' },
   { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
     motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
+    renk: 'Lacivert', yakit: 'Dizel', motorNo: 'DV6FD10JBCE4455',
+    silindir: '1560', guc: '100', koltuk: '5', ilkTescil: '21.11.2019',
+    depo: '50',
     sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' },
   { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
     motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
+    renk: 'Siyah', yakit: 'Dizel', motorNo: 'CLH1234567',
+    silindir: '1598', guc: '110', koltuk: '5', ilkTescil: '08.08.2016',
+    depo: '50',
     sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41', not: '' }
 ];
 
@@ -75,6 +87,21 @@ var KAYITLAR = [
       { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: 0, kimGetirdi: '' }
     ] },
 
+  /* İKİNCİ KM ÖLÇÜMÜ — ay/km kuralı ancak iki ölçümle çalışıyor
+     (03.09). Tek ölçümlü araçta günlük km tahmin edilmiyor; bu kayıt
+     olmadan "hangisi önce gelirse" kuralının km yarısı prototipte
+     hiç görünmüyordu. 15.03'te 142.500, 20.06'da 151.200 —
+     97 günde 8.700 km. */
+  { id: 6, plaka: '34 ABC 123', tur: 'bakim', km: '151.200',
+    sikayet: 'Ara bakım',
+    acilis: '20.06.2026', teslimTarihi: '20.06.2026',
+    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
+        marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+    ] },
+
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
      Menü rozeti ve çekmecedeki bildirim bu kayıttan besleniyor. */
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
@@ -100,7 +127,10 @@ var DUKKAN = {
   ad: 'Ahmet Usta Oto Servis',
   adres: 'Ostim OSB, Ankara',
   tel: '0532 000 00 00',
-  bakimPeriyoduAy: 6            /* A-3 — Cemil onayına açık */
+  /* HATIRLATMA: AY **VEYA** KM — hangisi önce gelirse (Cemil, 03.09).
+     K-002 yalnız ayı sayıyordu; gerçek bakım kuralı ikisi birden. */
+  bakimPeriyoduAy: 6,
+  bakimPeriyoduKm: 10000
 };
 
 /* ---- Sorgular (tek yerde; ekranlar kendi filtresini yazmaz) ---- */
@@ -173,4 +203,95 @@ function odemeDagilimi() {
     }
   });
   return d;
+}
+
+/* ---- GİDER (muhasebe) ----
+   03.09 — Cemil: "Muhasebe için x tl elektrik faturası ekle gibi
+   örnekler." Gider girişi K-013'te "usta her gideri girmez, girmezse
+   rakam yalan söyler" diye ertelenmişti. SESLE GİRİLİYORSA o itiraz
+   zayıflıyor: "beş yüz lira elektrik faturası" demek, form doldurmak
+   değil. K-014'e bakılsın. */
+var GIDERLER = [
+  { id: 1, tarih: '01.09.2026', aciklama: 'Elektrik faturası', tutar: 2400, tur: 'fatura' },
+  { id: 2, tarih: '02.09.2026', aciklama: 'Öz Yedek Parça — triger seti', tutar: 4200, tur: 'parca' }
+];
+
+/* ---- KM GEÇMİŞİ ----
+   Ayrı tablo YOK: kilometre zaten servis kaydında duruyor (K-002).
+   Geçmiş, kayıtlardan türetiliyor — bir aracın km'si iki yerde
+   tutulsaydı ikisi ayrışırdı. */
+function kmGecmisi(plaka) {
+  return aracKayitlari(plaka)
+    .filter(function (k) { return k.km; })
+    .map(function (k) {
+      return { tarih: k.teslimTarihi || k.acilis, km: parseInt(String(k.km).replace(/\D/g, ''), 10), kayit: k };
+    })
+    .filter(function (x) { return x.km > 0; })
+    .sort(function (a, b) { return tariheCevir(a.tarih) - tariheCevir(b.tarih); });
+}
+
+/* Günlük ortalama km — iki ölçüm arasındaki farktan. Tek ölçüm varsa
+   tahmin YAPILMAZ; uydurma bir ortalama, yanlış hatırlatma demektir. */
+function gunlukKm(plaka) {
+  var g = kmGecmisi(plaka);
+  if (g.length < 2) return 0;
+  var ilk = g[0], son = g[g.length - 1];
+  var gun = (tariheCevir(son.tarih) - tariheCevir(ilk.tarih)) / 86400000;
+  if (gun <= 0) return 0;
+  return (son.km - ilk.km) / gun;
+}
+
+/* ---- BAKIM HATIRLATMASI: AY **VEYA** KM, HANGİSİ ÖNCE GELİRSE ----
+   Cemil, 03.09'da bu kuralı seçti. K-002 yalnız ayı sayıyordu; gerçek
+   bakım kuralı "6 ay veya 10.000 km"dir.
+
+   KM TAHMİNİ ANCAK İKİ ÖLÇÜM VARSA yapılır. Tek ölçümle günlük km
+   uydurmak, ustayı yanlış güne çağırır — ay tek başına çalışır. */
+function hatirlatmaHesapla(kayit) {
+  var d = new Date(tariheCevir(kayit.teslimTarihi || kayit.acilis).getTime());
+  d.setMonth(d.getMonth() + DUKKAN.bakimPeriyoduAy);
+  var ayTarihi = d;
+
+  var sonuc = { ayTarihi: ayTarihi, kmHedef: 0, kmTarihi: null, hangisi: 'ay' };
+
+  var baslangicKm = parseInt(String(kayit.km || '').replace(/\D/g, ''), 10);
+  if (baslangicKm > 0) {
+    sonuc.kmHedef = baslangicKm + DUKKAN.bakimPeriyoduKm;
+    var gk = gunlukKm(kayit.plaka);
+    if (gk > 0) {
+      var gerekenGun = DUKKAN.bakimPeriyoduKm / gk;
+      var kd = new Date(tariheCevir(kayit.teslimTarihi || kayit.acilis).getTime());
+      kd.setDate(kd.getDate() + Math.round(gerekenGun));
+      sonuc.kmTarihi = kd;
+      if (kd < ayTarihi) sonuc.hangisi = 'km';
+    }
+  }
+  sonuc.tarih = (sonuc.hangisi === 'km') ? sonuc.kmTarihi : sonuc.ayTarihi;
+  return sonuc;
+}
+
+function gunAyYil(d) {
+  return ('0' + d.getDate()).slice(-2) + '.' +
+         ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+}
+
+/* Tarihi gelmiş ve gönderilmemiş hatırlatmalar — ana ekran, çekmece
+   rozeti ve araç ekranı AYNI kaynaktan besleniyor. */
+function hatirlatmasiGelenler() {
+  return KAYITLAR.filter(function (k) {
+    return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
+           tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
+  });
+}
+
+/* Bir aracın SON bakımı ve bir sonraki hatırlatması. */
+function sonBakim(plaka) {
+  var b = aracKayitlari(plaka).filter(function (k) {
+    return k.tur === 'bakim' && k.teslimTarihi;
+  });
+  return b.length ? b[b.length - 1] : null;
+}
+
+function giderToplami() {
+  return GIDERLER.reduce(function (t, g) { return t + (g.tutar || 0); }, 0);
 }

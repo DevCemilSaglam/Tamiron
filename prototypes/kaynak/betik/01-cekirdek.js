@@ -26,8 +26,25 @@ window.addEventListener('unhandledrejection', function (e) {
 var ACIK_KAYIT = null;
 var ACIK_PLAKA = null;
 /* Sesli isleme NE ICIN gidildigi. Ayni ekran farkli beklentilerle
-   aciliyor: "arac kaydi" plaka bekler, "araclar" arama bekler. */
+   aciliyor: "servis-ekle" plaka bekler, "araclar" arama bekler. */
 var SESLI_NIYET = null;
+
+/* SESIN EKRANLARA BIRAKTIGI NOTLAR. Usta ayni seyi iki kez
+   soylemesin: ses ne duyduysa gidecegi ekrana yaziyor, ekran da
+   acilirken okuyup TEMIZLIYOR (birakilsa bir sonraki acilisa sizar). */
+var RUHSAT_ONDOLGU = null;   /* {plaka, sahipAd, sahipTel, is, tur, km} */
+var MESAJ_HEDEF = null;      /* {plaka, sablon} */
+var ARAMA_TERIMI = null;     /* {hedef, terim, suzgec} */
+
+/* Sesli isleme BAGLAMLA gitmenin TEK yolu.
+   Once her mikrofon "SESLI_NIYET = x; Ekran.ac('ses')" yaziyordu ve
+   ekran ZATEN ACIKKEN Ekran.ac() erken donuyordu: baglam degisiyor,
+   ornekler ve baslik ESKI kaliyordu. Tek yer olunca hata da tek. */
+function sesleAc(niyet) {
+  SESLI_NIYET = niyet || 'genel';
+  if (Ekran.adi() === 'ses') Ekran.tazele();
+  else Ekran.ac('ses');
+}
 
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
@@ -138,7 +155,69 @@ function balon(metin, dinliyor, sure) {
   balonSayaci = setTimeout(function () { t.classList.remove('show'); }, sure || 2600);
 }
 
+/* ============ SELAMLAMA — v1'den, üstüne CUMA ============
+   Cemil, 03.09: "Hayırlı akşamlar, usta alanı için değişen selamlamalar
+   hazırlamıştık. Onu buraya alalım. Buna bir de cuma günü için Hayırlı
+   cumalar mesajı da ekleyelim, cuma günü göstersin."
+
+   İki kural v1'den geliyor ve ikisi de bir hatadan doğdu:
+   · SAAT PENCERESİ — sabit "günaydın" saat 13'te de günaydın diyordu
+     (Cemil, 01.09: "saat 13, bana günaydın mesajı veriyor").
+   · TEKRAR ETMEZ — düz rastgele seçim 200 denemede 26 kez üst üste
+     aynı selamı veriyordu; "her açılışta farklı gelsin" denmişti. */
+var SELAM_HITAP = 'usta';
+var SELAMLAR = [
+  { metin: 'Hayırlı işler',    saat: null },
+  { metin: 'Bol kazançlar',    saat: null },
+  { metin: 'Kolay gelsin',     saat: null },
+  { metin: 'Bereketli olsun',  saat: null },
+  { metin: 'Günaydın',         saat: [5, 11] },
+  { metin: 'Hayırlı sabahlar', saat: [5, 11] },
+  { metin: 'İyi günler',       saat: [11, 18] },
+  { metin: 'İyi akşamlar',     saat: [18, 23] },
+  { metin: 'Hayırlı akşamlar', saat: [18, 23] },
+  { metin: 'Hayırlı geceler',  saat: [23, 5] },
+  /* CUMA — yalnız cuma günü havuza girer. Sabahtan akşama kadar
+     geçerli; cuma gecesi artık cumartesidir, o yüzden 23'te biter. */
+  { metin: 'Hayırlı cumalar',  saat: [5, 23], gun: 5 }
+];
+
+function selamSaatUyar(s, saat) {
+  if (!s.saat) return true;
+  var a = s.saat[0], b = s.saat[1];
+  return (a < b) ? (saat >= a && saat < b) : (saat >= a || saat < b);
+}
+
+var sonSelam = '';
+function selamMetni(simdi) {
+  var d = simdi || new Date();
+  var saat = d.getHours(), gun = d.getDay();      /* 5 = cuma */
+  var uygun = SELAMLAR.filter(function (s) {
+    if (s.gun !== undefined && s.gun !== gun) return false;
+    return selamSaatUyar(s, saat);
+  });
+  if (!uygun.length) uygun = [SELAMLAR[0]];
+  var i = Math.floor(Math.random() * uygun.length);
+  if (uygun.length > 1 && uygun[i].metin === sonSelam) i = (i + 1) % uygun.length;
+  sonSelam = uygun[i].metin;
+  return uygun[i].metin + ', ' + SELAM_HITAP;
+}
+
 /* ---- ortak biçimleyiciler ---- */
+/* ⚠️ TÜRKÇEDE \b KULLANMA. JavaScript'in \b'si ASCII sınırına bakar:
+   "ğ", "ş", "ı", "ç" kelime karakteri SAYILMAZ. Bu yüzden
+   /\bde\b/ deseni "değişecek" kelimesinin başındaki "de"yi tutuyor ve
+   geriye "ğişecek" kalıyordu (03.09'da sesle satır eklerken çıktı).
+   Aynı tuzak /\bara\b/ ile "araç" kelimesini "ç"ye indirirdi.
+   Kural: kelime atılacaksa BOŞLUKTAN BÖL, eşitlikle karşılaştır. */
+function kelimeleriAt(metin, atilacaklar) {
+  var kume = {};
+  atilacaklar.forEach(function (k) { kume[norm(k)] = 1; });
+  return (metin || '').split(/\s+/)
+    .filter(function (p) { return p && !kume[norm(p.replace(/[.,!?]/g, ''))]; })
+    .join(' ').trim();
+}
+
 /* "03.09.2026" -> Date. Cekmece'nin icinde ozeldi; ana ekran da
    hatirlatma tarihi karsilastirinca ORTAK NESNE KURALI devreye girdi:
    iki yerde iki ayri cozumleyici, iki ayri hata demektir. */
@@ -352,19 +431,16 @@ document.addEventListener('DOMContentLoaded', function () {
   bagla('brandHome', function () { Ekran.ac('home'); });
   bagla('temaBtn', function () { Tema.dondur(); });
 
-  /* ARA — ARAÇLAR ekranının kendi arama kutusuna götürür.
-     Önce ana ekrandaki kutuya götürüyordu; ana ekran menüye dönünce
-     o kutu kalktı ve düğme ölü bir id arıyor kaldı. Denetimin OLU-ID
-     testi yakaladı: bir ekranı değiştirmek, ona dokunan HER YERİ
-     değiştirir. */
-  var araya = function () {
+  /* ÜSTTEKİ ARA DÜĞMESİ KALKTI (Cemil, 03.09: "Üstteki aramayı
+     kaldırabiliriz"). Her listenin kendi arama kutusu var; header'daki
+     düğme "hangi listede arıyorum" sorusunu doğuruyordu. Çekmecedeki
+     "Plaka ara" duruyor — o, listeye GİDEN bir yol. */
+  bagla('drawerAra', function () {
     Cekmece.kapa();
     Ekran.ac('araclar');
     var k = document.getElementById('arcQ');
     if (k) { k.focus(); k.select(); }
-  };
-  bagla('araBtn', araya);
-  bagla('drawerAra', araya);
+  });
 
   document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && Cekmece.acikMi()) Cekmece.kapa();

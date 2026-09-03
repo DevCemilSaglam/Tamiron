@@ -42,6 +42,12 @@
 <script>
 Ekran.tanim('musteriler', {
   ciz: function () {
+    /* Sesten gelen arama: "41 abc 43 ara" ya da "34 ABC 123 sahibini
+       ara" — ikincisinde ses plakadan sahibi bulup adını yazıyor. */
+    if (ARAMA_TERIMI && ARAMA_TERIMI.hedef === 'musteriler') {
+      document.getElementById('msQ').value = ARAMA_TERIMI.terim || '';
+      ARAMA_TERIMI = null;
+    }
     var q = norm((document.getElementById('msQ') || {}).value || '');
     var liste = musteriler().filter(function (m) {
       if (!q) return true;
@@ -63,7 +69,19 @@ Ekran.tanim('musteriler', {
               '<use href="#i-user"></use></svg></span>' +
             '<div class="tl-body">' +
               '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
-              '<div class="tl-sub mono">' + (m.tel || 'telefon yok') + '</div>' +
+              /* TELEFON ARANABİLİR (v1'deki gibi) — mono metin değil,
+                 dokunulunca arayan bir bağlantı. */
+              (m.tel
+                ? '<a class="tel-link" href="tel:' + m.tel.replace(/\s/g, '') + '"' +
+                    ' data-tel="1" aria-label="' + m.ad + ' ara">' +
+                    '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +
+                    m.tel + '</a>'
+                : '<div class="tl-sub">telefon yok</div>') +
+              '<div class="tl-veri">' +
+                '<span><b>' + m.araclar.length + '</b> araç</span>' +
+                '<span><b>' + m.araclar.reduce(function (t, a) {
+                  return t + aracKayitlari(a.plaka).length; }, 0) + '</b> kayıt</span>' +
+              '</div>' +
               '<div class="tl-foot">' +
                 /* Plaka .cip icinde: cip zaten 44 px dokunma hedefi.
                    Cıplak span 28 px kaliyordu, denetim yakaladi. */

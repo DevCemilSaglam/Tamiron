@@ -38,6 +38,12 @@
 <script>
 Ekran.tanim('araclar', {
   ciz: function () {
+    /* Ses buraya arama terimi bırakmış olabilir. Okunur ve TEMİZLENİR;
+       bırakılsa bir sonraki açılışta yine aynı şeyi arardı. */
+    if (ARAMA_TERIMI && ARAMA_TERIMI.hedef === 'araclar') {
+      document.getElementById('arcQ').value = ARAMA_TERIMI.terim || '';
+      ARAMA_TERIMI = null;
+    }
     var q = norm((document.getElementById('arcQ') || {}).value || '');
     /* Arama plakada, markada, modelde VE SAHİPTE çalışır — usta
        plakayı değil adı hatırlıyor olabilir. */
@@ -55,6 +61,9 @@ Ekran.tanim('araclar', {
       ? liste.map(function (a) {
           var ic = icerideki().filter(function (k) { return k.plaka === a.plaka; })[0];
           var sayi = aracKayitlari(a.plaka).length;
+          var sb = sonBakim(a.plaka);
+          var g = kmGecmisi(a.plaka);
+          var sonKm = g.length ? g[g.length - 1].km.toLocaleString('tr-TR') : '';
           return '<div class="tl-item' + (ic ? ' t-tamirat' : '') + '"' +
               ' data-arac="' + a.plaka + '" role="button" tabindex="0">' +
             '<span class="tl-ic"><svg class="ico ico-sm">' +
@@ -64,11 +73,28 @@ Ekran.tanim('araclar', {
                 '<span class="tl-tip">' + a.marka + ' ' + a.model + '</span>' +
                 plakaHtml(a.plaka) +
               '</div>' +
-              '<div class="tl-sub">' + (a.sahipAd || 'sahip yazılmamış') +
-                (a.motor ? ' · ' + a.motor : '') + '</div>' +
+              '<div class="tl-sub">' + (a.sahipAd || 'sahip yazılmamış') + '</div>' +
+              /* LİSTE DETAYLI (Cemil, 03.09: "Araçlar listesi yine
+                 detaylı olmalı"). Ustanın araç kartını açmadan sorduğu
+                 şeyler: kaç model, hangi motor, kaç km, içeride mi,
+                 son bakım ne zaman, telefonu ne. */
+              '<div class="tl-veri">' +
+                (a.yil ? '<span>Model <b>' + a.yil + '</b></span>' : '') +
+                (a.motor ? '<span><b>' + a.motor + '</b></span>' : '') +
+                (a.yakit ? '<span>' + a.yakit + '</span>' : '') +
+                (a.renk ? '<span>' + a.renk + '</span>' : '') +
+                (sonKm ? '<span>Son <b>' + sonKm + '</b> km</span>' : '') +
+              '</div>' +
+              (a.sahipTel
+                ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '"' +
+                    ' data-tel="1" aria-label="' + (a.sahipAd || 'sahibini') + ' ara">' +
+                    '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +
+                    a.sahipTel + '</a>'
+                : '') +
               '<div class="tl-foot">' +
                 (ic ? '<span class="pill accent">içeride</span>' : '') +
                 '<span class="tl-date">' + sayi + ' kayıt</span>' +
+                (sb ? '<span class="tl-date">son bakım ' + sb.teslimTarihi + '</span>' : '') +
               '</div>' +
             '</div>' +
           '</div>';

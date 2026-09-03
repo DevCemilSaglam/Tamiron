@@ -1,25 +1,48 @@
-<!-- ekran: arac · ARAÇ (EKRANLAR.md §6) — akış dışı, başvuru
-     Akışın hiçbir adımı buradan geçmez. Neden var: K-005'in işe
-     yaraması için. "Bu parçayı geçen sefer müşteri getirmişti"
-     bilgisi araç ikinci kez geldiğinde KARŞIYA ÇIKMALI, yoksa
-     tartışma çıkar.
+<!-- ekran: arac · ARAÇ
+     Akışın hiçbir adımı buradan geçmez; başvuru ekranı. Neden var:
+     K-005'in işe yaraması için — "bu parçayı geçen sefer müşteri
+     getirmişti" bilgisi araç ikinci kez geldiğinde karşıya çıkmalı.
+
+     03.09'da üç şey eklendi (Cemil):
+       · "Aracın detayında ruhsattan gelen bilgileri olmalı"
+       · "Depo, km kayıtları olmalı"  → depo = YAKIT DEPOSU
+       · "Telefon numaraları aranabilir olmalı v1'deki gibi"
+
+     KM GEÇMİŞİ AYRI TABLO DEĞİL: kilometre zaten servis kaydında
+     duruyor (K-002). İki yerde tutulsaydı ikisi ayrışırdı. Geçmiş
+     kayıtlardan türetiliyor ve aradaki FARK da gösteriliyor —
+     "6 ayda 8.700 km" bilgisi, bir sonraki bakımın ne zaman geleceğini
+     söyleyen tek şey.
 
      BİLEŞENLER v1'DEN: .card · .arac-bas .plate-lg .veh-title
-     .spec-strip · .section-label · .notice · .tl-item (ortak
-     kayitSatiriHtml) · .plate-hint. Yeni bileşen yazılmadı.
+     .spec-strip · .section-label · .tel-link · .notice · .tl-item
+     (ortak kayitSatiriHtml) · .tutar-serit .tutar-sat .tv
+     · .plate-hint · .bos-durum. Yeni bileşen yazılmadı.
 
-     GEÇMİŞ SATIRI ORTAK NESNE: ana ekranla aynı kayitSatiriHtml.
-     Burada plaka gizleniyor (zaten aracın kendi sayfası).
-
-     ÜZERİNDE YOK: kontrol tarihleri (muayene/sigorta/kasko)
-     · yaklaşan kontroller · belge arşivi · ayrı müşteri ekranı. -->
+     ÜZERİNDE YOK: kontrol tarihleri (muayene/sigorta/kasko) · belge
+     arşivi · araç silme · ayrı müşteri ekranı. -->
 <section class="screen" id="screen-arac">
 
   <div class="card">
     <div id="arKunye"></div>
+    <div id="arIletisim"></div>
   </div>
 
   <div id="arBakim"></div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Ruhsat bilgileri
+    </div>
+    <div class="tutar-serit" id="arRuhsat"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clock"></use></svg> Kilometre geçmişi
+    </div>
+    <div id="arKm"></div>
+  </div>
 
   <div class="section-label">
     <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş
@@ -45,33 +68,92 @@ Ekran.tanim('arac', {
           (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
         '<div class="spec-strip">' +
           (a.motor ? '<span class="spec-val">' + a.motor + '</span>' : '') +
-          '<span class="spec-sep">·</span>' +
-          '<span class="spec-val">' + (a.sahipAd || 'sahip yazılmamış') + '</span>' +
-          '<span class="spec-sep">·</span>' +
-          '<span class="spec-val">' + (a.sahipTel || 'telefon yok') + '</span>' +
+          (a.yakit ? '<span class="spec-sep">·</span><span class="spec-val">' +
+            a.yakit + '</span>' : '') +
+          (a.renk ? '<span class="spec-sep">·</span><span class="spec-val">' +
+            a.renk + '</span>' : '') +
         '</div>' +
       '</div>';
 
-    /* Son bakım + bir sonraki hatırlatma. km burada işe yarıyor:
-       "geçen bakım 142.500'de yapılmış" (K-002). */
-    var bakimlar = aracKayitlari(a.plaka).filter(function (k) {
-      return k.tur === 'bakim' && k.teslimTarihi;
-    });
-    var son = bakimlar[bakimlar.length - 1];
-    document.getElementById('arBakim').innerHTML = son
-      ? '<div class="notice accent">' +
+    /* TELEFON ARANABİLİR (v1'deki gibi): tel: bağlantısı, 44 px hedef.
+       Ustanın elinde telefon var; numarayı okuyup elle tuşlamak
+       gereksiz bir adım. */
+    document.getElementById('arIletisim').innerHTML =
+      '<div class="tl-veri" style="margin-top:10px">' +
+        '<span>Sahibi <b>' + (a.sahipAd || 'yazılmamış') + '</b></span>' +
+      '</div>' +
+      (a.sahipTel
+        ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '">' +
+            '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' + a.sahipTel + '</a>'
+        : '<p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>');
+
+    /* ---- RUHSAT BİLGİLERİ ----
+       ⚠️ TC kimlik no ve adres ruhsatta VAR ama BURADA YOK
+       (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir).
+       Yakıt deposu ruhsatta yazmaz; araç bilgisi olarak tutuluyor. */
+    var alanlar = [
+      ['Şasi no (VIN)', a.vin], ['Motor no', a.motorNo],
+      ['Motor hacmi', a.silindir ? a.silindir + ' cc' : ''],
+      ['Motor gücü', a.guc ? a.guc + ' kW' : ''],
+      ['Yakıt', a.yakit], ['Renk', a.renk],
+      ['Koltuk', a.koltuk], ['İlk tescil', a.ilkTescil],
+      ['Yakıt deposu', a.depo ? a.depo + ' litre' : '']
+    ].filter(function (x) { return x[1]; });
+
+    document.getElementById('arRuhsat').innerHTML = alanlar.length
+      ? alanlar.map(function (x) {
+          return '<div class="tutar-sat"><span>' + x[0] + '</span>' +
+                 '<span class="tv">' + x[1] + '</span></div>';
+        }).join('')
+      : '<p class="plate-hint">Ruhsat okunmamış — bilgiler boş.</p>';
+
+    /* ---- KİLOMETRE GEÇMİŞİ ---- */
+    var g = kmGecmisi(a.plaka);
+    var gk = gunlukKm(a.plaka);
+    document.getElementById('arKm').innerHTML = g.length
+      ? '<div class="tutar-serit">' +
+          g.map(function (x, i) {
+            var fark = i > 0 ? x.km - g[i - 1].km : 0;
+            return '<div class="tutar-sat"><span>' + x.tarih + '</span>' +
+              '<span class="tv">' + x.km.toLocaleString('tr-TR') + ' km' +
+              (fark > 0 ? ' <span class="k-katalog">+' +
+                fark.toLocaleString('tr-TR') + '</span>' : '') + '</span></div>';
+          }).join('') +
+          (gk > 0
+            ? '<div class="tutar-sat genel"><span>Günde ortalama</span><span class="tv">' +
+                Math.round(gk).toLocaleString('tr-TR') + ' km</span></div>'
+            : '') +
+        '</div>' +
+        (gk > 0 ? '' :
+          '<p class="plate-hint">Tahmin için en az iki ölçüm gerekiyor. ' +
+          'Tek ölçümle günlük km uydurmak, ustayı yanlış güne çağırır.</p>')
+      : bosDurumHtml('i-clock', 'Kilometre yazılmamış',
+          'Bakım kaydı açarken kilometre girilirse burada birikir.');
+
+    /* ---- SON BAKIM + BİR SONRAKİ HATIRLATMA (ay VEYA km) ---- */
+    var son = sonBakim(a.plaka);
+    if (son) {
+      var hs = hatirlatmaHesapla(son);
+      document.getElementById('arBakim').innerHTML =
+        '<div class="notice accent">' +
           '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
           '<span class="n-body">Son bakım <b>' + son.teslimTarihi + '</b>' +
-            (son.km ? ' · ' + son.km + ' km' : '') +
-            (son.hatirlatmaTarihi
-              ? '<br>Hatırlatma: <b>' + son.hatirlatmaTarihi + '</b>' : '') +
+            (son.km ? ' · ' + son.km + ' km' : '') + '<br>' +
+            'Sıradaki: <b>' + gunAyYil(hs.tarih) + '</b>' +
+            (hs.kmHedef ? ' ya da <b>' + hs.kmHedef.toLocaleString('tr-TR') + ' km</b>' : '') +
+            ' — hangisi önce gelirse' +
+            (hs.hangisi === 'km' ? ' <i>(kilometreden geliyor)</i>' : '') +
           '</span>' +
-        '</div>'
-      : '';
+        '</div>';
+    } else {
+      document.getElementById('arBakim').innerHTML = '';
+    }
 
     var kayitlar = aracKayitlari(a.plaka);
     document.getElementById('arGecmis').innerHTML = kayitlar.length
-      ? kayitlar.map(function (k) { return kayitSatiriHtml(k, { plaka: false }); }).join('')
+      ? kayitlar.slice().reverse().map(function (k) {
+          return kayitSatiriHtml(k, { plaka: false });
+        }).join('')
       : bosDurumHtml('i-clipboard-list', 'Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
 
     document.getElementById('arNot').textContent = a.not || 'Not yok.';

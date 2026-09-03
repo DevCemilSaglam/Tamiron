@@ -1,20 +1,23 @@
 <!-- ekran: home · ANA MENÜ
-     03.09 — Cemil: "Yine anasayfada buttonlar olmalı. En üstte Sesli
-     İşlem buttonu, Araç kaydı, araçlar, servis kaydı ekle, servis
-     kayıtları, müşteriler, muhasebe olacak. Yine buttonların yanında
-     mikrofon buttonu olacak."
+     03.09 — Cemil'in verdiği sıra: Sesli işlem (en üstte, ötekilerle
+     AYNI biçimde) · Servis kaydı ekle · Servis kayıtları · Araçlar ·
+     Müşteriler · Muhasebe · Müşteriye mesaj.
 
-     ANA EKRAN LİSTE DEĞİL, MENÜ. Önceki hâlinde ana ekran "içerideki
-     araçlar" listesiydi; o liste kaybolmadı, kendi ekranına geçti
-     (Servis kayıtları · içeride süzgeci açık gelir).
+     "ARAÇ KAYDI" KALDIRILDI (Cemil, 03.09). Araç zaten servis kaydı
+     açılırken ruhsattan giriyordu; ayrı bir menü maddesi olması aynı
+     işi iki yerde gösteriyor ve "hangisinden gireceğim" sorusunu
+     doğuruyordu.
+
+     SESLİ İŞLEM ÖTEKİLERLE AYNI SATIR BİÇİMİNDE: ayrı duran büyük bir
+     düğme "bu başka bir şey" diye okunuyordu. Oysa sesli işlem menünün
+     bir maddesi — farkı, hangi işi yapacağını senin söylemen.
 
      HER SATIRIN SAĞ UCUNDA MİKROFON: iş hem dokunarak hem söyleyerek
-     başlatılabiliyor. Mikrofonu tek bir ekrana hapsetmek, sesle
-     başlamak isteyen ustayı önce gözle aramaya zorluyordu.
+     başlatılabiliyor; mikrofon o satırın BAĞLAMIYLA sesli işleme gider.
 
      BİLEŞENLER v1'DEN: .greeting · .menu-list .menu-row .main
-     .ic-badge .txt .lbl .sub .mic · .btn .btn-primary .btn-lg
-     · .notice. Yeni bileşen yazılmadı (K-008). -->
+     .ic-badge .txt .lbl .sub .mic · .notice .n-ic .n-body.
+     Yeni bileşen yazılmadı (K-008). -->
 <section class="screen" id="screen-home">
 
   <div class="greeting">
@@ -22,34 +25,17 @@
     <p>Mikrofona basıp <b>plaka söyleyebilir</b>, ne yapılacağını <b>yazdırabilirsin</b>.</p>
   </div>
 
-  <!-- EN ÜSTTE SESLİ İŞLEM: tek düğme, tek iş. Altındaki menü
-       "ne yapacağımı biliyorum" yolu; bu düğme "söylüyorum, sen bul". -->
-  <button class="btn btn-primary btn-lg" data-git="ses">
-    <svg class="ico"><use href="#i-mic"></use></svg> Sesli işlem
-  </button>
-
   <div id="homeHatirlatma"></div>
 
   <nav class="menu-list" aria-label="Ana menü">
 
     <div class="menu-row">
-      <button class="main" data-git="ruhsat">
-        <span class="ic-badge"><svg class="ico"><use href="#i-camera"></use></svg></span>
-        <span class="txt"><span class="lbl">Araç kaydı</span>
-          <span class="sub">Ruhsatı çek · yeni araç</span></span>
+      <button class="main" data-git="ses">
+        <span class="ic-badge"><svg class="ico"><use href="#i-mic"></use></svg></span>
+        <span class="txt"><span class="lbl">Sesli işlem</span>
+          <span class="sub">Söyle, gerisini o bulsun</span></span>
       </button>
-      <button class="mic" data-sesle="arac-kaydi" aria-label="Araç kaydı — plakayı sesle söyle">
-        <svg class="ico"><use href="#i-mic"></use></svg>
-      </button>
-    </div>
-
-    <div class="menu-row">
-      <button class="main" data-git="araclar">
-        <span class="ic-badge"><svg class="ico"><use href="#i-car"></use></svg></span>
-        <span class="txt"><span class="lbl">Araçlar</span>
-          <span class="sub" id="menuAraclarAlt">—</span></span>
-      </button>
-      <button class="mic" data-sesle="araclar" aria-label="Araçlarda sesle ara">
+      <button class="mic" data-sesle="genel" aria-label="Sesli işlem — dinlemeye başla">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -60,7 +46,7 @@
         <span class="txt"><span class="lbl">Servis kaydı ekle</span>
           <span class="sub">Araç geldi · iş açılıyor</span></span>
       </button>
-      <button class="mic" data-sesle="servis-ekle" aria-label="Servis kaydı — sesle aç">
+      <button class="mic" data-sesle="servis-ekle" aria-label="Servis kaydını sesle aç">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -77,6 +63,17 @@
     </div>
 
     <div class="menu-row">
+      <button class="main" data-git="araclar">
+        <span class="ic-badge"><svg class="ico"><use href="#i-car"></use></svg></span>
+        <span class="txt"><span class="lbl">Araçlar</span>
+          <span class="sub" id="menuAraclarAlt">—</span></span>
+      </button>
+      <button class="mic" data-sesle="araclar" aria-label="Araçlarda sesle ara">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
       <button class="main" data-git="musteriler">
         <span class="ic-badge"><svg class="ico"><use href="#i-users"></use></svg></span>
         <span class="txt"><span class="lbl">Müşteriler</span>
@@ -88,12 +85,23 @@
     </div>
 
     <div class="menu-row">
+      <button class="main" data-git="mesaj">
+        <span class="ic-badge"><svg class="ico"><use href="#i-message-square"></use></svg></span>
+        <span class="txt"><span class="lbl">Müşteriye mesaj</span>
+          <span class="sub">WhatsApp · özet · hatırlatma</span></span>
+      </button>
+      <button class="mic" data-sesle="mesaj" aria-label="Mesajı sesle yaz">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+
+    <div class="menu-row">
       <button class="main" data-git="muhasebe">
         <span class="ic-badge"><svg class="ico"><use href="#i-receipt"></use></svg></span>
         <span class="txt"><span class="lbl">Muhasebe</span>
           <span class="sub" id="menuMuhasebeAlt">—</span></span>
       </button>
-      <button class="mic" data-sesle="muhasebe" aria-label="Muhasebe — sesle sor">
+      <button class="mic" data-sesle="muhasebe" aria-label="Gideri sesle ekle">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -103,59 +111,51 @@
 </section>
 
 <script>
-/* SELAMLAMA SAATE BAKAR. Cemil, 01.09: "saat 13, bana günaydın mesajı
-   veriyor... hayırlı işler, usta şeklinde olmalı." Sabit metin
-   kullanıcının gününü yanlış okur; kişiselleşmiş gibi görünüp
-   yanılmak, hiç selamlamamaktan kötüdür. */
-function selamMetni(saat) {
-  if (saat < 6) return 'Hayırlı işler, usta';       /* gece vardiyası */
-  if (saat < 11) return 'Günaydın, usta';
-  if (saat < 18) return 'Hayırlı işler, usta';
-  return 'Hayırlı akşamlar, usta';
-}
-
 Ekran.tanim('home', {
   ciz: function () {
-    document.getElementById('selam').textContent = selamMetni(new Date().getHours());
+    /* Selamlama havuzu çekirdekte (selamMetni) — saat penceresi ve
+       cuma orada. Ekran yalnız çağırıyor. */
+    document.getElementById('selam').textContent = selamMetni();
 
-    /* Menü satırlarının alt yazıları SAYIYI söyler — usta ekranı
-       açmadan içeride ne olduğunu görsün. */
     var ic = icerideki().length;
-    document.getElementById('menuAraclarAlt').textContent =
-      ARACLAR.length + ' araç kayıtlı';
     document.getElementById('menuKayitlarAlt').textContent =
       ic ? ic + ' araç içeride · ' + KAYITLAR.length + ' kayıt'
          : KAYITLAR.length + ' kayıt · içeride araç yok';
+    document.getElementById('menuAraclarAlt').textContent =
+      ARACLAR.length + ' araç kayıtlı';
     document.getElementById('menuMusterilerAlt').textContent =
       musteriler().length + ' müşteri';
     document.getElementById('menuMuhasebeAlt').textContent =
       'Bugün ' + tutar(bugunTahsilat()) + ' ₺ · ' +
       tutar(veresiyeToplami()) + ' ₺ veresiye';
 
-    /* Bakım hatırlatması ana ekranda KALIYOR (T-17, K-002): menüye
-       dönüşse de ustanın "bugün kimi arayacağım" sorusu ilk ekranda
-       cevaplanmalı. Çekmecedeki rozetle aynı kaynaktan besleniyor. */
-    var h = KAYITLAR.filter(function (k) {
-      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
-             tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
-    });
+    /* Bakım hatırlatması ana ekranda KALIYOR (T-17): ustanın "bugün
+       kimi arayacağım" sorusu ilk ekranda cevaplanmalı. */
+    var h = hatirlatmasiGelenler();
+
+    /* ŞERİT TIKLANABİLİR. "Bakım zamanı geldi" deyip hiçbir yere
+       götürmeyen bir uyarı ustaya iş çıkarıyordu: plakayı okuyup
+       listeden aramak zorunda kalıyordu. Tek araçsa doğrudan aracına,
+       birden fazlaysa listeye. */
     document.getElementById('homeHatirlatma').innerHTML = h.length
-      ? '<div class="notice warn">' +
+      ? '<button class="notice warn"' +
+          (h.length === 1 ? ' data-arac="' + h[0].plaka + '"' : ' data-git="kayitlar"') +
+          ' aria-label="Bakım zamanı gelen araçları aç">' +
           '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
           '<span class="n-body"><b>' + h.length + ' aracın</b> bakım zamanı geldi — ' +
             h.map(function (k) { return k.plaka; }).join(', ') + '</span>' +
-        '</div>'
+          '<svg class="ico ico-sm n-ok"><use href="#i-chevron-right"></use></svg>' +
+        '</button>'
       : '';
   }
 });
 
-/* Mikrofonlar sesli işleme, NE İÇİN basıldığı bilgisiyle gider.
-   "Araçlarda ara" ile "servis kaydı aç" aynı ekranı açıyor ama
-   ekran ne beklediğini biliyor. */
+/* Mikrofonlar sesli işleme NE İÇİN basıldığı bilgisiyle gider:
+   "araçlarda ara" ile "gider ekle" aynı ekranı açıyor ama ekran ne
+   beklediğini biliyor ve örneklerini ona göre gösteriyor. */
 document.addEventListener('click', function (e) {
   var m = e.target.closest('[data-sesle]');
   if (!m) return;
-  SESLI_NIYET = m.getAttribute('data-sesle');
-  Ekran.ac('ses');
+  sesleAc(m.getAttribute('data-sesle'));
 });
 </script>

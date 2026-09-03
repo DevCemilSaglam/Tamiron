@@ -1256,3 +1256,28 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .ses-duyulan .sd-lbl { display: block; margin-bottom: 4px; font-style: normal;
   font-size: 11px; font-weight: 700; letter-spacing: .08em;
   text-transform: uppercase; color: var(--faint); }
+
+/* ---------- TELEFON — TEK BİLEŞEN (v1'den) ----------
+   03.09, Cemil: "Telefon numaraları aranabilir olmalı v1'deki gibi."
+   Nerede telefon gösteriliyorsa aynı görünür: ikon + mono + aksan.
+   .tel-link = blok/liste bağlamı (44 px dokunma hedefi)
+   .tel-inline = cümle içinde geçen telefon (yükseklik zorlanmaz) */
+.tel-link { display: inline-flex; align-items: center; gap: 7px; width: fit-content;
+  padding: 4px 0; min-height: 44px;
+  background: transparent; color: var(--accent); text-decoration: none;
+  font-family: var(--font-mono); font-weight: 600; font-size: 14.5px; letter-spacing: .01em; }
+.tel-link:hover { text-decoration: underline; }
+.tel-link .ico-sm { width: 14px; height: 14px; flex: none; }
+.tel-inline { font-family: var(--font-mono); color: var(--accent); text-decoration: none; }
+
+/* Uyarı şeridi DÜĞME olabilir: "bakım zamanı geldi" deyip hiçbir yere
+   götürmeyen bir uyarı, ustaya iş çıkarıyordu (03.09). */
+button.notice { width: 100%; text-align: left; cursor: pointer; }
+button.notice:hover { filter: brightness(.98); }
+.notice .n-ok { flex: none; margin-left: auto; opacity: .7; }
+
+/* Liste satırında ikincil bilgi kümesi — servis kaydına GİRMEDEN
+   görülsün diye (Cemil, 03.09: "kayıtlar daha detaylı olsun"). */
+.tl-veri { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; }
+.tl-veri span { font-size: 12.5px; color: var(--muted); }
+.tl-veri b { font-weight: 600; color: var(--text); }

@@ -47,6 +47,12 @@ var kytSecili = 'iceride';        /* günlük soru önce cevaplanır */
 
 Ekran.tanim('kayitlar', {
   ciz: function () {
+    /* Sesten gelen arama: "balata ara" ya da "içeridekileri göster". */
+    if (ARAMA_TERIMI && ARAMA_TERIMI.hedef === 'kayitlar') {
+      document.getElementById('kytQ').value = ARAMA_TERIMI.terim || '';
+      if (ARAMA_TERIMI.suzgec) kytSecili = ARAMA_TERIMI.suzgec;
+      ARAMA_TERIMI = null;
+    }
     var q = norm((document.getElementById('kytQ') || {}).value || '');
 
     var liste = KAYITLAR.filter(function (k) {
