@@ -1,4 +1,4 @@
-# TAMIRON — TASARIM SİSTEMİ (TASARIM-SISTEMI.md) · v31 · 01.09.2026
+# TAMIRON — TASARIM SİSTEMİ (TASARIM-SISTEMI.md) · v2.0 · 03.09.2026
 
 > Tamiron'un görsel dili. **Tek kaynak: `tokens.css`** (renk/tip/ölçü). Bu belge o token'ların nasıl kullanılacağını ve bileşen desenlerini tanımlar. Kural: ekran/bileşen kodunda **ham hex/px-renk YOK** — yalnız token. (K-022 tasarım-önce, K-023 tek kaynak.)
 
@@ -60,7 +60,6 @@ Tümü `tokens.css`'ten. Değiştirmek için oradaki "MARKA PALETİ" hexleri.
 - **Kart:** `--surface`, `--line` kenarlık, `--radius-lg`, `--shadow`. Zemin (`--bg`) üstünde yüzer.
 - **Buton:** birincil = `--primary`/`--on-primary`; ghost = şeffaf + `--line`; aksan ikon = `--accent`. Belirgin `:focus-visible` (2px `--primary`).
 - **Durum pill:** `--ok-bg`/`--ok` gibi (ör. "Teklif hazır"). **Her durumun kendi rengi olur** — nötr gri (`muted`) bir SONUÇ için kullanılmaz: gri "durum yok" gibi okunur. Dört sonuç rengi: `ok` tamamlandı · `warn` ertelendi · **`info` bilgi verildi** (mavi, nötr sonuç) · **`crit` reddedildi**. `muted` yalnız gerçekten durumsuz etiketlerde (ör. "Ziyaret · bilgi" öncü rozeti).
-- **Öncelik etiketi (4 kademe):** Zorunlu=`crit`, Yapılabilir=`warn`, İyi olur=`ok`, Yapılmayabilir=`surface-2`/`muted` (soluk). Form + renkle kodlanır.
 - **PLAKA — TEK BİLEŞEN, HER YERDE AYNI.** Gerçek TR plakasının dili: **`--primary` çerçeve + solda dolu mavi “TR” bloğu + mono numara** (`--surface` zemin, `--text` metin). Plaka nerede görünüyorsa bu bileşenle çizilir — düz mono metin ya da farklı bir rozet **kullanılmaz**.
   - **Üç boyut:** `.plate-sm` (liste satırı, etiket, eyebrow içi) · varsayılan (metin içi) · `.plate-lg` (ekran başlığı). Yalnız ölçü değişir; **renk ve yapı sabittir** — plaka her yerde aynı şeye benzer.
   - Plaka **giriş alanı** da aynı dili kullanır (TR bloğu + mavi çerçeve), böylece yazarken görülen şey kaydedildikten sonra görülenle aynıdır.
@@ -78,11 +77,7 @@ Tümü `tokens.css`'ten. Değiştirmek için oradaki "MARKA PALETİ" hexleri.
 - **Ana menü (mobil):** tam genişlik **dikey satırlar** (K-024); birincil eylem (Araç Giriş) `--primary` ile öne çıkar.
 
 ### 5.2 EK BİLEŞEN DESENLERİ (omurga prototipinden, 29.08)
-- **Bildirim listesi (drawer içinde):** başlık **sticky**; **sağa swipe = sil** + her satırda erişilebilir `[x]`; "Temizle" hepsini siler; **liste boşsa bölüm ve rozet tamamen gizlenir.**
-- **Zaman tüneli (timeline):** solda tip ikonu, sağda dikey yığın. **Özet bağlamda (ör. "Son 3") yalnız İŞİN TİPİ** (*Bakım · İnceleme · Tamirat · Teklif*) + **alt şerit: solda DURUM rozeti, sağda TARİH** (mono, nowrap). Kayıt numarası ve yapılan işler özete girmez — **detay ayrı ekrana** (Geçmiş). **Tutar/fiyat GÖSTERİLMEZ** (tutar teklif/muhasebe ekranlarının işi).
-- **Satır şerİdİ = TİP.** Her timeline satırında **3px sol kenar şeridi** servis kaydı tipini verir (`--tip-*`, §2); tip ikonu aynı renkte. **Zemin boyanmaz.** ⚠️ **Kural:** bir satırın zeminini semantik yumuşak renkle (`--warn-bg` vb.) boyarsan **aynı ailenin rozeti görünmez olur** — rozetin kendi zemini satır zeminiyle çakışır. Nötr zemin + şerit → rozet kontrastını korur.
 - **Uyarı şeridi (notice):** ikon + metin, üç ton — `ok` (bilgilendirme/başarı) · `warn` (eksik bilgi) · `accent` (dükkan kuralı/yönlendirme). Akışı kesen ayrı adım yerine **ekran içinde** uyarı verir.
-- **Durum geçiş şeridi:** `pill → ok → pill` (ör. *Servis kaydı · bilgi* → **İşleme döndü**) — durum değişimini görünür kılar.
 - **TELEFON — TEK BİLEŞEN, HER YERDE AYNI.** İkon + **mono + `--accent`**, **zeminsiz**, `tel:` linki (K-020 "tıklanabilir plaka/kişi" ruhu). İki bağlam:
   - **`.tel-link`** — blok/liste bağlamı (kişi satırı, iletişim kartı): 14.5px, ikonlu, **44px dokunma hedefi** (`min-height`).
   - **`.tel-inline`** — cümle içinde geçen telefon: yalnız mono + aksan, **yükseklik zorlanmaz** (metin akışını bozmaz).
@@ -95,13 +90,7 @@ Tümü `tokens.css`'ten. Değiştirmek için oradaki "MARKA PALETİ" hexleri.
   - Açılışta **seçili seçenek görünür** hale getirilir (`scrollIntoView`) — uzun listede aşağıdaysa aranmaz.
   - **Tarih de aynı kusurda:** native takvimi işletim sistemi çizer. Yerine **`GG.AA.YYYY` maskeli metin alanı** — klavyeden yazmak takvimden seçmekten zaten hızlıdır. Ayın **gerçek gün sayısı** doğrulanır (31.02 reddedilir); eksik yazılırken uyarı çıkmaz.
 - **Liste ekranı (Araçlar / Kişiler):** üstte **standart arama kutusu** (arama ikonu + alan + doluyken ✕ temizle), **hemen altında satırlar**. ⚠️ **Sonuç sayacı konmaz** — liste zaten görünüyor; sayac aramayla liste arasına girip gözü oyalar. Satır: sol tanımlayıcı (plaka rozeti / baş harf rozeti) + ad ve alt bilgi + sağda `chevron`. **Boş sonuçta ne aranabileceğini söyleyen mesaj** ("Eşleşen araç yok. Plaka, marka, model ya da sahip adıyla arayın.") — kuru "sonuç yok" değil.
-- **Tarihe bağlı durum rozeti:** bitiş tarihi taşıyan satırlar (muayene, sigorta, garanti…) **kendi durumunu söyler**: geçmişse `crit` *"N gün geçti"*, 30 gün içindeyse `warn` *"N gün kaldı"*, değilse rozetsiz. Bölüm başında kaç tanesinin dikkat istediği yazılır. **Tarihi göstermek yetmez — ne anlama geldiğini de söyle.**
-- **Kişi satırı (Kişiler listesi):** avatar + **ad** + bağlı **plaka etiketleri**; altında **telefon ayrı bir `tel:` linki** (mono, aksan zeminli pill). **Rol yazılmaz** — kimin ne olduğu bu listede işe yaramaz; gereken tek şey kişiye ulaşmak.
-  - ⚠️ **`<button>` içine `<a>` konmaz** (iç içe etkileşimli öğe). Satırın tamamı tıklanıp aynı zamanda içindeki telefon aranacaksa, satır **dikey ikiye bölünür**: üstte düğme, altında link.
-  - **Satır tek hedef gibi davranır ("yayılmış bağlantı"):** asıl düğmenin `::after`'ı `position:absolute; inset:0` ile **tüm satırı** kaplar; hover/aktif durum **satırın kendisine** verilir (iç parçaya değil). İkincil link (telefon) `position:relative; z-index:1` ile **üstte** kalır — ona basınca satırın eylemi değil kendi eylemi çalışır. Klavye odağı da `::after` üzerinde gösterilir.
-  - **Dokunma hedefi en az 44px** (telefon gibi ikincil eylemler dahil). ⚠️ **Görsel ağırlık ≠ dokunma alanı:** hedefi büyütmek için font/zemin büyütmek gerekmez — **`min-height` ile alan korunur, metin küçük kalır.** İkincil eylemler zeminsiz bırakılır; dolu pill zemin onları birincil eylem gibi gösterir.
 - **Künye listesi (etiket — değer):** `dt` sabit genişlikte soluk etiket, `dd` değer; satırlar ince ayraçla ayrılır. **Kod/numara değerleri mono** (şasi, motor no, km). **Boş alanın satırı hiç çizilmez** — "—" dolgusu yok. Kayıt ekranında toplanan her alanın bir okuma yeri olmalıdır.
-- **Renk seçici:** özel seçimin renk varyantı — her seçenekte **kutucuk + ad**, seçilince kutucuk tetik düğmesinde de görünür. Seçim **ad + hex** birlikte tutulur; kutucuk stilden değil **veriden** boyanır (§2 kuralının doğal sonucu).
 - **İpucu satırı yer tutmaz:** doğrulama/ipucu metni **boşken görünmez** (`:empty { display:none }`) — alanlar arasında ölü boşluk kalmaz, ipucu geldiğinde araya girer. *(İstisna: tek ipuculu ekranlarda — ör. plaka — yeri sabit tutulur ki buton zıplamasın.)*
 - **Bölüm başlığı + eylem:** kart içi bölüm başlığının **sağ ucunda** bir veya iki yuvarlak eylem (ör. ruhsattan oku + sesle doldur; biri dolu aksan, diğeri çerçeveli) — ayrı şerit/kutu yerine başlık satırına yerleşir, dikey yer harcamaz.
 - **Tekrarlanan alan grubu (ör. iletişim):** “Ekle” butonu **doğrudan forma yeni bir alan bloğu** ekler — ayrı panel, ayrı “Vazgeç/Kaydet” adımı **yoktur**; blok asıl kayıtla birlikte kaydedilir. Bloklar ince üst ayraçla ayrılır, başlık satırının sağında kaldırma düğmesi bulunur, silince başlıklar yeniden numaralandırılır.
@@ -111,7 +100,6 @@ Tümü `tokens.css`'ten. Değiştirmek için oradaki "MARKA PALETİ" hexleri.
 - **Kalem listesi (parça/işçilik):** her satır **tip rozeti + düzenlenebilir ad + sağa yaslı mono tutar + kaldır**. Tip rozetleri semantik değil ayırt edicidir (parça `--accent`, işçilik `--info`). Altta **toplam şeridi**: ara satırlar soluk, **genel toplam display fontuyla büyük** — müşteriye söylenen rakam tek bakışta okunur. Boş listede ne yapılacağını söyleyen mesaj.
 - **Form alanı stili `.field`'a bağlı olmamalı:** başlığı `section-label` ile gelen ya da bir satır içine gömülen alanlar (ör. kalem satırları) `.field` dışında kalır ve **tema almaz** (koyu temada siyah metin). **Taban kural** bunu garanti eder: `input, textarea, select { color: inherit; font-family: var(--font-body); }` — renk daima kapsayıcıdan gelir. Bu hata iki kez tekrarlandığı için kural seviyesine çıkarıldı.
 - **Sesle doldur:** çok alanlı formda bölüm başlığının sağında yuvarlak mikrofon butonu; basılınca "Dinliyorum…" göstergesi, ardından alanlar **sırayla** dolar (ne olduğu görünür). Form alanları **boş başlar** — dolu başlarsa sesli girişin etkisi görünmez.
-- **Araç rengi = küçük renkli KUTUCUK** (16px, `--line` sınırlı), metin değil. ⚠️ **Renk bir token DEĞİL, kayıttan gelen VERİdir** — `tokens.css`'ten gelmez (K-023 istisnası; araç renginin kod/hex saklanması `VERI-MODELI.md`'ye düşer).
 
 ## 6. TEMA
 `data-theme="light|dark"` kökte; seçilmezse `prefers-color-scheme`. `body` arka planı daima `var(--bg)` (şeffaf bırakılmaz). Her iki temaya eşit özen; kontrast korunur.
@@ -313,129 +301,74 @@ Yalnızca ekranı *tarif eden* cümleler atıldı. **Kural taşıyanlar** ait ol
 
 Bilgi kaybolmadı, yeri değişti.
 
-## Sürüm notları
-- v1 · 24.08.2026 — marka, renk/tip/ölçü token rolleri, bileşen desenleri, tema, erişilebilirlik.
-- **v2 · 29.08.2026** — omurga prototipinden (`prototypes/omurga.html` v12) çıkan kararlar işlendi: **§3.1 ikon seti = Lucide** (emoji yok), **§5.1 uygulama kabuğu** (sabit header/footer, geri-ileri disabled görünür, sağdan drawer, tema drawer'da, satır-başı mikrofon), **§5.2 ek bileşenler** (bildirim listesi, timeline, tip şeridi, notice, durum geçiş şeridi, telefon, plaka maskesi, araç rengi kutucuğu = veri).
-- **v3 · 29.08.2026** — **TİP RENKLERİ** (`--tip-bakim/tamirat/inceleme/teklif`, §2) eklendi: ziyaret tipini ayırt eder, durumdan ayrıdır; dördü de mevcut paletten türer (yeni hex yok), `--nut` için dar istisna. §5.2: **satır şeridi = tip** kuralı (zemin boyanmaz).
-- **v4 · 29.08.2026** — `--info`/`--info-bg` (mavi, nötr sonuç) eklendi; **durum rozetlerinde gri yasak** kuralı. Maskeli alan kuralı: boşken örnek metni yerine **placeholder maske şablonu**. **Sesle doldur şeridi** deseni.
-- **v5 · 29.08.2026** — **Logo düzeltmesi:** somun turuncu değil **teal**; "turuncu yalnız logoda" kuralı kaldırıldı. `--nut` → **`--highlight`** (üçüncü vurgu). §5.2'ye **ruhsat formu** deseni.
-- **v6 · 29.08.2026** — §5.2: renk seçici · autocomplete alanı (bağımlı liste) · bölüm başlığı + sağ eylem · satır içi ekleme paneli desenleri.
-- **v7 · 29.08.2026** — **Native `<select>` yasağı** + özel seçim bileşeni (tema uyumlu menü, ESC/dışarı tıklama). Renk seçici çip yerine seçim menüsüne döndü. Tekrarlanan alan grubu (panel/kaydet adımı yok) + tek-seçim işareti desenleri.
-- **v8 · 29.08.2026** — `<datalist>` de yasağa dahil (native çizim + doluyken filtreleme yüzünden tekrar seçilemiyor); özel seçime **menü içi arama** ve **bağımlı seçim temizleme** kuralları. İpucu satırı boşken yer tutmaz.
-- **v9 · 29.08.2026** — §5.2: **künye listesi** deseni (etiket–değer, mono kod alanları, boş satır çizilmez).
-- **v10 · 29.08.2026** — §5.2: **liste ekranı** deseni (arama kutusu + sonuç sayısı + satır + yol gösteren boş durum). “Geçerli iletişim” rozeti küçültüldü (10.5px) — ada eşlik eden ikincil bir işaret, başlıkla yarışmaz.
-- **v11 · 29.08.2026** — **Plaka tek bileşene indirildi** (çerçeve + TR bloğu + mono numara, üç boyut); düz mono plaka metni ve ayrı rozet biçimleri kaldırıldı.
-- **v12 · 29.08.2026** — Native **tarih seçici** de yasağa dahil (GG.AA.YYYY maskesi). **Tarihe bağlı durum rozeti** deseni. **Her not alanının kendi mikrofonu** kuralı. Form alanı stilinin `.field`'a bağlı olmaması (tema hatası kaynağıydı).
-- **v13 · 29.08.2026** — **Kalem listesi + toplam şeridi** deseni. Form alanları için **taban kural** (`color: inherit`) — `.field` dışında kalan alanların tema almaması sorunu kökünden çözüldü.
-- **v14 · 29.08.2026** — **Aç/kapa anahtarı (switch)** deseni; alan görünürlüğü ayarı için ayar satırı düzeni.
-- **v15 · 29.08.2026** — Liste ekranlarından **sonuç sayacı kaldırıldı** (arama → doğrudan liste). Liste satırına **basılı durum** (`:active`) ve görünür klavye odağı eklendi.
-- **v16 · 29.08.2026** — **Kişi satırı** deseni: rol gösterilmez, telefon ayrı `tel:` linki (16px mono, 44px dokunma hedefi). "button içine a konmaz" kuralı.
-- **v17 · 30.08.2026** — Kişi telefonu **zeminsiz ve daha küçük** (14.5px), dokunma hedefi `min-height` ile korundu. Kural: görsel ağırlık ile dokunma alanı ayrı şeyler.
-- **v18 · 30.08.2026** — **Telefon tek bileşene indirildi** (`.tel-link` / `.tel-inline` + `.mail-link`); her ekranda aynı görünüyor. **Yayılmış bağlantı** deseni: satırın tamamı tıklanabilir ve hover satırın kendisinde, içindeki telefon ayrı çalışıyor.
-- **v19 · 30.08.2026** — **Otomatik denetim** (12 ekran / 308 öğe): 6 dokunma hedefi 44 px'e çıkarıldı (görünüş korunarak), `--shadow-sm` + `--scrim` tokens.css'e taşındı; `.tel-inline` ve araç `renkHex` **kural dışı** olarak netleşti; A-D1…A-D4 açık bırakıldı.
-- **v20 · 30.08.2026** — **Taban renk kuralına `button` eklendi.** Koyu temada `.ozet-kutu` ve `.odeme-yol` siyah yazı çıkıyordu (tarayıcı `buttontext` varsayılanı). Üçüncü kez yaşanan tuzak; kontrol yöntemiyle birlikte kalıcı bölüm açıldı.
-- **v21 · 30.08.2026** — **Erişilebilirlik denetimi:** çekmeceye odak tuzağı eklendi; `focusables()` iki hatası düzeltildi (SVG `<use>` yakalıyordu, boyutu sıfır öğeleri geçiriyordu); basit mod anahtarına aria-label.
-- **v22 · 31.08.2026** — **Boş durum deseni** (`.bos-durum`): "hiç veri yok" ile "arama sonucu boş" ayrıldı; ilki yol gösterir ve eylem düğmesi taşır, ikincisi ne ile aranabileceğini söyler. `.iyi` varyantı — boşluğun olumlu olduğu yerlerde yeşil ikon.
-- **v23 · 31.08.2026** — **Balon (toast) tasarım sistemine alındı:** ters kontrast kaldırıldı (koyu temada beyaz balon çıkıyordu), yüzey rengine geçti; **dinleme hâli** marka aksanıyla ayrıldı. Aksan zeminde metin rengi kuralı yazıldı (ölçüm: 3.1 → 14.4).
-- **v24 · 31.08.2026** — **Tanımsız CSS sınıfı testi** (9. sağlık testi): `.row-btns` 9 ekranda bozuk düğmeye yol açmıştı. Servis kaydı satırında plaka sağa yaslandı (`.tl-title` flex), kişi künyesi çipleri eklendi.
-- **v25 · 31.08.2026** — **Ortak liste nesneleri**: araç, servis kaydı ve kişi tek fonksiyonda çiziliyor (`nesneArac` · `nesneServisKaydi` · `nesneKisi`). Servis kaydı şeridi artık **tipi değil durumu** söylüyor. 22 ölü CSS kuralı silindi; denetime **16. test `OLU-SINIF`** eklendi ve denetim artık **CSS yorumlarını ayıklıyor**.
-- **v26 · 31.08.2026** — **Araç başlığı ortak nesne** (`nesneAracBasligi`); araç künyesi **akordiyon**; kontrol tarihleri **tek satır**; iletişimde geçerli olan **üstte**, tek kişide rozet yok. **Müşteri notları** (yatay kaydırmalı, sesle eklenir, **aramaya dahil**). Terim kararı: her yerde **Müşteri**. `norm()` **aksan katlıyor**. `.screen > * { flex-shrink: 0 }`. Denetim **18 test**.
-- **v27 · 31.08.2026** — **Ekran başlıkları ve açıklamaları kaldırıldı** (Cemil): 21 `h1`, 24 paragraf. Eyebrow tek başlık satırı oldu, dinamik sayaçlar `.eb-say` ile yanına taşındı. Topbar 72 px, düğmeler 48 px. Kural taşıyan açıklamalar kartların içine indi.
-- **v28 · 01.09.2026** — **Beş yeni desen.**
-  **Tabaka** (`.tabaka`): alttan açılan seçim yüzeyi. Kural — *seçim için ekran değiştirme*: kullanıcı bir formun ortasındayken yeni ekran açmak yazdıklarını gözden kaçırtıyor. Tabaka üstte açılır, seçince kapanır, form yerinde kalır. Çekmeceyle aynı erişilebilirlik sözleşmesi: `role="dialog"`, Esc kapatır, Tab tuzağı, arka plan `inert`.
-  **Ürün satırı** (`.urun-sat` / `nesneUrun`): katalog ürününün tek çizimi — parça seçicide, stok listesinde, mal kabulde aynı. Değiştirici sınıflar `u-` önekli (`.stok` başka bir bileşenin yeşil noktasını içeri alıyordu — **önek kuralı**).
-  **Çip grubu** (`.cip`): süre seçimiyle aynı desen, artık ret sebebi ve indirim oranı gibi yerlerde de kullanılıyor.
-  **Hızlı eylem** (`.tl-eylem`): liste satırının içinde, satırın kendi tıklamasını yutmayan ikinci eylem (`stopPropagation`). Satır kaydı açar, düğme işi ilerletir.
-  **Açılır menüde grup başlığı** (`.sel-grup`): `selDoldur` artık `{ grup, degerler }` kabul ediyor; arama yapınca boşalan grup başlığı gizleniyor.
-
-  **İki kalıcı tuzak yazıldı:**
-  1. **`flex: 1 1 0` + `min-width: 0` sarmayı öldürür.** Öğeler sıfıra kadar daralabildiği için satır hiç dolmaz, `flex-wrap` devreye girmez, `white-space: nowrap` ile yazı kutunun dışına taşar. Doğrusu `flex: 1 1 auto; min-width: max-content`. Ayrıca `.btn` tabanında `width: 100%` varsa `width: auto` da verilmeli, yoksa her düğme ayrı satıra düşer.
-  2. **Blok olmayan `<span>` alt satıra inmez.** `.mk-ad`/`.mk-alt` ve `.bb-ad`/`.bb-alt` yan yana akıyordu ("… TRWstok 0 adet", "Tamiron Oto Servis Örnek Mah…"). Ad + alt satır deseninde ikisi de `display: block` olmalı.
-- **v29 · 01.09.2026** — **Kural: ekran verisine bakan çizim, ekran açılışında çalışır.** Sayfa yüklenirken bir kez çizmek iki hatayı birden doğuruyor: (1) o anda aşağıda tanımlı `var`'lar henüz `undefined` (bu projede **sekiz kez**), (2) veri sonradan değişince liste bayat kalıyor. **`typeof X === 'undefined'` koruması bir çözüm değil, hata gizleyicidir** — patlamayı önler, yanlış davranışı sürdürür ve denetim "0 bulgu" der. Denetime **22. test YÜKLEME SIRASI** eklendi.
-- **v30 · 01.09.2026** — **Nötr griler markaya kaydırıldı; alt başlıklar renkli.** Cemil: *"sayfalarda boşluklar hep gri, biraz renkli olabilir; alt başlıklar renkli olabilir; koyu temada griler daha açık, açık temada daha koyu belirgin olsun."*
-
-  **Token değişiklikleri** (ikisi de `tokens.css` + gömülü kopya):
-
-  | Token | Açık (eski → yeni) | Koyu (eski → yeni) |
-  |---|---|---|
-  | `--bg` | `#F2F5F8` → `#EDF2F9` | `#0A0F17` → `#0A1220` |
-  | `--surface` | `#FFFFFF` (aynı) | `#121A25` → `#14202F` |
-  | `--surface-2` | `#E9F0F5` → `#E2EBF5` | `#0E141D` → `#172436` |
-  | `--line` | `#DBE3EC` → `#D3DEEB` | `#233042` → `#2A3B51` |
-  | `--muted` | `#54637A` → `#44556F` | `#93A2B4` → `#A9B8CB` |
-  | `--faint` | `#93A2B4` → `#7E8FA5` | `#6E7E90` → `#8496AB` |
-
-  **İki yeni token:** `--field-bg` (metin alanlarının zemini — beyaz/nötr değil, hafif tinted) ve `--hint` (ipucu metni — `--muted`'dan ayrı, mavimsi).
-
-  **Ölçüm — yüzeye karşı kontrast oranı:**
-
-  | | açık | koyu |
-  |---|---|---|
-  | `--text` | 16.82 | 14.06 |
-  | `--muted` | 7.57 | 8.15 |
-  | `--hint` | 6.29 | 7.57 |
-  | `--faint` | 3.30 | 5.43 |
-  | `--primary` (alt başlık) | 8.46 | 5.09 |
-
-  `--faint` açık temada 3.30 — yalnız **yer tutucu ve ikon** için; gövde metninde kullanılmaz (AA 4.5 altında). Koyu temada 5.43'e çıktı, orada gövde metninde de kullanılabilir.
-
-  **Kural: alt başlık (`.section-label`) `--primary` renginde.** Gri başlık sayfa taranırken kayboluyordu; bölüm başları önce göze çarpsın.
-
-  **Kalıcı tuzak — koyu tema İKİ YERDE tanımlı.** `[data-theme="dark"]` (kullanıcı seçerse) ve `@media (prefers-color-scheme: dark)` (sistem tercihi) aynı değerleri **kopyalar**; CSS'te tek kaynaktan türetilemiyor. Bu turda tam bu oldu: biri güncellendi, öteki unutuldu — *seçilen* koyu temada yeni renkler, *sistem* koyu temasında eski renkler çıkıyordu. Kullanıcıların çoğu "sistem" ayarında olduğu için değişiklik onlara hiç ulaşmayacaktı. Denetime **23. test `TEMA-UYUSMAZLIGI`** eklendi: iki bloğu token token karşılaştırıyor (33 token, fark yok).
-
 ---
 
-## v31 — dördüncü tur bileşenleri (01.09.2026, işler 19–28)
+# v2.0 — tamircinin geri bildirimine göre ayıklama (03.09.2026)
 
-### Gizlenen para — `•••`, boşluk değil
+Bu belge v1'den **devralındı ve budandı.** Zanaat bilgisi (plaka bileşeni, telefon bileşeni, native seçim tuzağı, koyu tema taban rengi, dokunma hedefi, yayılmış bağlantı…) **akıştan bağımsızdır ve olduğu gibi durur.** Eski ekranlara bağlı desenler çıkarıldı.
 
-Yetkisi olmayan kullanıcıya rakamı **silip boş bırakmak** *"fiyat yok"* gibi okunuyordu. Doğrusu: nokta serisi + **sebebi yazan not**.
+## Düşen dokuz desen
 
-```
-.para-gizli { letter-spacing: .18em; color: var(--faint); font-family: var(--font-mono); }
-```
-
-Şeridin tamamı gizleniyorsa tek satır kalır (`Toplam •••`) ve altında sebep yazar. **Tek tek maskelemek**, "burada bir rakam var ama sana yok" demenin en gürültülü yoludur.
-
-Sebep **iki ayrı metindir** ve ayrımı korunmalıdır:
-- yetkisizlik → *"Çırak rolünde fiyatlar görünmez."*
-- yanlış kayıt → *"Bu kaydın sorumlusu sen değilsin…"*
-
-### Kesinlik rozeti (`.k-kesinlik`)
-
-Üç kademe, ama **yalnız ikisi işaretlenir**: `kesin` çoğunluktur, işaretlenmez. **İstisna işaretlenir, kural değil** — bu belgedeki genel kural (bkz. "araç dışarıda" işareti).
-
-| Kesinlik | Görünüm |
+| Desen | Neden düştü |
 |---|---|
-| kesin | rozet yok |
-| olabilir | `--warn-bg` / `--warn` |
-| şartlı | `--surface-2` / `--faint`, satır `opacity: .8` |
+| Öncelik etiketi (4 kademe) | v2'de öncelik kavramı yok |
+| Zaman tüneli özet kuralları (*Bakım · İnceleme · Tamirat · Teklif*) | İki tür kaldı: tamirat / bakım (**K-006**) |
+| Satır şeridi = tip (`--tip-*`) | Dört tip yok |
+| Durum geçiş şeridi (`pill → ok → pill`) | Durum makinesi yok (**K-004**) |
+| Tarihe bağlı durum rozeti (muayene/sigorta/garanti) | Kontrol tarihleri modelde yok |
+| Kişi satırı (Kişiler listesi) | Ayrı müşteri ekranı yok — müşteri aracın üstünde |
+| Renk seçici · araç rengi kutucuğu | Renk saklanmıyor |
+| Bildirim listesi (çekmece içinde) | **Çekmece yok** — aşağıya bak |
 
-Rozet **düğmedir** — dokununca kesin → olabilir → şartlı → kesin döner.
+## ⚠️ Çekmece (drawer) kalktı
 
-### Tavsiye şeridi (`.ep-satir`)
+v1'in kabuğunda sağdan açılan bir çekmece vardı: bildirimler, bölümler, kullanıcı, ayarlar. **v2'de yok.**
 
-Tavsiye **kalem değildir**, kalem gibi görünmemelidir: **kesik kenarlık** (`border: 1px dashed`), `--surface-2` zemin. Üç kademeli güç, üç ayrı ikon rengi:
+**Gerekçe:** Altı ekran var (`EKRANLAR.md`) ve hepsine ana ekrandan ya da akışın kendisinden ulaşılıyor. Çekmece, **on üç maddeyi bir yere sığdırmak** için vardı. T-18 zaten *"iç içe menü yok"* diyor — çekmece tanım gereği iç içe bir menüdür.
 
-| Güç | Ton | Renk |
-|---|---|---|
-| birlikte değişir | uyarı | `--crit-bg` / `--crit` |
-| bakılmalı | soru | `--warn-bg` / `--warn` |
-| açılmışken | hatırlatma | `--accent-soft` / `--accent` |
+**Ayarlar** ana ekrandan tek düğmeyle açılır. **Bildirim** yok: teslim edilmemiş kayıtlar zaten ana ekranın kendisi.
 
-Her tavsiye kırmızı olursa hiçbiri okunmaz. Bastırılan tavsiye `opacity: .72`.
+> Kabuk sadeleşiyor: **sabit header (logo + geri) + ekran gövdesi.** Footer ve çekmece yok.
 
-### ⚠️ `.btn` esnek satırda — width geri alınmalı
+## Yazı ölçeği artık token — ve taban büyüdü
 
-`.btn` tabanı `width: 100%` veriyor. **Bir flex satırına konulduğunda** doğal genişliği %100 sanılıp bütün yeri alıyor ve kardeşini sıfıra eziyor (`.ep-govde` 0 px kaldı, metin kelime kelime alt alta dizildi). Bu projede **ikinci kez** yaşandı (ilki `.btn-row` sarmaması).
+v1'de yazı boyutları bileşen CSS'ine gömülüydü; *"hepsini büyüt"* demek yüzlerce satıra dokunmak demekti. Kullanıcımız **teknolojiden uzak ve yaşlı olabilir** (T-18) — taban boyut **tek yerden** değişebilmeli.
 
-```css
-/* flex satırındaki her .btn için: */
-.x-btn { flex: none; width: auto; }
+```
+--tip-xs   13px   rozet, küçük etiket — ASGARİ, bundan küçük yok
+--tip-sm   15px   alt bilgi, ikincil satır
+--tip-md   17px   TABAN — gövde, buton, alan     (v1'de 16)
+--tip-lg   20px   bölüm başlığı
+--tip-xl   26px   ekran başlığı
+--tip-2xl  34px   toplam tutar
 ```
 
-Sağlık denetiminin **25. testi** (EZILEN-GOVDE) bunu otomatik yakalıyor.
+**Dokunma hedefi de token:** `--dokun: 48px` (v1'de kural yazılıydı ama her bileşende elle yazılıyordu; 44 → **48**).
 
-### ⚠️ Sınıf adı tek bileşene aittir
+## ⚠️ En soluk metin ölçüldü ve düzeltildi
 
-`.rol-cip` zaten personel rozetiydi; aynı ad rol seçme düğmesine verilince hem görünüm bozuldu hem `querySelectorAll` 4 yerine **8 öğe** buldu. Bu projede **üçüncü** sınıf çakışması (`.stok`, `.tablo-kap`, `.rol-cip`). Sınıf adı burada hem stil hem seçici olduğu için çakışma iki yerden birden vuruyor. Denetimin **24. testi** (SINIF-CAKISMASI) bunu yakalıyor.
+`--faint` açık temada **AA'yı geçmiyordu.** T-18 kapsamında ölçüldü:
+
+| | surface | bg | surface-2 |
+|---|---|---|---|
+| **Eski** `#7E8FA5` | 3.30 | **2.94** | **2.79** |
+| **Yeni** `#596A80` | **5.53** | **4.92** | **4.59** |
+
+Üç zeminde de AA geçiyor. Koyu tema zaten geçiyordu (5.43 / 6.19 / 5.17) — dokunulmadı.
+
+> **Kural: bir renk üç zeminde de ölçülür** (`--surface`, `--bg`, `--surface-2`). v1'de yalnız `--surface` üstünde bakılmıştı ve `--surface-2` gözden kaçmıştı.
+
+## Yeni ekranlara göre bileşen ihtiyacı
+
+`EKRANLAR.md`'deki altı ekranın kullandığı desenler — **hepsi zaten yukarıda var**, yeni bileşen gerekmiyor:
+
+| Ekran | Kullandığı desenler |
+|---|---|
+| 1 · İçerideki araçlar | liste ekranı · plaka · boş durum · arama kutusu |
+| 2 · Ruhsatı çek | maskeli alan · künye listesi · seçim çipleri (tamirat/bakım) · ipucu satırı |
+| 3 · Servis kaydı | kalem listesi · toplam şeridi · her alanın kendi mikrofonu · bölüm başlığı + eylem |
+| 4 · Parça fiyatı sor | özel seçim (parçacı) · kart · buton |
+| 5 · Teslim et | toplam şeridi · seçim çipleri (ödeme yolu) · buton |
+| 6 · Araç | künye listesi · plaka · telefon bileşeni · liste |
+
+**Yeni desen yazılmadı.** v1'in zanaatı yeni ürünü karşılıyor — düşen şey desenler değil, **ekranlardı**.

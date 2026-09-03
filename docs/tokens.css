@@ -42,6 +42,25 @@
 
   /* ---------- YARIÇAP / GÖLGE ---------- */
   --radius-sm: 8px;  --radius-md: 12px;  --radius-lg: 16px;  --radius-pill: 999px;
+
+  /* ---- TIPOGRAFI OLCEGI (v2, 03.09.2026) ----
+     v1'de boyutlar bilesen CSS'ine gomuluydu; "hepsini buyut" demek
+     yuzlerce satir dokunmak demekti. Kullanicimiz teknolojiden uzak ve
+     yasli olabilir (T-18) — taban boyut TEK YERDEN degisebilmeli.
+     Taban 17px (v1'de 16). Olcek 1.15 civari, yuvarlatilmis. */
+  --tip-xs:   13px;   /* rozet, kucuk etiket — asgari, bundan kucuk YOK */
+  --tip-sm:   15px;   /* alt bilgi, ikincil satir */
+  --tip-md:   17px;   /* TABAN — govde metni, buton, alan */
+  --tip-lg:   20px;   /* bolum basligi */
+  --tip-xl:   26px;   /* ekran basligi */
+  --tip-2xl:  34px;   /* toplam tutar — tek bakista okunacak rakam */
+
+  --satir-siki: 1.25;  /* baslik */
+  --satir-nor:  1.55;  /* govde */
+
+  /* Dokunma hedefi — 44px asgari (v1'de kural yaziliydi ama token
+     degildi, her bilesende elle yaziliyordu). */
+  --dokun: 48px;
 }
 
 /* ============================================================
@@ -55,7 +74,11 @@
   --line:          #D3DEEB;   /* kenarlık / ayraç */
   --text:          #0F1E30;   /* ana metin */
   --muted:         #44556F;   /* ikincil metin */
-  --faint:         #7E8FA5;
+  /* T-18 (yasli goz) icin OLCULDU ve DUZELTILDI (03.09.2026).
+     Eski deger #7E8FA5: surface 3.30 · bg 2.94 · surface-2 2.79 —
+     ucu de AA'nin altinda, en soluk metnimiz okunmuyordu.
+     Yeni deger UC ZEMINDE de AA gecer: 5.53 / 4.92 / 4.59. */
+  --faint:         #596A80;
   --field-bg:      #F6FAFE;   /* metin alanlarinin zemini — notr gri degil */
   --hint:          #4B6183;   /* ipucu metni — muted'dan mavimsi */   /* en soluk (placeholder, ikon) */
 
