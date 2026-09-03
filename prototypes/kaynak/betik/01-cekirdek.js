@@ -21,6 +21,11 @@ window.addEventListener('unhandledrejection', function (e) {
     (e.reason && e.reason.message ? e.reason.message : e.reason));
 });
 
+/* Hangi servis kaydi acik — ekranlar arasi tek paylasilan durum.
+   Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
+var ACIK_KAYIT = null;
+var ACIK_PLAKA = null;
+
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
   var gecmis = [];
@@ -49,6 +54,18 @@ var Ekran = (function () {
     return true;
   }
 
+  /* Acik ekrani yeniden cizer — KAYDIRMAYI VE ODAGI BOZMADAN.
+     goster() sayfayi basa atar; arama kutusunda her tusta basa
+     atlamak ekrani kullanilamaz yapardi. */
+  function tazele() {
+    if (!acik) return;
+    var k = kayit[acik];
+    var el = document.getElementById('screen-' + acik);
+    if (k && el && typeof k.ciz === 'function') {
+      try { k.ciz(el); } catch (e) { console.error('ciz(' + acik + '):', e); }
+    }
+  }
+
   function ac(ad) {
     if (ad === acik) return;
     if (acik) gecmis.push(acik);
@@ -65,7 +82,7 @@ var Ekran = (function () {
     if (b) b.disabled = gecmis.length === 0;
   }
 
-  return { tanim: tanim, ac: ac, geri: geri, goster: goster,
+  return { tanim: tanim, ac: ac, geri: geri, goster: goster, tazele: tazele,
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
            geriVarMi: function () { return gecmis.length > 0; } };

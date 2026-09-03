@@ -43,6 +43,9 @@ button { min-height: var(--dokun); cursor: pointer; }
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
+/* Rakam kolonları hizalı — plaka, tutar, km, yıl */
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
 /* İkon — currentColor ile boyanır, token rengine uyar */
 .ico { width: 24px; height: 24px; flex: none; }
 .ico-lg { width: 32px; height: 32px; }

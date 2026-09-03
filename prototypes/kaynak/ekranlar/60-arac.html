@@ -1,0 +1,105 @@
+<!-- ekran: arac · ARAÇ (EKRANLAR.md §6) — akış dışı, başvuru
+     Akışın hiçbir adımı buradan geçmez. Neden var: K-005'in işe
+     yaraması için. "Bu parçayı geçen sefer müşteri getirmişti"
+     bilgisi araç ikinci kez geldiğinde KARŞIYA ÇIKMALI, yoksa
+     tartışma çıkar.
+
+     ÜZERİNDE YOK: kontrol tarihleri (muayene/sigorta/kasko)
+     · yaklaşan kontroller · belge arşivi · ayrı müşteri ekranı. -->
+<section class="screen" id="screen-arac">
+
+  <div class="kayit-kunye" id="arKunye"></div>
+
+  <div id="arBakim"></div>
+
+  <h2 class="bolum-bas">Geçmiş</h2>
+  <div id="arGecmis"></div>
+
+  <h2 class="bolum-bas">Not</h2>
+  <p class="ar-not" id="arNot"></p>
+
+</section>
+
+<style>
+.ar-bakim {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-size: var(--tip-sm);
+  color: var(--muted);
+}
+.ar-bakim strong { color: var(--text); font-size: var(--tip-md); }
+.ar-not { color: var(--muted); font-size: var(--tip-sm); }
+.ar-getiren {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: var(--tip-xs);
+  font-weight: 600;
+}
+</style>
+
+<script>
+Ekran.tanim('arac', {
+  ciz: function () {
+    var a = aracBul(ACIK_PLAKA);
+    if (!a) return;
+
+    document.getElementById('arKunye').innerHTML =
+      '<div class="kunye-ust">' + plakaHtml(a.plaka) + '</div>' +
+      '<div class="kunye-arac">' + a.marka + ' ' + a.model + ' · ' + a.yil +
+        ' · ' + a.motor + '</div>' +
+      '<div class="kunye-arac">' + (a.sahipAd || 'sahip yazılmamış') +
+        (a.sahipTel ? ' · ' + a.sahipTel : ' · telefon yok') + '</div>';
+
+    /* Son bakım + bir sonraki hatırlatma. km burada işe yarıyor:
+       "geçen bakım 142.500'de yapılmış" (K-002). */
+    var bakimlar = aracKayitlari(a.plaka).filter(function (k) {
+      return k.tur === 'bakim' && k.teslimTarihi;
+    });
+    var son = bakimlar[bakimlar.length - 1];
+    document.getElementById('arBakim').innerHTML = son
+      ? '<div class="ar-bakim">' +
+          '<strong>Son bakım</strong>' +
+          '<span>' + son.teslimTarihi + (son.km ? ' · ' + son.km + ' km' : '') + '</span>' +
+          (son.hatirlatmaTarihi
+            ? '<span>Hatırlatma: ' + son.hatirlatmaTarihi + '</span>' : '') +
+        '</div>'
+      : '';
+
+    var kayitlar = aracKayitlari(a.plaka);
+    document.getElementById('arGecmis').innerHTML = kayitlar.length
+      ? kayitlar.map(function (k) {
+          /* MÜŞTERİ PARÇASI GEÇMİŞTE İŞARETLİ KALIR — K-005'in
+             asıl işe yaradığı yer burası. */
+          var mp = (k.satirlar || []).filter(function (s) {
+            return s.tip === 'parca' && s.kimGetirdi === 'musteri';
+          });
+          return '<button class="kayit-sat" data-kayit="' + k.id + '">' +
+            '<span class="kayit-ust">' +
+              '<span class="kayit-tur ' + k.tur + '">' +
+                (k.tur === 'bakim' ? 'Bakım' : 'Tamirat') + '</span>' +
+              '<span class="kayit-arac">' +
+                (k.teslimTarihi || 'içeride') + '</span>' +
+            '</span>' +
+            '<span class="kayit-is">' + (k.sikayet || '—') + '</span>' +
+            '<span class="kayit-arac">' + tutar(kayitToplami(k)) + ' ₺</span>' +
+            (mp.length
+              ? '<span class="ar-getiren">parçayı müşteri getirmişti: ' +
+                  mp.map(function (s) { return s.ad || 'parça'; }).join(', ') + '</span>'
+              : '') +
+          '</button>';
+        }).join('')
+      : bosDurumHtml('Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
+
+    document.getElementById('arNot').textContent = a.not || 'Not yok.';
+  }
+});
+</script>

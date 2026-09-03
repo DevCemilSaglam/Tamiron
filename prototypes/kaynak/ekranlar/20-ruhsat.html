@@ -1,26 +1,230 @@
-<!-- ekran: ruhsat · Ruhsatı çek (EKRANLAR.md §2)
-     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak. -->
+<!-- ekran: ruhsat · RUHSATI ÇEK (EKRANLAR.md §2)
+     Akış Adım 1. Tamircinin cümlesi: "Ruhsatı çekti, kayıt açıldı." (T-3)
+
+     ARAŞTIRMADAN GELEN İKİ ŞEY BURADA (RUHSAT-OKUMA.md):
+     · TELEFON ruhsatta YOK — ayrı alan, ZORUNLU DEĞİL (A-29)
+     · TC kimlik no ve adres ruhsatta VAR ama OKUNMAZ, SAKLANMAZ
+
+     ÜZERİNDE YOK: uzun araç formu · renk · yakıt · anahtar/radyo kodu
+     · sigorta ve muayene tarihleri · müşteri kaydı adımı. -->
 <section class="screen" id="screen-ruhsat">
 
   <h1 class="ekran-bas">Ruhsatı çek</h1>
   <p class="ekran-alt">Telefonu ruhsata tut — bilgiler kendiliğinden dolar.</p>
 
-  <div class="iskelet-not">
-    <strong>İskelet.</strong> Bu ekran 13. işte yazılacak.
-    Araştırmadan gelen iki not burada uygulanacak:
-    <b>telefon alanı</b> eklenecek (ruhsatta yok, A-29) ve
-    <b>TC kimlik no ile adres saklanmayacak</b>.
-  </div>
-
-  <button class="ana-btn" data-git="home">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-geri"></use></svg>
-    <span>Ana ekrana dön</span>
+  <button class="ana-btn" id="ruhsatCek">
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
+    <span>Ruhsatı çek</span>
   </button>
+
+  <p class="ruhsat-kacis">
+    Ruhsat yoksa ya da okunmuyorsa —
+    <button class="baglanti-btn" id="ruhsatElle">plakayı yaz</button>
+  </p>
+
+  <div id="ruhsatSonuc" hidden>
+
+    <div class="kart">
+      <!-- PLAKA EN ÜSTTE VE BÜYÜK: yanlış okunursa kayıt YANLIŞ ARACA
+           bağlanır. Doğrulanan tek alan bu (RUHSAT-OKUMA §5). -->
+      <div class="alan">
+        <label for="rPlaka">Plaka</label>
+        <input id="rPlaka" class="plaka-alan mono" placeholder="34 ABC 123" autocomplete="off" />
+        <p class="alan-ipucu" id="rPlakaIpucu"></p>
+      </div>
+
+      <div class="ikili">
+        <div class="alan"><label for="rMarka">Marka</label><input id="rMarka" /></div>
+        <div class="alan"><label for="rModel">Model</label><input id="rModel" /></div>
+      </div>
+      <div class="ikili">
+        <div class="alan"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
+        <div class="alan"><label for="rMotor">Motor</label><input id="rMotor" /></div>
+      </div>
+
+      <div class="alan">
+        <label for="rTel">Telefon <span class="istege-bagli">— ruhsatta yazmaz, isteğe bağlı</span></label>
+        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
+        <p class="alan-ipucu">Bakım hatırlatması ve özet bu numaraya gider. Boş kalabilir.</p>
+      </div>
+    </div>
+
+    <h2 class="bolum-bas">Ne için geldi?</h2>
+    <div class="secim-grup ikili">
+      <button class="secim-btn" id="turTamirat" aria-pressed="false">Tamirat</button>
+      <button class="secim-btn" id="turBakim" aria-pressed="false">Bakım</button>
+    </div>
+
+    <!-- Km YALNIZ BAKIMDA (K-002). Bir kez yazılır, güncellenmez. -->
+    <div class="alan" id="kmAlan" hidden>
+      <label for="rKm">Kilometre</label>
+      <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
+      <p class="alan-ipucu">Göstergeden oku. Bir sonraki bakımda işine yarar.</p>
+    </div>
+
+    <button class="ana-btn" id="kaydiAc" disabled>
+      <svg class="ico ico-lg" aria-hidden="true"><use href="#i-tamam"></use></svg>
+      <span>Kaydı aç</span>
+    </button>
+
+  </div>
 
 </section>
 
+<style>
+.ruhsat-kacis {
+  margin: 12px 0 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--tip-sm);
+}
+.baglanti-btn {
+  /* METIN KUCUK, ALAN BUYUK — gorsel agirlik dokunma alani degildir
+     (TASARIM-SISTEMI). Denetim 19px olcmustu. */
+  min-height: var(--dokun);
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: var(--tip-sm);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.plaka-alan { letter-spacing: .08em; font-weight: 600; }
+.ikili { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.alan-ipucu { margin: 0; color: var(--faint); font-size: var(--tip-xs); min-height: 1.2em; }
+.alan-ipucu.uyari { color: var(--crit); }
+.istege-bagli { font-weight: 400; color: var(--faint); }
+.bolum-bas { font-size: var(--tip-lg); margin: 6px 0 10px; }
+</style>
+
 <script>
+var rTur = null;
+
+/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici. */
+function plakaBicim(ham) {
+  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
+  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
+  var kalan = t.slice(il.length);
+  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
+  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
+  return [il, harf, rakam].filter(Boolean).join(' ');
+}
+function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+
+function ruhsatDurum() {
+  var p = plakaBicim(document.getElementById('rPlaka').value);
+  var ip = document.getElementById('rPlakaIpucu');
+  var tamam = plakaGecerli(p) && rTur;
+  if (p && !plakaGecerli(p)) {
+    ip.textContent = 'Plaka eksik — ör. 34 ABC 123';
+    ip.className = 'alan-ipucu uyari';
+  } else {
+    var a = aracBul(p);
+    ip.textContent = a ? a.marka + ' ' + a.model + ' — bu araç kayıtlı' : '';
+    ip.className = 'alan-ipucu';
+  }
+  document.getElementById('kaydiAc').disabled = !tamam;
+}
+
+function turSec(t) {
+  rTur = t;
+  document.getElementById('turTamirat').setAttribute('aria-pressed', String(t === 'tamirat'));
+  document.getElementById('turBakim').setAttribute('aria-pressed', String(t === 'bakim'));
+  document.getElementById('kmAlan').hidden = (t !== 'bakim');
+  ruhsatDurum();
+}
+
 Ekran.tanim('ruhsat', {
-  ciz: function () { /* 13. işte doldurulacak */ }
+  ciz: function (kok) {
+    /* Ekran her açılışta TEMİZ başlar — yarım kalmış bir kayıt
+       sonrakine sızmasın. */
+    rTur = null;
+    kok.querySelector('#ruhsatSonuc').hidden = true;
+    ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rTel', 'rKm'].forEach(function (id) {
+      var e = document.getElementById(id); if (e) e.value = '';
+    });
+    turSec(null);
+  }
+});
+
+/* ---- sahte okuma ----
+   Gerçek okuma bir servise bağlanacak (RUHSAT-OKUMA.md C yolu).
+   Burada ekranın DAVRANIŞI gösteriliyor: alanlar dolar, HEPSİ
+   DÜZELTİLEBİLİR, hiçbiri kendiliğinden kaydedilmez. */
+var RUHSAT_ORNEK = [
+  { plaka: '41 P 3873', marka: 'Hyundai', model: 'i20', yil: '2020', motor: '1.4 MPI' },
+  { plaka: '06 BFT 41', marka: 'Ford', model: 'Focus', yil: '2017', motor: '1.5 TDCi' }
+];
+var ruhsatSira = 0;
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.id === 'ruhsatCek') {
+    var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
+    ruhsatSira++;
+    document.getElementById('rPlaka').value = r.plaka;
+    document.getElementById('rMarka').value = r.marka;
+    document.getElementById('rModel').value = r.model;
+    document.getElementById('rYil').value = r.yil;
+    document.getElementById('rMotor').value = r.motor;
+    document.getElementById('ruhsatSonuc').hidden = false;
+    ruhsatDurum();
+    balon('Okundu — yanlış varsa düzelt.');
+  }
+
+  if (t.id === 'ruhsatElle') {
+    document.getElementById('ruhsatSonuc').hidden = false;
+    document.getElementById('rPlaka').focus();
+    ruhsatDurum();
+  }
+
+  if (t.id === 'turTamirat') turSec('tamirat');
+  if (t.id === 'turBakim') turSec('bakim');
+
+  if (t.id === 'kaydiAc') {
+    var p = plakaBicim(document.getElementById('rPlaka').value);
+    if (!aracBul(p)) {
+      ARACLAR.push({
+        plaka: p,
+        marka: document.getElementById('rMarka').value,
+        model: document.getElementById('rModel').value,
+        yil: document.getElementById('rYil').value,
+        motor: document.getElementById('rMotor').value,
+        vin: '',
+        sahipAd: '',
+        sahipTel: document.getElementById('rTel').value,
+        not: ''
+      });
+    }
+    var yeni = {
+      id: KAYITLAR.length + 1,
+      plaka: p,
+      tur: rTur,
+      km: rTur === 'bakim' ? document.getElementById('rKm').value : '',
+      sikayet: '',
+      acilis: '03.09.2026',
+      teslimTarihi: null,
+      odemeYolu: null,
+      hatirlatmaTarihi: null,
+      hatirlatmaGonderildi: false,
+      satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    Ekran.ac('kayit');
+  }
+});
+
+document.addEventListener('input', function (e) {
+  if (!e.target) return;
+  if (e.target.id === 'rPlaka') {
+    var s = e.target.selectionStart;
+    e.target.value = plakaBicim(e.target.value);
+    try { e.target.setSelectionRange(e.target.value.length, e.target.value.length); } catch (x) {}
+    ruhsatDurum();
+  }
 });
 </script>

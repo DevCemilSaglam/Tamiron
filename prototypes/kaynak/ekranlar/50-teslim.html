@@ -1,0 +1,119 @@
+<!-- ekran: teslim · TESLİM ET (EKRANLAR.md §5)
+     Akış Adım 7. Tamircinin dördüncü isteği: "teslim ettiğinde
+     ödemeyi nasıl aldığını bilmek."
+
+     AYRI EKRAN, ÇÜNKÜ AYRI AN. Servis kaydıyla birleştirilirse
+     yanlışlıkla teslim edilir ve teslim geri alınamaz.
+
+     ÜZERİNDE YOK: kısmi ödeme takibi · taksit planı · cari hesap
+     · borç yaşlandırma · teslim alan kişi seçimi · fatura. -->
+<section class="screen" id="screen-teslim">
+
+  <h1 class="ekran-bas">Teslim et</h1>
+  <p class="ekran-alt" id="tsAlt">—</p>
+
+  <div class="tutar-buyuk" id="tsTutar"></div>
+
+  <h2 class="bolum-bas">Ödeme nasıl alındı?</h2>
+  <div class="secim-grup ikili" id="tsOdeme"></div>
+
+  <button class="ana-btn" id="tsTeslim" disabled>
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-tamam"></use></svg>
+    <span>Teslim et</span>
+  </button>
+
+  <p class="ts-not" id="tsNot"></p>
+
+</section>
+
+<style>
+.tutar-buyuk {
+  padding: 24px 16px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.tutar-buyuk .rakam {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--tip-2xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.tutar-buyuk .alt { color: var(--muted); font-size: var(--tip-sm); }
+.ts-not { margin-top: 14px; color: var(--muted); font-size: var(--tip-sm); text-align: center; }
+</style>
+
+<script>
+/* "ALMADIM" BİR ÖDEME YOLUDUR. Veresiye gerçek ve teslimi
+   bekletmemeli (EKRANLAR.md §5). */
+var ODEME_YOLLARI = [
+  { k: 'nakit', ad: 'Nakit' },
+  { k: 'kart', ad: 'Kart' },
+  { k: 'havale', ad: 'Havale' },
+  { k: 'almadim', ad: 'Almadım' }
+];
+var tsSecili = null;
+
+function tsCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+
+  document.getElementById('tsAlt').textContent =
+    k.plaka + (a ? ' · ' + a.marka + ' ' + a.model : '');
+
+  document.getElementById('tsTutar').innerHTML =
+    '<span class="rakam">' + tutar(kayitToplami(k)) + ' ₺</span>' +
+    '<span class="alt">' + (k.satirlar || []).length + ' satır</span>';
+
+  document.getElementById('tsOdeme').innerHTML = ODEME_YOLLARI.map(function (o) {
+    return '<button class="secim-btn" data-odeme="' + o.k + '" aria-pressed="' +
+      (tsSecili === o.k) + '">' + o.ad + '</button>';
+  }).join('');
+
+  document.getElementById('tsTeslim').disabled = !tsSecili;
+
+  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın. */
+  document.getElementById('tsNot').textContent = (k.tur === 'bakim')
+    ? 'Teslimden sonra ' + DUKKAN.bakimPeriyoduAy + ' ay sonrası için bakım hatırlatması kurulacak.'
+    : '';
+}
+
+Ekran.tanim('teslim', {
+  ciz: function () { tsSecili = null; tsCiz(); }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var o = t.getAttribute('data-odeme');
+  if (o) { tsSecili = o; tsCiz(); }
+
+  if (t.id === 'tsTeslim' && tsSecili) {
+    var k = kayitBul(ACIK_KAYIT);
+    var a = aracBul(k.plaka);
+    k.teslimTarihi = '03.09.2026';        /* TEK DURUM ALANI — K-004 */
+    k.odemeYolu = tsSecili;
+
+    /* Bakımsa hatırlatma KURULUR (K-002). Ay üzerinden — km takip
+       edilemiyor, edilen tek şey zaman. */
+    if (k.tur === 'bakim') {
+      var d = new Date(BUGUN.getTime());
+      d.setMonth(d.getMonth() + DUKKAN.bakimPeriyoduAy);
+      k.hatirlatmaTarihi = ('0' + d.getDate()).slice(-2) + '.' +
+                           ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+      k.hatirlatmaGonderildi = false;
+    }
+
+    balon(k.plaka + ' teslim edildi.' +
+      (a && a.sahipTel ? ' Özet gönderildi.' : ' Telefon yok, özet gönderilemedi.'),
+      false, 3200);
+    ACIK_KAYIT = null;
+    Ekran.ac('home');
+  }
+});
+</script>

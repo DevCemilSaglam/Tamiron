@@ -33,9 +33,13 @@ function stilMetni() {
     if(id&&!tan[id]){var e=u.closest('.screen');ek('OLU-IKON',e?e.id.replace(/^screen-/,''):'(kabuk)','#'+id);}});
   var kod=document.documentElement.innerHTML;
   ekranlar.forEach(function(a){ if(a==='home')return;
-    /* v2: gezinme data-git="ad" ile yapiliyor (cekirdek betikteki
-       delegasyon). Bu desen eklenmezse HER ekran yetim gorunurdu. */
-    if(!new RegExp("(?:go|drawerGo)\\('"+a+"'\\)|showScreen\\('"+a+"'\\)|data-git=\""+a+"\"").test(kod))
+    /* v2 gezinmesi IKI yoldan olur ve IKISI DE gecerli:
+         data-git="ad"   — bildirimsel, cekirdekteki delegasyon yakalar
+         Ekran.ac('ad')  — kod icinden (ornegin bir kayit acilirken)
+       Ikincisi eklenmeseydi 'kayit' ve 'arac' ekranlari yetim
+       gorunurdu; oysa ikisine de gidiliyor. */
+    if(!new RegExp("(?:go|drawerGo)\\('"+a+"'\\)|showScreen\\('"+a+"'\\)|"+
+                   "Ekran\\.ac\\('"+a+"'\\)|data-git=\""+a+"\"").test(kod))
       ek('YETIM',a,'gidilmiyor'); });
   /* 9) TANIMSIZ CSS SINIFI — kullaniliyor ama hicbir kuralda gecmiyor.
      .row-btns hatasi boyle olustu: dogru sinif .btn-row idi, 9 ekranda

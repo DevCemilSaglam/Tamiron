@@ -1,0 +1,171 @@
+/* ============ ORTAK BİLEŞENLER ============
+   Yalnız birden çok ekranda kullanılanlar. Tek ekrana ait stil o
+   ekranın kendi dosyasında durur. */
+
+/* ---- ekran başlığı ---- */
+.ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
+.ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
+
+/* ---- PLAKA — her yerde aynı (ortak nesne) ---- */
+.plaka {
+  display: inline-flex;
+  align-items: stretch;
+  border: 2px solid var(--primary);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  line-height: 1;
+}
+.plaka-tr {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: var(--tip-xs);
+}
+.plaka-no {
+  display: flex;
+  align-items: center;
+  padding: 6px 9px;
+  color: var(--text);
+  font-size: var(--tip-md);
+  letter-spacing: .04em;
+}
+.plaka-sm .plaka-no { padding: 4px 7px; font-size: var(--tip-sm); }
+
+/* ---- kart ---- */
+.kart {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
+}
+
+/* ---- büyük ana eylem — T-18: tek, büyük, tartışmasız ---- */
+.ana-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 76px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-size: var(--tip-lg);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+/* ---- ikincil düğme ---- */
+.ikincil-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--tip-md);
+  font-weight: 600;
+}
+
+/* ---- servis kaydı satırı (ortak nesne) ---- */
+.kayit-sat {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin-bottom: 10px;
+}
+.kayit-sat:hover { border-color: var(--primary); }
+.kayit-ust { display: flex; align-items: center; gap: 10px; }
+.kayit-tur {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: var(--tip-xs);
+  font-weight: 600;
+}
+.kayit-tur.tamirat { background: var(--accent-soft); color: var(--accent); }
+.kayit-tur.bakim { background: var(--warn-bg); color: var(--warn); }
+.kayit-arac { color: var(--muted); font-size: var(--tip-sm); }
+.kayit-is { font-size: var(--tip-md); font-weight: 500; }
+.kayit-not { color: var(--warn); font-size: var(--tip-sm); }
+
+/* ---- para ---- */
+.para { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---- boş durum ---- */
+.bos-durum {
+  display: grid;
+  gap: 6px;
+  padding: 28px 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--muted);
+}
+.bos-durum strong { color: var(--text); font-size: var(--tip-md); }
+.bos-durum span { font-size: var(--tip-sm); }
+
+/* ---- alan ---- */
+.alan { display: grid; gap: 6px; margin-bottom: 14px; }
+.alan label { font-size: var(--tip-sm); color: var(--muted); font-weight: 600; }
+.alan input {
+  min-height: var(--dokun);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--field-bg);
+}
+.alan input:focus-visible { border-color: var(--primary); }
+
+/* ---- arama kutusu ---- */
+.arama {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  min-height: var(--dokun);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--field-bg);
+  margin-bottom: 16px;
+}
+/* Kap 48px ama INPUT'un kendisi 22px'ti — parmak kutuya degil
+   alana basiyor. Gorsel agirlik ayni, dokunma alani tam. */
+.arama input { flex: 1; min-width: 0; min-height: var(--dokun);
+  border: 0; background: transparent; }
+.arama input:focus { outline: none; }
+.arama svg { color: var(--faint); }
+
+/* ---- iki büyük seçim (tamirat / bakım · ödeme yolu) ---- */
+.secim-grup { display: grid; gap: 10px; margin-bottom: 16px; }
+.secim-grup.ikili { grid-template-columns: 1fr 1fr; }
+.secim-btn {
+  min-height: 64px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: var(--tip-md);
+  font-weight: 600;
+}
+.secim-btn[aria-pressed="true"] {
+  border-color: var(--primary);
+  /* secili hâl: --primary temali oldugu icin iki temada da tutar */
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+}

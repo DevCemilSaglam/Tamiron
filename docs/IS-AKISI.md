@@ -452,3 +452,61 @@ Ne yok: link tıklama zorunluluğu, kampanya, indirim kuponu, uzun metin.
 | **A-17** | Aynı müşterinin **birden fazla aracı** varsa ayrı ayrı mı SMS gider? Öneri: **evet, ayrı** — plaka mesajın konusudur |
 | **A-18** | Müşteri hatırlatmaya **cevap yazarsa** ne olur? SMS tek yönlü; öneri: **kapsam dışı**, telefonla arar |
 | **A-19** | Hatırlatma **kaç gün önceden** gitsin — tam gününde mi, birkaç gün önce mi? Öneri: **tam gününde**, sadeliği bozmasın |
+
+---
+
+# SENARYO İŞLETİMİ — ölçüm (03.09.2026, iş 14)
+
+> Prototip üzerinde **gerçekten çalıştırıldı**, tahmin edilmedi.
+> Tasarımdaki sayı (§2) 10–13 idi; ölçüm bunu doğruladı ama **üst sınırda**.
+
+## Ölçülen
+
+| Yol | Tasarım | **Ölçüm** |
+|---|---|---|
+| Tam yol (parçacıya sorularak) | 10–13 | **13** |
+| Kısa yol (usta fiyatı biliyor, Adım 3–4 atlanıyor) | 7–9 | **9** |
+
+**İkisi de aralığın üst ucunda.** Tasarımdaki alt uç (10 ve 7) iyimserdi — gerçekte her adım bir dokunuş daha istiyor.
+
+### Tam yol, adım adım
+
+```
+ 1  Ruhsatı çek düğmesi        → ruhsat ekranı
+ 2  Ruhsatı çek                → alanlar doldu
+ 3  Tamirat
+ 4  Kaydı aç                   → servis kaydı
+ 5  Ne istiyor                 (sesle/yazarak)
+ 6  + Parça
+ 7  Parça fiyatı sor           → parçacı ekranı
+ 8  Parçacı seç
+ 9  WhatsApp ile gönder        → servis kaydı
+10  + İşçilik
+11  Teslim et                  → teslim ekranı
+12  Nakit
+13  TESLİM ET                  → ana ekran
+```
+
+Klavyeyle yazılanlar (parça adı, fiyat, şikâyet) dokunuş sayılmadı — sayılan yalnız **dokunma** eylemleri.
+
+## Bulgu: ilk iki dokunuş aynı işi yapıyor
+
+`1` ana ekrandaki *"Ruhsatı çek"* düğmesi ekranı **açıyor**; `2` o ekrandaki aynı adlı düğme kamerayı **açıyor**. Kullanıcı açısından tek bir niyet, iki dokunuş.
+
+> **A-14'e ölçülmüş kanıt.** Ekran 2 ana ekranın üstünde bir **tabaka** olsaydı — ya da ana ekrandaki düğme doğrudan kamerayı açsaydı — tam yol **12**, kısa yol **8** olurdu. Ekran sayısı da 6'dan 5'e inerdi.
+>
+> Karşı argüman: kamerayı doğrudan açmak, plakayı elle yazmak isteyen ustayı önce kameradan geçirir. Çözüm, ana ekran düğmesinin kamerayı açması ve *"plakayı yaz"* kaçışının o ekranda kalması olabilir. **Cemil'in kararı.**
+
+## Doğrulanan kollar
+
+| Kol | Sonuç |
+|---|---|
+| **Bakım** (K-002, K-006) | Km alanı yalnız bakımda çıkıyor · künyede *"86.400 km"* görünüyor · teslimden önce *"6 ay sonrası için hatırlatma kurulacak"* uyarısı çıkıyor · teslimde hatırlatma **03.03.2027** olarak kuruldu · ana ekranda hatırlatma şeridi belirdi |
+| **Müşteri parçası** (K-005, Kol D) | Satır **fiyatsız** kaldı, toplama girmedi (800 ₺ yalnız işçilik) · araç ekranında geçmişte *"parçayı müşteri getirmişti: Ön fren balatası"* işareti duruyor |
+| **Parçacıya sorma** (Adım 3–4) | Yalnız **tamircinin alacağı ve fiyatı belli olmayan** parçalar listeleniyor · mesaj önizlemesi araç künyesi + plaka + parça listesi + ruhsat eki · gönderdikten sonra servis kaydına dönüyor, fiyat **elle** giriliyor (WHATSAPP.md A yolu) |
+
+## Sağlık denetimi
+
+**6 ekran · 0 bulgu · ölçüm yapıldı** (375 px). Yükleme hatası yok.
+
+Yol boyunca altı bulgu çıktı ve hepsi düzeltildi: iki yetim ekran (denetim `Ekran.ac()` yolunu tanımıyordu), tanımsız `.mono`, arama kutusundaki 22 px'lik dokunma hedefi, *"plakayı yaz"* bağlantısının 19 px'lik hedefi, künye düğmesinin erişilebilir adının olmaması.

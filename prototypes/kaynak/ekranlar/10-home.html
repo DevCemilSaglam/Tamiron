@@ -1,62 +1,86 @@
-<!-- ekran: home · İçerideki araçlar (EKRANLAR.md §1)
-     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak.
-     Buradaki amaç derlemenin, gezinmenin ve denetimin çalıştığını
-     göstermek. -->
+<!-- ekran: home · İÇERİDEKİ ARAÇLAR (EKRANLAR.md §1)
+     Ustanın sabah sorduğu tek soru: "hangi araçlar bende?"
+     Liste = TESLİM EDİLMEMİŞ KAYITLAR. Başka tanım yok (K-004).
+
+     ÜZERİNDE YOK: durum filtresi · özet paneli · istatistik ·
+     alt menü · sekme · takvim · randevu. -->
 <section class="screen" id="screen-home">
 
   <h1 class="ekran-bas">İçerideki araçlar</h1>
   <p class="ekran-alt" id="homeSay">—</p>
-
-  <div class="iskelet-not">
-    <strong>İskelet.</strong> Ekranların içeriği 13. işte yazılacak.
-    Bu ekranın işi şimdilik derlemenin ve gezinmenin çalıştığını göstermek.
-  </div>
 
   <button class="ana-btn" data-git="ruhsat">
     <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
     <span>Ruhsatı çek</span>
   </button>
 
+  <div class="arama" id="homeArama">
+    <svg class="ico" aria-hidden="true"><use href="#i-ara"></use></svg>
+    <input type="search" id="homeQ" placeholder="Plaka ara" aria-label="Plaka ara" />
+  </div>
+
+  <div id="homeListe"></div>
+
+  <div id="homeHatirlatma"></div>
+
 </section>
 
 <style>
-.ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
-.ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
-
-.iskelet-not {
-  background: var(--surface-2);
-  border: 1px dashed var(--line);
+.home-hatirlat {
+  display: grid;
+  gap: 4px;
+  margin-top: 22px;
+  padding: 14px;
+  border: 1px solid var(--warn);
   border-radius: var(--radius-md);
-  padding: 14px 16px;
-  color: var(--muted);
+  background: var(--warn-bg);
+  color: var(--warn);
   font-size: var(--tip-sm);
-  margin-bottom: 18px;
 }
-
-/* Ana eylem — T-18: büyük, tek, tartışmasız */
-.ana-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 76px;
-  border: 0;
-  border-radius: var(--radius-lg);
-  background: var(--primary);
-  color: var(--on-primary);
-  font-family: var(--font-display);
-  font-size: var(--tip-lg);
-  font-weight: 700;
-  box-shadow: var(--shadow);
-}
+.home-hatirlat strong { font-size: var(--tip-md); }
 </style>
 
 <script>
 Ekran.tanim('home', {
   ciz: function () {
-    var el = document.getElementById('homeSay');
-    if (el) el.textContent = ARACLAR.length + ' araç içeride';
+    var q = norm((document.getElementById('homeQ') || {}).value || '');
+    var liste = icerideki().filter(function (k) {
+      return !q || norm(k.plaka).indexOf(q) >= 0;
+    });
+
+    var say = document.getElementById('homeSay');
+    if (say) {
+      say.textContent = q
+        ? liste.length + ' araç bulundu'
+        : liste.length + ' araç içeride';
+    }
+
+    var kap = document.getElementById('homeListe');
+    kap.innerHTML = liste.length
+      ? liste.map(kayitSatiriHtml).join('')
+      : (q
+          ? bosDurumHtml('Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
+          : bosDurumHtml('İçeride araç yok',
+              'Hepsi teslim edilmiş. Yeni iş için yukarıdan ruhsatı çek.'));
+
+    /* Bakım hatırlatması — ustaya BUGÜN kimi arayacağını söyler.
+       Ayrı ekran değil, bir şerit (T-17, K-002). */
+    var h = KAYITLAR.filter(function (k) {
+      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
+    });
+    var hk = document.getElementById('homeHatirlatma');
+    hk.innerHTML = h.length
+      ? '<div class="home-hatirlat">' +
+          '<strong>' + h.length + ' araç bakım zamanına yaklaştı</strong>' +
+          '<span>' + h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
+        '</div>'
+      : '';
   }
+});
+
+/* Arama: her tuşta yeniden çiz — tazele() kaydırmayı ve odağı bozmaz.
+   goster() kullanılsaydı her harfte sayfa başa atlardı. */
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'homeQ') Ekran.tazele();
 });
 </script>

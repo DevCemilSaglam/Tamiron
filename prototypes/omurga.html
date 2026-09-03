@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-03 18:09
+  Üretim: 2026-09-03 18:19
 -->
 
 <html lang="tr" data-theme="light">
@@ -216,6 +216,9 @@ button { min-height: var(--dokun); cursor: pointer; }
   *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
 }
 
+/* Rakam kolonları hizalı — plaka, tutar, km, yıl */
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
 /* İkon — currentColor ile boyanır, token rengine uyar */
 .ico { width: 24px; height: 24px; flex: none; }
 .ico-lg { width: 32px; height: 32px; }
@@ -307,21 +310,56 @@ button { min-height: var(--dokun); cursor: pointer; }
 .balon.uyari { background: var(--crit); color: var(--surface); }
 
 
-/* ===== ekran: 10-home.html ===== */
+/* ===== stil/03-bilesen.css ===== */
+/* ============ ORTAK BİLEŞENLER ============
+   Yalnız birden çok ekranda kullanılanlar. Tek ekrana ait stil o
+   ekranın kendi dosyasında durur. */
+
+/* ---- ekran başlığı ---- */
 .ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
 .ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
 
-.iskelet-not {
-  background: var(--surface-2);
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-md);
-  padding: 14px 16px;
-  color: var(--muted);
-  font-size: var(--tip-sm);
-  margin-bottom: 18px;
+/* ---- PLAKA — her yerde aynı (ortak nesne) ---- */
+.plaka {
+  display: inline-flex;
+  align-items: stretch;
+  border: 2px solid var(--primary);
+  border-radius: 5px;
+  overflow: hidden;
+  background: var(--surface);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  line-height: 1;
+}
+.plaka-tr {
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-size: var(--tip-xs);
+}
+.plaka-no {
+  display: flex;
+  align-items: center;
+  padding: 6px 9px;
+  color: var(--text);
+  font-size: var(--tip-md);
+  letter-spacing: .04em;
+}
+.plaka-sm .plaka-no { padding: 4px 7px; font-size: var(--tip-sm); }
+
+/* ---- kart ---- */
+.kart {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  margin-bottom: 14px;
 }
 
-/* Ana eylem — T-18: büyük, tek, tartışmasız */
+/* ---- büyük ana eylem — T-18: tek, büyük, tartışmasız ---- */
 .ana-btn {
   display: flex;
   align-items: center;
@@ -337,6 +375,331 @@ button { min-height: var(--dokun); cursor: pointer; }
   font-size: var(--tip-lg);
   font-weight: 700;
   box-shadow: var(--shadow);
+}
+
+/* ---- ikincil düğme ---- */
+.ikincil-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--tip-md);
+  font-weight: 600;
+}
+
+/* ---- servis kaydı satırı (ortak nesne) ---- */
+.kayit-sat {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin-bottom: 10px;
+}
+.kayit-sat:hover { border-color: var(--primary); }
+.kayit-ust { display: flex; align-items: center; gap: 10px; }
+.kayit-tur {
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-size: var(--tip-xs);
+  font-weight: 600;
+}
+.kayit-tur.tamirat { background: var(--accent-soft); color: var(--accent); }
+.kayit-tur.bakim { background: var(--warn-bg); color: var(--warn); }
+.kayit-arac { color: var(--muted); font-size: var(--tip-sm); }
+.kayit-is { font-size: var(--tip-md); font-weight: 500; }
+.kayit-not { color: var(--warn); font-size: var(--tip-sm); }
+
+/* ---- para ---- */
+.para { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* ---- boş durum ---- */
+.bos-durum {
+  display: grid;
+  gap: 6px;
+  padding: 28px 18px;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--muted);
+}
+.bos-durum strong { color: var(--text); font-size: var(--tip-md); }
+.bos-durum span { font-size: var(--tip-sm); }
+
+/* ---- alan ---- */
+.alan { display: grid; gap: 6px; margin-bottom: 14px; }
+.alan label { font-size: var(--tip-sm); color: var(--muted); font-weight: 600; }
+.alan input {
+  min-height: var(--dokun);
+  padding: 0 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--field-bg);
+}
+.alan input:focus-visible { border-color: var(--primary); }
+
+/* ---- arama kutusu ---- */
+.arama {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  min-height: var(--dokun);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--field-bg);
+  margin-bottom: 16px;
+}
+/* Kap 48px ama INPUT'un kendisi 22px'ti — parmak kutuya degil
+   alana basiyor. Gorsel agirlik ayni, dokunma alani tam. */
+.arama input { flex: 1; min-width: 0; min-height: var(--dokun);
+  border: 0; background: transparent; }
+.arama input:focus { outline: none; }
+.arama svg { color: var(--faint); }
+
+/* ---- iki büyük seçim (tamirat / bakım · ödeme yolu) ---- */
+.secim-grup { display: grid; gap: 10px; margin-bottom: 16px; }
+.secim-grup.ikili { grid-template-columns: 1fr 1fr; }
+.secim-btn {
+  min-height: 64px;
+  border: 2px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-size: var(--tip-md);
+  font-weight: 600;
+}
+.secim-btn[aria-pressed="true"] {
+  border-color: var(--primary);
+  /* secili hâl: --primary temali oldugu icin iki temada da tutar */
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+
+/* ===== ekran: 10-home.html ===== */
+.home-hatirlat {
+  display: grid;
+  gap: 4px;
+  margin-top: 22px;
+  padding: 14px;
+  border: 1px solid var(--warn);
+  border-radius: var(--radius-md);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: var(--tip-sm);
+}
+.home-hatirlat strong { font-size: var(--tip-md); }
+
+/* ===== ekran: 20-ruhsat.html ===== */
+.ruhsat-kacis {
+  margin: 12px 0 20px;
+  text-align: center;
+  color: var(--muted);
+  font-size: var(--tip-sm);
+}
+.baglanti-btn {
+  /* METIN KUCUK, ALAN BUYUK — gorsel agirlik dokunma alani degildir
+     (TASARIM-SISTEMI). Denetim 19px olcmustu. */
+  min-height: var(--dokun);
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--primary);
+  font-size: var(--tip-sm);
+  font-weight: 600;
+  text-decoration: underline;
+}
+.plaka-alan { letter-spacing: .08em; font-weight: 600; }
+.ikili { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.alan-ipucu { margin: 0; color: var(--faint); font-size: var(--tip-xs); min-height: 1.2em; }
+.alan-ipucu.uyari { color: var(--crit); }
+.istege-bagli { font-weight: 400; color: var(--faint); }
+.bolum-bas { font-size: var(--tip-lg); margin: 6px 0 10px; }
+
+/* ===== ekran: 30-kayit.html ===== */
+.kayit-kunye {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 18px;
+  padding: 14px;
+  text-align: left;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+}
+.kayit-kunye:hover { border-color: var(--primary); }
+.kunye-ust { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.kunye-arac { color: var(--muted); font-size: var(--tip-sm); }
+
+.metin-mikrofon { display: flex; gap: 8px; }
+.metin-mikrofon input { flex: 1; min-width: 0; }
+.mik-btn {
+  width: var(--dokun);
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--primary);
+}
+
+/* SATIRLAR TEK LİSTE. Parça mı işçilik mi satırın kendi işareti;
+   iki ayrı bölüm değil (EKRANLAR.md §3). */
+.k-satir {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin-bottom: 8px;
+}
+.k-tip {
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--tip-xs);
+  font-weight: 600;
+}
+.k-tip.parca { background: var(--accent-soft); color: var(--accent); }
+.k-tip.iscilik { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
+.k-ad { min-width: 0; border: 0; background: transparent; font-size: var(--tip-md); }
+.k-fiyat {
+  width: 92px;
+  text-align: right;
+  border: 0;
+  background: transparent;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+.k-sil {
+  width: 36px; height: 36px; min-height: 36px;
+  border: 0; border-radius: var(--radius-pill);
+  background: transparent; color: var(--faint);
+}
+
+/* KİM GETİRDİ — bilgi alanı değil, ileride kimin ödeyeceğini
+   belirleyen anahtar (K-005). O yüzden satırda GÖRÜNÜR duruyor. */
+.k-getiren {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--tip-xs);
+  color: var(--muted);
+}
+.k-getiren button {
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-size: var(--tip-xs);
+  font-weight: 600;
+}
+.k-getiren button[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  color: var(--primary);
+}
+
+.satir-ekle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
+.ikincil-btn.genis { margin-bottom: 10px; min-height: var(--dokun); }
+
+.toplam-serit {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 16px;
+  margin-bottom: 18px;
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.toplam-serit .etiket { font-size: var(--tip-md); font-weight: 600; }
+.toplam-serit .deger {
+  font-family: var(--font-mono);
+  font-size: var(--tip-2xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===== ekran: 40-parca-sor.html ===== */
+.ps-parca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin-bottom: 8px;
+  font-size: var(--tip-md);
+}
+.mesaj-onizleme {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--tip-sm);
+  white-space: pre-wrap;
+  margin-bottom: 18px;
+}
+.mesaj-onizleme .ek { display: block; margin-top: 8px; color: var(--primary); font-weight: 600; }
+.ps-not { margin-top: 12px; color: var(--faint); font-size: var(--tip-sm); text-align: center; }
+
+/* ===== ekran: 50-teslim.html ===== */
+.tutar-buyuk {
+  padding: 24px 16px;
+  margin-bottom: 20px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  text-align: center;
+}
+.tutar-buyuk .rakam {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: var(--tip-2xl);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.tutar-buyuk .alt { color: var(--muted); font-size: var(--tip-sm); }
+.ts-not { margin-top: 14px; color: var(--muted); font-size: var(--tip-sm); text-align: center; }
+
+/* ===== ekran: 60-arac.html ===== */
+.ar-bakim {
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  font-size: var(--tip-sm);
+  color: var(--muted);
+}
+.ar-bakim strong { color: var(--text); font-size: var(--tip-md); }
+.ar-not { color: var(--muted); font-size: var(--tip-sm); }
+.ar-getiren {
+  display: inline-block;
+  margin-top: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: var(--warn-bg);
+  color: var(--warn);
+  font-size: var(--tip-xs);
+  font-weight: 600;
 }
 
 </style>
@@ -365,45 +728,244 @@ button { min-height: var(--dokun); cursor: pointer; }
 
   <main class="govde" id="govde">
     
-<!-- ekran: home · İçerideki araçlar (EKRANLAR.md §1)
-     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak.
-     Buradaki amaç derlemenin, gezinmenin ve denetimin çalıştığını
-     göstermek. -->
+<!-- ekran: home · İÇERİDEKİ ARAÇLAR (EKRANLAR.md §1)
+     Ustanın sabah sorduğu tek soru: "hangi araçlar bende?"
+     Liste = TESLİM EDİLMEMİŞ KAYITLAR. Başka tanım yok (K-004).
+
+     ÜZERİNDE YOK: durum filtresi · özet paneli · istatistik ·
+     alt menü · sekme · takvim · randevu. -->
 <section class="screen" id="screen-home">
 
   <h1 class="ekran-bas">İçerideki araçlar</h1>
   <p class="ekran-alt" id="homeSay">—</p>
-
-  <div class="iskelet-not">
-    <strong>İskelet.</strong> Ekranların içeriği 13. işte yazılacak.
-    Bu ekranın işi şimdilik derlemenin ve gezinmenin çalıştığını göstermek.
-  </div>
 
   <button class="ana-btn" data-git="ruhsat">
     <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
     <span>Ruhsatı çek</span>
   </button>
 
+  <div class="arama" id="homeArama">
+    <svg class="ico" aria-hidden="true"><use href="#i-ara"></use></svg>
+    <input type="search" id="homeQ" placeholder="Plaka ara" aria-label="Plaka ara" />
+  </div>
+
+  <div id="homeListe"></div>
+
+  <div id="homeHatirlatma"></div>
+
 </section>
 
-<!-- ekran: ruhsat · Ruhsatı çek (EKRANLAR.md §2)
-     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak. -->
+<!-- ekran: ruhsat · RUHSATI ÇEK (EKRANLAR.md §2)
+     Akış Adım 1. Tamircinin cümlesi: "Ruhsatı çekti, kayıt açıldı." (T-3)
+
+     ARAŞTIRMADAN GELEN İKİ ŞEY BURADA (RUHSAT-OKUMA.md):
+     · TELEFON ruhsatta YOK — ayrı alan, ZORUNLU DEĞİL (A-29)
+     · TC kimlik no ve adres ruhsatta VAR ama OKUNMAZ, SAKLANMAZ
+
+     ÜZERİNDE YOK: uzun araç formu · renk · yakıt · anahtar/radyo kodu
+     · sigorta ve muayene tarihleri · müşteri kaydı adımı. -->
 <section class="screen" id="screen-ruhsat">
 
   <h1 class="ekran-bas">Ruhsatı çek</h1>
   <p class="ekran-alt">Telefonu ruhsata tut — bilgiler kendiliğinden dolar.</p>
 
-  <div class="iskelet-not">
-    <strong>İskelet.</strong> Bu ekran 13. işte yazılacak.
-    Araştırmadan gelen iki not burada uygulanacak:
-    <b>telefon alanı</b> eklenecek (ruhsatta yok, A-29) ve
-    <b>TC kimlik no ile adres saklanmayacak</b>.
+  <button class="ana-btn" id="ruhsatCek">
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
+    <span>Ruhsatı çek</span>
+  </button>
+
+  <p class="ruhsat-kacis">
+    Ruhsat yoksa ya da okunmuyorsa —
+    <button class="baglanti-btn" id="ruhsatElle">plakayı yaz</button>
+  </p>
+
+  <div id="ruhsatSonuc" hidden>
+
+    <div class="kart">
+      <!-- PLAKA EN ÜSTTE VE BÜYÜK: yanlış okunursa kayıt YANLIŞ ARACA
+           bağlanır. Doğrulanan tek alan bu (RUHSAT-OKUMA §5). -->
+      <div class="alan">
+        <label for="rPlaka">Plaka</label>
+        <input id="rPlaka" class="plaka-alan mono" placeholder="34 ABC 123" autocomplete="off" />
+        <p class="alan-ipucu" id="rPlakaIpucu"></p>
+      </div>
+
+      <div class="ikili">
+        <div class="alan"><label for="rMarka">Marka</label><input id="rMarka" /></div>
+        <div class="alan"><label for="rModel">Model</label><input id="rModel" /></div>
+      </div>
+      <div class="ikili">
+        <div class="alan"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
+        <div class="alan"><label for="rMotor">Motor</label><input id="rMotor" /></div>
+      </div>
+
+      <div class="alan">
+        <label for="rTel">Telefon <span class="istege-bagli">— ruhsatta yazmaz, isteğe bağlı</span></label>
+        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
+        <p class="alan-ipucu">Bakım hatırlatması ve özet bu numaraya gider. Boş kalabilir.</p>
+      </div>
+    </div>
+
+    <h2 class="bolum-bas">Ne için geldi?</h2>
+    <div class="secim-grup ikili">
+      <button class="secim-btn" id="turTamirat" aria-pressed="false">Tamirat</button>
+      <button class="secim-btn" id="turBakim" aria-pressed="false">Bakım</button>
+    </div>
+
+    <!-- Km YALNIZ BAKIMDA (K-002). Bir kez yazılır, güncellenmez. -->
+    <div class="alan" id="kmAlan" hidden>
+      <label for="rKm">Kilometre</label>
+      <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
+      <p class="alan-ipucu">Göstergeden oku. Bir sonraki bakımda işine yarar.</p>
+    </div>
+
+    <button class="ana-btn" id="kaydiAc" disabled>
+      <svg class="ico ico-lg" aria-hidden="true"><use href="#i-tamam"></use></svg>
+      <span>Kaydı aç</span>
+    </button>
+
   </div>
 
-  <button class="ana-btn" data-git="home">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-geri"></use></svg>
-    <span>Ana ekrana dön</span>
+</section>
+
+<!-- ekran: kayit · SERVİS KAYDI (EKRANLAR.md §3) — ÜRÜNÜN KALBİ
+     Akışın dört adımı burada: 2 ne istiyor · 4 fiyat geldi ·
+     5 parça geldi (kim getirdi) · 6 iş yapıldı.
+     Kayıt TESLİM EDİLENE KADAR AÇIK ve satır eklenebilir (K-003).
+
+     ÜZERİNDE YOK: durum rozeti · kesinlik kademeleri · garanti süresi
+     · katalog seçici · fiyat karşılaştırma tablosu · onay bekleme
+     durumu · red paneli · kabul formu · iskonto mekanizması. -->
+<section class="screen" id="screen-kayit">
+
+  <!-- Künyeye dokununca ARAÇ açılır: geçmiş, son bakım ve
+       "parçayı geçen sefer kim getirmişti" orada (K-005). -->
+  <button class="kayit-kunye" id="kayitKunye" data-arac-ac="1"
+          aria-label="Aracın geçmişini aç"></button>
+
+  <div class="alan">
+    <label for="kSikayet">Ne istiyor?</label>
+    <div class="metin-mikrofon">
+      <input id="kSikayet" placeholder="ör. triger seti değişecek" autocomplete="off" />
+      <button class="mik-btn" id="kSikayetMik" aria-label="Sesle söyle">
+        <svg class="ico" aria-hidden="true"><use href="#i-mikrofon"></use></svg>
+      </button>
+    </div>
+  </div>
+
+  <h2 class="bolum-bas">Yapılanlar</h2>
+  <div id="kSatirlar"></div>
+
+  <div class="satir-ekle">
+    <button class="ikincil-btn" id="kParcaEkle">
+      <svg class="ico" aria-hidden="true"><use href="#i-ekle"></use></svg> Parça
+    </button>
+    <button class="ikincil-btn" id="kIscilikEkle">
+      <svg class="ico" aria-hidden="true"><use href="#i-ekle"></use></svg> İşçilik
+    </button>
+  </div>
+
+  <div class="toplam-serit" id="kToplam"></div>
+
+  <button class="ikincil-btn genis" data-git="parca-sor">
+    <svg class="ico" aria-hidden="true"><use href="#i-parca"></use></svg> Parça fiyatı sor
   </button>
+
+  <button class="ikincil-btn genis" id="kOnayIste">
+    <svg class="ico" aria-hidden="true"><use href="#i-tamam"></use></svg> Onay iste
+  </button>
+
+  <button class="ana-btn" data-git="teslim">
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-para"></use></svg>
+    <span>Teslim et</span>
+  </button>
+
+</section>
+
+<!-- ekran: parca-sor · PARÇA FİYATI SOR (EKRANLAR.md §4)
+     Akış Adım 3–4. Tamirci: "Yedek parçacıdan fiyat alırken, ruhsatı
+     ve gereken parçaları gönderiyor." (T-12)
+
+     WHATSAPP.md ÖNERİSİ (A yolu) UYGULANDI: mesajı biz hazırlıyoruz,
+     usta KENDİ WhatsApp'ından gönderiyor. Cevabı okuyamıyoruz — usta
+     gelen fiyatı elle giriyor. Karşılığında hiçbir kurulum yok:
+     Meta hesabı, işletme doğrulaması, şablon onayı gerekmiyor.
+
+     ÜZERİNDE YOK: parça arama · katalog · OEM kodu girme alanı
+     (usta kodu bilmiyor — S7) · fiyat karşılaştırma tablosu. -->
+<section class="screen" id="screen-parca-sor">
+
+  <h1 class="ekran-bas">Parça fiyatı sor</h1>
+  <p class="ekran-alt">Ruhsat ve parça listesi birlikte gider.</p>
+
+  <h2 class="bolum-bas">Sorulacak parçalar</h2>
+  <div id="psParcalar"></div>
+
+  <h2 class="bolum-bas">Kime sorulacak?</h2>
+  <div class="secim-grup" id="psParcacilar"></div>
+
+  <h2 class="bolum-bas">Gidecek mesaj</h2>
+  <div class="mesaj-onizleme" id="psMesaj"></div>
+
+  <button class="ana-btn" id="psGonder" disabled>
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-parca"></use></svg>
+    <span>WhatsApp ile gönder</span>
+  </button>
+
+  <p class="ps-not">
+    Cevap kendi WhatsApp'ına gelir. Gelen fiyatı servis kaydındaki
+    satıra yazman yeter.
+  </p>
+
+</section>
+
+<!-- ekran: teslim · TESLİM ET (EKRANLAR.md §5)
+     Akış Adım 7. Tamircinin dördüncü isteği: "teslim ettiğinde
+     ödemeyi nasıl aldığını bilmek."
+
+     AYRI EKRAN, ÇÜNKÜ AYRI AN. Servis kaydıyla birleştirilirse
+     yanlışlıkla teslim edilir ve teslim geri alınamaz.
+
+     ÜZERİNDE YOK: kısmi ödeme takibi · taksit planı · cari hesap
+     · borç yaşlandırma · teslim alan kişi seçimi · fatura. -->
+<section class="screen" id="screen-teslim">
+
+  <h1 class="ekran-bas">Teslim et</h1>
+  <p class="ekran-alt" id="tsAlt">—</p>
+
+  <div class="tutar-buyuk" id="tsTutar"></div>
+
+  <h2 class="bolum-bas">Ödeme nasıl alındı?</h2>
+  <div class="secim-grup ikili" id="tsOdeme"></div>
+
+  <button class="ana-btn" id="tsTeslim" disabled>
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-tamam"></use></svg>
+    <span>Teslim et</span>
+  </button>
+
+  <p class="ts-not" id="tsNot"></p>
+
+</section>
+
+<!-- ekran: arac · ARAÇ (EKRANLAR.md §6) — akış dışı, başvuru
+     Akışın hiçbir adımı buradan geçmez. Neden var: K-005'in işe
+     yaraması için. "Bu parçayı geçen sefer müşteri getirmişti"
+     bilgisi araç ikinci kez geldiğinde KARŞIYA ÇIKMALI, yoksa
+     tartışma çıkar.
+
+     ÜZERİNDE YOK: kontrol tarihleri (muayene/sigorta/kasko)
+     · yaklaşan kontroller · belge arşivi · ayrı müşteri ekranı. -->
+<section class="screen" id="screen-arac">
+
+  <div class="kayit-kunye" id="arKunye"></div>
+
+  <div id="arBakim"></div>
+
+  <h2 class="bolum-bas">Geçmiş</h2>
+  <div id="arGecmis"></div>
+
+  <h2 class="bolum-bas">Not</h2>
+  <p class="ar-not" id="arNot"></p>
 
 </section>
 
@@ -461,6 +1023,11 @@ window.addEventListener('unhandledrejection', function (e) {
     (e.reason && e.reason.message ? e.reason.message : e.reason));
 });
 
+/* Hangi servis kaydi acik — ekranlar arasi tek paylasilan durum.
+   Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
+var ACIK_KAYIT = null;
+var ACIK_PLAKA = null;
+
 var Ekran = (function () {
   var kayit = {};     /* ad -> { ciz } */
   var gecmis = [];
@@ -489,6 +1056,18 @@ var Ekran = (function () {
     return true;
   }
 
+  /* Acik ekrani yeniden cizer — KAYDIRMAYI VE ODAGI BOZMADAN.
+     goster() sayfayi basa atar; arama kutusunda her tusta basa
+     atlamak ekrani kullanilamaz yapardi. */
+  function tazele() {
+    if (!acik) return;
+    var k = kayit[acik];
+    var el = document.getElementById('screen-' + acik);
+    if (k && el && typeof k.ciz === 'function') {
+      try { k.ciz(el); } catch (e) { console.error('ciz(' + acik + '):', e); }
+    }
+  }
+
   function ac(ad) {
     if (ad === acik) return;
     if (acik) gecmis.push(acik);
@@ -505,7 +1084,7 @@ var Ekran = (function () {
     if (b) b.disabled = gecmis.length === 0;
   }
 
-  return { tanim: tanim, ac: ac, geri: geri, goster: goster,
+  return { tanim: tanim, ac: ac, geri: geri, goster: goster, tazele: tazele,
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
            geriVarMi: function () { return gecmis.length > 0; } };
@@ -557,45 +1136,663 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /* ===== betik/02-veri.js ===== */
 /* ============ SAHTE VERİ ============
-   Backend yok. Alanlar VERI-MODELI.md ile birebir — modelde olmayan
-   alan buraya da girmez.
+   Backend yok. Alanlar VERI-MODELI.md ile BİREBİR — modelde olmayan
+   alan buraya da girmez. Modelde olmayan bir alana ihtiyaç duyulursa
+   önce VERI-MODELI.md açılır.
 
-   ⚠️ İSKELET: 13. işte gerçek örnek veriyle genişletilecek. */
+   ⚠️ Ruhsatta TC kimlik no ve adres VAR ama burada YOK
+   (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir). */
 
-/* Vehicle — VERI-MODELI §1 */
+var BUGUN = new Date(2026, 8, 3);   /* prototipin "bugün"ü — TEK KAYNAK */
+
+/* ---- Vehicle (VERI-MODELI §1) ---- */
 var ARACLAR = [
   { plaka: '34 ABC 123', marka: 'Renault', model: 'Mégane', yil: '2018',
     motor: '1.5 dCi', vin: 'VF1RFB00858123456',
-    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: '' },
+    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: 'Arka cam kolu kırık — müşteri biliyor.' },
   { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
     motor: '1.4 Fire', vin: 'NM4358004ZT129041',
     sahipAd: 'Hasan Demir', sahipTel: '0542 331 90 07', not: '' },
   { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
     motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
-    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' }
+    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' },
+  { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
+    motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
+    sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41', not: '' }
 ];
 
-/* Supplier — VERI-MODELI §4. İki alan: ad + telefon. */
+/* ---- ServiceRecord (VERI-MODELI §2) ----
+   `tur`: repair | maintenance (K-006)
+   `teslimTarihi` DOLUYSA araç çıkmıştır — TEK DURUM ALANI (K-004).
+   `Total` alanı YOK: satırlardan hesaplanır. */
+var KAYITLAR = [
+  { id: 1, plaka: '34 ABC 123', tur: 'tamirat', km: '',
+    sikayet: 'Triger seti değişecek',
+    acilis: '03.09.2026', teslimTarihi: null,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
+        marka: '', kod: '', tanim: 'tanimlanamadi' }
+    ] },
+
+  { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
+    sikayet: 'Periyodik bakım',
+    acilis: '02.09.2026', teslimTarihi: null,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Motor yağı', fiyat: 1900, alis: 1450, kimGetirdi: 'tamirci',
+        marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
+      { tip: 'parca', ad: 'Yağ filtresi', fiyat: 260, alis: 180, kimGetirdi: 'tamirci',
+        marka: 'Mann', kod: 'W 71180', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+    ] },
+
+  { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
+    sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
+    acilis: '01.09.2026', teslimTarihi: null,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
+        marka: '', kod: '', tanim: 'tanimlanamadi' },
+      { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: 0, kimGetirdi: '' }
+    ] },
+
+  /* Teslim edilmiş — ana ekranda GÖRÜNMEZ, araç geçmişinde görünür */
+  { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
+    sikayet: 'Periyodik bakım',
+    acilis: '15.03.2026', teslimTarihi: '15.03.2026',
+    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
+        marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: 0, kimGetirdi: '' }
+    ] }
+];
+
+/* ---- Supplier (VERI-MODELI §4) — iki alan ---- */
 var PARCACILAR = [
   { ad: 'Öz Yedek Parça', tel: '0532 111 22 33' },
-  { ad: 'Ahmet Oto Yedek Parça', tel: '0533 444 55 66' }
+  { ad: 'Ahmet Oto Yedek Parça', tel: '0533 444 55 66' },
+  { ad: 'Ankara Bosch Bayi', tel: '0312 222 33 44' }
 ];
+
+/* ---- Shop (VERI-MODELI §8) ---- */
+var DUKKAN = {
+  ad: 'Ahmet Usta Oto Servis',
+  adres: 'Ostim OSB, Ankara',
+  tel: '0532 000 00 00',
+  bakimPeriyoduAy: 6            /* A-3 — Cemil onayına açık */
+};
+
+/* ---- Sorgular (tek yerde; ekranlar kendi filtresini yazmaz) ---- */
+function aracBul(plaka) {
+  for (var i = 0; i < ARACLAR.length; i++) if (ARACLAR[i].plaka === plaka) return ARACLAR[i];
+  return null;
+}
+function kayitBul(id) {
+  for (var i = 0; i < KAYITLAR.length; i++) if (KAYITLAR[i].id === id) return KAYITLAR[i];
+  return null;
+}
+/* İÇERİDEKİ = teslim edilmemiş. Başka tanım yok (K-004). */
+function icerideki() {
+  return KAYITLAR.filter(function (k) { return !k.teslimTarihi; });
+}
+function aracKayitlari(plaka) {
+  return KAYITLAR.filter(function (k) { return k.plaka === plaka; });
+}
+function kayitToplami(k) {
+  return (k.satirlar || []).reduce(function (t, s) { return t + (s.fiyat || 0); }, 0);
+}
+/* Parçası sorulmuş ama fiyatı gelmemiş — DURUM DEĞİL, veriden türetilir
+   (K-004 notu, A-4). */
+function fiyatiBekleyen(k) {
+  return (k.satirlar || []).some(function (s) {
+    return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
+  });
+}
+
+
+/* ===== betik/03-nesne.js ===== */
+/* ============ ORTAK NESNELER ============
+   BİR NESNE BİR YERDE ÇİZİLİR. Plaka üç ekranda görünüyor; üç kez
+   yazılırsa üç kez ayrışır. v1'de bu kural sonradan konmuştu ve
+   konana kadar plaka her ekranda biraz farklıydı.
+
+   Ekran dosyaları bu fonksiyonları ÇAĞIRIR, kendi kopyasını yazmaz. */
+
+/* ---- PLAKA — gerçek TR plakasının dili ---- */
+function plakaHtml(p, kucuk) {
+  return '<span class="plaka' + (kucuk ? ' plaka-sm' : '') + '">' +
+           '<span class="plaka-tr">TR</span>' +
+           '<span class="plaka-no">' + p + '</span>' +
+         '</span>';
+}
+
+/* ---- SERVİS KAYDI SATIRI — ana ekranda ve araç kartında aynı ---- */
+function kayitSatiriHtml(k) {
+  var a = aracBul(k.plaka);
+  var bekliyor = fiyatiBekleyen(k);
+  return '<button class="kayit-sat" data-kayit="' + k.id + '">' +
+    '<span class="kayit-ust">' +
+      plakaHtml(k.plaka, true) +
+      '<span class="kayit-tur ' + k.tur + '">' + (k.tur === 'bakim' ? 'Bakım' : 'Tamirat') + '</span>' +
+    '</span>' +
+    '<span class="kayit-arac">' + (a ? a.marka + ' ' + a.model : '') + '</span>' +
+    '<span class="kayit-is">' + (k.sikayet || '—') + '</span>' +
+    (bekliyor ? '<span class="kayit-not">parçası bekleniyor</span>' : '') +
+    '</button>';
+}
+
+/* ---- PARA ---- */
+function paraHtml(n) {
+  return '<span class="para">' + tutar(n) + ' ₺</span>';
+}
+
+/* ---- BOŞ DURUM — kuru "sonuç yok" değil, ne yapılacağını söyler ---- */
+function bosDurumHtml(baslik, aciklama) {
+  return '<div class="bos-durum">' +
+    '<strong>' + baslik + '</strong>' +
+    '<span>' + aciklama + '</span>' +
+  '</div>';
+}
+
+/* ---- ORTAK NESNENİN DAVRANIŞI DA ORTAK ----
+   kayitSatiriHtml() iki ekranda kullanılıyor (ana ekran, araç kartı).
+   Tıklama davranışını her ekrana ayrı yazmak, nesneyi iki yere
+   bölmek olurdu. Nesne neredeyse davranışı da orada. */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-kayit]');
+  if (!t) return;
+  ACIK_KAYIT = parseInt(t.getAttribute('data-kayit'), 10);
+  Ekran.ac('kayit');
+});
 
 
 /* ===== ekran: 10-home.html ===== */
 (function () {
 Ekran.tanim('home', {
   ciz: function () {
-    var el = document.getElementById('homeSay');
-    if (el) el.textContent = ARACLAR.length + ' araç içeride';
+    var q = norm((document.getElementById('homeQ') || {}).value || '');
+    var liste = icerideki().filter(function (k) {
+      return !q || norm(k.plaka).indexOf(q) >= 0;
+    });
+
+    var say = document.getElementById('homeSay');
+    if (say) {
+      say.textContent = q
+        ? liste.length + ' araç bulundu'
+        : liste.length + ' araç içeride';
+    }
+
+    var kap = document.getElementById('homeListe');
+    kap.innerHTML = liste.length
+      ? liste.map(kayitSatiriHtml).join('')
+      : (q
+          ? bosDurumHtml('Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
+          : bosDurumHtml('İçeride araç yok',
+              'Hepsi teslim edilmiş. Yeni iş için yukarıdan ruhsatı çek.'));
+
+    /* Bakım hatırlatması — ustaya BUGÜN kimi arayacağını söyler.
+       Ayrı ekran değil, bir şerit (T-17, K-002). */
+    var h = KAYITLAR.filter(function (k) {
+      return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
+    });
+    var hk = document.getElementById('homeHatirlatma');
+    hk.innerHTML = h.length
+      ? '<div class="home-hatirlat">' +
+          '<strong>' + h.length + ' araç bakım zamanına yaklaştı</strong>' +
+          '<span>' + h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
+        '</div>'
+      : '';
   }
+});
+
+/* Arama: her tuşta yeniden çiz — tazele() kaydırmayı ve odağı bozmaz.
+   goster() kullanılsaydı her harfte sayfa başa atlardı. */
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'homeQ') Ekran.tazele();
 });
 })();
 
 /* ===== ekran: 20-ruhsat.html ===== */
 (function () {
+var rTur = null;
+
+/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici. */
+function plakaBicim(ham) {
+  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
+  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
+  var kalan = t.slice(il.length);
+  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
+  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
+  return [il, harf, rakam].filter(Boolean).join(' ');
+}
+function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+
+function ruhsatDurum() {
+  var p = plakaBicim(document.getElementById('rPlaka').value);
+  var ip = document.getElementById('rPlakaIpucu');
+  var tamam = plakaGecerli(p) && rTur;
+  if (p && !plakaGecerli(p)) {
+    ip.textContent = 'Plaka eksik — ör. 34 ABC 123';
+    ip.className = 'alan-ipucu uyari';
+  } else {
+    var a = aracBul(p);
+    ip.textContent = a ? a.marka + ' ' + a.model + ' — bu araç kayıtlı' : '';
+    ip.className = 'alan-ipucu';
+  }
+  document.getElementById('kaydiAc').disabled = !tamam;
+}
+
+function turSec(t) {
+  rTur = t;
+  document.getElementById('turTamirat').setAttribute('aria-pressed', String(t === 'tamirat'));
+  document.getElementById('turBakim').setAttribute('aria-pressed', String(t === 'bakim'));
+  document.getElementById('kmAlan').hidden = (t !== 'bakim');
+  ruhsatDurum();
+}
+
 Ekran.tanim('ruhsat', {
-  ciz: function () { /* 13. işte doldurulacak */ }
+  ciz: function (kok) {
+    /* Ekran her açılışta TEMİZ başlar — yarım kalmış bir kayıt
+       sonrakine sızmasın. */
+    rTur = null;
+    kok.querySelector('#ruhsatSonuc').hidden = true;
+    ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rTel', 'rKm'].forEach(function (id) {
+      var e = document.getElementById(id); if (e) e.value = '';
+    });
+    turSec(null);
+  }
+});
+
+/* ---- sahte okuma ----
+   Gerçek okuma bir servise bağlanacak (RUHSAT-OKUMA.md C yolu).
+   Burada ekranın DAVRANIŞI gösteriliyor: alanlar dolar, HEPSİ
+   DÜZELTİLEBİLİR, hiçbiri kendiliğinden kaydedilmez. */
+var RUHSAT_ORNEK = [
+  { plaka: '41 P 3873', marka: 'Hyundai', model: 'i20', yil: '2020', motor: '1.4 MPI' },
+  { plaka: '06 BFT 41', marka: 'Ford', model: 'Focus', yil: '2017', motor: '1.5 TDCi' }
+];
+var ruhsatSira = 0;
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.id === 'ruhsatCek') {
+    var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
+    ruhsatSira++;
+    document.getElementById('rPlaka').value = r.plaka;
+    document.getElementById('rMarka').value = r.marka;
+    document.getElementById('rModel').value = r.model;
+    document.getElementById('rYil').value = r.yil;
+    document.getElementById('rMotor').value = r.motor;
+    document.getElementById('ruhsatSonuc').hidden = false;
+    ruhsatDurum();
+    balon('Okundu — yanlış varsa düzelt.');
+  }
+
+  if (t.id === 'ruhsatElle') {
+    document.getElementById('ruhsatSonuc').hidden = false;
+    document.getElementById('rPlaka').focus();
+    ruhsatDurum();
+  }
+
+  if (t.id === 'turTamirat') turSec('tamirat');
+  if (t.id === 'turBakim') turSec('bakim');
+
+  if (t.id === 'kaydiAc') {
+    var p = plakaBicim(document.getElementById('rPlaka').value);
+    if (!aracBul(p)) {
+      ARACLAR.push({
+        plaka: p,
+        marka: document.getElementById('rMarka').value,
+        model: document.getElementById('rModel').value,
+        yil: document.getElementById('rYil').value,
+        motor: document.getElementById('rMotor').value,
+        vin: '',
+        sahipAd: '',
+        sahipTel: document.getElementById('rTel').value,
+        not: ''
+      });
+    }
+    var yeni = {
+      id: KAYITLAR.length + 1,
+      plaka: p,
+      tur: rTur,
+      km: rTur === 'bakim' ? document.getElementById('rKm').value : '',
+      sikayet: '',
+      acilis: '03.09.2026',
+      teslimTarihi: null,
+      odemeYolu: null,
+      hatirlatmaTarihi: null,
+      hatirlatmaGonderildi: false,
+      satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    Ekran.ac('kayit');
+  }
+});
+
+document.addEventListener('input', function (e) {
+  if (!e.target) return;
+  if (e.target.id === 'rPlaka') {
+    var s = e.target.selectionStart;
+    e.target.value = plakaBicim(e.target.value);
+    try { e.target.setSelectionRange(e.target.value.length, e.target.value.length); } catch (x) {}
+    ruhsatDurum();
+  }
+});
+})();
+
+/* ===== ekran: 30-kayit.html ===== */
+(function () {
+function kayitCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+
+  document.getElementById('kayitKunye').innerHTML =
+    '<div class="kunye-ust">' + plakaHtml(k.plaka) +
+      '<span class="kayit-tur ' + k.tur + '">' +
+      (k.tur === 'bakim' ? 'Bakım' : 'Tamirat') + '</span></div>' +
+    '<div class="kunye-arac">' +
+      (a ? a.marka + ' ' + a.model + ' · ' + a.yil : '') +
+      (k.tur === 'bakim' && k.km ? ' · ' + k.km + ' km' : '') +
+    '</div>';
+
+  document.getElementById('kSikayet').value = k.sikayet || '';
+
+  var kap = document.getElementById('kSatirlar');
+  kap.innerHTML = (k.satirlar || []).length
+    ? k.satirlar.map(function (s, i) {
+        return '<div class="k-satir">' +
+          '<span class="k-tip ' + s.tip + '">' + (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</span>' +
+          '<input class="k-ad" value="' + (s.ad || '').replace(/"/g, '&quot;') +
+            '" data-satir-ad="' + i + '" placeholder="' +
+            (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') + '" />' +
+          '<input class="k-fiyat" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
+            '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="—" aria-label="Fiyat" />' +
+          '<button class="k-sil" data-satir-sil="' + i + '" aria-label="Satırı kaldır">✕</button>' +
+          (s.tip === 'parca'
+            ? '<span class="k-getiren">Parçayı kim getirdi?' +
+                '<button data-getiren="' + i + '|tamirci" aria-pressed="' +
+                  (s.kimGetirdi === 'tamirci') + '">Tamirci</button>' +
+                '<button data-getiren="' + i + '|musteri" aria-pressed="' +
+                  (s.kimGetirdi === 'musteri') + '">Müşteri</button>' +
+              '</span>'
+            : '') +
+        '</div>';
+      }).join('')
+    : bosDurumHtml('Henüz bir şey yazılmadı',
+        'Parça ya da işçilik ekle. Kayıt teslim edilene kadar açık kalır.');
+
+  document.getElementById('kToplam').innerHTML =
+    '<span class="etiket">Toplam</span>' +
+    '<span class="deger">' + tutar(kayitToplami(k)) + ' ₺</span>';
+}
+
+Ekran.tanim('kayit', { ciz: kayitCiz });
+
+document.addEventListener('click', function (e) {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.id === 'kParcaEkle') {
+    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
+                      kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
+    Ekran.tazele();
+  }
+  if (t.id === 'kIscilikEkle') {
+    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
+    Ekran.tazele();
+  }
+  if (t.id === 'kSikayetMik') {
+    document.getElementById('kSikayet').value = 'Triger seti değişecek';
+    k.sikayet = 'Triger seti değişecek';
+    balon('Duyduğumu yazdım — kontrol et.');
+    Ekran.tazele();
+  }
+  /* K-003: onay bir AKIŞ değil, bir EYLEM. Kayıt beklemeye geçmez,
+     durum değişmez — mesaj gider, iş yürümeye devam eder. */
+  if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
+
+  if (t.id === 'kOnayIste') {
+    var a = aracBul(k.plaka);
+    balon((a && a.sahipTel)
+      ? 'Özet gönderildi — ' + a.sahipTel
+      : 'Telefon yok; özet gönderilemedi.', !(a && a.sahipTel), 3000);
+  }
+
+  var sil = t.getAttribute('data-satir-sil');
+  if (sil !== null) { k.satirlar.splice(parseInt(sil, 10), 1); Ekran.tazele(); }
+
+  var g = t.getAttribute('data-getiren');
+  if (g) {
+    var p = g.split('|');
+    k.satirlar[parseInt(p[0], 10)].kimGetirdi = p[1];
+    /* Müşteri getirdiyse satır fiyatsız kalır (S2, K-005). */
+    if (p[1] === 'musteri') k.satirlar[parseInt(p[0], 10)].fiyat = 0;
+    Ekran.tazele();
+  }
+});
+
+document.addEventListener('input', function (e) {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k || !e.target) return;
+
+  if (e.target.id === 'kSikayet') { k.sikayet = e.target.value; return; }
+
+  var ad = e.target.getAttribute && e.target.getAttribute('data-satir-ad');
+  if (ad !== null && ad !== undefined) { k.satirlar[parseInt(ad, 10)].ad = e.target.value; return; }
+
+  var f = e.target.getAttribute && e.target.getAttribute('data-satir-fiyat');
+  if (f !== null && f !== undefined) {
+    var n = parseInt((e.target.value || '').replace(/[^0-9]/g, ''), 10) || 0;
+    k.satirlar[parseInt(f, 10)].fiyat = n;
+    /* Yalnız toplamı tazele — alanı yeniden çizmek imleci kaçırır. */
+    document.getElementById('kToplam').innerHTML =
+      '<span class="etiket">Toplam</span>' +
+      '<span class="deger">' + tutar(kayitToplami(k)) + ' ₺</span>';
+  }
+});
+})();
+
+/* ===== ekran: 40-parca-sor.html ===== */
+(function () {
+var psSecili = null;
+
+function psParcaListesi(k) {
+  /* Yalnız TAMİRCİNİN alacağı ve fiyatı henüz belli olmayan parçalar.
+     Müşterinin getireceği parçanın fiyatını sormanın anlamı yok. */
+  return (k.satirlar || []).filter(function (s) {
+    return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
+  });
+}
+
+function psCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+  var parcalar = psParcaListesi(k);
+
+  document.getElementById('psParcalar').innerHTML = parcalar.length
+    ? parcalar.map(function (s) {
+        return '<div class="ps-parca">' +
+          '<svg class="ico" aria-hidden="true"><use href="#i-parca"></use></svg>' +
+          (s.ad || 'adı yazılmamış parça') + '</div>';
+      }).join('')
+    : bosDurumHtml('Sorulacak parça yok',
+        'Servis kaydında fiyatı belli olmayan bir parça olmalı.');
+
+  document.getElementById('psParcacilar').innerHTML = PARCACILAR.map(function (p, i) {
+    return '<button class="secim-btn" data-parcaci="' + i + '" aria-pressed="' +
+      (psSecili === i) + '">' + p.ad + '</button>';
+  }).join('');
+
+  var satirlar = parcalar.map(function (s) { return '· ' + (s.ad || '?'); }).join('\n');
+  document.getElementById('psMesaj').textContent =
+    (a ? a.marka + ' ' + a.model + ' ' + a.yil + ' · ' + a.motor + '\n' : '') +
+    k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?';
+
+  var ek = document.createElement('span');
+  ek.className = 'ek';
+  ek.textContent = '📎 ruhsat fotoğrafı eklenecek';
+  document.getElementById('psMesaj').appendChild(ek);
+
+  document.getElementById('psGonder').disabled = (psSecili === null || !parcalar.length);
+}
+
+Ekran.tanim('parca-sor', {
+  ciz: function () { psSecili = null; psCiz(); }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var p = t.getAttribute('data-parcaci');
+  if (p !== null) { psSecili = parseInt(p, 10); psCiz(); }
+
+  if (t.id === 'psGonder' && psSecili !== null) {
+    balon(PARCACILAR[psSecili].ad + ' — WhatsApp açılıyor, mesaj hazır.', false, 3000);
+    Ekran.ac('kayit');
+  }
+});
+})();
+
+/* ===== ekran: 50-teslim.html ===== */
+(function () {
+/* "ALMADIM" BİR ÖDEME YOLUDUR. Veresiye gerçek ve teslimi
+   bekletmemeli (EKRANLAR.md §5). */
+var ODEME_YOLLARI = [
+  { k: 'nakit', ad: 'Nakit' },
+  { k: 'kart', ad: 'Kart' },
+  { k: 'havale', ad: 'Havale' },
+  { k: 'almadim', ad: 'Almadım' }
+];
+var tsSecili = null;
+
+function tsCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+
+  document.getElementById('tsAlt').textContent =
+    k.plaka + (a ? ' · ' + a.marka + ' ' + a.model : '');
+
+  document.getElementById('tsTutar').innerHTML =
+    '<span class="rakam">' + tutar(kayitToplami(k)) + ' ₺</span>' +
+    '<span class="alt">' + (k.satirlar || []).length + ' satır</span>';
+
+  document.getElementById('tsOdeme').innerHTML = ODEME_YOLLARI.map(function (o) {
+    return '<button class="secim-btn" data-odeme="' + o.k + '" aria-pressed="' +
+      (tsSecili === o.k) + '">' + o.ad + '</button>';
+  }).join('');
+
+  document.getElementById('tsTeslim').disabled = !tsSecili;
+
+  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın. */
+  document.getElementById('tsNot').textContent = (k.tur === 'bakim')
+    ? 'Teslimden sonra ' + DUKKAN.bakimPeriyoduAy + ' ay sonrası için bakım hatırlatması kurulacak.'
+    : '';
+}
+
+Ekran.tanim('teslim', {
+  ciz: function () { tsSecili = null; tsCiz(); }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var o = t.getAttribute('data-odeme');
+  if (o) { tsSecili = o; tsCiz(); }
+
+  if (t.id === 'tsTeslim' && tsSecili) {
+    var k = kayitBul(ACIK_KAYIT);
+    var a = aracBul(k.plaka);
+    k.teslimTarihi = '03.09.2026';        /* TEK DURUM ALANI — K-004 */
+    k.odemeYolu = tsSecili;
+
+    /* Bakımsa hatırlatma KURULUR (K-002). Ay üzerinden — km takip
+       edilemiyor, edilen tek şey zaman. */
+    if (k.tur === 'bakim') {
+      var d = new Date(BUGUN.getTime());
+      d.setMonth(d.getMonth() + DUKKAN.bakimPeriyoduAy);
+      k.hatirlatmaTarihi = ('0' + d.getDate()).slice(-2) + '.' +
+                           ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+      k.hatirlatmaGonderildi = false;
+    }
+
+    balon(k.plaka + ' teslim edildi.' +
+      (a && a.sahipTel ? ' Özet gönderildi.' : ' Telefon yok, özet gönderilemedi.'),
+      false, 3200);
+    ACIK_KAYIT = null;
+    Ekran.ac('home');
+  }
+});
+})();
+
+/* ===== ekran: 60-arac.html ===== */
+(function () {
+Ekran.tanim('arac', {
+  ciz: function () {
+    var a = aracBul(ACIK_PLAKA);
+    if (!a) return;
+
+    document.getElementById('arKunye').innerHTML =
+      '<div class="kunye-ust">' + plakaHtml(a.plaka) + '</div>' +
+      '<div class="kunye-arac">' + a.marka + ' ' + a.model + ' · ' + a.yil +
+        ' · ' + a.motor + '</div>' +
+      '<div class="kunye-arac">' + (a.sahipAd || 'sahip yazılmamış') +
+        (a.sahipTel ? ' · ' + a.sahipTel : ' · telefon yok') + '</div>';
+
+    /* Son bakım + bir sonraki hatırlatma. km burada işe yarıyor:
+       "geçen bakım 142.500'de yapılmış" (K-002). */
+    var bakimlar = aracKayitlari(a.plaka).filter(function (k) {
+      return k.tur === 'bakim' && k.teslimTarihi;
+    });
+    var son = bakimlar[bakimlar.length - 1];
+    document.getElementById('arBakim').innerHTML = son
+      ? '<div class="ar-bakim">' +
+          '<strong>Son bakım</strong>' +
+          '<span>' + son.teslimTarihi + (son.km ? ' · ' + son.km + ' km' : '') + '</span>' +
+          (son.hatirlatmaTarihi
+            ? '<span>Hatırlatma: ' + son.hatirlatmaTarihi + '</span>' : '') +
+        '</div>'
+      : '';
+
+    var kayitlar = aracKayitlari(a.plaka);
+    document.getElementById('arGecmis').innerHTML = kayitlar.length
+      ? kayitlar.map(function (k) {
+          /* MÜŞTERİ PARÇASI GEÇMİŞTE İŞARETLİ KALIR — K-005'in
+             asıl işe yaradığı yer burası. */
+          var mp = (k.satirlar || []).filter(function (s) {
+            return s.tip === 'parca' && s.kimGetirdi === 'musteri';
+          });
+          return '<button class="kayit-sat" data-kayit="' + k.id + '">' +
+            '<span class="kayit-ust">' +
+              '<span class="kayit-tur ' + k.tur + '">' +
+                (k.tur === 'bakim' ? 'Bakım' : 'Tamirat') + '</span>' +
+              '<span class="kayit-arac">' +
+                (k.teslimTarihi || 'içeride') + '</span>' +
+            '</span>' +
+            '<span class="kayit-is">' + (k.sikayet || '—') + '</span>' +
+            '<span class="kayit-arac">' + tutar(kayitToplami(k)) + ' ₺</span>' +
+            (mp.length
+              ? '<span class="ar-getiren">parçayı müşteri getirmişti: ' +
+                  mp.map(function (s) { return s.ad || 'parça'; }).join(', ') + '</span>'
+              : '') +
+          '</button>';
+        }).join('')
+      : bosDurumHtml('Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
+
+    document.getElementById('arNot').textContent = a.not || 'Not yok.';
+  }
 });
 })();
 

@@ -1,0 +1,124 @@
+<!-- ekran: parca-sor · PARÇA FİYATI SOR (EKRANLAR.md §4)
+     Akış Adım 3–4. Tamirci: "Yedek parçacıdan fiyat alırken, ruhsatı
+     ve gereken parçaları gönderiyor." (T-12)
+
+     WHATSAPP.md ÖNERİSİ (A yolu) UYGULANDI: mesajı biz hazırlıyoruz,
+     usta KENDİ WhatsApp'ından gönderiyor. Cevabı okuyamıyoruz — usta
+     gelen fiyatı elle giriyor. Karşılığında hiçbir kurulum yok:
+     Meta hesabı, işletme doğrulaması, şablon onayı gerekmiyor.
+
+     ÜZERİNDE YOK: parça arama · katalog · OEM kodu girme alanı
+     (usta kodu bilmiyor — S7) · fiyat karşılaştırma tablosu. -->
+<section class="screen" id="screen-parca-sor">
+
+  <h1 class="ekran-bas">Parça fiyatı sor</h1>
+  <p class="ekran-alt">Ruhsat ve parça listesi birlikte gider.</p>
+
+  <h2 class="bolum-bas">Sorulacak parçalar</h2>
+  <div id="psParcalar"></div>
+
+  <h2 class="bolum-bas">Kime sorulacak?</h2>
+  <div class="secim-grup" id="psParcacilar"></div>
+
+  <h2 class="bolum-bas">Gidecek mesaj</h2>
+  <div class="mesaj-onizleme" id="psMesaj"></div>
+
+  <button class="ana-btn" id="psGonder" disabled>
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-parca"></use></svg>
+    <span>WhatsApp ile gönder</span>
+  </button>
+
+  <p class="ps-not">
+    Cevap kendi WhatsApp'ına gelir. Gelen fiyatı servis kaydındaki
+    satıra yazman yeter.
+  </p>
+
+</section>
+
+<style>
+.ps-parca {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  margin-bottom: 8px;
+  font-size: var(--tip-md);
+}
+.mesaj-onizleme {
+  padding: 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-size: var(--tip-sm);
+  white-space: pre-wrap;
+  margin-bottom: 18px;
+}
+.mesaj-onizleme .ek { display: block; margin-top: 8px; color: var(--primary); font-weight: 600; }
+.ps-not { margin-top: 12px; color: var(--faint); font-size: var(--tip-sm); text-align: center; }
+</style>
+
+<script>
+var psSecili = null;
+
+function psParcaListesi(k) {
+  /* Yalnız TAMİRCİNİN alacağı ve fiyatı henüz belli olmayan parçalar.
+     Müşterinin getireceği parçanın fiyatını sormanın anlamı yok. */
+  return (k.satirlar || []).filter(function (s) {
+    return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
+  });
+}
+
+function psCiz() {
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var a = aracBul(k.plaka);
+  var parcalar = psParcaListesi(k);
+
+  document.getElementById('psParcalar').innerHTML = parcalar.length
+    ? parcalar.map(function (s) {
+        return '<div class="ps-parca">' +
+          '<svg class="ico" aria-hidden="true"><use href="#i-parca"></use></svg>' +
+          (s.ad || 'adı yazılmamış parça') + '</div>';
+      }).join('')
+    : bosDurumHtml('Sorulacak parça yok',
+        'Servis kaydında fiyatı belli olmayan bir parça olmalı.');
+
+  document.getElementById('psParcacilar').innerHTML = PARCACILAR.map(function (p, i) {
+    return '<button class="secim-btn" data-parcaci="' + i + '" aria-pressed="' +
+      (psSecili === i) + '">' + p.ad + '</button>';
+  }).join('');
+
+  var satirlar = parcalar.map(function (s) { return '· ' + (s.ad || '?'); }).join('\n');
+  document.getElementById('psMesaj').textContent =
+    (a ? a.marka + ' ' + a.model + ' ' + a.yil + ' · ' + a.motor + '\n' : '') +
+    k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?';
+
+  var ek = document.createElement('span');
+  ek.className = 'ek';
+  ek.textContent = '📎 ruhsat fotoğrafı eklenecek';
+  document.getElementById('psMesaj').appendChild(ek);
+
+  document.getElementById('psGonder').disabled = (psSecili === null || !parcalar.length);
+}
+
+Ekran.tanim('parca-sor', {
+  ciz: function () { psSecili = null; psCiz(); }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var p = t.getAttribute('data-parcaci');
+  if (p !== null) { psSecili = parseInt(p, 10); psCiz(); }
+
+  if (t.id === 'psGonder' && psSecili !== null) {
+    balon(PARCACILAR[psSecili].ad + ' — WhatsApp açılıyor, mesaj hazır.', false, 3000);
+    Ekran.ac('kayit');
+  }
+});
+</script>
