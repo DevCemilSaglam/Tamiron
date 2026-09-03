@@ -573,3 +573,57 @@ alabileceği bilgisi değerli."* Fiyat artık alışa taşınıyor
 > **Ders:** kol belgede *"ekran açmıyor"* diye geçince kolu
 > **çalıştırmadan** doğru saydım. Bir kolun ekran açmaması onun
 > **çalıştığı** anlamına gelmiyor.
+
+
+---
+
+# SESLİ YOL — ana yolun kısayolu (03.09.2026)
+
+**Cemil:** *"Sesli işlem buttonunda kaydettiği ile işleme çevireceğiz."*
+
+Ses **yeni bir yetenek açmıyor.** Yaptığı her şey elle de yapılabilir;
+yaptığı tek şey **kısaltmak.** Yedi işin dışına çıkmıyor.
+
+## Dört hâl
+
+```
+dinliyor  →  duyuldu  →  NE YAPILACAĞI ANLAŞILDI  →  onay
+```
+
+Üçüncü adım olmadan ses, bir arama kutusundan farksız kalır. Asıl iş
+tanıma değil, **tanımadan sonrası**: duyulan cümlenin hangi işleme
+karşılık geldiğini söylemek.
+
+> **⚠️ ONAYSIZ HİÇBİR ŞEY YAPILMIYOR.** Yanlış duyulan bir cümlenin
+> kaydı kendiliğinden açması, ustayı sesten **tamamen** soğutur. Bir
+> kez yanlış kayıt açan bir mikrofona ikinci kez basılmaz.
+
+## Ölçülen — dört cümle, dört işlem
+
+| Söylenen | Anlaşılan |
+|---|---|
+| *"34 ABC 123 triger seti değişecek"* | **Tamirat** kaydı · şikâyet *"triger seti değişecek"* |
+| *"06 TMR 07 bakıma geldi kilometre 88 bin"* | **Bakım** kaydı · km **88.000** |
+| *"35 KLM 45 teslim ettim nakit aldım"* | **Teslim** · tutar 800 ₺ · ödeme **nakit** seçili |
+| *"99 ZZ 9999 fren balatası"* | **Araç kayıtlı değil** → ruhsata yönlendirir |
+
+Km cümlenin içinden çıkarılıyor ve iş tarifinden **siliniyor**:
+*"bakıma geldi kilometre 88 bin"* cümlesinin şikâyeti *"bakıma geldi"*,
+kilometre ayrı alan.
+
+## Dokunuş
+
+| Yol | Dokunuş |
+|---|---|
+| Ana yolda kayıt açmak | 4 *(menü → ruhsat çek → tür → kaydı aç)* |
+| **Sesli kayıt açmak** | **3** *(sesli işlem → söyle → onayla)* |
+
+Kazanç bir dokunuş gibi görünüyor ama asıl kazanç **yazmamak**: şikâyet,
+tür ve kilometre cümleden çıkıyor. Ana yolda bunlar ayrı ayrı giriliyor.
+
+## AÇIK
+
+| Kod | Konu |
+|---|---|
+| **A-S1** | Tanıma motoru hangisi olacak? Ekran örnek cümleler üstünden çalışıyor; çözümleme (`sesCozumle`) gerçek, motor değil |
+| **A-S2** | Motor yanlış duyduğunda düzeltme nasıl olacak — cümleyi elle düzeltmek mi, baştan söylemek mi? Şimdilik: baştan söyle |

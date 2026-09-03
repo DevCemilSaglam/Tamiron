@@ -431,6 +431,9 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Tema düğmesi | `.theme-toggle` (yalnız `Tema` modülü yönetir) |
 | Bildirim | `.notif-list` > `.notif-item` > `.ni-ic` + `.ni-body` > `.ni-title` + `.ni-sub` |
 | Rozet (sayaç) | `.icon-btn` içinde `.badge` — boşken kendiliğinden gizlenir |
+| Ana menü | `.menu-list` > `.menu-row` > `.main` (`.ic-badge` + `.txt` > `.lbl` + `.sub`) + `.mic` |
+| Selamlama | `.greeting` > `h1` + `p` — metni saate bakar |
+| Sesli işlem | `.ses-sahne` > `.ses-orb` (`.dinliyor` `.tamam` `.hata`) + `.ses-durum` + `.ses-aciklama` + `.ses-duyulan` > `.sd-lbl` |
 
 Denetimin **TANIMSIZ-SINIF** ve **OLU-SINIF** testleri bu sözlüğün bekçisidir:
 biri sözlükte olmayan sınıfı, öteki sözlükte kalıp kullanılmayanı yakalar.

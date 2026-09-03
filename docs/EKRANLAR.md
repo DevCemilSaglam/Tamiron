@@ -26,7 +26,31 @@ Buna giriş noktası (**1 · İçerideki araçlar**) ve akış dışı başvuru 
 
 ---
 
-## 1 · İÇERİDEKİ ARAÇLAR *(ana ekran)*
+## 0 · ANA MENÜ *(ana ekran — 03.09'da değişti)*
+
+**Cemil:** *"Yine anasayfada buttonlar olmalı. En üstte Sesli İşlem
+buttonu, Araç kaydı, araçlar, servis kaydı ekle, servis kayıtları,
+müşteriler, muhasebe olacak. Yine buttonların yanında mikrofon buttonu
+olacak."*
+
+| Üzerinde ne var | Üzerinde ne YOK |
+|---|---|
+| Saate göre selamlama | Özet paneli, gösterge tablosu |
+| **Sesli işlem** — en üstte, tek düğme | Grafik, rakam yığını |
+| Bakım hatırlatma şeridi (T-17) | Bildirim listesi *(çekmecede)* |
+| Altı menü satırı, **her birinin sağ ucunda mikrofon** | İç içe menü, alt menü |
+| Satır altlarında sayı: *"5 araç kayıtlı"*, *"4 araç içeride"* | Arama kutusu *(listelerin kendi içinde)* |
+
+**Her satırın sağında mikrofon var** çünkü iş hem dokunarak hem
+söyleyerek başlatılabilmeli. Mikrofonu tek bir ekrana hapsetmek, sesle
+başlamak isteyen ustayı önce **gözle aramaya** zorluyordu.
+
+> **İçerideki araçlar listesi kaybolmadı**, Ekran 8'e (Servis kayıtları)
+> taşındı ve orada *"içeride"* süzgeci **açık** gelir.
+
+---
+
+## 1 · ~~İÇERİDEKİ ARAÇLAR (ana ekran)~~ → **Ekran 8'e taşındı**
 
 **Hangi işe:** giriş noktası. Ustanın sabah sorduğu tek soru: *"hangi araçlar bende?"*
 
@@ -161,11 +185,34 @@ Tek ekran. Personel, rol, yetki **yok** — tamirci bahsetmedi (K-004 notu).
 
 ## Sayım
 
+**03.09'da değişti.** Ana ekran menüye dönünce menünün gösterdiği
+ekranlar da gerekti.
+
 | | Sayı |
 |---|---|
-| Ana yol ekranı | **6** *(bütçe: 6)* ✅ |
-| Destek ekranı | 1 |
-| **Toplam** | **7** |
+| Ana yolun geçtiği ekran | **5** — ruhsat · kayıt · parça sor · teslim (+ menü) |
+| Menüden açılan ekran | 5 — araçlar · servis kayıtları · müşteriler · muhasebe · sesli işlem |
+| Başvuru ekranı | 1 — araç |
+| **Toplam** | **11** |
+
+**Bütçe (A-1) bu istekle cevaplandı.** 6 ekran benim önerimdi ve
+*"Cemil onayına açık"* işaretliydi; menü isteği o soruya verilmiş cevap
+sayıldı. **Ölçülen asıl sayı değişmedi: ana yol hâlâ 13 dokunuş** —
+menü satırı, eski *"Ruhsatı çek"* düğmesinin yerini aldı.
+
+> Ekran sayısı bir bütçe kalemi, ama **tek başına ölçü değil.** Asıl
+> ölçü, işin kaç dokunuşta bittiği ve kaç ekranın ana yola **girdiği**.
+> Beş yeni ekranın hiçbiri ana yolun üstünde durmuyor.
+
+### Yeni ekranlar
+
+| Ekran | Neden var | Üzerinde ne YOK |
+|---|---|---|
+| **7 · Sesli işlem** | *"Kaydettiği ile işleme çevireceğiz"* — söylenen cümle işleme dönüyor | Tanıma motoru *(A-S1)* · serbest komut dili · onaysız işlem |
+| **8 · Servis kayıtları** | Eski ana ekranın listesi + teslim edilmişler | Durum alanı *(süzgeç `teslimTarihi`'nden türetilir, K-004)* |
+| **9 · Araçlar** | *"Hangi araçlar kayıtlı"* — menüden gelince gidecek yeri kalmamıştı | Araç ekleme formu · renk · VIN · kontrol tarihleri |
+| **10 · Müşteriler** | Menüde istendi | **Müşteri tablosu** — liste araçtan türetiliyor |
+| **11 · Muhasebe** | Menüde istendi | Gider · kâr · cari hesap · fatura *(kapsam kararı bekliyor)* |
 
 **Kıyas:** v1 · 38 ekran.
 

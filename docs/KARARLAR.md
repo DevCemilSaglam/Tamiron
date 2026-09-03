@@ -10,6 +10,78 @@
 
 ---
 
+## K-013 · Muhasebe, yeni alan istemeden başlar (03.09.2026)
+
+**Karar:** Muhasebe ekranı yalnız **zaten kayıtlı olan** veriyi okur:
+teslimdeki `PaymentMethod` ve satırlardaki `Price`. Gider, kâr, cari
+hesap ve fatura **yazılmadı** — kapsam kararı verilene kadar da
+yazılmayacak.
+
+**Neden:** Bu dördü ustadan **yeni veri** ister. *"Her gideri gir"*
+diyen bir ekran, girilmediğinde **yalan söyleyen** bir ekrandır. Yanlış
+rakam gösteren muhasebe, muhasebe olmamasından kötüdür.
+
+**Bedavaya gelen üç rakam:** bugün tahsil edilen · ödeme yoluna göre
+dağılım · **veresiye listesi.** *"Almadım"* bir ödeme yolu olduğu için
+(K-004 teslim akışı) alacak zaten kayıtlı. Liste olarak veriliyor,
+tek rakam olarak değil: ustanın sorusu *"ne kadar alacağım"* değil,
+**"kimden alacağım"**.
+
+**Ekran kendi yarım olduğunu yazıyor.** Bir ekranın eksiğini söylemesi,
+saklamasından iyidir.
+
+**Cemil onayına açık:** kapsam. *"Sonra geçeceğiz"* dedin — seçenekler
+günlük kasa · kasa+gider · cari hesap olarak duruyor.
+
+---
+
+## K-012 · Müşteri ekranı var, müşteri tablosu yok (03.09.2026)
+
+**Karar:** *"Müşteriler"* ekranı açıldı ama `Customer` tablosu
+**açılmadı**. Liste araçtan türetiliyor: aynı `sahipAd` + `sahipTel`
+tek satırda toplanıyor, araçları altında sıralanıyor.
+
+**Neden:** v1'de müşteri dünyası **üç tabloydu** (`Party`, `Contact`,
+`VehicleContact`) ve tamircinin *"karmaşık"* dediği yığının içindeydi.
+İhtiyaç duyulan şey **ekrandı** — *"Ahmet kimdi, hangi arabaydı"* —
+tablo değil. Ekranı tablosuz vermek mümkün olduğu sürece tablo
+açılmaz.
+
+**Bedeli açık ve kabul edildi (A-M1):** aynı kişinin adı iki araçta
+farklı yazılmışsa **iki müşteri görünür.** Birleştirme yok. Tamirci
+bundan şikâyet ederse tablo o zaman konuşulur — şikâyet etmeden değil.
+
+---
+
+## K-011 · Ana ekran menüdür; her satırın kendi mikrofonu vardır (03.09.2026)
+
+**Karar:** Ana ekran, *"içerideki araçlar"* listesi olmaktan çıkıp
+**menü** oldu: en üstte Sesli işlem, altında altı satır (araç kaydı ·
+araçlar · servis kaydı ekle · servis kayıtları · müşteriler ·
+muhasebe), **her satırın sağ ucunda mikrofon.**
+
+**Cemil:** *"Yine anasayfada buttonlar olmalı… Yine buttonların yanında
+mikrofon buttonu olacak."*
+
+**Mikrofon neden her satırda:** iş hem dokunarak hem söyleyerek
+başlatılabilmeli. Mikrofonu tek bir ekrana hapsetmek, sesle başlamak
+isteyen ustayı önce **gözle aramaya** zorluyordu — sesin bütün kazancı
+orada gidiyor.
+
+**Kaybolan bir şey yok:** içerideki araçlar listesi kendi ekranına
+geçti ve orada *"içeride"* süzgeci **açık** geliyor. Bakım hatırlatma
+şeridi ana ekranda **kaldı** — ustanın *"bugün kimi arayacağım"*
+sorusu ilk ekranda cevaplanmalı (T-17).
+
+**Ölçüldü:** ana yol yine **13 dokunuş.** Menü satırı, eski
+*"Ruhsatı çek"* düğmesinin yerini aldı; bir tık eklemedi.
+
+**T-18 (*"iç içe menü yok"*) ne oldu:** menü **tek katman**. Menüden
+açılan hiçbir ekranın kendi menüsü yok; hepsi liste ya da tek iş.
+Yasak olan iç içelik, menünün kendisi değil.
+
+---
+
 ## K-010 · Tema üç hâllidir; "sistem" gerçek bir seçenektir (03.09.2026)
 
 **Karar:** Tema üç hâl arasında döner: **sistem · açık · koyu.** Seçim

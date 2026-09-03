@@ -13,12 +13,14 @@ turda üretilen tek çalışan şey tıklanabilir prototip.
 
 | | |
 |---|---|
-| Ana yol | **7 adım · 6 ekran** — hepsi prototipte çalışıyor |
-| Dokunuş | tam yol **13**, kısa yol **9** (ölçüldü, `IS-AKISI.md` §senaryo) |
+| Ana yol | **7 adım** — hepsi prototipte çalışıyor |
+| Ekran | **11** (ana yol 5 · menüden 5 · başvuru 1) — 03.09'da 6'dan çıktı |
+| Dokunuş | tam yol **13**, kısa yol **9**, **sesli yol 3** (ölçüldü) |
+| Ana ekran | **Menü** — Sesli işlem + altı satır, her satırın sağında mikrofon |
 | İstisna kolları | **5 kol · 0 yeni ekran · 0 yeni adım** — hepsi işletildi |
 | Sağlık denetimi | 26 test · **0 bulgu** · 375 px'te ölçüldü |
 | Kabuk | header (menü · logo · ara · geri · ileri) + çekmece + tema (3 hâl) |
-| Kararlar | K-001 … K-010 |
+| Kararlar | K-001 … K-013 |
 | Paket | `app/` üretiliyor (9 dosya, çevrimdışı, düz yapı) |
 
 ---
@@ -27,7 +29,7 @@ turda üretilen tek çalışan şey tıklanabilir prototip.
 
 1. **`arastirma/TAMIRCI-GERIBILDIRIM.md`** — bu deponun 1 numaralı belgesi.
    Tamircinin sözü bizim akıl yürütmemizi yener.
-2. `KARARLAR.md` — K-001…K-010 + açık maddeler
+2. `KARARLAR.md` — K-001…K-013 + açık maddeler
 3. `IS-AKISI.md` — yedi adım, beş kol, ölçülmüş senaryo
 4. `EKRANLAR.md` — altı ekran; her ekranın *"üzerinde ne YOK"* sütunu
 5. `VERI-MODELI.md` — sekiz tablo
@@ -42,7 +44,9 @@ prototypes/kaynak/**        <- ELLE BURASI DÜZENLENİR
   kabuk.html                   header + toast + yuvalar
   stil/01-taban 02-kabuk 03-bilesen.css
   betik/01-cekirdek 02-veri 03-nesne.js
-  ekranlar/10-home … 60-arac.html
+  ekranlar/10-home 15-ses 20-ruhsat 30-kayit 40-parca-sor
+           50-teslim 60-arac 70-araclar 80-kayitlar
+           90-musteriler 95-muhasebe
         |
         |  node tools/prototip-derle.js
         v
@@ -111,12 +115,15 @@ tercihini sessizce ezdi (K-009, K-010).
 | **Ç-2** | OEM kodu yönü — TecDoc'un kaderini belirler | K-001 |
 | **K-007** | Kol B'de hiçbir cevap seçilmezse akış durur mu | durmaz |
 
-**Sırada bekleyen alan:** **muhasebe.** Cemil 03.09'da *"muhasebe
-alanını da yapacağız"* dedi, kapsamı *"sonra geçeceğiz"* diyerek erteledi.
-README'de *"basit ön muhasebe"* yazıyor ama tamircinin yedi işinde
-muhasebe **yok** — kapsamı Cemil'in vereceği bir karar, tasarım ondan
-sonra başlar. Elde hazır olan hammadde: teslimdeki `PaymentMethod`
-(nakit/kart/havale/**almadım**) ve satırlardaki `Price`/`Cost` ayrımı.
+**Sırada bekleyen alan:** **muhasebenin kapsamı.** Ekran açıldı ama
+yalnız zaten kayıtlı veriyi okuyor (K-013): bugün tahsilat · ödeme
+dağılımı · veresiye listesi. Gider, kâr, cari hesap ve fatura ustadan
+**yeni veri** ister; girilmezse rakam yalan söyler, o yüzden
+yazılmadı. Seçenekler: günlük kasa · kasa+gider · cari hesap.
+
+**Sesli işlem için (A-S1):** tanıma motoru bağlı değil. Ekran örnek
+cümleler üstünden çalışıyor ve **çözümleme gerçek** — motor gelince
+değişecek olan `sesCozumle()`, ekran değil.
 
 **Yapılmamış işler:** müşteri tarafı (T-19/20/21) · gerçek ruhsat okuma
 (`RUHSAT-OKUMA.md` C yolu) · gerçek WhatsApp gönderimi
