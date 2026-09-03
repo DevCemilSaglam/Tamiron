@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-03 21:13
+  Üretim: 2026-09-03 21:42
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -1687,8 +1687,13 @@ button.notice:hover { filter: brightness(.98); }
 
   <nav class="menu-list" aria-label="Ana menü">
 
+    <!-- ⚠️ data-git="ses" DEĞİL, data-sesle="genel".
+         data-git ile açılınca SESLI_NIYET değişmiyor ve ekran BİR
+         ÖNCEKİ bağlamda kalıyordu: muhasebeden çıkıp menüden "Sesli
+         işlem"e basınca başlık "Sesli işlem · Muhasebe" diyor ve
+         gider örnekleri gösteriyordu (04.09'da bulundu). -->
     <div class="menu-row">
-      <button class="main" data-git="ses">
+      <button class="main" data-sesle="genel">
         <span class="ic-badge"><svg class="ico"><use href="#i-mic"></use></svg></span>
         <span class="txt"><span class="lbl">Sesli işlem</span>
           <span class="sub">Söyle, gerisini o bulsun</span></span>
@@ -1834,15 +1839,24 @@ button.notice:hover { filter: brightness(.98); }
      · .plate-hint · .cip-grup .cip · .btn. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-ruhsat">
 
+  <!-- BAŞLIK "SERVİS KAYDI EKLE" (04.09). Menüden bu adla giriliyordu
+       ama ekran "Ruhsatı çek" diyordu; usta hangi işi yaptığını
+       ekrandan okuyamıyordu. Ruhsat çekmek işin ADI değil, ilk adımı. -->
   <div class="screen-head">
     <span class="eyebrow">
-      <svg class="ico ico-sm"><use href="#i-camera"></use></svg> Ruhsatı çek
+      <svg class="ico ico-sm"><use href="#i-plus"></use></svg> Servis kaydı ekle
     </span>
   </div>
 
   <!-- Sesten gelen bilgi burada özetlenir: usta söylediğini ikinci kez
        yazmasın, ama neyin yazıldığını da görsün. -->
   <div id="ruhsatSesOzet"></div>
+
+  <!-- ⚠️ KAYITLI ARAÇ İÇİN RUHSAT ÇEKMEK GEREKMEZ (04.09).
+       Önce tek yol ruhsattı: dört aracı kayıtlı olan usta, aynı araç
+       ikinci kez geldiğinde ruhsatı yeniden çekiyordu. Aracın bilgisi
+       zaten elimizde; eksik olan yalnız "ne için geldi". -->
+  <div id="ruhsatKayitli"></div>
 
   <button class="btn btn-primary btn-lg" id="ruhsatCek">
     <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
@@ -2116,6 +2130,15 @@ button.notice:hover { filter: brightness(.98); }
     <div id="arIletisim"></div>
   </div>
 
+  <!-- ⚠️ 04.09 — BU EKRAN ÖLÜ UÇTU. Araç açılıyordu ama buradan
+       hiçbir şey yapılamıyordu: aracı görüp servis kaydı açmak için
+       ana ekrana dönüp ruhsat çekmek gerekiyordu. Oysa araç ZATEN
+       kayıtlı; ruhsatı ikinci kez çekmek anlamsız iş.
+
+       KAYITLI ARACA RUHSATSIZ KAYIT: aracın bilgileri elimizde, tek
+       eksik "ne için geldi". O yüzden tür seçimi burada. -->
+  <div id="arEylem"></div>
+
   <div id="arBakim"></div>
 
   <div class="card">
@@ -2205,6 +2228,12 @@ button.notice:hover { filter: brightness(.98); }
     </span>
   </div>
 
+  <!-- 04.09: bu ekran ölü uçtu — kayıtlara bakıyorsun ama yenisini
+       açmak için ana ekrana dönmen gerekiyordu. -->
+  <button class="btn btn-primary btn-lg" data-git="ruhsat">
+    <svg class="ico"><use href="#i-plus"></use></svg> Yeni servis kaydı
+  </button>
+
   <div class="cip-grup" id="kytSuzgec" role="group" aria-label="Süzgeç"></div>
 
   <div class="search-box" id="kytArama">
@@ -2252,8 +2281,16 @@ button.notice:hover { filter: brightness(.98); }
   </div>
 
   <div id="msjSecim">
-    <div class="section-label">
-      <svg class="ico ico-sm"><use href="#i-users"></use></svg> Kime?
+    <div class="section-label with-action">
+      <span class="lbl-txt">
+        <svg class="ico ico-sm"><use href="#i-users"></use></svg> Kime?
+      </span>
+      <!-- 04.09: seçim ekranında mikrofon yoktu — "34 ABC 123
+           sahibine mesaj gönder" diyebilmek için önce menüye dönmek
+           gerekiyordu. -->
+      <button class="mic-round" id="msjSecimMik" aria-label="Kime göndereceğini sesle söyle" title="Sesle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
     </div>
     <div class="search-box" id="msjArama">
       <svg class="ico"><use href="#i-search"></use></svg>
@@ -2436,13 +2473,19 @@ button.notice:hover { filter: brightness(.98); }
       <div class="drawer-sec-label">
         <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç ve iş
       </div>
+      <!-- 04.09 DÜZELTİLDİ: bu iki satır menüdeki eski dünyaya
+           bakıyordu. "Araç girişi" menüden kaldırılan bir kavramdı;
+           "İçerideki araçlar" ise ANA EKRANA gidiyordu — ana ekran
+           menüye dönünce orada liste kalmamıştı, düğme boş bir menüye
+           götürüyordu. Çekmece ile menü ayrı ayrı düzeltilince
+           birbirinden koptu. -->
       <button class="drawer-item" data-git="ruhsat">
-        <span class="di-ic"><svg class="ico"><use href="#i-camera"></use></svg></span>
-        Araç girişi
+        <span class="di-ic"><svg class="ico"><use href="#i-plus"></use></svg></span>
+        Servis kaydı ekle
       </button>
-      <button class="drawer-item" data-git="home">
+      <button class="drawer-item" data-git="kayitlar">
         <span class="di-ic"><svg class="ico"><use href="#i-clipboard-list"></use></svg></span>
-        İçerideki araçlar
+        Servis kayıtları
       </button>
       <button class="drawer-item" id="drawerAra">
         <span class="di-ic"><svg class="ico"><use href="#i-search"></use></svg></span>
@@ -3124,6 +3167,32 @@ var KAYITLAR = [
       { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
     ] },
 
+  /* MUHASEBE EKRANI BOŞ GÖRÜNMESİN (04.09). Tohum veride bugün teslim
+     edilmiş kayıt ve veresiye YOKTU; muhasebe ve ana menü "Bugün 0 ₺ ·
+     0 ₺ veresiye" diyordu. Ekran doğru çalışıyordu ama gösterecek
+     şey yoktu — çalıştığı görülemeyen bir ekran, çalışmıyor sayılır. */
+  { id: 7, plaka: '35 KLM 45', tur: 'tamirat', km: '',
+    sikayet: 'Ön cam silecek motoru',
+    acilis: '03.09.2026', teslimTarihi: '03.09.2026',
+    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
+        marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Söküm takım', fiyat: 700, alis: 0, kimGetirdi: '' }
+    ] },
+
+  /* VERESİYE — "almadım" bir ödeme yoludur (K-004). Muhasebedeki
+     "kimden alacağım" listesi bu kayıttan besleniyor. */
+  { id: 8, plaka: '06 TMR 07', tur: 'tamirat', km: '',
+    sikayet: 'Akü değişimi',
+    acilis: '28.08.2026', teslimTarihi: '28.08.2026',
+    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
+        marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Takma', fiyat: 250, alis: 0, kimGetirdi: '' }
+    ] },
+
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
      Menü rozeti ve çekmecedeki bildirim bu kayıttan besleniyor. */
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
@@ -3296,6 +3365,10 @@ function gunAyYil(d) {
   return ('0' + d.getDate()).slice(-2) + '.' +
          ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
 }
+/* BUGÜNÜN METNİ TEK YERDE. '03.09.2026' on üç yerde elle yazılıydı;
+   prototipin günü değişince on üç yerin on ikisi eski günde kalırdı
+   ve hangisinin unutulduğu ancak rakam tutmayınca anlaşılırdı. */
+function bugunMetin() { return gunAyYil(BUGUN); }
 
 /* Tarihi gelmiş ve gönderilmemiş hatırlatmalar — ana ekran, çekmece
    rozeti ve araç ekranı AYNI kaynaktan besleniyor. */
@@ -3392,7 +3465,10 @@ function kayitSatiriHtml(k, s) {
       '</div>' +
       /* Telefon LİSTEDE aranabilir: usta "kimi arayacağım" sorusunun
          cevabını satırda görüp oradan arıyor (v1'deki gibi). */
-      (a && a.sahipTel
+      /* s.tel === false: aracın KENDİ ekranında sahibin telefonu zaten
+         tepede duruyor; her geçmiş satırında tekrar etmesi aynı
+         numarayı dört kez gösteriyordu (04.09). */
+      (s.tel !== false && a && a.sahipTel
         ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '"' +
             ' data-tel="1" aria-label="' + (a.sahipAd || 'sahibini') + ' ara">' +
             '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +
@@ -3747,7 +3823,7 @@ function sesOzet(o) {
   if (o.tur === 'gider-ekle') return {
     baslik: 'Gider eklenecek',
     satirlar: [['Açıklama', o.aciklama], ['Tutar', tutar(o.tutar) + ' ₺'],
-               ['Tarih', '03.09.2026']],
+               ['Tarih', bugunMetin()]],
     eylem: 'Gideri ekle' };
 
   if (o.tur === 'mesaj') return {
@@ -3786,7 +3862,7 @@ function sesUygula(o) {
   if (o.tur === 'servis-ac') {
     var yeni = { id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
       km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
-      acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: [] };
     KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
     balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
@@ -3818,7 +3894,7 @@ function sesUygula(o) {
     Ekran.ac('kayit'); return;
   }
   if (o.tur === 'gider-ekle') {
-    GIDERLER.push({ id: GIDERLER.length + 1, tarih: '03.09.2026',
+    GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
       aciklama: o.aciklama, tutar: o.tutar, tur: 'fatura' });
     balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
     Ekran.ac('muhasebe'); return;
@@ -4078,6 +4154,27 @@ Ekran.tanim('ruhsat', {
       rSesNotu = null;
       document.getElementById('ruhsatSesOzet').innerHTML = '';
     }
+
+    /* KAYITLI ARAÇLAR — ruhsat çekmeden kayıt açmanın yolu.
+       İçeride olan araç LİSTEDE YOK: aynı araca ikinci kayıt açmak,
+       ustanın işini ikiye bölmek olur. */
+    var secilebilir = ARACLAR.filter(function (a) {
+      return !icerideki().some(function (k) { return k.plaka === a.plaka; });
+    });
+    document.getElementById('ruhsatKayitli').innerHTML = secilebilir.length
+      ? '<div class="card">' +
+          '<div class="section-label">' +
+            '<svg class="ico ico-sm"><use href="#i-car"></use></svg> Kayıtlı araç mı geldi?' +
+          '</div>' +
+          '<div class="cip-grup">' +
+            secilebilir.map(function (a) {
+              return '<button class="cip" data-kayitli="' + a.plaka + '">' +
+                a.plaka + ' · ' + a.marka + '</button>';
+            }).join('') +
+          '</div>' +
+          '<p class="plate-hint">Dokun, ruhsat çekmeden aracın sayfasına git.</p>' +
+        '</div>'
+      : '';
   }
 });
 
@@ -4094,6 +4191,11 @@ var ruhsatSira = 0;
 document.addEventListener('click', function (e) {
   var t = e.target.closest('button');
   if (!t) return;
+
+  /* Kayıtlı araca dokunuldu — aracın sayfasına gidiyor; kaydı oradan
+     tür seçerek açıyor. Ruhsat hiç çekilmiyor. */
+  var kp = t.getAttribute('data-kayitli');
+  if (kp) { ACIK_PLAKA = kp; Ekran.ac('arac'); return; }
 
   if (t.id === 'ruhsatCek') {
     var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
@@ -4137,7 +4239,7 @@ document.addEventListener('click', function (e) {
       /* Sesle söylenen iş şikâyet olarak düşer — usta aynı cümleyi
          servis kaydında tekrar yazmasın. */
       sikayet: (rSesNotu && rSesNotu.is) || '',
-      acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
     };
     KAYITLAR.push(yeni);
@@ -4442,14 +4544,27 @@ function tsCiz() {
 
   document.getElementById('tsTeslim').disabled = !tsSecili;
 
-  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın. */
-  document.getElementById('tsNot').innerHTML = (k.tur === 'bakim')
-    ? '<div class="notice accent">' +
+  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın.
+     Hangi tarihin kurulacağını da söylüyor: "6 ay sonra" demek yetmez,
+     km'den gelen tarih daha erken olabilir. */
+  if (k.tur === 'bakim') {
+    var hs2 = hatirlatmaHesapla(k);
+    document.getElementById('tsNot').innerHTML =
+      '<div class="notice accent">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
-        '<span class="n-body">Teslimden sonra <b>' + DUKKAN.bakimPeriyoduAy +
-          ' ay</b> sonrası için bakım hatırlatması kurulacak.</span>' +
-      '</div>'
-    : '';
+        '<span class="n-body">Teslimden sonra <b>' + gunAyYil(hs2.tarih) +
+          '</b> için bakım hatırlatması kurulacak' +
+          (hs2.hangisi === 'km'
+            ? ' — bu araç günde ortalama ' +
+              Math.round(gunlukKm(k.plaka)).toLocaleString('tr-TR') +
+              ' km gidiyor, <b>' + DUKKAN.bakimPeriyoduKm.toLocaleString('tr-TR') +
+              ' km</b> aydan önce doluyor.'
+            : ' (' + DUKKAN.bakimPeriyoduAy + ' ay).') +
+        '</span>' +
+      '</div>';
+  } else {
+    document.getElementById('tsNot').innerHTML = '';
+  }
 }
 
 Ekran.tanim('teslim', {
@@ -4466,16 +4581,17 @@ document.addEventListener('click', function (e) {
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
     var a = aracBul(k.plaka);
-    k.teslimTarihi = '03.09.2026';        /* TEK DURUM ALANI — K-004 */
+    k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */
     k.odemeYolu = tsSecili;
 
-    /* Bakımsa hatırlatma KURULUR (K-002). Ay üzerinden — km takip
-       edilemiyor, edilen tek şey zaman. */
+    /* Bakımsa hatırlatma KURULUR — AY **VEYA** KM, hangisi önce
+       gelirse (K-002, 04.09 güncellemesi).
+       ⚠️ Burada kendi hesabımı yapıyordum: yalnız ay sayıyordu ve araç
+       ekranı ay+km gösteriyordu. Aynı soruya iki ekran iki ayrı cevap
+       veriyordu. Hesap artık TEK YERDE: hatirlatmaHesapla(). */
     if (k.tur === 'bakim') {
-      var d = new Date(BUGUN.getTime());
-      d.setMonth(d.getMonth() + DUKKAN.bakimPeriyoduAy);
-      k.hatirlatmaTarihi = ('0' + d.getDate()).slice(-2) + '.' +
-                           ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+      var hs = hatirlatmaHesapla(k);
+      k.hatirlatmaTarihi = gunAyYil(hs.tarih);
       k.hatirlatmaGonderildi = false;
     }
 
@@ -4519,6 +4635,25 @@ Ekran.tanim('arac', {
         ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '">' +
             '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' + a.sahipTel + '</a>'
         : '<p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>');
+
+    /* ---- EYLEMLER ----
+       İçerideyse "kaydı aç" değil, AÇIK KAYDA GİT: aynı araca ikinci
+       kayıt açmak, ustanın iki yerde iş yapması demek. */
+    var acikKayit = icerideki().filter(function (k) { return k.plaka === a.plaka; })[0];
+    document.getElementById('arEylem').innerHTML =
+      (acikKayit
+        ? '<button class="btn btn-primary btn-lg" data-kayit="' + acikKayit.id + '">' +
+            '<svg class="ico"><use href="#i-clipboard-list"></use></svg>' +
+            ' Açık servis kaydına git</button>'
+        : '<button class="btn btn-primary btn-lg" id="arYeniKayit">' +
+            '<svg class="ico"><use href="#i-plus"></use></svg>' +
+            ' Servis kaydı aç</button>') +
+      '<div class="btn-row" style="margin-top:10px">' +
+        '<button class="btn btn-ghost" id="arMesaj"' + (a.sahipTel ? '' : ' disabled') + '>' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg> Mesaj gönder</button>' +
+        '<button class="btn btn-ghost" id="arSesle">' +
+          '<svg class="ico"><use href="#i-mic"></use></svg> Sesle işlem</button>' +
+      '</div>';
 
     /* ---- RUHSAT BİLGİLERİ ----
        ⚠️ TC kimlik no ve adres ruhsatta VAR ama BURADA YOK
@@ -4583,14 +4718,62 @@ Ekran.tanim('arac', {
     }
 
     var kayitlar = aracKayitlari(a.plaka);
+    /* tel:false — sahibin telefonu ekranın TEPESİNDE zaten var; her
+       geçmiş satırında tekrar etmesi aynı numarayı DÖRT KEZ
+       gösteriyordu (04.09). */
     document.getElementById('arGecmis').innerHTML = kayitlar.length
       ? kayitlar.slice().reverse().map(function (k) {
-          return kayitSatiriHtml(k, { plaka: false });
+          return kayitSatiriHtml(k, { plaka: false, tel: false });
         }).join('')
       : bosDurumHtml('i-clipboard-list', 'Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
 
     document.getElementById('arNot').textContent = a.not || 'Not yok.';
   }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t || Ekran.adi() !== 'arac') return;
+  var a = aracBul(ACIK_PLAKA);
+  if (!a) return;
+
+  /* KAYITLI ARACA RUHSATSIZ SERVİS KAYDI: araç zaten kayıtlı, tek
+     eksik "ne için geldi". Tür seçilir seçilmez kayıt açılıyor. */
+  if (t.id === 'arYeniKayit') {
+    document.getElementById('arEylem').innerHTML =
+      '<div class="card">' +
+        '<div class="section-label">' +
+          '<svg class="ico ico-sm"><use href="#i-wrench"></use></svg> Ne için geldi?' +
+        '</div>' +
+        '<div class="cip-grup">' +
+          '<button class="cip" data-yenitur="tamirat">Tamirat</button>' +
+          '<button class="cip" data-yenitur="bakim">Bakım</button>' +
+        '</div>' +
+        '<p class="plate-hint">Ruhsat çekmene gerek yok — bu araç kayıtlı.</p>' +
+      '</div>';
+    return;
+  }
+
+  var yt = t.getAttribute('data-yenitur');
+  if (yt) {
+    var yeni = {
+      id: KAYITLAR.length + 1, plaka: a.plaka, tur: yt, km: '',
+      sikayet: '', acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    balon(a.plaka + ' için ' + TUR_AD[yt].toLowerCase() + ' kaydı açıldı.', false, 2800);
+    Ekran.ac('kayit');
+    return;
+  }
+
+  if (t.id === 'arMesaj') {
+    MESAJ_HEDEF = { plaka: a.plaka, sablon: 'ozet' };
+    Ekran.ac('mesaj');
+    return;
+  }
+  if (t.id === 'arSesle') { sesleAc('genel'); return; }
 });
 })();
 
@@ -4882,7 +5065,7 @@ document.addEventListener('click', function (e) {
   if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
   if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }
 
-  if (t.id === 'msjMik') {
+  if (t.id === 'msjMik' || t.id === 'msjSecimMik') {
     sesleAc('mesaj'); return;
   }
 
@@ -4959,6 +5142,14 @@ Ekran.tanim('musteriler', {
                     '" aria-label="' + a.plaka + ' aracini ac">' +
                     plakaHtml(a.plaka) + '</button>';
                 }).join('') +
+                /* 04.09: müşteriyi buluyordun ama BURADAN mesaj
+                   gönderemiyordun — mesaj ekranına gidip aynı
+                   müşteriyi ikinci kez aramak gerekiyordu. */
+                (m.tel
+                  ? '<button class="cip" data-mesajla="' + m.araclar[0].plaka + '">' +
+                      '<svg class="ico ico-sm"><use href="#i-message-square"></use></svg>' +
+                      ' Mesaj</button>'
+                  : '') +
               '</div>' +
             '</div>' +
           '</div>';
@@ -4973,6 +5164,13 @@ Ekran.tanim('musteriler', {
 document.addEventListener('click', function (e) {
   if (e.target.closest('#msQTemiz')) {
     document.getElementById('msQ').value = ''; Ekran.tazele();
+    return;
+  }
+  var mp = e.target.closest('[data-mesajla]');
+  if (mp) {
+    e.stopPropagation();
+    MESAJ_HEDEF = { plaka: mp.getAttribute('data-mesajla'), sablon: 'ozet' };
+    Ekran.ac('mesaj');
   }
 });
 document.addEventListener('input', function (e) {
@@ -4989,7 +5187,7 @@ Ekran.tanim('muhasebe', {
     var bugun = bugunTahsilat();
     document.getElementById('muhBugun').innerHTML =
       '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
-        KAYITLAR.filter(function (k) { return k.teslimTarihi === '03.09.2026'; }).length +
+        KAYITLAR.filter(function (k) { return k.teslimTarihi === bugunMetin(); }).length +
         ' araç</span></div>' +
       '<div class="tutar-sat genel"><span>Tahsil edilen</span>' +
         '<span class="tv">' + tutar(bugun) + ' ₺</span></div>';
@@ -5042,6 +5240,9 @@ Ekran.tanim('muhasebe', {
        ekran bunu saklamıyor (K-014). */
     document.getElementById('muhGiderler').innerHTML = GIDERLER.length
       ? GIDERLER.slice().reverse().map(function (g) {
+          /* SİLİNEBİLİR OLMALI: gider sesle giriliyor ve ses yanlış
+             duyabilir. Geri alınamayan bir giriş, ustayı sesle
+             girmekten caydırır (04.09). */
           return '<div class="tl-item">' +
             '<span class="tl-ic"><svg class="ico ico-sm">' +
               '<use href="#i-receipt"></use></svg></span>' +
@@ -5052,6 +5253,9 @@ Ekran.tanim('muhasebe', {
                 '<span class="tl-date">' + tutar(g.tutar) + ' ₺</span>' +
               '</div>' +
             '</div>' +
+            '<button class="k-sil" data-gider-sil="' + g.id + '"' +
+              ' aria-label="' + g.aciklama + ' giderini kaldır">' +
+              '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>' +
           '</div>';
         }).join('') +
         '<div class="tutar-serit">' +
@@ -5075,8 +5279,17 @@ Ekran.tanim('muhasebe', {
 });
 
 document.addEventListener('click', function (e) {
-  if (e.target.closest('#muhSesleGider')) {
-    sesleAc('muhasebe');
+  if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
+
+  var gs = e.target.closest('[data-gider-sil]');
+  if (gs) {
+    var id = parseInt(gs.getAttribute('data-gider-sil'), 10);
+    var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
+    if (i >= 0) {
+      var silinen = GIDERLER.splice(i, 1)[0];
+      balon(silinen.aciklama + ' kaldırıldı.', false, 2400);
+      Ekran.tazele();
+    }
   }
 });
 })();
@@ -5149,7 +5362,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>409524d4</b><br>' +
+      'Sürüm <b>09c827a9</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

@@ -511,6 +511,33 @@ function stilMetni() {
     });
   }
 
+  /* 27) OLU UC — ekran aciliyor ama oradan HICBIR SEY yapilamiyor
+     (04.09.2026). Arac ekrani tam boyleydi: araci goruyordun, servis
+     kaydi acmak icin ana ekrana donup ruhsati YENIDEN cekmen
+     gerekiyordu. Ekran "calisiyor" gorunuyordu cunku ciziliyordu;
+     calismadigi ancak kullanmaya calisinca anlasiliyordu.
+
+     Geri dugmesi eylem SAYILMAZ: her ekranda var ve hicbir isi
+     ilerletmiyor. Sayilan sey, ekranin KENDI icindeki eylemler. */
+  {
+    /* Ekranlarin cogu bir kayit/arac secili degilken bos ciziliyor —
+       once onlari doldur, yoksa test sahte bulgu verir. */
+    try {
+      if (typeof KAYITLAR !== 'undefined' && KAYITLAR.length) {
+        window.ACIK_KAYIT = KAYITLAR[0].id;
+        window.ACIK_PLAKA = KAYITLAR[0].plaka;
+      }
+    } catch (e) {}
+    ekranlar.forEach(function (a) {
+      showScreen(a);
+      var s = document.getElementById('screen-' + a);
+      if (!s) return;
+      var eylem = s.querySelectorAll('button, a[href], input, textarea, [data-git], [role="button"]');
+      if (!eylem.length) ek('OLU-UC', a, 'ekranda hicbir eylem yok');
+    });
+    showScreen('home');
+  }
+
   showScreen('home');
   console.log('SAGLIK DENETIMI — '+ekranlar.length+' ekran, '+b.length+' bulgu');
   b.forEach(function(x){
