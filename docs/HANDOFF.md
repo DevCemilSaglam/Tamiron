@@ -16,8 +16,9 @@ turda üretilen tek çalışan şey tıklanabilir prototip.
 | Ana yol | **7 adım · 6 ekran** — hepsi prototipte çalışıyor |
 | Dokunuş | tam yol **13**, kısa yol **9** (ölçüldü, `IS-AKISI.md` §senaryo) |
 | İstisna kolları | **5 kol · 0 yeni ekran · 0 yeni adım** — hepsi işletildi |
-| Sağlık denetimi | 25 test · **0 bulgu** · 375 px'te ölçüldü |
-| Kararlar | K-001 … K-008 |
+| Sağlık denetimi | 26 test · **0 bulgu** · 375 px'te ölçüldü |
+| Kabuk | header (menü · logo · ara · geri · ileri) + çekmece + tema (3 hâl) |
+| Kararlar | K-001 … K-010 |
 | Paket | `app/` üretiliyor (9 dosya, çevrimdışı, düz yapı) |
 
 ---
@@ -48,9 +49,10 @@ prototypes/kaynak/**        <- ELLE BURASI DÜZENLENİR
 prototypes/omurga.html      <- ÜRETİLMİŞTİR, elle düzenlenmez
 ```
 
-**Derleme dört şeyi denetler** ve bulursa `exit 1` verir:
+**Derleme beş şeyi denetler** ve bulursa `exit 1` verir:
 ekran dosyaları arası **sınıf çakışması** · ölü `data-git` hedefi ·
-`id` ile dosya adı uyuşmazlığı · **ölü ikon referansı**.
+`id` ile dosya adı uyuşmazlığı · **ölü ikon referansı** ·
+**tanımsız token** (`var(--x)` ama `--x` yok).
 
 Her ekran betiği derlemede **kendi IIFE'sine sarılır** — v1'in sekiz
 `var` sızıntısı hatası bu yüzden yapısal olarak imkânsız.
@@ -81,9 +83,18 @@ belgede *"ekran açmıyor"* diye geçtiği için doğru sayılmıştı; işletil
 ikisi çalışmıyordu (Kol B'de çoklu seçim yoktu, Kol D fiyatı siliyordu).
 
 **Delikli denetim, denetimsiz olmaktan kötüdür** — yanlış güven verir.
-Bu turda üç denetim deliği kapandı: sınıf çakışması regex'inde eksik `m`
-bayrağı, ölü ikon referansının hiç test edilmemesi, `pwa-build`'in
-kabuğun sınıf adlarına sessizce bağımlı olması.
+Bu turda **altı** denetim deliği kapandı: sınıf çakışması regex'inde
+eksik `m` bayrağı · ölü ikon referansının hiç test edilmemesi ·
+`pwa-build`'in kabuğun sınıf adlarına sessizce bağımlı olması ·
+tanımsız token (`--nav-hover`, `--nav-on-bg`, `--info`, `--info-bg`
+kullanılıyordu ama yoktu; seçili çip ve İŞÇİLİK rozeti **zeminsiz**
+çiziliyordu) · çekmece odak testinin v1 adlarını arayıp **sessizce
+atlanması** · kaydın olmayan bir araca bağlanabilmesi (26. test).
+
+**Bir kabı kaldırırken içindekiler de kalkmaz.** *"Çekmece yok"* kararı
+alınırken tema anahtarının nereye gideceği sorulmamıştı; çekmece
+kalkınca tema kökte sabit bir değere düştü ve kullanıcının telefon
+tercihini sessizce ezdi (K-009, K-010).
 
 ---
 

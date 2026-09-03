@@ -10,6 +10,51 @@
 
 ---
 
+## K-010 · Tema üç hâllidir; "sistem" gerçek bir seçenektir (03.09.2026)
+
+**Karar:** Tema üç hâl arasında döner: **sistem · açık · koyu.** Seçim
+yapılmamışken kökte `data-theme` **bulunmaz** ve `prefers-color-scheme`
+devreye girer. Seçim `localStorage`'da tutulur; erişilemediği yerde
+(gizli sekme, `data:` URL) tema yine çalışır.
+
+**Neden:** Kökte sabit `data-theme="light"` yazılıydı. Telefonunu akşam
+koyuya alan usta, uygulamanın da geçmesini bekler; sabit değer onun
+tercihini **sessizce eziyordu.** İki hâlli bir anahtar bu tercihi
+ifade edemez — "sistem"i atmak, kullanıcının kararını atmaktır.
+
+**Düğme şu anki hâli söyler**, bir sonrakini değil: v1'de *"Koyu tema"*
+yazan düğme koyu temadayken de aynı şeyi yazıyordu ve hangi hâlde
+olunduğu okunamıyordu.
+
+---
+
+## K-009 · Çekmece geri geldi (03.09.2026)
+
+**Karar:** `TASARIM-SISTEMI.md` v2.0'daki *"çekmece yok"* kararı geri
+alındı. Header v1'in düzenine döndü: menü (rozetli) · logo · ara ·
+geri · ileri.
+
+**Cemil:** *"Header aynı şekilde tutmamız gerekiyordu. Tema konusu da
+devam edecek."*
+
+**Kararın hatası:** çekmeceyi kaldırırken **içindekilerin nereye
+gideceği** sorulmamıştı. Tema anahtarının evi çekmeceydi. Bir kabı
+kaldırırken içindekiler de kalkmaz — kalkarsa sessizce kaybolurlar,
+ki tam bu oldu.
+
+**T-18 (*"iç içe menü yok"*) nasıl korunuyor:** ana yolun **hiçbir
+adımı çekmeceden geçmiyor.** Ölçüldü — çekmece hiç açılmadan tam yol
+yine 13 dokunuş. Çekmece bir **kestirme**, bir yol değil.
+
+**Çekmecenin içi v2'nin:** v1'in on yedi maddesinden üçü kaldı (araç
+girişi, içerideki araçlar, plaka ara) + bakım periyodu + tema.
+Bildirimler uydurma değil, vadesi gelmiş bakım hatırlatmaları.
+
+**Cemil onayına açık:** rozet yalnız bakım hatırlatmalarını sayıyor.
+İleride başka bildirim türü girerse rozet ne sayacak?
+
+---
+
 ## K-008 · Tasarım sistemi bağlayıcı bir sınıf sözlüğüdür (03.09.2026)
 
 **Karar:** Bir ekran, `TASARIM-SISTEMI.md`'nin sonundaki sınıf sözlüğünde

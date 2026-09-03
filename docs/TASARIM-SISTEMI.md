@@ -320,15 +320,37 @@ Bu belge v1'den **devralındı ve budandı.** Zanaat bilgisi (plaka bileşeni, t
 | Renk seçici · araç rengi kutucuğu | Renk saklanmıyor |
 | Bildirim listesi (çekmece içinde) | **Çekmece yok** — aşağıya bak |
 
-## ⚠️ Çekmece (drawer) kalktı
+## ~~Çekmece (drawer) kalktı~~ → **GERİ GELDİ (03.09, K-009)**
 
-v1'in kabuğunda sağdan açılan bir çekmece vardı: bildirimler, bölümler, kullanıcı, ayarlar. **v2'de yok.**
+Bu bölüm *"çekmece v2'de yok"* diyordu. Cemil geri aldı: *"Header aynı
+şekilde tutmamız gerekiyordu. Tema konusu da devam edecek."*
 
-**Gerekçe:** Altı ekran var (`EKRANLAR.md`) ve hepsine ana ekrandan ya da akışın kendisinden ulaşılıyor. Çekmece, **on üç maddeyi bir yere sığdırmak** için vardı. T-18 zaten *"iç içe menü yok"* diyor — çekmece tanım gereği iç içe bir menüdür.
+**Kararın hatası neredeydi:** çekmeceyi kaldırırken içindekilerin nereye
+gideceği sorulmamıştı. **Tema anahtarının evi çekmeceydi** — çekmece
+kalkınca temanın gideceği yer kalmadı ve kökte sabit
+`data-theme="light"` kalakaldı; kullanıcının telefon tercihi sessizce
+eziliyordu. Bir kabı kaldırırken içindekiler de kalkmaz.
 
-**Ayarlar** ana ekrandan tek düğmeyle açılır. **Bildirim** yok: teslim edilmemiş kayıtlar zaten ana ekranın kendisi.
+**Şimdiki hâli:** çekmece v1'in bileşenleriyle, **içeriği v2'nin**.
+v1'de on yedi menü maddesi vardı ve çoğu v2'de olmayan ekranlara
+gidiyordu; kalan üçü yedi işe hizmet ediyor.
 
-> Kabuk sadeleşiyor: **sabit header (logo + geri) + ekran gövdesi.** Footer ve çekmece yok.
+| Bölüm | İçinde ne var |
+|---|---|
+| Bildirimler | Vadesi gelmiş **bakım hatırlatmaları** (yedinci iş). Uydurma bildirim yok; yoksa başlık da görünmez |
+| Araç ve iş | Araç girişi · İçerideki araçlar · Plaka ara — **hiçbiri yeni ekran değil** |
+| Ayarlar | Bakım periyodu (K-002) · **Tema** |
+
+**T-18 itirazı hâlâ geçerli ve karşılığı var:** çekmece iç içe bir
+menüdür, o yüzden **ana yolun hiçbir adımı çekmeceden geçmiyor.** Akış
+çekmece hiç açılmadan baştan sona işliyor (ölçüldü: 13 dokunuş,
+değişmedi). Çekmece bir kestirme, bir yol değil.
+
+**ÜZERİNDE YOK:** kullanıcı/oturum · stok · mal kabul · tahsilat ·
+muhasebe · müşteriler · yaklaşan kontroller. v1'de bunların hepsi
+vardı ve tamircinin *"karmaşık"* dediği yığındı.
+
+> Kabuk: **header (menü · logo · ara · geri · ileri) + ekran gövdesi + çekmece.** Footer yok.
 
 ## Yazı ölçeği artık token — ve taban büyüdü
 
@@ -403,6 +425,12 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Boş durum | `.bos-durum` (yalnız `bosDurumHtml()` üretir) |
 | İpucu satırı | `.plate-hint` |
 | Balon | tek `#toast`, `.show` ile görünür (yalnız `balon()` yönetir) |
+| Çekmece | `.drawer-overlay` + `.drawer` > `.drawer-head` `.drawer-title` + `.drawer-body` |
+| Çekmece satırı | `.drawer-item` > `.di-ic` · başlık: `.drawer-sec-label` · ayraç: `.divider` |
+| Ayar satırı | `.setting-row` > `.sr-txt` > `.sr-label` + `.sr-sub` |
+| Tema düğmesi | `.theme-toggle` (yalnız `Tema` modülü yönetir) |
+| Bildirim | `.notif-list` > `.notif-item` > `.ni-ic` + `.ni-body` > `.ni-title` + `.ni-sub` |
+| Rozet (sayaç) | `.icon-btn` içinde `.badge` — boşken kendiliğinden gizlenir |
 
 Denetimin **TANIMSIZ-SINIF** ve **OLU-SINIF** testleri bu sözlüğün bekçisidir:
 biri sözlükte olmayan sınıfı, öteki sözlükte kalıp kullanılmayanı yakalar.
