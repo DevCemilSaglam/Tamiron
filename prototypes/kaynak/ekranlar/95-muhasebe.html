@@ -68,7 +68,7 @@ Ekran.tanim('muhasebe', {
     var bugun = bugunTahsilat();
     document.getElementById('muhBugun').innerHTML =
       '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
-        KAYITLAR.filter(function (k) { return k.teslimTarihi === '03.09.2026'; }).length +
+        KAYITLAR.filter(function (k) { return k.teslimTarihi === bugunMetin(); }).length +
         ' araç</span></div>' +
       '<div class="tutar-sat genel"><span>Tahsil edilen</span>' +
         '<span class="tv">' + tutar(bugun) + ' ₺</span></div>';
@@ -121,6 +121,9 @@ Ekran.tanim('muhasebe', {
        ekran bunu saklamıyor (K-014). */
     document.getElementById('muhGiderler').innerHTML = GIDERLER.length
       ? GIDERLER.slice().reverse().map(function (g) {
+          /* SİLİNEBİLİR OLMALI: gider sesle giriliyor ve ses yanlış
+             duyabilir. Geri alınamayan bir giriş, ustayı sesle
+             girmekten caydırır (04.09). */
           return '<div class="tl-item">' +
             '<span class="tl-ic"><svg class="ico ico-sm">' +
               '<use href="#i-receipt"></use></svg></span>' +
@@ -131,6 +134,9 @@ Ekran.tanim('muhasebe', {
                 '<span class="tl-date">' + tutar(g.tutar) + ' ₺</span>' +
               '</div>' +
             '</div>' +
+            '<button class="k-sil" data-gider-sil="' + g.id + '"' +
+              ' aria-label="' + g.aciklama + ' giderini kaldır">' +
+              '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>' +
           '</div>';
         }).join('') +
         '<div class="tutar-serit">' +
@@ -154,8 +160,17 @@ Ekran.tanim('muhasebe', {
 });
 
 document.addEventListener('click', function (e) {
-  if (e.target.closest('#muhSesleGider')) {
-    sesleAc('muhasebe');
+  if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
+
+  var gs = e.target.closest('[data-gider-sil]');
+  if (gs) {
+    var id = parseInt(gs.getAttribute('data-gider-sil'), 10);
+    var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
+    if (i >= 0) {
+      var silinen = GIDERLER.splice(i, 1)[0];
+      balon(silinen.aciklama + ' kaldırıldı.', false, 2400);
+      Ekran.tazele();
+    }
   }
 });
 </script>

@@ -102,6 +102,32 @@ var KAYITLAR = [
       { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
     ] },
 
+  /* MUHASEBE EKRANI BOŞ GÖRÜNMESİN (04.09). Tohum veride bugün teslim
+     edilmiş kayıt ve veresiye YOKTU; muhasebe ve ana menü "Bugün 0 ₺ ·
+     0 ₺ veresiye" diyordu. Ekran doğru çalışıyordu ama gösterecek
+     şey yoktu — çalıştığı görülemeyen bir ekran, çalışmıyor sayılır. */
+  { id: 7, plaka: '35 KLM 45', tur: 'tamirat', km: '',
+    sikayet: 'Ön cam silecek motoru',
+    acilis: '03.09.2026', teslimTarihi: '03.09.2026',
+    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
+        marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Söküm takım', fiyat: 700, alis: 0, kimGetirdi: '' }
+    ] },
+
+  /* VERESİYE — "almadım" bir ödeme yoludur (K-004). Muhasebedeki
+     "kimden alacağım" listesi bu kayıttan besleniyor. */
+  { id: 8, plaka: '06 TMR 07', tur: 'tamirat', km: '',
+    sikayet: 'Akü değişimi',
+    acilis: '28.08.2026', teslimTarihi: '28.08.2026',
+    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    satirlar: [
+      { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
+        marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
+      { tip: 'iscilik', ad: 'Takma', fiyat: 250, alis: 0, kimGetirdi: '' }
+    ] },
+
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
      Menü rozeti ve çekmecedeki bildirim bu kayıttan besleniyor. */
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
@@ -274,6 +300,10 @@ function gunAyYil(d) {
   return ('0' + d.getDate()).slice(-2) + '.' +
          ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
 }
+/* BUGÜNÜN METNİ TEK YERDE. '03.09.2026' on üç yerde elle yazılıydı;
+   prototipin günü değişince on üç yerin on ikisi eski günde kalırdı
+   ve hangisinin unutulduğu ancak rakam tutmayınca anlaşılırdı. */
+function bugunMetin() { return gunAyYil(BUGUN); }
 
 /* Tarihi gelmiş ve gönderilmemiş hatırlatmalar — ana ekran, çekmece
    rozeti ve araç ekranı AYNI kaynaktan besleniyor. */

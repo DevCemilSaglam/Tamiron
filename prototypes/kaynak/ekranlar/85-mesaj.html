@@ -30,8 +30,16 @@
   </div>
 
   <div id="msjSecim">
-    <div class="section-label">
-      <svg class="ico ico-sm"><use href="#i-users"></use></svg> Kime?
+    <div class="section-label with-action">
+      <span class="lbl-txt">
+        <svg class="ico ico-sm"><use href="#i-users"></use></svg> Kime?
+      </span>
+      <!-- 04.09: seçim ekranında mikrofon yoktu — "34 ABC 123
+           sahibine mesaj gönder" diyebilmek için önce menüye dönmek
+           gerekiyordu. -->
+      <button class="mic-round" id="msjSecimMik" aria-label="Kime göndereceğini sesle söyle" title="Sesle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
     </div>
     <div class="search-box" id="msjArama">
       <svg class="ico"><use href="#i-search"></use></svg>
@@ -216,7 +224,7 @@ document.addEventListener('click', function (e) {
   if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
   if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }
 
-  if (t.id === 'msjMik') {
+  if (t.id === 'msjMik' || t.id === 'msjSecimMik') {
     sesleAc('mesaj'); return;
   }
 

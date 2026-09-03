@@ -29,8 +29,13 @@
 
   <nav class="menu-list" aria-label="Ana menü">
 
+    <!-- ⚠️ data-git="ses" DEĞİL, data-sesle="genel".
+         data-git ile açılınca SESLI_NIYET değişmiyor ve ekran BİR
+         ÖNCEKİ bağlamda kalıyordu: muhasebeden çıkıp menüden "Sesli
+         işlem"e basınca başlık "Sesli işlem · Muhasebe" diyor ve
+         gider örnekleri gösteriyordu (04.09'da bulundu). -->
     <div class="menu-row">
-      <button class="main" data-git="ses">
+      <button class="main" data-sesle="genel">
         <span class="ic-badge"><svg class="ico"><use href="#i-mic"></use></svg></span>
         <span class="txt"><span class="lbl">Sesli işlem</span>
           <span class="sub">Söyle, gerisini o bulsun</span></span>

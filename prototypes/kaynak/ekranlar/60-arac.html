@@ -28,6 +28,15 @@
     <div id="arIletisim"></div>
   </div>
 
+  <!-- ⚠️ 04.09 — BU EKRAN ÖLÜ UÇTU. Araç açılıyordu ama buradan
+       hiçbir şey yapılamıyordu: aracı görüp servis kaydı açmak için
+       ana ekrana dönüp ruhsat çekmek gerekiyordu. Oysa araç ZATEN
+       kayıtlı; ruhsatı ikinci kez çekmek anlamsız iş.
+
+       KAYITLI ARACA RUHSATSIZ KAYIT: aracın bilgileri elimizde, tek
+       eksik "ne için geldi". O yüzden tür seçimi burada. -->
+  <div id="arEylem"></div>
+
   <div id="arBakim"></div>
 
   <div class="card">
@@ -86,6 +95,25 @@ Ekran.tanim('arac', {
         ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '">' +
             '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' + a.sahipTel + '</a>'
         : '<p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>');
+
+    /* ---- EYLEMLER ----
+       İçerideyse "kaydı aç" değil, AÇIK KAYDA GİT: aynı araca ikinci
+       kayıt açmak, ustanın iki yerde iş yapması demek. */
+    var acikKayit = icerideki().filter(function (k) { return k.plaka === a.plaka; })[0];
+    document.getElementById('arEylem').innerHTML =
+      (acikKayit
+        ? '<button class="btn btn-primary btn-lg" data-kayit="' + acikKayit.id + '">' +
+            '<svg class="ico"><use href="#i-clipboard-list"></use></svg>' +
+            ' Açık servis kaydına git</button>'
+        : '<button class="btn btn-primary btn-lg" id="arYeniKayit">' +
+            '<svg class="ico"><use href="#i-plus"></use></svg>' +
+            ' Servis kaydı aç</button>') +
+      '<div class="btn-row" style="margin-top:10px">' +
+        '<button class="btn btn-ghost" id="arMesaj"' + (a.sahipTel ? '' : ' disabled') + '>' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg> Mesaj gönder</button>' +
+        '<button class="btn btn-ghost" id="arSesle">' +
+          '<svg class="ico"><use href="#i-mic"></use></svg> Sesle işlem</button>' +
+      '</div>';
 
     /* ---- RUHSAT BİLGİLERİ ----
        ⚠️ TC kimlik no ve adres ruhsatta VAR ama BURADA YOK
@@ -150,13 +178,61 @@ Ekran.tanim('arac', {
     }
 
     var kayitlar = aracKayitlari(a.plaka);
+    /* tel:false — sahibin telefonu ekranın TEPESİNDE zaten var; her
+       geçmiş satırında tekrar etmesi aynı numarayı DÖRT KEZ
+       gösteriyordu (04.09). */
     document.getElementById('arGecmis').innerHTML = kayitlar.length
       ? kayitlar.slice().reverse().map(function (k) {
-          return kayitSatiriHtml(k, { plaka: false });
+          return kayitSatiriHtml(k, { plaka: false, tel: false });
         }).join('')
       : bosDurumHtml('i-clipboard-list', 'Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
 
     document.getElementById('arNot').textContent = a.not || 'Not yok.';
   }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t || Ekran.adi() !== 'arac') return;
+  var a = aracBul(ACIK_PLAKA);
+  if (!a) return;
+
+  /* KAYITLI ARACA RUHSATSIZ SERVİS KAYDI: araç zaten kayıtlı, tek
+     eksik "ne için geldi". Tür seçilir seçilmez kayıt açılıyor. */
+  if (t.id === 'arYeniKayit') {
+    document.getElementById('arEylem').innerHTML =
+      '<div class="card">' +
+        '<div class="section-label">' +
+          '<svg class="ico ico-sm"><use href="#i-wrench"></use></svg> Ne için geldi?' +
+        '</div>' +
+        '<div class="cip-grup">' +
+          '<button class="cip" data-yenitur="tamirat">Tamirat</button>' +
+          '<button class="cip" data-yenitur="bakim">Bakım</button>' +
+        '</div>' +
+        '<p class="plate-hint">Ruhsat çekmene gerek yok — bu araç kayıtlı.</p>' +
+      '</div>';
+    return;
+  }
+
+  var yt = t.getAttribute('data-yenitur');
+  if (yt) {
+    var yeni = {
+      id: KAYITLAR.length + 1, plaka: a.plaka, tur: yt, km: '',
+      sikayet: '', acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
+    };
+    KAYITLAR.push(yeni);
+    ACIK_KAYIT = yeni.id;
+    balon(a.plaka + ' için ' + TUR_AD[yt].toLowerCase() + ' kaydı açıldı.', false, 2800);
+    Ekran.ac('kayit');
+    return;
+  }
+
+  if (t.id === 'arMesaj') {
+    MESAJ_HEDEF = { plaka: a.plaka, sablon: 'ozet' };
+    Ekran.ac('mesaj');
+    return;
+  }
+  if (t.id === 'arSesle') { sesleAc('genel'); return; }
 });
 </script>

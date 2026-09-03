@@ -90,6 +90,14 @@ Ekran.tanim('musteriler', {
                     '" aria-label="' + a.plaka + ' aracini ac">' +
                     plakaHtml(a.plaka) + '</button>';
                 }).join('') +
+                /* 04.09: müşteriyi buluyordun ama BURADAN mesaj
+                   gönderemiyordun — mesaj ekranına gidip aynı
+                   müşteriyi ikinci kez aramak gerekiyordu. */
+                (m.tel
+                  ? '<button class="cip" data-mesajla="' + m.araclar[0].plaka + '">' +
+                      '<svg class="ico ico-sm"><use href="#i-message-square"></use></svg>' +
+                      ' Mesaj</button>'
+                  : '') +
               '</div>' +
             '</div>' +
           '</div>';
@@ -104,6 +112,13 @@ Ekran.tanim('musteriler', {
 document.addEventListener('click', function (e) {
   if (e.target.closest('#msQTemiz')) {
     document.getElementById('msQ').value = ''; Ekran.tazele();
+    return;
+  }
+  var mp = e.target.closest('[data-mesajla]');
+  if (mp) {
+    e.stopPropagation();
+    MESAJ_HEDEF = { plaka: mp.getAttribute('data-mesajla'), sablon: 'ozet' };
+    Ekran.ac('mesaj');
   }
 });
 document.addEventListener('input', function (e) {

@@ -85,14 +85,27 @@ function tsCiz() {
 
   document.getElementById('tsTeslim').disabled = !tsSecili;
 
-  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın. */
-  document.getElementById('tsNot').innerHTML = (k.tur === 'bakim')
-    ? '<div class="notice accent">' +
+  /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın.
+     Hangi tarihin kurulacağını da söylüyor: "6 ay sonra" demek yetmez,
+     km'den gelen tarih daha erken olabilir. */
+  if (k.tur === 'bakim') {
+    var hs2 = hatirlatmaHesapla(k);
+    document.getElementById('tsNot').innerHTML =
+      '<div class="notice accent">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
-        '<span class="n-body">Teslimden sonra <b>' + DUKKAN.bakimPeriyoduAy +
-          ' ay</b> sonrası için bakım hatırlatması kurulacak.</span>' +
-      '</div>'
-    : '';
+        '<span class="n-body">Teslimden sonra <b>' + gunAyYil(hs2.tarih) +
+          '</b> için bakım hatırlatması kurulacak' +
+          (hs2.hangisi === 'km'
+            ? ' — bu araç günde ortalama ' +
+              Math.round(gunlukKm(k.plaka)).toLocaleString('tr-TR') +
+              ' km gidiyor, <b>' + DUKKAN.bakimPeriyoduKm.toLocaleString('tr-TR') +
+              ' km</b> aydan önce doluyor.'
+            : ' (' + DUKKAN.bakimPeriyoduAy + ' ay).') +
+        '</span>' +
+      '</div>';
+  } else {
+    document.getElementById('tsNot').innerHTML = '';
+  }
 }
 
 Ekran.tanim('teslim', {
@@ -109,16 +122,17 @@ document.addEventListener('click', function (e) {
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
     var a = aracBul(k.plaka);
-    k.teslimTarihi = '03.09.2026';        /* TEK DURUM ALANI — K-004 */
+    k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */
     k.odemeYolu = tsSecili;
 
-    /* Bakımsa hatırlatma KURULUR (K-002). Ay üzerinden — km takip
-       edilemiyor, edilen tek şey zaman. */
+    /* Bakımsa hatırlatma KURULUR — AY **VEYA** KM, hangisi önce
+       gelirse (K-002, 04.09 güncellemesi).
+       ⚠️ Burada kendi hesabımı yapıyordum: yalnız ay sayıyordu ve araç
+       ekranı ay+km gösteriyordu. Aynı soruya iki ekran iki ayrı cevap
+       veriyordu. Hesap artık TEK YERDE: hatirlatmaHesapla(). */
     if (k.tur === 'bakim') {
-      var d = new Date(BUGUN.getTime());
-      d.setMonth(d.getMonth() + DUKKAN.bakimPeriyoduAy);
-      k.hatirlatmaTarihi = ('0' + d.getDate()).slice(-2) + '.' +
-                           ('0' + (d.getMonth() + 1)).slice(-2) + '.' + d.getFullYear();
+      var hs = hatirlatmaHesapla(k);
+      k.hatirlatmaTarihi = gunAyYil(hs.tarih);
       k.hatirlatmaGonderildi = false;
     }
 

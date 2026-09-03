@@ -70,7 +70,10 @@ function kayitSatiriHtml(k, s) {
       '</div>' +
       /* Telefon LİSTEDE aranabilir: usta "kimi arayacağım" sorusunun
          cevabını satırda görüp oradan arıyor (v1'deki gibi). */
-      (a && a.sahipTel
+      /* s.tel === false: aracın KENDİ ekranında sahibin telefonu zaten
+         tepede duruyor; her geçmiş satırında tekrar etmesi aynı
+         numarayı dört kez gösteriyordu (04.09). */
+      (s.tel !== false && a && a.sahipTel
         ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '"' +
             ' data-tel="1" aria-label="' + (a.sahipAd || 'sahibini') + ' ara">' +
             '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +

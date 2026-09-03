@@ -10,15 +10,24 @@
      · .plate-hint · .cip-grup .cip · .btn. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-ruhsat">
 
+  <!-- BAŞLIK "SERVİS KAYDI EKLE" (04.09). Menüden bu adla giriliyordu
+       ama ekran "Ruhsatı çek" diyordu; usta hangi işi yaptığını
+       ekrandan okuyamıyordu. Ruhsat çekmek işin ADI değil, ilk adımı. -->
   <div class="screen-head">
     <span class="eyebrow">
-      <svg class="ico ico-sm"><use href="#i-camera"></use></svg> Ruhsatı çek
+      <svg class="ico ico-sm"><use href="#i-plus"></use></svg> Servis kaydı ekle
     </span>
   </div>
 
   <!-- Sesten gelen bilgi burada özetlenir: usta söylediğini ikinci kez
        yazmasın, ama neyin yazıldığını da görsün. -->
   <div id="ruhsatSesOzet"></div>
+
+  <!-- ⚠️ KAYITLI ARAÇ İÇİN RUHSAT ÇEKMEK GEREKMEZ (04.09).
+       Önce tek yol ruhsattı: dört aracı kayıtlı olan usta, aynı araç
+       ikinci kez geldiğinde ruhsatı yeniden çekiyordu. Aracın bilgisi
+       zaten elimizde; eksik olan yalnız "ne için geldi". -->
+  <div id="ruhsatKayitli"></div>
 
   <button class="btn btn-primary btn-lg" id="ruhsatCek">
     <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
@@ -168,6 +177,27 @@ Ekran.tanim('ruhsat', {
       rSesNotu = null;
       document.getElementById('ruhsatSesOzet').innerHTML = '';
     }
+
+    /* KAYITLI ARAÇLAR — ruhsat çekmeden kayıt açmanın yolu.
+       İçeride olan araç LİSTEDE YOK: aynı araca ikinci kayıt açmak,
+       ustanın işini ikiye bölmek olur. */
+    var secilebilir = ARACLAR.filter(function (a) {
+      return !icerideki().some(function (k) { return k.plaka === a.plaka; });
+    });
+    document.getElementById('ruhsatKayitli').innerHTML = secilebilir.length
+      ? '<div class="card">' +
+          '<div class="section-label">' +
+            '<svg class="ico ico-sm"><use href="#i-car"></use></svg> Kayıtlı araç mı geldi?' +
+          '</div>' +
+          '<div class="cip-grup">' +
+            secilebilir.map(function (a) {
+              return '<button class="cip" data-kayitli="' + a.plaka + '">' +
+                a.plaka + ' · ' + a.marka + '</button>';
+            }).join('') +
+          '</div>' +
+          '<p class="plate-hint">Dokun, ruhsat çekmeden aracın sayfasına git.</p>' +
+        '</div>'
+      : '';
   }
 });
 
@@ -184,6 +214,11 @@ var ruhsatSira = 0;
 document.addEventListener('click', function (e) {
   var t = e.target.closest('button');
   if (!t) return;
+
+  /* Kayıtlı araca dokunuldu — aracın sayfasına gidiyor; kaydı oradan
+     tür seçerek açıyor. Ruhsat hiç çekilmiyor. */
+  var kp = t.getAttribute('data-kayitli');
+  if (kp) { ACIK_PLAKA = kp; Ekran.ac('arac'); return; }
 
   if (t.id === 'ruhsatCek') {
     var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
@@ -227,7 +262,7 @@ document.addEventListener('click', function (e) {
       /* Sesle söylenen iş şikâyet olarak düşer — usta aynı cümleyi
          servis kaydında tekrar yazmasın. */
       sikayet: (rSesNotu && rSesNotu.is) || '',
-      acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
     };
     KAYITLAR.push(yeni);

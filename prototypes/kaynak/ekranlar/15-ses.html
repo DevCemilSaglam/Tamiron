@@ -302,7 +302,7 @@ function sesOzet(o) {
   if (o.tur === 'gider-ekle') return {
     baslik: 'Gider eklenecek',
     satirlar: [['Açıklama', o.aciklama], ['Tutar', tutar(o.tutar) + ' ₺'],
-               ['Tarih', '03.09.2026']],
+               ['Tarih', bugunMetin()]],
     eylem: 'Gideri ekle' };
 
   if (o.tur === 'mesaj') return {
@@ -341,7 +341,7 @@ function sesUygula(o) {
   if (o.tur === 'servis-ac') {
     var yeni = { id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
       km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
-      acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: [] };
     KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
     balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
@@ -373,7 +373,7 @@ function sesUygula(o) {
     Ekran.ac('kayit'); return;
   }
   if (o.tur === 'gider-ekle') {
-    GIDERLER.push({ id: GIDERLER.length + 1, tarih: '03.09.2026',
+    GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
       aciklama: o.aciklama, tutar: o.tutar, tur: 'fatura' });
     balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
     Ekran.ac('muhasebe'); return;
