@@ -510,3 +510,47 @@ Klavyeyle yazılanlar (parça adı, fiyat, şikâyet) dokunuş sayılmadı — s
 **6 ekran · 0 bulgu · ölçüm yapıldı** (375 px). Yükleme hatası yok.
 
 Yol boyunca altı bulgu çıktı ve hepsi düzeltildi: iki yetim ekran (denetim `Ekran.ac()` yolunu tanımıyordu), tanımsız `.mono`, arama kutusundaki 22 px'lik dokunma hedefi, *"plakayı yaz"* bağlantısının 19 px'lik hedefi, künye düğmesinin erişilebilir adının olmaması.
+
+---
+
+# İSTİSNA KOLLARI — prototipte işletildi (03.09.2026, iş 15)
+
+Beş kolun her biri prototipte tek tek çalıştırıldı. Ölçüm 375 px'te,
+sağlık denetimi kolların **en ağır hâli açıkken** koşturuldu
+(iki çip sırası + parçacı fiyatı aynı satırda): **0 bulgu**.
+
+| Kol | Nasıl işletildi | Sonuç |
+|---|---|---|
+| **A · Teşhis** | Ekran 3'te *"Ne istiyor"* alanı sayıldı | **Tek** serbest alan · ayrı "tespit" alanı yok — kol ekran açmıyor |
+| **B · Büyük iş** | Ekran 4'te iki parçacı seçildi, gönderildi, Ekran 3'e dönüldü | Çip sayısı 2 · düğme *"WhatsApp ile 2 parçacıya gönder"* · satıra `sorulan: [0,1]` yazıldı · Ekran 3'te *"Cevap kimden geldi?"* iki çip çıktı, biri seçildi |
+| **C · Ek iş** | Açık kayda satır eklendi | Satır eklendi, hiçbir durum değişmedi — zaten var olan davranış |
+| **D · Müşteri parçası** | *"sonradan"* hâli: 4.200 ₺ girilmiş satırda *"Müşteri"* seçildi | Satır fiyatı 0, toplama girmiyor · **parçacı fiyatı korundu** ve `parçacı 4.200 ₺` olarak soluk duruyor |
+| **D · baştan belli** | Aynı satırla Ekran 4 açıldı | Sorulacak parça **0** · boş durum çıkıyor — müşterinin getireceği parçanın fiyatı sorulmuyor |
+| **E · Onay isteme** | Kayıt açıkken *"Onay iste"* | Özet gönderildi balonu · `teslimTarihi` değişmedi · `durum`/`onayBekliyor` diye bir alan **yok** (K-003, K-004) |
+
+**Ekran sayısı kollardan sonra da 6.** Yeni adım eklenmedi.
+
+## Kol B iki eksik açığa çıkardı
+
+**1 · Çoklu seçim yoktu.** Ekran 4 tek parçacı seçiyordu; belge
+*"birden fazla parçacı seçilir"* diyordu. Seçim çoklu yapıldı, düğme
+kaç kişiye gideceğini söylüyor (*"gönderdim sandım, birine gitti"*
+hatası buradan çıkar).
+
+**2 · Cevabın kimden geldiği kayıtta yoktu.** `PriceRequest` modelde
+her parçacı için ayrı kayıt (VERI-MODELI §5) ama arayüzde karşılığı
+yoktu. Satırın altına *"Cevap kimden geldi?"* çipleri eklendi —
+**yalnız birden fazla parçacıya sorulmuşsa çıkıyor**, ana yol
+kalınlaşmıyor.
+
+## Kol D'de veri kaybı vardı
+
+Müşteri parçası seçilince satırın fiyatını **sıfırlıyordum.** Belge
+tam tersini söylüyor: *"gelen fiyat kayıtta kalır — ne kadara
+alabileceği bilgisi değerli."* Fiyat artık alışa taşınıyor
+(`ServiceLine.Cost`), müşteriye söylenecek rakam (`Price`) sıfırlanıyor.
+İkisi ayrı alan olduğu için ikisi de saklanabiliyor.
+
+> **Ders:** kol belgede *"ekran açmıyor"* diye geçince kolu
+> **çalıştırmadan** doğru saydım. Bir kolun ekran açmaması onun
+> **çalıştığı** anlamına gelmiyor.

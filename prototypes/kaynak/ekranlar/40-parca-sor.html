@@ -43,7 +43,8 @@
   </div>
 
   <button class="btn btn-primary btn-lg" id="psGonder" disabled>
-    <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
+    <svg class="ico"><use href="#i-message-square"></use></svg>
+    <span>WhatsApp ile gönder</span>
   </button>
 
   <p class="plate-hint" style="text-align:center">
@@ -60,7 +61,11 @@
 </style>
 
 <script>
-var psSecili = null;
+/* KOL B (IS-AKISI): "Büyük bir iş ise parçalar farklı firmalardan
+   araştırılabiliyor" (T-11). ÇOKLU seçim — ana yolda usta bir tane
+   seçer, kolda birkaçını seçer. Ekran aynı, adım aynı; değişen tek
+   şey seçimin tekil olmaması. */
+var psSecililer = [];
 
 function psParcaListesi(k) {
   /* Yalnız TAMİRCİNİN alacağı ve fiyatı henüz belli olmayan parçalar.
@@ -88,7 +93,7 @@ function psCiz() {
 
   document.getElementById('psParcacilar').innerHTML = PARCACILAR.map(function (p, i) {
     return '<button class="cip" data-parcaci="' + i + '" aria-pressed="' +
-      (psSecili === i) + '">' + p.ad + '</button>';
+      (psSecililer.indexOf(i) !== -1) + '">' + p.ad + '</button>';
   }).join('');
 
   /* Mesajın gövdesi DÜZ METİN — parçacıya giden şey bu, biçim değil. */
@@ -98,11 +103,17 @@ function psCiz() {
     k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
     '\n\n📎 ruhsat fotoğrafı eklenecek';
 
-  document.getElementById('psGonder').disabled = (psSecili === null || !parcalar.length);
+  var g = document.getElementById('psGonder');
+  g.disabled = (!psSecililer.length || !parcalar.length);
+  /* Düğme kaç kişiye gideceğini SÖYLER: çoklu seçimde "gönderdim
+     sandım, birine gitti" hatası buradan çıkar. */
+  g.querySelector('span').textContent = psSecililer.length > 1
+    ? 'WhatsApp ile ' + psSecililer.length + ' parçacıya gönder'
+    : 'WhatsApp ile gönder';
 }
 
 Ekran.tanim('parca-sor', {
-  ciz: function () { psSecili = null; psCiz(); }
+  ciz: function () { psSecililer = []; psCiz(); }
 });
 
 document.addEventListener('click', function (e) {
@@ -110,10 +121,25 @@ document.addEventListener('click', function (e) {
   if (!t) return;
 
   var p = t.getAttribute('data-parcaci');
-  if (p !== null) { psSecili = parseInt(p, 10); psCiz(); }
+  if (p !== null) {
+    var i = parseInt(p, 10), y = psSecililer.indexOf(i);
+    if (y === -1) psSecililer.push(i); else psSecililer.splice(y, 1);
+    psCiz();
+  }
 
-  if (t.id === 'psGonder' && psSecili !== null) {
-    balon(PARCACILAR[psSecili].ad + ' — WhatsApp açılıyor, mesaj hazır.', false, 3000);
+  if (t.id === 'psGonder' && psSecililer.length) {
+    var k = kayitBul(ACIK_KAYIT);
+    /* SORULDUĞU SATIRA YAZILIR. Adım 4'te "cevap kimden geldi"
+       sorusunun cevabı burada üretiliyor; kayıt ekranı bunu okuyup
+       fiyat satırının altına çip olarak koyuyor — ayrı bir
+       karşılaştırma ekranı gerekmiyor (Kol B). */
+    psParcaListesi(k).forEach(function (s) {
+      s.sorulan = psSecililer.slice();
+    });
+    balon(psSecililer.length > 1
+      ? psSecililer.length + ' parçacıya soruldu — cevaplar kayda düşecek.'
+      : PARCACILAR[psSecililer[0]].ad + ' — WhatsApp açılıyor, mesaj hazır.',
+      false, 3000);
     Ekran.ac('kayit');
   }
 });

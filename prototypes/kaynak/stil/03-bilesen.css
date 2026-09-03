@@ -1029,3 +1029,23 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .plate-sm { border-width: 1.5px; }
 .plate-sm .plate-tr { font-size: 9.5px; padding: 0 5px; }
 .plate-sm .plate-no { font-size: 12.5px; padding: 3px 7px; letter-spacing: .06em; }
+
+/* Katalog/alis fiyati SADECE BILGI — musteriye soylenecek rakam degil,
+   o yuzden .k-tutar gibi degil, soluk ve kucuk. v1'den geri alindi:
+   Kol D'de musteri parcayi kendi getirse bile parcacidan gelen fiyat
+   kayitta KALIYOR (IS-AKISI Kol D "sonradan" hali). */
+.kalem .k-katalog { font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+
+/* Buyuk plaka — v1'den. TANIMSIZ-SINIF testi yakaladi ve GEC yakaladi:
+   .plate-lg'yi JS uretiyor, ekran cizilmeden DOM'da olmuyor. Ders:
+   denetim yalniz acik ekrani degil, CIZILMIS ekrani gormeli. */
+.plate-lg { align-self: flex-start; }
+.plate-lg .plate-tr { font-size: 13px; padding: 0 9px; }
+.plate-lg .plate-no { font-size: 22px; padding: 7px 13px; }
+
+/* Fiyat satiri SARMALI: yanina parcaci fiyati (.k-katalog) gelince
+   217 px'lik kutuya 281 px istiyordu (olcum 03.09, 375 px). Input'un
+   kucule bilmesi de sart -- flex cocugu varsayilan olarak icerigi
+   kadar genis kalir. */
+.kalem .k-tutar-satir { flex-wrap: wrap; }
+.kalem input.k-tutar { min-width: 0; }

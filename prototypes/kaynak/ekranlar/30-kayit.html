@@ -130,7 +130,23 @@ function kayitCiz() {
           '<span class="k-tutar-satir">' +
             '<input class="k-tutar mono" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
               '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="fiyat" aria-label="Tutar" />' +
+            /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM DEĞİL:
+               soluk ve küçük durur. Kol D'de müşteri parçayı kendi
+               getirse bile bu rakam kayıtta kalır — "ne kadara
+               alabileceği" bilgisi değerli (IS-AKISI Kol D). */
+            (s.alis ? '<span class="k-katalog">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
           '</span>' +
+          /* KOL B · cevap kimden geldi. Tek parçacıya sorulduysa çip
+             çıkmaz — ana yol kalınlaşmaz. */
+          (s.tip === 'parca' && (s.sorulan || []).length > 1
+            ? '<span class="k-getiren">Cevap kimden geldi?' +
+                s.sorulan.map(function (pi) {
+                  return '<button class="cip" data-kaynak="' + i + '|' + pi +
+                    '" aria-pressed="' + (s.kaynak === pi) + '">' +
+                    PARCACILAR[pi].ad + '</button>';
+                }).join('') +
+              '</span>'
+            : '') +
           (s.tip === 'parca'
             ? '<span class="k-getiren">Parçayı kim getirdi?' +
                 '<button class="cip" data-getiren="' + i + '|tamirci" aria-pressed="' +
@@ -181,12 +197,26 @@ document.addEventListener('click', function (e) {
   var sil = t.getAttribute('data-satir-sil');
   if (sil !== null) { k.satirlar.splice(parseInt(sil, 10), 1); Ekran.tazele(); }
 
+  var kay = t.getAttribute('data-kaynak');
+  if (kay) {
+    var pk = kay.split('|');
+    k.satirlar[parseInt(pk[0], 10)].kaynak = parseInt(pk[1], 10);
+    Ekran.tazele();
+  }
+
   var g = t.getAttribute('data-getiren');
   if (g) {
     var p = g.split('|');
-    k.satirlar[parseInt(p[0], 10)].kimGetirdi = p[1];
-    /* Müşteri getirdiyse satır fiyatsız kalır (S2, K-005). */
-    if (p[1] === 'musteri') k.satirlar[parseInt(p[0], 10)].fiyat = 0;
+    var s = k.satirlar[parseInt(p[0], 10)];
+    s.kimGetirdi = p[1];
+    /* Müşteri getirdiyse satır fiyatsız kalır (S2, K-005) — AMA gelen
+       fiyat SİLİNMEZ, alışa taşınır. Önce sıfırlıyordum: Kol D'nin
+       "sonradan" hâlinde ("ucuza buldum, kendim alayım") parçacının
+       verdiği rakam kayıttan uçuyordu. Belge onun kalmasını söylüyor. */
+    if (p[1] === 'musteri') {
+      if (s.fiyat && !s.alis) s.alis = s.fiyat;
+      s.fiyat = 0;
+    }
     Ekran.tazele();
   }
 });
