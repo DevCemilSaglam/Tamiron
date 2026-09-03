@@ -1,0 +1,173 @@
+/* ============================================================
+   TAMIRON — Tasarım Tokenları (TEK KAYNAK)
+   ------------------------------------------------------------
+   Renkleri değiştirmek istersen: SADECE aşağıdaki
+   "MARKA PALETİ" bölümündeki hex kodlarını düzenle.
+   Işık/koyu tema ve tüm arayüz renkleri bu paletten türer.
+
+   Kullanım:
+     <html data-theme="light">  ->  açık tema (varsayılan)
+     <html data-theme="dark">   ->  koyu tema
+   Tema seçimi yoksa işletim sistemi tercihini izler.
+   ============================================================ */
+
+:root {
+  /* ---------- MARKA PALETİ (burayı değiştir) ---------- */
+  --brand-navy:          #1C4E86;  /* ana mavi — açık tema birincil */
+  --brand-navy-strong:   #163F6D;  /* koyu ton (hover) */
+  --brand-blue:          #5B8DEF;  /* parlak mavi — koyu tema birincil */
+  --brand-blue-strong:   #78A2F2;  /* açık ton (koyu tema hover) */
+  --brand-teal:          #279689;  /* teal aksan — açık tema */
+  --brand-teal-bright:   #34C1AF;  /* teal aksan — koyu tema */
+  --brand-orange:        #E8641C;  /* turuncu vurgu — açık tema */
+  --brand-orange-bright: #F2843E;  /* turuncu vurgu — koyu tema */
+
+  /* ---------- SEMANTİK / DURUM RENKLERİ ---------- */
+  --sem-crit:   #C4432E;  --sem-crit-dark:   #F0785F;   /* zorunlu / hata */
+  --sem-warn:   #9C6B12;  --sem-warn-dark:   #E0A64B;   /* yapılabilir / uyarı */
+  --sem-ok:     #1F8A5B;  --sem-ok-dark:     #4FC98A;   /* iyi olur / başarılı */
+
+  /* ---------- TİPOGRAFİ ---------- */
+  --font-display: "Sora", system-ui, sans-serif;         /* başlıklar */
+  --font-body:    "Instrument Sans", system-ui, sans-serif; /* metin/arayüz */
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace; /* plaka, tutar, kod */
+
+  /* ---------- LOGO (marka varlığı) ----------
+     Logo SVG'si artık TEK blok; tema farkı yalnız wordmark renginde.
+     ⚠️ --logo-nut (#269689) ile --brand-teal (#279689) BİR HANE farklı —
+     logonun kendi değeri korundu, görünüm değişmesin diye. Bkz. A-D5. */
+  --logo-nut:       #269689;   /* somun ana yüz */
+  --logo-nut-shade: #22766E;   /* somun gölge */
+  --logo-nut-tint:  #5AA79F;   /* somun üst yüz */
+
+  /* ---------- YARIÇAP / GÖLGE ---------- */
+  --radius-sm: 8px;  --radius-md: 12px;  --radius-lg: 16px;  --radius-pill: 999px;
+}
+
+/* ============================================================
+   IŞIK TEMA  (varsayılan)
+   ============================================================ */
+:root,
+[data-theme="light"] {
+  --bg:            #EDF2F9;   /* uygulama zemini */
+  --surface:       #FFFFFF;   /* kartlar */
+  --surface-2:     #E2EBF5;   /* ikincil yüzey / hafif dolgu */
+  --line:          #D3DEEB;   /* kenarlık / ayraç */
+  --text:          #0F1E30;   /* ana metin */
+  --muted:         #44556F;   /* ikincil metin */
+  --faint:         #7E8FA5;
+  --field-bg:      #F6FAFE;   /* metin alanlarinin zemini — notr gri degil */
+  --hint:          #4B6183;   /* ipucu metni — muted'dan mavimsi */   /* en soluk (placeholder, ikon) */
+
+  --primary:        var(--brand-navy);
+  --primary-strong: var(--brand-navy-strong);
+  --on-primary:     #FFFFFF;
+  --accent:         var(--brand-teal);
+  --accent-soft:    #DCF2EF;   /* aksan yumuşak zemin (rozet) */
+  --on-accent:      #FFFFFF;
+  --highlight:            var(--brand-orange);   /* üçüncü vurgu (turuncu) */
+
+  /* sol menü — zemine karışır (ayrı koyu blok DEĞİL) */
+  --rail:        #ECF1F6;
+  --rail-line:   #DBE3EC;
+  --rail-text:   #0F1E30;
+  --rail-muted:  #54637A;
+  --nav-on-bg:   color-mix(in srgb, var(--primary) 12%, transparent); /* aktif öğe yumuşak dolgu */
+  --nav-on-fg:   var(--primary);
+  --nav-hover:   color-mix(in srgb, var(--text) 6%, transparent);
+
+
+  /* ---------- ZİYARET TİPİ RENKLERİ (ayrı eder, durum bildirmez) ----------
+     Yeni hex eklenmez — hepsi mevcut marka/semantik paletten türer.
+     ⚠️ 31.08: ŞERİT ARTIK DURUMU SÖYLÜYOR (Cemil). Bu renkler şeritte
+     değil, servis kaydı satırının İKONUNDA tipi ayırt etmek için
+     kullanılıyor. Şerit rengi semantik durum paletinden gelir. */
+  --tip-bakim:    var(--accent);    /* teal   — periyodik / rutin */
+  --tip-tamirat:  var(--primary);   /* mavi   — asıl onarım işi */
+  --tip-inceleme: var(--warn);      /* amber  — tespit / dikkat */
+  --tip-teklif:   var(--highlight);       /* turuncu — fiyat / satis */
+
+--info:      var(--primary);   /* bilgi / notr sonuc — durum rozeti */
+  --info-bg:   #E4EBF7;   /* bilgi rozeti yumuşak zemin */
+
+  --crit: var(--sem-crit);  --crit-bg: #FBE7E2;
+  --warn: var(--sem-warn);  --warn-bg: #F6EDD9;
+  --ok:   var(--sem-ok);    --ok-bg:   #E3F2EA;
+
+  --logo-word: #142230;   /* wordmark — açık tema */
+  --shadow-sm: 0 1px 2px rgba(8,20,32,.06), 0 4px 10px -6px rgba(8,20,32,.25);
+  --shadow: 0 1px 2px rgba(8,20,32,.05), 0 20px 44px -30px rgba(8,20,32,.45);
+  --scrim: rgba(8,20,32,.48);   /* drawer / modal karartma */
+}
+
+/* ============================================================
+   KOYU TEMA
+   ============================================================ */
+[data-theme="dark"] {
+  --bg:            #0A1220;
+  --surface:       #14202F;
+  --surface-2:     #172436;
+  --line:          #2A3B51;
+  --text:          #E7EEF6;
+  --muted:         #A9B8CB;
+  --faint:         #8496AB;
+  --field-bg:      #101B2B;
+  --hint:          #9DB2CB;
+
+  --primary:        var(--brand-blue);
+  --primary-strong: var(--brand-blue-strong);
+  --on-primary:     #FFFFFF;
+  --accent:         var(--brand-teal-bright);
+  --accent-soft:    #0F2A28;
+  --on-accent:      #04201C;
+  --highlight:            var(--brand-orange-bright);
+
+  --rail:        #0E141D;
+  --rail-line:   #233042;
+  --rail-text:   #E7EEF6;
+  --rail-muted:  #93A2B4;
+  --nav-on-bg:   color-mix(in srgb, var(--primary) 22%, transparent);
+  --nav-on-fg:   var(--primary);
+  --nav-hover:   color-mix(in srgb, #fff 6%, transparent);
+
+
+  /* ---------- ZİYARET TİPİ RENKLERİ (ayrı eder, durum bildirmez) ----------
+     Yeni hex eklenmez — hepsi mevcut marka/semantik paletten türer.
+     Durum rozetiyle karışmaz: şerit TİPİ, rozet DURUMU söyler. */
+  --tip-bakim:    var(--accent);    /* teal   — periyodik / rutin */
+  --tip-tamirat:  var(--primary);   /* mavi   — asıl onarım işi */
+  --tip-inceleme: var(--warn);      /* amber  — tespit / dikkat */
+  --tip-teklif:   var(--highlight);       /* turuncu — fiyat / satis */
+
+--info:      var(--primary);   /* bilgi / notr sonuc — durum rozeti */
+  --info-bg:   #111E33;   /* bilgi rozeti yumuşak zemin */
+
+  --crit: var(--sem-crit-dark);  --crit-bg: #2A1512;
+  --warn: var(--sem-warn-dark);  --warn-bg: #241C0E;
+  --ok:   var(--sem-ok-dark);    --ok-bg:   #102420;
+
+  --logo-word: #E7EEF6;   /* wordmark — koyu tema */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
+  --scrim: rgba(0,0,0,.62);
+}
+
+/* Tema seçilmemişse (data-theme yok) işletim sistemi koyuysa koyu uygula */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0A1220; --surface:#14202F; --surface-2:#172436; --line:#2A3B51;
+    --text:#E7EEF6; --muted:#A9B8CB; --faint:#8496AB;
+    --field-bg:#101B2B; --hint:#9DB2CB;
+    --primary:var(--brand-blue); --primary-strong:var(--brand-blue-strong); --on-primary:#FFFFFF;
+    --accent:var(--brand-teal-bright); --accent-soft:#0F2A28; --on-accent:#04201C;
+    --highlight:var(--brand-orange-bright);
+    --rail:#172436; --rail-line:#2A3B51; --rail-text:#E7EEF6; --rail-muted:#A9B8CB;
+    --nav-on-bg:color-mix(in srgb, var(--brand-blue) 22%, transparent); --nav-on-fg:var(--brand-blue);
+    --nav-hover:color-mix(in srgb, #fff 6%, transparent);
+    --crit:var(--sem-crit-dark); --crit-bg:#2A1512; --warn:var(--sem-warn-dark); --warn-bg:#241C0E; --ok:var(--sem-ok-dark); --ok-bg:#102420;
+    --logo-word:#E7EEF6;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
+    --scrim: rgba(0,0,0,.62);
+  }
+}

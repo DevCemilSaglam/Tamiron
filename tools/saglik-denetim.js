@@ -1,0 +1,486 @@
+/* Tamiron prototip saglik denetimi — 23 test.
+   Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
+(function(){
+/* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
+   degildir; birakilirsa 16. test sahte bulgu verir, 5. test ise
+   gercek eksigi gizler. */
+function stilMetni() {
+  var t = '';
+  document.querySelectorAll('style').forEach(function (s) { t += s.textContent; });
+  return t.replace(/\/\*[\s\S]*?\*\//g, ' ');
+}
+
+  var b=[];function ek(t,e,d){b.push(t+' | '+e+' | '+d);}
+  var ekranlar=Array.from(document.querySelectorAll('.screen')).map(function(e){return e.id.replace(/^screen-/,'');});
+  ekranlar.forEach(function(a){try{showScreen(a);}catch(e){ek('ACILMIYOR',a,e.message);}});
+  var fnRe=/^([A-Za-z_$][\w$]*)\s*\(/;
+  document.querySelectorAll('[onclick]').forEach(function(el){
+    var k=el.getAttribute('onclick')||'';
+    k.split(';').forEach(function(pc){pc=pc.trim();if(!pc)return;var m=pc.match(fnRe);if(!m)return;var ad=m[1];
+      if(['go','showScreen','setTimeout','if','return','window','document'].indexOf(ad)>=0)return;
+      if(typeof window[ad]!=='function'){var e=el.closest('.screen');ek('OLU-FN',e?e.id.replace(/^screen-/,''):'(kabuk)',ad);}});
+    (k.match(/go\('([a-z-]+)'\)/g)||[]).forEach(function(x){var t=x.match(/go\('([a-z-]+)'\)/)[1];
+      if(!document.getElementById('screen-'+t)){var e=el.closest('.screen');ek('OLU-EKRAN',e?e.id.replace(/^screen-/,''):'(kabuk)',t);}});
+  });
+  var tan={};document.querySelectorAll('symbol[id]').forEach(function(s){tan[s.id]=1;});
+  document.querySelectorAll('use').forEach(function(u){var id=(u.getAttribute('href')||'').replace('#','');
+    if(id&&!tan[id]){var e=u.closest('.screen');ek('OLU-IKON',e?e.id.replace(/^screen-/,''):'(kabuk)','#'+id);}});
+  var kod=document.documentElement.innerHTML;
+  ekranlar.forEach(function(a){ if(a==='home')return;
+    if(!new RegExp("(?:go|drawerGo)\\('"+a+"'\\)|showScreen\\('"+a+"'\\)").test(kod)) ek('YETIM',a,'gidilmiyor'); });
+  /* 9) TANIMSIZ CSS SINIFI — kullaniliyor ama hicbir kuralda gecmiyor.
+     .row-btns hatasi boyle olustu: dogru sinif .btn-row idi, 9 ekranda
+     yanlis yazilmis ve butonlar ust uste binmisti. */
+  var stil = stilMetni();
+  var gorulen={};
+  document.querySelectorAll('.screen [class]').forEach(function(el){
+    /* SVG'de className bir SVGAnimatedString'dir, string DEGIL —
+       toString() "[object SVGAnimatedString]" verir ve sahte bulgu uretir. */
+    var cn = el.className;
+    cn = (typeof cn === 'string') ? cn : ((cn && cn.baseVal) || '');
+    cn.split(/\s+/).forEach(function(c){
+      if(!c || gorulen[c]) return;
+      gorulen[c]=1;
+      if(stil.indexOf('.'+c)<0){
+        var e=el.closest('.screen');
+        ek('TANIMSIZ-SINIF', e?e.id.replace(/^screen-/,''):'(kabuk)', '.'+c);
+      }
+    });
+  });
+
+  var SEC='button, a[href], [role="button"], input:not([type=hidden]), textarea, .chip, .sel-trigger';
+  ekranlar.forEach(function(a){showScreen(a);
+    document.querySelectorAll('#screen-'+a+' '+SEC).forEach(function(el){
+      var r=el.getBoundingClientRect(); if(!r.width||!r.height) return;
+      if(getComputedStyle(el).visibility==='hidden') return;
+      var bf=getComputedStyle(el,'::before'),hh=r.height;
+      if(bf.content!=='none'&&bf.position==='absolute'){var bh=parseFloat(bf.height); if(!isNaN(bh))hh=Math.max(hh,bh);}
+      var af=getComputedStyle(el,'::after');
+      if(af.position==='absolute'&&(parseFloat(af.top)===0||af.inset==='0px')&&el.offsetParent) hh=Math.max(hh,el.offsetParent.getBoundingClientRect().height);
+      if(hh<44){var s=(el.className||'').toString().split(' ')[0]||el.tagName;
+        if(s==='tel-inline')return; if(el.tagName==='INPUT'&&el.closest('.search-box'))return;
+        ek('KUCUK-HEDEF',a,s+'='+Math.round(hh));}});});
+  document.documentElement.setAttribute('data-theme','dark');
+  ekranlar.forEach(function(a){showScreen(a);
+    document.querySelectorAll('#screen-'+a+' button, #screen-'+a+' input, #screen-'+a+' textarea, #screen-'+a+' select').forEach(function(el){
+      var r=el.getBoundingClientRect(); if(!r.width||!r.height)return;
+      if(getComputedStyle(el).color==='rgb(0, 0, 0)') ek('KOYU-SIYAH',a,(el.className||'').toString().split(' ')[0]||el.tagName);});});
+  document.documentElement.setAttribute('data-theme','light');
+  ekranlar.forEach(function(a){showScreen(a);var el=document.getElementById('screen-'+a);
+    if(el.scrollWidth>el.clientWidth+2) ek('YATAY-TASMA',a,el.scrollWidth+'>'+el.clientWidth);});
+
+/* 20) IC TASMA — ekran koku degil, ICERIDEKI bir kutu tasiyor.
+   Onceki 19 test bunu kaciriyordu: "+ Parca / + Iscilik butonlari birbirine
+   girmis" (Cemil, 01.09) = .btn-row 393 > 373. Kok temizdi.
+   Hale elemesi: 44 px dokunma hedefi ::before'lari (inset -19px -8px)
+   gorunmez ama scrollWidth'i buyutuyor; tasma haleden buyuk degilse
+   sayilmaz. */
+  function hale(el){
+    var en=0;
+    ['::before','::after'].forEach(function(ps){
+      var c=getComputedStyle(el,ps);
+      if(c.content==='none'||c.position!=='absolute')return;
+      var r=parseFloat(c.right); if(r<0&&-r>en)en=-r;
+    });
+    return en;
+  }
+  ekranlar.forEach(function(a){showScreen(a);
+    document.querySelectorAll('#screen-'+a+' *').forEach(function(el){
+      var ov=el.scrollWidth-el.clientWidth;
+      if(ov<=2)return;
+      if(getComputedStyle(el).overflowX!=='visible')return;
+      var h=hale(el);
+      el.querySelectorAll('*').forEach(function(c){var x=hale(c); if(x>h)h=x;});
+      if(ov<=h+2)return;
+      ek('IC-TASMA',a,((el.className||'').toString().split(' ')[0]||el.tagName)+' '+el.scrollWidth+'>'+el.clientWidth);});});
+/* 10) YINELENEN FONKSIYON — ayni ad iki kez tanimlanmis.
+   Ikincisi birinciyi SESSIZCE eziyor. odemeYollariCiz boyle bulundu:
+   olu kopya VAR OLMAYAN bir alana (ODEME_YOLLARI[i].durum) bakiyordu. */
+(function () {
+  var kod = '';
+  document.querySelectorAll('script').forEach(function (s) { kod += s.textContent; });
+  var re = new RegExp('(?:^|\\n)function\\s+([A-Za-z_$][\\w$]*)\\s*\\(', 'g');
+  var m, say = {};
+  while ((m = re.exec(kod))) { say[m[1]] = (say[m[1]] || 0) + 1; }
+  Object.keys(say).forEach(function (ad) {
+    if (say[ad] > 1) ek('YINELENEN-FN', '(betik)', ad + ' x' + say[ad]);
+  });
+})();
+
+/* 11) YINELENEN UST DUZEY VAR — ayni ad iki kez tanimlanmis.
+   Ikinci atama birinciyi eziyor ve TIP bile degisebiliyor. Bulunanlar:
+   - BUGUN: once [29,8,2026] dizisi, sonra new Date(...). Dizi bekleyen
+     kod BUGUN[2] okuyordu -> undefined -> fark NaN -> arac kartindaki
+     "x gun kaldi/gecti" rozetleri HIC GORUNMUYORDU.
+   - ODEME_YOLLARI: once odeme DURUMLARI, sonra odeme YONTEMLERI. */
+(function () {
+  var kod = '';
+  document.querySelectorAll('script').forEach(function (s) { kod += s.textContent; });
+  var re = new RegExp('(?:^|\\n)var\\s+([A-Za-z_$][\\w$]*)\\s*=', 'g');
+  var m, say = {};
+  while ((m = re.exec(kod))) { say[m[1]] = (say[m[1]] || 0) + 1; }
+  Object.keys(say).forEach(function (ad) {
+    if (say[ad] > 1) ek('YINELENEN-VAR', '(betik)', ad + ' x' + say[ad]);
+  });
+})();
+
+/* 12-14) KLAVYE TURU (31.08)
+   DIKKAT — secici kapsami: 'kok a[href], button, ...' yazilirsa VIRGUL
+   kapsami kirar, ilk parca disindakiler TUM belgeden gelir. Her parca
+   ayri ayri kapsanmali; bu testin ilk halinde 39 sahte bulgu cikti. */
+(function () {
+  var PARCA = ['a[href]', 'button', 'input:not([type=hidden])', 'select', 'textarea', '[tabindex]'];
+  function kapsa(kok) { return PARCA.map(function (x) { return kok + ' ' + x; }).join(', '); }
+  function ekranAdi(el) { var s = el.closest('.screen'); return s ? s.id.replace(/^screen-/, '') : '(kabuk)'; }
+
+  /* 12) adsiz dugme / etiketsiz alan */
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' button, #screen-' + a + ' a[href]').forEach(function (el) {
+      if (el.offsetParent === null) return;
+      var metin = (el.textContent || '').replace(/\s+/g, ' ').trim();
+      if (!(metin || el.getAttribute('aria-label') || el.getAttribute('title')))
+        ek('ADSIZ-DUGME', a, (el.className || '').toString().split(' ')[0] || el.tagName);
+    });
+    document.querySelectorAll('#screen-' + a + ' input:not([type=hidden]), #screen-' + a + ' textarea').forEach(function (el) {
+      if (el.offsetParent === null) return;
+      var lbl = el.id ? document.querySelector('label[for="' + el.id + '"]') : null;
+      if (!lbl && !el.getAttribute('aria-label') && !el.closest('label'))
+        ek('ETIKETSIZ-ALAN', a, el.id || (el.className || '').toString().split(' ')[0] || el.tagName);
+    });
+  });
+
+  /* 13) pozitif tabindex — sekme sirasini bozar */
+  document.querySelectorAll('[tabindex]').forEach(function (el) {
+    var t = parseInt(el.getAttribute('tabindex'), 10);
+    if (t > 0) ek('POZITIF-TABINDEX', ekranAdi(el), el.tagName + ' tabindex=' + t);
+  });
+
+  /* 14) cekmece acikken arkada odaklanabilir oge kalmamali */
+  if (typeof openDrawer === 'function') {
+    showScreen('home');
+    openDrawer();
+    var dr = document.getElementById('drawer');
+    var dis = Array.prototype.slice.call(document.querySelectorAll(kapsa('body'))).filter(function (el) {
+      return el.offsetParent !== null && !el.disabled && !dr.contains(el) && !el.closest('[inert]');
+    });
+    if (dis.length) ek('DRAWER-ODAK-SIZINTISI', 'drawer', dis.length + ' oge');
+    if (!document.querySelector('.topbar').inert) ek('DRAWER-ARKA-PLAN', 'drawer', 'topbar inert degil');
+    closeDrawer();
+    if (document.querySelector('.topbar').inert) ek('DRAWER-ARKA-PLAN', 'drawer', 'kapaninca inert kalkmiyor');
+  }
+})();
+
+/* 15) GORUNMEZ KARAKTER (31.08)
+   Servis gecmisindeki 17 kaydin numarasi U+0001 idi: ekranda "Servis #"
+   yaziyor, numara hic gorunmuyordu. Goz denetimi bunu YAKALAYAMAZ cunku
+   karakter cizilmiyor. Kontrol karakterleri, sifir genislikli bosluklar
+   ve kirilmayan bosluk taranir. */
+(function () {
+  var re = new RegExp('[\\u0000-\\u0008\\u000B\\u000C\\u000E-\\u001F\\u007F\\u00A0\\u200B-\\u200F\\uFEFF]');
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    var el = document.getElementById('screen-' + a);
+    var yur = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+    var d;
+    while ((d = yur.nextNode())) {
+      var m = d.nodeValue.match(re);
+      if (!m) continue;
+      var kod = 'U+' + ('000' + m[0].charCodeAt(0).toString(16).toUpperCase()).slice(-4);
+      ek('GORUNMEZ-KARAKTER', a, kod + ' - "' + d.nodeValue.replace(re, '?').trim().slice(0, 40) + '"');
+    }
+  });
+})();
+
+/* 16) OLU CSS SINIFI (31.08)
+   15. testin TERSI: o kullanilan-ama-tanimsiz sinifi arar, bu
+   tanimli-ama-kullanilmayani. Ortak nesnelere gecince .kisi-arac ve
+   .is-satir aileleri olu kaldi; birakilsa "iki ayri satir bicimi var"
+   yanilgisi surerdi. Durum/tema varyantlari (d-*, t-*, is-*) elle
+   eklenip cikarildigi icin BEYAZ LISTE ile disarida tutuluyor. */
+(function () {
+  var BEYAZ = /^(d-|t-|c-|tip-|is-|sel-|drawer|toast|screen|active|open|dark|light)/;
+  var stil = stilMetni();
+  var tanimli = {};
+  /* Noktadan ONCE harf/rakam olmamali: "tokens.css" icindeki .css
+     bir SINIF degil, dosya uzantisi. Ilk yazimda 23 bulgunun biri
+     bu yuzden sahteydi. */
+  var re = new RegExp('(^|[^A-Za-z0-9_-])\\.([A-Za-z_][\\w-]*)', 'g');
+  var m;
+  while ((m = re.exec(stil))) { tanimli[m[2]] = true; }
+
+  var kullanilan = {};
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('[class]').forEach(function (el) {
+      var cn = el.className;
+      cn = (typeof cn === 'string') ? cn : ((cn && cn.baseVal) || '');
+      cn.split(/\s+/).forEach(function (c) { if (c) kullanilan[c] = true; });
+    });
+  });
+  /* JS icinde string olarak uretilen siniflar da sayilir */
+  var kod = '';
+  document.querySelectorAll('script').forEach(function (s) { kod += s.textContent; });
+
+  Object.keys(tanimli).forEach(function (c) {
+    if (kullanilan[c] || BEYAZ.test(c)) return;
+    if (kod.indexOf("'" + c) >= 0 || kod.indexOf('\"' + c) >= 0 || kod.indexOf(' ' + c) >= 0) return;
+    ek('OLU-SINIF', '(stil)', '.' + c);
+  });
+})();
+
+/* 17) YETIM VERI ANAHTARI (31.08)
+   Not anahtarlari GERCEK bir kayda ait olmali:
+   NOTLAR.musteri -> musteri adi, NOTLAR.arac -> kayitli plaka.
+   Tohum veriye 'Ali Yildiz' diye OLMAYAN bir musteri yazilmisti:
+   not hicbir ekranda gorunmuyor, arama bos donuyor, hata da yok. */
+(function () {
+  if (typeof NOTLAR === 'undefined') return;
+  if (typeof kisileriTuret === 'function') {
+    var m = {};
+    kisileriTuret().forEach(function (k) { m[k.ad] = true; });
+    Object.keys(NOTLAR.musteri || {}).forEach(function (ad) {
+      if (!m[ad]) ek('YETIM-VERI', '(veri)', 'NOTLAR.musteri["' + ad + '"] — boyle bir musteri yok');
+    });
+  }
+  if (typeof ARACLAR !== 'undefined') {
+    var a = {};
+    ARACLAR.forEach(function (x) { a[x.plaka] = true; });
+    Object.keys(NOTLAR.arac || {}).forEach(function (pl) {
+      if (!a[pl]) ek('YETIM-VERI', '(veri)', 'NOTLAR.arac["' + pl + '"] — boyle bir plaka yok');
+    });
+    /* ACIK_ISLER de ARACLAR'a bagli: olmayan plaka yazilinca ekran
+       sessizce VARSAYILAN araca dusuyor. Bilgilendirmede teslim
+       listesinden secilen isin musterisi yanlis geliyordu (01.09). */
+    if (typeof ACIK_ISLER !== 'undefined' && ACIK_ISLER) {
+      ACIK_ISLER.forEach(function (x) {
+        if (!a[x.plaka]) ek('YETIM-VERI', '(veri)', 'ACIK_ISLER["' + x.plaka + '"] — boyle bir plaka yok');
+      });
+    }
+  }
+})();
+
+/* 18) KIRPILMIS KUTU (31.08)
+   Kutunun yuksekligi ILK COCUGUNDAN kucukse icerik gorunmuyordur.
+   Not seridi boyle bulundu: .screen bir flex sutun, serit 2 px'e
+   ezilmis, icindeki 28 px'lik kart gorunmuyordu. Gorsel denetim
+   bunu 'bos alan' sanip gecer. */
+(function () {
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' > *, #screen-' + a + ' .card > *').forEach(function (el) {
+      var c = el.firstElementChild;
+      if (!c) return;
+      var eh = el.getBoundingClientRect().height;
+      var ch = c.getBoundingClientRect().height;
+      if (!ch || eh >= ch - 1) return;
+      if (getComputedStyle(el).overflowY === 'auto' && el.scrollHeight > el.clientHeight + 4) return;
+      ek('KIRPILMIS-KUTU', a, ((el.className || '').toString().split(' ')[0] || el.tagName) +
+        ' ' + Math.round(eh) + 'px < icerik ' + Math.round(ch) + 'px');
+    });
+  });
+})();
+
+/* 19) YUKLEME HATASI (01.09)
+   Sayfa acilirken atilan hata sessiz kaliyordu: ekran cizilmiyor ama
+   denetim '0 bulgu' diyordu. Bu projede ALTI kez var hoisting
+   yuzunden yasandi — yuklenirken calisan fonksiyon, HENUZ ATANMAMIS
+   bir var'a dokunuyor. Sayfanin basindaki toplayici okunur. */
+(function () {
+  if (typeof window.YUKLEME_HATALARI === 'undefined') {
+    ek('TOPLAYICI-YOK', '(kabuk)', 'sayfada yukleme hatasi toplayicisi yok');
+    return;
+  }
+  window.YUKLEME_HATALARI.forEach(function (m) {
+    ek('YUKLEME-HATASI', '(kabuk)', m);
+  });
+})();
+
+/* 21) OLU ID (01.09)
+   JS bir id ile oge ariyor ama sayfada boyle bir oge YOK.
+   Cizim fonksiyonu o satirda PATLIYOR; ekran yarim kaliyor ya da hic
+   acilmiyor. 20 test bunu kaciriyordu cunku ACILMIYOR testi ekrani
+   BOS durumda aciyor ve cizici erken donuyor — hata ancak gercek bir
+   kayit acilinca cikiyor.
+   Bulunan: fdArac — fiyat calismasi detayi acilmiyordu. */
+(function () {
+  var kod = '';
+  document.querySelectorAll('script').forEach(function (sc) { kod += sc.textContent; });
+  var re = /getElementById\(\s*'([A-Za-z_][\w-]*)'\s*\)/g;
+  var m, gorulen = {};
+  while ((m = re.exec(kod))) {
+    var id = m[1];
+    if (gorulen[id]) continue;
+    gorulen[id] = 1;
+    if (!document.getElementById(id)) ek('OLU-ID', '(betik)', "getElementById('" + id + "') — boyle bir oge yok");
+  }
+})();
+
+/* 22) YUKLEME SIRASI (01.09)
+   Sayfa yuklenirken calisan bir fonksiyon, DAHA ASAGIDA tanimlanan bir
+   ust duzey var'a bakiyor. Bu projede YEDINCI kez yasandi.
+   19. test yalniz PATLAYANINI yakalar; kodda "typeof X === 'undefined'"
+   korumasi varsa hata atilmaz, fonksiyon SESSIZCE yanlis is yapar ve
+   denetim "0 bulgu" der.
+   Bulunan: araclariCiz() / kisileriCiz() yuklemede calisiyor ama
+   ACIK_ISLER 3300 satir asagida tanimli -> "icerideki araclar ustte ve
+   kenarligi farkli" DOM'a hic girmiyordu. */
+(function () {
+  var kod = '';
+  document.querySelectorAll('script').forEach(function (sc) { kod += '\n' + sc.textContent; });
+
+  /* Sutun 0'daki ust duzey var tanimlari: ad -> ilk gorundugu yer */
+  var varYeri = {}, m;
+  var varRe = /\nvar\s+([A-Za-z_$][\w$]*)\s*=/g;
+  while ((m = varRe.exec(kod))) {
+    if (!(m[1] in varYeri)) varYeri[m[1]] = m.index;
+  }
+
+  /* Sutun 0'daki cagrilar: fn();  — yukleme sirasinda calisirlar */
+  var cagriRe = /\n([A-Za-z_$][\w$]*)\(\s*\)\s*;/g;
+  while ((m = cagriRe.exec(kod))) {
+    var ad = m[1], yer = m.index;
+    var fn = window[ad];
+    if (typeof fn !== 'function') continue;
+    var govde = fn.toString();
+    Object.keys(varYeri).forEach(function (v) {
+      if (varYeri[v] < yer) return;                       /* zaten yukarida */
+      if (!new RegExp('\\b' + v + '\\b').test(govde)) return;
+      ek('YUKLEME-SIRASI', '(betik)',
+         ad + '() yuklemede calisiyor ama ' + v + ' DAHA ASAGIDA tanimli');
+    });
+  }
+})();
+
+/* 23) TEMA UYUSMAZLIGI (01.09)
+   Koyu tema IKI YERDE tanimli: [data-theme="dark"] (kullanici secerse)
+   ve @media (prefers-color-scheme: dark) (sistem tercihi). CSS'te
+   tek kaynaktan turetilemiyor, kopyalaniyor — biri guncellenip oteki
+   unutuluyor. 01.09 renk turunda tam bu oldu: secilen koyu temada yeni
+   renkler, SISTEM koyu temasinda eski renkler cikiyordu. Kullanicilarin
+   cogu "sistem" ayarinda oldugu icin degisiklik onlara ulasmayacakti. */
+(function () {
+  var css = stilMetni();
+  function blok(bas) {
+    var i = css.indexOf(bas);
+    if (i < 0) return null;
+    var a = css.indexOf('{', i), d = 0, j = a;
+    for (; j < css.length; j++) {
+      if (css[j] === '{') d++;
+      else if (css[j] === '}') { d--; if (!d) break; }
+    }
+    return css.slice(a + 1, j);
+  }
+  function tokenlar(metin) {
+    var m, t = {}, re = /(--[\w-]+)\s*:\s*([^;}]+)/g;
+    while ((m = re.exec(metin))) t[m[1]] = m[2].trim().replace(/\s+/g, ' ');
+    return t;
+  }
+  var a = blok('[data-theme="dark"]');
+  var b = blok('prefers-color-scheme: dark');
+  if (!a || !b) return;
+  var ta = tokenlar(a), tb = tokenlar(b);
+  Object.keys(ta).forEach(function (k) {
+    if (!(k in tb)) { ek('TEMA-UYUSMAZLIGI', '(stil)', k + ' sistem koyu temasinda YOK'); return; }
+    if (ta[k].toLowerCase() !== tb[k].toLowerCase()) {
+      ek('TEMA-UYUSMAZLIGI', '(stil)', k + ': secili="' + ta[k] + '" sistem="' + tb[k] + '"');
+    }
+  });
+})();
+
+/* 24) SINIF CAKISMASI (01.09)
+   Ayni CSS sinif adi IKI AYRI BILESEN icin tanimlanmis. Bu projede
+   uc kez oldu: .stok (yesil nokta ::before baska bir bilesenden
+   miras kaldi), .rol-cip (personel rozeti ile rol secme dugmesi ayni
+   adi kullandi — hem gorunum bozuldu hem querySelectorAll 4 yerine 8
+   oge buldu). Sinif adi burada hem STIL hem SECICI oldugu icin
+   cakisma iki yerden birden vuruyor.
+
+   Yalniz SADE ve TEK secicilere bakilir (".ad { }"). Sayilmayanlar,
+   cunku hepsi mesru: @media icindeki geri donusler (.device kucuk
+   ekranda baska), grup secici (.a, .b, .c { min-height: 44px } —
+   dokunma hedefi), durum/varyant (.x:hover, .x[aria-pressed], .x.y),
+   baglamda daraltma (.kart .x).
+   Kurucu ozellik = bileseni TANIMLAYAN alan (display/padding/flex...);
+   yalniz renk veren ikinci kural varyanttir, cakisma degil. */
+(function () {
+  var css = stilMetni();
+  /* @media ve benzeri @-bloklarini govdesiyle birlikte cikar. */
+  var temiz = '', i = 0, j, d;
+  while (i < css.length) {
+    var at = css.indexOf('@', i);
+    if (at < 0) { temiz += css.slice(i); break; }
+    temiz += css.slice(i, at);
+    var a = css.indexOf('{', at);
+    if (a < 0) break;
+    d = 0;
+    for (j = a; j < css.length; j++) {
+      if (css[j] === '{') d++;
+      else if (css[j] === '}') { d--; if (!d) break; }
+    }
+    i = j + 1;
+  }
+
+  var KURUCU = /(^|;)\s*(display|position|padding|flex|grid-template|grid-template-columns)\s*:/;
+  var yer = {};
+  var re = /(^|[}])([^{}]*)\{([^{}]*)\}/g, m;
+  while ((m = re.exec(temiz))) {
+    var sec = m[2].trim(), govde = m[3];
+    if (!/^\.[a-zA-Z][\w-]*$/.test(sec)) continue;
+    if (!KURUCU.test(';' + govde)) continue;
+    var ad = sec.slice(1);
+    (yer[ad] = yer[ad] || []).push(govde.trim().replace(/\s+/g, ' ').slice(0, 40));
+  }
+  Object.keys(yer).forEach(function (ad) {
+    if (yer[ad].length < 2) return;
+    ek('SINIF-CAKISMASI', '(stil)',
+       '.' + ad + ' iki kez kurucu tanimlanmis: "' + yer[ad][0] + '" / "' + yer[ad][1] + '"');
+  });
+})();
+
+/* 25) EZILEN GOVDE (01.09)
+   Bir esnek satirda (display:flex) YAN OGE govdeyi sifira eziyor.
+   Bu projede ikinci kez: .btn tabani "width: 100%" veriyor ve bir
+   flex satirina konunca dogal genisligi 100% sanilip butun yeri
+   aliyor. Ilk seferinde .btn-row sarmiyordu, ikincisinde eksik parca
+   satirinda metin kelime kelime alt alta dizildi (.ep-govde = 0px).
+
+   Tasma degil — 20. test bunu yakalamiyor, cunku icerik tasmiyor,
+   SIKISIYOR. Olcut: esnek kabin icinde METNI OLAN bir cocuk 8px'den
+   dar kaldiysa ve kardesi kabin genisliginin %70'inden fazlasini
+   aldiysa bulgu verilir. */
+(function () {
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' *').forEach(function (kap) {
+      if (getComputedStyle(kap).display.indexOf('flex') < 0) return;
+      var kw = kap.getBoundingClientRect().width;
+      if (kw < 40) return;
+      var cocuklar = Array.prototype.slice.call(kap.children);
+      if (cocuklar.length < 2) return;
+      var ezik = null, obur = 0;
+      cocuklar.forEach(function (c) {
+        /* GIZLI OGE EZILMIS DEGILDIR — display:none genisligi zaten
+           sifirdir. Ilk yazimda uc sahte bulgu bundandi (gizlenmis
+           menu satiri, kapali "dinliyorum" ipucu, gizli rozet). */
+        if (c.offsetParent === null && getComputedStyle(c).position !== 'fixed') return;
+        var w = c.getBoundingClientRect().width;
+        if (w < 8 && (c.textContent || '').trim().length > 3) ezik = c;
+        if (w > obur) obur = w;
+      });
+      if (ezik && obur > kw * 0.7) {
+        ek('EZILEN-GOVDE', a,
+           (kap.className || kap.tagName) + ' icinde ' +
+           (ezik.className || ezik.tagName) + ' 0px kaldi (kardesi ' +
+           Math.round(obur) + '/' + Math.round(kw) + 'px)');
+      }
+    });
+  });
+})();
+
+  showScreen('home');
+  console.log('SAGLIK DENETIMI — '+ekranlar.length+' ekran, '+b.length+' bulgu');
+  b.forEach(function(x){
+console.log('  '+x);});
+  return {ekran:ekranlar.length, bulgu:b.length, liste:b};
+})()

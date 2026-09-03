@@ -1,0 +1,11 @@
+bin/
+obj/
+.vs/
+*.user
+node_modules/
+.env
+appsettings.*.Local.json
+tamiron-app.zip
+
+# yayin paketi (SendUserFile ile gonderiliyor, surumlenmez)
+app.zip
