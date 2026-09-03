@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-03 18:57
+  Üretim: 2026-09-03 19:07
 -->
 
 <html lang="tr" data-theme="light">
@@ -1282,6 +1282,26 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .plate-sm .plate-tr { font-size: 9.5px; padding: 0 5px; }
 .plate-sm .plate-no { font-size: 12.5px; padding: 3px 7px; letter-spacing: .06em; }
 
+/* Katalog/alis fiyati SADECE BILGI — musteriye soylenecek rakam degil,
+   o yuzden .k-tutar gibi degil, soluk ve kucuk. v1'den geri alindi:
+   Kol D'de musteri parcayi kendi getirse bile parcacidan gelen fiyat
+   kayitta KALIYOR (IS-AKISI Kol D "sonradan" hali). */
+.kalem .k-katalog { font-size: 11.5px; color: var(--faint); white-space: nowrap; }
+
+/* Buyuk plaka — v1'den. TANIMSIZ-SINIF testi yakaladi ve GEC yakaladi:
+   .plate-lg'yi JS uretiyor, ekran cizilmeden DOM'da olmuyor. Ders:
+   denetim yalniz acik ekrani degil, CIZILMIS ekrani gormeli. */
+.plate-lg { align-self: flex-start; }
+.plate-lg .plate-tr { font-size: 13px; padding: 0 9px; }
+.plate-lg .plate-no { font-size: 22px; padding: 7px 13px; }
+
+/* Fiyat satiri SARMALI: yanina parcaci fiyati (.k-katalog) gelince
+   217 px'lik kutuya 281 px istiyordu (olcum 03.09, 375 px). Input'un
+   kucule bilmesi de sart -- flex cocugu varsayilan olarak icerigi
+   kadar genis kalir. */
+.kalem .k-tutar-satir { flex-wrap: wrap; }
+.kalem input.k-tutar { min-width: 0; }
+
 
 /* ===== ekran: 30-kayit.html ===== */
 /* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
@@ -1601,7 +1621,8 @@ alanları ::before ile büyür. Ölçüm (30.08,
   </div>
 
   <button class="btn btn-primary btn-lg" id="psGonder" disabled>
-    <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
+    <svg class="ico"><use href="#i-message-square"></use></svg>
+    <span>WhatsApp ile gönder</span>
   </button>
 
   <p class="plate-hint" style="text-align:center">
@@ -2284,7 +2305,23 @@ function kayitCiz() {
           '<span class="k-tutar-satir">' +
             '<input class="k-tutar mono" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
               '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="fiyat" aria-label="Tutar" />' +
+            /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM DEĞİL:
+               soluk ve küçük durur. Kol D'de müşteri parçayı kendi
+               getirse bile bu rakam kayıtta kalır — "ne kadara
+               alabileceği" bilgisi değerli (IS-AKISI Kol D). */
+            (s.alis ? '<span class="k-katalog">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
           '</span>' +
+          /* KOL B · cevap kimden geldi. Tek parçacıya sorulduysa çip
+             çıkmaz — ana yol kalınlaşmaz. */
+          (s.tip === 'parca' && (s.sorulan || []).length > 1
+            ? '<span class="k-getiren">Cevap kimden geldi?' +
+                s.sorulan.map(function (pi) {
+                  return '<button class="cip" data-kaynak="' + i + '|' + pi +
+                    '" aria-pressed="' + (s.kaynak === pi) + '">' +
+                    PARCACILAR[pi].ad + '</button>';
+                }).join('') +
+              '</span>'
+            : '') +
           (s.tip === 'parca'
             ? '<span class="k-getiren">Parçayı kim getirdi?' +
                 '<button class="cip" data-getiren="' + i + '|tamirci" aria-pressed="' +
@@ -2335,12 +2372,26 @@ document.addEventListener('click', function (e) {
   var sil = t.getAttribute('data-satir-sil');
   if (sil !== null) { k.satirlar.splice(parseInt(sil, 10), 1); Ekran.tazele(); }
 
+  var kay = t.getAttribute('data-kaynak');
+  if (kay) {
+    var pk = kay.split('|');
+    k.satirlar[parseInt(pk[0], 10)].kaynak = parseInt(pk[1], 10);
+    Ekran.tazele();
+  }
+
   var g = t.getAttribute('data-getiren');
   if (g) {
     var p = g.split('|');
-    k.satirlar[parseInt(p[0], 10)].kimGetirdi = p[1];
-    /* Müşteri getirdiyse satır fiyatsız kalır (S2, K-005). */
-    if (p[1] === 'musteri') k.satirlar[parseInt(p[0], 10)].fiyat = 0;
+    var s = k.satirlar[parseInt(p[0], 10)];
+    s.kimGetirdi = p[1];
+    /* Müşteri getirdiyse satır fiyatsız kalır (S2, K-005) — AMA gelen
+       fiyat SİLİNMEZ, alışa taşınır. Önce sıfırlıyordum: Kol D'nin
+       "sonradan" hâlinde ("ucuza buldum, kendim alayım") parçacının
+       verdiği rakam kayıttan uçuyordu. Belge onun kalmasını söylüyor. */
+    if (p[1] === 'musteri') {
+      if (s.fiyat && !s.alis) s.alis = s.fiyat;
+      s.fiyat = 0;
+    }
     Ekran.tazele();
   }
 });
@@ -2366,7 +2417,11 @@ document.addEventListener('input', function (e) {
 
 /* ===== ekran: 40-parca-sor.html ===== */
 (function () {
-var psSecili = null;
+/* KOL B (IS-AKISI): "Büyük bir iş ise parçalar farklı firmalardan
+   araştırılabiliyor" (T-11). ÇOKLU seçim — ana yolda usta bir tane
+   seçer, kolda birkaçını seçer. Ekran aynı, adım aynı; değişen tek
+   şey seçimin tekil olmaması. */
+var psSecililer = [];
 
 function psParcaListesi(k) {
   /* Yalnız TAMİRCİNİN alacağı ve fiyatı henüz belli olmayan parçalar.
@@ -2394,7 +2449,7 @@ function psCiz() {
 
   document.getElementById('psParcacilar').innerHTML = PARCACILAR.map(function (p, i) {
     return '<button class="cip" data-parcaci="' + i + '" aria-pressed="' +
-      (psSecili === i) + '">' + p.ad + '</button>';
+      (psSecililer.indexOf(i) !== -1) + '">' + p.ad + '</button>';
   }).join('');
 
   /* Mesajın gövdesi DÜZ METİN — parçacıya giden şey bu, biçim değil. */
@@ -2404,11 +2459,17 @@ function psCiz() {
     k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
     '\n\n📎 ruhsat fotoğrafı eklenecek';
 
-  document.getElementById('psGonder').disabled = (psSecili === null || !parcalar.length);
+  var g = document.getElementById('psGonder');
+  g.disabled = (!psSecililer.length || !parcalar.length);
+  /* Düğme kaç kişiye gideceğini SÖYLER: çoklu seçimde "gönderdim
+     sandım, birine gitti" hatası buradan çıkar. */
+  g.querySelector('span').textContent = psSecililer.length > 1
+    ? 'WhatsApp ile ' + psSecililer.length + ' parçacıya gönder'
+    : 'WhatsApp ile gönder';
 }
 
 Ekran.tanim('parca-sor', {
-  ciz: function () { psSecili = null; psCiz(); }
+  ciz: function () { psSecililer = []; psCiz(); }
 });
 
 document.addEventListener('click', function (e) {
@@ -2416,10 +2477,25 @@ document.addEventListener('click', function (e) {
   if (!t) return;
 
   var p = t.getAttribute('data-parcaci');
-  if (p !== null) { psSecili = parseInt(p, 10); psCiz(); }
+  if (p !== null) {
+    var i = parseInt(p, 10), y = psSecililer.indexOf(i);
+    if (y === -1) psSecililer.push(i); else psSecililer.splice(y, 1);
+    psCiz();
+  }
 
-  if (t.id === 'psGonder' && psSecili !== null) {
-    balon(PARCACILAR[psSecili].ad + ' — WhatsApp açılıyor, mesaj hazır.', false, 3000);
+  if (t.id === 'psGonder' && psSecililer.length) {
+    var k = kayitBul(ACIK_KAYIT);
+    /* SORULDUĞU SATIRA YAZILIR. Adım 4'te "cevap kimden geldi"
+       sorusunun cevabı burada üretiliyor; kayıt ekranı bunu okuyup
+       fiyat satırının altına çip olarak koyuyor — ayrı bir
+       karşılaştırma ekranı gerekmiyor (Kol B). */
+    psParcaListesi(k).forEach(function (s) {
+      s.sorulan = psSecililer.slice();
+    });
+    balon(psSecililer.length > 1
+      ? psSecililer.length + ' parçacıya soruldu — cevaplar kayda düşecek.'
+      : PARCACILAR[psSecililer[0]].ad + ' — WhatsApp açılıyor, mesaj hazır.',
+      false, 3000);
     Ekran.ac('kayit');
   }
 });
@@ -2634,7 +2710,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>219310e4</b><br>' +
+      'Sürüm <b>b20c04ae</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

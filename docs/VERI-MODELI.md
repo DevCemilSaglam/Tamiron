@@ -67,10 +67,11 @@ Akıştaki yeri: **Adım 2, 4, 5, 6** · Ekran 3
 | `Kind` | `Part` \| `Labor` — **satırın işareti, ayrı liste değil** |
 | `Name` | Ustanın yazdığı/söylediği: *"triger seti"* |
 | `Price` | Müşteriye söylenen. **Müşteri parçasında boş/0** (S2) |
-| `Cost` | Parçacıdan gelen — usta üstüne ekliyor (T-9). Müşteriye gitmez |
+| `Cost` | Parçacıdan gelen — usta üstüne ekliyor (T-9). Müşteriye gitmez. **Kol D'de müşteri parçayı kendi getirse bile SİLİNMEZ** — *"ne kadara alabileceği"* bilgisi değerli (03.09) |
 | `SuppliedBy` | `Shop` \| `Customer` — **K-005, sorumluluk anahtarı** |
 | `PartBrand` · `PartCode` | Ayrıştırılabildiyse (K-001). **Boş olabilir** |
 | `MatchStatus` | `Coded` \| `Matched` \| `Unidentified` — `PARCA-TANIMLAMA.md` §3 |
+| `SelectedReplyId` | **Kol B · hangi parçacının cevabı kullanıldı.** Birden fazla parçacıya sorulmuşsa usta birini seçiyor; seçmezse boş kalır ve akış durmaz (03.09) |
 
 > `SuppliedBy` yalnız `Kind = Part` için anlamlı. İşçilikte boş.
 >

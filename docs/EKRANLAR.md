@@ -85,6 +85,12 @@ Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açı
 
 ---
 
+> **03.09 eklendi · cevap kimden geldi.** Birden fazla parçacıya sorulmuşsa parça satırının altında *"Cevap kimden geldi?"* çipleri çıkar (Kol B). **Tek parçacıya sorulduysa çıkmaz** — ana yol kalınlaşmıyor. Ayrı bir "fiyat karşılaştırma" ekranı böylece gerekmiyor.
+>
+> **03.09 eklendi · alış fiyatı.** Parçacıdan gelen rakam satırın altında soluk durur (*"parçacı 4.200 ₺"*). Müşteriye söylenecek rakam değil; müşteri parçayı kendi getirse bile **kayıtta kalır** (Kol D).
+
+---
+
 ## 4 · PARÇA FİYATI SOR
 
 **Hangi işe:** *"parçacıya fiyat sormak"* — beşinci iş
@@ -98,6 +104,8 @@ Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açı
 | Gelen cevaplar *(geldiyse)* — ham metin + ayrıştırılan | OEM kodu girme alanı (K-001) |
 
 > **Birden fazla parçacı seçilebilir** (Kol B · büyük iş) ama varsayılan tek. Cevaplar aynı yerde birikir.
+>
+> **03.09 · prototipte işletildi:** seçim çoklu; düğme kaç kişiye gideceğini söylüyor (*"WhatsApp ile 2 parçacıya gönder"*). Tek parçacı seçildiğinde ekran ana yoldaki hâlinden **hiç farklı görünmüyor** — kol ancak kullanılınca ortaya çıkıyor.
 >
 > Ustadan **OEM kodu istenmiyor** — bilmiyor (S7). Kod parçacıdan gelirse kaydedilir, gelmezse satır *"tanımlanamadı"* kalır ve iş yürür.
 

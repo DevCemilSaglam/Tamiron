@@ -10,6 +10,52 @@
 
 ---
 
+## K-008 · Tasarım sistemi bağlayıcı bir sınıf sözlüğüdür (03.09.2026)
+
+**Karar:** Bir ekran, `TASARIM-SISTEMI.md`'nin sonundaki sınıf sözlüğünde
+olmayan bir bileşen sınıfı **açamaz**. Yeni bir görsel ihtiyaç varsa önce
+sözlüğe girer, sonra kullanılır.
+
+**Neden:** Tasarım sistemini v1'den **belge olarak** taşımıştık ve belge
+doğruydu. Yine de altı ekranı yazarken bileşenleri sıfırdan uydurdum
+(`.ana-btn`, `.kart`, `.plaka`, `.ekran-bas`, `.tutar-buyuk`). Prototip
+yabancı çıktı. Cemil: *"Eski tasarımla hiç ilgisi yok. Tasarım eskisi gibi
+devam etmeli. Yazdık bunları."*
+
+*"Kalem listesi kullanılır"* yazması, ekranın `.kalem .k-tip .k-ad`
+yazacağını garanti etmiyor. Bağlayıcı olan **sınıf adının kendisi.**
+
+**Bekçisi denetim:** `TANIMSIZ-SINIF` sözlükte olmayanı, `OLU-SINIF`
+sözlükte kalıp kullanılmayanı yakalar. Bu iş sırasında ikisi birlikte
+**60 bulgu** çıkardı; içlerinde taşındığı sanılan ama taşınmamış dokuz v1
+kuralı vardı (`.btn-primary`, `.btn-ghost`, `.btn-lg`, `.plate-sm`,
+`.plate-lg`, `.arac-bas`, `.veh-title`, `.spec-strip`, `.k-katalog`) —
+ana düğmeler **zeminsiz**, liste plakaları **büyük** çiziliyordu.
+
+---
+
+## K-007 · Kol B'de cevabın kaynağı satırda tutulur (03.09.2026)
+
+**Karar:** Birden fazla parçacıya sorulduğunda hangi cevabın kullanıldığı
+**satırın kendisinde** tutulur (`ServiceLine.SelectedReplyId`). Ayrı bir
+fiyat karşılaştırma ekranı **açılmaz**; çipler yalnız birden fazla
+parçacıya sorulmuşsa görünür.
+
+**Neden:** v1'de bu bir **ekran ailesiydi** (karşılaştırma tablosu, en
+uygun seçili, teklif detayı) ve tamirci *"karmaşık"* dediği yığının
+içindeydi. Ama bilgi gerçek: `PriceRequest` modelde zaten her parçacı için
+ayrı kayıt. Bilgiyi tutup ekranı açmamak mümkün — çünkü soru *"hangisi
+daha ucuz"* değil, *"bu satırın fiyatı kimden geldi"*.
+
+**Ana yola maliyeti sıfır:** tek parçacıya sorulduğunda çip çıkmıyor,
+ekran ana yoldaki hâlinden farksız.
+
+**Cemil onayına açık:** usta hiçbirini seçmezse alan boş kalıyor ve akış
+duruyor mu? Öneri: **durmaz** — rakam satırda, kaynağı bilinmese de iş
+yürür.
+
+---
+
 ## K-006 · Tamirat ve bakım iki ayrı türdür (03.09.2026)
 
 **Karar:** Servis kaydının bir **türü** vardır: `tamirat` | `bakim`. Kayıt açılırken seçilir.
