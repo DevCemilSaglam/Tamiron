@@ -530,6 +530,25 @@ sağlık denetimi kolların **en ağır hâli açıkken** koşturuldu
 
 **Ekran sayısı kollardan sonra da 6.** Yeni adım eklenmedi.
 
+### Kolların dokunuş maliyeti — ölçüldü
+
+Kollar eklendikten **sonra** ana yol yeniden sayıldı (375 px, gerçek
+tıklamalarla, her adımda taze düğüm):
+
+| Yol | Dokunuş | Değişim |
+|---|---|---|
+| Tam yol (parça soruluyor) | **13** | değişmedi |
+| Kısa yol (parça sorulmuyor) | **9** | değişmedi |
+| Tam yol **+ Kol B kullanılırsa** | 15 | +2 |
+
+Kol B'nin iki dokunuşu **yalnız kol kullanılınca** ödeniyor: ikinci
+parçacının seçilmesi ve *"cevap kimden geldi"*. Tek parçacı seçildiğinde
+çip hiç çizilmiyor — ana yol, kol var olmadan önceki hâliyle **birebir
+aynı**.
+
+> Kolun doğru ölçüsü *"kaç dokunuş ekledi"* değil, **"kullanılmadığında
+> kaç dokunuş ekledi"**. Bu sayı sıfır olmalı ve sıfır.
+
 ## Kol B iki eksik açığa çıkardı
 
 **1 · Çoklu seçim yoktu.** Ekran 4 tek parçacı seçiyordu; belge

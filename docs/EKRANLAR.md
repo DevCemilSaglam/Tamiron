@@ -169,6 +169,18 @@ Tek ekran. Personel, rol, yetki **yok** — tamirci bahsetmedi (K-004 notu).
 
 **Kıyas:** v1 · 38 ekran.
 
+### Ölçülen dokunuş (03.09.2026, kollar eklendikten sonra)
+
+| Yol | Dokunuş |
+|---|---|
+| Tam yol — parça soruluyor | **13** |
+| Kısa yol — parça sorulmuyor | **9** |
+| Tam yol + Kol B (çok parçacı) | 15 · **+2, yalnız kol kullanılınca** |
+
+Klavyeyle yazılanlar (parça adı, fiyat, şikâyet) sayılmadı — sayılan
+yalnız **dokunma** eylemleri. Ölçüm 375 px'te gerçek tıklamalarla
+yapıldı; beş kol eklendikten sonra tam ve kısa yol **değişmedi**.
+
 Ana yolun 6'sından yalnız **5'i akış adımı taşıyor**; 6. (Araç) başvuru ekranı. 2. ekran tabakaya dönüşürse akış **4 ekranda** biter.
 
 ---
