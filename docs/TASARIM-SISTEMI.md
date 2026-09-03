@@ -313,7 +313,7 @@ Bu belge v1'den **devralındı ve budandı.** Zanaat bilgisi (plaka bileşeni, t
 |---|---|
 | Öncelik etiketi (4 kademe) | v2'de öncelik kavramı yok |
 | Zaman tüneli özet kuralları (*Bakım · İnceleme · Tamirat · Teklif*) | İki tür kaldı: tamirat / bakım (**K-006**) |
-| Satır şeridi = tip (`--tip-*`) | Dört tip yok |
+| ~~Satır şeridi = tip~~ | **DÜŞMEDİ** — 03.09 düzeltmesi: dört tip yok ama **iki** var. Şerit `t-tamirat` (`--primary`) / `t-bakim` (`--accent`) olarak duruyor; tipi tek bakışta söyleyen tek işaret bu ve v2'de durum rozeti olmadığı için şeridin yükü arttı, azalmadı. |
 | Durum geçiş şeridi (`pill → ok → pill`) | Durum makinesi yok (**K-004**) |
 | Tarihe bağlı durum rozeti (muayene/sigorta/garanti) | Kontrol tarihleri modelde yok |
 | Kişi satırı (Kişiler listesi) | Ayrı müşteri ekranı yok — müşteri aracın üstünde |
@@ -372,3 +372,37 @@ v1'de yazı boyutları bileşen CSS'ine gömülüydü; *"hepsini büyüt"* demek
 | 6 · Araç | künye listesi · plaka · telefon bileşeni · liste |
 
 **Yeni desen yazılmadı.** v1'in zanaatı yeni ürünü karşılıyor — düşen şey desenler değil, **ekranlardı**.
+
+## ⚠️ 03.09 — desenleri BELGE olarak taşımak yetmiyor
+
+Bu belge doğruydu ve yine de prototip yabancı çıktı: altı ekranı yazarken
+bileşenleri sıfırdan uydurdum (`.ana-btn`, `.kart`, `.plaka`, `.ekran-bas`,
+`.tutar-buyuk`…). Cemil: *"Eski tasarımla hiç ilgisi yok. Tasarım eskisi gibi
+devam etmeli. Yazdık bunları."*
+
+**Ders:** tasarım sistemi bir belge değil, bir **sınıf sözlüğüdür**. Belgede
+"kalem listesi kullanılır" yazması, ekranın `.kalem .k-tip .k-ad` yazacağını
+garanti etmiyor. Aşağıdaki sözlük bağlayıcıdır; bir ekran burada olmayan bir
+sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
+
+| İş | Sınıf |
+|---|---|
+| Ekran başlığı | `.screen-head` > `.eyebrow` |
+| Kart | `.card` · vurgulu: `.card.raised` |
+| Bölüm başlığı | `.section-label` · eylemli: `.section-label.with-action` > `.lbl-txt` |
+| Ana düğme | `.btn.btn-primary.btn-lg` · ikincil: `.btn.btn-ghost` · yan yana: `.btn-row` |
+| Seçim | `.cip-grup` > `.cip` (`aria-pressed`) |
+| Alan | `.field` · ikili: `.field-2` · arama: `.search-box` |
+| Plaka | `.plate` + `.plate-sm` / `.plate-lg` (yalnız `plakaHtml()` üretir) |
+| Araç künyesi | `.arac-bas` > `.plate-lg` + `.veh-title` (`.yr`) + `.spec-strip` > `.spec-val` `.spec-sep` |
+| Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |
+| Kalem | `.kalem-list` > `.kalem` > `.k-tip` `.k-ad` `.k-tutar` `.k-sil` · boş: `.kalem-bos` |
+| Tutar | `.tutar-serit` > `.tutar-sat` / `.tutar-sat.genel` > `.tv` |
+| Rozet | `.pill` + `.ok\|.warn\|.crit\|.accent\|.info\|.muted` |
+| Uyarı kutusu | `.notice` (+ hâl) > `.n-ic` + `.n-body` |
+| Boş durum | `.bos-durum` (yalnız `bosDurumHtml()` üretir) |
+| İpucu satırı | `.plate-hint` |
+| Balon | tek `#toast`, `.show` ile görünür (yalnız `balon()` yönetir) |
+
+Denetimin **TANIMSIZ-SINIF** ve **OLU-SINIF** testleri bu sözlüğün bekçisidir:
+biri sözlükte olmayan sınıfı, öteki sözlükte kalıp kullanılmayanı yakalar.
