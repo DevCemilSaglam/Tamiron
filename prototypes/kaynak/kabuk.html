@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tamiron — Prototip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+/* @@STIL@@ */
+</style>
+</head>
+<body>
+
+<!-- ================= KABUK =================
+     TASARIM-SISTEMI v2.0: sabit header + ekran gövdesi.
+     ÇEKMECE YOK, FOOTER YOK — altı ekran var, hepsine ana ekrandan
+     ya da akışın kendisinden ulaşılıyor (T-18: iç içe menü yok). -->
+<div class="cihaz">
+
+  <header class="ust-cubuk">
+    <button class="ust-btn" data-git="home" aria-label="Ana ekrana dön">
+      <svg class="ico" aria-hidden="true"><use href="#i-ev"></use></svg>
+    </button>
+    <span class="marka">TAMİRON</span>
+    <button class="ust-btn" id="geriBtn" aria-label="Geri">
+      <svg class="ico" aria-hidden="true"><use href="#i-geri"></use></svg>
+    </button>
+  </header>
+
+  <!-- PWA kurulum düğmesi buraya enjekte edilir (tools/pwa-build.js).
+       Yuva kabukta duruyor ki derleyici hiçbir EKRANIN adını bilmesin. -->
+  <div id="kurulumYuva"></div>
+
+  <main class="govde" id="govde">
+    <!-- @@EKRANLAR@@ -->
+  </main>
+
+</div>
+
+<div class="balon-kap" id="balonKap" role="status" aria-live="polite"></div>
+
+<!-- ================= İKONLAR (Lucide · inline sprite) ================= -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <defs>
+    <g id="ikon-taban" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round"></g>
+  </defs>
+  <!-- @@IKONLAR@@ -->
+</svg>
+
+<script>
+/* @@BETIK@@ */
+</script>
+</body>
+</html>

@@ -36,8 +36,8 @@ html = html.replace(fontLink, '<link rel="stylesheet" href="fonts.css" />\n');
 
 /* ---------- 3) PWA basligi ---------- */
 const pwaBaslik = `<link rel="manifest" href="manifest.json" />
-<link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
-<link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="icon" type="image/svg+xml" href="icon.svg" />
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F5F8" />
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0F17" />
 <meta name="mobile-web-app-capable" content="yes" />
@@ -56,34 +56,31 @@ const guvenliAlan = `<style>
    max() ile taban bosluk garanti ediliyor; yukseklik prototipin
    kendi 72px'i uzerine ekleniyor (onceden 60px'e eziliyordu).
    31.08: topbar 68 -> 72 px (Cemil: navigasyon biraz daha buyuk). */
-.topbar { padding-top: max(env(safe-area-inset-top), 12px);
-          height: calc(72px + max(env(safe-area-inset-top), 12px)); }
-.footer { padding-bottom: env(safe-area-inset-bottom); }
-.drawer { padding-top: env(safe-area-inset-top); }
-@supports (height: 100dvh) { .device { height: 100dvh; } }
-@media (min-width: 480px) { @supports (height: 100dvh) { .device { height: calc(100dvh - 48px); } } }
+.ust-cubuk { padding-top: max(env(safe-area-inset-top), 10px); }
+.govde { padding-bottom: max(env(safe-area-inset-bottom), 40px); }
+@supports (height: 100dvh) { .cihaz { min-height: 100dvh; } }
 </style>
 `;
 html = html.replace('</head>', guvenliAlan + '</head>');
 
-/* ---------- 5) kurulum dugmesi (drawer icinde) ----------
+/* ---------- 5) kurulum dugmesi (kabuktaki yuvaya) ----------
    NEDEN: Android'de tarayicilar kurulum secenegini farkli yerlere koyuyor
    (Brave "Ekle..." alt menusu, Opera "Ana ekrana ekle", bazilari hic gostermiyor).
    beforeinstallprompt olayini yakalayip KENDI dugmemizi gosteriyoruz — menude
    arama derdi kalmiyor. Dugme yalniz tarayici "kurulabilir" dediginde gorunur,
    yani ayni zamanda teshis aracidir. */
-const kurulumDugmesi = `      <button class="btn btn-primary" id="kurBtn" style="display:none;margin:8px 12px 4px;width:calc(100% - 24px)">
-        <svg class="ico"><use href="#i-arrow-right"></use></svg> Uygulamayı yükle
-      </button>
-      <p class="plate-hint" id="kurNot" style="display:none;padding:0 12px 8px">Ana ekrana eklenir, tam ekran açılır.</p>
-      <p class="plate-hint" id="kurDurum" style="padding:0 12px 8px;line-height:1.7"></p>
-`;
-const drawerAyarBasligi = '      <div class="drawer-sec-label"><svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar</div>';
-if (!html.includes(drawerAyarBasligi)) {
-  console.error('HATA: drawer Ayarlar basligi bulunamadi; kurulum dugmesi eklenemedi.');
+const kurulumDugmesi = `<button id="kurBtn" style="display:none;margin:10px 14px 0;width:calc(100% - 28px);min-height:var(--dokun);border:0;border-radius:var(--radius-md);background:var(--primary);color:var(--on-primary);font-weight:600">
+    Uygulamayı yükle
+  </button>
+  <p id="kurNot" style="display:none;margin:6px 14px 0;color:var(--muted);font-size:var(--tip-sm)">Ana ekrana eklenir, tam ekran açılır.</p>
+  <p id="kurDurum" style="margin:6px 14px 0;color:var(--faint);font-size:var(--tip-xs);line-height:1.7"></p>`;
+
+const yuva = '<div id="kurulumYuva"></div>';
+if (!html.includes(yuva)) {
+  console.error('HATA: kabukta #kurulumYuva bulunamadi; kurulum dugmesi eklenemedi.');
   process.exit(1);
 }
-html = html.replace(drawerAyarBasligi, kurulumDugmesi + drawerAyarBasligi);
+html = html.replace(yuva, '<div id="kurulumYuva">' + kurulumDugmesi + '</div>');
 
 /* ---------- 6) service worker kaydi + kurulum akisi ---------- */
 const swKayit = `<script>
@@ -100,7 +97,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
    navBack()'ine bagliyoruz: ekran yiginonda geri gidilecek yer varsa
    oraya doner, ANA EKRANDA ise cikisa izin verir (beklenen davranis). */
 (function () {
-  if (!window.history || typeof window.navBack !== 'function') return;
+  if (!window.history || !window.Ekran) return;
 
   function doldur() { history.pushState({ tamiron: 1 }, ''); }
   doldur();
@@ -108,9 +105,8 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   var sonCikisDenemesi = 0;
 
   window.addEventListener('popstate', function () {
-    var yigin = window.back_stack;
-    if (window.drawerOpen || (yigin && yigin.length)) {
-      navBack();
+    if (Ekran.geriVarMi()) {
+      Ekran.geri();
       doldur();          /* bir sonraki geri de yakalansin diye yigini tazele */
       sonCikisDenemesi = 0;
       return;
@@ -122,15 +118,9 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     if (simdi - sonCikisDenemesi < 2000) return;   /* cikisa izin ver */
     sonCikisDenemesi = simdi;
     doldur();
-    if (typeof showToast === 'function') showToast('Çıkmak için tekrar geri tuşuna bas.', false, 1900);
+    if (typeof balon === 'function') balon('Çıkmak için tekrar geri tuşuna bas.', false, 1900);
   });
 
-  /* Cekmece aciksa geri tusu ONCE onu kapatsin (telefonda beklenen davranis) */
-  var eskiNavBack = window.navBack;
-  window.navBack = function () {
-    if (window.drawerOpen && typeof closeDrawer === 'function') { closeDrawer(); return; }
-    eskiNavBack();
-  };
 })();
 
 /* Kurulum istemi + TESHIS.
@@ -197,7 +187,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
     if (btn) btn.style.display = 'none';
     if (not) not.style.display = 'none';
     yaz();
-    if (window.showToast) showToast('Uygulama yüklendi.', false, 2200);
+    if (window.balon) balon('Uygulama yüklendi.', false, 2200);
   });
 })();
 </script>
@@ -221,6 +211,22 @@ const fontCss = fontSablon.replace(/url\((fonts\/[^)]+\.woff2)\)/g, (t, yol) => 
   fontBoyut += ham.length;
   return 'url(data:font/woff2;base64,' + ham.toString('base64') + ')';
 });
+
+/* ---------- 6b) PWA varliklari: manifest + ikonlar ----------
+   v1'de bunlar app/ icinde ELLE duruyordu; app/ bir URETIM ciktisi
+   oldugu icin yanlisti (silinince geri gelmiyordu). Artik kaynakta
+   duruyor ve buraya DUZ kopyalaniyor — alt klasor yok. */
+const PWA_KAYNAK = path.join(KOK, 'prototypes', 'pwa');
+let kopyalanan = 0;
+if (fs.existsSync(PWA_KAYNAK)) {
+  for (const f of fs.readdirSync(PWA_KAYNAK)) {
+    fs.copyFileSync(path.join(PWA_KAYNAK, f), path.join(APP, f));
+    kopyalanan++;
+  }
+} else {
+  console.error('HATA: prototypes/pwa yok — manifest ve ikonlar kopyalanamadi.');
+  process.exit(1);
+}
 
 /* ---------- 7) surum damgasi: HEM sw HEM sayfa ----------
    Sayfadaki teshis satiri surumu gosterir; boylece telefonda hangi kopyanin

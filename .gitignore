@@ -1,11 +1,3 @@
-bin/
-obj/
-.vs/
-*.user
+# uretim ciktisi degil, kaynak degil
 node_modules/
-.env
-appsettings.*.Local.json
-tamiron-app.zip
-
-# yayin paketi (SendUserFile ile gonderiliyor, surumlenmez)
-app.zip
+prototypes/.omurga.denetim-yedek

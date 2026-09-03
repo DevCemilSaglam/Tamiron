@@ -11,6 +11,12 @@ function stilMetni() {
 }
 
   var b=[];function ek(t,e,d){b.push(t+' | '+e+' | '+d);}
+
+  /* OLCULEBILIR MI? Onizleme bolmesi bazen SIFIR GENISLIKTE aciliyor;
+     o hâlde her kutunun clientWidth'i 0 cikiyor ve tasma testleri
+     ONLARCA SAHTE BULGU uretiyor. Olcemeyen bir test, olcum yapmis
+     gibi rapor etmemeli — atladigini soylemeli. */
+  var OLCULEBILIR = window.innerWidth >= 320;
   var ekranlar=Array.from(document.querySelectorAll('.screen')).map(function(e){return e.id.replace(/^screen-/,'');});
   ekranlar.forEach(function(a){try{showScreen(a);}catch(e){ek('ACILMIYOR',a,e.message);}});
   var fnRe=/^([A-Za-z_$][\w$]*)\s*\(/;
@@ -27,7 +33,10 @@ function stilMetni() {
     if(id&&!tan[id]){var e=u.closest('.screen');ek('OLU-IKON',e?e.id.replace(/^screen-/,''):'(kabuk)','#'+id);}});
   var kod=document.documentElement.innerHTML;
   ekranlar.forEach(function(a){ if(a==='home')return;
-    if(!new RegExp("(?:go|drawerGo)\\('"+a+"'\\)|showScreen\\('"+a+"'\\)").test(kod)) ek('YETIM',a,'gidilmiyor'); });
+    /* v2: gezinme data-git="ad" ile yapiliyor (cekirdek betikteki
+       delegasyon). Bu desen eklenmezse HER ekran yetim gorunurdu. */
+    if(!new RegExp("(?:go|drawerGo)\\('"+a+"'\\)|showScreen\\('"+a+"'\\)|data-git=\""+a+"\"").test(kod))
+      ek('YETIM',a,'gidilmiyor'); });
   /* 9) TANIMSIZ CSS SINIFI — kullaniliyor ama hicbir kuralda gecmiyor.
      .row-btns hatasi boyle olustu: dogru sinif .btn-row idi, 9 ekranda
      yanlis yazilmis ve butonlar ust uste binmisti. */
@@ -67,7 +76,7 @@ function stilMetni() {
       if(getComputedStyle(el).color==='rgb(0, 0, 0)') ek('KOYU-SIYAH',a,(el.className||'').toString().split(' ')[0]||el.tagName);});});
   document.documentElement.setAttribute('data-theme','light');
   ekranlar.forEach(function(a){showScreen(a);var el=document.getElementById('screen-'+a);
-    if(el.scrollWidth>el.clientWidth+2) ek('YATAY-TASMA',a,el.scrollWidth+'>'+el.clientWidth);});
+    if(OLCULEBILIR && el.scrollWidth>el.clientWidth+2) ek('YATAY-TASMA',a,el.scrollWidth+'>'+el.clientWidth);});
 
 /* 20) IC TASMA — ekran koku degil, ICERIDEKI bir kutu tasiyor.
    Onceki 19 test bunu kaciriyordu: "+ Parca / + Iscilik butonlari birbirine
@@ -92,7 +101,7 @@ function stilMetni() {
       var h=hale(el);
       el.querySelectorAll('*').forEach(function(c){var x=hale(c); if(x>h)h=x;});
       if(ov<=h+2)return;
-      ek('IC-TASMA',a,((el.className||'').toString().split(' ')[0]||el.tagName)+' '+el.scrollWidth+'>'+el.clientWidth);});});
+      if(OLCULEBILIR) ek('IC-TASMA',a,((el.className||'').toString().split(' ')[0]||el.tagName)+' '+el.scrollWidth+'>'+el.clientWidth);});});
 /* 10) YINELENEN FONKSIYON — ayni ad iki kez tanimlanmis.
    Ikincisi birinciyi SESSIZCE eziyor. odemeYollariCiz boyle bulundu:
    olu kopya VAR OLMAYAN bir alana (ODEME_YOLLARI[i].durum) bakiyordu. */
@@ -304,8 +313,15 @@ function stilMetni() {
    kayit acilinca cikiyor.
    Bulunan: fdArac — fiyat calismasi detayi acilmiyordu. */
 (function () {
+  /* DENETIMIN KENDI BETIGI TARANMAZ. Denetim gomulu calisiyor ve kendi
+     icinde getElementById('drawer') gecen bir test var (14). Cekmece
+     v2'de kaldirilinca denetim KENDINI olu referansla sucladi. Kendi
+     kodunu olcen bir arac, olctugu seye karismamali. */
   var kod = '';
-  document.querySelectorAll('script').forEach(function (sc) { kod += sc.textContent; });
+  document.querySelectorAll('script').forEach(function (sc) {
+    if (sc.textContent.indexOf('SAGLIK DENETIMI') >= 0) return;
+    kod += sc.textContent;
+  });
   var re = /getElementById\(\s*'([A-Za-z_][\w-]*)'\s*\)/g;
   var m, gorulen = {};
   while ((m = re.exec(kod))) {
@@ -469,7 +485,7 @@ function stilMetni() {
         if (w > obur) obur = w;
       });
       if (ezik && obur > kw * 0.7) {
-        ek('EZILEN-GOVDE', a,
+        if (OLCULEBILIR) ek('EZILEN-GOVDE', a,
            (kap.className || kap.tagName) + ' icinde ' +
            (ezik.className || ezik.tagName) + ' 0px kaldi (kardesi ' +
            Math.round(obur) + '/' + Math.round(kw) + 'px)');
@@ -482,5 +498,6 @@ function stilMetni() {
   console.log('SAGLIK DENETIMI — '+ekranlar.length+' ekran, '+b.length+' bulgu');
   b.forEach(function(x){
 console.log('  '+x);});
-  return {ekran:ekranlar.length, bulgu:b.length, liste:b};
+  return {ekran:ekranlar.length, bulgu:b.length, liste:b,
+          olcum: OLCULEBILIR ? 'yapildi' : 'ATLANDI (gorus alani '+window.innerWidth+'px)'};
 })()

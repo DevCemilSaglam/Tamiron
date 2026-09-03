@@ -1,0 +1,62 @@
+<!-- ekran: home · İçerideki araçlar (EKRANLAR.md §1)
+     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak.
+     Buradaki amaç derlemenin, gezinmenin ve denetimin çalıştığını
+     göstermek. -->
+<section class="screen" id="screen-home">
+
+  <h1 class="ekran-bas">İçerideki araçlar</h1>
+  <p class="ekran-alt" id="homeSay">—</p>
+
+  <div class="iskelet-not">
+    <strong>İskelet.</strong> Ekranların içeriği 13. işte yazılacak.
+    Bu ekranın işi şimdilik derlemenin ve gezinmenin çalıştığını göstermek.
+  </div>
+
+  <button class="ana-btn" data-git="ruhsat">
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
+    <span>Ruhsatı çek</span>
+  </button>
+
+</section>
+
+<style>
+.ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
+.ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
+
+.iskelet-not {
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  color: var(--muted);
+  font-size: var(--tip-sm);
+  margin-bottom: 18px;
+}
+
+/* Ana eylem — T-18: büyük, tek, tartışmasız */
+.ana-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 76px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-size: var(--tip-lg);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+</style>
+
+<script>
+Ekran.tanim('home', {
+  ciz: function () {
+    var el = document.getElementById('homeSay');
+    if (el) el.textContent = ARACLAR.length + ' araç içeride';
+  }
+});
+</script>

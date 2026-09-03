@@ -91,27 +91,6 @@
   --highlight:            var(--brand-orange);   /* üçüncü vurgu (turuncu) */
 
   /* sol menü — zemine karışır (ayrı koyu blok DEĞİL) */
-  --rail:        #ECF1F6;
-  --rail-line:   #DBE3EC;
-  --rail-text:   #0F1E30;
-  --rail-muted:  #54637A;
-  --nav-on-bg:   color-mix(in srgb, var(--primary) 12%, transparent); /* aktif öğe yumuşak dolgu */
-  --nav-on-fg:   var(--primary);
-  --nav-hover:   color-mix(in srgb, var(--text) 6%, transparent);
-
-
-  /* ---------- ZİYARET TİPİ RENKLERİ (ayrı eder, durum bildirmez) ----------
-     Yeni hex eklenmez — hepsi mevcut marka/semantik paletten türer.
-     ⚠️ 31.08: ŞERİT ARTIK DURUMU SÖYLÜYOR (Cemil). Bu renkler şeritte
-     değil, servis kaydı satırının İKONUNDA tipi ayırt etmek için
-     kullanılıyor. Şerit rengi semantik durum paletinden gelir. */
-  --tip-bakim:    var(--accent);    /* teal   — periyodik / rutin */
-  --tip-tamirat:  var(--primary);   /* mavi   — asıl onarım işi */
-  --tip-inceleme: var(--warn);      /* amber  — tespit / dikkat */
-  --tip-teklif:   var(--highlight);       /* turuncu — fiyat / satis */
-
---info:      var(--primary);   /* bilgi / notr sonuc — durum rozeti */
-  --info-bg:   #E4EBF7;   /* bilgi rozeti yumuşak zemin */
 
   --crit: var(--sem-crit);  --crit-bg: #FBE7E2;
   --warn: var(--sem-warn);  --warn-bg: #F6EDD9;
@@ -145,26 +124,6 @@
   --on-accent:      #04201C;
   --highlight:            var(--brand-orange-bright);
 
-  --rail:        #0E141D;
-  --rail-line:   #233042;
-  --rail-text:   #E7EEF6;
-  --rail-muted:  #93A2B4;
-  --nav-on-bg:   color-mix(in srgb, var(--primary) 22%, transparent);
-  --nav-on-fg:   var(--primary);
-  --nav-hover:   color-mix(in srgb, #fff 6%, transparent);
-
-
-  /* ---------- ZİYARET TİPİ RENKLERİ (ayrı eder, durum bildirmez) ----------
-     Yeni hex eklenmez — hepsi mevcut marka/semantik paletten türer.
-     Durum rozetiyle karışmaz: şerit TİPİ, rozet DURUMU söyler. */
-  --tip-bakim:    var(--accent);    /* teal   — periyodik / rutin */
-  --tip-tamirat:  var(--primary);   /* mavi   — asıl onarım işi */
-  --tip-inceleme: var(--warn);      /* amber  — tespit / dikkat */
-  --tip-teklif:   var(--highlight);       /* turuncu — fiyat / satis */
-
---info:      var(--primary);   /* bilgi / notr sonuc — durum rozeti */
-  --info-bg:   #111E33;   /* bilgi rozeti yumuşak zemin */
-
   --crit: var(--sem-crit-dark);  --crit-bg: #2A1512;
   --warn: var(--sem-warn-dark);  --warn-bg: #241C0E;
   --ok:   var(--sem-ok-dark);    --ok-bg:   #102420;
@@ -184,9 +143,6 @@
     --primary:var(--brand-blue); --primary-strong:var(--brand-blue-strong); --on-primary:#FFFFFF;
     --accent:var(--brand-teal-bright); --accent-soft:#0F2A28; --on-accent:#04201C;
     --highlight:var(--brand-orange-bright);
-    --rail:#172436; --rail-line:#2A3B51; --rail-text:#E7EEF6; --rail-muted:#A9B8CB;
-    --nav-on-bg:color-mix(in srgb, var(--brand-blue) 22%, transparent); --nav-on-fg:var(--brand-blue);
-    --nav-hover:color-mix(in srgb, #fff 6%, transparent);
     --crit:var(--sem-crit-dark); --crit-bg:#2A1512; --warn:var(--sem-warn-dark); --warn-bg:#241C0E; --ok:var(--sem-ok-dark); --ok-bg:#102420;
     --logo-word:#E7EEF6;
     --shadow-sm:0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);

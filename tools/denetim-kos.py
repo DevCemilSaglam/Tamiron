@@ -28,9 +28,21 @@ if sys.argv[1] == 'gom':
     # silinince her yerel degisken ust duzey sanildi (28 sahte bulgu).
     a = re.sub(r'/\*[\s\S]*?\*/', '', a)
     a = re.sub(r'\n{3,}', '\n\n', a)
+    # DENETIM YENIDEN CALISTIRILABILIR. Onceden yalnizca 'load' aninda
+    # bir kez calisiyordu; onizleme bolmesi o anda SIFIR GENISLIKTE
+    # oldugu icin tasma testleri hep "atlandi" diyordu ve olcum hic
+    # yapilamiyordu. Artik bir fonksiyon: gorus alani ayarlandiktan
+    # sonra DENETIM_CALISTIR() ile tekrar cagrilir.
+    # DIKKAT — "return" ile denetim govdesi ARASINA SATIR SONU GIRMEMELI.
+    # Govde bir satir sonuyla basliyor; "return \n (function..." yazilinca
+    # JavaScript otomatik noktali virgul koyuyor ve fonksiyon UNDEFINED
+    # donuyor. Acilis parantezi return'un yanina yazilarak engellenir.
     h = h.replace('</body>',
-                  "<script>window.addEventListener('load',function(){try{window.DENETIM="
-                  + a + ";}catch(e){window.DENETIM={hata:e.message};}});</scr" + "ipt></body>", 1)
+                  "<script>window.DENETIM_CALISTIR=function(){return ("
+                  + a + ");};"
+                  "window.addEventListener('load',function(){try{"
+                  "window.DENETIM=window.DENETIM_CALISTIR();"
+                  "}catch(e){window.DENETIM={hata:e.message};}});</scr" + "ipt></body>", 1)
     # Onizleme bolmesinin dosya siniri var ve omurga her turda buyuyor.
     # GECICI kopyadan SATIR BASINDAKI yorum bloklari atilir — bunlar
     # dosyadaki aciklamalar, calisirken gerekmiyorlar. Satir icindeki

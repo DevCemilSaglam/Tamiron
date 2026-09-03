@@ -1,0 +1,604 @@
+<!doctype html>
+<!--
+  ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
+  Kaynak: prototypes/kaynak/**
+  Üretmek için: node tools/prototip-derle.js
+  Üretim: 2026-09-03 18:09
+-->
+
+<html lang="tr" data-theme="light">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Tamiron — Prototip</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+/* ===== tokens.css (docs/tokens.css) ===== */
+/* ============================================================
+   TAMIRON — Tasarım Tokenları (TEK KAYNAK)
+   ------------------------------------------------------------
+   Renkleri değiştirmek istersen: SADECE aşağıdaki
+   "MARKA PALETİ" bölümündeki hex kodlarını düzenle.
+   Işık/koyu tema ve tüm arayüz renkleri bu paletten türer.
+
+   Kullanım:
+     <html data-theme="light">  ->  açık tema (varsayılan)
+     <html data-theme="dark">   ->  koyu tema
+   Tema seçimi yoksa işletim sistemi tercihini izler.
+   ============================================================ */
+
+:root {
+  /* ---------- MARKA PALETİ (burayı değiştir) ---------- */
+  --brand-navy:          #1C4E86;  /* ana mavi — açık tema birincil */
+  --brand-navy-strong:   #163F6D;  /* koyu ton (hover) */
+  --brand-blue:          #5B8DEF;  /* parlak mavi — koyu tema birincil */
+  --brand-blue-strong:   #78A2F2;  /* açık ton (koyu tema hover) */
+  --brand-teal:          #279689;  /* teal aksan — açık tema */
+  --brand-teal-bright:   #34C1AF;  /* teal aksan — koyu tema */
+  --brand-orange:        #E8641C;  /* turuncu vurgu — açık tema */
+  --brand-orange-bright: #F2843E;  /* turuncu vurgu — koyu tema */
+
+  /* ---------- SEMANTİK / DURUM RENKLERİ ---------- */
+  --sem-crit:   #C4432E;  --sem-crit-dark:   #F0785F;   /* zorunlu / hata */
+  --sem-warn:   #9C6B12;  --sem-warn-dark:   #E0A64B;   /* yapılabilir / uyarı */
+  --sem-ok:     #1F8A5B;  --sem-ok-dark:     #4FC98A;   /* iyi olur / başarılı */
+
+  /* ---------- TİPOGRAFİ ---------- */
+  --font-display: "Sora", system-ui, sans-serif;         /* başlıklar */
+  --font-body:    "Instrument Sans", system-ui, sans-serif; /* metin/arayüz */
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace; /* plaka, tutar, kod */
+
+  /* ---------- LOGO (marka varlığı) ----------
+     Logo SVG'si artık TEK blok; tema farkı yalnız wordmark renginde.
+     ⚠️ --logo-nut (#269689) ile --brand-teal (#279689) BİR HANE farklı —
+     logonun kendi değeri korundu, görünüm değişmesin diye. Bkz. A-D5. */
+  --logo-nut:       #269689;   /* somun ana yüz */
+  --logo-nut-shade: #22766E;   /* somun gölge */
+  --logo-nut-tint:  #5AA79F;   /* somun üst yüz */
+
+  /* ---------- YARIÇAP / GÖLGE ---------- */
+  --radius-sm: 8px;  --radius-md: 12px;  --radius-lg: 16px;  --radius-pill: 999px;
+
+  /* ---- TIPOGRAFI OLCEGI (v2, 03.09.2026) ----
+     v1'de boyutlar bilesen CSS'ine gomuluydu; "hepsini buyut" demek
+     yuzlerce satir dokunmak demekti. Kullanicimiz teknolojiden uzak ve
+     yasli olabilir (T-18) — taban boyut TEK YERDEN degisebilmeli.
+     Taban 17px (v1'de 16). Olcek 1.15 civari, yuvarlatilmis. */
+  --tip-xs:   13px;   /* rozet, kucuk etiket — asgari, bundan kucuk YOK */
+  --tip-sm:   15px;   /* alt bilgi, ikincil satir */
+  --tip-md:   17px;   /* TABAN — govde metni, buton, alan */
+  --tip-lg:   20px;   /* bolum basligi */
+  --tip-xl:   26px;   /* ekran basligi */
+  --tip-2xl:  34px;   /* toplam tutar — tek bakista okunacak rakam */
+
+  --satir-siki: 1.25;  /* baslik */
+  --satir-nor:  1.55;  /* govde */
+
+  /* Dokunma hedefi — 44px asgari (v1'de kural yaziliydi ama token
+     degildi, her bilesende elle yaziliyordu). */
+  --dokun: 48px;
+}
+
+/* ============================================================
+   IŞIK TEMA  (varsayılan)
+   ============================================================ */
+:root,
+[data-theme="light"] {
+  --bg:            #EDF2F9;   /* uygulama zemini */
+  --surface:       #FFFFFF;   /* kartlar */
+  --surface-2:     #E2EBF5;   /* ikincil yüzey / hafif dolgu */
+  --line:          #D3DEEB;   /* kenarlık / ayraç */
+  --text:          #0F1E30;   /* ana metin */
+  --muted:         #44556F;   /* ikincil metin */
+  /* T-18 (yasli goz) icin OLCULDU ve DUZELTILDI (03.09.2026).
+     Eski deger #7E8FA5: surface 3.30 · bg 2.94 · surface-2 2.79 —
+     ucu de AA'nin altinda, en soluk metnimiz okunmuyordu.
+     Yeni deger UC ZEMINDE de AA gecer: 5.53 / 4.92 / 4.59. */
+  --faint:         #596A80;
+  --field-bg:      #F6FAFE;   /* metin alanlarinin zemini — notr gri degil */
+  --hint:          #4B6183;   /* ipucu metni — muted'dan mavimsi */   /* en soluk (placeholder, ikon) */
+
+  --primary:        var(--brand-navy);
+  --primary-strong: var(--brand-navy-strong);
+  --on-primary:     #FFFFFF;
+  --accent:         var(--brand-teal);
+  --accent-soft:    #DCF2EF;   /* aksan yumuşak zemin (rozet) */
+  --on-accent:      #FFFFFF;
+  --highlight:            var(--brand-orange);   /* üçüncü vurgu (turuncu) */
+
+  /* sol menü — zemine karışır (ayrı koyu blok DEĞİL) */
+
+  --crit: var(--sem-crit);  --crit-bg: #FBE7E2;
+  --warn: var(--sem-warn);  --warn-bg: #F6EDD9;
+  --ok:   var(--sem-ok);    --ok-bg:   #E3F2EA;
+
+  --logo-word: #142230;   /* wordmark — açık tema */
+  --shadow-sm: 0 1px 2px rgba(8,20,32,.06), 0 4px 10px -6px rgba(8,20,32,.25);
+  --shadow: 0 1px 2px rgba(8,20,32,.05), 0 20px 44px -30px rgba(8,20,32,.45);
+  --scrim: rgba(8,20,32,.48);   /* drawer / modal karartma */
+}
+
+/* ============================================================
+   KOYU TEMA
+   ============================================================ */
+[data-theme="dark"] {
+  --bg:            #0A1220;
+  --surface:       #14202F;
+  --surface-2:     #172436;
+  --line:          #2A3B51;
+  --text:          #E7EEF6;
+  --muted:         #A9B8CB;
+  --faint:         #8496AB;
+  --field-bg:      #101B2B;
+  --hint:          #9DB2CB;
+
+  --primary:        var(--brand-blue);
+  --primary-strong: var(--brand-blue-strong);
+  --on-primary:     #FFFFFF;
+  --accent:         var(--brand-teal-bright);
+  --accent-soft:    #0F2A28;
+  --on-accent:      #04201C;
+  --highlight:            var(--brand-orange-bright);
+
+  --crit: var(--sem-crit-dark);  --crit-bg: #2A1512;
+  --warn: var(--sem-warn-dark);  --warn-bg: #241C0E;
+  --ok:   var(--sem-ok-dark);    --ok-bg:   #102420;
+
+  --logo-word: #E7EEF6;   /* wordmark — koyu tema */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
+  --scrim: rgba(0,0,0,.62);
+}
+
+/* Tema seçilmemişse (data-theme yok) işletim sistemi koyuysa koyu uygula */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0A1220; --surface:#14202F; --surface-2:#172436; --line:#2A3B51;
+    --text:#E7EEF6; --muted:#A9B8CB; --faint:#8496AB;
+    --field-bg:#101B2B; --hint:#9DB2CB;
+    --primary:var(--brand-blue); --primary-strong:var(--brand-blue-strong); --on-primary:#FFFFFF;
+    --accent:var(--brand-teal-bright); --accent-soft:#0F2A28; --on-accent:#04201C;
+    --highlight:var(--brand-orange-bright);
+    --crit:var(--sem-crit-dark); --crit-bg:#2A1512; --warn:var(--sem-warn-dark); --warn-bg:#241C0E; --ok:var(--sem-ok-dark); --ok-bg:#102420;
+    --logo-word:#E7EEF6;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
+    --scrim: rgba(0,0,0,.62);
+  }
+}
+
+
+/* ===== stil/01-taban.css ===== */
+/* ============ TABAN ============
+   Renk, yazı ve ölçü TOKEN'DAN gelir (docs/tokens.css, K-023).
+   Burada ham hex YOK. */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--tip-md);
+  line-height: var(--satir-nor);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* TABAN KURAL — iki kez yaşanan hata (TASARIM-SISTEMI):
+   .field dışında kalan alanlar tema almıyordu. Renk DAİMA
+   kapsayıcıdan gelir. */
+input, textarea, select, button {
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: inherit;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: var(--satir-siki);
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+/* Dokunma hedefi: GÖRSEL AĞIRLIK ≠ DOKUNMA ALANI.
+   Hedefi büyütmek için yazıyı büyütmek gerekmez. */
+button { min-height: var(--dokun); cursor: pointer; }
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* İkon — currentColor ile boyanır, token rengine uyar */
+.ico { width: 24px; height: 24px; flex: none; }
+.ico-lg { width: 32px; height: 32px; }
+
+
+/* ===== stil/02-kabuk.css ===== */
+/* ============ KABUK ============
+   Sabit üst çubuk + kayan gövde. Çekmece ve footer YOK
+   (TASARIM-SISTEMI v2.0). */
+
+.cihaz {
+  max-width: 460px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+
+.ust-cubuk {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--line);
+}
+
+.marka {
+  flex: 1;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: var(--tip-lg);
+  letter-spacing: .01em;
+  color: var(--primary);
+}
+
+.ust-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--dokun);
+  height: var(--dokun);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--text);
+}
+.ust-btn:hover { border-color: var(--primary); }
+
+/* Geri tuşu işlevsizken GİZLENMEZ, silikleşir — düzen zıplamasın
+   (TASARIM-SISTEMI, v1'den taşınan kural). */
+.ust-btn[disabled] { opacity: .35; pointer-events: none; }
+
+.govde {
+  flex: 1;
+  padding: 16px 14px 40px;
+}
+
+/* Ekranlar: yalnız biri görünür. */
+.screen { display: none; }
+.screen.acik { display: block; }
+
+/* ---- balon (toast) ---- */
+.balon-kap {
+  position: fixed;
+  left: 50%;
+  bottom: 20px;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(420px, calc(100vw - 28px));
+  pointer-events: none;
+}
+.balon {
+  background: var(--text);
+  color: var(--bg);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: var(--tip-sm);
+  box-shadow: var(--shadow);
+}
+.balon.uyari { background: var(--crit); color: var(--surface); }
+
+
+/* ===== ekran: 10-home.html ===== */
+.ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
+.ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
+
+.iskelet-not {
+  background: var(--surface-2);
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  color: var(--muted);
+  font-size: var(--tip-sm);
+  margin-bottom: 18px;
+}
+
+/* Ana eylem — T-18: büyük, tek, tartışmasız */
+.ana-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 76px;
+  border: 0;
+  border-radius: var(--radius-lg);
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-display);
+  font-size: var(--tip-lg);
+  font-weight: 700;
+  box-shadow: var(--shadow);
+}
+
+</style>
+</head>
+<body>
+
+<!-- ================= KABUK =================
+     TASARIM-SISTEMI v2.0: sabit header + ekran gövdesi.
+     ÇEKMECE YOK, FOOTER YOK — altı ekran var, hepsine ana ekrandan
+     ya da akışın kendisinden ulaşılıyor (T-18: iç içe menü yok). -->
+<div class="cihaz">
+
+  <header class="ust-cubuk">
+    <button class="ust-btn" data-git="home" aria-label="Ana ekrana dön">
+      <svg class="ico" aria-hidden="true"><use href="#i-ev"></use></svg>
+    </button>
+    <span class="marka">TAMİRON</span>
+    <button class="ust-btn" id="geriBtn" aria-label="Geri">
+      <svg class="ico" aria-hidden="true"><use href="#i-geri"></use></svg>
+    </button>
+  </header>
+
+  <!-- PWA kurulum düğmesi buraya enjekte edilir (tools/pwa-build.js).
+       Yuva kabukta duruyor ki derleyici hiçbir EKRANIN adını bilmesin. -->
+  <div id="kurulumYuva"></div>
+
+  <main class="govde" id="govde">
+    
+<!-- ekran: home · İçerideki araçlar (EKRANLAR.md §1)
+     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak.
+     Buradaki amaç derlemenin, gezinmenin ve denetimin çalıştığını
+     göstermek. -->
+<section class="screen" id="screen-home">
+
+  <h1 class="ekran-bas">İçerideki araçlar</h1>
+  <p class="ekran-alt" id="homeSay">—</p>
+
+  <div class="iskelet-not">
+    <strong>İskelet.</strong> Ekranların içeriği 13. işte yazılacak.
+    Bu ekranın işi şimdilik derlemenin ve gezinmenin çalıştığını göstermek.
+  </div>
+
+  <button class="ana-btn" data-git="ruhsat">
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
+    <span>Ruhsatı çek</span>
+  </button>
+
+</section>
+
+<!-- ekran: ruhsat · Ruhsatı çek (EKRANLAR.md §2)
+     ⚠️ İSKELET YER TUTUCUSU — gerçek içerik 13. işte yazılacak. -->
+<section class="screen" id="screen-ruhsat">
+
+  <h1 class="ekran-bas">Ruhsatı çek</h1>
+  <p class="ekran-alt">Telefonu ruhsata tut — bilgiler kendiliğinden dolar.</p>
+
+  <div class="iskelet-not">
+    <strong>İskelet.</strong> Bu ekran 13. işte yazılacak.
+    Araştırmadan gelen iki not burada uygulanacak:
+    <b>telefon alanı</b> eklenecek (ruhsatta yok, A-29) ve
+    <b>TC kimlik no ile adres saklanmayacak</b>.
+  </div>
+
+  <button class="ana-btn" data-git="home">
+    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-geri"></use></svg>
+    <span>Ana ekrana dön</span>
+  </button>
+
+</section>
+
+  </main>
+
+</div>
+
+<div class="balon-kap" id="balonKap" role="status" aria-live="polite"></div>
+
+<!-- ================= İKONLAR (Lucide · inline sprite) ================= -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <defs>
+    <g id="ikon-taban" fill="none" stroke="currentColor" stroke-width="2"
+       stroke-linecap="round" stroke-linejoin="round"></g>
+  </defs>
+    <!-- Lucide · inline sprite. currentColor ile boyanır (K-023).
+       Dış bağımlılık yok. Yeni ikon buraya eklenir. -->
+  <symbol id="i-ev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9.5 12 3l9 6.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-geri" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-arac" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 17h2v-4l-2-5H5L3 13v4h2"/><circle cx="7" cy="17" r="2"/><circle cx="17" cy="17" r="2"/><path d="M9 17h6"/></symbol>
+  <symbol id="i-kamera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+  <symbol id="i-ara" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-ekle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-tamam" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-mikrofon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M19 10a7 7 0 0 1-14 0M12 19v3"/></symbol>
+  <symbol id="i-parca" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7.5 4.3 9 5.2v9.4l-9 5.2-9-5.2V9.5z" transform="translate(4.5)"/></symbol>
+  <symbol id="i-para" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+  <symbol id="i-ayar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/></symbol>
+
+</svg>
+
+<script>
+
+/* ===== betik/01-cekirdek.js ===== */
+/* ============ ÇEKİRDEK ============
+   Ekran kaydı, gezinme, balon. Ekranlar buraya BAĞLANIR;
+   çekirdek hiçbir ekranı bilmez.
+
+   v1 DERSİ: her şey tek bir global kapsamdaydı ve aynı var-hoisting
+   hatası SEKİZ kez, sınıf adı çakışması ÜÇ kez yaşandı. Burada her
+   ekranın betiği derlemede kendi IIFE'sine sarılıyor — sorun
+   disiplinle değil YAPIYLA çözülüyor. */
+
+/* YUKLEME HATASI TOPLAYICISI — denetim bunu ariyor (TOPLAYICI-YOK).
+   Sessizce olen bir betik, prototipte en pahali hata turudur: sayfa
+   acilir, hicbir sey calismaz ve sebep gorunmez. */
+/* Ad denetimin bekledigi ad — tools/saglik-denetim.js 19. test
+   window.YUKLEME_HATALARI ariyor. */
+window.YUKLEME_HATALARI = [];
+window.addEventListener('error', function (e) {
+  window.YUKLEME_HATALARI.push((e.message || 'hata') + ' @ ' + (e.filename || '') + ':' + (e.lineno || 0));
+});
+window.addEventListener('unhandledrejection', function (e) {
+  window.YUKLEME_HATALARI.push('soz reddedildi: ' +
+    (e.reason && e.reason.message ? e.reason.message : e.reason));
+});
+
+var Ekran = (function () {
+  var kayit = {};     /* ad -> { ciz } */
+  var gecmis = [];
+  var acik = null;
+
+  function tanim(ad, o) {
+    if (kayit[ad]) { console.warn('Ekran iki kez tanımlandı: ' + ad); return; }
+    kayit[ad] = o || {};
+  }
+
+  /* Ekranı gösterir. Geçmişe YAZMAZ — onu ac() yapar. */
+  function goster(ad) {
+    var el = document.getElementById('screen-' + ad);
+    if (!el) { console.warn('Ekran yok: ' + ad); return false; }
+    var hepsi = document.querySelectorAll('.screen');
+    for (var i = 0; i < hepsi.length; i++) hepsi[i].classList.remove('acik');
+    el.classList.add('acik');
+    acik = ad;
+    var k = kayit[ad];
+    if (k && typeof k.ciz === 'function') {
+      try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); }
+    }
+    document.querySelector('.govde').scrollTop = 0;
+    window.scrollTo(0, 0);
+    geriTazele();
+    return true;
+  }
+
+  function ac(ad) {
+    if (ad === acik) return;
+    if (acik) gecmis.push(acik);
+    goster(ad);
+  }
+
+  function geri() {
+    if (!gecmis.length) return;
+    goster(gecmis.pop());
+  }
+
+  function geriTazele() {
+    var b = document.getElementById('geriBtn');
+    if (b) b.disabled = gecmis.length === 0;
+  }
+
+  return { tanim: tanim, ac: ac, geri: geri, goster: goster,
+           adi: function () { return acik; },
+           /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
+           geriVarMi: function () { return gecmis.length > 0; } };
+})();
+
+/* Denetim aracı (tools/saglik-denetim.js) bu ada göre çalışıyor —
+   25 testi yeniden yazmamak için köprü bırakıldı. */
+function showScreen(ad) { Ekran.goster(ad); }
+
+/* ---- GEZİNME: data-git ----
+   v1'de her düğme onclick="go('x')" yazıyordu; bu her işlevi GLOBAL
+   olmaya zorluyordu ve ölü referanslar ancak çalışma anında
+   görülüyordu. Burada gezinme VERİ, kod değil. */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-git]');
+  if (!t) return;
+  e.preventDefault();
+  Ekran.ac(t.getAttribute('data-git'));
+});
+
+/* ---- balon ---- */
+function balon(metin, uyari, sure) {
+  var kap = document.getElementById('balonKap');
+  if (!kap) return;
+  var d = document.createElement('div');
+  d.className = 'balon' + (uyari ? ' uyari' : '');
+  d.textContent = metin;
+  kap.appendChild(d);
+  setTimeout(function () { d.remove(); }, sure || 2600);
+}
+
+/* ---- ortak biçimleyiciler ---- */
+function tutar(n) {
+  return (n || 0).toLocaleString('tr-TR');
+}
+function norm(s) {
+  return (s || '').toLocaleLowerCase('tr')
+    .replace(/ı/g, 'i').replace(/ü/g, 'u').replace(/ö/g, 'o')
+    .replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
+}
+
+/* ---- açılış ---- */
+document.addEventListener('DOMContentLoaded', function () {
+  var g = document.getElementById('geriBtn');
+  if (g) g.addEventListener('click', function () { Ekran.geri(); });
+  Ekran.goster('home');
+});
+
+
+/* ===== betik/02-veri.js ===== */
+/* ============ SAHTE VERİ ============
+   Backend yok. Alanlar VERI-MODELI.md ile birebir — modelde olmayan
+   alan buraya da girmez.
+
+   ⚠️ İSKELET: 13. işte gerçek örnek veriyle genişletilecek. */
+
+/* Vehicle — VERI-MODELI §1 */
+var ARACLAR = [
+  { plaka: '34 ABC 123', marka: 'Renault', model: 'Mégane', yil: '2018',
+    motor: '1.5 dCi', vin: 'VF1RFB00858123456',
+    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: '' },
+  { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
+    motor: '1.4 Fire', vin: 'NM4358004ZT129041',
+    sahipAd: 'Hasan Demir', sahipTel: '0542 331 90 07', not: '' },
+  { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
+    motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
+    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' }
+];
+
+/* Supplier — VERI-MODELI §4. İki alan: ad + telefon. */
+var PARCACILAR = [
+  { ad: 'Öz Yedek Parça', tel: '0532 111 22 33' },
+  { ad: 'Ahmet Oto Yedek Parça', tel: '0533 444 55 66' }
+];
+
+
+/* ===== ekran: 10-home.html ===== */
+(function () {
+Ekran.tanim('home', {
+  ciz: function () {
+    var el = document.getElementById('homeSay');
+    if (el) el.textContent = ARACLAR.length + ' araç içeride';
+  }
+});
+})();
+
+/* ===== ekran: 20-ruhsat.html ===== */
+(function () {
+Ekran.tanim('ruhsat', {
+  ciz: function () { /* 13. işte doldurulacak */ }
+});
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+/* ============ TABAN ============
+   Renk, yazı ve ölçü TOKEN'DAN gelir (docs/tokens.css, K-023).
+   Burada ham hex YOK. */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--tip-md);
+  line-height: var(--satir-nor);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* TABAN KURAL — iki kez yaşanan hata (TASARIM-SISTEMI):
+   .field dışında kalan alanlar tema almıyordu. Renk DAİMA
+   kapsayıcıdan gelir. */
+input, textarea, select, button {
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: inherit;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: var(--satir-siki);
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+/* Dokunma hedefi: GÖRSEL AĞIRLIK ≠ DOKUNMA ALANI.
+   Hedefi büyütmek için yazıyı büyütmek gerekmez. */
+button { min-height: var(--dokun); cursor: pointer; }
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* İkon — currentColor ile boyanır, token rengine uyar */
+.ico { width: 24px; height: 24px; flex: none; }
+.ico-lg { width: 32px; height: 32px; }

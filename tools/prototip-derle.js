@@ -1,0 +1,161 @@
+/* ============ PROTOTİP DERLEYİCİ ============
+   prototypes/kaynak/**  ->  prototypes/omurga.html
+
+   NEDEN VAR: v1'in prototipi TEK DOSYAYDI ve 10.700 satıra çıktı.
+   Sonuçları ölçüldü — aynı var-hoisting hatası SEKİZ kez, sınıf adı
+   çakışması ÜÇ kez yaşandı, dosya önizleme sınırını aştı ve bir tur
+   boyunca açılmadı. Parçalı yazıp derlemek bunların üçünü de yapısal
+   olarak çözüyor.
+
+   KULLANIM:  node tools/prototip-derle.js
+
+   KAYNAK DÜZENİ
+     kabuk.html            @@STIL@@ @@EKRANLAR@@ @@BETIK@@ @@IKONLAR@@
+     stil/NN-*.css         sırayla eklenir (dosya adındaki numara)
+     betik/NN-*.js         sırayla eklenir — ÇEKİRDEK ÖNCE
+     ekranlar/NN-ad.html   her biri: markup + <style> + <script>
+     ikonlar.svg           <symbol> tanımları
+
+   EKRAN DOSYASI SÖZLEŞMESİ
+     - Markup kök öğesi:  <section class="screen" id="screen-ad">
+     - <style>  bloğu varsa CSS'in sonuna eklenir
+     - <script> bloğu varsa BETİĞE EKLENİR ve IIFE'ye SARILIR
+       (global kapsam kirlenmesin — v1'in sekiz kez yaşadığı hata)
+
+   DERLEME DENETİMİ (kırılmadan önce yakalar)
+     1. Aynı sınıf adı iki ayrı ekran dosyasında tanımlanmış mı
+        (.rol-cip / .stok / .tablo-kap çakışmaları bu sınıftandı)
+     2. data-git hedefi var olmayan bir ekranı gösteriyor mu
+     3. Ekran id'si dosya adıyla uyuşuyor mu
+*/
+
+const fs = require('fs');
+const path = require('path');
+
+const KOK = path.join(__dirname, '..');
+const KAYNAK = path.join(KOK, 'prototypes', 'kaynak');
+const CIKTI = path.join(KOK, 'prototypes', 'omurga.html');
+const TOKENS = path.join(KOK, 'docs', 'tokens.css');
+
+const uyarilar = [];
+
+function oku(p) { return fs.readFileSync(p, 'utf8'); }
+
+function siraliDosyalar(klasor, uzanti) {
+  if (!fs.existsSync(klasor)) return [];
+  return fs.readdirSync(klasor)
+    .filter(f => f.endsWith(uzanti))
+    .sort()                       /* sıra dosya adındaki numaradan */
+    .map(f => ({ ad: f, yol: path.join(klasor, f) }));
+}
+
+/* ---- 1. tokens (tek renk/tip/ölçü kaynağı — K-023) ---- */
+let css = '/* ===== tokens.css (docs/tokens.css) ===== */\n' + oku(TOKENS) + '\n';
+
+/* ---- 2. ortak stil ---- */
+for (const d of siraliDosyalar(path.join(KAYNAK, 'stil'), '.css')) {
+  css += `\n/* ===== stil/${d.ad} ===== */\n` + oku(d.yol) + '\n';
+}
+
+/* ---- 3. çekirdek betik ---- */
+let js = '';
+for (const d of siraliDosyalar(path.join(KAYNAK, 'betik'), '.js')) {
+  js += `\n/* ===== betik/${d.ad} ===== */\n` + oku(d.yol) + '\n';
+}
+
+/* ---- 4. ekranlar ---- */
+let ekranMarkup = '';
+const ekranAdlari = [];
+const sinifSahibi = {};   /* sınıf adı -> ilk tanımlayan dosya */
+
+for (const d of siraliDosyalar(path.join(KAYNAK, 'ekranlar'), '.html')) {
+  let icerik = oku(d.yol);
+
+  /* <style> çıkar */
+  icerik = icerik.replace(/<style>([\s\S]*?)<\/style>/g, (_, blok) => {
+    css += `\n/* ===== ekran: ${d.ad} ===== */\n` + blok.trim() + '\n';
+    /* derleme denetimi 1: sınıf çakışması
+       DİKKAT: `m` bayrağı şart. Onsuz `^` yalnız 0. konumu tutuyor ve
+       bloğun ilk satırındaki sınıf GÖZDEN KAÇIYOR — ilk yazımda
+       .ana-btn çakışması tam böyle kaçtı. Delikli denetim, denetimsiz
+       olmaktan kötüdür: yanlış güven verir. */
+    const re = /(^|[},])\s*\.([a-zA-Z][\w-]*)/gm;
+    let m;
+    while ((m = re.exec(blok))) {
+      const sinif = m[2];
+      if (sinifSahibi[sinif] && sinifSahibi[sinif] !== d.ad) {
+        uyarilar.push(`SINIF ÇAKIŞMASI: .${sinif} hem ${sinifSahibi[sinif]} hem ${d.ad} içinde`);
+      } else {
+        sinifSahibi[sinif] = d.ad;
+      }
+    }
+    return '';
+  });
+
+  /* <script> çıkar — IIFE'ye sarılır */
+  icerik = icerik.replace(/<script>([\s\S]*?)<\/script>/g, (_, blok) => {
+    js += `\n/* ===== ekran: ${d.ad} ===== */\n(function () {\n${blok.trim()}\n})();\n`;
+    return '';
+  });
+
+  const markup = icerik.trim();
+
+  /* derleme denetimi 3: id dosya adıyla uyuşuyor mu */
+  const idEsle = markup.match(/id="screen-([\w-]+)"/);
+  const dosyaAdi = d.ad.replace(/^\d+-/, '').replace(/\.html$/, '');
+  if (!idEsle) {
+    uyarilar.push(`${d.ad}: id="screen-…" bulunamadı`);
+  } else {
+    ekranAdlari.push(idEsle[1]);
+    if (idEsle[1] !== dosyaAdi) {
+      uyarilar.push(`${d.ad}: id "screen-${idEsle[1]}" dosya adı "${dosyaAdi}" ile uyuşmuyor`);
+    }
+  }
+
+  ekranMarkup += '\n' + markup + '\n';
+}
+
+/* derleme denetimi 2: data-git hedefleri */
+const hedefRe = /data-git="([\w-]+)"/g;
+const tumMetin = ekranMarkup + oku(path.join(KAYNAK, 'kabuk.html'));
+let h;
+while ((h = hedefRe.exec(tumMetin))) {
+  if (!ekranAdlari.includes(h[1])) {
+    uyarilar.push(`data-git="${h[1]}" — böyle bir ekran yok`);
+  }
+}
+
+/* ---- 5. ikonlar ---- */
+const ikonYol = path.join(KAYNAK, 'ikonlar.svg');
+const ikonlar = fs.existsSync(ikonYol) ? oku(ikonYol) : '';
+
+/* ---- 6. birleştir ---- */
+const baslik = `<!--
+  ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
+  Kaynak: prototypes/kaynak/**
+  Üretmek için: node tools/prototip-derle.js
+  Üretim: ${new Date().toISOString().slice(0, 16).replace('T', ' ')}
+-->
+`;
+
+let cikti = oku(path.join(KAYNAK, 'kabuk.html'))
+  .replace('<!doctype html>', '<!doctype html>\n' + baslik)
+  .replace('/* @@STIL@@ */', css)
+  .replace('<!-- @@EKRANLAR@@ -->', ekranMarkup)
+  .replace('<!-- @@IKONLAR@@ -->', ikonlar)
+  .replace('/* @@BETIK@@ */', js);
+
+fs.writeFileSync(CIKTI, cikti, 'utf8');
+
+/* ---- rapor ---- */
+const kb = Math.round(cikti.length / 1024);
+console.log(`prototypes/omurga.html üretildi — ${kb} KB · ${ekranAdlari.length} ekran`);
+console.log('  ekranlar: ' + (ekranAdlari.join(', ') || '(yok)'));
+
+if (uyarilar.length) {
+  console.log('\nDERLEME UYARILARI (' + uyarilar.length + '):');
+  uyarilar.forEach(u => console.log('  ! ' + u));
+  process.exitCode = 1;
+} else {
+  console.log('  derleme denetimi temiz');
+}
