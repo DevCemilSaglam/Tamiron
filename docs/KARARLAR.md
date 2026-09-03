@@ -10,6 +10,115 @@
 
 ---
 
+## K-018 · Türkçe metinde `\b` kullanılmaz (04.09.2026)
+
+**Karar:** Kelime atmak/aramak için JavaScript'in `\b` sınırı
+**kullanılmaz.** Bunun yerine `kelimeleriAt()`: boşluktan böl,
+eşitlikle karşılaştır.
+
+**Neden — yaşanmış hata:** `/\bde\b/` deseni *"değişecek"* kelimesinin
+başındaki **"de"yi tutuyordu.** JavaScript'in `\b`'si ASCII sınırına
+bakar; `ğ`, `ş`, `ı`, `ç` kelime karakteri **sayılmaz**, o yüzden
+"de" ile "ğişecek" arasında sınır var sanılıyor. Sesle *"balata da
+değişecek"* denince kayda **"balata ğişecek"** düşüyordu.
+
+Aynı tuzak `/\bara\b/` ile **"araç"** kelimesini **"ç"**ye indirirdi —
+o hata henüz kimse söylemeden bulundu, çünkü aynı desen kullanılıyordu.
+
+**Genel ders:** İngilizce için yazılmış metin araçları Türkçede sessizce
+yanlış çalışır. Sessizce, çünkü hata mesajı yok — yalnız yanlış sonuç.
+
+---
+
+## K-017 · Sesli işlem bağlamıyla açılır (03.09.2026)
+
+**Karar:** Sesli işlem ekranı **hangi ekrandan/hangi mikrofondan**
+açıldığını bilir; başlığında yazar (*"Sesli işlem · Araçlarda ara"*) ve
+örneklerini ona göre gösterir. Bağlama geçiş **tek fonksiyondan**
+yapılır: `sesleAc(niyet)`.
+
+**Neden:** Ustanın *"ne diyebilirim"* sorusu geldiği yere göre farklı.
+Muhasebeden gelen *"2400 TL elektrik faturası ekle"* der, açık servis
+kaydından gelen *"balata da değişecek"*. Herkese aynı örnekleri
+göstermek, ekranı **herkes için biraz yanlış** yapıyordu.
+
+**Neden tek fonksiyon:** her mikrofon kendi başına `SESLI_NIYET = x;
+Ekran.ac('ses')` yazıyordu ve ekran **zaten açıkken** `Ekran.ac()` erken
+dönüyordu: bağlam değişiyor, başlık ve örnekler eski kalıyordu. Tek
+giriş noktası olunca hata da tek yerde.
+
+---
+
+## K-016 · Ses, var olan işi kısaltır; yeni yetenek açmaz (03.09.2026)
+
+**Karar:** Sesli işlemin yaptığı her şey **elle de yapılabilir.** Ses
+yeni bir yol açmaz, var olanı kısaltır — yedi işin dışına çıkmaz.
+
+**Dört hâl ve üçüncüsü:**
+`dinliyor → duyuldu → NE YAPILACAĞI ANLAŞILDI → onay`
+Üçüncü adım olmadan ses, bir arama kutusundan farksız kalır. Asıl iş
+tanıma değil, **tanımadan sonrası**.
+
+**⚠️ ONAYSIZ HİÇBİR ŞEY YAPILMAZ.** Yanlış duyulan bir cümlenin kaydı
+kendiliğinden açması, ustayı sesten **tamamen** soğutur: bir kez yanlış
+kayıt açan mikrofona ikinci kez basılmaz. Anlaşılan işlem yazıyla
+gösterilir, usta onaylar.
+
+---
+
+## K-015 · Ses tanıma: tarayıcının kendi API'si (03.09.2026)
+
+**Cemil:** *"Buna apiyi bağlayabilir miyiz? Ücretsiz bir api. Nasıl
+çalışıyor, test etmiş oluruz."*
+
+**Karar:** **Web Speech API** (`SpeechRecognition` /
+`webkitSpeechRecognition`) kullanılıyor. Tarayıcının kendi motoru.
+
+| | |
+|---|---|
+| Ücret | **Yok** |
+| Anahtar / hesap | **Yok** — kayıt olmak gerekmiyor |
+| Kurulum | **Yok** — `new webkitSpeechRecognition()`, `lang = 'tr-TR'` |
+| Nerede var | Chrome, Edge · **Firefox'ta yok** |
+| Şart | **Güvenli bağlam** (https ya da localhost) + mikrofon izni |
+
+**⚠️ `file://` ile açılan dosyada çalışmaz.** Prototip şu an dosyadan
+açıldığı için mikrofon açılmıyor; ekran bunu **yazıyor** ve örnek
+cümleler her zaman duruyor. `app/` bir https adresine konursa mikrofon
+çalışır.
+
+**⚠️ GİZLİLİK — bu bir karardır, ayrıntı değil:** Chrome bu API'de sesi
+**Google'ın sunucusuna gönderir.** Cihazda kalmaz. Tamirhanede
+konuşulanlar (müşteri adı, telefon, plaka) bu yoldan dışarı çıkar.
+Ücretsiz olmasının bedeli bu.
+
+**Cemil onayına açık (A-S3):** kabul mü, yoksa cihazda çalışan bir
+motor mu aranmalı? Alternatifler ücretli (Google STT, Azure) ya da
+ağır (cihaz üstü Whisper). Öneri: **prototipte kabul**, gerçek
+kullanıma geçerken yeniden konuşulur.
+
+---
+
+## K-014 · Gider girişi sesle mümkün; kâr yine hesaplanmıyor (03.09.2026)
+
+**Karar:** Muhasebeye **gider girişi eklendi** — ama yalnız sesle ve
+elle giriş; **kâr ve cari hesap hâlâ hesaplanmıyor.**
+
+**K-013'ün itirazı neydi:** *"Gider için ustanın her gideri girmesi
+gerekir; girilmezse rakam yalan söyler."*
+
+**Neden zayıfladı:** Cemil *"x TL elektrik faturası ekle gibi
+örnekler"* isteyince giriş maliyeti düştü. **Söylemek form doldurmak
+değil.** Mikrofona basıp *"2400 TL elektrik faturası ekle"* demek,
+ustanın zaten yaptığı bir şeyin yanına eklenebilir.
+
+**Neden tamamen kalkmadı:** girilen gider görünür, **girilmeyen
+görünmez.** Eksik giderle çıkan kâr, kâr olmamasından kötüdür — çünkü
+usta ona *inanır*. Ekran bu yüzden giderlerin **"girildiği kadar
+doğru"** olduğunu yazıyor.
+
+---
+
 ## K-013 · Muhasebe, yeni alan istemeden başlar (03.09.2026)
 
 **Karar:** Muhasebe ekranı yalnız **zaten kayıtlı olan** veriyi okur:
@@ -260,7 +369,44 @@ Yani onay bir **eylem**, bir **kol** değil.
 
 **Cemil onayına açık:** Varsayılan periyot kaç ay? Öneri: **6 ay**, dükkân ayarından değiştirilebilir, kayıtta da elle değiştirilebilir.
 
-**Kapsam dışı:** km tahmini ("ayda ortalama şu kadar gidiyor"), km-bazlı bildirim, araçtan otomatik km okuma.
+**~~Kapsam dışı: km tahmini, km-bazlı bildirim.~~**
+
+---
+
+### ⚠️ 04.09.2026 — GÜNCELLENDİ: ay **veya** km, hangisi önce gelirse
+
+Cemil sordu (*"Bakım zamanı hatırlatması neye göre olacak?"*) ve
+**ay + km, hangisi önce gelirse** seçeneğini seçti. Yukarıdaki
+*"hatırlatmanın dayanağı zamandır"* cümlesi artık **yarım doğru**.
+
+**Yeni kural:**
+
+| | |
+|---|---|
+| Ay hedefi | Teslim + `bakimPeriyoduAy` (varsayılan 6) |
+| Km hedefi | Son bakımın km'si + `bakimPeriyoduKm` (varsayılan 10.000) |
+| Hangisi kurulur | **Önce geleni** |
+
+**Km hedefi tarihe nasıl çevriliyor:** aracın **kendi geçmişinden.**
+İki bakım arasındaki km farkı ve gün farkı, günlük ortalamayı veriyor;
+10.000 km'nin kaç günde dolacağı buradan çıkıyor.
+
+> **⚠️ TEK ÖLÇÜMLE TAHMİN YAPILMAZ.** Bir aracın tek km kaydı varsa
+> günlük ortalama **uydurulmaz** ve ay tek başına çalışır. Uydurma bir
+> ortalama, ustayı yanlış güne çağırır — hatırlatmanın tek işi doğru
+> günde çalmaktır.
+
+**Eski gerekçe neden çürüdü:** *"km'yi izleyemiyoruz"* doğruydu ama
+**izlemek gerekmiyormuş.** Araç her gelişinde km zaten yazılıyor; iki
+nokta bir eğim veriyor. İzleme değil, **iki ölçüm** yetiyor.
+
+**Ölçüldü (04.09):** 34 ABC 123 · 15.03'te 142.500, 20.06'da 151.200 →
+97 günde 8.700 km → günde **89,7 km** → 10.000 km **09.10.2026**'da
+dolar; 6 ay ise 20.12.2026. **Km kazanıyor**, hatırlatma 09.10'a
+kuruluyor.
+
+**Kapsam dışı kalmaya devam ediyor:** araçtan otomatik km okuma,
+müşteriden km sorma.
 
 ---
 
