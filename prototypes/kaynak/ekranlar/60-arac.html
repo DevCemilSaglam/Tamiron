@@ -4,47 +4,34 @@
      bilgisi araç ikinci kez geldiğinde KARŞIYA ÇIKMALI, yoksa
      tartışma çıkar.
 
+     BİLEŞENLER v1'DEN: .card · .arac-bas .plate-lg .veh-title
+     .spec-strip · .section-label · .notice · .tl-item (ortak
+     kayitSatiriHtml) · .plate-hint. Yeni bileşen yazılmadı.
+
+     GEÇMİŞ SATIRI ORTAK NESNE: ana ekranla aynı kayitSatiriHtml.
+     Burada plaka gizleniyor (zaten aracın kendi sayfası).
+
      ÜZERİNDE YOK: kontrol tarihleri (muayene/sigorta/kasko)
      · yaklaşan kontroller · belge arşivi · ayrı müşteri ekranı. -->
 <section class="screen" id="screen-arac">
 
-  <div class="kayit-kunye" id="arKunye"></div>
+  <div class="card">
+    <div id="arKunye"></div>
+  </div>
 
   <div id="arBakim"></div>
 
-  <h2 class="bolum-bas">Geçmiş</h2>
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş
+  </div>
   <div id="arGecmis"></div>
 
-  <h2 class="bolum-bas">Not</h2>
-  <p class="ar-not" id="arNot"></p>
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Not
+  </div>
+  <p class="plate-hint" id="arNot"></p>
 
 </section>
-
-<style>
-.ar-bakim {
-  display: grid;
-  gap: 4px;
-  padding: 14px;
-  margin-bottom: 18px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  font-size: var(--tip-sm);
-  color: var(--muted);
-}
-.ar-bakim strong { color: var(--text); font-size: var(--tip-md); }
-.ar-not { color: var(--muted); font-size: var(--tip-sm); }
-.ar-getiren {
-  display: inline-block;
-  margin-top: 4px;
-  padding: 2px 8px;
-  border-radius: var(--radius-pill);
-  background: var(--warn-bg);
-  color: var(--warn);
-  font-size: var(--tip-xs);
-  font-weight: 600;
-}
-</style>
 
 <script>
 Ekran.tanim('arac', {
@@ -53,11 +40,17 @@ Ekran.tanim('arac', {
     if (!a) return;
 
     document.getElementById('arKunye').innerHTML =
-      '<div class="kunye-ust">' + plakaHtml(a.plaka) + '</div>' +
-      '<div class="kunye-arac">' + a.marka + ' ' + a.model + ' · ' + a.yil +
-        ' · ' + a.motor + '</div>' +
-      '<div class="kunye-arac">' + (a.sahipAd || 'sahip yazılmamış') +
-        (a.sahipTel ? ' · ' + a.sahipTel : ' · telefon yok') + '</div>';
+      '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
+        '<div class="veh-title">' + a.marka + ' ' + a.model +
+          (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+        '<div class="spec-strip">' +
+          (a.motor ? '<span class="spec-val">' + a.motor + '</span>' : '') +
+          '<span class="spec-sep">·</span>' +
+          '<span class="spec-val">' + (a.sahipAd || 'sahip yazılmamış') + '</span>' +
+          '<span class="spec-sep">·</span>' +
+          '<span class="spec-val">' + (a.sahipTel || 'telefon yok') + '</span>' +
+        '</div>' +
+      '</div>';
 
     /* Son bakım + bir sonraki hatırlatma. km burada işe yarıyor:
        "geçen bakım 142.500'de yapılmış" (K-002). */
@@ -66,38 +59,20 @@ Ekran.tanim('arac', {
     });
     var son = bakimlar[bakimlar.length - 1];
     document.getElementById('arBakim').innerHTML = son
-      ? '<div class="ar-bakim">' +
-          '<strong>Son bakım</strong>' +
-          '<span>' + son.teslimTarihi + (son.km ? ' · ' + son.km + ' km' : '') + '</span>' +
-          (son.hatirlatmaTarihi
-            ? '<span>Hatırlatma: ' + son.hatirlatmaTarihi + '</span>' : '') +
+      ? '<div class="notice accent">' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
+          '<span class="n-body">Son bakım <b>' + son.teslimTarihi + '</b>' +
+            (son.km ? ' · ' + son.km + ' km' : '') +
+            (son.hatirlatmaTarihi
+              ? '<br>Hatırlatma: <b>' + son.hatirlatmaTarihi + '</b>' : '') +
+          '</span>' +
         '</div>'
       : '';
 
     var kayitlar = aracKayitlari(a.plaka);
     document.getElementById('arGecmis').innerHTML = kayitlar.length
-      ? kayitlar.map(function (k) {
-          /* MÜŞTERİ PARÇASI GEÇMİŞTE İŞARETLİ KALIR — K-005'in
-             asıl işe yaradığı yer burası. */
-          var mp = (k.satirlar || []).filter(function (s) {
-            return s.tip === 'parca' && s.kimGetirdi === 'musteri';
-          });
-          return '<button class="kayit-sat" data-kayit="' + k.id + '">' +
-            '<span class="kayit-ust">' +
-              '<span class="kayit-tur ' + k.tur + '">' +
-                (k.tur === 'bakim' ? 'Bakım' : 'Tamirat') + '</span>' +
-              '<span class="kayit-arac">' +
-                (k.teslimTarihi || 'içeride') + '</span>' +
-            '</span>' +
-            '<span class="kayit-is">' + (k.sikayet || '—') + '</span>' +
-            '<span class="kayit-arac">' + tutar(kayitToplami(k)) + ' ₺</span>' +
-            (mp.length
-              ? '<span class="ar-getiren">parçayı müşteri getirmişti: ' +
-                  mp.map(function (s) { return s.ad || 'parça'; }).join(', ') + '</span>'
-              : '') +
-          '</button>';
-        }).join('')
-      : bosDurumHtml('Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
+      ? kayitlar.map(function (k) { return kayitSatiriHtml(k, { plaka: false }); }).join('')
+      : bosDurumHtml('i-clipboard-list', 'Geçmiş kayıt yok', 'Bu araç ilk kez geliyor.');
 
     document.getElementById('arNot').textContent = a.not || 'Not yok.';
   }

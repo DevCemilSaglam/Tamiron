@@ -1,107 +1,94 @@
-<!-- ekran: ruhsat · RUHSATI ÇEK (EKRANLAR.md §2)
-     Akış Adım 1. Tamircinin cümlesi: "Ruhsatı çekti, kayıt açıldı." (T-3)
+<!-- ekran: ruhsat · RUHSATI ÇEK (EKRANLAR.md §2 · Akış Adım 1)
+     "Ruhsatı çekti, kayıt açıldı." (T-3)
 
-     ARAŞTIRMADAN GELEN İKİ ŞEY BURADA (RUHSAT-OKUMA.md):
+     ARAŞTIRMADAN GELEN İKİ ŞEY (RUHSAT-OKUMA.md):
      · TELEFON ruhsatta YOK — ayrı alan, ZORUNLU DEĞİL (A-29)
      · TC kimlik no ve adres ruhsatta VAR ama OKUNMAZ, SAKLANMAZ
 
-     ÜZERİNDE YOK: uzun araç formu · renk · yakıt · anahtar/radyo kodu
-     · sigorta ve muayene tarihleri · müşteri kaydı adımı. -->
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card .card.raised
+     · .plate-input-wrap .plate-field .tr-tag · .field .field-2
+     · .plate-hint · .cip-grup .cip · .btn. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-ruhsat">
 
-  <h1 class="ekran-bas">Ruhsatı çek</h1>
-  <p class="ekran-alt">Telefonu ruhsata tut — bilgiler kendiliğinden dolar.</p>
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-camera"></use></svg> Ruhsatı çek
+    </span>
+  </div>
 
-  <button class="ana-btn" id="ruhsatCek">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
-    <span>Ruhsatı çek</span>
+  <button class="btn btn-primary btn-lg" id="ruhsatCek">
+    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
   </button>
 
-  <p class="ruhsat-kacis">
-    Ruhsat yoksa ya da okunmuyorsa —
-    <button class="baglanti-btn" id="ruhsatElle">plakayı yaz</button>
+  <p class="plate-hint" style="text-align:center">
+    Ruhsat yoksa ya da okunmuyorsa
+    <button class="btn btn-ghost" id="ruhsatElle" style="margin-top:8px">
+      <svg class="ico"><use href="#i-file-text"></use></svg> Plakayı yaz
+    </button>
   </p>
 
   <div id="ruhsatSonuc" hidden>
 
-    <div class="kart">
-      <!-- PLAKA EN ÜSTTE VE BÜYÜK: yanlış okunursa kayıt YANLIŞ ARACA
-           bağlanır. Doğrulanan tek alan bu (RUHSAT-OKUMA §5). -->
-      <div class="alan">
-        <label for="rPlaka">Plaka</label>
-        <input id="rPlaka" class="plaka-alan mono" placeholder="34 ABC 123" autocomplete="off" />
-        <p class="alan-ipucu" id="rPlakaIpucu"></p>
-      </div>
-
-      <div class="ikili">
-        <div class="alan"><label for="rMarka">Marka</label><input id="rMarka" /></div>
-        <div class="alan"><label for="rModel">Model</label><input id="rModel" /></div>
-      </div>
-      <div class="ikili">
-        <div class="alan"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
-        <div class="alan"><label for="rMotor">Motor</label><input id="rMotor" /></div>
-      </div>
-
-      <div class="alan">
-        <label for="rTel">Telefon <span class="istege-bagli">— ruhsatta yazmaz, isteğe bağlı</span></label>
-        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
-        <p class="alan-ipucu">Bakım hatırlatması ve özet bu numaraya gider. Boş kalabilir.</p>
+    <!-- PLAKA EN ÜSTTE VE BÜYÜK: yanlış okunursa kayıt YANLIŞ ARACA
+         bağlanır. Doğrulanan tek alan bu (RUHSAT-OKUMA §5). -->
+    <div class="card raised">
+      <div class="plate-input-wrap">
+        <div class="plate-field">
+          <span class="tr-tag">TR</span>
+          <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123"
+                 autocomplete="off" spellcheck="false" aria-label="Plaka" />
+        </div>
+        <div class="plate-hint" id="rPlakaIpucu" role="status"></div>
       </div>
     </div>
 
-    <h2 class="bolum-bas">Ne için geldi?</h2>
-    <div class="secim-grup ikili">
-      <button class="secim-btn" id="turTamirat" aria-pressed="false">Tamirat</button>
-      <button class="secim-btn" id="turBakim" aria-pressed="false">Bakım</button>
+    <div class="card">
+      <div class="section-label">
+        <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç
+      </div>
+      <div class="field-2">
+        <div class="field"><label for="rMarka">Marka</label><input id="rMarka" /></div>
+        <div class="field"><label for="rModel">Model</label><input id="rModel" /></div>
+      </div>
+      <div class="field-2">
+        <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
+        <div class="field"><label for="rMotor">Motor</label><input id="rMotor" /></div>
+      </div>
+
+      <div class="field">
+        <label for="rTel">Telefon</label>
+        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
+        <div class="plate-hint">Ruhsatta yazmaz — isteğe bağlı. Bakım hatırlatması ve özet buraya gider.</div>
+      </div>
+    </div>
+
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-wrench"></use></svg> Ne için geldi?
+    </div>
+    <div class="cip-grup" id="turGrup" role="group" aria-label="İş türü">
+      <button class="cip" id="turTamirat" aria-pressed="false">Tamirat</button>
+      <button class="cip" id="turBakim" aria-pressed="false">Bakım</button>
     </div>
 
     <!-- Km YALNIZ BAKIMDA (K-002). Bir kez yazılır, güncellenmez. -->
-    <div class="alan" id="kmAlan" hidden>
+    <div class="field" id="kmAlan" hidden>
       <label for="rKm">Kilometre</label>
       <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
-      <p class="alan-ipucu">Göstergeden oku. Bir sonraki bakımda işine yarar.</p>
+      <div class="plate-hint">Göstergeden oku. Bir sonraki bakımda işine yarar.</div>
     </div>
 
-    <button class="ana-btn" id="kaydiAc" disabled>
-      <svg class="ico ico-lg" aria-hidden="true"><use href="#i-tamam"></use></svg>
-      <span>Kaydı aç</span>
+    <button class="btn btn-primary btn-lg" id="kaydiAc" disabled>
+      <svg class="ico"><use href="#i-check"></use></svg> Kaydı aç
     </button>
 
   </div>
 
 </section>
 
-<style>
-.ruhsat-kacis {
-  margin: 12px 0 20px;
-  text-align: center;
-  color: var(--muted);
-  font-size: var(--tip-sm);
-}
-.baglanti-btn {
-  /* METIN KUCUK, ALAN BUYUK — gorsel agirlik dokunma alani degildir
-     (TASARIM-SISTEMI). Denetim 19px olcmustu. */
-  min-height: var(--dokun);
-  padding: 0 8px;
-  border: 0;
-  background: none;
-  color: var(--primary);
-  font-size: var(--tip-sm);
-  font-weight: 600;
-  text-decoration: underline;
-}
-.plaka-alan { letter-spacing: .08em; font-weight: 600; }
-.ikili { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.alan-ipucu { margin: 0; color: var(--faint); font-size: var(--tip-xs); min-height: 1.2em; }
-.alan-ipucu.uyari { color: var(--crit); }
-.istege-bagli { font-weight: 400; color: var(--faint); }
-.bolum-bas { font-size: var(--tip-lg); margin: 6px 0 10px; }
-</style>
-
 <script>
 var rTur = null;
 
-/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici. */
+/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı). */
 function plakaBicim(ham) {
   var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
   var il = t.slice(0, 2).replace(/[^0-9]/g, '');
@@ -115,16 +102,15 @@ function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(
 function ruhsatDurum() {
   var p = plakaBicim(document.getElementById('rPlaka').value);
   var ip = document.getElementById('rPlakaIpucu');
-  var tamam = plakaGecerli(p) && rTur;
   if (p && !plakaGecerli(p)) {
     ip.textContent = 'Plaka eksik — ör. 34 ABC 123';
-    ip.className = 'alan-ipucu uyari';
+    ip.className = 'plate-hint warn';
   } else {
     var a = aracBul(p);
     ip.textContent = a ? a.marka + ' ' + a.model + ' — bu araç kayıtlı' : '';
-    ip.className = 'alan-ipucu';
+    ip.className = 'plate-hint';
   }
-  document.getElementById('kaydiAc').disabled = !tamam;
+  document.getElementById('kaydiAc').disabled = !(plakaGecerli(p) && rTur);
 }
 
 function turSec(t) {
@@ -137,8 +123,8 @@ function turSec(t) {
 
 Ekran.tanim('ruhsat', {
   ciz: function (kok) {
-    /* Ekran her açılışta TEMİZ başlar — yarım kalmış bir kayıt
-       sonrakine sızmasın. */
+    /* Ekran her açılışta TEMİZ başlar — yarım kalmış kayıt sonrakine
+       sızmasın. */
     rTur = null;
     kok.querySelector('#ruhsatSonuc').hidden = true;
     ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rTel', 'rKm'].forEach(function (id) {
@@ -193,24 +179,16 @@ document.addEventListener('click', function (e) {
         model: document.getElementById('rModel').value,
         yil: document.getElementById('rYil').value,
         motor: document.getElementById('rMotor').value,
-        vin: '',
-        sahipAd: '',
+        vin: '', sahipAd: '',
         sahipTel: document.getElementById('rTel').value,
         not: ''
       });
     }
     var yeni = {
-      id: KAYITLAR.length + 1,
-      plaka: p,
-      tur: rTur,
+      id: KAYITLAR.length + 1, plaka: p, tur: rTur,
       km: rTur === 'bakim' ? document.getElementById('rKm').value : '',
-      sikayet: '',
-      acilis: '03.09.2026',
-      teslimTarihi: null,
-      odemeYolu: null,
-      hatirlatmaTarihi: null,
-      hatirlatmaGonderildi: false,
-      satirlar: []
+      sikayet: '', acilis: '03.09.2026', teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
     };
     KAYITLAR.push(yeni);
     ACIK_KAYIT = yeni.id;
@@ -219,9 +197,7 @@ document.addEventListener('click', function (e) {
 });
 
 document.addEventListener('input', function (e) {
-  if (!e.target) return;
-  if (e.target.id === 'rPlaka') {
-    var s = e.target.selectionStart;
+  if (e.target && e.target.id === 'rPlaka') {
     e.target.value = plakaBicim(e.target.value);
     try { e.target.setSelectionRange(e.target.value.length, e.target.value.length); } catch (x) {}
     ruhsatDurum();

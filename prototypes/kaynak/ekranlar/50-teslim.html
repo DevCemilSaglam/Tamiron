@@ -5,46 +5,38 @@
      AYRI EKRAN, ÇÜNKÜ AYRI AN. Servis kaydıyla birleştirilirse
      yanlışlıkla teslim edilir ve teslim geri alınamaz.
 
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .arac-bas
+     .plate-lg .veh-title .spec-strip · .tutar-serit .tutar-sat.genel
+     .tv · .cip-grup .cip · .btn .btn-primary .btn-lg · .notice.
+     Yeni bileşen yazılmadı.
+
      ÜZERİNDE YOK: kısmi ödeme takibi · taksit planı · cari hesap
      · borç yaşlandırma · teslim alan kişi seçimi · fatura. -->
 <section class="screen" id="screen-teslim">
 
-  <h1 class="ekran-bas">Teslim et</h1>
-  <p class="ekran-alt" id="tsAlt">—</p>
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Teslim et
+    </span>
+  </div>
 
-  <div class="tutar-buyuk" id="tsTutar"></div>
+  <div class="card">
+    <div id="tsKunye"></div>
+    <div class="tutar-serit" id="tsTutar"></div>
+  </div>
 
-  <h2 class="bolum-bas">Ödeme nasıl alındı?</h2>
-  <div class="secim-grup ikili" id="tsOdeme"></div>
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme nasıl alındı?
+  </div>
+  <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu"></div>
 
-  <button class="ana-btn" id="tsTeslim" disabled>
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-tamam"></use></svg>
-    <span>Teslim et</span>
+  <button class="btn btn-primary btn-lg" id="tsTeslim" disabled>
+    <svg class="ico"><use href="#i-check"></use></svg> Teslim et
   </button>
 
-  <p class="ts-not" id="tsNot"></p>
+  <div id="tsNot"></div>
 
 </section>
-
-<style>
-.tutar-buyuk {
-  padding: 24px 16px;
-  margin-bottom: 20px;
-  border-radius: var(--radius-lg);
-  background: var(--surface);
-  border: 1px solid var(--line);
-  text-align: center;
-}
-.tutar-buyuk .rakam {
-  display: block;
-  font-family: var(--font-mono);
-  font-size: var(--tip-2xl);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-.tutar-buyuk .alt { color: var(--muted); font-size: var(--tip-sm); }
-.ts-not { margin-top: 14px; color: var(--muted); font-size: var(--tip-sm); text-align: center; }
-</style>
 
 <script>
 /* "ALMADIM" BİR ÖDEME YOLUDUR. Veresiye gerçek ve teslimi
@@ -62,23 +54,44 @@ function tsCiz() {
   if (!k) return;
   var a = aracBul(k.plaka);
 
-  document.getElementById('tsAlt').textContent =
-    k.plaka + (a ? ' · ' + a.marka + ' ' + a.model : '');
+  /* Künye SERVİS KAYDIYLA AYNI — hangi aracı teslim ettiğini
+     tanıdığı görünümden okusun, yeni bir düzen öğrenmesin. */
+  document.getElementById('tsKunye').innerHTML =
+    '<div class="arac-bas">' + plakaHtml(k.plaka, 'plate-lg') +
+      '<div class="veh-title">' + (a ? a.marka + ' ' + a.model : '') +
+        (a && a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+      '<div class="spec-strip">' +
+        '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
+        (a && a.motor
+          ? '<span class="spec-sep">·</span><span class="spec-val">' + a.motor + '</span>' : '') +
+      '</div>' +
+    '</div>';
 
   document.getElementById('tsTutar').innerHTML =
-    '<span class="rakam">' + tutar(kayitToplami(k)) + ' ₺</span>' +
-    '<span class="alt">' + (k.satirlar || []).length + ' satır</span>';
+    /* Rakam BİR KEZ yazılır. Üstte aynı tutarı tekrar etmek "iki ayrı
+       rakam mı?" sorusunu doğuruyordu; üst satır yalnız neyin
+       toplandığını söyler. */
+    '<div class="tutar-sat"><span>' + (k.satirlar || []).length + ' satır</span>' +
+      (fiyatiBekleyen(k)
+        ? '<span class="pill warn">fiyatı girilmemiş satır var</span>' : '') +
+    '</div>' +
+    '<div class="tutar-sat genel"><span>Alınacak</span>' +
+      '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
 
   document.getElementById('tsOdeme').innerHTML = ODEME_YOLLARI.map(function (o) {
-    return '<button class="secim-btn" data-odeme="' + o.k + '" aria-pressed="' +
+    return '<button class="cip" data-odeme="' + o.k + '" aria-pressed="' +
       (tsSecili === o.k) + '">' + o.ad + '</button>';
   }).join('');
 
   document.getElementById('tsTeslim').disabled = !tsSecili;
 
   /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın. */
-  document.getElementById('tsNot').textContent = (k.tur === 'bakim')
-    ? 'Teslimden sonra ' + DUKKAN.bakimPeriyoduAy + ' ay sonrası için bakım hatırlatması kurulacak.'
+  document.getElementById('tsNot').innerHTML = (k.tur === 'bakim')
+    ? '<div class="notice accent">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
+        '<span class="n-body">Teslimden sonra <b>' + DUKKAN.bakimPeriyoduAy +
+          ' ay</b> sonrası için bakım hatırlatması kurulacak.</span>' +
+      '</div>'
     : '';
 }
 

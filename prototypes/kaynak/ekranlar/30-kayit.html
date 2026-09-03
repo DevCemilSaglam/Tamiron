@@ -3,209 +3,147 @@
      5 parça geldi (kim getirdi) · 6 iş yapıldı.
      Kayıt TESLİM EDİLENE KADAR AÇIK ve satır eklenebilir (K-003).
 
+     BİLEŞENLER v1'DEN: .card · .section-label .with-action .lbl-txt
+     · .mic-round · .field · .kalem .k-tip .k-ad .k-tutar .k-sil
+     · .tutar-serit .tutar-sat .tv · .btn .btn-row · .cip
+     · .arac-bas .plate-lg. Yeni bileşen yazılmadı.
+
      ÜZERİNDE YOK: durum rozeti · kesinlik kademeleri · garanti süresi
-     · katalog seçici · fiyat karşılaştırma tablosu · onay bekleme
-     durumu · red paneli · kabul formu · iskonto mekanizması. -->
+     · katalog seçici · fiyat karşılaştırma · onay bekleme durumu
+     · red paneli · kabul formu · iskonto mekanizması. -->
 <section class="screen" id="screen-kayit">
+
+  <div class="screen-head">
+    <span class="eyebrow" id="kayitBaslik"></span>
+  </div>
 
   <!-- Künyeye dokununca ARAÇ açılır: geçmiş, son bakım ve
        "parçayı geçen sefer kim getirmişti" orada (K-005). -->
-  <button class="kayit-kunye" id="kayitKunye" data-arac-ac="1"
-          aria-label="Aracın geçmişini aç"></button>
+  <div class="card" id="kayitKunye" data-arac-ac="1" role="button" tabindex="0"
+       aria-label="Aracın geçmişini aç"></div>
 
-  <div class="alan">
-    <label for="kSikayet">Ne istiyor?</label>
-    <div class="metin-mikrofon">
-      <input id="kSikayet" placeholder="ör. triger seti değişecek" autocomplete="off" />
-      <button class="mik-btn" id="kSikayetMik" aria-label="Sesle söyle">
-        <svg class="ico" aria-hidden="true"><use href="#i-mikrofon"></use></svg>
+  <div class="card">
+    <div class="section-label with-action">
+      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne istiyor?</span>
+      <button class="mic-round" id="kSikayetMik" aria-label="Sesle söyle" title="Sesle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
+    </div>
+    <div class="field">
+      <input id="kSikayet" placeholder="ör. triger seti değişecek" autocomplete="off" aria-label="Ne istiyor" />
     </div>
   </div>
 
-  <h2 class="bolum-bas">Yapılanlar</h2>
-  <div id="kSatirlar"></div>
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılanlar
+    </div>
 
-  <div class="satir-ekle">
-    <button class="ikincil-btn" id="kParcaEkle">
-      <svg class="ico" aria-hidden="true"><use href="#i-ekle"></use></svg> Parça
+    <div class="kalem-list" id="kSatirlar"></div>
+
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="kParcaEkle">
+        <svg class="ico"><use href="#i-plus"></use></svg> Parça
+      </button>
+      <button class="btn btn-ghost" id="kIscilikEkle">
+        <svg class="ico"><use href="#i-plus"></use></svg> İşçilik
+      </button>
+    </div>
+
+    <div class="tutar-serit" id="kToplam"></div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" data-git="parca-sor">
+      <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
     </button>
-    <button class="ikincil-btn" id="kIscilikEkle">
-      <svg class="ico" aria-hidden="true"><use href="#i-ekle"></use></svg> İşçilik
+    <button class="btn btn-ghost" id="kOnayIste">
+      <svg class="ico"><use href="#i-message-square"></use></svg> Onay iste
     </button>
   </div>
 
-  <div class="toplam-serit" id="kToplam"></div>
-
-  <button class="ikincil-btn genis" data-git="parca-sor">
-    <svg class="ico" aria-hidden="true"><use href="#i-parca"></use></svg> Parça fiyatı sor
-  </button>
-
-  <button class="ikincil-btn genis" id="kOnayIste">
-    <svg class="ico" aria-hidden="true"><use href="#i-tamam"></use></svg> Onay iste
-  </button>
-
-  <button class="ana-btn" data-git="teslim">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-para"></use></svg>
-    <span>Teslim et</span>
+  <button class="btn btn-primary btn-lg" data-git="teslim">
+    <svg class="ico"><use href="#i-wallet"></use></svg> Teslim et
   </button>
 
 </section>
 
 <style>
-.kayit-kunye {
-  display: grid;
-  gap: 8px;
-  width: 100%;
-  margin-bottom: 18px;
-  padding: 14px;
-  text-align: left;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-}
-.kayit-kunye:hover { border-color: var(--primary); }
-.kunye-ust { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.kunye-arac { color: var(--muted); font-size: var(--tip-sm); }
-
-.metin-mikrofon { display: flex; gap: 8px; }
-.metin-mikrofon input { flex: 1; min-width: 0; }
-.mik-btn {
-  width: var(--dokun);
-  flex: none;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--primary);
-}
-
-/* SATIRLAR TEK LİSTE. Parça mı işçilik mi satırın kendi işareti;
-   iki ayrı bölüm değil (EKRANLAR.md §3). */
-.k-satir {
-  display: grid;
-  grid-template-columns: auto 1fr auto auto;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  margin-bottom: 8px;
-}
-.k-tip {
-  padding: 3px 8px;
-  border-radius: var(--radius-pill);
-  font-size: var(--tip-xs);
-  font-weight: 600;
-}
-.k-tip.parca { background: var(--accent-soft); color: var(--accent); }
-.k-tip.iscilik { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary); }
-.k-ad { min-width: 0; border: 0; background: transparent; font-size: var(--tip-md); }
-.k-fiyat {
-  width: 92px;
-  text-align: right;
-  border: 0;
-  background: transparent;
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  font-weight: 600;
-}
-.k-sil {
-  width: 36px; height: 36px; min-height: 36px;
-  border: 0; border-radius: var(--radius-pill);
-  background: transparent; color: var(--faint);
-}
+/* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
+   içi henüz doldurulmamışken bile dokunma hedefinden küçük olamaz.
+   Denetim boş haldeyken 38 px ölçmüştü. */
+#kayitKunye { min-height: var(--dokun); }
 
 /* KİM GETİRDİ — bilgi alanı değil, ileride kimin ödeyeceğini
-   belirleyen anahtar (K-005). O yüzden satırda GÖRÜNÜR duruyor. */
+   belirleyen anahtar (K-005). Kalem satırının altında, v1'in .cip
+   bileşeniyle; kendi görünümünü uydurmuyor. */
 .k-getiren {
   grid-column: 1 / -1;
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: var(--tip-xs);
+  flex-wrap: wrap;
+  margin-top: 6px;
+  font-size: 12px;
   color: var(--muted);
-}
-.k-getiren button {
-  min-height: 32px;
-  padding: 0 10px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-pill);
-  background: var(--surface);
-  font-size: var(--tip-xs);
-  font-weight: 600;
-}
-.k-getiren button[aria-pressed="true"] {
-  border-color: var(--primary);
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
-  color: var(--primary);
-}
-
-.satir-ekle { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 18px; }
-.ikincil-btn.genis { margin-bottom: 10px; min-height: var(--dokun); }
-
-.toplam-serit {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 16px;
-  margin-bottom: 18px;
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-}
-.toplam-serit .etiket { font-size: var(--tip-md); font-weight: 600; }
-.toplam-serit .deger {
-  font-family: var(--font-mono);
-  font-size: var(--tip-2xl);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 </style>
 
 <script>
+function kayitToplamCiz(k) {
+  document.getElementById('kToplam').innerHTML =
+    '<div class="tutar-sat genel"><span>Toplam</span>' +
+    '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
+}
+
 function kayitCiz() {
   var k = kayitBul(ACIK_KAYIT);
   if (!k) return;
   var a = aracBul(k.plaka);
 
+  document.getElementById('kayitBaslik').innerHTML =
+    '<svg class="ico ico-sm"><use href="#' + TUR_IKON[k.tur] + '"></use></svg> ' + TUR_AD[k.tur];
+
   document.getElementById('kayitKunye').innerHTML =
-    '<div class="kunye-ust">' + plakaHtml(k.plaka) +
-      '<span class="kayit-tur ' + k.tur + '">' +
-      (k.tur === 'bakim' ? 'Bakım' : 'Tamirat') + '</span></div>' +
-    '<div class="kunye-arac">' +
-      (a ? a.marka + ' ' + a.model + ' · ' + a.yil : '') +
-      (k.tur === 'bakim' && k.km ? ' · ' + k.km + ' km' : '') +
+    '<div class="arac-bas">' + plakaHtml(k.plaka, 'plate-lg') +
+      '<div class="veh-title">' + (a ? a.marka + ' ' + a.model : '') +
+        (a && a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+      '<div class="spec-strip">' +
+        (a && a.motor ? '<span class="spec-val">' + a.motor + '</span>' : '') +
+        (k.tur === 'bakim' && k.km
+          ? '<span class="spec-sep">·</span><span class="spec-val mono">' + k.km + ' km</span>' : '') +
+      '</div>' +
     '</div>';
 
   document.getElementById('kSikayet').value = k.sikayet || '';
 
-  var kap = document.getElementById('kSatirlar');
-  kap.innerHTML = (k.satirlar || []).length
+  document.getElementById('kSatirlar').innerHTML = (k.satirlar || []).length
     ? k.satirlar.map(function (s, i) {
-        return '<div class="k-satir">' +
-          '<span class="k-tip ' + s.tip + '">' + (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</span>' +
+        return '<div class="kalem">' +
+          '<span class="k-tip ' + (s.tip === 'parca' ? 'parca' : 'iscilik') + '">' +
+            (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</span>' +
           '<input class="k-ad" value="' + (s.ad || '').replace(/"/g, '&quot;') +
             '" data-satir-ad="' + i + '" placeholder="' +
-            (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') + '" />' +
-          '<input class="k-fiyat" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
-            '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="—" aria-label="Fiyat" />' +
-          '<button class="k-sil" data-satir-sil="' + i + '" aria-label="Satırı kaldır">✕</button>' +
+            (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') + '" aria-label="Satır adı" />' +
+          '<button class="k-sil" data-satir-sil="' + i + '" aria-label="Satırı kaldır">' +
+            '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>' +
+          '<span class="k-tutar-satir">' +
+            '<input class="k-tutar mono" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
+              '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="fiyat" aria-label="Tutar" />' +
+          '</span>' +
           (s.tip === 'parca'
             ? '<span class="k-getiren">Parçayı kim getirdi?' +
-                '<button data-getiren="' + i + '|tamirci" aria-pressed="' +
+                '<button class="cip" data-getiren="' + i + '|tamirci" aria-pressed="' +
                   (s.kimGetirdi === 'tamirci') + '">Tamirci</button>' +
-                '<button data-getiren="' + i + '|musteri" aria-pressed="' +
+                '<button class="cip" data-getiren="' + i + '|musteri" aria-pressed="' +
                   (s.kimGetirdi === 'musteri') + '">Müşteri</button>' +
               '</span>'
             : '') +
         '</div>';
       }).join('')
-    : bosDurumHtml('Henüz bir şey yazılmadı',
-        'Parça ya da işçilik ekle. Kayıt teslim edilene kadar açık kalır.');
+    : '<p class="kalem-bos">Henüz bir şey yazılmadı — parça ya da işçilik ekle.</p>';
 
-  document.getElementById('kToplam').innerHTML =
-    '<span class="etiket">Toplam</span>' +
-    '<span class="deger">' + tutar(kayitToplami(k)) + ' ₺</span>';
+  kayitToplamCiz(k);
 }
 
 Ekran.tanim('kayit', { ciz: kayitCiz });
@@ -213,8 +151,10 @@ Ekran.tanim('kayit', { ciz: kayitCiz });
 document.addEventListener('click', function (e) {
   var k = kayitBul(ACIK_KAYIT);
   if (!k) return;
-  var t = e.target.closest('button');
+  var t = e.target.closest('button, [data-arac-ac]');
   if (!t) return;
+
+  if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
 
   if (t.id === 'kParcaEkle') {
     k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
@@ -226,20 +166,16 @@ document.addEventListener('click', function (e) {
     Ekran.tazele();
   }
   if (t.id === 'kSikayetMik') {
-    document.getElementById('kSikayet').value = 'Triger seti değişecek';
     k.sikayet = 'Triger seti değişecek';
-    balon('Duyduğumu yazdım — kontrol et.');
+    balon('Duyduğumu yazdım — kontrol et.', true, 2600);
     Ekran.tazele();
   }
   /* K-003: onay bir AKIŞ değil, bir EYLEM. Kayıt beklemeye geçmez,
      durum değişmez — mesaj gider, iş yürümeye devam eder. */
-  if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
-
   if (t.id === 'kOnayIste') {
     var a = aracBul(k.plaka);
-    balon((a && a.sahipTel)
-      ? 'Özet gönderildi — ' + a.sahipTel
-      : 'Telefon yok; özet gönderilemedi.', !(a && a.sahipTel), 3000);
+    balon((a && a.sahipTel) ? 'Özet gönderildi — ' + a.sahipTel
+                            : 'Telefon yok; özet gönderilemedi.', false, 3000);
   }
 
   var sil = t.getAttribute('data-satir-sil');
@@ -257,21 +193,19 @@ document.addEventListener('click', function (e) {
 
 document.addEventListener('input', function (e) {
   var k = kayitBul(ACIK_KAYIT);
-  if (!k || !e.target) return;
+  if (!k || !e.target || !e.target.getAttribute) return;
 
   if (e.target.id === 'kSikayet') { k.sikayet = e.target.value; return; }
 
-  var ad = e.target.getAttribute && e.target.getAttribute('data-satir-ad');
-  if (ad !== null && ad !== undefined) { k.satirlar[parseInt(ad, 10)].ad = e.target.value; return; }
+  var ad = e.target.getAttribute('data-satir-ad');
+  if (ad !== null) { k.satirlar[parseInt(ad, 10)].ad = e.target.value; return; }
 
-  var f = e.target.getAttribute && e.target.getAttribute('data-satir-fiyat');
-  if (f !== null && f !== undefined) {
-    var n = parseInt((e.target.value || '').replace(/[^0-9]/g, ''), 10) || 0;
-    k.satirlar[parseInt(f, 10)].fiyat = n;
+  var f = e.target.getAttribute('data-satir-fiyat');
+  if (f !== null) {
+    k.satirlar[parseInt(f, 10)].fiyat =
+      parseInt((e.target.value || '').replace(/[^0-9]/g, ''), 10) || 0;
     /* Yalnız toplamı tazele — alanı yeniden çizmek imleci kaçırır. */
-    document.getElementById('kToplam').innerHTML =
-      '<span class="etiket">Toplam</span>' +
-      '<span class="deger">' + tutar(kayitToplami(k)) + ' ₺</span>';
+    kayitToplamCiz(k);
   }
 });
 </script>

@@ -7,28 +7,46 @@
      gelen fiyatı elle giriyor. Karşılığında hiçbir kurulum yok:
      Meta hesabı, işletme doğrulaması, şablon onayı gerekmiyor.
 
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
+     · .kalem-list .kalem .k-tip .k-ad · .cip-grup .cip
+     · .notice .n-ic .n-body · .btn .btn-primary .btn-lg · .plate-hint.
+     Yeni bileşen yazılmadı (03.09 — "Tasarım eskisi gibi devam etmeli").
+
      ÜZERİNDE YOK: parça arama · katalog · OEM kodu girme alanı
      (usta kodu bilmiyor — S7) · fiyat karşılaştırma tablosu. -->
 <section class="screen" id="screen-parca-sor">
 
-  <h1 class="ekran-bas">Parça fiyatı sor</h1>
-  <p class="ekran-alt">Ruhsat ve parça listesi birlikte gider.</p>
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça fiyatı sor
+    </span>
+  </div>
 
-  <h2 class="bolum-bas">Sorulacak parçalar</h2>
-  <div id="psParcalar"></div>
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-package"></use></svg> Sorulacak parçalar
+    </div>
+    <div class="kalem-list" id="psParcalar"></div>
+  </div>
 
-  <h2 class="bolum-bas">Kime sorulacak?</h2>
-  <div class="secim-grup" id="psParcacilar"></div>
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-user"></use></svg> Kime sorulacak?
+  </div>
+  <div class="cip-grup" id="psParcacilar" role="group" aria-label="Parçacı seç"></div>
 
-  <h2 class="bolum-bas">Gidecek mesaj</h2>
-  <div class="mesaj-onizleme" id="psMesaj"></div>
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Gidecek mesaj
+  </div>
+  <div class="notice accent">
+    <span class="n-ic"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg></span>
+    <span class="n-body ps-mesaj" id="psMesaj"></span>
+  </div>
 
-  <button class="ana-btn" id="psGonder" disabled>
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-parca"></use></svg>
-    <span>WhatsApp ile gönder</span>
+  <button class="btn btn-primary btn-lg" id="psGonder" disabled>
+    <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
   </button>
 
-  <p class="ps-not">
+  <p class="plate-hint" style="text-align:center">
     Cevap kendi WhatsApp'ına gelir. Gelen fiyatı servis kaydındaki
     satıra yazman yeter.
   </p>
@@ -36,29 +54,9 @@
 </section>
 
 <style>
-.ps-parca {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  margin-bottom: 8px;
-  font-size: var(--tip-md);
-}
-.mesaj-onizleme {
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
-  background: var(--surface-2);
-  color: var(--muted);
-  font-size: var(--tip-sm);
-  white-space: pre-wrap;
-  margin-bottom: 18px;
-}
-.mesaj-onizleme .ek { display: block; margin-top: 8px; color: var(--primary); font-weight: 600; }
-.ps-not { margin-top: 12px; color: var(--faint); font-size: var(--tip-sm); text-align: center; }
+/* Mesaj METNİN KENDİSİ — satır sonları korunmalı, yoksa parça listesi
+   tek satıra yapışıp okunmaz olur. v1'in .notice'ına takılan tek delta. */
+.notice .n-body.ps-mesaj { white-space: pre-wrap; }
 </style>
 
 <script>
@@ -80,27 +78,25 @@ function psCiz() {
 
   document.getElementById('psParcalar').innerHTML = parcalar.length
     ? parcalar.map(function (s) {
-        return '<div class="ps-parca">' +
-          '<svg class="ico" aria-hidden="true"><use href="#i-parca"></use></svg>' +
-          (s.ad || 'adı yazılmamış parça') + '</div>';
+        return '<div class="kalem">' +
+          '<span class="k-tip parca">PARÇA</span>' +
+          '<span class="k-ad">' + (s.ad || 'adı yazılmamış parça') + '</span>' +
+        '</div>';
       }).join('')
-    : bosDurumHtml('Sorulacak parça yok',
+    : bosDurumHtml('i-package', 'Sorulacak parça yok',
         'Servis kaydında fiyatı belli olmayan bir parça olmalı.');
 
   document.getElementById('psParcacilar').innerHTML = PARCACILAR.map(function (p, i) {
-    return '<button class="secim-btn" data-parcaci="' + i + '" aria-pressed="' +
+    return '<button class="cip" data-parcaci="' + i + '" aria-pressed="' +
       (psSecili === i) + '">' + p.ad + '</button>';
   }).join('');
 
+  /* Mesajın gövdesi DÜZ METİN — parçacıya giden şey bu, biçim değil. */
   var satirlar = parcalar.map(function (s) { return '· ' + (s.ad || '?'); }).join('\n');
   document.getElementById('psMesaj').textContent =
     (a ? a.marka + ' ' + a.model + ' ' + a.yil + ' · ' + a.motor + '\n' : '') +
-    k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?';
-
-  var ek = document.createElement('span');
-  ek.className = 'ek';
-  ek.textContent = '📎 ruhsat fotoğrafı eklenecek';
-  document.getElementById('psMesaj').appendChild(ek);
+    k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
+    '\n\n📎 ruhsat fotoğrafı eklenecek';
 
   document.getElementById('psGonder').disabled = (psSecili === null || !parcalar.length);
 }

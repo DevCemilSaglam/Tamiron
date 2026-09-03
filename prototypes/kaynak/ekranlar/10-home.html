@@ -1,22 +1,28 @@
 <!-- ekran: home · İÇERİDEKİ ARAÇLAR (EKRANLAR.md §1)
-     Ustanın sabah sorduğu tek soru: "hangi araçlar bende?"
      Liste = TESLİM EDİLMEMİŞ KAYITLAR. Başka tanım yok (K-004).
 
-     ÜZERİNDE YOK: durum filtresi · özet paneli · istatistik ·
-     alt menü · sekme · takvim · randevu. -->
+     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .btn .btn-primary
+     .btn-lg · .search-box · .tl-item (kayıt satırı) · .bos-durum
+     · .notice. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-home">
 
-  <h1 class="ekran-bas">İçerideki araçlar</h1>
-  <p class="ekran-alt" id="homeSay">—</p>
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-car"></use></svg> İçerideki araçlar
+      <span class="eb-say" id="homeSay"></span>
+    </span>
+  </div>
 
-  <button class="ana-btn" data-git="ruhsat">
-    <svg class="ico ico-lg" aria-hidden="true"><use href="#i-kamera"></use></svg>
-    <span>Ruhsatı çek</span>
+  <button class="btn btn-primary btn-lg" data-git="ruhsat">
+    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
   </button>
 
-  <div class="arama" id="homeArama">
-    <svg class="ico" aria-hidden="true"><use href="#i-ara"></use></svg>
-    <input type="search" id="homeQ" placeholder="Plaka ara" aria-label="Plaka ara" />
+  <div class="search-box" id="homeArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="homeQ" placeholder="Plaka ara…" autocomplete="off" aria-label="Plaka ara" />
+    <button class="clear" id="homeQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
   </div>
 
   <div id="homeListe"></div>
@@ -24,21 +30,6 @@
   <div id="homeHatirlatma"></div>
 
 </section>
-
-<style>
-.home-hatirlat {
-  display: grid;
-  gap: 4px;
-  margin-top: 22px;
-  padding: 14px;
-  border: 1px solid var(--warn);
-  border-radius: var(--radius-md);
-  background: var(--warn-bg);
-  color: var(--warn);
-  font-size: var(--tip-sm);
-}
-.home-hatirlat strong { font-size: var(--tip-md); }
-</style>
 
 <script>
 Ekran.tanim('home', {
@@ -49,38 +40,39 @@ Ekran.tanim('home', {
     });
 
     var say = document.getElementById('homeSay');
-    if (say) {
-      say.textContent = q
-        ? liste.length + ' araç bulundu'
-        : liste.length + ' araç içeride';
-    }
+    if (say) say.textContent = liste.length + (q ? ' bulundu' : ' araç');
 
-    var kap = document.getElementById('homeListe');
-    kap.innerHTML = liste.length
+    document.getElementById('homeArama').classList.toggle('filled', !!q);
+
+    document.getElementById('homeListe').innerHTML = liste.length
       ? liste.map(kayitSatiriHtml).join('')
       : (q
-          ? bosDurumHtml('Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
-          : bosDurumHtml('İçeride araç yok',
+          ? bosDurumHtml('i-search', 'Eşleşen araç yok', 'Plakanın bir kısmını yazman yeter.')
+          : bosDurumHtml('i-circle-check', 'İçeride araç yok',
               'Hepsi teslim edilmiş. Yeni iş için yukarıdan ruhsatı çek.'));
 
-    /* Bakım hatırlatması — ustaya BUGÜN kimi arayacağını söyler.
-       Ayrı ekran değil, bir şerit (T-17, K-002). */
+    /* Bakım hatırlatması — ayrı ekran değil, bir uyarı şeridi
+       (T-17, K-002). Ustaya bugün kimi arayacağını söyler. */
     var h = KAYITLAR.filter(function (k) {
       return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
     });
-    var hk = document.getElementById('homeHatirlatma');
-    hk.innerHTML = h.length
-      ? '<div class="home-hatirlat">' +
-          '<strong>' + h.length + ' araç bakım zamanına yaklaştı</strong>' +
-          '<span>' + h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
+    document.getElementById('homeHatirlatma').innerHTML = h.length
+      ? '<div class="notice warn">' +
+          '<svg class="ico n-ic"><use href="#i-clock"></use></svg>' +
+          '<span class="n-body"><b>' + h.length + ' araç bakım zamanına yaklaştı.</b> ' +
+          h.map(function (k) { return k.plaka; }).join(' · ') + '</span>' +
         '</div>'
       : '';
   }
 });
 
-/* Arama: her tuşta yeniden çiz — tazele() kaydırmayı ve odağı bozmaz.
-   goster() kullanılsaydı her harfte sayfa başa atlardı. */
 document.addEventListener('input', function (e) {
   if (e.target && e.target.id === 'homeQ') Ekran.tazele();
+});
+document.addEventListener('click', function (e) {
+  if (e.target.closest && e.target.closest('#homeQTemiz')) {
+    document.getElementById('homeQ').value = '';
+    Ekran.tazele();
+  }
 });
 </script>

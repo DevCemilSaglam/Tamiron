@@ -129,6 +129,22 @@ while ((h = hedefRe.exec(tumMetin))) {
 const ikonYol = path.join(KAYNAK, 'ikonlar.svg');
 const ikonlar = fs.existsSync(ikonYol) ? oku(ikonYol) : '';
 
+/* derleme denetimi 4: ÖLÜ İKON REFERANSI
+   03.09 — teslim ekranı #i-tamam, parça ekranı #i-parca çağırıyordu;
+   ikizlerinin hiçbiri ikonlar.svg'de yoktu. <use> sessizce HİÇBİR ŞEY
+   çizer: düğme metni yerinde durur, ikon yerinde boşluk kalır ve
+   hiçbir denetim ses çıkarmaz. Sessiz bozulma en pahalı bozulmadır. */
+const tanimliIkonlar = (ikonlar.match(/id="([\w-]+)"/g) || [])
+  .map(s => s.slice(4, -1));
+const kullanimRe = /<use[^>]*href="#([\w-]+)"/g;
+const ikonMetni = ekranMarkup + js + oku(path.join(KAYNAK, 'kabuk.html'));
+const eksikIkon = new Set();
+let u2;
+while ((u2 = kullanimRe.exec(ikonMetni))) {
+  if (!tanimliIkonlar.includes(u2[1])) eksikIkon.add(u2[1]);
+}
+eksikIkon.forEach(i => uyarilar.push(`<use href="#${i}"> — ikonlar.svg'de böyle bir ikon yok`));
+
 /* ---- 6. birleştir ---- */
 const baslik = `<!--
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.

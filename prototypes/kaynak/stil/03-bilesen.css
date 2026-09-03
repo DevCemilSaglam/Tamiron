@@ -1,171 +1,1031 @@
-/* ============ ORTAK BİLEŞENLER ============
-   Yalnız birden çok ekranda kullanılanlar. Tek ekrana ait stil o
-   ekranın kendi dosyasında durur. */
+taşımamakla aynı
+   şey — belge duruyordu,
+görünüş yabancıydı.
 
-/* ---- ekran başlığı ---- */
-.ekran-bas { font-size: var(--tip-xl); margin-bottom: 4px; }
-.ekran-alt { color: var(--muted); font-size: var(--tip-sm); margin: 0 0 18px; }
+   Elenenler yalnız v2'de KARŞILIĞI OLMAYANLAR: çekmece · footer ·
+   rail · dört ziyaret tipi · durum rozetleri · bildirim listesi.
 
-/* ---- PLAKA — her yerde aynı (ortak nesne) ---- */
-.plaka {
-  display: inline-flex;
-  align-items: stretch;
-  border: 2px solid var(--primary);
-  border-radius: 5px;
-  overflow: hidden;
-  background: var(--surface);
+   YENİ BİLEŞEN YAZMADAN ÖNCE burada var mı diye bakılır. */
+
+.mono {
   font-family: var(--font-mono);
-  font-weight: 600;
-  line-height: 1;
-}
-.plaka-tr {
+  font-variant-numeric: tabular-nums;
+}/* ---------- LUCIDE İKON tabanı ---------- */
+.ico {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  flex: none;
+  vertical-align: middle;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}.ico-sm {
+  width: 18px;
+  height: 18px;
+}/* Telefon çerçevesi — masaüstünde ortada bir "cihaz" gibi */
+.device {
+  max-width: 460px;
+  margin: 0 auto;
+  height: 100vh;
+  overflow: hidden;
+  background: var(--bg);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow);
+}/* ============================================================
+   ÜST BAR — her ekranda TUTARLI/standart (geri + logo)
+   ============================================================ */
+.topbar {
+  /* Yukseklik ic ogeye gore: logo ve icon-btn 44px;
+  60px'te ust/alt 8px
+     kaliyordu ve sikisik goruunuyordu (Cemil 30.08) -> 12px nefes. */
+  flex: none;
+  position: relative;
+  z-index: 30;
   display: flex;
   align-items: center;
-  padding: 0 5px;
-  background: var(--primary);
-  color: var(--on-primary);
-  font-size: var(--tip-xs);
-}
-.plaka-no {
-  display: flex;
+  gap: 12px;
+  /* 31.08: Cemil "navigasyon biraz daha buyuk olabilir" dedi. Ekran
+     basliklari kalktigi icin ustte yer acildi;
+  dugmeler 44 -> 48 px. */
+  height: 72px;
+  padding: 0 16px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+}.brand-logo {
+  display: inline-flex;
   align-items: center;
-  padding: 6px 9px;
+  cursor: pointer;
+  min-width: 0;
+  overflow: hidden;
+}/* Logo yüksekliği = icon-btn yüksekliği (40px); butonlarla aynı ölçek */
+/* Secici SVG etiketine degil SINIFA baglandi: .logo-mark hicbir kurala
+   bagli degildi,
+denetim "tanimsiz sinif" olarak isaretledi. */
+/* Logo,
+icon-btn ile AYNI yukseklikte kalmali (K-A-D5 hizasi):
+   dugmeler 48 px oldu,
+logo da 48 px. */
+.brand-logo .logo-mark {
+  height: 48px;
+  width: auto;
+  max-width: 100%;
+  display: block;
+}.topbar .spacer {
+  flex: 1 1 8px;
+  min-width: 8px;
+}.topbar-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  flex: 0 1 auto;
+  min-width: 0;
+}.topbar-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: none;
+}/* Standart ikon-buton (header sağ grubu + drawer) */
+.icon-btn {
+  position: relative;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--line);
+  background: var(--surface);
   color: var(--text);
-  font-size: var(--tip-md);
-  letter-spacing: .04em;
-}
-.plaka-sm .plaka-no { padding: 4px 7px; font-size: var(--tip-sm); }
-
-/* ---- kart ---- */
-.kart {
+  border-radius: var(--radius-pill);
+  transition: background .15s, transform .1s;
+}.icon-btn:hover {
+  background: var(--nav-hover);
+}.icon-btn:active {
+  transform: scale(.94);
+}.icon-btn:disabled,
+.icon-btn[aria-disabled="true"] {
+  opacity: .35;
+  cursor: not-allowed;
+  pointer-events: none;
+}.icon-btn .ico {
+  width: 23px;
+  height: 23px;
+}.icon-btn.avatar {
+  background: var(--accent-soft);
+  border-color: transparent;
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .02em;
+}.icon-btn.avatar:hover {
+  filter: brightness(1.04);
+  background: var(--accent-soft);
+}/* ============================================================
+   EKRAN GÖVDESİ
+   ============================================================ */
+.screen {
+  display: none;
+  flex-direction: column;
+  padding: 12px 16px 24px;
+  gap: 14px;
+  animation: fade .24s ease;
+}.screen.active {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}/* .screen bir flex SUTUN ve kaydirma kabi. Cocuklarinin kuculmesi
+   HER ZAMAN hatadir: kutu icerikten kisa kalir,
+icerik gorunmez.
+   Not seridi 2 px'e,
+akordiyon 2 px'e inmisti (31.08). Tek tek
+   yamamak yerine sinifin kokunu kapatiyoruz. */
+.screen > * {
+  flex-shrink: 0;
+}/* Tek satir kaldi: dikey bosluk kucultuldu ki kontroller yukari gelsin. */
+.screen-head {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: -4px;
+}.screen-head h1 {
+  font-size: 28px;
+  font-weight: 700;
+}.screen-head p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+}/* Ekran basliklari (h1) ve aciklamalari (p) KALKTI (Cemil,
+31.08):
+   "sayfalarda baslik ve aciklama istemiyorum,
+kontroller ustte olsun".
+   Eyebrow artik ekranin TEK baslik satiri — biraz buyudu ve dinamik
+   sayaci (.eb-say) yaninda tasiyor. */
+.eyebrow {
+  /* Bazi ekranlarda satirda hem PLAKA hem sayac var (fiyat ekrani
+     434 px istiyordu) — sarmasina izin verilir. */
+  display: flex;
+  align-items: center;
+  gap: 7px 9px;
+  flex-wrap: wrap;
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--accent);
+}.eyebrow .ico-sm {
+  width: 17px;
+  height: 17px;
+}.eyebrow .eb-say {
+  margin-left: auto;
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--muted);
+}.eyebrow .eb-say:empty {
+  display: none;
+}/* ---------- KART / YÜZEY ---------- */
+.card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  padding: 18px;
+}.card.raised {
   box-shadow: var(--shadow);
-  margin-bottom: 14px;
-}
-
-/* ---- büyük ana eylem — T-18: tek, büyük, tartışmasız ---- */
-.ana-btn {
+}/* ALT BASLIKLAR RENKLI (Cemil,
+01.09): gri degil birincil renk.
+   Sayfa taranirken bolum baslari once goze carpsin. */
+.section-label {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  min-height: 76px;
-  border: 0;
-  border-radius: var(--radius-lg);
-  background: var(--primary);
-  color: var(--on-primary);
-  font-family: var(--font-display);
-  font-size: var(--tip-lg);
+  gap: 7px;
+  font-size: 12px;
   font-weight: 700;
-  box-shadow: var(--shadow);
-}
-
-/* ---- ikincil düğme ---- */
-.ikincil-btn {
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 12px;
+}/* Baslik ile altindaki ipucu 4 px kaliyordu (olcum). */
+.section-label + /* Ipucu metni notr gri degil — kendi tokeni var. */
+.plate-hint {
+  margin-top: 2px;
+  margin-bottom: 4px;
+}/* ---------- PLAKA GİRİŞ ---------- */
+.plate-input-wrap {
   display: flex;
+  flex-direction: column;
+  gap: 16px;
   align-items: center;
-  justify-content: center;
+}.plate-field {
+  display: flex;
+  align-items: stretch;
   gap: 8px;
   width: 100%;
-  border: 1px solid var(--line);
+  border: 2px solid var(--primary);
   border-radius: var(--radius-md);
   background: var(--surface);
+  padding: 6px;
+}.plate-field .tr-tag {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+  background: var(--primary);
+  color: var(--on-primary);
+  padding: 0 10px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+}.plate-field input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
   color: var(--text);
-  font-size: var(--tip-md);
+  font-family: var(--font-mono);
   font-weight: 600;
-}
-
-/* ---- servis kaydı satırı (ortak nesne) ---- */
-.kayit-sat {
-  display: grid;
-  gap: 4px;
+  font-size: 26px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  min-width: 0;
+  padding: 10px 4px;
+}.plate-field input::placeholder {
+  color: var(--faint);
+  letter-spacing: 1px;
+}/* ---------- BUTONLAR (standart set) ---------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  padding: 15px 18px;
+  font-size: 16.5px;
+  font-weight: 600;
   width: 100%;
-  padding: 14px;
-  text-align: left;
-  border: 1px solid var(--line);
-  border-radius: var(--radius-md);
+  transition: background .15s, filter .15s, transform .1s, border-color .15s;
+}.btn:active {
+  transform: scale(.985);
+}.btn .ico {
+  width: 22px;
+  height: 22px;
+}/* Butonlar SIGMAZSA ALT SATIRA iner. Onceden "flex:1 1 0; min-width:0"
+   idi: butonlar sifira kadar daralabildigi icin satir hic dolmuyor,
+wrap devreye girmiyor,
+nowrap yuzunden yazi disari tasiyordu —
+   "+ Parca" ile "+ Iscilik" ic ice goruntusu (Cemil,
+01.09). */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}.btn-row .btn {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: max-content;
+  white-space: nowrap;
+}/* .btn tabanında width:100% var (tek buton tam genislik olsun diye);
+   satir icinde bu,
+her butonu ayri satira dusuruyordu. */
+
+/* ---------- ARAÇ KARTI ---------- */
+/* ---------- PLAKA — TEK BİLEŞEN,
+HER YERDE AYNI ----------
+   Gerçek TR plakasının dili: mavi çerçeve + solda mavi "TR" bloğu + mono numara.
+   Üç boyut: .plate-sm (liste/etiket) · varsayılan (metin içi) · .plate-lg (ekran başlığı). */
+.plate {
+  display: inline-flex;
+  align-items: stretch;
+  flex: none;
+  overflow: hidden;
+  vertical-align: middle;
+  border: 2px solid var(--primary);
+  border-radius: var(--radius-sm);
   background: var(--surface);
-  margin-bottom: 10px;
-}
-.kayit-sat:hover { border-color: var(--primary); }
-.kayit-ust { display: flex; align-items: center; gap: 10px; }
-.kayit-tur {
-  padding: 3px 9px;
-  border-radius: var(--radius-pill);
-  font-size: var(--tip-xs);
+}.plate .plate-tr {
+  display: flex;
+  align-items: center;
+  flex: none;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: .04em;
+  padding: 0 7px;
+}.plate .plate-no {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: var(--font-mono);
   font-weight: 600;
-}
-.kayit-tur.tamirat { background: var(--accent-soft); color: var(--accent); }
-.kayit-tur.bakim { background: var(--warn-bg); color: var(--warn); }
-.kayit-arac { color: var(--muted); font-size: var(--tip-sm); }
-.kayit-is { font-size: var(--tip-md); font-weight: 500; }
-.kayit-not { color: var(--warn); font-size: var(--tip-sm); }
-
-/* ---- para ---- */
-.para { font-family: var(--font-mono); font-variant-numeric: tabular-nums; font-weight: 600; }
-
-/* ---- boş durum ---- */
-.bos-durum {
-  display: grid;
-  gap: 6px;
-  padding: 28px 18px;
-  border: 1px dashed var(--line);
-  border-radius: var(--radius-md);
-  text-align: center;
-  color: var(--muted);
-}
-.bos-durum strong { color: var(--text); font-size: var(--tip-md); }
-.bos-durum span { font-size: var(--tip-sm); }
-
-/* ---- alan ---- */
-.alan { display: grid; gap: 6px; margin-bottom: 14px; }
-.alan label { font-size: var(--tip-sm); color: var(--muted); font-weight: 600; }
-.alan input {
-  min-height: var(--dokun);
-  padding: 0 14px;
+  font-size: 16px;
+  letter-spacing: .08em;
+  color: var(--text);
+  padding: 5px 10px;
+}.tl-item {
+  /* position: relative — ayri bir blokta duruyordu; sağlık denetimi
+     "iki kez kurucu tanimlanmis" dedi, tek yere alindi (03.09). */
+  position: relative;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
+  background: var(--surface-2);
+}/* Kayit satirlari BITISIKTI: acik islerde,
+bildirimde,
+arac gecmisinde
+   alt alta yapisiyorlardi (olcum: 0 px). */
+.tl-item + .tl-item {
+  margin-top: 10px;
+}.tl-item .tl-title + .tl-sub {
+  margin-top: 5px;
+}/* HER satırda sol kenar şeridi = ZİYARET TİPİ (zemin nötr kalır).
+   Şerit TİPİ söyler,
+rozet DURUMU — ikisi karışmaz.
+   Zemin neden boyanmıyor: satır zemini semantik yumuşak renge (ör. --warn-bg)
+   boyanınca aynı ailenin rozeti görünmez oluyordu. */
+.tl-item {
+  border-left: 3px solid var(--line);
+  padding-left: 10px;
+}/* ŞERİT = DURUM (Cemil,
+31.08). Önceki kural şeridi TİPE bağlıyordu;
+   bir listede "hangisi bekliyor" sorusu "hangisi bakım" sorusundan daha
+   sık soruluyor. Tip bilgisi kaybolmuyor: İKON tipi taşımaya devam ediyor. */
+.tl-item.d-ok {
+  border-left-color: var(--ok);
+}.tl-item.d-warn {
+  border-left-color: var(--warn);
+}.tl-item.d-crit {
+  border-left-color: var(--crit);
+}.tl-item.d-info {
+  border-left-color: var(--info);
+}.tl-item.d-accent {
+  border-left-color: var(--accent);
+}.tl-item.d-muted {
+  border-left-color: var(--line);
+}/* SATIR ŞERİDİ = TÜR (v1 kuralı,
+v2'de iki değerle sürüyor).
+   v1'de dört ziyaret tipi vardı ve --tip-* token'ları bunlardan
+   türüyordu; K-006 ile tür ikiye indi,
+token'lar kalktı,
+renkler
+   doğrudan kaynağından alınıyor: bakım teal,
+tamirat mavi.
+   Zemin BOYANMAZ — boyanırsa aynı ailenin rozeti görünmez olur. */
+.tl-item.t-bakim { border-left: 3px solid var(--accent); }.tl-item.t-tamirat { border-left: 3px solid var(--primary); }.tl-item.t-bakim .tl-ic {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}.tl-item.t-tamirat .tl-ic {
+  color: var(--primary);
+  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
+}.tl-ic {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--muted);
+}.tl-ic.ok {
+  color: var(--ok);
+  border-color: color-mix(in srgb, var(--ok) 35%, var(--line));
+}.tl-ic.accent {
+  color: var(--accent);
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
+}.tl-ic.warn {
+  color: var(--warn);
+  border-color: color-mix(in srgb, var(--warn) 40%, var(--line));
+}.tl-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}/* 1) İşin tipi / başlığı */
+.tl-title {
+  font-weight: 600;
+}/* 2) Detay satırı */
+.tl-sub {
+  font-size: 13.5px;
+  color: var(--muted);
+}/* 3) Alt şerit: solda DURUM,
+sağda TARİH */
+/* Alt satirda artik UC oge olabiliyor (durum + sorumlu + tarih).
+   Sarmayinca ucuncusu tasiyordu; tarih hep en sagda kalsin diye
+   margin-left:auto ile itiliyor. */
+.tl-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  margin-top: 4px;
+}.tl-foot .tl-date {
+  margin-left: auto;
+  white-space: nowrap;
+}.tl-date {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--muted);
+  white-space: nowrap;
+  margin-left: auto;
+}/* ---------- ROZETLER / DURUM ---------- */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 5px 11px;
+  border-radius: var(--radius-pill);
+}.pill .ico-sm {
+  width: 14px;
+  height: 14px;
+}.pill.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}.pill.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}.pill.crit {
+  background: var(--crit-bg);
+  color: var(--crit);
+}.pill.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}.pill.info {
+  background: var(--info-bg);
+  color: var(--info);
+}.pill.muted {
+  background: var(--surface-2);
+  color: var(--muted);
+}/* ---------- FORM ---------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}.field label {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--muted);
+}/* Form alanlari: .field sarmalayicisi olsun ya da olmasin ayni gorunur.
+   (Not alanlari section-label ile geldigi icin .field icinde degil.) */
+.field input,
+.field select,
+.field textarea,
+textarea {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  /* METIN ALANLARININ ZEMINI kendi tokeninde: beyaz/notr gri degil,
+     hafif tinted (Cemil, 01.09 "text bosluklari da renkli olabilir"). */
   background: var(--field-bg);
-}
-.alan input:focus-visible { border-color: var(--primary); }
-
-/* ---- arama kutusu ---- */
-.arama {
+  color: var(--text);
+  padding: 13px 14px;
+  font-size: 16px;
+  font-family: var(--font-body);
+  width: 100%;
+}.field textarea,
+textarea {
+  resize: vertical;
+  min-height: 130px;
+  line-height: 1.5;
+}.field input:focus,
+.field select:focus,
+.field textarea:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}.field-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}/* Form satirlari kart icinde alt alta gelince yapisiyordu. */
+.field-2 + .field-2,
+.field-2 + .field,
+.field + .field-2 {
+  margin-top: 14px;
+}.plate-hint + .field-2,
+.plate-hint + .field {
+  margin-top: 12px;
+}/* ---------- DİNLEME göstergesi ---------- */
+/* Plaka alani altindaki canli ipucu (format / gecerlilik) */
+/* İpucu satırı: BOŞKEN YER TUTMAZ — doğrulama gelince araya girer.
+   (Plaka ekranında tek ipucu olduğu için orada yeri sabit tutulur.) */
+.plate-hint {
+  font-size: 13px;
+  color: var(--hint);
+  line-height: 1.45;
+}.plate-hint:empty {
+  display: none;
+}.plate-hint.ok {
+  color: var(--ok);
+  font-weight: 600;
+}.plate-hint.warn {
+  color: var(--warn);
+  font-weight: 600;
+}/* Sarti saglanmayan birincil buton — gorunur ama pasif (kabuk kurali: gizleme,
+solda birak) */
+.btn.is-off {
+  opacity: .45;
+  cursor: not-allowed;
+}/* Bölüm başlığının sağındaki eylem (ör. sesle doldur mikrofonu) */
+/* Baslik + eylem: baslik KISALIR,
+eylem butonu kisalmaz — yoksa
+   "Yapilacak isler / Fotograftan" satiri tasiyordu (olcum: 381 > 373). */
+.section-label.with-action {
+  justify-content: space-between;
+  margin-bottom: 14px;
+  gap: 10px;
+}.section-label .lbl-txt {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}.mic-round.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
+}.mic-round.ghost:hover {
+  background: var(--accent-soft);
+  filter: none;
+}.mic-round {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: 0;
+  background: var(--accent);
+  color: var(--on-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}.mic-round:hover {
+  filter: brightness(1.06);
+}.mic-round .ico {
+  width: 20px;
+  height: 20px;
+}/* ---------- LİSTE EKRANLARI (Araçlar / Kişiler) ---------- */
+.search-box {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
-  min-height: var(--dokun);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: var(--field-bg);
-  margin-bottom: 16px;
-}
-/* Kap 48px ama INPUT'un kendisi 22px'ti — parmak kutuya degil
-   alana basiyor. Gorsel agirlik ayni, dokunma alani tam. */
-.arama input { flex: 1; min-width: 0; min-height: var(--dokun);
-  border: 0; background: transparent; }
-.arama input:focus { outline: none; }
-.arama svg { color: var(--faint); }
-
-/* ---- iki büyük seçim (tamirat / bakım · ödeme yolu) ---- */
-.secim-grup { display: grid; gap: 10px; margin-bottom: 16px; }
-.secim-grup.ikili { grid-template-columns: 1fr 1fr; }
-.secim-btn {
-  min-height: 64px;
-  border: 2px solid var(--line);
+  padding: 12px 14px;
+  margin-bottom: 14px;
+}.search-box .ico {
+  width: 20px;
+  height: 20px;
+  color: var(--faint);
+  flex: none;
+}.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  color: var(--text);
+  font-family: var(--font-body);
+}.search-box input::placeholder {
+  color: var(--faint);
+}.search-box .clear {
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}.search-box.filled .clear {
+  display: flex;
+}.search-box .clear:hover {
+  color: var(--text);
+}.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
+/* Parca ve iscilik satirlari BITISIKTI (Cemil,
+01.09). */
+.kalem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}/* URUN ADI USTTE TEK SATIR,
+FIYAT ALTTA (Cemil,
+01.09) — urun ismi
+   uzun olabiliyor; ad ile fiyat yan yanayken ad kirpiliyordu.
+   Satir: [tip] [ad............] [sil]
+                [fiyat] [rozet] */
+.kalem {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 4px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  background: var(--surface);
-  font-size: var(--tip-md);
+  background: var(--surface-2);
+}.kalem .k-tutar-satir {
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}.kalem .k-tip {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+}.kalem .k-tip.parca {
+  background: var(--accent-soft);
+  color: var(--accent);
+}.kalem .k-tip.iscilik {
+  background: var(--info-bg);
+  color: var(--info);
+}/* Ad TEK SATIR: uzun urun adi satiri buyutmesin,
+kirpilsin. */
+.kalem .k-ad {
+  min-width: 0;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}.kalem .k-tutar {
+  font-family: var(--font-mono);
   font-weight: 600;
-}
-.secim-btn[aria-pressed="true"] {
+  font-size: 15px;
+  white-space: nowrap;
+}/* Satır içi düzenlenebilir alanlar da 44 px dokunma hedefi olmalı
+   (Cemil: "44 px olsun. Kurala her yerde uyalım isterim").
+   Bu alanlar liste BOŞKEN görünmediği için önceki denetimlerde kaçmıştı. */
+.kalem input.k-ad,
+.kalem input.k-tutar {
+  min-height: 44px;
+}/* .k-sil BAGIMSIZ olmali: stil .kalem'e kilitliyken hasar listesinde,
+fiyat detayinda ve fotodan liste ekraninda tarayicinin varsayilan
+   dugmesi (BEYAZ KUTU) olarak ciziliyordu. */
+.k-sil {
+  /* position: relative — ::before ile buyuyen 44 px dokunma alani
+     bunu gerektiriyor; ayri blokta durdugu icin denetim "iki kez
+     kurucu tanimlanmis" diyordu (03.09). */
+  position: relative;
+  border: 0;
+  background: transparent;
+  color: var(--faint);
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}.k-sil:hover {
+  color: var(--crit);
+  background: var(--crit-bg);
+}.kalem-bos {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14.5px;
+}/* Toplam şeridi — müşteriye söylenen rakam */
+.tutar-serit {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+}.tutar-sat {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--muted);
+}.tutar-sat .tv {
+  font-family: var(--font-mono);
+  color: var(--text);
+}.tutar-sat.genel {
+  font-size: 17px;
+  color: var(--text);
+  font-weight: 600;
+  margin-top: 4px;
+}.tutar-sat.genel .tv {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+}.notice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-size: 14.5px;
+  line-height: 1.42;
+}.notice .n-ic {
+  flex: none;
+}.notice.ok {
+  background: var(--ok-bg);
+  color: var(--ok);
+}.notice.warn {
+  background: var(--warn-bg);
+  color: var(--warn);
+}.notice.accent {
+  background: var(--accent-soft);
+  color: var(--accent);
+}.notice .n-body {
+  color: var(--text);
+}.notice .n-body b {
+  color: inherit;
+  font-weight: 700;
+}.notice.ok .n-body b {
+  color: var(--ok);
+}.notice.warn .n-body b {
+  color: var(--warn);
+}.notice.accent .n-body b {
+  color: var(--accent);
+}/* Secili servis kaydi (bilgilendirmede hangi is uzerinde calisiyoruz). */
+.tl-item.secili {
   border-color: var(--primary);
-  /* secili hâl: --primary temali oldugu icin iki temada da tutar */
-  background: color-mix(in srgb, var(--primary) 12%, transparent);
+  box-shadow: inset 0 0 0 1px var(--primary);
+}/* ---------- TOAST (sahte sesli komut) ---------- */
+/* BALON (toast)
+   Onceden background:var(--text) / color:var(--bg) idi — ters kontrast.
+   Koyu temada BEYAZ balon cikiyordu ve arayuzun geri kalanindan kopuktu
+   (Cemil 31.08). Artik yuzey renginde: kartlarla ayni dil,
+ince kenarlik
+   ve golge ile one cikiyor. */
+.toast {
+  position: absolute;
+  left: 50%;
+  bottom: 22px;
+  transform: translate(-50%, 12px);
+  display: none;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--line);
+  padding: 12px 18px;
+  border-radius: var(--radius-pill);
+  font-size: 14.5px;
+  font-weight: 600;
+  box-shadow: var(--shadow);
+  z-index: 60;
+  max-width: calc(100% - 40px);
+}.toast.show {
+  display: inline-flex;
+  animation: toastIn .2s ease forwards;
+}/* DINLEME hali marka aksaniyla ayrilir — sesli islem ozel bir durum,
+sradan bir bildirimle ayni gorunmemeli. */
+.toast.dinliyor {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  /* YAZI --text kalir: --accent-soft uzerine --accent kontrasti acik temada
+     yalniz 3.1 cikiyordu (WCAG AA metin icin 4.5 ister). Marka rengini
+     ZEMIN, KENARLIK ve NOKTA tasiyor;
+  okunabilirlik bozulmuyor. */
+  color: var(--text);
+}.toast .dot-live {
+  background: var(--accent);
+}.kalem.ke-sartli {
+  opacity: .8;
+}.tutar-sat.belki .tv {
+  color: var(--warn);
+}.tutar-sat.sartli {
+  color: var(--faint);
+}.tutar-sat.sartli .tv {
+  color: var(--faint);
+}/* ---- BOŞ DURUM ----
+   İki ayrı hâl var ve karıştırılmamalı:
+   · "hiç veri yok"      → ilk kullanım; YOL GÖSTERİR,
+eylem düğmesi taşır
+   · "arama sonucu boş"  → veri var ama eşleşmedi; NE ile aranabileceğini söyler */
+.bos-durum {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  padding: 34px 20px;
+}.bos-durum .bd-ikon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  margin-bottom: 6px;
+  background: var(--surface-2);
+  color: var(--faint);
+}.bos-durum .bd-ikon .ico {
+  width: 24px;
+  height: 24px;
+}.bos-durum .bd-baslik {
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  font-weight: 600;
+}.bos-durum .bd-aciklama {
+  font-size: 13.5px;
+  color: var(--muted);
+  max-width: 30ch;
+  line-height: 1.5;
+}.bos-durum .btn {
+  margin-top: 12px;
+}.bos-durum.iyi .bd-ikon {
+  background: var(--ok-bg);
+  color: var(--ok);
+}/* Cip grubu — sure secimiyle ayni desen,
+baska yerlerde de kullanilir. */
+.cip-grup {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}.cip {
+  min-height: 44px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}.cip[aria-pressed="true"] {
+  background: var(--nav-on-bg);
+  border-color: var(--primary);
   color: var(--primary);
-}
+}.tutar-sat.indirim .tv {
+  color: var(--crit);
+}/* Alis ve fark satirlari DUKKAN ICIN — musteri belgesinde cizilmez. */
+.tutar-sat.kar {
+  color: var(--faint);
+  font-size: 13px;
+}.tutar-sat.kar .tv {
+  color: var(--muted);
+}/* ---- servis kaydı satırı: TİP solda,
+PLAKA sağa yaslı ---- */
+.tl-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}.tl-title .tl-tip {
+  flex: 1;
+  min-width: 0;
+}.tl-title .plate {
+  margin-left: auto;
+  flex: none;
+}/* açık işlerde randevu şeridi */
+.pill.randevu {
+  background: var(--nav-on-bg);
+  color: var(--primary);
+}.tl-date.gecikme {
+  color: var(--crit);
+  font-weight: 700;
+}.arac-bas .plate {
+  align-self: flex-start;
+}/* ---- servis kaydı özeti (liste görünümünde tek satır) ---- */
+.tl-sub.tl-ozet {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}/* İÇERİDE olan araç / müşterisi — kenarlık farklı {
+  border-color: var(--accent);
+  border-width: 2px;
+  padding: 12px 13px;
+}/* ---- kalem listesi ve tutar şeridi (v1) ----
+   İlk çıkarmada .k-* ve .tv seçicileri aile listesinde
+   yoktu ve atlanmıştı; kalem satırı stilsiz kalıyordu. */
+.kalem .k-tip {
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  padding: 3px 7px;
+  border-radius: var(--radius-sm);
+  white-space: nowrap;
+  ;
+}.kalem .k-tip.parca {
+  background: var(--accent-soft);
+  color: var(--accent);
+  ;
+}.kalem .k-tip.iscilik {
+  background: var(--info-bg);
+  color: var(--info);
+  ;
+}/* Ad TEK SATIR: uzun urun adi satiri buyutmesin,
+kirpilsin. */
+.kalem .k-ad {
+  min-width: 0;
+  font-size: 15px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  ;
+}.kalem .k-tutar {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 15px;
+  white-space: nowrap;
+}/* ---------- DOKUNMA HEDEFİ DÜZELTMELERİ (K-024 · en az 44px) ----------
+   GÖRSEL AĞIRLIK ≠ DOKUNMA ALANI: ikincil eylemler küçük GÖRÜNMEYE devam eder,
+alanları ::before ile büyür. Ölçüm (30.08,
+.k-sil::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: max(100%, 44px);
+  height: 44px;
+  /* görünmez — yalnız dokunma alanı */;
+}.kalem .k-tutar-satir {
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  ;
+}.tutar-sat .tv {
+  font-family: var(--font-mono);
+  color: var(--text);
+  ;
+}.tutar-sat.genel .tv {
+  font-family: var(--font-display);
+  font-size: 24px;
+  font-weight: 700;
+  ;
+}.tutar-sat.belki .tv {
+  color: var(--warn);
+  ;
+}.tutar-sat.sartli .tv {
+  color: var(--faint);
+  ;
+}.tutar-sat.indirim .tv {
+  color: var(--crit);
+  ;
+}.tutar-sat.kar .tv {
+  color: var(--muted);
+  ;
+}.kalem-bos {
+  padding: 18px 12px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14.5px;
+  ;
+}/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
+/* Parca ve iscilik satirlari BITISIKTI (Cemil,
+01.09). */
+.kalem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  ;
+}/* ---------- ARAC BASLIGI — v1'den (03.09'da gozden kacmisti) ----------
+   30-kayit ve 60-arac ekranlari bu siniflari kullaniyordu ama kurallar
+   tasinmamisti; kunye stilsiz ciziliyordu. */
+.arac-bas { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }.arac-bas .veh-title { margin-top: 9px; }.veh-title { font-family: var(--font-display); font-weight: 700; font-size: 23px; margin-top: 12px; }.veh-title .yr { color: var(--muted); font-weight: 500; }/* Detaylar TEK SERIT (tasarsa yatay kaydir; alta inmez) */
+.spec-strip {
+  display: flex; align-items: center; gap: 9px; margin-top: 3px;
+  overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}.spec-strip::-webkit-scrollbar { display: none; }.spec-val { font-size: 14px; color: var(--text); font-weight: 600; flex: none; }.spec-sep { color: var(--faint); flex: none; }
+
+/* ---------- BUTON VARYANTLARI + KUCUK PLAKA — v1'den ----------
+   03.09'da taşınmadıkları fark edildi: .btn taşınmış ama .btn-primary,
+   .btn-ghost, .btn-lg ve .plate-sm taşınmamıştı; ana düğmeler
+   ZEMİNSİZ, liste plakaları BÜYÜK çiziliyordu. Sağlık denetiminin
+   TANIMSIZ-SINIF testi yakaladı. */
+.btn-primary { background: var(--primary); color: var(--on-primary); }
+.btn-primary:hover { background: var(--primary-strong); }
+.btn-ghost { background: transparent; color: var(--text); border-color: var(--line); }
+.btn-ghost:hover { background: var(--nav-hover); }
+.btn-lg { padding: 17px; font-size: 17.5px; }
+.plate-sm { border-width: 1.5px; }
+.plate-sm .plate-tr { font-size: 9.5px; padding: 0 5px; }
+.plate-sm .plate-no { font-size: 12.5px; padding: 3px 7px; letter-spacing: .06em; }

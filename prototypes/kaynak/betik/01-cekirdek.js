@@ -41,14 +41,16 @@ var Ekran = (function () {
     var el = document.getElementById('screen-' + ad);
     if (!el) { console.warn('Ekran yok: ' + ad); return false; }
     var hepsi = document.querySelectorAll('.screen');
-    for (var i = 0; i < hepsi.length; i++) hepsi[i].classList.remove('acik');
-    el.classList.add('acik');
+    /* v1 sozlesmesi: gorunur ekran .active — bilesen CSS'i ve denetim
+       bu ada gore yazilmis, degistirilmez. */
+    for (var i = 0; i < hepsi.length; i++) hepsi[i].classList.remove('active');
+    el.classList.add('active');
     acik = ad;
     var k = kayit[ad];
     if (k && typeof k.ciz === 'function') {
       try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); }
     }
-    document.querySelector('.govde').scrollTop = 0;
+    el.scrollTop = 0;
     window.scrollTo(0, 0);
     geriTazele();
     return true;
@@ -104,14 +106,18 @@ document.addEventListener('click', function (e) {
 });
 
 /* ---- balon ---- */
-function balon(metin, uyari, sure) {
-  var kap = document.getElementById('balonKap');
-  if (!kap) return;
-  var d = document.createElement('div');
-  d.className = 'balon' + (uyari ? ' uyari' : '');
-  d.textContent = metin;
-  kap.appendChild(d);
-  setTimeout(function () { d.remove(); }, sure || 2600);
+/* v1'in balonu: TEK oge, .show ile acilir. Yigin degil — ust uste
+   balon birikmesi v1'de bilerek yapilmamisti. */
+var balonSayaci = null;
+function balon(metin, dinliyor, sure) {
+  var t = document.getElementById('toast');
+  if (!t) return;
+  t.innerHTML = (dinliyor ? '<span class="dot-live"></span>' : '') +
+                '<span>' + metin + '</span>';
+  t.classList.toggle('dinliyor', !!dinliyor);
+  t.classList.add('show');
+  if (balonSayaci) clearTimeout(balonSayaci);
+  balonSayaci = setTimeout(function () { t.classList.remove('show'); }, sure || 2600);
 }
 
 /* ---- ortak biçimleyiciler ---- */
