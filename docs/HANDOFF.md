@@ -27,7 +27,7 @@ turda üretilen tek çalışan şey tıklanabilir prototip.
 
 1. **`arastirma/TAMIRCI-GERIBILDIRIM.md`** — bu deponun 1 numaralı belgesi.
    Tamircinin sözü bizim akıl yürütmemizi yener.
-2. `KARARLAR.md` — K-001…K-008 + açık maddeler
+2. `KARARLAR.md` — K-001…K-010 + açık maddeler
 3. `IS-AKISI.md` — yedi adım, beş kol, ölçülmüş senaryo
 4. `EKRANLAR.md` — altı ekran; her ekranın *"üzerinde ne YOK"* sütunu
 5. `VERI-MODELI.md` — sekiz tablo
@@ -110,6 +110,13 @@ tercihini sessizce ezdi (K-009, K-010).
 | **A-14** | Ekran 2 tabaka mı olsun | ölçüldü: tabaka olursa **13 → 12** dokunuş, **6 → 5** ekran |
 | **Ç-2** | OEM kodu yönü — TecDoc'un kaderini belirler | K-001 |
 | **K-007** | Kol B'de hiçbir cevap seçilmezse akış durur mu | durmaz |
+
+**Sırada bekleyen alan:** **muhasebe.** Cemil 03.09'da *"muhasebe
+alanını da yapacağız"* dedi, kapsamı *"sonra geçeceğiz"* diyerek erteledi.
+README'de *"basit ön muhasebe"* yazıyor ama tamircinin yedi işinde
+muhasebe **yok** — kapsamı Cemil'in vereceği bir karar, tasarım ondan
+sonra başlar. Elde hazır olan hammadde: teslimdeki `PaymentMethod`
+(nakit/kart/havale/**almadım**) ve satırlardaki `Price`/`Cost` ayrımı.
 
 **Yapılmamış işler:** müşteri tarafı (T-19/20/21) · gerçek ruhsat okuma
 (`RUHSAT-OKUMA.md` C yolu) · gerçek WhatsApp gönderimi
