@@ -422,6 +422,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Araç rengi | `.renk-kutu` + `.r-<renk>` (yalnız `renkKutuHtml()` üretir) |
 | Açılır bölüm | `.akordiyon` > `.akd-bas` (`.akd-say` `.akd-ok`) + `.akd-govde` — yalnız `akordiyonHtml()` üretir, davranışı `Akordiyon` modülünde |
 | Kilometre satırı | `.km-sat` > `.km-tarih` + `.km-deger` |
+| Müşteri özeti başlığı | `.ozet-bas` > `.oz-ad` + `.oz-alt` · parça markası: `.oz-marka` |
 | Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |
 | Kalem | `.kalem-list` > `.kalem` > `.k-tip` `.k-ad` `.k-tutar` `.k-sil` · boş: `.kalem-bos` |

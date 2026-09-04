@@ -223,7 +223,22 @@ menü satırı, eski *"Ruhsatı çek"* düğmesinin yerini aldı.
 | **8 · Servis kayıtları** | Eski ana ekranın listesi + teslim edilmişler | Durum alanı *(süzgeç `teslimTarihi`'nden türetilir, K-004)* |
 | **9 · Araçlar** | *"Hangi araçlar kayıtlı"* — menüden gelince gidecek yeri kalmamıştı. **04.09'da satır yeniden çizildi (K-019.2):** plaka · marka/model/motor + **renk kutucuğu** · ruhsat sahibi · telefon · ikinci iletişim. İçeridekiler üstte, **çerçeveden** belli | Araç ekleme formu · araç ikonu · *"içeride"* yazısı · kayıt sayısı · son bakım · VIN · kontrol tarihleri |
 | **10 · Müşteriler** | Menüde istendi | **Müşteri tablosu** — liste araçtan türetiliyor |
-| **11 · Muhasebe** | Menüde istendi | Gider · kâr · cari hesap · fatura *(kapsam kararı bekliyor)* |
+| **11 · Muhasebe** | Menüde istendi | Kâr · cari hesap · fatura/KDV · gider kategorisi · aylık özet *(K-022: kapsam **kasa+gider** önerildi)* |
+
+---
+
+## Müşterinin gördüğü sayfa — ustanın ekranı DEĞİL
+
+| Ekran | Neden var | Üzerinde ne YOK |
+|---|---|---|
+| **12 · Özet** | Yedi işten **altıncısı**: müşteriye özet göndermek (T-19/20/21). Tamirci bugün PDF gönderiyor; **link canlıdır, PDF ölü** (K-023) | Fiyat düzenleme · onay/red düğmesi · ödeme alanı · **alış fiyatı** · başka araç · geçmiş kayıt · giriş/parola *(A-M9)* |
+
+**Ekran bütçesi (A-2) ustanın ekranlarını sayıyor.** Bu sayfayı müşteri
+görüyor; prototipte ustanın **önizlemesi** olarak duruyor ve tepesinde bunu
+yazıyor. Ustanın erişimi: mesaj ekranındaki *"Müşteri ne görecek?"* düğmesi —
+yalnız **özet şablonunda** çıkar.
+
+---
 
 **Kıyas:** v1 · 38 ekran.
 

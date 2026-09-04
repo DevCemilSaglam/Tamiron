@@ -10,6 +10,70 @@
 
 ---
 
+## K-023 · Müşteriye PDF değil LİNK gider; özet ustanın ekranı değildir (04.09.2026)
+
+**Karar:** Yedi işten altıncısı (*müşteriye özet göndermek*) yazıldı.
+Müşteri bir **sayfa** görüyor, bir dosya değil.
+
+### 23.1 · PDF neden değil
+
+Tamircinin bugünkü işi (S8): *"müşteriye iş listesinin yani tutarın iş,
+parça açıklaması ve Toplam tutar olarak pdf gönderiyorlarmış. Bunu WhatsApp
+üzerinden uygulama linki gönderme fikri mantıklı geldi."*
+
+| | PDF | Link |
+|---|---|---|
+| Üretmek | **sunucu ister** | ister istemez |
+| Gönderildikten sonra | **ölü** — o anki hâli taşır | canlı, iş sürerken güncellenir |
+| Müşteri bir hafta sonra | dosyayı bulamaz | linke yine dokunur |
+| T-21 (*"müşteride de program olsun"*) | karşılamaz | **en ucuz hâli** — kurulum yok |
+
+**Mesaj yine de bir işe yarıyor:** WhatsApp'ta linke dokunmayan da olur, o
+yüzden **kalem sayısı ve toplam mesajın içinde** duruyor. Tam liste sayfada.
+
+### 23.2 · Bu ekran ustanın ekranı DEĞİL
+
+Ekran sayısı 12 → **13**, ama ekran bütçesi (A-2) **ustanın** ekranlarını
+sayıyor; bu sayfayı müşteri görüyor. Prototipte ustanın **önizlemesi** olarak
+duruyor ve **tepesinde bunu yazıyor** — yazmasaydı bir sonraki oturumda
+*"13. ekran nereden çıktı"* diye sorulurdu.
+
+Ustanın erişimi mesaj ekranındaki **"Müşteri ne görecek?"** düğmesi. Yalnız
+**özet şablonunda** çıkıyor; öteki iki şablon link taşımıyor, gösterilecek
+sayfa da yok.
+
+### 23.3 · Sayfanın üzerinde ne YOK ve neden
+
+| Yok | Neden |
+|---|---|
+| Fiyat düzenleme, satır ekleme | Müşterinin sayfası — salt okunur |
+| Onay / red düğmesi | **Onay mekanizması kurulmuyor** (K-003, S4) |
+| Ödeme alanı | Para dükkânda alınıyor; kapsam dışı |
+| Alış fiyatı (`alis`) | **Müşteriye gitmez** (`VERI-MODELI §3`) |
+| Başka araç, geçmiş kayıt | Link tek kaydın |
+
+**Müşteri parçası SÖYLENİYOR.** Fiyatsız bir satırı sessizce göstermek
+müşteriye *"bu bedavaydı"* diye okunur; oysa parayı o ödemiş (S2, K-005).
+Satırda *"parçayı siz getirdiniz"* yazıyor.
+
+**Durum tek** (K-004): *"Aracınız serviste"* ya da *"… tarihinde teslim
+edildi"*. Müşterinin ikinci sorusu bu.
+
+> **Cemil onayına açık (A-M9):** sayfada **kimlik doğrulama yok** — linki olan
+> görür. Link plaka + kayıt numarasından türüyor, yani **tahmin edilebilir**.
+> Gerçek kullanımda tahmin edilemez bir kod gerekir. Prototipte kabul;
+> backend fazında kapatılacak.
+
+### 23.4 · Ekranlar arası devredilen değer çekirdekte durur
+
+`ozetLinki()` iki ekranda gerekiyordu (mesaj metni ve özet sayfası). Ekran
+betikleri derlemede **kendi IIFE'sine sarıldığı** için özet ekranında
+tanımlansaydı mesaj ekranı onu **göremezdi** — ve hata, mesaj metninde sessizce
+eksik bir link olarak çıkardı. `OZET_KAYIT` ile birlikte çekirdeğe alındı;
+`MESAJ_HEDEF`, `ARAMA_TERIMI`, `RUHSAT_ONDOLGU` zaten orada.
+
+---
+
 ## K-022 · Muhasebe kapsamı: kasa + gider. Cari hesap kapsam dışı (04.09.2026)
 
 > **Karar taslağı — Cemil onayına açık (MUH).** Lider Cemil yokken
@@ -810,3 +874,5 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
+| **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no). Backend fazında kapatılacak — kabul mü | Cemil |
+| ~~A-2~~ | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya | Kısmen kapandı |

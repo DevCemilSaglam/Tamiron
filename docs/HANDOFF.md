@@ -13,13 +13,13 @@ tıklanabilir prototip.
 
 | | |
 |---|---|
-| Ekran | **12** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe |
+| Ekran | **13** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
 | Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
 | Dokunuş | ana yol **12**, kısa yol **9**, **sesli yol 3** (ölçüldü) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
 | Sağlık denetimi | **30 test · 0 bulgu** · 375 px'te ölçüldü |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-022** |
+| Kararlar | **K-001 … K-023** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -132,7 +132,7 @@ harf dizisi sanıldı ve plaka yanlış okundu. Kural keskinleştirildi:
 > **A-1 (ekran bütçesi 6) kapandı:** Cemil menüyü ve dört yeni ekranı
 > isteyince bütçe cevaplanmış oldu. Ölçülen asıl sayı değişmedi.
 
-**Yapılmamış işler:** müşteri tarafı (T-19/20/21) · gerçek ruhsat
+**Yapılmamış işler:** ~~müşteri özeti~~ **(K-023'te yazıldı)** · müşteri uygulaması (T-21) · gerçek ruhsat
 okuma (`RUHSAT-OKUMA.md` C yolu) · gerçek WhatsApp gönderimi
 (`WHATSAPP.md` A yolu, kurulum gerektirmiyor) · SMS + İYS kaydı ·
 backend.

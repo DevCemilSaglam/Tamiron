@@ -34,6 +34,10 @@ var SESLI_NIYET = null;
    acilirken okuyup TEMIZLIYOR (birakilsa bir sonraki acilisa sizar). */
 var RUHSAT_ONDOLGU = null;   /* {plaka, sahipAd, sahipTel, is, tur, km} */
 var MESAJ_HEDEF = null;      /* {plaka, sablon} */
+/* Müşteriye gönderilen özetin hangi kayda ait olduğu. Müşteri linkten
+   gelseydi bu bilgi linkin içinde olurdu; prototipte usta hangi kaydı
+   önizliyorsa o. */
+var OZET_KAYIT = null;      /* kayit id */
 var ARAMA_TERIMI = null;     /* {hedef, terim, suzgec} */
 
 /* Sesli isleme BAGLAMLA gitmenin TEK yolu.
@@ -237,6 +241,24 @@ function kelimeleriAt(metin, atilacaklar) {
 function tariheCevir(g) {
   var p = (g || '').split('.');
   return new Date(+p[2], (+p[1] || 1) - 1, +p[0] || 1);
+}
+
+/* ---- MÜŞTERİ ÖZETİNİN ADRESİ ----
+   Kod plakadan ve kayıt numarasından türüyor. Backend yok: kod
+   ÜRETİLİYOR ama çözülmüyor — sayfanın nasıl adresleneceği bir tasarım
+   sorusu, uygulaması backend fazında.
+
+   ⚠️ Plakada Türkçe harf yok ama BOŞLUK var; boşluk atılıyor, kelime
+   sınırı ARANMIYOR (K-018).
+
+   İki ekran kullanıyor (mesaj metni ve özet sayfası) — o yüzden burada:
+   ekran betikleri derlemede kendi IIFE'sine sarılır ve bir ekranda
+   tanımlanan fonksiyonu öteki göremez. */
+function ozetKodu(k) {
+  return (k.plaka || '').split(' ').join('').toLowerCase() + '-' + k.id;
+}
+function ozetLinki(k) {
+  return 'tamiron.app/o/' + ozetKodu(k);
 }
 
 function tutar(n) {

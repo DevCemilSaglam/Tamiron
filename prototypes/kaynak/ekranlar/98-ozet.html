@@ -1,0 +1,168 @@
+<!-- ekran: ozet · MÜŞTERİNİN GÖRDÜĞÜ ÖZET (04.09.2026)
+     Yedi işten ALTINCISI: "Müşteriye özet göndermek." (T-19, T-20, T-21)
+
+     TAMİRCİNİN BUGÜNKÜ İŞİ (S8): "müşteriye iş listesinin yani tutarın
+     iş, parça açıklaması ve Toplam tutar olarak pdf gönderiyorlarmış.
+     Bunu WhatsApp üzerinden uygulama linki gönderme fikri mantıklı
+     geldi. Müşteride de program olması beğenildi."
+
+     ⚠️ BU EKRAN USTANIN EKRANI DEĞİL. Ekran bütçesi (A-2) ustanın
+     ekranlarını sayıyor; bu sayfayı müşteri görüyor. Prototipte
+     ustanın ÖNİZLEMESİ olarak duruyor ve tepesinde bunu yazıyor —
+     yazmasaydı bir sonraki oturumda "13. ekran nereden çıktı" diye
+     sorulurdu.
+
+     PDF DEĞİL LİNK — NEDEN: PDF üretmek sunucu ister, gönderilince
+     ölü bir dosyadır ve müşteri onu bir daha bulamaz. Link canlıdır:
+     iş sürerken bakınca güncelini görür. T-21'in ("müşteride de
+     program olsun") en ucuz hâli de bu — kurulum yok, açılan bir
+     sayfa var.
+
+     ÜZERİNDE NE YOK ve neden:
+       · Fiyat düzenleme, satır ekleme — müşterinin sayfası, salt okunur
+       · Onay/red düğmesi — onay mekanizması KURULMUYOR (K-003, S4)
+       · Ödeme/kredi kartı alanı — kapsam dışı, para dükkânda alınıyor
+       · Giriş/parola — linki olan görür; kimlik doğrulama yok (A-M9)
+       · Alış fiyatı (`alis`) — MÜŞTERİYE GİTMEZ (VERI-MODELI §3)
+       · Dükkânın öteki müşterileri, başka araçlar, geçmiş kayıtlar
+
+     BİLEŞENLER: .card · .notice .n-ic .n-body · .ozet-bas ·
+     .arac-bas .plate-lg .veh-title .spec-strip · .section-label ·
+     .tutar-serit .tutar-sat .tutar-sat.genel .tv · .pill ·
+     .tel-link · .bos-durum. Yeni: yalnız .ozet-bas (sözlüğe girdi). -->
+<section class="screen" id="screen-ozet">
+
+  <!-- ÖNİZLEME ŞERİDİ — müşteride GÖRÜNMEZ. Prototipte duruyor ki
+       ustanın ekranıyla müşterinin sayfası karışmasın. -->
+  <div class="notice" id="ozOnizleme"></div>
+
+  <div class="card">
+    <div class="ozet-bas" id="ozDukkan"></div>
+  </div>
+
+  <div class="card">
+    <div id="ozArac"></div>
+  </div>
+
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılan işler
+  </div>
+  <div id="ozKalemler"></div>
+
+  <div id="ozDurum"></div>
+
+</section>
+
+<script>
+/* OZET_KAYIT ve ozetLinki() ÇEKİRDEKTE (01-cekirdek.js) — ekran
+   betikleri derlemede kendi IIFE'sine sarılıyor, burada tanımlansaydı
+   mesaj ekranı linki üretemezdi. Ekranlar arası devredilen her değer
+   çekirdekte durur (MESAJ_HEDEF, ARAMA_TERIMI, RUHSAT_ONDOLGU gibi). */
+
+Ekran.tanim('ozet', {
+  ciz: function () {
+    var k = (OZET_KAYIT !== null) ? kayitBul(OZET_KAYIT) : null;
+    if (!k) {
+      document.getElementById('ozOnizleme').innerHTML = '';
+      document.getElementById('ozDukkan').innerHTML = '';
+      document.getElementById('ozArac').innerHTML = '';
+      document.getElementById('ozDurum').innerHTML = '';
+      document.getElementById('ozKalemler').innerHTML = bosDurumHtml(
+        'i-clipboard-list', 'Özet seçilmedi',
+        'Bir servis kaydından "Özeti gör"e dokunman gerekiyor.');
+      return;
+    }
+    var a = aracBul(k.plaka);
+
+    document.getElementById('ozOnizleme').innerHTML =
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+      '<span class="n-body"><b>Müşterinin gördüğü sayfa.</b> Bu şerit ' +
+      'yalnız sende görünüyor. Link: <b>' + ozetLinki(k) + '</b></span>';
+
+    /* DÜKKÂN ÜSTTE: müşteri sayfayı WhatsApp'tan açıyor ve ilk sorusu
+       "bu kimden geldi". Telefon aranabilir — sorusu varsa arayacak. */
+    document.getElementById('ozDukkan').innerHTML =
+      '<div class="oz-ad">' + DUKKAN.ad + '</div>' +
+      (DUKKAN.adres ? '<div class="oz-alt">' + DUKKAN.adres + '</div>' : '') +
+      (DUKKAN.tel ? telLinkHtml(DUKKAN.tel, DUKKAN.ad) : '');
+
+    document.getElementById('ozArac').innerHTML = a
+      ? '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
+          '<div class="veh-title">' + a.marka + ' ' + a.model +
+            (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+          '<div class="spec-strip">' +
+            '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
+            (k.km ? '<span class="spec-sep">·</span><span class="spec-val">' +
+              k.km + ' km</span>' : '') +
+          '</div>' +
+        '</div>' +
+        (k.sikayet ? '<p class="plate-hint">' + k.sikayet + '</p>' : '')
+      : '';
+
+    /* KALEMLER — "iş, parça açıklaması ve toplam tutar" (S8).
+       ⚠️ MÜŞTERİ PARÇASI 0 TL DURUYOR (S2, K-005) ve BUNU SÖYLÜYOR.
+       Fiyatsız bir satırı sessizce göstermek, müşteriye "bu bedavaydı"
+       diye okunur; oysa parayı o ödemiş. */
+    var satirlar = k.satirlar || [];
+    document.getElementById('ozKalemler').innerHTML = satirlar.length
+      ? '<div class="tutar-serit">' +
+          satirlar.map(function (s) {
+            var etiket = s.ad || (s.tip === 'iscilik' ? 'İşçilik' : 'Parça');
+            var ek = (s.tip === 'parca' && s.marka)
+              ? ' <span class="oz-marka">' + s.marka +
+                (s.kod ? ' · ' + s.kod : '') + '</span>' : '';
+            var musterinin = (s.tip === 'parca' && s.kimGetirdi === 'musteri');
+            return '<div class="tutar-sat"><span>' + etiket + ek +
+              (musterinin ? ' <span class="pill muted">parçayı siz getirdiniz</span>' : '') +
+              '</span><span class="tv">' +
+              (s.fiyat ? tutar(s.fiyat) + ' ₺' : '—') + '</span></div>';
+          }).join('') +
+          '<div class="tutar-sat genel"><span>Toplam</span><span class="tv">' +
+            tutar(kayitToplami(k)) + ' ₺</span></div>' +
+        '</div>'
+      : bosDurumHtml('i-clipboard-list', 'Henüz iş yazılmadı',
+          'Araç işleme alındığında yapılanlar burada görünecek.');
+
+    /* DURUM: müşterinin ikinci sorusu "aracım hazır mı".
+       Tek durum var (K-004) ve burada da tek durum gösteriliyor. */
+    document.getElementById('ozDurum').innerHTML =
+      '<div class="notice ' + (k.teslimTarihi ? 'ok' : 'accent') + '">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#' +
+          (k.teslimTarihi ? 'i-circle-check' : 'i-clock') + '"></use></svg></span>' +
+        '<span class="n-body">' +
+          (k.teslimTarihi
+            ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
+              (k.odemeYolu === 'almadim'
+                ? ' Ödeme <b>alınmadı</b>.'
+                : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
+                    k.odemeYolu) + '</b>.' : ''))
+            : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.') +
+        '</span>' +
+      '</div>';
+  }
+});
+</script>
+
+<style>
+/* Müşteri sayfasının başlığı — dükkânın adı. Ustanın ekranlarında
+   böyle bir başlık yok: orada dükkân zaten belli, burada ilk soru
+   "bu kimden geldi". */
+.ozet-bas .oz-ad {
+  font-family: var(--font-display);
+  font-size: var(--tip-lg);
+  font-weight: 700;
+  color: var(--text);
+}
+.ozet-bas .oz-alt {
+  margin-top: 2px;
+  font-size: var(--tip-sm);
+  color: var(--muted);
+}
+/* Parçanın markası/kodu satırın içinde ikincil kalır — müşteri için
+   asıl bilgi "ne yapıldı" ve "kaça". */
+.oz-marka {
+  font-family: var(--font-mono);
+  font-size: var(--tip-xs);
+  color: var(--muted);
+}
+</style>

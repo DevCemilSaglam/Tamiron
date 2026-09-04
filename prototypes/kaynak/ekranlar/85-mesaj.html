@@ -77,6 +77,11 @@
 
     <div id="msjUyari"></div>
 
+    <!-- ÖZETİ GÖR — 04.09. Mesaj artık liste değil LİNK taşıyor (T-20);
+         ustanın "linke basınca müşteri ne görecek" sorusunun cevabı
+         gönderMEDEN önce burada. Gönderdikten sonra öğrenmek geç. -->
+    <div id="msjOnizle"></div>
+
     <button class="btn btn-primary btn-lg" id="msjGonder">
       <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
     </button>
@@ -98,6 +103,14 @@ var MSJ_SABLON = [
   { k: 'hazir', ad: 'Aracınız hazır' },
   { k: 'hatirlatma', ad: 'Bakım hatırlatması' }
 ];
+
+/* Hangi kaydın özeti — TEK YERDE. Metin bir kayıttan, önizleme başka
+   bir kayıttan üretilseydi usta gönderdiğinden farklı bir şey görürdü
+   ve bunu ancak müşteri sorunca anlardı. */
+function msjOzetKaydi(plaka) {
+  return icerideki().filter(function (x) { return x.plaka === plaka; })[0] ||
+         aracKayitlari(plaka).slice(-1)[0] || null;
+}
 
 function msjMetinUret(plaka, sablon) {
   var a = aracBul(plaka);
@@ -123,14 +136,20 @@ function msjMetinUret(plaka, sablon) {
            'Uygun olduğunuzda bekleriz.\n\n' + DUKKAN.ad + '\n' + DUKKAN.tel;
   }
   /* özet — açık ya da son kayıttan üretilir */
-  var k = icerideki().filter(function (x) { return x.plaka === plaka; })[0] ||
-          aracKayitlari(plaka).slice(-1)[0];
+  var k = msjOzetKaydi(plaka);
   if (!k) return basi + arac + ' için henüz bir kayıt yok.';
-  var satirlar = (k.satirlar || []).map(function (s) {
-    return '· ' + (s.ad || '—') + (s.fiyat ? ' — ' + tutar(s.fiyat) + ' ₺' : '');
-  }).join('\n');
-  return basi + arac + ' için yapılanlar:\n' + (satirlar || '· —') +
-         '\n\nToplam: ' + tutar(kayitToplami(k)) + ' ₺\n\n' +
+  /* ⚠️ 04.09 — MESAJ ARTIK LİSTEYİ TAŞIMIYOR, LİNKİ TAŞIYOR (T-20).
+     Tamirci bugün PDF gönderiyor (S8). PDF ölü bir dosyadır: gönderildiği
+     anki hâli taşır, iş sürerken güncellenmez ve müşteri onu bir daha
+     bulamaz. Link canlıdır — müşteri istediği an bakar, güncelini görür.
+
+     LİSTE YİNE DE ÖZETLENİYOR: WhatsApp'ta linke dokunmayan da olur;
+     kalem sayısı ve toplam mesajın içinde duruyor ki link açılmasa bile
+     mesaj bir işe yarasın. Tam liste sayfada. */
+  var adet = (k.satirlar || []).length;
+  return basi + arac + ' için ' + (adet ? adet + ' kalem ' : '') +
+         'işlem yapıldı.\nToplam: ' + tutar(kayitToplami(k)) + ' ₺\n\n' +
+         'Ayrıntılı özet: ' + ozetLinki(k) + '\n\n' +
          DUKKAN.ad + '\n' + DUKKAN.tel;
 }
 
@@ -211,6 +230,16 @@ function msjYazimCiz() {
       '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
       'önce araç kaydına telefon yaz.</span></div>';
   document.getElementById('msjGonder').disabled = !tel;
+
+  /* Önizleme YALNIZ özet şablonunda: linki taşıyan tek şablon o.
+     "Hazır" ve "hatırlatma" mesajlarında gösterilecek bir sayfa yok. */
+  var ozetK = msjOzetKaydi(msjPlaka);
+  document.getElementById('msjOnizle').innerHTML =
+    (msjSablonSecili === 'ozet' && ozetK)
+      ? '<button class="btn btn-ghost" id="msjOzetGor">' +
+          '<svg class="ico"><use href="#i-file-text"></use></svg>' +
+          ' Müşteri ne görecek?</button>'
+      : '';
 }
 
 Ekran.tanim('mesaj', {
@@ -250,6 +279,16 @@ document.addEventListener('click', function (e) {
   }
 
   if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
+
+  /* Özet sayfasını AÇAR — usta linkin ucundakini görsün. Geri düğmesi
+     mesaja döndürüyor, mesaj yazımı bozulmuyor (msjPlaka duruyor). */
+  if (t.id === 'msjOzetGor') {
+    var ok = msjOzetKaydi(msjPlaka);
+    if (!ok) return;
+    OZET_KAYIT = ok.id;
+    Ekran.ac('ozet');
+    return;
+  }
   if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }
 
   if (t.id === 'msjMik' || t.id === 'msjSecimMik') {
