@@ -390,3 +390,37 @@ function sonBakim(plaka) {
 function giderToplami() {
   return GIDERLER.reduce(function (t, g) { return t + (g.tutar || 0); }, 0);
 }
+
+/* ---- PARÇA ALIŞI — BEDAVAYA GELEN DÖRDÜNCÜ RAKAM (04.09) ----
+   `alis` (ServiceLine.Cost) ZATEN KAYITLI, çünkü T-9 var: "Usta kendi
+   fiyat aldıysa, parça fiyatlarına ekleme yapabiliyor." Parçacıdan
+   gelen fiyat satıra yazılıyor.
+
+   Yani tamircinin parçaya ödediği para veri modelinde duruyor ve
+   ustadan TEK BİR YENİ GİRİŞ istemiyor. K-013'ün ölçüsüne göre bu
+   rakam "girilmezse yalan söyleyen" gruba değil, "zaten kayıtlı"
+   gruba ait.
+
+   YALNIZ TAMİRCİNİN ALDIĞI PARÇALAR: müşteri kendi getirdiyse para
+   tamirciden çıkmamıştır (K-005). kimGetirdi === 'musteri' olan satır
+   sayılsaydı, ödenmemiş bir para gider gibi görünürdü.
+
+   YALNIZ TESLİM EDİLMİŞ KAYITLAR: içerideki araçta parça daha
+   alınmamış olabilir — henüz olmamış bir harcamayı gider saymak,
+   ustayı olduğundan yoksul gösterir. */
+function parcaAlislari() {
+  var liste = [];
+  KAYITLAR.forEach(function (k) {
+    if (!k.teslimTarihi) return;
+    (k.satirlar || []).forEach(function (s) {
+      if (s.tip !== 'parca' || s.kimGetirdi !== 'tamirci') return;
+      if (!s.alis) return;
+      liste.push({ tarih: k.teslimTarihi, plaka: k.plaka,
+                   ad: s.ad || 'parça', tutar: s.alis, kayit: k.id });
+    });
+  });
+  return liste;
+}
+function parcaAlisiToplami() {
+  return parcaAlislari().reduce(function (t, x) { return t + x.tutar; }, 0);
+}

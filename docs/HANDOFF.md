@@ -19,7 +19,7 @@ tıklanabilir prototip.
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
 | Sağlık denetimi | **30 test · 0 bulgu** · 375 px'te ölçüldü |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-021** |
+| Kararlar | **K-001 … K-022** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -123,7 +123,7 @@ harf dizisi sanıldı ve plaka yanlış okundu. Kural keskinleştirildi:
 | **A-14** | Ruhsat ekranı tabaka mı olsun | Ölçüldü: bir dokunuş ve bir ekran kazandırır |
 | **Ç-2** | OEM kodu yönü — TecDoc'un kaderi | K-001'de kaldığı gibi |
 | **A-S3** | **Ses gizliliği:** Chrome sesi Google'a gönderiyor | Prototipte kabul, gerçek kullanımda yeniden konuşulur |
-| **MUH** | **Muhasebe kapsamı** — nereye kadar | Günlük kasa · kasa+gider · cari hesap |
+| **MUH** | **Muhasebe kapsamı** — nereye kadar | **K-022 taslağı hazır:** kasa+gider. Cari hesap kapsam dışı. Ölçüm: `arastirma/MUHASEBE-KAPSAMI.md` |
 | **A-M1** | Müşteri adı iki araçta farklı yazılırsa iki müşteri görünüyor | Tamirci şikâyet edene kadar dokunma |
 | **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi | İkinci iletişim varsa o |
 | **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi | Kaydın kendi ekranında kalsın |

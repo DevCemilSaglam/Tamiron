@@ -10,6 +10,86 @@
 
 ---
 
+## K-022 · Muhasebe kapsamı: kasa + gider. Cari hesap kapsam dışı (04.09.2026)
+
+> **Karar taslağı — Cemil onayına açık (MUH).** Lider Cemil yokken
+> hazırladı; ölçümler ve gerekçe `arastirma/MUHASEBE-KAPSAMI.md`'de.
+> Kod tarafında yalnız **hiçbir yeni alan istemeyen** kısım yazıldı.
+
+### 22.1 · Seçenek B — kasa + gider
+
+| Seçenek | Yeni veri girişi | Yalan söyleyebilir mi | Yedi işten hangisi |
+|---|---|---|---|
+| A · günlük kasa | **sıfır** | hayır | **4** — teslimde ödemeyi bilmek |
+| **B · kasa + gider** | her gider için bir giriş | evet, eksik girilirse | 4'ün komşusu |
+| C · cari hesap | açılış + her ödeme + her kısmi ödeme | **evet, ve kalıcı** | **hiçbiri** |
+
+**C neden kapsam dışı:** yedi işten hiçbirine hizmet etmiyor · **K-012'yi geri
+alıyor** (müşteri tablosu yok, müşteri aracın üstünde iki alan) · bir kez kayan
+bakiye bir daha tutmaz. Paraşüt'te cari hesap bir **ekran ailesi**: ekstre,
+mutabakat, virman, ödeme hatırlatma. Bu, tamircinin *"karmaşık"* dediği yığının
+tam ortası. *"İleride lazım olur"* gerekçe değildir.
+
+**B'nin sınırı keskin:** fatura yok · KDV yok · tevkifat yok · e-belge yok ·
+banka yok · çek/senet yok · stok yok · gider kategorisi yok · aylık özet yok.
+Hepsi rakiplerde var; **hiçbiri yedi işten birine hizmet etmiyor.**
+
+### 22.2 · Parça alışı bedavaya geldi — ve bu bir kural örneği
+
+`ServiceLine.Cost` (`alis`) **zaten kayıtlı**, çünkü T-9 var: *"Usta kendi fiyat
+aldıysa, parça fiyatlarına ekleme yapabiliyor."* Tamircinin parçaya ödediği para
+veri modelinde duruyor ve ustadan **tek bir yeni giriş istemiyor.**
+
+K-013'ün ölçüsü şuydu: *"girilmezse yalan söyleyen rakam gösterilmez."* Bu rakam
+o gruba ait değil — **her zaman doğru.** Bu yüzden yazıldı.
+
+**İki süzgeç, ikisi de gerekçeli:**
+- **Yalnız tamircinin aldığı parçalar.** Müşteri getirdiyse para tamirciden
+  çıkmamıştır (K-005); sayılsaydı ödenmemiş bir para gider gibi görünürdü.
+- **Yalnız teslim edilmiş kayıtlar.** İçerideki araçta parça daha alınmamış
+  olabilir; olmamış bir harcamayı gider saymak ustayı olduğundan yoksul gösterir.
+
+**⚠️ Çift sayma tehlikesi ekranda YAZILI.** Usta parçayı hem satıra alış olarak
+yazıp hem elle *"Öz Yedek Parça — triger seti"* diye gider ekleyebilir. Bu
+yüzden parça alışı, elle giderlerden **ayrı** duruyor ve ekran uyarıyor.
+Karıştırılsaydı çift sayma **sessizce** olurdu.
+
+**Ölçüldü (04.09):** 5 satır · **7.160 ₺** · içerideki kayıtlar sayılmadı ·
+müşteri parçası sayılmadı.
+
+### 22.3 · Kâr yine hesaplanmıyor — ama sebebi inceldi
+
+**İş başına kâr** (`fiyat − alış`) matematiksel olarak doğru çıkar; **dükkân
+kârı** çıkmaz, çünkü kira/elektrik/maaş girilmemiş olabilir. İkisi aynı ekranda
+dururken usta ikincisini birincisi sanar.
+
+İş başına kâr **önerildi ama yazılmadı** — yeni bir rakam ve karıştırılma riski
+var. Cemil onayına açık (A-M7).
+
+### 22.4 · YENİ KISIT: KARAR BÜTÇESİ
+
+İki rakip incelemesi de **bağımsız olarak** bunu istedi. Ekran bütçesi (A-2)
+karmaşıklığın yalnız bir kaynağını kısıtlıyor; ölçüm **üç** kaynak olduğunu
+gösterdi: **menü genişliği · formdaki karar sayısı · dil.**
+
+| Kısıt | Değer | Bugünkü ölçüm |
+|---|---|---|
+| Üst menüde başlık | en fazla **8** | **7** |
+| Ana yolda bir ekranda sabit karar | en fazla **3** | **3** (ruhsat) |
+| Alan adında tamircinin ağzından çıkmayan kelime | **0** | 0 |
+
+**Varsayılanı olan alan karar sayılmaz** — rakiplerle aynı ölçü. Paraşüt'ün
+fatura formunda ~10 alan görünüyor ama gerçekten doldurulan **2**; LucaNet'te
+~20 alan, hiçbiri katlanmamış, en az 4–5 karar.
+
+**Tamiron'un ana yolu ölçüldü (04.09):** ruhsat fotoğrafı çekilince 5 alan
+kendiliğinden doluyor; tek parçalı bir tamirat baştan sona **5–6 karar**.
+
+Üçüncü kısıt LucaNet'in tersi: *"Senaryo Tipi"*, *"Muhasebeleşebilir mi?"*,
+*"Muhtelif Müşteri"* — T-18'in tam karşıtı. `SOZLUK.md` bu testin yeri.
+
+---
+
 ## K-021 · Ölü uç turu: iki sahte eylem ve bir yalan söyleyen düğme (04.09.2026)
 
 **Karar:** On iki ekranın hepsi tek tek **işletildi** — çizildiğine
@@ -727,3 +807,6 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M5** | Arama mikrofonu Cemil yalnız **araçlar** için istedi; **dört listeye birden** kondu. Kalsın mı? | Cemil |
 | ~~A-M2~~ | **UYGULANDI (K-021.3)** — ikinci iletişim varsa mesaj ona gider, usta hedefi değiştirebiliyor | Onay bekliyor |
 | **A-M6** | *"Onay iste"* düğmesi **"Özet gönder"** oldu — ad doğru mu? | Cemil |
+| **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
+| **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
+| **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |

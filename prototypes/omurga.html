@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-04 20:22
+  Üretim: 2026-09-04 20:29
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2605,10 +2605,20 @@ alanları ::before ile büyür. Ölçüm (30.08,
      yoludur — veresiye bu yüzden uydurma bir alan değil, var olan
      verinin okunması.
 
-     ÜZERİNDE YOK ve karar verilmeden yazılmayacak: gider girişi ·
-     kâr hesabı · cari hesap · tahsilat kaydı · fatura/KDV · dönem
-     kapanışı. Bunların her biri ustadan YENİ VERİ ister; istediği veri
-     girilmezse rakam yalan söyler.
+     ⚠️ 04.09 — KAPSAM ÖNERİSİ YAZILDI: arastirma/MUHASEBE-KAPSAMI.md
+     (üç seçenek Paraşüt ve LucaNet ONE haritalarına karşı ölçüldü).
+     Öneri: B — kasa + gider. Cari hesap kapsam dışı; yedi işten
+     hiçbirine hizmet etmiyor ve K-012'yi geri alıyor.
+
+     PARÇA ALIŞI BEDAVAYA GELDİ: satırdaki `alis` zaten kayıtlı (T-9).
+     Ustadan yeni giriş istemiyor, bu yüzden "girildiği kadar" değil
+     HER ZAMAN doğru. Elle giderlerden AYRI duruyor — karışsaydı usta
+     aynı parçayı iki kez sayabilirdi.
+
+     ÜZERİNDE YOK ve karar verilmeden yazılmayacak: kâr hesabı · cari
+     hesap · tahsilat kaydı · fatura/KDV · dönem kapanışı · gider
+     kategorisi · aylık özet. Bunların her biri ustadan YENİ VERİ
+     ister; istediği veri girilmezse rakam yalan söyler.
 
      BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
      · .tutar-serit .tutar-sat .tutar-sat.genel .tv · .tl-item
@@ -2674,6 +2684,16 @@ alanları ::before ile büyür. Ölçüm (30.08,
   </div>
 
   <div id="muhGiderler"></div>
+
+  <!-- PARÇA ALIŞI — ELLE GİRİLEN GİDERLERDEN AYRI DURUYOR (04.09).
+       Karıştırılsaydı çift sayma sessizce olurdu: usta parçayı hem
+       servis satırına alış olarak yazıp hem elle "Öz Yedek Parça —
+       triger seti" diye gider ekleyebilir. Ayrı durunca hem rakam
+       görünüyor hem tehlike yazılabiliyor. -->
+  <div class="section-label">
+    <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça alışı
+  </div>
+  <div id="muhParcaAlisi"></div>
 
   <div class="section-label">
     <svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg> Alınamayan (veresiye)
@@ -3772,6 +3792,40 @@ function sonBakim(plaka) {
 
 function giderToplami() {
   return GIDERLER.reduce(function (t, g) { return t + (g.tutar || 0); }, 0);
+}
+
+/* ---- PARÇA ALIŞI — BEDAVAYA GELEN DÖRDÜNCÜ RAKAM (04.09) ----
+   `alis` (ServiceLine.Cost) ZATEN KAYITLI, çünkü T-9 var: "Usta kendi
+   fiyat aldıysa, parça fiyatlarına ekleme yapabiliyor." Parçacıdan
+   gelen fiyat satıra yazılıyor.
+
+   Yani tamircinin parçaya ödediği para veri modelinde duruyor ve
+   ustadan TEK BİR YENİ GİRİŞ istemiyor. K-013'ün ölçüsüne göre bu
+   rakam "girilmezse yalan söyleyen" gruba değil, "zaten kayıtlı"
+   gruba ait.
+
+   YALNIZ TAMİRCİNİN ALDIĞI PARÇALAR: müşteri kendi getirdiyse para
+   tamirciden çıkmamıştır (K-005). kimGetirdi === 'musteri' olan satır
+   sayılsaydı, ödenmemiş bir para gider gibi görünürdü.
+
+   YALNIZ TESLİM EDİLMİŞ KAYITLAR: içerideki araçta parça daha
+   alınmamış olabilir — henüz olmamış bir harcamayı gider saymak,
+   ustayı olduğundan yoksul gösterir. */
+function parcaAlislari() {
+  var liste = [];
+  KAYITLAR.forEach(function (k) {
+    if (!k.teslimTarihi) return;
+    (k.satirlar || []).forEach(function (s) {
+      if (s.tip !== 'parca' || s.kimGetirdi !== 'tamirci') return;
+      if (!s.alis) return;
+      liste.push({ tarih: k.teslimTarihi, plaka: k.plaka,
+                   ad: s.ad || 'parça', tutar: s.alis, kayit: k.id });
+    });
+  });
+  return liste;
+}
+function parcaAlisiToplami() {
+  return parcaAlislari().reduce(function (t, x) { return t + x.tutar; }, 0);
 }
 
 
@@ -5959,14 +6013,35 @@ Ekran.tanim('muhasebe', {
           '"Gider ekle"ye dokun ya da mikrofona basıp ' +
           '"2400 TL elektrik faturası ekle" de.');
 
+    /* ---- PARÇA ALIŞI ----
+       Yeni alan İSTEMİYOR: satırdaki `alis` zaten kayıtlı (T-9).
+       Bu yüzden "girildiği kadar doğru" değil, HER ZAMAN doğru. */
+    var pa = parcaAlislari();
+    document.getElementById('muhParcaAlisi').innerHTML = pa.length
+      ? '<div class="tutar-serit">' +
+          pa.slice().reverse().map(function (x) {
+            return '<div class="tutar-sat"><span>' + x.ad + ' · ' + x.plaka +
+              '</span><span class="tv">' + tutar(x.tutar) + ' ₺</span></div>';
+          }).join('') +
+          '<div class="tutar-sat genel"><span>Toplam parça alışı</span>' +
+            '<span class="tv">' + tutar(parcaAlisiToplami()) + ' ₺</span></div>' +
+        '</div>' +
+        '<p class="plate-hint">Bu rakam servis kayıtlarındaki alış ' +
+        'fiyatlarından çıkıyor — ayrıca elle gider yazmana gerek yok, ' +
+        'yazarsan iki kez sayılır.</p>'
+      : bosDurumHtml('i-package', 'Parça alışı yok',
+          'Teslim edilmiş bir kayıtta tamircinin aldığı parçanın alış ' +
+          'fiyatı yazılıysa burada görünür.');
+
     /* KAPSAM AÇIK OLDUĞU İÇİN EKRANDA DA YAZIYOR. Bir ekranın
        "burası yarım" demesi, yarım olduğunu saklamasından iyidir. */
     document.getElementById('muhKapsam').innerHTML =
       '<div class="notice">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
-        '<span class="n-body"><b>Kapsam kararı bekliyor.</b> Tahsilat rakamları ' +
-        'hiçbir yeni alan istemeden teslimdeki ödeme yolundan çıkıyor; ' +
-        'giderler ise <b>girildiği kadar</b> doğru. Kâr ve cari hesap bu yüzden ' +
+        '<span class="n-body"><b>Kapsam kararı bekliyor.</b> Tahsilat ve ' +
+        'parça alışı hiçbir yeni alan istemeden kayıtlardan çıkıyor — ' +
+        'bunlar <b>her zaman</b> doğru. Elle yazılan giderler ise ' +
+        '<b>girildiği kadar</b> doğru. Kâr ve cari hesap bu yüzden ' +
         'hesaplanmıyor — eksik giderle çıkan kâr, kârdan kötüdür.</span>' +
       '</div>';
   }
