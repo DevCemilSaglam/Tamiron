@@ -26,7 +26,21 @@ Başlangıç: 04.09.2026 · son commit `4a6dfe5`
 | 4 | **Müşteri özeti (T-19/20/21)** — WhatsApp'tan gidecek özet | **BİTTİ** | `ozet` ekranı: müşterinin gördüğü salt-okunur sayfa. Mesaj artık liste değil **link** taşıyor. Ustanın önizlemesi mesaj ekranından (K-023) |
 | 5 | **Sesli işlem kapsam denetimi** — K-016 gerçekten tutuyor mu | **BİTTİ** | Tutuyor (9/9 işin elle yolu var) ama **denetimin kendisi bozuktu**: ölçtüğü durumu kirletiyordu. Düzeltilince özet ekranında gizli ölü uç çıktı. K-018 üçüncü kez (31. test) (K-024) |
 | 6 | **Dar ve geniş ekran ölçümü** — 320 px ve 430 px | **BİTTİ** | 320'de düğme metni **sessizce kırpılıyordu** (`overflow:hidden` taşma testinden gizliyordu). Dar ekranda ikon kalktı; 32. test eklendi. Üç genişlikte de 0 bulgu (K-025) |
-| 7 | **Belge tazeleme** — HANDOFF · EKRANLAR · IS-AKISI + dokunuş sayımı | SIRADA | |
+| 7 | **Belge tazeleme** — HANDOFF · EKRANLAR · IS-AKISI + dokunuş sayımı | **BİTTİ** | Bütün yollar yürütülerek yeniden ölçüldü: ana yol **12** (belgede 13 yazıyordu), kısa yol **9**, kayıtlı araç **8**, sesli **2+konuşma**, özet **2** |
+
+---
+
+## Kuyruk bitti — 05.09.2026
+
+Yedi işin yedisi de **BİTTİ**. Yeni iş Cemil'den gelir.
+
+**Bu turda ne oldu:** K-019 … K-025 (yedi karar) · denetim **27 → 32 test**
+(beşi bu turda yaşanmış hatalardan doğdu, beşi de negatif testle
+doğrulandı) · ekran 12 → 13 (yeni olan **müşterinin** sayfası, ustanın
+değil).
+
+**Cemil'i bekleyen dokuz açık madde** `HANDOFF.md §5`'te; hepsinin yanında
+bir öneri var, hiçbiri işi durdurmadı.
 
 ---
 

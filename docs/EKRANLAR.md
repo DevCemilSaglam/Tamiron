@@ -196,20 +196,25 @@ Tek ekran. Personel, rol, yetki **yok** — tamirci bahsetmedi (K-004 notu).
 
 ## Sayım
 
-**03.09'da değişti.** Ana ekran menüye dönünce menünün gösterdiği
-ekranlar da gerekti.
+**03.09'da değişti** (ana ekran menü oldu), **04.09'da bir ekran daha
+geldi** (müşterinin gördüğü özet — ustanın ekranı değil, K-023).
 
 | | Sayı |
 |---|---|
 | Ana yolun geçtiği ekran | **5** — ruhsat · kayıt · parça sor · teslim (+ menü) |
-| Menüden açılan ekran | 5 — araçlar · servis kayıtları · müşteriler · muhasebe · sesli işlem |
+| Menüden açılan ekran | 6 — araçlar · servis kayıtları · müşteriler · muhasebe · müşteriye mesaj · sesli işlem |
 | Başvuru ekranı | 1 — araç |
-| **Toplam** | **11** |
+| **Ustanın ekranı — toplam** | **12** |
+| Müşterinin sayfası *(bütçe dışı)* | 1 — özet |
+| **Prototipteki toplam** | **13** |
 
-**Bütçe (A-1) bu istekle cevaplandı.** 6 ekran benim önerimdi ve
-*"Cemil onayına açık"* işaretliydi; menü isteği o soruya verilmiş cevap
-sayıldı. **Ölçülen asıl sayı değişmedi: ana yol hâlâ 13 dokunuş** —
-menü satırı, eski *"Ruhsatı çek"* düğmesinin yerini aldı.
+**Bütçe (A-1) 03.09'da menü isteğiyle cevaplandı.** 6 ekran benim önerimdi
+ve *"Cemil onayına açık"* işaretliydi.
+
+**Ölçülen asıl sayı 05.09'da yeniden ölçüldü: ana yol 12 dokunuş**
+(03.09'da 13'tü; menü satırı eski *"Ruhsatı çek"* düğmesinin yerini alınca
+bir dokunuş düştü ama belge o gün güncellenmemişti). **Kayıtlı araçta 8** —
+ikinci kez gelen her araç için geçerli, yani zamanla asıl yol o olacak.
 
 > Ekran sayısı bir bütçe kalemi, ama **tek başına ölçü değil.** Asıl
 > ölçü, işin kaç dokunuşta bittiği ve kaç ekranın ana yola **girdiği**.

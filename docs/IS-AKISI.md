@@ -130,7 +130,7 @@ Tamircinin dört isteğinden dördüncüsü buydu: *"teslim ettiğinde ödemeyi 
 | **Tam yol** (parçacıya sorularak) | **10–13** |
 | **Kısa yol** (usta fiyatı biliyor, 3–4. adım atlanıyor) | **7–9** |
 
-**Kıyas:** v1'de aynı işin *yalnız fiyat çalışmasına kadarki* kısmı 11 dokunuştu; teslim ve ödeme onun üstüneydi. Burada **baştan sona** 10–13.
+**Kıyas:** v1'de aynı işin *yalnız fiyat çalışmasına kadarki* kısmı 11 dokunuştu; teslim ve ödeme onun üstüneydi. Burada **baştan sona 12** (ölçüldü, 05.09) — kayıtlı araçta **8**.
 
 > Bu sayı **ölçülmedi, tasarımdan çıkarıldı.** 14. işte prototipte gerçekten işletilip doğrulanacak — v1'de senaryoyu işletmek üç kırık ortaya çıkarmıştı.
 
@@ -312,7 +312,7 @@ Tek düğme: **"Onay iste"** → müşteriye özet gider. Cevap gelirse kayda d�
 
 **Beş kolun toplam maliyeti: sıfır yeni ekran, sıfır yeni adım.**
 
-Ana yol yedi adım, 10–13 dokunuş olarak duruyor.
+Ana yol yedi adım, **12 dokunuş** (ölçüldü, 05.09). Kayıtlı araçta **8**.
 
 ---
 
@@ -462,32 +462,63 @@ Ne yok: link tıklama zorunluluğu, kampanya, indirim kuponu, uzun metin.
 
 ## Ölçülen
 
-| Yol | Tasarım | **Ölçüm** |
+> **⚠️ 05.09'da YENİDEN ÖLÇÜLDÜ.** Aşağıdaki sayılar tarayıcıda, akış
+> **baştan sona yürütülerek** sayıldı — tahmin değil. Bir önceki ölçüm
+> (13/9) 03.09'a aitti ve o gün ana ekran hâlâ *"Ruhsatı çek"* düğmesi
+> taşıyordu; menü geldiğinde (K-011) bir dokunuş düştü ama belge
+> güncellenmemişti. **Ölçülmemiş sayı belgede durmaz.**
+
+| Yol | Tasarım | **Ölçüm (05.09)** |
 |---|---|---|
-| Tam yol (parçacıya sorularak) | 10–13 | **13** |
+| Tam yol (parçacıya sorularak) | 10–13 | **12** |
 | Kısa yol (usta fiyatı biliyor, Adım 3–4 atlanıyor) | 7–9 | **9** |
+| **Kayıtlı araç yolu** *(04.09'da açıldı, K-021)* | — | **8** |
+| **Sesli yol** | — | **2 dokunuş + 1 konuşma** |
+| **Müşteriye özet** *(6. iş, K-023)* | — | **2** |
 
-**İkisi de aralığın üst ucunda.** Tasarımdaki alt uç (10 ve 7) iyimserdi — gerçekte her adım bir dokunuş daha istiyor.
-
-### Tam yol, adım adım
+### Tam yol, adım adım (ölçüldü)
 
 ```
- 1  Ruhsatı çek düğmesi        → ruhsat ekranı
- 2  Ruhsatı çek                → alanlar doldu
+ 1  Servis kaydı ekle          → ruhsat ekranı
+ 2  Ruhsatı çek                → 5 alan kendiliğinden doldu
  3  Tamirat
  4  Kaydı aç                   → servis kaydı
- 5  Ne istiyor                 (sesle/yazarak)
- 6  + Parça
- 7  Parça fiyatı sor           → parçacı ekranı
- 8  Parçacı seç
- 9  WhatsApp ile gönder        → servis kaydı
-10  + İşçilik
-11  Teslim et                  → teslim ekranı
-12  Nakit
-13  TESLİM ET                  → ana ekran
+ 5  + Parça
+ 6  Parça fiyatı sor           → parçacı ekranı
+ 7  Parçacı seç
+ 8  WhatsApp ile gönder        → servis kaydı
+ 9  + İşçilik
+10  Teslim et                  → teslim ekranı
+11  Nakit
+12  TESLİM ET                  → ana ekran
 ```
 
-Klavyeyle yazılanlar (parça adı, fiyat, şikâyet) dokunuş sayılmadı — sayılan yalnız **dokunma** eylemleri.
+### Kayıtlı araç yolu — 8 dokunuş
+
+Araç zaten kayıtlıysa **ruhsat çekilmiyor** (04.09, K-021'in ölü uç
+düzeltmesi). Bu, ikinci kez gelen her araç için geçerli — yani zamanla
+**asıl yol bu olacak**:
+
+```
+ 1  Araçlar                    → liste
+ 2  Araç kartı                 → araç ekranı
+ 3  Kayıt aç
+ 4  Tamirat                    → servis kaydı
+ 5  + Parça
+ 6  Teslim et                  → teslim ekranı
+ 7  Nakit
+ 8  TESLİM ET                  → ana ekran
+```
+
+### Sesli yol — 2 dokunuş + 1 konuşma
+
+`mikrofon → "34 ABC 123 triger seti değişecek" → Kaydı aç`
+
+Onaysız hiçbir şey yapılmıyor (K-016): anlaşılan işlem yazıyla gösteriliyor,
+usta onaylıyor. Ölçüldü — onaydan sonra kayıt gerçekten açıldı.
+
+Klavyeyle yazılanlar (parça adı, fiyat, şikâyet) dokunuş sayılmadı — sayılan
+yalnız **dokunma** eylemleri.
 
 ## Bulgu: ilk iki dokunuş aynı işi yapıyor
 

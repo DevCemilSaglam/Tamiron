@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 04.09.2026 *(araç ekranları — K-019)*
+> **Son güncelleme:** 05.09.2026 *(K-019…K-025 · Cemil yokken çalışılan tur)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -15,7 +15,7 @@ tıklanabilir prototip.
 |---|---|
 | Ekran | **13** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
 | Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
-| Dokunuş | ana yol **12**, kısa yol **9**, **sesli yol 3** (ölçüldü) |
+| Dokunuş | ana yol **12** · kısa yol **9** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 05.09'da yürütülerek ölçüldü* |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
 | Sağlık denetimi | **32 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
@@ -119,13 +119,40 @@ sonra aynı tuzağa bir kez daha düşüldü: *"beş yüz"* içindeki "ş y"
 harf dizisi sanıldı ve plaka yanlış okundu. Kural keskinleştirildi:
 **Türkçe metinde sınır aranmaz, boşluktan bölünür.**
 
+### 04–05.09 turunda öğrenilen beş şey daha
+
+**Detay ile kalabalık aynı şey değil.** 03.09'da *"araçlar listesi yine
+detaylı olmalı"* denmişti; satıra model, motor, yakıt, son km, kayıt sayısı
+ve son bakım dolduruldu. Cemil hepsini kaldırttı — **kalabalık listede plaka
+bile geç bulunuyor** (K-019.2).
+
+**Aynı soruyu iki yerde cevaplamak, iki ayrı cevap demektir.** *"Hatırlatması
+gelmiş kayıtlar"* iki ayrı süzgeçle hesaplanıyordu ve biri `tur === 'bakim'`
+süzüyordu: aynı kayıt çekmecede görünüp ana ekranda görünmüyordu (K-019.1).
+
+**Ölçüm aleti ölçtüğü şeyi değiştirmemeli.** Denetim `load` anında
+kendiliğinden koşuyor ve 30. test her düğmeye basıyordu; prototip **her
+açılışta kirli başlıyordu** ve ses çözümleyici her cümleyi *"satır ekle"*
+diye okuyordu. Düzeltilir düzeltilmez, kirli durumun **gizlediği** gerçek bir
+ölü uç ortaya çıktı — test *"geçmiyordu"*, **yanlış şeye bakıyordu**
+(K-024.1).
+
+**Kesilen metin, taşan metinden tehlikelidir.** `overflow:hidden` bir kutu
+taşmaz, **keser** — ve taşma testi taşmayan kutuları kasten atlar. 320 px'te
+bir düğme *"Açık kay"* yazıyordu ve hiçbir test görmedi (K-025).
+
+**K-018 üçüncü kez.** `` yasaklandı, yerine `indexOf` kondu, aynı hata geri
+geldi: *"yeni **araç**"* → arama, *"**beyaz** araba"* → mesaj, *"**gösterge**
+paneli"* → arama. Kural artık şöyle: **kısa komut kelimeleri içinde aranmaz**
+(K-024.2).
+
 ---
 
 ## 5 · Cemil'in kararını bekleyenler
 
 | Kod | Soru | Öneri |
 |---|---|---|
-| **A-2** | Müşteri tarafı bu fazda mı | Özet linki evet, uygulama sonra |
+| **A-2** | Müşteri tarafı bu fazda mı | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya |
 | **A-3** | Bakım periyodu · şu an 6 ay + 10.000 km | Onay |
 | **A-14** | Ruhsat ekranı tabaka mı olsun | Ölçüldü: bir dokunuş ve bir ekran kazandırır |
 | **Ç-2** | OEM kodu yönü — TecDoc'un kaderi | K-001'de kaldığı gibi |
@@ -134,7 +161,12 @@ harf dizisi sanıldı ve plaka yanlış okundu. Kural keskinleştirildi:
 | **A-M1** | Müşteri adı iki araçta farklı yazılırsa iki müşteri görünüyor | Tamirci şikâyet edene kadar dokunma |
 | **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi | İkinci iletişim varsa o |
 | **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi | Kaydın kendi ekranında kalsın |
-| **A-M4** | Çekmecedeki **Bildirimler başlığı** üstte sabit duruyor — kalsın mı, kaysın mı | Şu an kalıyor, dokunulmadı |
+| ~~A-M4~~ | **KAPANDI (K-020.3)** — ekran görüntüsü gösterdi ki yapışkan başlık bildirimi örtüyordu; kaldırıldı | — |
+| **A-M5** | Arama mikrofonu yalnız **araçlar** için istenmişti; **dört listeye birden** kondu. Kalsın mı? | Kalsın — dördü de aynı iş |
+| **A-M6** | *"Onay iste"* düğmesi **"Özet gönder"** oldu (artık gerçekten gönderiyor) — ad doğru mu? | Doğru: yaptığı iş T-19 |
+| **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, **yazılmadı** | Dükkân kârıyla karışma riski var |
+| **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Kabul — iki rakip incelemesi de istedi |
+| **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no) | Prototipte kabul, backend fazında kapatılacak |
 
 > **A-1 (ekran bütçesi 6) kapandı:** Cemil menüyü ve dört yeni ekranı
 > isteyince bütçe cevaplanmış oldu. Ölçülen asıl sayı değişmedi.
