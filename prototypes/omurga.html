@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-04 09:12
+  Üretim: 2026-09-04 10:34
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -888,6 +888,9 @@ eylem butonu kisalmaz — yoksa
   width: 20px;
   height: 20px;
 }/* ---------- LİSTE EKRANLARI (Araçlar / Kişiler) ---------- */
+/* 04.09 — ARAMA KUTUSUNUN KENDİ MİKROFONU VAR (Cemil: "Araçlar arama
+   mic button olsun"). Sağ dolgu 14 -> 7 px indi ki 44 px'lik mikrofon
+   kutuyu şişirmesin: yükseklik 56 px'te kalıyor, dokunma hedefi tam. */
 .search-box {
   position: relative;
   display: flex;
@@ -896,7 +899,7 @@ eylem butonu kisalmaz — yoksa
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 7px 7px 7px 14px;
   margin-bottom: 14px;
 }.search-box .ico {
   width: 20px;
@@ -928,7 +931,12 @@ eylem butonu kisalmaz — yoksa
   display: flex;
 }.search-box .clear:hover {
   color: var(--text);
-}.list {
+}/* ⚠️ .search-box .ico kuralı ikonu --faint yapıyor ve mikrofonunkini
+   de yakalıyordu (aynı özgüllük, sonra gelen kazanır). Mikrofonun
+   ikonu düğmenin kendi rengini almalı; yoksa aksan çerçeveli ama
+   soluk ikonlu, yarı sönük bir düğme çıkıyor. */
+.search-box .mic-round .ico { color: currentColor; }
+.list {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1406,10 +1414,16 @@ alanları ::before ile büyür. Ölçüm (30.08,
   color: var(--muted); display: flex; align-items: center; gap: 7px;
   padding: 6px 12px 4px;
 }
-#notifSection .drawer-sec-label {
-  position: sticky; top: 0; background: var(--surface);
-  z-index: 10; margin: -4px -4px 4px; padding: 8px 12px; border-radius: 0;
-}
+/* ⚠️ 04.09 — "BİLDİRİMLER" BAŞLIĞI ARTIK YAPIŞMIYOR.
+   Başlık `position: sticky` idi ve çekmece kaydırılınca üstte kalıp
+   ALTINDAKİ BİLDİRİMİ ÖRTÜYORDU: Cemil'in ekran görüntüsünde
+   başlığın altında bildirim kartının yalnız bir dilimi görünüyor.
+
+   Yapışkan başlık uzun listeler içindir — "hangi bölümdeyim" sorusu
+   kaydırırken kaybolmasın diye. Burada liste birkaç satır; kazandığı
+   şey yok, kaybettirdiği şey bildirimin kendisi. Kural yerine iki
+   satırlık nefes kaldı. */
+#notifSection .drawer-sec-label { padding: 8px 12px 6px; }
 .divider { height: 1px; background: var(--line); border: none; margin: 18px 0 14px; }
 .drawer .divider { margin: 10px 8px; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; }
@@ -1846,14 +1860,16 @@ alanları ::before ile büyür. Ölçüm (30.08,
          ÖNCEKİ bağlamda kalıyordu: muhasebeden çıkıp menüden "Sesli
          işlem"e basınca başlık "Sesli işlem · Muhasebe" diyor ve
          gider örnekleri gösteriyordu (04.09'da bulundu). -->
+    <!-- ⚠️ 04.09 — BU SATIRIN SAĞINDA MİKROFON YOK (Cemil: "Sesli işlem
+         buttonunun yanında mik button olmasın").
+         Öteki satırlarda mikrofonun bir işi var: "o satırın işini
+         söyleyerek yap". Bu satırın kendisi ZATEN o iş — yanına ikinci
+         bir mikrofon koymak, aynı düğmeyi iki kez göstermekti. -->
     <div class="menu-row">
       <button class="main" data-sesle="genel">
         <span class="ic-badge"><svg class="ico"><use href="#i-mic"></use></svg></span>
         <span class="txt"><span class="lbl">Sesli işlem</span>
           <span class="sub">Söyle, gerisini o bulsun</span></span>
-      </button>
-      <button class="mic" data-sesle="genel" aria-label="Sesli işlem — dinlemeye başla">
-        <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
 
@@ -2375,6 +2391,9 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <button class="clear" id="arcQTemiz" aria-label="Aramayı temizle">
       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
     </button>
+    <button class="mic-round ghost" data-sesle="araclar" aria-label="Araçlarda sesle ara">
+      <svg class="ico"><use href="#i-mic"></use></svg>
+    </button>
   </div>
 
   <div id="arcListe"></div>
@@ -2419,6 +2438,9 @@ alanları ::before ile büyür. Ölçüm (30.08,
            autocomplete="off" aria-label="Kayıtlarda ara" />
     <button class="clear" id="kytQTemiz" aria-label="Aramayı temizle">
       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+    <button class="mic-round ghost" data-sesle="kayitlar" aria-label="Kayıtlarda sesle ara">
+      <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
 
@@ -2475,6 +2497,9 @@ alanları ::before ile büyür. Ölçüm (30.08,
              autocomplete="off" aria-label="Müşteri ara" />
       <button class="clear" id="msjQTemiz" aria-label="Aramayı temizle">
         <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+      </button>
+      <button class="mic-round ghost" data-sesle="mesaj" aria-label="Müşteriyi sesle bul">
+        <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
     <div id="msjListe"></div>
@@ -2546,6 +2571,9 @@ alanları ::before ile büyür. Ölçüm (30.08,
            autocomplete="off" aria-label="Müşterilerde ara" />
     <button class="clear" id="msQTemiz" aria-label="Aramayı temizle">
       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+    <button class="mic-round ghost" data-sesle="musteriler" aria-label="Müşterilerde sesle ara">
+      <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
 
@@ -3164,6 +3192,23 @@ var Cekmece = (function () {
   return { ac: ac, kapa: kapa, ciz: cizBildirimler,
            acikMi: function () { return acikMi; } };
 })();
+
+/* ============ MİKROFONLAR — TEK DELEGASYON ============
+   Mikrofon sesli işleme NE İÇİN basıldığı bilgisiyle gider (K-017):
+   "araçlarda ara" ile "gider ekle" aynı ekranı açıyor ama ekran ne
+   beklediğini biliyor ve örneklerini ona göre gösteriyor.
+
+   ⚠️ 04.09'a kadar bu dinleyici ANA EKRANIN betiğindeydi. Ana ekran
+   dışındaki hiçbir mikrofon yokken sorun değildi; arama kutularına
+   mikrofon eklenince dört ekranın davranışı, hiç ilgisi olmayan bir
+   ekranın dosyasından gelmeye başladı. Ana ekran bir gün kalkarsa
+   ya da yeniden yazılırsa bütün mikrofonlar SESSİZCE ölürdü —
+   tıklıyorsun, hiçbir şey olmuyor, hata da yok. */
+document.addEventListener('click', function (e) {
+  var m = e.target.closest('[data-sesle]');
+  if (!m) return;
+  sesleAc(m.getAttribute('data-sesle'));
+});
 
 /* ============ AÇILIR BÖLÜM (akordiyon) ============
    04.09, Cemil: "ruhsat bilgileri akordion olarak yer alsın. Altında
@@ -3887,14 +3932,11 @@ Ekran.tanim('home', {
   }
 });
 
-/* Mikrofonlar sesli işleme NE İÇİN basıldığı bilgisiyle gider:
-   "araçlarda ara" ile "gider ekle" aynı ekranı açıyor ama ekran ne
-   beklediğini biliyor ve örneklerini ona göre gösteriyor. */
-document.addEventListener('click', function (e) {
-  var m = e.target.closest('[data-sesle]');
-  if (!m) return;
-  sesleAc(m.getAttribute('data-sesle'));
-});
+/* [data-sesle] delegasyonu 01-cekirdek.js'e TASINDI (04.09).
+   Burada duruyordu ve ana ekranın dışındaki mikrofonlar da ona
+   bağlıydı: arama kutularına mikrofon eklenince davranış, hiç
+   ilgisi olmayan bir EKRANIN betiğinden geliyor oldu. Ana ekran
+   bir gün kalkarsa bütün mikrofonlar sessizce ölürdü. */
 })();
 
 /* ===== ekran: 15-ses.html ===== */

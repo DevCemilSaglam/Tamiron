@@ -413,6 +413,23 @@ var Cekmece = (function () {
            acikMi: function () { return acikMi; } };
 })();
 
+/* ============ MİKROFONLAR — TEK DELEGASYON ============
+   Mikrofon sesli işleme NE İÇİN basıldığı bilgisiyle gider (K-017):
+   "araçlarda ara" ile "gider ekle" aynı ekranı açıyor ama ekran ne
+   beklediğini biliyor ve örneklerini ona göre gösteriyor.
+
+   ⚠️ 04.09'a kadar bu dinleyici ANA EKRANIN betiğindeydi. Ana ekran
+   dışındaki hiçbir mikrofon yokken sorun değildi; arama kutularına
+   mikrofon eklenince dört ekranın davranışı, hiç ilgisi olmayan bir
+   ekranın dosyasından gelmeye başladı. Ana ekran bir gün kalkarsa
+   ya da yeniden yazılırsa bütün mikrofonlar SESSİZCE ölürdü —
+   tıklıyorsun, hiçbir şey olmuyor, hata da yok. */
+document.addEventListener('click', function (e) {
+  var m = e.target.closest('[data-sesle]');
+  if (!m) return;
+  sesleAc(m.getAttribute('data-sesle'));
+});
+
 /* ============ AÇILIR BÖLÜM (akordiyon) ============
    04.09, Cemil: "ruhsat bilgileri akordion olarak yer alsın. Altında
    km bilgileri yine akordion olarak olsun."

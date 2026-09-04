@@ -10,6 +10,64 @@
 
 ---
 
+## K-020 · Mikrofon, işin yanında durur — kendi yanında değil (04.09.2026)
+
+**Karar (Cemil, üç madde):**
+
+> *"Araçlar arama mic button olsun."*
+> *"Sesli işlem buttonunun yanında mik button olmasın."*
+> *"Bildirimler başlığı üstte kalıyor. Ss'te mevcut."*
+
+### 20.1 · Arama kutusunun kendi mikrofonu var
+
+Mikrofon **arama kutusunun sağ ucunda**, `.mic-round.ghost` olarak.
+Bastığında sesli işlem **o listenin bağlamıyla** açılıyor (K-017):
+araçlarda `araclar`, kayıtlarda `kayitlar`, müşterilerde `musteriler`,
+mesajda `mesaj`.
+
+> **Cemil onayına açık (A-M5):** Cemil yalnız **araçları** söyledi;
+> mikrofon **dört arama kutusuna birden** kondu. Gerekçe: dördü de
+> aynı iş (*"aradığımı söyleyerek bulayım"*) ve menüde bu iş için
+> zaten dört ayrı mikrofon var; birine koyup ötekine koymamak,
+> ustaya *"hangisinde çalışıyordu"* diye düşündürür. İstenmezse
+> üç satır silinerek geri alınır.
+
+### 20.2 · Sesli işlem satırının yanında mikrofon YOK
+
+Öteki menü satırlarında mikrofonun bir işi var: *"bu satırın işini
+söyleyerek yap."* **Sesli işlem satırının kendisi zaten o iş.** Yanına
+ikinci bir mikrofon koymak, aynı düğmeyi iki kez göstermekti.
+
+**Bu bir hatayı ortaya çıkardı:** `[data-sesle]` dinleyicisi **ana
+ekranın betiğinde** duruyordu. Ana ekranın dışında mikrofon yokken
+sorun değildi; arama kutularına mikrofon eklenince dört ekranın
+davranışı, hiç ilgisi olmayan bir ekranın dosyasından gelmeye başladı.
+Ana ekran yeniden yazılsa bütün mikrofonlar **sessizce** ölürdü —
+tıklıyorsun, hiçbir şey olmuyor, hata da yok. Delegasyon çekirdeğe
+taşındı (ortak nesne kuralı: davranış tek yerde).
+
+### 20.3 · A-M4 kapandı — "Bildirimler" başlığı yapışmıyor
+
+Ekran görüntüsü soruyu cevapladı: başlık `position: sticky` idi ve
+çekmece kaydırılınca **altındaki bildirimin üstüne biniyordu**;
+görüntüde bildirim kartının yalnız bir dilimi duruyor. Kural kalktı.
+
+Yapışkan başlık **uzun** listeler içindir. Burada liste birkaç satır:
+kazandırdığı şey yok, kaybettirdiği şey bildirimin kendisi.
+
+**Denetime 29. test (ORTEN-YAPISKAN) eklendi** — ve ilk yazımı
+**boştu**: negatif test bulgu vermedi, çünkü çekmece o anki veriyle
+taşmıyordu. Kaydırma yoksa yapışkan öge hiç ayrılmaz. Test *"bu ekran
+iyi"* demiyordu, *"bugünkü veri az"* diyordu. Doğru soru şu: **bu kap
+kaydırılırsa başlık içeriği örter mi?** Test artık kabı 200 px'e
+kısaltıp taşmayı **zorluyor**; ölçüm veriden bağımsız.
+
+> **Ders (üçüncü kez):** bir testin yazılmış olması, ölçüyor olması
+> demek değil. Negatif test olmasaydı bu delik *"29 test, 0 bulgu"*
+> diye rapor edilecekti.
+
+---
+
 ## K-019 · Araç ekranları Cemil'in tarifiyle yeniden kuruldu (04.09.2026)
 
 **Karar:** Cemil araçlar listesinin satırını ve araç detayının sırasını
@@ -584,4 +642,5 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-7** | SMS sağlayıcısı + **İYS kaydı** (yasal zorunluluk) | 10. iş |
 | **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi? Varsayım: **ikinci iletişim varsa o** (K-019.3) | Cemil |
 | **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi (K-019.6) | Cemil |
-| **A-M4** | Çekmecedeki **Bildirimler başlığı** üstte sabit (sticky) duruyor — kalsın mı, içerikle birlikte mi kaysın? *(Cemil'in 04.09 notu bu noktada iki türlü okunuyordu; **hiçbir şey değiştirilmedi**)* | Cemil |
+| ~~A-M4~~ | **KAPANDI (K-020.3)** — ekran görüntüsü gösterdi ki başlık bildirimi örtüyordu; yapışkanlık kaldırıldı | — |
+| **A-M5** | Arama mikrofonu Cemil yalnız **araçlar** için istedi; **dört listeye birden** kondu. Kalsın mı? | Cemil |

@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 28 test.
+/* Tamiron prototip saglik denetimi — 29 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -571,6 +571,72 @@ function stilMetni() {
         if (acildi && !govde.hidden) { ek('ACILMAYAN-BOLUM', a, hedef + ' — bir daha kapanmiyor'); }
       }
     });
+    showScreen('home');
+  }
+
+  /* 29) ORTEN YAPISKAN — position:sticky bir baslik, kaydirinca
+     ALTINDAKI ICERIGI ORTUYOR (04.09.2026).
+
+     Cemil'in ekran goruntusu buldu: cekmecedeki "BILDIRIMLER" basligi
+     sticky idi ve cekmece kaydirilinca bildirim kartinin uzerine
+     binip yalniz bir dilimini birakiyordu.
+
+     Neden hicbir test yakalamadi: HER SEY DOGRU CIZILIYORDU. Kutu
+     yerinde, metin yerinde, dokunma hedefi yerinde. Bozulan sey ancak
+     KAYDIRINCA ortaya cikiyor — durgun ekranda olcen hicbir test
+     goremez. O yuzden bu test once KAYDIRIYOR, sonra olcuyor.
+
+     NEGATIF DOGRULAMA (04.09): kural gecici olarak geri kondu
+     (#notifSection .drawer-sec-label { position: sticky; top: 0 })
+     ve test 1 bulgu verdi; kaldirilinca 0 bulguya dondu. */
+  {
+    var kaplar = [];
+    var cekmeceGovde = document.querySelector('.drawer-body');
+    if (cekmeceGovde) { openDrawer(); kaplar.push(cekmeceGovde); }
+    ekranlar.forEach(function (a) {
+      showScreen(a);
+      var e = document.getElementById('screen-' + a);
+      if (e) kaplar.push(e);
+    });
+
+    kaplar.forEach(function (kap) {
+      var eskiKaydirma = kap.scrollTop;
+      var eskiYukseklik = kap.style.maxHeight;
+      /* ⚠️ TASMA ZORLANIYOR — ILK YAZIMDA BU YOKTU VE TEST BOSTU.
+         Negatif test bulgu VERMEDI: yapiskan basligi geri koydum, test
+         0 dedi. Sebep, kabin o anki veriyle TASMAMASIYDI — kaydirma
+         yoksa yapiskan oge hic ayrilmaz ve hicbir seyi ortmez.
+         Yani test "bu ekran iyi" demiyordu, "bugunku veri az" diyordu.
+         Sorulacak soru su: BU KAP KAYDIRILIRSA basligi icerigi orter
+         mi? Kabi kisaltip kaydirtiyoruz; olcum veriden bagimsiz olsun.
+         (Bildirim sayisi artinca cekmece zaten kaydirilir.) */
+      kap.style.maxHeight = '200px';
+      kap.scrollTop = kap.scrollHeight;
+      Array.prototype.forEach.call(kap.querySelectorAll('*'), function (el) {
+        if (getComputedStyle(el).position !== 'sticky') return;
+        var yr = el.getBoundingClientRect();
+        if (!yr.height) return;
+        /* Yapiskan ogeden SONRA gelen kardesler ortulmemeli. */
+        var k = el.nextElementSibling;
+        while (k) {
+          var kr = k.getBoundingClientRect();
+          if (kr.height) {
+            var ortusme = Math.min(yr.bottom, kr.bottom) - Math.max(yr.top, kr.top);
+            if (ortusme > 2) {
+              ek('ORTEN-YAPISKAN',
+                 (kap.id || 'cekmece').replace(/^screen-/, ''),
+                 ((el.className || '').toString().split(' ')[0] || el.tagName) +
+                 ' ' + Math.round(ortusme) + 'px ortuyor');
+              break;
+            }
+          }
+          k = k.nextElementSibling;
+        }
+      });
+      kap.style.maxHeight = eskiYukseklik;
+      kap.scrollTop = eskiKaydirma;
+    });
+    if (cekmeceGovde) closeDrawer();
     showScreen('home');
   }
 

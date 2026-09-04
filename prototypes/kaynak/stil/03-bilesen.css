@@ -597,6 +597,9 @@ eylem butonu kisalmaz — yoksa
   width: 20px;
   height: 20px;
 }/* ---------- LİSTE EKRANLARI (Araçlar / Kişiler) ---------- */
+/* 04.09 — ARAMA KUTUSUNUN KENDİ MİKROFONU VAR (Cemil: "Araçlar arama
+   mic button olsun"). Sağ dolgu 14 -> 7 px indi ki 44 px'lik mikrofon
+   kutuyu şişirmesin: yükseklik 56 px'te kalıyor, dokunma hedefi tam. */
 .search-box {
   position: relative;
   display: flex;
@@ -605,7 +608,7 @@ eylem butonu kisalmaz — yoksa
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  padding: 12px 14px;
+  padding: 7px 7px 7px 14px;
   margin-bottom: 14px;
 }.search-box .ico {
   width: 20px;
@@ -637,7 +640,12 @@ eylem butonu kisalmaz — yoksa
   display: flex;
 }.search-box .clear:hover {
   color: var(--text);
-}.list {
+}/* ⚠️ .search-box .ico kuralı ikonu --faint yapıyor ve mikrofonunkini
+   de yakalıyordu (aynı özgüllük, sonra gelen kazanır). Mikrofonun
+   ikonu düğmenin kendi rengini almalı; yoksa aksan çerçeveli ama
+   soluk ikonlu, yarı sönük bir düğme çıkıyor. */
+.search-box .mic-round .ico { color: currentColor; }
+.list {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1115,10 +1123,16 @@ alanları ::before ile büyür. Ölçüm (30.08,
   color: var(--muted); display: flex; align-items: center; gap: 7px;
   padding: 6px 12px 4px;
 }
-#notifSection .drawer-sec-label {
-  position: sticky; top: 0; background: var(--surface);
-  z-index: 10; margin: -4px -4px 4px; padding: 8px 12px; border-radius: 0;
-}
+/* ⚠️ 04.09 — "BİLDİRİMLER" BAŞLIĞI ARTIK YAPIŞMIYOR.
+   Başlık `position: sticky` idi ve çekmece kaydırılınca üstte kalıp
+   ALTINDAKİ BİLDİRİMİ ÖRTÜYORDU: Cemil'in ekran görüntüsünde
+   başlığın altında bildirim kartının yalnız bir dilimi görünüyor.
+
+   Yapışkan başlık uzun listeler içindir — "hangi bölümdeyim" sorusu
+   kaydırırken kaybolmasın diye. Burada liste birkaç satır; kazandığı
+   şey yok, kaybettirdiği şey bildirimin kendisi. Kural yerine iki
+   satırlık nefes kaldı. */
+#notifSection .drawer-sec-label { padding: 8px 12px 6px; }
 .divider { height: 1px; background: var(--line); border: none; margin: 18px 0 14px; }
 .drawer .divider { margin: 10px 8px; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 12px; }
