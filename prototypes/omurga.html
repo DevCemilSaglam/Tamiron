@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-04 20:38
+  Üretim: 2026-09-04 20:50
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -3151,6 +3151,28 @@ function selamMetni(simdi) {
    geriye "ğişecek" kalıyordu (03.09'da sesle satır eklerken çıktı).
    Aynı tuzak /\bara\b/ ile "araç" kelimesini "ç"ye indirirdi.
    Kural: kelime atılacaksa BOŞLUKTAN BÖL, eşitlikle karşılaştır. */
+/* ---- KELİME VAR MI — K-018'İN ÜÇÜNCÜ TEKRARI (04.09) ----
+   `` yasağı yazıldı (K-018), sonra yerine `indexOf` kondu ve AYNI
+   HATA geri geldi. Ölçüldü:
+
+     "yeni ARAC bakım"        -> "arac" içinde " ara" var  -> ARAMA sanıldı
+     "BEYAZ araba geldi"      -> "beyaz" içinde "yaz" var  -> MESAJ sanıldı
+     "GOSTERGE paneli yanıyor"-> "gösterge" içinde "göster"-> ARAMA sanıldı
+
+   Üçü de ustanın en sıradan cümleleri. Kural bir kez daha keskinleşti:
+   KISA KOMUT KELİMELERİ İÇİNDE ARANMAZ, BOŞLUKTAN BÖLÜNÜP EŞİTLİKLE
+   KARŞILAŞTIRILIR. Uzun ve ayırt edici kökler (mesaj, whatsapp,
+   hatırlatma, içeridek) için içinde aramak hâlâ doğru — onlar başka
+   kelimenin içine düşmüyor. */
+function kelimeVarMi(metin, kelimeler) {
+  var parcalar = norm(metin).split(/\s+/);
+  for (var i = 0; i < parcalar.length; i++) {
+    var kelime = parcalar[i].replace(/[.,!?;:]/g, '');
+    if (kelimeler.indexOf(kelime) >= 0) return true;
+  }
+  return false;
+}
+
 function kelimeleriAt(metin, atilacaklar) {
   var kume = {};
   atilacaklar.forEach(function (k) { kume[norm(k)] = 1; });
@@ -4449,8 +4471,10 @@ function sesCozumle(c) {
   }
 
   /* --- MESAJ GÖNDER --- */
-  if (d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 || d.indexOf('yaz') >= 0 ||
-      d.indexOf('gonder') >= 0) {
+  /* "yaz" KELİME OLARAK aranıyor: "beyaz" içinde geçiyordu ve
+     "34 ABC 123 beyaz araba geldi" mesaj sanılıyordu (K-018). */
+  if (d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
+      kelimeVarMi(d, ['yaz', 'yazdir']) || d.indexOf('gonder') >= 0) {
     if (p) {
       var ar = aracBul(p.plaka);
       if (!ar) return { tur: 'bilinmeyen-arac', plaka: p.plaka };
@@ -4461,8 +4485,12 @@ function sesCozumle(c) {
   }
 
   /* --- ARAMA --- */
-  if (d.indexOf(' ara') >= 0 || d.slice(-3) === 'ara' || d.indexOf('bul') >= 0 ||
-      d.indexOf('goster') >= 0 || ['araclar', 'kayitlar', 'musteriler'].indexOf(baglam) >= 0) {
+  /* ⚠️ ÜÇ KOMUT KELİMESİ DE KELİME OLARAK ARANIYOR (K-018, 04.09).
+     Önce " ara" diye İÇİNDE aranıyordu ve "yeni ARAÇ" bunu tutuyordu;
+     "GÖSTERGE paneli" de "göster"i tutuyordu. Usta aracını tarif
+     edince program arama yapıyordu. */
+  if (kelimeVarMi(d, ['ara', 'bul', 'goster']) ||
+      ['araclar', 'kayitlar', 'musteriler'].indexOf(baglam) >= 0) {
     /* \b DEĞİL: /\bara\b/ deseni "araç" kelimesini "ç"ye indiriyordu. */
     var terim = kelimeleriAt(metin,
       ['ara', 'bul', 'göster', 'goster', 'sahibini', 'sahibi', 'aracını', 'aracini']);
@@ -6253,9 +6281,21 @@ Ekran.tanim('ozet', {
       document.getElementById('ozDukkan').innerHTML = '';
       document.getElementById('ozArac').innerHTML = '';
       document.getElementById('ozDurum').innerHTML = '';
+      /* ⚠️ 04.09 — BURASI ÖLÜ UÇTU ve denetim BUNU GÖREMİYORDU.
+         Boş durumda ekranda tek bir dokunulabilir şey yoktu; 27. test
+         (OLU-UC) bunu ancak denetim KENDİ KİRLETTİĞİ durumu geri
+         yüklemeye başlayınca yakaladı. Önce OZET_KAYIT denetimin
+         kendi tıklamalarıyla doluyordu ve ekran hep dolu çiziliyordu:
+         test "geçiyor" değil, YANLIŞ ŞEYE bakıyordu.
+
+         Müşteri boş özet görmez (link hep bir kayda ait). Bu hâli
+         yalnız usta görür — ve buradan çıkabilmeli. */
       document.getElementById('ozKalemler').innerHTML = bosDurumHtml(
         'i-clipboard-list', 'Özet seçilmedi',
-        'Bir servis kaydından "Özeti gör"e dokunman gerekiyor.');
+        'Müşteriye gönderilecek özet bir servis kaydına ait olur.',
+        '<button class="btn btn-primary" data-git="kayitlar">' +
+          '<svg class="ico"><use href="#i-clipboard-list"></use></svg>' +
+          ' Servis kayıtlarına git</button>');
       return;
     }
     var a = aracBul(k.plaka);

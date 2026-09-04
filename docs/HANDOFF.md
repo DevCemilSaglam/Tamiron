@@ -17,9 +17,9 @@ tıklanabilir prototip.
 | Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
 | Dokunuş | ana yol **12**, kısa yol **9**, **sesli yol 3** (ölçüldü) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
-| Sağlık denetimi | **30 test · 0 bulgu** · 375 px'te ölçüldü |
+| Sağlık denetimi | **31 test · 0 bulgu** · 375 px'te ölçüldü · denetim artık **ölçtüğü durumu geri yüklüyor** (K-024.1) |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-023** |
+| Kararlar | **K-001 … K-024** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---

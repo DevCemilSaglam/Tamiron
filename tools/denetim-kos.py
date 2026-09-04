@@ -19,7 +19,34 @@ import sys
 p = 'prototypes/omurga.html'
 yedek = 'prototypes/.omurga.denetim-yedek'
 
+# ESKI DERLEME OLCULMEZ (04.09.2026).
+# Yasanan hata: "derle -> geri -> gom" sirasiyla kosuldu. `geri` kendi
+# yedegini yaziyor ve TAZE DERLEMEYI EZDI; sonra o eski dosyaya denetim
+# gomuldu. Tarayicida olculen sey kaynagin hali DEGILDI ve bunu ancak
+# "eklediklerim neden gorunmuyor" diye bakinca fark ettim.
+#
+# "0 bulgu" raporlamanin en sinsi yolu bu: denetim dogru kosuyor, dogru
+# olcuyor, ama YANLIS DOSYAYI olcuyor. Sessiz bozulma.
+def kaynak_daha_yeni_mi():
+    if not os.path.exists(p):
+        return True
+    omurga_zaman = os.path.getmtime(p)
+    kok = 'prototypes/kaynak'
+    for klasor, _, dosyalar in os.walk(kok):
+        for d in dosyalar:
+            if os.path.getmtime(os.path.join(klasor, d)) > omurga_zaman:
+                return True
+    # tokens.css de omurgaya gomuluyor
+    t = 'docs/tokens.css'
+    return os.path.exists(t) and os.path.getmtime(t) > omurga_zaman
+
+
 if sys.argv[1] == 'gom':
+    if kaynak_daha_yeni_mi():
+        print("DURDURULDU: kaynak omurga.html dosyasindan YENI.")
+        print('Once derle:  node tools/prototip-derle.js')
+        print('(Eski derlemeyi olcmek "0 bulgu" der ama yanlis dosyayi olcer.)')
+        sys.exit(1)
     shutil.copyfile(p, yedek)
     h = io.open(p, encoding='utf-8').read()
     a = io.open('tools/saglik-denetim.js', encoding='utf-8').read()

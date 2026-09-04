@@ -10,6 +10,87 @@
 
 ---
 
+## K-024 · K-016 tutuyor — ama denetimin kendisi bozuktu (04.09.2026)
+
+**Karar:** *"Ses var olan işi kısaltır, yeni yetenek açmaz"* (K-016) **ölçüldü
+ve doğrulandı.** Sesin yaptığı dokuz işin **dokuzunun da** elle yolu var.
+
+| Sesin yaptığı | Elle karşılığı |
+|---|---|
+| `servis-ac` | araç ekranı → **Kayıt aç** → tür seç |
+| `yeni-arac` | menü → Servis kaydı ekle → ruhsat |
+| `teslim` (+ödeme) | kayıt → Teslim et → ödeme çipi |
+| `satir-ekle` | kayıt → **+ Parça / + İşçilik** |
+| `gider-ekle` | muhasebe → **Gider ekle** ← *bugün eklendi (K-021.1)* |
+| `mesaj` | mesaj ekranı → müşteri + şablon |
+| `ara` (+süzgeç) | her listenin arama kutusu + kayıtlardaki çipler |
+| `bilinmeyen-arac` | ruhsat → elle gir |
+| `teslim-edilecek-kayit-yok` | araç ekranı |
+
+**⚠️ K-016 bu sabah ÇİĞNENMİŞ DURUMDAYDI.** `gider-ekle` yalnız sesin
+yapabildiği bir işti; elle yolu **yoktu** ve Web Speech Firefox'ta çalışmıyor
+(K-015). Ölü uç turunda bulundu (K-021.1). Kural yazılıydı, denetlenmiyordu.
+
+### 24.1 · ⚠️ DENETİM ÖLÇTÜĞÜ ŞEYİ BOZUYORDU
+
+Bu turun en pahalı bulgusu.
+
+**30. test (SAHTE-EYLEM) her düğmeye basıyor**, 27. test `ACIK_KAYIT` ve
+`ACIK_PLAKA` atıyor. Denetim `load` anında **kendiliğinden koştuğu** için
+prototip **her açılışta kirli başlıyordu**: taze yüklenmiş bir sayfada
+`SESLI_NIYET = 'kayit-icinde'`, `ACIK_KAYIT = 1` duruyordu.
+
+Sonuç: sesli işlem çözümleyicisi **her cümleyi *"satır ekle"* diye okuyordu.**
+Dokuz farklı cümle denendi, dokuzu da aynı cevabı verdi.
+
+> **Kendi ölçtüğü şeyi değiştiren bir araç, ölçüm aleti değildir.**
+
+Denetim artık başta **derin kopya** alıyor, sonda **geri yüklüyor**.
+
+**Ve düzeltir düzeltmez GERÇEK bir hata ortaya çıktı:** özet ekranı boş
+durumda **ölü uçtu** — hiçbir dokunulabilir öge yoktu. 27. test bunu
+göremiyordu, çünkü `OZET_KAYIT` denetimin **kendi tıklamalarıyla** doluyordu
+ve ekran hep dolu çiziliyordu. Test *"geçiyor"* değildi, **yanlış şeye
+bakıyordu.**
+
+### 24.2 · K-018 ÜÇÜNCÜ KEZ — kısa kelime, başka kelimenin içinde
+
+`` yasaklandı (K-018), yerine `indexOf` kondu ve **aynı hata geri geldi.**
+Ölçüldü:
+
+| Usta ne dedi | Program ne anladı | Neden |
+|---|---|---|
+| *"41 KV 5588 yeni **araç** bakım"* | **arama** | `"arac"` içinde `" ara"` var |
+| *"34 ABC 123 **beyaz** araba geldi"* | **mesaj** | `"beyaz"` içinde `"yaz"` var |
+| *"34 ABC 123 **gösterge** paneli yanıyor"* | **arama** | `"gösterge"` içinde `"göster"` var |
+
+Üçü de ustanın **en sıradan** cümleleri. Kural bir kez daha keskinleşti:
+
+> **Kısa komut kelimeleri İÇİNDE aranmaz** — boşluktan bölünüp **eşitlikle**
+> karşılaştırılır (`kelimeVarMi`). Uzun ve ayırt edici kökler (`mesaj`,
+> `whatsapp`, `hatırlatma`, `içeridek`) için içinde aramak hâlâ doğru; onlar
+> başka kelimenin içine düşmüyor.
+
+**31. test (SES-KELIME-TUZAGI)** bu üç cümleyi ölçüyor. Neden kural değil
+**davranış** ölçülüyor: kodda `indexOf` aramak yanlış pozitif yağdırır —
+uzun kökler için `indexOf` doğrudur. Ölçülecek şey, tuzak cümlenin doğru
+okunup okunmadığı. Negatif testle doğrulandı (eski davranış → 3 bulgu).
+
+### 24.3 · Eski derleme ölçülmez — araca koruma kondu
+
+*"derle → geri → göm"* sırasıyla koşuldu; `geri` kendi yedeğini yazıyor ve
+**taze derlemeyi ezdi.** Sonra o eski dosyaya denetim gömüldü. Tarayıcıda
+ölçülen şey kaynağın hâli **değildi** ve bu ancak *"eklediklerim neden
+görünmüyor"* diye bakınca fark edildi.
+
+> ***"0 bulgu"* raporlamanın en sinsi yolu bu:** denetim doğru koşuyor, doğru
+> ölçüyor, ama **yanlış dosyayı** ölçüyor.
+
+`denetim-kos.py gom` artık kaynak `omurga.html`'den yeniyse **reddediyor**.
+Negatif testle doğrulandı.
+
+---
+
 ## K-023 · Müşteriye PDF değil LİNK gider; özet ustanın ekranı değildir (04.09.2026)
 
 **Karar:** Yedi işten altıncısı (*müşteriye özet göndermek*) yazıldı.

@@ -67,9 +67,21 @@ Ekran.tanim('ozet', {
       document.getElementById('ozDukkan').innerHTML = '';
       document.getElementById('ozArac').innerHTML = '';
       document.getElementById('ozDurum').innerHTML = '';
+      /* ⚠️ 04.09 — BURASI ÖLÜ UÇTU ve denetim BUNU GÖREMİYORDU.
+         Boş durumda ekranda tek bir dokunulabilir şey yoktu; 27. test
+         (OLU-UC) bunu ancak denetim KENDİ KİRLETTİĞİ durumu geri
+         yüklemeye başlayınca yakaladı. Önce OZET_KAYIT denetimin
+         kendi tıklamalarıyla doluyordu ve ekran hep dolu çiziliyordu:
+         test "geçiyor" değil, YANLIŞ ŞEYE bakıyordu.
+
+         Müşteri boş özet görmez (link hep bir kayda ait). Bu hâli
+         yalnız usta görür — ve buradan çıkabilmeli. */
       document.getElementById('ozKalemler').innerHTML = bosDurumHtml(
         'i-clipboard-list', 'Özet seçilmedi',
-        'Bir servis kaydından "Özeti gör"e dokunman gerekiyor.');
+        'Müşteriye gönderilecek özet bir servis kaydına ait olur.',
+        '<button class="btn btn-primary" data-git="kayitlar">' +
+          '<svg class="ico"><use href="#i-clipboard-list"></use></svg>' +
+          ' Servis kayıtlarına git</button>');
       return;
     }
     var a = aracBul(k.plaka);

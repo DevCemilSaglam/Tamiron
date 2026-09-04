@@ -227,6 +227,28 @@ function selamMetni(simdi) {
    geriye "ğişecek" kalıyordu (03.09'da sesle satır eklerken çıktı).
    Aynı tuzak /\bara\b/ ile "araç" kelimesini "ç"ye indirirdi.
    Kural: kelime atılacaksa BOŞLUKTAN BÖL, eşitlikle karşılaştır. */
+/* ---- KELİME VAR MI — K-018'İN ÜÇÜNCÜ TEKRARI (04.09) ----
+   `` yasağı yazıldı (K-018), sonra yerine `indexOf` kondu ve AYNI
+   HATA geri geldi. Ölçüldü:
+
+     "yeni ARAC bakım"        -> "arac" içinde " ara" var  -> ARAMA sanıldı
+     "BEYAZ araba geldi"      -> "beyaz" içinde "yaz" var  -> MESAJ sanıldı
+     "GOSTERGE paneli yanıyor"-> "gösterge" içinde "göster"-> ARAMA sanıldı
+
+   Üçü de ustanın en sıradan cümleleri. Kural bir kez daha keskinleşti:
+   KISA KOMUT KELİMELERİ İÇİNDE ARANMAZ, BOŞLUKTAN BÖLÜNÜP EŞİTLİKLE
+   KARŞILAŞTIRILIR. Uzun ve ayırt edici kökler (mesaj, whatsapp,
+   hatırlatma, içeridek) için içinde aramak hâlâ doğru — onlar başka
+   kelimenin içine düşmüyor. */
+function kelimeVarMi(metin, kelimeler) {
+  var parcalar = norm(metin).split(/\s+/);
+  for (var i = 0; i < parcalar.length; i++) {
+    var kelime = parcalar[i].replace(/[.,!?;:]/g, '');
+    if (kelimeler.indexOf(kelime) >= 0) return true;
+  }
+  return false;
+}
+
 function kelimeleriAt(metin, atilacaklar) {
   var kume = {};
   atilacaklar.forEach(function (k) { kume[norm(k)] = 1; });

@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 30 test.
+/* Tamiron prototip saglik denetimi — 31 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -11,6 +11,35 @@ function stilMetni() {
 }
 
   var b=[];function ek(t,e,d){b.push(t+' | '+e+' | '+d);}
+
+  /* ⚠️ DENETIM OLCTUGU SEYI BOZMAZ (04.09.2026).
+     30. test (SAHTE-EYLEM) her dugmeye BASIYOR; 27. test ACIK_KAYIT ve
+     ACIK_PLAKA atiyor. Denetim `load` aninda KENDILIGINDEN kostugu icin
+     prototip her acilista KIRLI basliyordu: taze yuklenmis bir sayfada
+     SESLI_NIYET 'kayit-icinde', ACIK_KAYIT 1 duruyordu ve sesli islem
+     coozumleyicisi HER CUMLEYI "satir ekle" diye okuyordu.
+
+     Yani denetim yalniz veriyi degil, SONRAKI OLCUMU de bozuyordu.
+     Kendi olctugu seyi degistiren bir arac, olcum aleti degildir.
+
+     Cozum: bastan derin kopya, sonda geri yukleme. */
+  var YEDEK = (function () {
+    var y = {};
+    ['KAYITLAR', 'ARACLAR', 'GIDERLER', 'PARCACILAR', 'DUKKAN'].forEach(function (ad) {
+      try { y[ad] = JSON.parse(JSON.stringify(window[ad])); } catch (e) { y[ad] = null; }
+    });
+    ['ACIK_KAYIT', 'ACIK_PLAKA', 'SESLI_NIYET', 'MESAJ_HEDEF',
+     'RUHSAT_ONDOLGU', 'ARAMA_TERIMI', 'OZET_KAYIT'].forEach(function (ad) {
+      y[ad] = window[ad];
+    });
+    return y;
+  })();
+  function yedegiGeriYukle() {
+    Object.keys(YEDEK).forEach(function (ad) {
+      if (YEDEK[ad] === null && ['KAYITLAR','ARACLAR','GIDERLER','PARCACILAR','DUKKAN'].indexOf(ad) >= 0) return;
+      try { window[ad] = YEDEK[ad]; } catch (e) {}
+    });
+  }
 
   /* OLCULEBILIR MI? Onizleme bolmesi bazen SIFIR GENISLIKTE aciliyor;
      o hâlde her kutunun clientWidth'i 0 cikiyor ve tasma testleri
@@ -707,7 +736,47 @@ function stilMetni() {
     showScreen('home');
   }
 
+  /* 31) SES KELIME TUZAGI — kisa komut kelimesi baska bir kelimenin
+     ICINDE bulunuyor (04.09.2026). K-018'IN UCUNCU TEKRARI.
+
+     `\b` yasagi yazildi, yerine indexOf kondu ve ayni hata geri geldi:
+       "yeni ARAC bakim"          -> "arac" icinde " ara"    -> ARAMA
+       "BEYAZ araba geldi"        -> "beyaz" icinde "yaz"    -> MESAJ
+       "GOSTERGE paneli yaniyor"  -> "gosterge" icinde "goster" -> ARAMA
+     Ucu de ustanin en siradan cumleleri; ucunde de program ustanin
+     dedigini degil, harf dizisini duyuyordu.
+
+     Neden KURAL degil DAVRANIS olculuyor: kodda "indexOf" aramak
+     yanlis pozitif yagdirir (uzun ve ayirt edici kokler icin indexOf
+     DOGRU). Olculecek sey, tuzak cumlenin dogru okunup okunmadigi.
+
+     NEGATIF DOGRULAMA (04.09): kelimeVarMi cagrilari indexOf'a geri
+     cevrildi -> 3 bulgu; duzeltilince -> 0. */
+  if (typeof window.SES_COZUMLE === 'function') {
+    var sesYedekNiyet = window.SESLI_NIYET, sesYedekKayit = window.ACIK_KAYIT;
+    window.SESLI_NIYET = 'genel';
+    window.ACIK_KAYIT = null;
+    /* [cumle, OLMAMASI GEREKEN tur] — plakali bir arac tarifi asla
+       arama ya da mesaj olarak okunmamali. */
+    [['41 KV 5588 yeni arac bakim', 'ara'],
+     ['34 ABC 123 beyaz araba geldi', 'mesaj'],
+     ['34 ABC 123 gosterge paneli yaniyor', 'ara']].forEach(function (x) {
+      var o = null;
+      try { o = window.SES_COZUMLE(x[0]); } catch (e) { return; }
+      if (o && o.tur === x[1]) {
+        ek('SES-KELIME-TUZAGI', 'ses',
+           '"' + x[0] + '" -> ' + x[1] + ' sanildi (kisa kelime icinde bulundu)');
+      }
+    });
+    window.SESLI_NIYET = sesYedekNiyet;
+    window.ACIK_KAYIT = sesYedekKayit;
+  }
+
+  /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
+     yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */
+  yedegiGeriYukle();
   showScreen('home');
+
   console.log('SAGLIK DENETIMI — '+ekranlar.length+' ekran, '+b.length+' bulgu');
   b.forEach(function(x){
 console.log('  '+x);});
