@@ -5,16 +5,16 @@
 modeli haritasını çıkarmak. Tamiron'un "basit ön muhasebe" ayağı için **tavan
 referansı**: neyin standart olduğunu, neyin fazlalık olduğunu ölçmek.
 
-**Kaynaklar (hepsi herkese açık, giriş yapılmadı):**
-- `apidocs.parasut.com` — API V4. Veri modelinin **kesin** kaynağı; pazarlama
-  metni değil, gerçek kaynak ağacı.
-- `parasut.com/kullanim-kilavuzu` — 29 kategori, ~175 madde. Ekran/akış kaynağı.
+**Kaynaklar:**
+- **Canlı uygulama** (`uygulama.parasut.com`, deneme hesabı) — menü ağacı ve
+  fatura formu doğrudan okundu. §2.0 ve §2.10 bu kaynaktan, **doğrulanmış**.
+- `apidocs.parasut.com` — API V4. Veri modelinin **kesin** kaynağı.
+- `parasut.com/kullanim-kilavuzu` — 29 kategori, ~175 madde.
 - `parasut.com/on-muhasebe-programi` + özellik sayfaları.
 
-> **Not:** Uygulama içine (`uygulama.parasut.com`) giriş yapılmadı — parola girmek
-> Claude'a kapalı bir işlem. Aşağıdaki menü ağacı API bölümlemesi + kılavuz
-> kategorilerinden türetildi; ikisi birbirini doğruluyor. Ekran içi ayrıntı
-> (buton yerleşimi, boş durum ekranları, sihirbaz adımları) için oturum gerekir.
+> **Yöntem notu:** Şifre Claude tarafından girilmedi; Cemil kendi Chrome'unda
+> giriş yaptı, oturum eklenti üzerinden okundu. Uygulamada hiçbir kayıt
+> oluşturulmadı/değiştirilmedi — yalnız okundu.
 
 ---
 
@@ -34,6 +34,106 @@ bölümlemeyi izliyor, üstüne 3 destek alanı ekliyor:
 | + | Raporlama | (API'de yok, arayüzde var) |
 | + | Kullanıcı/Hesap | Yetkilendirme, firma bilgisi, çoklu firma, abonelik |
 | + | Entegrasyonlar | Banka, e-ticaret, kargo, CRM, finansman |
+
+---
+
+## 2.0 Gerçek menü ağacı (uygulamadan okundu — doğrulanmış)
+
+```
+GÜNCEL DURUM                    /
+ASİSTAN  [BETA]                 /parasut-asistan
+SATIŞLAR
+  Teklifler                     /teklifler
+  Faturalar                     /satislar
+  Müşteriler                    /musteriler
+  Satışlar Raporu               /raporlar/satislar
+  Tahsilatlar Raporu            /raporlar/tahsilatlar
+  Gelir Gider Raporu            /raporlar/gelir-ve-gider-raporu
+GİDERLER
+  Gider Listesi                 /giderler
+  Tedarikçiler                  /tedarikciler
+  Çalışanlar                    /calisanlar
+  Giderler Raporu               /raporlar/giderler
+  Ödemeler Raporu               /raporlar/odemeler
+  KDV Raporu                    /raporlar/kdv
+NAKİT
+  Kasa ve Bankalar              /kasa-ve-bankalar
+  Çekler                        /cekler
+  Kasa / Banka Raporu           /raporlar/kasa-banka
+  Nakit Akışı Raporu            /raporlar/nakit-akisi
+STOK
+  Hizmet ve Ürünler             /hizmet-ve-urunler
+  Depolar                       /depolar
+  Depolar Arası Transfer        /depolar-arasi-transfer
+  Giden İrsaliyeler             /giden-irsaliyeler
+  Gelen İrsaliyeler             /gelen-irsaliyeler
+  Fiyat Listeleri               /fiyat-listeleri
+  Stok Geçmişi                  /stok-hareketleri
+  Stoktaki Ürünler Raporu       /raporlar/stoktaki-urunler
+E-TİCARET  [YENİ]               /e-ticaret/sozlesmeler
+— — —
+UYGULAMALAR                     /entegrasyonlar
+PAZARYERİ                       (dış site)
+MENÜYÜ SAKLA                    (menüyü daraltır)
+AYARLAR
+  Firma Bilgileri               /firma-bilgileri
+  Kategori ve Etiketler         /kategori-ve-etiketler
+  Kullanıcılar                  /kullanicilar
+  Yazdırma Şablonları           /fatura-sablonlari
+```
+
+**Toplam ~32 gezinme hedefi** (form/detay ekranları hariç). 6 üst başlık, en
+derin dal 8 madde.
+
+**Beklentiyi bozan üç bulgu:**
+
+1. **"Raporlar" diye bir bölüm yok.** 9 rapor, ait oldukları modüllerin içine
+   dağıtılmış. Kullanıcı rapor aramaya değil, bulunduğu bölümde raporu görmeye
+   yönlendiriliyor. Tamiron için doğrudan kopyalanabilir bir karar: ayrı rapor
+   menüsü açmak yerine raporu işin yanına koymak.
+2. **Müşteriler ve Tedarikçiler arayüzde AYRI menü maddesi** — oysa API'de ikisi
+   de tek `contact` varlığı. Yani veri modeli birleşik, arayüz ayrık. Tamiron'da
+   da aynısı yapılabilir: tek tablo, iki liste ekranı.
+3. **Kılavuzda anlatılan "Krediler" menüde yok.** Muhtemelen Kasa/Banka içine
+   gömülü. Kılavuz ile ürünün birebir örtüşmediğinin hatırlatıcısı.
+
+### 2.10 Hızlı İşlemler (ana ekran kısayolları — doğrulanmış)
+
+Güncel Durum ekranında sabit **4 kısayol**:
+`SATIŞ FATURASI OLUŞTUR` · `HIZLI FİŞ/FATURA OLUŞTUR` · `ALIŞ FATURASI OLUŞTUR` ·
+`MÜŞTERİ OLUŞTUR`
+
+32 ekranlık bir programda ana ekrandan **yalnız 4 eylem** öne çıkarılmış.
+
+### 2.11 Yeni Satış Faturası formu — alan sayımı (doğrulanmış)
+
+Ekranda görünen alanlar:
+
+| Alan | Tip | Varsayılan |
+|---|---|---|
+| Fatura İsmi | metin | boş |
+| Müşteri | arama + yeni isim yazılabilir | boş |
+| Müşteri Bilgileri | salt okunur | seçimle dolar |
+| Tahsilat Durumu | 2 seçenek | **Tahsil Edilecek** |
+| Düzenleme Tarihi | tarih | **bugün** |
+| Vade Tarihi | Aynı gün / 7 / 14 / 30 / 60 + tarih | **Aynı gün** |
+| Stok Takibi | 2 seçenek | **Stok çıkışı yapılsın** |
+| Satır: Hizmet/Ürün · Miktar · Birim · Br. Fiyat · Vergi · Toplam | — | **1,00 · Adet · 0,00 · KDV %20** |
+| Fatura Kategorisi (sağ panel) | seçim | Kategorisiz |
+| Etiketler (sağ panel) | seçim | Etiketsiz |
+
+Katlanmış hâlde duran opsiyoneller: `+ FATURA NO EKLE` · `↻ DÖVİZ DEĞİŞTİR` ·
+`+ SİPARİŞ BİLGİSİ EKLE`
+
+> **Bu belgedeki en önemli ölçüm:** ekranda ~10 alan görünüyor ama kullanıcının
+> gerçekten doldurması gereken alan sayısı **2** — müşteri ve ürün/fiyat. Geri
+> kalan her şeyin ya akıllı varsayılanı var, ya opsiyonel, ya da katlanmış.
+> Paraşüt "az alan" değil, **az karar** tasarlamış. Tamiron'un basitlik hedefi
+> ekran/alan saymakla değil, **kullanıcıdan istenen karar sayısını** saymakla
+> ölçülmeli.
+
+*(Formun alt kısmı — notlar, indirim, genel toplam — iframe içinde kaldığı ve
+görüntü alanına sığmadığı için okunamadı.)*
 
 ---
 
@@ -164,8 +264,16 @@ yalnızca kuyruğuna denk geliyor; gövdesi (servis kaydı, parça tedariki) Par
 **yok**. Bu, "Tamiron bir muhasebe programı değildir; kuyruğunda muhasebe olan bir
 servis programıdır" tezini destekliyor.
 
-### 4.4 Açık kalanlar (oturum gerektirir)
-- Sol menüdeki gerçek madde sayısı ve sırası
+### 4.4 Açık kalanlar
+- ~~Sol menüdeki gerçek madde sayısı ve sırası~~ → **§2.0'da kapandı** (~32 hedef)
+- ~~Fatura formundaki alan sayısı~~ → **§2.11'de kapandı** (görünen ~10, gerçekte doldurulan 2)
+- Fatura formunun alt yarısı (notlar, indirim, genel toplam) — iframe, okunamadı
 - Yeni kullanıcının ilk giriş (onboarding) adımları
-- Fatura oluşturma formundaki zorunlu alan sayısı — **basitlik ölçümü için asıl veri bu**
 - Mobil uygulamanın "4 adımda e-fatura" akışının gerçek adımları
+
+### 4.5 Tek cümlelik sonuç
+Paraşüt 32 ekranlık bir program ama ana ekranda 4 kısayol, en sık kullanılan
+formda 2 gerçek karar var. **Karmaşıklığı ekran sayısıyla değil, kullanıcıdan
+istenen karar sayısıyla yönetiyor.** Tamircinin "karmaşık geldi" tepkisi de
+muhtemelen ekran sayısına değil, karar sayısına verilmiş bir tepkiydi —
+A-2 ekran bütçesinin yanına bir **karar bütçesi** koymak gerekebilir.
