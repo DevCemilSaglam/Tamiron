@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-03 21:42
+  Üretim: 2026-09-04 07:55
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -3631,6 +3631,108 @@ function sesBaglam() {
 /* ================= ÇÖZÜMLEME =================
    Gerçek motor geldiğinde değişecek olan BURASI, ekran değil.
    Sıra önemli: en dar kalıp önce denenir. */
+/* GERÇEK MOTORUN DÖNDÜRDÜĞÜ METİN DÜZGÜN DEĞİL. Tanıma "34 ABC 123"
+   yerine "34 a b c 123" (harf harf), "34ABC123" (bitişik) ya da
+   "34 Abc 123" döndürebiliyor. Plakayı aramadan ÖNCE tek harfler
+   birleştiriliyor — yoksa doğru duyulmuş bir plaka bulunamıyor. */
+/* ⚠️ BU FONKSİYON BİR KEZ `\b` İLE YAZILDI VE BOZDU — K-018'i yazdıktan
+   SONRA. Desen şuydu: /\b([A-Za-z…])(\s+[A-Za-z…])+\b/
+   "beş yüz" içinde "ş y" ikilisini TEK HARF DİZİSİ sandı, çünkü 'e' ile
+   'ş' arasında `\b` var (ş, ASCII kelime karakteri değil) ve 'y' ile
+   'ü' arasında da var. Sonuç "beşyüz" oldu, sayı çözümlenemedi.
+   Kural bir kez daha: Türkçede sınır aramak yerine BOŞLUKTAN BÖL. */
+function sesHarfleriBirlestir(metin) {
+  var t = (metin || '').split(/\s+/).filter(Boolean);
+  var cikti = [], i = 0;
+  var tekHarf = function (p) { return p.length === 1 && /[A-Za-zÇĞİÖŞÜçğıöşü]/.test(p); };
+  while (i < t.length) {
+    if (!tekHarf(t[i])) { cikti.push(t[i]); i++; continue; }
+    var j = i;
+    while (j < t.length && tekHarf(t[j])) j++;
+    /* Tek başına duran bir harf harf dizisi değildir — dokunma. */
+    if (j - i >= 2) cikti.push(t.slice(i, j).join(''));
+    else cikti.push(t[i]);
+    i = j;
+  }
+  return cikti.join(' ');
+}
+
+/* TANIMA MOTORU SAYIYI KELİME OLARAK DÖNDÜREBİLİR: "otuz dört ABC yüz
+   yirmi üç". Rakama çevrilmezse plaka hiç bulunamıyor.
+
+   ⚠️ TEK KELİMELİK SAYI ÇEVRİLMEZ — "bir de balata değişecek" cümlesi
+   "1 de balata değişecek" olurdu. İstisna: peşinden birim geliyorsa
+   ("elli lira", "seksen kilometre") çevrilir, orada sayı olduğu kesin. */
+var SES_SAYI = {
+  'sifir': 0, 'bir': 1, 'iki': 2, 'uc': 3, 'dort': 4, 'bes': 5,
+  'alti': 6, 'yedi': 7, 'sekiz': 8, 'dokuz': 9, 'on': 10, 'yirmi': 20,
+  'otuz': 30, 'kirk': 40, 'elli': 50, 'altmis': 60, 'yetmis': 70,
+  'seksen': 80, 'doksan': 90
+};
+var SES_BIRIM = { 'lira': 1, 'tl': 1, '₺': 1, 'km': 1, 'kilometre': 1 };
+
+function sesSayilariCevir(metin) {
+  var parcalar = metin.split(/(\s+)/);
+  var cikti = [], i = 0;
+
+  function sayiMi(p) {
+    var n = norm((p || '').replace(/[.,!?]/g, ''));
+    return SES_SAYI[n] !== undefined || n === 'yuz' || n === 'bin';
+  }
+
+  while (i < parcalar.length) {
+    if (!sayiMi(parcalar[i])) { cikti.push(parcalar[i]); i++; continue; }
+
+    /* Sayı sözcüklerinden oluşan diziyi topla (aradaki boşluklar dahil). */
+    var basla = i, kelimeler = [];
+    while (i < parcalar.length) {
+      if (/^\s+$/.test(parcalar[i])) { i++; continue; }
+      if (!sayiMi(parcalar[i])) break;
+      kelimeler.push(norm(parcalar[i].replace(/[.,!?]/g, '')));
+      i++;
+    }
+
+    var sonrakiBirim = false;
+    for (var j = i; j < parcalar.length; j++) {
+      if (/^\s+$/.test(parcalar[j])) continue;
+      sonrakiBirim = SES_BIRIM[norm(parcalar[j].replace(/[.,!?]/g, ''))] === 1;
+      break;
+    }
+
+    /* Tek kelimeyse ve peşinden birim gelmiyorsa DOKUNMA. */
+    if (kelimeler.length < 2 && !sonrakiBirim) {
+      for (var k = basla; k < i; k++) cikti.push(parcalar[k]);
+      continue;
+    }
+
+    /* BAŞTA "SIFIR" VARSA RAKAM RAKAM SÖYLENİYOR demektir:
+       "sıfır altı" → "06", toplayarak "6" olurdu ve plakanın il kodu
+       iki hane olmak zorunda. */
+    var deger;
+    if (kelimeler[0] === 'sifir' && kelimeler.every(function (w) {
+          return SES_SAYI[w] !== undefined && SES_SAYI[w] < 10;
+        })) {
+      deger = kelimeler.map(function (w) { return SES_SAYI[w]; }).join('');
+    } else {
+      var toplam = 0, gecerli = 0;
+      kelimeler.forEach(function (w) {
+        if (w === 'yuz') gecerli = (gecerli || 1) * 100;
+        else if (w === 'bin') { toplam += (gecerli || 1) * 1000; gecerli = 0; }
+        else gecerli += SES_SAYI[w];
+      });
+      deger = String(toplam + gecerli);
+    }
+    /* ⚠️ SONA BOŞLUK ŞART: dizi toplanırken aradaki boşluklar yutuldu.
+       Konmazsa "otuz dört abc" → "34abc" oluyor ve plaka deseni
+       tutmuyordu. */
+    cikti.push(deger + ' ');
+  }
+  return cikti.join('').replace(/\s+/g, ' ').trim();
+}
+
+/* ⚠️ Birleştirme ÇÖZÜMLEMENİN GİRİŞİNDE bir kez yapılır, burada
+   değil: indeks/uzunluk döndüren bir fonksiyon metni değiştirirse,
+   çağıran taraf ORİJİNAL metni yanlış yerden keser. */
 function sesPlakaBul(metin) {
   var m = metin.toLocaleUpperCase('tr')
                .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
@@ -3654,7 +3756,10 @@ function sesTutarBul(d) {
 }
 
 function sesCozumle(c) {
-  var metin = (c || '').trim();
+  /* Ham metnin düzeltmeleri BURADA, tek giriş noktasında: harf harf
+     söylenen plaka birleşiyor, kelimeyle söylenen sayı rakama
+     dönüyor. Böylece bütün indeksler aynı metne göre. */
+  var metin = sesSayilariCevir(sesHarfleriBirlestir((c || '').trim()));
   var d = norm(metin);
   var p = sesPlakaBul(metin);
   var baglam = SESLI_NIYET || 'genel';
@@ -3987,15 +4092,41 @@ function sesDinlemeyiBaslat() {
   try {
     sesTanima = new Sinif();
     sesTanima.lang = 'tr-TR';
-    sesTanima.interimResults = false;
+    /* ARA SONUÇ AÇIK: usta konuşurken metni GÖRSÜN. Kapalıyken ekran
+       konuşma bitene kadar hiçbir şey göstermiyor ve "beni duyuyor mu"
+       sorusu cevapsız kalıyor. */
+    sesTanima.interimResults = true;
     sesTanima.maxAlternatives = 1;
+
     sesTanima.onresult = function (e) {
-      var c = e.results[0][0].transcript;
-      sesCumleIsle(c);
+      var kesin = '', gecici = '';
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) kesin += e.results[i][0].transcript;
+        else gecici += e.results[i][0].transcript;
+      }
+      if (kesin) { sesCumleIsle(kesin); return; }
+      /* Geçici metni yalnız GÖSTER, çözümleme yapma — yarım cümleyi
+         işleme çevirmek yanlış işlem demek. */
+      sesCumle = gecici;
+      var duy = document.getElementById('sesDuyulan');
+      duy.hidden = !gecici;
+      if (gecici) duy.innerHTML = '<span class="sd-lbl">Duyuluyor…</span>' + gecici;
     };
+
     sesTanima.onerror = function (e) {
       sesDurumu = 'bos'; sesCiz();
-      balon('Mikrofon hatası: ' + (e.error || 'bilinmiyor'), false, 3200);
+      /* Hata kodlarını TÜRKÇE VE EYLEMLİ söyle: "not-allowed" yazan bir
+         balon ustaya hiçbir şey anlatmıyor. */
+      var mesaj = ({
+        'not-allowed': 'Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden izin ver.',
+        'service-not-allowed': 'Tarayıcı mikrofonu engelledi. Sayfayı https ya da localhost üzerinden aç.',
+        'no-speech': 'Ses duyulmadı. Mikrofona biraz daha yakın söyle.',
+        'audio-capture': 'Mikrofon bulunamadı.',
+        'network': 'Tanıma sunucusuna ulaşılamadı — internet bağlantısını kontrol et.',
+        'aborted': ''
+      })[e.error];
+      if (mesaj === undefined) mesaj = 'Mikrofon hatası: ' + (e.error || 'bilinmiyor');
+      if (mesaj) balon(mesaj, false, 4000);
     };
     sesTanima.onend = function () {
       if (sesDurumu === 'dinliyor') { sesDurumu = 'bos'; sesCiz(); }
@@ -4007,6 +4138,23 @@ function sesDinlemeyiBaslat() {
     balon('Mikrofon başlatılamadı.', false, 2600);
   }
 }
+
+/* ---- TEST KÖPRÜSÜ ----
+   Ekran betikleri derlemede kendi IIFE'sine sarılıyor (v1'in sekiz
+   var-sızıntısı hatası bu yüzden imkânsız). İyi bir kural, ama
+   çözümlemeyi dışarıdan sınamayı da imkânsız kılıyordu: gerçek tanıma
+   metinleri ("34 abc 123" gibi küçük harfli, noktalamasız) ancak
+   mikrofonla denenebiliyordu.
+   Denetimin showScreen köprüsüyle aynı gerekçe: sınanamayan kod,
+   sınanmamış koddur. */
+window.SES_COZUMLE = function (c) { return sesCozumle(c); };
+/* Ham metnin düzeltilmiş hâli — hata ararken hangi adımın bozduğunu
+   görmek için. */
+window.SES_METIN = function (c) {
+  var h = sesHarfleriBirlestir((c || '').trim());
+  return { harf: h, sayi: sesSayilariCevir(h) };
+};
+window.SES_SOYLE = function (c) { sesCumleIsle(c); return sesIslem; };
 
 /* Duyulan cümleyi işle — motordan da gelse, örnekten de gelse AYNI yol.
    İki ayrı yol yazmak, örneklerle çalışıp gerçekte çalışmayan bir

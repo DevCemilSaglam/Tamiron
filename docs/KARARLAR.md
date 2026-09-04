@@ -28,6 +28,21 @@ o hata henüz kimse söylemeden bulundu, çünkü aynı desen kullanılıyordu.
 **Genel ders:** İngilizce için yazılmış metin araçları Türkçede sessizce
 yanlış çalışır. Sessizce, çünkü hata mesajı yok — yalnız yanlış sonuç.
 
+### ⚠️ 04.09 — AYNI TUZAĞA BU KARARDAN SONRA BİR KEZ DAHA DÜŞÜLDÜ
+
+Sesle söylenen plakayı toparlamak için harf birleştirici yazdım ve
+yine `\b` kullandım:
+`/\b([A-Za-zÇĞİÖŞÜçğıöşü])(\s+[A-Za-zÇĞİÖŞÜçğıöşü])+\b/`
+
+*"beş yüz"* içindeki **"ş y"** ikilisini "harf harf söylenmiş plaka"
+sandı — çünkü `e`↔`ş` arasında da, `y`↔`ü` arasında da `\b` var.
+Sonuç **"beşyüz"** oldu, *"kırk bir KV beş bin beş yüz seksen sekiz"*
+plakası **41 KV 5000** olarak okundu.
+
+**Kararı yazmak yetmiyor.** Kural artık şöyle keskin: *Türkçe metinde
+kelime sınırı ARANMAZ, boşluktan BÖLÜNÜR.* İki fonksiyon da
+(`kelimeleriAt`, `sesHarfleriBirlestir`) bu şekilde yazıldı.
+
 ---
 
 ## K-017 · Sesli işlem bağlamıyla açılır (03.09.2026)
