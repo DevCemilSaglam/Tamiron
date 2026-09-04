@@ -49,6 +49,36 @@
       <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
+  <!-- ⚠️ 04.09 — GİDER ELLE DE GİRİLEBİLİYOR (ölü uç turu).
+       Bu bölümün TEK girişi mikrofondu ve boş durumu bile "Mikrofona
+       basıp '2400 TL elektrik faturası ekle' demen yeter" diyordu.
+       Oysa K-015: Web Speech Firefox'ta YOK ve güvenli bağlam ister —
+       mikrofon açılmayan bir tarayıcıda gider bölümü TAMAMEN
+       kullanılamıyordu ve ekran bunu söylemiyordu.
+
+       K-014 zaten "sesle VE ELLE giriş" diyordu; elle olan yazılmamıştı.
+       Ses bir kısayoldur, tek kapı değil (K-016). -->
+  <div class="btn-row">
+    <button class="btn btn-ghost" id="muhGiderEkle">
+      <svg class="ico"><use href="#i-plus"></use></svg> Gider ekle
+    </button>
+  </div>
+
+  <div class="card" id="muhGiderForm" hidden>
+    <div class="field">
+      <label for="muhGiderAd">Ne için</label>
+      <input id="muhGiderAd" placeholder="ör. elektrik faturası" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="muhGiderTutar">Tutar (₺)</label>
+      <input id="muhGiderTutar" inputmode="numeric" placeholder="0" autocomplete="off" />
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="muhGiderKaydet">Ekle</button>
+      <button class="btn btn-ghost" id="muhGiderVazgec">Vazgeç</button>
+    </div>
+  </div>
+
   <div id="muhGiderler"></div>
 
   <div class="section-label">
@@ -65,6 +95,10 @@ var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almad
 
 Ekran.tanim('muhasebe', {
   ciz: function () {
+    /* Ekran her açıldığında form KAPALI başlar. Açık bırakılsaydı
+       usta bir sonraki gelişinde yarım bir formla karşılaşırdı ve
+       "ben bunu doldurmuş muydum" sorusu doğardı. */
+    if (document.getElementById('muhGiderForm')) muhFormGoster(false);
     var bugun = bugunTahsilat();
     document.getElementById('muhBugun').innerHTML =
       '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
@@ -144,7 +178,8 @@ Ekran.tanim('muhasebe', {
             tutar(giderToplami()) + ' ₺</span></div>' +
         '</div>'
       : bosDurumHtml('i-receipt', 'Gider yazılmamış',
-          'Mikrofona basıp "2400 TL elektrik faturası ekle" demen yeter.');
+          '"Gider ekle"ye dokun ya da mikrofona basıp ' +
+          '"2400 TL elektrik faturası ekle" de.');
 
     /* KAPSAM AÇIK OLDUĞU İÇİN EKRANDA DA YAZIYOR. Bir ekranın
        "burası yarım" demesi, yarım olduğunu saklamasından iyidir. */
@@ -159,8 +194,44 @@ Ekran.tanim('muhasebe', {
   }
 });
 
+/* Formu acip kapatmak EKRANI TAZELEMEZ: tazele() ekranin butun
+   govdesini yeniden yaziyor ve yarim yazilmis gider ucup gidiyordu. */
+function muhFormGoster(acik) {
+  var f = document.getElementById('muhGiderForm');
+  f.hidden = !acik;
+  document.getElementById('muhGiderEkle').hidden = acik;
+  if (acik) document.getElementById('muhGiderAd').focus();
+  else {
+    document.getElementById('muhGiderAd').value = '';
+    document.getElementById('muhGiderTutar').value = '';
+  }
+}
+
 document.addEventListener('click', function (e) {
+  if (Ekran.adi() !== 'muhasebe') return;
   if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
+
+  if (e.target.closest('#muhGiderEkle')) { muhFormGoster(true); return; }
+  if (e.target.closest('#muhGiderVazgec')) { muhFormGoster(false); return; }
+
+  if (e.target.closest('#muhGiderKaydet')) {
+    var ad = (document.getElementById('muhGiderAd').value || '').trim();
+    /* Rakam disindaki her sey atilir: usta "2.400 TL" ya da "2400 tl"
+       yazabilir. parseInt tek basina "2.400"u 2 okurdu. */
+    var tut = parseInt(String(document.getElementById('muhGiderTutar').value)
+                .replace(/[^0-9]/g, ''), 10) || 0;
+    if (!ad || !tut) {
+      balon('Gider için hem açıklama hem tutar gerekiyor.', false, 2600);
+      return;
+    }
+    GIDERLER.push({ id: (GIDERLER.length ? Math.max.apply(null,
+      GIDERLER.map(function (g) { return g.id; })) : 0) + 1,
+      tarih: bugunMetin(), aciklama: ad, tutar: tut, tur: 'elle' });
+    balon(ad + ' — ' + tutar(tut) + ' ₺ eklendi.', false, 2600);
+    muhFormGoster(false);
+    Ekran.tazele();
+    return;
+  }
 
   var gs = e.target.closest('[data-gider-sil]');
   if (gs) {

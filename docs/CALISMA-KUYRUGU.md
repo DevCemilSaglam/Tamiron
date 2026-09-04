@@ -20,8 +20,8 @@ Başlangıç: 04.09.2026 · son commit `4a6dfe5`
 
 | # | İş | Durum | Sonuç |
 |---|---|---|---|
-| 1 | **Ölü uç turu** — 12 ekranın hepsini gerçekten işlet | SIRADA | |
-| 2 | **A-M2** — özet/hatırlatma ikinci iletişime gitsin | SIRADA | |
+| 1 | **Ölü uç turu** — 12 ekranın hepsini gerçekten işlet | **BİTTİ** | 3 bulgu: muhasebede elle gider yok · "Onay iste" sahte · `Ekran.ac()` zaten açık ekranda ölü. Üçü de düzeltildi, 30. test eklendi (K-021) |
+| 2 | **A-M2** — özet/hatırlatma ikinci iletişime gitsin | **BİTTİ** | Hedef seçilebilir, kime gittiği göndermeden önce yazıyor; firmaya "Bey/Hanım" denmiyor (K-021.3) |
 | 3 | **Muhasebe kapsamı (MUH)** — üç seçeneği ölç, öneri + karar taslağı | SIRADA | |
 | 4 | **Müşteri özeti (T-19/20/21)** — WhatsApp'tan gidecek özet | SIRADA | |
 | 5 | **Sesli işlem kapsam denetimi** — K-016 gerçekten tutuyor mu | SIRADA | |

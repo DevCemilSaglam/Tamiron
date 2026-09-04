@@ -195,6 +195,62 @@ function fiyatiBekleyen(k) {
   });
 }
 
+/* ---- MESAJ KİME GİDER (A-M2, 04.09) ----
+   Ruhsat sahibi FİRMA olabilir (K-019.3) ve firmanın numarası
+   santraldir. Özet ya da bakım hatırlatması santrale gitmez — aracı
+   getiren kişiye gider.
+
+   **Varsayım — Cemil onayına açık (A-M2):** ikinci iletişim varsa
+   mesaj ONA gider, yoksa ruhsattaki numaraya. Usta yine de mesaj
+   ekranından hedefi değiştirebiliyor; varsayım bir KİLİT değil,
+   varsayılan.
+
+   ⚠️ "BEY/HANIM" HERKESE YAZILMAZ. Firma adına hitap edilince mesaj
+   "Demir Nakliyat Ltd. Şti. Bey/Hanım," diye başlıyordu — müşteriye
+   giden ilk cümle bu ve ciddiyetsiz görünüyor. Firma olup olmadığı
+   ada bakılarak anlaşılıyor; ayrı bir alan tutmuyoruz (K-012'nin
+   kuralı: ekran gerekiyorsa tablo/alan gerekmiyor olabilir). */
+var FIRMA_ISARETLERI = ['ltd', 'ltd.', 'sti', 'sti.', 'şti', 'şti.',
+  'a.s.', 'a.ş.', 'as', 'aş', 'anonim', 'limited', 'san', 'san.',
+  'tic', 'tic.', 'sirketi', 'şirketi', 'kollektif', 'komandit'];
+
+/* ⚠️ Türkçede kelime sınırı ARANMAZ (K-018): ad boşluktan BÖLÜNÜP
+   her parça eşitlikle karşılaştırılıyor. Desenle arasaydık "Astan"
+   içindeki "as" firma sanılırdı. */
+function firmaMi(ad) {
+  var parcalar = norm(ad).split(/\s+/);
+  for (var i = 0; i < parcalar.length; i++) {
+    if (FIRMA_ISARETLERI.indexOf(parcalar[i]) >= 0) return true;
+  }
+  return false;
+}
+
+function mesajHedefleri(plaka) {
+  var a = aracBul(plaka);
+  if (!a) return [];
+  var liste = [];
+  if (a.iletisimTel || a.iletisimAd) {
+    liste.push({ anahtar: 'iletisim', ad: a.iletisimAd || 'iletişim',
+                 tel: a.iletisimTel || '', rol: 'İletişim',
+                 kisi: !firmaMi(a.iletisimAd) });
+  }
+  liste.push({ anahtar: 'sahip', ad: a.sahipAd || '', tel: a.sahipTel || '',
+               rol: 'Ruhsat sahibi', kisi: !firmaMi(a.sahipAd) });
+  return liste;
+}
+
+/* Varsayılan hedef: telefonu OLAN ilk sıradaki. Telefonsuz bir hedefi
+   varsayılan yapmak, ustayı "neden gönderemiyorum"a düşürüyordu. */
+function mesajHedefi(plaka, anahtar) {
+  var h = mesajHedefleri(plaka);
+  if (!h.length) return null;
+  if (anahtar) {
+    for (var i = 0; i < h.length; i++) if (h[i].anahtar === anahtar) return h[i];
+  }
+  for (var j = 0; j < h.length; j++) if (h[j].tel) return h[j];
+  return h[0];
+}
+
 /* ---- MÜŞTERİ: ayrı tablo değil, ARAÇTAN TÜRETİLİR ----
    VERI-MODELI'nde Customer YOK; müşteri aracın üstünde duruyor
    (sahipAd + sahipTel). Menüye "Müşteriler" gelince yeni tablo

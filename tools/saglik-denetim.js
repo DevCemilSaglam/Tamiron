@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 29 test.
+/* Tamiron prototip saglik denetimi — 30 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -637,6 +637,73 @@ function stilMetni() {
       kap.scrollTop = eskiKaydirma;
     });
     if (cekmeceGovde) closeDrawer();
+    showScreen('home');
+  }
+
+  /* 30) SAHTE EYLEM — dugme "gonderildi" diyor, HICBIR SEY OLMUYOR
+     (04.09.2026).
+
+     Kayit ekranindaki "Onay iste" dugmesi tam boyleydi: basiyordun,
+     balon "Ozet gonderildi — 0532..." diyordu ve hicbir sey
+     gonderilmiyordu. Mesaj ekrani ZATEN VARDI, oraya bile gitmiyordu.
+
+     Neden 27. ve 28. testler kacirdi: dugme VAR, tikliniyor, hatta
+     GERI BILDIRIM de veriyor. Ekran "calisiyor" gorunmenin otesinde,
+     "calisti" DIYOR. Bir kez boyle kanan usta bir daha hicbir
+     "gonderildi" yazisina inanmaz — bu yuzden sessiz bir olu uctan
+     daha pahali.
+
+     OLCUM: balon tamamlanmis bir eylem BILDIRIYORSA (gonderildi,
+     eklendi, kaydedildi, silindi, guncellendi), ya veri ya ekran
+     degismis olmali. Ikisi de ayni kaldiysa balon yalan soyluyor. */
+  {
+    var EYLEM_SOZU = ['gonderildi', 'eklendi', 'kaydedildi', 'silindi',
+                      'guncellendi', 'olusturuldu', 'kaldirildi'];
+    /* Turkce metinde kelime siniri ARANMAZ (K-018): balonun metni
+       kucultulup aksani katlaniyor, sonra icerik araniyor. */
+    function sadelestir(x) {
+      return (x || '').toLocaleLowerCase('tr')
+        .replace(/ı/g, 'i').replace(/ü/g, 'u').replace(/ö/g, 'o')
+        .replace(/ş/g, 's').replace(/ç/g, 'c').replace(/ğ/g, 'g');
+    }
+    function veriParmakIzi() {
+      var p = [];
+      ['KAYITLAR', 'ARACLAR', 'GIDERLER', 'PARCACILAR'].forEach(function (ad) {
+        try { p.push(ad + ':' + JSON.stringify(window[ad])); } catch (e) { p.push(ad + ':?'); }
+      });
+      return p.join('|');
+    }
+    var toast = document.getElementById('toast');
+    /* Gezinme ve mikrofon dugmeleri elenir: isleri baska bir ekrani
+       acmak, kendileri bir sey "yapmiyor" ve yaptigini da soylemiyor. */
+    var ELE = '[data-git], [data-sesle], [data-arac], [data-kayit], .mic-round, .clear, .akd-bas, .cip';
+    ekranlar.forEach(function (a) {
+      showScreen(a);
+      var dugmeler = Array.prototype.slice.call(
+        document.querySelectorAll('#screen-' + a + ' button'));
+      dugmeler.forEach(function (d) {
+        if (d.disabled || d.closest(ELE) || d.matches(ELE)) return;
+        var etiket = (d.id || (d.className || '').toString().split(' ')[0] || 'button');
+        if (toast) toast.textContent = '';
+        var oncekiVeri = veriParmakIzi();
+        var oncekiEkran = a;
+        var kap = document.getElementById('screen-' + a);
+        var oncekiHtml = kap ? kap.innerHTML : '';
+        try { d.click(); } catch (e) { return; }
+        var balonMetni = sadelestir(toast ? toast.textContent : '');
+        var iddia = EYLEM_SOZU.some(function (s) { return balonMetni.indexOf(s) >= 0; });
+        if (!iddia) { showScreen(a); return; }
+        var yeniEkran = (typeof Ekran !== 'undefined') ? Ekran.adi() : a;
+        var yeniHtml = kap ? kap.innerHTML : '';
+        if (yeniEkran === oncekiEkran && yeniHtml === oncekiHtml &&
+            veriParmakIzi() === oncekiVeri) {
+          ek('SAHTE-EYLEM', a, etiket + ' — balon "' +
+             (toast.textContent || '').slice(0, 40) + '" diyor, hicbir sey degismedi');
+        }
+        showScreen(a);
+      });
+    });
+    if (toast) { toast.textContent = ''; toast.classList.remove('show'); }
     showScreen('home');
   }
 

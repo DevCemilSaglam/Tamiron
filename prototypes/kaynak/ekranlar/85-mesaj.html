@@ -90,6 +90,8 @@
 <script>
 var msjPlaka = null;
 var msjSablonSecili = 'ozet';
+/* Hangi hedefe gidiyor — null ise varsayilan (telefonu olan ilk sira). */
+var msjHedefSecili = null;
 
 var MSJ_SABLON = [
   { k: 'ozet', ad: 'İşin özeti' },
@@ -100,7 +102,13 @@ var MSJ_SABLON = [
 function msjMetinUret(plaka, sablon) {
   var a = aracBul(plaka);
   if (!a) return '';
-  var basi = (a.sahipAd ? a.sahipAd + ' Bey/Hanım, ' : 'Merhaba, ');
+  /* HİTAP HEDEFE GÖRE (A-M2, 04.09). Önceden hep ruhsat sahibine
+     yazıyordu ve firma ruhsatlı araçta mesaj "Demir Nakliyat Ltd.
+     Şti. Bey/Hanım," diye başlıyordu — müşteriye giden İLK cümle bu. */
+  var h = mesajHedefi(plaka, msjHedefSecili);
+  var basi = (h && h.ad)
+    ? (h.kisi ? h.ad + ' Bey/Hanım, ' : h.ad + ', ')
+    : 'Merhaba, ';
   var arac = a.marka + ' ' + a.model + ' (' + plaka + ')';
 
   if (sablon === 'hazir') {
@@ -163,15 +171,30 @@ function msjYazimCiz() {
   var a = aracBul(msjPlaka);
   if (!a) return;
 
+  var hedefler = mesajHedefleri(msjPlaka);
+  var hedef = mesajHedefi(msjPlaka, msjHedefSecili);
+
   document.getElementById('msjKunye').innerHTML =
     '<div class="arac-bas">' + plakaHtml(msjPlaka, 'plate-lg') +
       '<div class="veh-title">' + (a.sahipAd || 'sahip yazılmamış') + '</div>' +
       '<div class="spec-strip"><span class="spec-val">' +
         a.marka + ' ' + a.model + '</span></div>' +
     '</div>' +
-    (a.sahipTel
-      ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '">' +
-          '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' + a.sahipTel + '</a>'
+    /* KİME GİDİYOR, GÖNDERMEDEN ÖNCE GÖRÜNÜR (A-M2). Ruhsat firmanınsa
+       santral numarası ile aracı getiren kişinin numarası ayrı; hangisine
+       gittiği yazmıyorsa usta yanlış kişiye özet gönderir ve bunu
+       ancak karşı taraf sorunca öğrenir. */
+    (hedefler.length > 1
+      ? '<div class="section-label" style="margin-top:14px">Kime gidecek?</div>' +
+        '<div class="cip-grup">' + hedefler.map(function (x) {
+          return '<button class="cip" data-hedef="' + x.anahtar + '" aria-pressed="' +
+            (hedef && hedef.anahtar === x.anahtar) + '"' +
+            (x.tel ? '' : ' disabled') + '>' + x.rol + ': ' +
+            (x.ad || 'ad yok') + (x.tel ? '' : ' (telefon yok)') + '</button>';
+        }).join('') + '</div>'
+      : '') +
+    (hedef && hedef.tel
+      ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
 
   document.getElementById('msjSablon').innerHTML = MSJ_SABLON.map(function (s) {
@@ -181,12 +204,13 @@ function msjYazimCiz() {
 
   /* TELEFON YOKSA GÖNDERİLEMEZ ve bu ÖNCEDEN söylenir — düğmeye
      bastıktan sonra öğrenmek, ustayı boşuna uğraştırır. */
-  document.getElementById('msjUyari').innerHTML = a.sahipTel ? '' :
+  var tel = hedef && hedef.tel;
+  document.getElementById('msjUyari').innerHTML = tel ? '' :
     '<div class="notice warn">' +
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
       '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
       'önce araç kaydına telefon yaz.</span></div>';
-  document.getElementById('msjGonder').disabled = !a.sahipTel;
+  document.getElementById('msjGonder').disabled = !tel;
 }
 
 Ekran.tanim('mesaj', {
@@ -196,6 +220,7 @@ Ekran.tanim('mesaj', {
     if (MESAJ_HEDEF) {
       msjPlaka = MESAJ_HEDEF.plaka;
       msjSablonSecili = MESAJ_HEDEF.sablon || 'ozet';
+      msjHedefSecili = null;      /* yeni müşteri, varsayılan hedefe dön */
       MESAJ_HEDEF = null;
       document.getElementById('msjMetin').value = msjMetinUret(msjPlaka, msjSablonSecili);
     }
@@ -231,9 +256,25 @@ document.addEventListener('click', function (e) {
     sesleAc('mesaj'); return;
   }
 
+  /* Hedef degistirilince metin YENIDEN URETILIR: hitap hedefe gore
+     degisiyor ve eski hitap kalirsa mesaj yanlis kisiye "Bey/Hanim"
+     diye gider. Usta metni ELLE degistirmisse korunur. */
+  var hd = t.getAttribute('data-hedef');
+  if (hd) {
+    var eskiMetin = document.getElementById('msjMetin').value;
+    var uretilmis = msjMetinUret(msjPlaka, msjSablonSecili);
+    msjHedefSecili = hd;
+    if (eskiMetin === uretilmis) {
+      document.getElementById('msjMetin').value = msjMetinUret(msjPlaka, msjSablonSecili);
+    }
+    msjYazimCiz();
+    return;
+  }
+
   if (t.id === 'msjGonder') {
     var a = aracBul(msjPlaka);
-    if (!a || !a.sahipTel) return;
+    var hedef = mesajHedefi(msjPlaka, msjHedefSecili);
+    if (!a || !hedef || !hedef.tel) return;
     /* Şablon "hatırlatma" ise hatırlatma GÖNDERİLDİ sayılır — yedinci
        işin döngüsü burada kapanıyor, yoksa aynı uyarı her gün çıkardı. */
     if (msjSablonSecili === 'hatirlatma') {
@@ -241,8 +282,10 @@ document.addEventListener('click', function (e) {
         if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
       });
     }
-    balon('WhatsApp açılıyor — ' + a.sahipTel + ', mesaj hazır.', false, 3200);
+    balon('WhatsApp açılıyor — ' + hedef.ad + ' · ' + hedef.tel +
+          ', mesaj hazır.', false, 3200);
     msjPlaka = null;
+    msjHedefSecili = null;
     Ekran.ac('home');
   }
 });

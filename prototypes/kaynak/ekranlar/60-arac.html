@@ -128,7 +128,11 @@ Ekran.tanim('arac', {
               '<svg class="ico"><use href="#i-clipboard-list"></use></svg> Açık kayıt</button>'
           : '<button class="btn btn-primary" id="arYeniKayit">' +
               '<svg class="ico"><use href="#i-plus"></use></svg> Kayıt aç</button>') +
-        '<button class="btn btn-ghost" id="arMesaj"' + (a.sahipTel ? '' : ' disabled') + '>' +
+        /* Hedef ruhsat sahibi OLMAYABILIR (A-M2): firma ruhsatli araçta
+           ikinci iletişim aranır. Düğme sahipTel'e bakınca, telefonu
+           yalnız ikinci iletişimde olan araçta kapalı kalıyordu. */
+        '<button class="btn btn-ghost" id="arMesaj"' +
+          (mesajHedefi(a.plaka) && mesajHedefi(a.plaka).tel ? '' : ' disabled') + '>' +
           '<svg class="ico"><use href="#i-message-square"></use></svg> Mesaj</button>' +
         '<button class="btn btn-ghost" id="arSesle">' +
           '<svg class="ico"><use href="#i-mic"></use></svg> Sesle</button>' +

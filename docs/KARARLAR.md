@@ -10,6 +10,87 @@
 
 ---
 
+## K-021 · Ölü uç turu: iki sahte eylem ve bir yalan söyleyen düğme (04.09.2026)
+
+**Karar:** On iki ekranın hepsi tek tek **işletildi** — çizildiğine
+bakılmadı, dokunuldu. Üç bulgu çıktı ve üçü de düzeltildi.
+
+### 21.1 · Muhasebede gider yalnız SESLE eklenebiliyordu
+
+Gider bölümünün tek girişi mikrofondu; boş durumu bile *"Mikrofona
+basıp '2400 TL elektrik faturası ekle' demen yeter"* diyordu.
+
+**Neden ölü uç:** K-015 — Web Speech **Firefox'ta yok** ve **güvenli
+bağlam** ister. Mikrofonu açılmayan bir tarayıcıda gider bölümü
+**tamamen kullanılamıyordu** ve ekran bunu söylemiyordu.
+
+K-014 zaten *"sesle **ve elle** giriş"* diyordu; elle olan hiç
+yazılmamıştı. **Ses bir kısayoldur, tek kapı değil** (K-016).
+
+Elle giriş eklendi: iki alan (ne için · tutar) + Ekle. Tutar alanı
+rakam dışını atıyor — usta *"2.400 TL"* yazınca `parseInt` tek başına
+**2** okuyordu.
+
+### 21.2 · "Onay iste" düğmesi yalan söylüyordu
+
+Düğme *"Onay iste"* diyordu, basınca balon *"Özet gönderildi —
+0532…"* diyordu ve **hiçbir şey gönderilmiyordu.** Mesaj ekranı zaten
+varken oraya bile gitmiyordu.
+
+**Üç ayrı sorun tek düğmede:** düğme ile balon farklı şey söylüyor ·
+sahte bir gönderim rapor ediliyor · gerçek yol varken kullanılmıyor.
+
+Düğme **"Özet gönder"** oldu ve mesaj ekranına özet şablonuyla
+gidiyor. Ad neden değişti: tamirci onay için *"işin içine
+katmayalım"* dedi (S4, K-003); düğmenin gerçekte yaptığı iş ise yedi
+işten **altıncısı** — müşteriye özet göndermek (T-19).
+**Cemil onayına açık (A-M6).**
+
+> **Sessiz bir ölü uçtan pahalı:** bir kez *"gönderildi"* yazısına
+> kanan usta, bir daha **hiçbir** onay yazısına inanmaz.
+
+**Denetime 30. test (SAHTE-EYLEM) eklendi.** Ölçüm: balon tamamlanmış
+bir eylem bildiriyorsa (*gönderildi · eklendi · kaydedildi · silindi ·
+güncellendi*), ya **veri** ya **ekran** değişmiş olmalı; ikisi de aynı
+kaldıysa balon yalan söylüyor. Negatif testle doğrulandı (eski davranış
+geri kondu → 1 bulgu; kaldırılınca → 0).
+
+### 21.3 · A-M2 uygulandı — mesaj ikinci iletişime gidiyor
+
+**Varsayım (Cemil onayına açık):** ikinci iletişim varsa özet ve
+hatırlatma **ona** gider, yoksa ruhsattaki numaraya. Usta mesaj
+ekranından hedefi **değiştirebiliyor** — varsayım bir kilit değil,
+varsayılan. Kime gittiği **göndermeden önce** yazıyor.
+
+**Test bir hata daha buldurdu:** firma ruhsatlı araçta mesaj
+*"Demir Nakliyat Ltd. Şti. **Bey/Hanım**,"* diye başlıyordu — müşteriye
+giden **ilk cümle** bu. Ad firma işaretleri taşıyorsa (`Ltd · Şti ·
+A.Ş. · San · Tic …`) *"Bey/Hanım"* yazılmıyor. Ayrı bir "tüzel kişi"
+alanı **açılmadı**; ada bakılıyor.
+
+⚠️ Firma araması **boşluktan bölüp eşitlikle** yapılıyor (K-018):
+desenle arasaydık *"Astan"* içindeki *"as"* firma sanılırdı. Ölçüldü —
+`firmaMi('Astan Aslan')` = false.
+
+### 21.4 · `Ekran.ac()` zaten açık ekranda sessizce hiçbir şey yapmıyordu
+
+Aynı ekrana ikinci kez gidilince düz `return` ediliyordu. v2'de
+ekranlara **kuyrukta veri bırakılarak** gidiliyor (`MESAJ_HEDEF`,
+`ARAMA_TERIMI`, `RUHSAT_ONDOLGU`, `SESLI_NIYET`): veri bırakılıyor,
+ekran açıldı sanılıyor, `ciz()` koşmadığı için ekran **bir önceki
+müşteriyi göstermeye devam ediyordu** — ve hata mesajı yok.
+
+**Bu, K-017'nin hata sınıfının aynısı.** Orada çözüm sesli işleme özel
+yazılmıştı (`sesleAc` tek giriş noktası) ve **kural taşınmadı**; aynı
+tuzak mesaj ekranında yeniden kuruldu. Artık kökünden kapalı: zaten
+açık ekrana gidilirse **tazelenir**, geçmişe ikinci kez yazılmaz.
+
+> **Buna test yazılmadı, çünkü sınıf artık İMKÂNSIZ.** Yapısal olarak
+> kapatılabilen bir hata için test yazmak, kapıyı kilitleyip yanına
+> bekçi dikmektir. Ölçüldü: geri düğmesi aynı ekranı iki kez saymıyor.
+
+---
+
 ## K-020 · Mikrofon, işin yanında durur — kendi yanında değil (04.09.2026)
 
 **Karar (Cemil, üç madde):**
@@ -644,3 +725,5 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi (K-019.6) | Cemil |
 | ~~A-M4~~ | **KAPANDI (K-020.3)** — ekran görüntüsü gösterdi ki başlık bildirimi örtüyordu; yapışkanlık kaldırıldı | — |
 | **A-M5** | Arama mikrofonu Cemil yalnız **araçlar** için istedi; **dört listeye birden** kondu. Kalsın mı? | Cemil |
+| ~~A-M2~~ | **UYGULANDI (K-021.3)** — ikinci iletişim varsa mesaj ona gider, usta hedefi değiştirebiliyor | Onay bekliyor |
+| **A-M6** | *"Onay iste"* düğmesi **"Özet gönder"** oldu — ad doğru mu? | Cemil |

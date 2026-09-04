@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-04 10:34
+  Üretim: 2026-09-04 20:22
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2185,8 +2185,19 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <button class="btn btn-ghost" data-git="parca-sor">
       <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
     </button>
-    <button class="btn btn-ghost" id="kOnayIste">
-      <svg class="ico"><use href="#i-message-square"></use></svg> Onay iste
+    <!-- ⚠️ 04.09 — "Onay iste" -> "Özet gönder" (ölü uç turu).
+         Düğme "Onay iste" diyordu, bastığında balon "Özet gönderildi"
+         diyordu ve GERÇEKTE HİÇBİR ŞEY GÖNDERİLMİYORDU. Üç ayrı sorun
+         tek düğmede: düğme ile balon farklı şey söylüyor, sahte bir
+         gönderim rapor ediliyor, ve mesaj ekranı ZATEN VARKEN oraya
+         gidilmiyor.
+
+         Ad neden değişti: tamirci onay için "işin içine katmayalım"
+         dedi (S4, K-003). Düğmenin gerçekte yaptığı iş ise yedi işten
+         altıncısı — MÜŞTERİYE ÖZET GÖNDERMEK (T-19). Ad artık yapılan
+         işi söylüyor. Cemil onayına açık (A-M6). -->
+    <button class="btn btn-ghost" id="kOzetGonder">
+      <svg class="ico"><use href="#i-message-square"></use></svg> Özet gönder
     </button>
   </div>
 
@@ -2654,6 +2665,36 @@ alanları ::before ile büyür. Ölçüm (30.08,
       <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
+  <!-- ⚠️ 04.09 — GİDER ELLE DE GİRİLEBİLİYOR (ölü uç turu).
+       Bu bölümün TEK girişi mikrofondu ve boş durumu bile "Mikrofona
+       basıp '2400 TL elektrik faturası ekle' demen yeter" diyordu.
+       Oysa K-015: Web Speech Firefox'ta YOK ve güvenli bağlam ister —
+       mikrofon açılmayan bir tarayıcıda gider bölümü TAMAMEN
+       kullanılamıyordu ve ekran bunu söylemiyordu.
+
+       K-014 zaten "sesle VE ELLE giriş" diyordu; elle olan yazılmamıştı.
+       Ses bir kısayoldur, tek kapı değil (K-016). -->
+  <div class="btn-row">
+    <button class="btn btn-ghost" id="muhGiderEkle">
+      <svg class="ico"><use href="#i-plus"></use></svg> Gider ekle
+    </button>
+  </div>
+
+  <div class="card" id="muhGiderForm" hidden>
+    <div class="field">
+      <label for="muhGiderAd">Ne için</label>
+      <input id="muhGiderAd" placeholder="ör. elektrik faturası" autocomplete="off" />
+    </div>
+    <div class="field">
+      <label for="muhGiderTutar">Tutar (₺)</label>
+      <input id="muhGiderTutar" inputmode="numeric" placeholder="0" autocomplete="off" />
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary" id="muhGiderKaydet">Ekle</button>
+      <button class="btn btn-ghost" id="muhGiderVazgec">Vazgeç</button>
+    </div>
+  </div>
+
   <div id="muhGiderler"></div>
 
   <div class="section-label">
@@ -2895,7 +2936,20 @@ var Ekran = (function () {
   }
 
   function ac(ad) {
-    if (ad === acik) return;
+    /* ⚠️ 04.09 — ZATEN ACIK EKRAN SESSIZCE CIZILMIYORDU.
+       Eskiden burada duz "return" vardı: aynı ekrana ikinci kez
+       gidilince hiçbir şey olmuyordu. Sorun, v2'de ekranlara
+       KUYRUKTA VERI birakilarak gidilmesi: MESAJ_HEDEF, ARAMA_TERIMI,
+       RUHSAT_ONDOLGU, SESLI_NIYET. Veri bırakılıyor, ekran açılıyor
+       sanılıyor, ama ciz() koşmadığı için ekran BIR ONCEKI musteriyi
+       gostermeye devam ediyordu — ve hata mesajı yok.
+
+       Aynı tuzağa K-017'de sesli işlemle düşülmüştü ve orada tek
+       giriş noktası (sesleAc) yazılarak çözülmüştü. Çözüm oraya özel
+       kalınca kural taşınmadı; burada kökünden kapatılıyor:
+       zaten açık ekrana gidilirse EKRAN TAZELENIR, geçmişe ikinci
+       kez yazılmaz (yoksa geri düğmesi aynı ekranda sayar). */
+    if (ad === acik) { tazele(); return; }
     if (acik) gecmis.push(acik);
     ileriYigin.length = 0;      /* yeni yol acildi — ileri gecmisi olur */
     goster(ad);
@@ -3544,6 +3598,62 @@ function fiyatiBekleyen(k) {
   return (k.satirlar || []).some(function (s) {
     return s.tip === 'parca' && s.kimGetirdi === 'tamirci' && !s.fiyat;
   });
+}
+
+/* ---- MESAJ KİME GİDER (A-M2, 04.09) ----
+   Ruhsat sahibi FİRMA olabilir (K-019.3) ve firmanın numarası
+   santraldir. Özet ya da bakım hatırlatması santrale gitmez — aracı
+   getiren kişiye gider.
+
+   **Varsayım — Cemil onayına açık (A-M2):** ikinci iletişim varsa
+   mesaj ONA gider, yoksa ruhsattaki numaraya. Usta yine de mesaj
+   ekranından hedefi değiştirebiliyor; varsayım bir KİLİT değil,
+   varsayılan.
+
+   ⚠️ "BEY/HANIM" HERKESE YAZILMAZ. Firma adına hitap edilince mesaj
+   "Demir Nakliyat Ltd. Şti. Bey/Hanım," diye başlıyordu — müşteriye
+   giden ilk cümle bu ve ciddiyetsiz görünüyor. Firma olup olmadığı
+   ada bakılarak anlaşılıyor; ayrı bir alan tutmuyoruz (K-012'nin
+   kuralı: ekran gerekiyorsa tablo/alan gerekmiyor olabilir). */
+var FIRMA_ISARETLERI = ['ltd', 'ltd.', 'sti', 'sti.', 'şti', 'şti.',
+  'a.s.', 'a.ş.', 'as', 'aş', 'anonim', 'limited', 'san', 'san.',
+  'tic', 'tic.', 'sirketi', 'şirketi', 'kollektif', 'komandit'];
+
+/* ⚠️ Türkçede kelime sınırı ARANMAZ (K-018): ad boşluktan BÖLÜNÜP
+   her parça eşitlikle karşılaştırılıyor. Desenle arasaydık "Astan"
+   içindeki "as" firma sanılırdı. */
+function firmaMi(ad) {
+  var parcalar = norm(ad).split(/\s+/);
+  for (var i = 0; i < parcalar.length; i++) {
+    if (FIRMA_ISARETLERI.indexOf(parcalar[i]) >= 0) return true;
+  }
+  return false;
+}
+
+function mesajHedefleri(plaka) {
+  var a = aracBul(plaka);
+  if (!a) return [];
+  var liste = [];
+  if (a.iletisimTel || a.iletisimAd) {
+    liste.push({ anahtar: 'iletisim', ad: a.iletisimAd || 'iletişim',
+                 tel: a.iletisimTel || '', rol: 'İletişim',
+                 kisi: !firmaMi(a.iletisimAd) });
+  }
+  liste.push({ anahtar: 'sahip', ad: a.sahipAd || '', tel: a.sahipTel || '',
+               rol: 'Ruhsat sahibi', kisi: !firmaMi(a.sahipAd) });
+  return liste;
+}
+
+/* Varsayılan hedef: telefonu OLAN ilk sıradaki. Telefonsuz bir hedefi
+   varsayılan yapmak, ustayı "neden gönderemiyorum"a düşürüyordu. */
+function mesajHedefi(plaka, anahtar) {
+  var h = mesajHedefleri(plaka);
+  if (!h.length) return null;
+  if (anahtar) {
+    for (var i = 0; i < h.length; i++) if (h[i].anahtar === anahtar) return h[i];
+  }
+  for (var j = 0; j < h.length; j++) if (h[j].tel) return h[j];
+  return h[0];
 }
 
 /* ---- MÜŞTERİ: ayrı tablo değil, ARAÇTAN TÜRETİLİR ----
@@ -4894,11 +5004,21 @@ document.addEventListener('click', function (e) {
     return;
   }
   /* K-003: onay bir AKIŞ değil, bir EYLEM. Kayıt beklemeye geçmez,
-     durum değişmez — mesaj gider, iş yürümeye devam eder. */
-  if (t.id === 'kOnayIste') {
-    var a = aracBul(k.plaka);
-    balon((a && a.sahipTel) ? 'Özet gönderildi — ' + a.sahipTel
-                            : 'Telefon yok; özet gönderilemedi.', false, 3000);
+     durum değişmez — mesaj gider, iş yürümeye devam eder.
+
+     ⚠️ ARTIK GERÇEKTEN GÖNDERİYOR: mesaj ekranına özet şablonuyla
+     gidiyor. Önceden yalnız balon çıkarıyordu ve "gönderildi" diyordu;
+     hiçbir şey gönderilmiyordu. Bir kez böyle kanan usta, bir daha
+     hiçbir "gönderildi" yazısına inanmaz. */
+  if (t.id === 'kOzetGonder') {
+    var hedef = mesajHedefi(k.plaka);
+    if (!hedef || !hedef.tel) {
+      balon('Telefon yok — özet gönderilemez. Araç kaydına telefon ekle.', false, 3200);
+      return;
+    }
+    MESAJ_HEDEF = { plaka: k.plaka, sablon: 'ozet' };
+    Ekran.ac('mesaj');
+    return;
   }
 
   var sil = t.getAttribute('data-satir-sil');
@@ -5195,7 +5315,11 @@ Ekran.tanim('arac', {
               '<svg class="ico"><use href="#i-clipboard-list"></use></svg> Açık kayıt</button>'
           : '<button class="btn btn-primary" id="arYeniKayit">' +
               '<svg class="ico"><use href="#i-plus"></use></svg> Kayıt aç</button>') +
-        '<button class="btn btn-ghost" id="arMesaj"' + (a.sahipTel ? '' : ' disabled') + '>' +
+        /* Hedef ruhsat sahibi OLMAYABILIR (A-M2): firma ruhsatli araçta
+           ikinci iletişim aranır. Düğme sahipTel'e bakınca, telefonu
+           yalnız ikinci iletişimde olan araçta kapalı kalıyordu. */
+        '<button class="btn btn-ghost" id="arMesaj"' +
+          (mesajHedefi(a.plaka) && mesajHedefi(a.plaka).tel ? '' : ' disabled') + '>' +
           '<svg class="ico"><use href="#i-message-square"></use></svg> Mesaj</button>' +
         '<button class="btn btn-ghost" id="arSesle">' +
           '<svg class="ico"><use href="#i-mic"></use></svg> Sesle</button>' +
@@ -5476,6 +5600,8 @@ document.addEventListener('input', function (e) {
 (function () {
 var msjPlaka = null;
 var msjSablonSecili = 'ozet';
+/* Hangi hedefe gidiyor — null ise varsayilan (telefonu olan ilk sira). */
+var msjHedefSecili = null;
 
 var MSJ_SABLON = [
   { k: 'ozet', ad: 'İşin özeti' },
@@ -5486,7 +5612,13 @@ var MSJ_SABLON = [
 function msjMetinUret(plaka, sablon) {
   var a = aracBul(plaka);
   if (!a) return '';
-  var basi = (a.sahipAd ? a.sahipAd + ' Bey/Hanım, ' : 'Merhaba, ');
+  /* HİTAP HEDEFE GÖRE (A-M2, 04.09). Önceden hep ruhsat sahibine
+     yazıyordu ve firma ruhsatlı araçta mesaj "Demir Nakliyat Ltd.
+     Şti. Bey/Hanım," diye başlıyordu — müşteriye giden İLK cümle bu. */
+  var h = mesajHedefi(plaka, msjHedefSecili);
+  var basi = (h && h.ad)
+    ? (h.kisi ? h.ad + ' Bey/Hanım, ' : h.ad + ', ')
+    : 'Merhaba, ';
   var arac = a.marka + ' ' + a.model + ' (' + plaka + ')';
 
   if (sablon === 'hazir') {
@@ -5549,15 +5681,30 @@ function msjYazimCiz() {
   var a = aracBul(msjPlaka);
   if (!a) return;
 
+  var hedefler = mesajHedefleri(msjPlaka);
+  var hedef = mesajHedefi(msjPlaka, msjHedefSecili);
+
   document.getElementById('msjKunye').innerHTML =
     '<div class="arac-bas">' + plakaHtml(msjPlaka, 'plate-lg') +
       '<div class="veh-title">' + (a.sahipAd || 'sahip yazılmamış') + '</div>' +
       '<div class="spec-strip"><span class="spec-val">' +
         a.marka + ' ' + a.model + '</span></div>' +
     '</div>' +
-    (a.sahipTel
-      ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '">' +
-          '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' + a.sahipTel + '</a>'
+    /* KİME GİDİYOR, GÖNDERMEDEN ÖNCE GÖRÜNÜR (A-M2). Ruhsat firmanınsa
+       santral numarası ile aracı getiren kişinin numarası ayrı; hangisine
+       gittiği yazmıyorsa usta yanlış kişiye özet gönderir ve bunu
+       ancak karşı taraf sorunca öğrenir. */
+    (hedefler.length > 1
+      ? '<div class="section-label" style="margin-top:14px">Kime gidecek?</div>' +
+        '<div class="cip-grup">' + hedefler.map(function (x) {
+          return '<button class="cip" data-hedef="' + x.anahtar + '" aria-pressed="' +
+            (hedef && hedef.anahtar === x.anahtar) + '"' +
+            (x.tel ? '' : ' disabled') + '>' + x.rol + ': ' +
+            (x.ad || 'ad yok') + (x.tel ? '' : ' (telefon yok)') + '</button>';
+        }).join('') + '</div>'
+      : '') +
+    (hedef && hedef.tel
+      ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
 
   document.getElementById('msjSablon').innerHTML = MSJ_SABLON.map(function (s) {
@@ -5567,12 +5714,13 @@ function msjYazimCiz() {
 
   /* TELEFON YOKSA GÖNDERİLEMEZ ve bu ÖNCEDEN söylenir — düğmeye
      bastıktan sonra öğrenmek, ustayı boşuna uğraştırır. */
-  document.getElementById('msjUyari').innerHTML = a.sahipTel ? '' :
+  var tel = hedef && hedef.tel;
+  document.getElementById('msjUyari').innerHTML = tel ? '' :
     '<div class="notice warn">' +
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
       '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
       'önce araç kaydına telefon yaz.</span></div>';
-  document.getElementById('msjGonder').disabled = !a.sahipTel;
+  document.getElementById('msjGonder').disabled = !tel;
 }
 
 Ekran.tanim('mesaj', {
@@ -5582,6 +5730,7 @@ Ekran.tanim('mesaj', {
     if (MESAJ_HEDEF) {
       msjPlaka = MESAJ_HEDEF.plaka;
       msjSablonSecili = MESAJ_HEDEF.sablon || 'ozet';
+      msjHedefSecili = null;      /* yeni müşteri, varsayılan hedefe dön */
       MESAJ_HEDEF = null;
       document.getElementById('msjMetin').value = msjMetinUret(msjPlaka, msjSablonSecili);
     }
@@ -5617,9 +5766,25 @@ document.addEventListener('click', function (e) {
     sesleAc('mesaj'); return;
   }
 
+  /* Hedef degistirilince metin YENIDEN URETILIR: hitap hedefe gore
+     degisiyor ve eski hitap kalirsa mesaj yanlis kisiye "Bey/Hanim"
+     diye gider. Usta metni ELLE degistirmisse korunur. */
+  var hd = t.getAttribute('data-hedef');
+  if (hd) {
+    var eskiMetin = document.getElementById('msjMetin').value;
+    var uretilmis = msjMetinUret(msjPlaka, msjSablonSecili);
+    msjHedefSecili = hd;
+    if (eskiMetin === uretilmis) {
+      document.getElementById('msjMetin').value = msjMetinUret(msjPlaka, msjSablonSecili);
+    }
+    msjYazimCiz();
+    return;
+  }
+
   if (t.id === 'msjGonder') {
     var a = aracBul(msjPlaka);
-    if (!a || !a.sahipTel) return;
+    var hedef = mesajHedefi(msjPlaka, msjHedefSecili);
+    if (!a || !hedef || !hedef.tel) return;
     /* Şablon "hatırlatma" ise hatırlatma GÖNDERİLDİ sayılır — yedinci
        işin döngüsü burada kapanıyor, yoksa aynı uyarı her gün çıkardı. */
     if (msjSablonSecili === 'hatirlatma') {
@@ -5627,8 +5792,10 @@ document.addEventListener('click', function (e) {
         if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
       });
     }
-    balon('WhatsApp açılıyor — ' + a.sahipTel + ', mesaj hazır.', false, 3200);
+    balon('WhatsApp açılıyor — ' + hedef.ad + ' · ' + hedef.tel +
+          ', mesaj hazır.', false, 3200);
     msjPlaka = null;
+    msjHedefSecili = null;
     Ekran.ac('home');
   }
 });
@@ -5728,6 +5895,10 @@ var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almad
 
 Ekran.tanim('muhasebe', {
   ciz: function () {
+    /* Ekran her açıldığında form KAPALI başlar. Açık bırakılsaydı
+       usta bir sonraki gelişinde yarım bir formla karşılaşırdı ve
+       "ben bunu doldurmuş muydum" sorusu doğardı. */
+    if (document.getElementById('muhGiderForm')) muhFormGoster(false);
     var bugun = bugunTahsilat();
     document.getElementById('muhBugun').innerHTML =
       '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
@@ -5807,7 +5978,8 @@ Ekran.tanim('muhasebe', {
             tutar(giderToplami()) + ' ₺</span></div>' +
         '</div>'
       : bosDurumHtml('i-receipt', 'Gider yazılmamış',
-          'Mikrofona basıp "2400 TL elektrik faturası ekle" demen yeter.');
+          '"Gider ekle"ye dokun ya da mikrofona basıp ' +
+          '"2400 TL elektrik faturası ekle" de.');
 
     /* KAPSAM AÇIK OLDUĞU İÇİN EKRANDA DA YAZIYOR. Bir ekranın
        "burası yarım" demesi, yarım olduğunu saklamasından iyidir. */
@@ -5822,8 +5994,44 @@ Ekran.tanim('muhasebe', {
   }
 });
 
+/* Formu acip kapatmak EKRANI TAZELEMEZ: tazele() ekranin butun
+   govdesini yeniden yaziyor ve yarim yazilmis gider ucup gidiyordu. */
+function muhFormGoster(acik) {
+  var f = document.getElementById('muhGiderForm');
+  f.hidden = !acik;
+  document.getElementById('muhGiderEkle').hidden = acik;
+  if (acik) document.getElementById('muhGiderAd').focus();
+  else {
+    document.getElementById('muhGiderAd').value = '';
+    document.getElementById('muhGiderTutar').value = '';
+  }
+}
+
 document.addEventListener('click', function (e) {
+  if (Ekran.adi() !== 'muhasebe') return;
   if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
+
+  if (e.target.closest('#muhGiderEkle')) { muhFormGoster(true); return; }
+  if (e.target.closest('#muhGiderVazgec')) { muhFormGoster(false); return; }
+
+  if (e.target.closest('#muhGiderKaydet')) {
+    var ad = (document.getElementById('muhGiderAd').value || '').trim();
+    /* Rakam disindaki her sey atilir: usta "2.400 TL" ya da "2400 tl"
+       yazabilir. parseInt tek basina "2.400"u 2 okurdu. */
+    var tut = parseInt(String(document.getElementById('muhGiderTutar').value)
+                .replace(/[^0-9]/g, ''), 10) || 0;
+    if (!ad || !tut) {
+      balon('Gider için hem açıklama hem tutar gerekiyor.', false, 2600);
+      return;
+    }
+    GIDERLER.push({ id: (GIDERLER.length ? Math.max.apply(null,
+      GIDERLER.map(function (g) { return g.id; })) : 0) + 1,
+      tarih: bugunMetin(), aciklama: ad, tutar: tut, tur: 'elle' });
+    balon(ad + ' — ' + tutar(tut) + ' ₺ eklendi.', false, 2600);
+    muhFormGoster(false);
+    Ekran.tazele();
+    return;
+  }
 
   var gs = e.target.closest('[data-gider-sil]');
   if (gs) {
@@ -5906,7 +6114,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>fa2945ba</b><br>' +
+      'Sürüm <b>cb037764</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

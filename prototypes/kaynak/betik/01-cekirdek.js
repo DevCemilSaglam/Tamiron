@@ -93,7 +93,20 @@ var Ekran = (function () {
   }
 
   function ac(ad) {
-    if (ad === acik) return;
+    /* ⚠️ 04.09 — ZATEN ACIK EKRAN SESSIZCE CIZILMIYORDU.
+       Eskiden burada duz "return" vardı: aynı ekrana ikinci kez
+       gidilince hiçbir şey olmuyordu. Sorun, v2'de ekranlara
+       KUYRUKTA VERI birakilarak gidilmesi: MESAJ_HEDEF, ARAMA_TERIMI,
+       RUHSAT_ONDOLGU, SESLI_NIYET. Veri bırakılıyor, ekran açılıyor
+       sanılıyor, ama ciz() koşmadığı için ekran BIR ONCEKI musteriyi
+       gostermeye devam ediyordu — ve hata mesajı yok.
+
+       Aynı tuzağa K-017'de sesli işlemle düşülmüştü ve orada tek
+       giriş noktası (sesleAc) yazılarak çözülmüştü. Çözüm oraya özel
+       kalınca kural taşınmadı; burada kökünden kapatılıyor:
+       zaten açık ekrana gidilirse EKRAN TAZELENIR, geçmişe ikinci
+       kez yazılmaz (yoksa geri düğmesi aynı ekranda sayar). */
+    if (ad === acik) { tazele(); return; }
     if (acik) gecmis.push(acik);
     ileriYigin.length = 0;      /* yeni yol acildi — ileri gecmisi olur */
     goster(ad);

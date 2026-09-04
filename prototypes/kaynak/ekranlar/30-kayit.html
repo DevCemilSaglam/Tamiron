@@ -64,8 +64,19 @@
     <button class="btn btn-ghost" data-git="parca-sor">
       <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
     </button>
-    <button class="btn btn-ghost" id="kOnayIste">
-      <svg class="ico"><use href="#i-message-square"></use></svg> Onay iste
+    <!-- ⚠️ 04.09 — "Onay iste" -> "Özet gönder" (ölü uç turu).
+         Düğme "Onay iste" diyordu, bastığında balon "Özet gönderildi"
+         diyordu ve GERÇEKTE HİÇBİR ŞEY GÖNDERİLMİYORDU. Üç ayrı sorun
+         tek düğmede: düğme ile balon farklı şey söylüyor, sahte bir
+         gönderim rapor ediliyor, ve mesaj ekranı ZATEN VARKEN oraya
+         gidilmiyor.
+
+         Ad neden değişti: tamirci onay için "işin içine katmayalım"
+         dedi (S4, K-003). Düğmenin gerçekte yaptığı iş ise yedi işten
+         altıncısı — MÜŞTERİYE ÖZET GÖNDERMEK (T-19). Ad artık yapılan
+         işi söylüyor. Cemil onayına açık (A-M6). -->
+    <button class="btn btn-ghost" id="kOzetGonder">
+      <svg class="ico"><use href="#i-message-square"></use></svg> Özet gönder
     </button>
   </div>
 
@@ -195,11 +206,21 @@ document.addEventListener('click', function (e) {
     return;
   }
   /* K-003: onay bir AKIŞ değil, bir EYLEM. Kayıt beklemeye geçmez,
-     durum değişmez — mesaj gider, iş yürümeye devam eder. */
-  if (t.id === 'kOnayIste') {
-    var a = aracBul(k.plaka);
-    balon((a && a.sahipTel) ? 'Özet gönderildi — ' + a.sahipTel
-                            : 'Telefon yok; özet gönderilemedi.', false, 3000);
+     durum değişmez — mesaj gider, iş yürümeye devam eder.
+
+     ⚠️ ARTIK GERÇEKTEN GÖNDERİYOR: mesaj ekranına özet şablonuyla
+     gidiyor. Önceden yalnız balon çıkarıyordu ve "gönderildi" diyordu;
+     hiçbir şey gönderilmiyordu. Bir kez böyle kanan usta, bir daha
+     hiçbir "gönderildi" yazısına inanmaz. */
+  if (t.id === 'kOzetGonder') {
+    var hedef = mesajHedefi(k.plaka);
+    if (!hedef || !hedef.tel) {
+      balon('Telefon yok — özet gönderilemez. Araç kaydına telefon ekle.', false, 3200);
+      return;
+    }
+    MESAJ_HEDEF = { plaka: k.plaka, sablon: 'ozet' };
+    Ekran.ac('mesaj');
+    return;
   }
 
   var sil = t.getAttribute('data-satir-sil');
