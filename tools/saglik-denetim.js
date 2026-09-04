@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 23 test.
+/* Tamiron prototip saglik denetimi — 28 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -534,6 +534,42 @@ function stilMetni() {
       if (!s) return;
       var eylem = s.querySelectorAll('button, a[href], input, textarea, [data-git], [role="button"]');
       if (!eylem.length) ek('OLU-UC', a, 'ekranda hicbir eylem yok');
+    });
+    showScreen('home');
+  }
+
+  /* 28) ACILMAYAN BOLUM — akordiyon ciziliyor ama ACILMIYOR (04.09.2026)
+     27. testin kucuk kardesi. OLU-UC "ekranda hic eylem yok" diyor;
+     bu test "eylem VAR ama HICBIR SEY yapmiyor" diyor.
+
+     Neden ayri bir hata sinifi: akordiyon KAPALI aciliyor. Kapali bir
+     bolum, calismayan bir bolumden GORSEL OLARAK AYIRT EDILEMEZ —
+     ikisi de ayni sekilde durur. aria-controls yanlis yazilsa, govde
+     id'si degisse ya da olay dinleyicisi baglanmasa ekran yine
+     "dogru" gorunur ve ruhsat bilgileri kimsenin ulasamadigi bir
+     yerde kalir. Ustanin bunu fark etmesinin tek yolu dokunmak.
+
+     NEGATIF DOGRULAMA (04.09): aria-controls degeri elle bozuldu
+     (arRuhsat -> arRuhsatX) ve test 1 bulgu verdi; geri alininca
+     0 bulguya dondu. Delikli denetim, denetimsiz olmaktan kotudur. */
+  {
+    ekranlar.forEach(function (a) {
+      showScreen(a);
+      var basliklar = document.querySelectorAll('#screen-' + a + ' .akd-bas');
+      for (var i = 0; i < basliklar.length; i++) {
+        var bas = basliklar[i];
+        var hedef = bas.getAttribute('aria-controls');
+        var govde = hedef ? document.getElementById(hedef) : null;
+        if (!govde) { ek('ACILMAYAN-BOLUM', a, (hedef || '(aria-controls yok)') + ' — govde yok'); continue; }
+        bas.click();
+        var acildi = !govde.hidden && govde.offsetHeight > 0;
+        if (!acildi) { ek('ACILMAYAN-BOLUM', a, hedef + ' — dokununca acilmiyor'); }
+        if (bas.getAttribute('aria-expanded') !== 'true') {
+          ek('ACILMAYAN-BOLUM', a, hedef + ' — aria-expanded guncellenmiyor');
+        }
+        bas.click();                       /* geri kapat: ekran denetim sonrasi bozulmasin */
+        if (acildi && !govde.hidden) { ek('ACILMAYAN-BOLUM', a, hedef + ' — bir daha kapanmiyor'); }
+      }
     });
     showScreen('home');
   }
