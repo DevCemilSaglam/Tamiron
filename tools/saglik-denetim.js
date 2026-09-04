@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 31 test.
+/* Tamiron prototip saglik denetimi — 32 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -771,6 +771,39 @@ function stilMetni() {
     window.SESLI_NIYET = sesYedekNiyet;
     window.ACIK_KAYIT = sesYedekKayit;
   }
+
+  /* 32) KIRPILAN METIN — overflow:hidden bir kutuda icerik SESSIZCE
+     kesiliyor (04.09.2026).
+
+     20. test (IC-TASMA) overflowX'i 'visible' OLMAYAN kutulari
+     ATLIYOR — dogru, cunku onlar tasmiyor. Ama tasmamalarinin sebebi
+     icerigi KESMELERI. Kesilen sey metinse kullanici eksik bir kelime
+     goruyor ve bunu bilmiyor.
+
+     Yasanan: arac ekranindaki uc dugme 375 px'e gore olculmustu; 320
+     px'te "Kayit ac" 96 px istiyor, kutu 89 px. overflow:hidden oldugu
+     icin ne tasma testi ne de goz yakaladi — dugme "Kayit a" yaziyordu.
+
+     Kasitli kisaltma AYRI: text-overflow:ellipsis konmussa tasarimci
+     bilerek kisaltmis, uc nokta da kullaniciya bunu SOYLUYOR. */
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' *').forEach(function (el) {
+      if (!el.clientWidth) return;
+      var c = getComputedStyle(el);
+      if (c.overflowX === 'visible') return;                /* IC-TASMA'nin isi */
+      if (c.overflowX === 'auto' || c.overflowX === 'scroll') return;  /* kaydirilabilir */
+      if (c.textOverflow === 'ellipsis') return;            /* kasitli kisaltma */
+      if (el.scrollWidth <= el.clientWidth + 1) return;
+      /* Yalniz METIN tasiyan kutular: bos bir kap kirpilirsa gorunur
+         bir sey kaybolmuyor. */
+      if (!(el.textContent || '').trim()) return;
+      ek('KIRPILAN-METIN', a,
+         ((el.className || '').toString().split(' ')[0] || el.tagName) +
+         ' "' + (el.textContent || '').trim().slice(0, 20) + '" ' +
+         el.scrollWidth + '>' + el.clientWidth);
+    });
+  });
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */

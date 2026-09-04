@@ -25,7 +25,7 @@ Başlangıç: 04.09.2026 · son commit `4a6dfe5`
 | 3 | **Muhasebe kapsamı (MUH)** — üç seçeneği ölç, öneri + karar taslağı | **BİTTİ** | `arastirma/MUHASEBE-KAPSAMI.md` + K-022 taslağı. Öneri B (kasa+gider), cari hesap kapsam dışı. Parça alışı yeni alan istemeden eklendi (7.160 ₺ ölçüldü) + karar bütçesi kısıtı önerildi |
 | 4 | **Müşteri özeti (T-19/20/21)** — WhatsApp'tan gidecek özet | **BİTTİ** | `ozet` ekranı: müşterinin gördüğü salt-okunur sayfa. Mesaj artık liste değil **link** taşıyor. Ustanın önizlemesi mesaj ekranından (K-023) |
 | 5 | **Sesli işlem kapsam denetimi** — K-016 gerçekten tutuyor mu | **BİTTİ** | Tutuyor (9/9 işin elle yolu var) ama **denetimin kendisi bozuktu**: ölçtüğü durumu kirletiyordu. Düzeltilince özet ekranında gizli ölü uç çıktı. K-018 üçüncü kez (31. test) (K-024) |
-| 6 | **Dar ve geniş ekran ölçümü** — 320 px ve 430 px | SIRADA | |
+| 6 | **Dar ve geniş ekran ölçümü** — 320 px ve 430 px | **BİTTİ** | 320'de düğme metni **sessizce kırpılıyordu** (`overflow:hidden` taşma testinden gizliyordu). Dar ekranda ikon kalktı; 32. test eklendi. Üç genişlikte de 0 bulgu (K-025) |
 | 7 | **Belge tazeleme** — HANDOFF · EKRANLAR · IS-AKISI + dokunuş sayımı | SIRADA | |
 
 ---

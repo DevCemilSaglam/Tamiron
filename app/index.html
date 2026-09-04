@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-04 20:50
+  Üretim: 2026-09-04 20:56
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -606,10 +606,26 @@ her butonu ayri satira dusuruyordu. */
    yazı buna göre kısıldı; 48 px dokunma hedefi korunuyor. */
 .btn-row.tek-satir { flex-wrap: nowrap; gap: 8px; }
 .btn-row.tek-satir .btn {
-  flex: 1 1 0; min-width: 0; padding: 14px 10px; gap: 6px;
-  font-size: var(--tip-sm); overflow: hidden;
+  flex: 1 1 0; min-width: 0; padding: 14px 8px; gap: 5px;
+  font-size: var(--tip-sm);
 }
 .btn-row.tek-satir .btn .ico { flex: none; }
+
+/* ⚠️ 04.09 — DAR EKRANDA İKON KALKAR, YAZI KALIR.
+   İlk yazımda burada `overflow: hidden` vardı ve 320 px'te "Açık kayıt"
+   102 px isteyip 89 px'lik kutuya SESSİZCE kırpılıyordu: düğme
+   "Açık kay" yazıyordu. Ne taşma testi görüyordu (kutu taşmıyor,
+   KESİYOR) ne de göz.
+
+   overflow:hidden KALDIRILDI — bir daha olursa taşma testi görsün.
+   Sığdırma işini ikon yapıyor: dar ekranda anlamı YAZI taşır, ikon
+   süstür. 24 px ikon + 5 px boşluk = 29 px, sorunu fazlasıyla çözer.
+
+   Ölçüldü (320 px): ikonlu 102 > 89 kırpılıyordu; ikonsuz 73 < 89. */
+@media (max-width: 359px) {
+  .btn-row.tek-satir .btn .ico { display: none; }
+  .btn-row.tek-satir .btn { padding: 14px 6px; }
+}
 
 /* ---------- ARAÇ KARTI ---------- */
 /* ---------- PLAKA — TEK BİLEŞEN,
@@ -6459,7 +6475,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>62ff6da3</b><br>' +
+      'Sürüm <b>150c0c9f</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

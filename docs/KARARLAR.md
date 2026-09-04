@@ -10,6 +10,53 @@
 
 ---
 
+## K-025 · Ölçüm üç genişlikte yapılır; kırpılan metin taşma sayılmaz (04.09.2026)
+
+**Karar:** Sağlık denetimi bundan sonra **320 · 375 · 430 px**'te koşulur.
+Tek genişlikte ölçmek, o genişlikte doğru olan bir tasarımı *"doğru"* sanmaktır.
+
+| Genişlik | Ne temsil ediyor | Sonuç (04.09) |
+|---|---|---|
+| **320 px** | Küçük/eski telefon — en dar gerçek cihaz | 0 bulgu *(düzeltmeden sonra)* |
+| **375 px** | Referans ölçü, bugüne kadarki tek ölçüm | 0 bulgu |
+| **430 px** | Büyük telefon | 0 bulgu |
+
+### 25.1 · Bulunan hata: 320 px'te düğme metni SESSİZCE kırpılıyordu
+
+Araç ekranının üç düğmesi (K-019.4) **375 px'e göre** ölçülmüştü. 320 px'te
+*"Açık kayıt"* **102 px** istiyor, kutu **89 px**.
+
+**Hiçbir test görmedi ve göz de görmedi.** Sebebi kendi yazdığım
+`overflow: hidden`: kutu taşmıyordu, **kesiyordu.** 20. test (IC-TASMA)
+`overflowX !== 'visible'` olan kutuları **kasten atlıyor** — doğru, çünkü
+onlar taşmıyor. Taşmamalarının sebebi içeriği kesmeleri.
+
+Düğme *"Açık kay"* yazıyordu.
+
+**Düzeltme — dar ekranda İKON kalkar, YAZI kalır.** Anlamı yazı taşır; ikon
+süstür. 24 px ikon + 5 px boşluk = 29 px, sorunu fazlasıyla çözüyor.
+`overflow: hidden` de **kaldırıldı** — bir daha olursa taşma testi görsün.
+
+**Ölçüldü:** 320 px ikonlu 102 > 89 (kırpık) → ikonsuz **89 = 89** ·
+375 px **107 = 107** · 430 px **125 = 125**.
+
+### 25.2 · 32. test: KIRPILAN-METIN
+
+> **Kesilen metin, taşan metinden tehlikelidir:** taşan görünür, kesilen
+> görünmez. Kullanıcı eksik bir kelime okur ve eksik olduğunu bilmez.
+
+Ölçüm: `overflow` görünür olmayan bir kutuda `scrollWidth > clientWidth` ve
+kutunun **metni varsa** bulgu. İki şey **kasten** dışarıda:
+- `overflow: auto/scroll` — kullanıcı kaydırabiliyorsa kırpılmış sayılmaz
+- `text-overflow: ellipsis` — tasarımcı bilerek kısaltmış ve **üç nokta
+  kullanıcıya bunu söylüyor**
+
+Negatif doğrulama gerekmedi: test **yazıldığı anda gerçek bir bulgu verdi**
+(`btn "Açık kayıt" 102>89`), düzeltmeden sonra 0'a düştü. Bir testin
+doğruluğunun en iyi kanıtı, yazılırken var olan bir hatayı bulmasıdır.
+
+---
+
 ## K-024 · K-016 tutuyor — ama denetimin kendisi bozuktu (04.09.2026)
 
 **Karar:** *"Ses var olan işi kısaltır, yeni yetenek açmaz"* (K-016) **ölçüldü

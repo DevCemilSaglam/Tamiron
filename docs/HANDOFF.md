@@ -17,9 +17,9 @@ tıklanabilir prototip.
 | Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
 | Dokunuş | ana yol **12**, kısa yol **9**, **sesli yol 3** (ölçüldü) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
-| Sağlık denetimi | **31 test · 0 bulgu** · 375 px'te ölçüldü · denetim artık **ölçtüğü durumu geri yüklüyor** (K-024.1) |
+| Sağlık denetimi | **32 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-024** |
+| Kararlar | **K-001 … K-025** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -69,10 +69,17 @@ Her ekran betiği derlemede **kendi IIFE'sine sarılır** — v1'in sekiz
 **Sağlık denetimi:**
 
 ```
-python tools/denetim-kos.py gom     # denetimi omurgaya gomer
-# tarayicida:  window.DENETIM_CALISTIR()
-python tools/denetim-kos.py geri    # geri alir
+python tools/denetim-kos.py geri    # varsa onceki gommeyi kaldir
+node tools/prototip-derle.js        # SIRA ONEMLI (asagi bak)
+python tools/denetim-kos.py gom
+# tarayicida 320 / 375 / 430 px'te:  window.DENETIM_CALISTIR()
+python tools/denetim-kos.py geri
 ```
+
+**⚠️ SIRA: `geri` DAİMA `derle`den ÖNCE.** `geri` kendi yedeğini yazar ve
+taze derlemeyi **ezer**; sonra o eski dosyaya denetim gömülür ve tarayıcıda
+ölçülen şey kaynağın hâli **olmaz**. `gom` artık kaynak omurgadan yeniyse
+**reddediyor** (K-024.3) — ama sıra yine de doğru kurulmalı.
 
 Denetim ölçüm yapamadıysa **söyler** (`olcum: "ATLANDI"`); sıfır
 genişlikte koşarsa sahte "0 bulgu" vermez.
