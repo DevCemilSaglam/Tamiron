@@ -37,7 +37,7 @@ olacak."*
 |---|---|
 | Saate göre selamlama | Özet paneli, gösterge tablosu |
 | **Sesli işlem** — en üstte, tek düğme | Grafik, rakam yığını |
-| Bakım hatırlatma şeridi (T-17) | Bildirim listesi *(çekmecede)* |
+| ~~Bakım hatırlatma şeridi~~ **04.09'da kalktı (K-019.1)** | **Bakım hatırlatması** — yalnız çekmecedeki Bildirimler + menü rozeti |
 | Altı menü satırı, **her birinin sağ ucunda mikrofon** | İç içe menü, alt menü |
 | Satır altlarında sayı: *"5 araç kayıtlı"*, *"4 araç içeride"* | Arama kutusu *(listelerin kendi içinde)* |
 
@@ -157,15 +157,26 @@ Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açı
 
 **Hangi işe:** doğrudan bir işe değil; **geçmişi** taşır. Akışın hiçbir adımı buradan geçmez.
 
+**Sıra (04.09, Cemil tarif etti — K-019.4):** künye → **üç düğme (tek
+satır)** → **NOT** → ruhsat *(açılır)* → kilometre *(açılır)* → bakım
+bilgileri → geçmiş. Önce **eylem**, sonra **başvuru**.
+
 | Üzerinde ne var | Üzerinde ne YOK |
 |---|---|
-| Araç künyesi | Kontrol tarihleri (muayene/sigorta/kasko) |
-| **Geçmiş kayıtlar** — ne yapılmış, ne zaman, kaç km | Yaklaşan kontroller |
-| **Parçayı kim getirmişti** — geçmiş satırlarda görünür (K-005) | Belge/medya arşivi |
-| Son bakım + bir sonraki hatırlatma | Müşteri kartı *(araçtan ayrı ekran yok)* |
-| Notlar | Not silme/geri alma mekanizması |
+| Araç künyesi + **renk kutucuğu** | Kontrol tarihleri (muayene/sigorta/kasko) |
+| **Kayıt aç · Mesaj · Sesle** — tek satır | Yaklaşan kontroller |
+| **Not** — düğmelerin hemen altında, kendi mikrofonuyla | Belge/medya arşivi |
+| Ruhsat bilgileri *(açılır bölüm)* | TC kimlik no · adres |
+| Kilometre — **yalnız tarih ve km** | **Km tahmini / günlük ortalama** (K-019.5) |
+| Bakım bilgileri — son bakım + sıradaki (K-002) | Müşteri kartı *(araçtan ayrı ekran yok)* |
+| **Geçmiş** — başlık · açıklama · tarih · teslim durumu | ~~Parçayı kim getirmişti rozeti~~ *(04.09'da düştü, K-019.6)* |
 
 > **Neden var:** K-005'in işe yaraması için. *"Bu parçayı geçen sefer müşteri getirmişti"* bilgisi araç ikinci kez geldiğinde **karşıya çıkmalı**, yoksa tartışma çıkar.
+>
+> **⚠️ 04.09 — o bilgi bu ekrandan çekildi.** Cemil geçmiş listesini
+> dört alana indirdi (*"Basit olsun"*) ve rozet düştü. Bilgi kaydın
+> kendi ekranında duruyor; ekranın var oluş gerekçesi zayıfladı.
+> Açık madde **A-M3**.
 >
 > **Müşteri ayrı ekran değil.** Tamirci araçla düşünüyor, plakayla arıyor. Müşteri bilgisi aracın üstünde durur.
 
@@ -210,7 +221,7 @@ menü satırı, eski *"Ruhsatı çek"* düğmesinin yerini aldı.
 |---|---|---|
 | **7 · Sesli işlem** | *"Kaydettiği ile işleme çevireceğiz"* — söylenen cümle işleme dönüyor | Tanıma motoru *(A-S1)* · serbest komut dili · onaysız işlem |
 | **8 · Servis kayıtları** | Eski ana ekranın listesi + teslim edilmişler | Durum alanı *(süzgeç `teslimTarihi`'nden türetilir, K-004)* |
-| **9 · Araçlar** | *"Hangi araçlar kayıtlı"* — menüden gelince gidecek yeri kalmamıştı | Araç ekleme formu · renk · VIN · kontrol tarihleri |
+| **9 · Araçlar** | *"Hangi araçlar kayıtlı"* — menüden gelince gidecek yeri kalmamıştı. **04.09'da satır yeniden çizildi (K-019.2):** plaka · marka/model/motor + **renk kutucuğu** · ruhsat sahibi · telefon · ikinci iletişim. İçeridekiler üstte, **çerçeveden** belli | Araç ekleme formu · araç ikonu · *"içeride"* yazısı · kayıt sayısı · son bakım · VIN · kontrol tarihleri |
 | **10 · Müşteriler** | Menüde istendi | **Müşteri tablosu** — liste araçtan türetiliyor |
 | **11 · Muhasebe** | Menüde istendi | Gider · kâr · cari hesap · fatura *(kapsam kararı bekliyor)* |
 

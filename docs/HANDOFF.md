@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 04.09.2026
+> **Son güncelleme:** 04.09.2026 *(araç ekranları — K-019)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -14,12 +14,12 @@ tıklanabilir prototip.
 | | |
 |---|---|
 | Ekran | **12** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe |
-| Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon |
+| Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
 | Dokunuş | ana yol **12**, kısa yol **9**, **sesli yol 3** (ölçüldü) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
-| Sağlık denetimi | **27 test · 0 bulgu** · 375 px'te ölçüldü |
+| Sağlık denetimi | **28 test · 0 bulgu** · 375 px'te ölçüldü |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-018** |
+| Kararlar | **K-001 … K-019** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -125,6 +125,9 @@ harf dizisi sanıldı ve plaka yanlış okundu. Kural keskinleştirildi:
 | **A-S3** | **Ses gizliliği:** Chrome sesi Google'a gönderiyor | Prototipte kabul, gerçek kullanımda yeniden konuşulur |
 | **MUH** | **Muhasebe kapsamı** — nereye kadar | Günlük kasa · kasa+gider · cari hesap |
 | **A-M1** | Müşteri adı iki araçta farklı yazılırsa iki müşteri görünüyor | Tamirci şikâyet edene kadar dokunma |
+| **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi | İkinci iletişim varsa o |
+| **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi | Kaydın kendi ekranında kalsın |
+| **A-M4** | Çekmecedeki **Bildirimler başlığı** üstte sabit duruyor — kalsın mı, kaysın mı | Şu an kalıyor, dokunulmadı |
 
 > **A-1 (ekran bütçesi 6) kapandı:** Cemil menüyü ve dört yeni ekranı
 > isteyince bütçe cevaplanmış oldu. Ölçülen asıl sayı değişmedi.

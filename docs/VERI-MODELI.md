@@ -25,9 +25,16 @@ Akıştaki yeri: **Adım 1** · Ekran 2, 6
 | `Brand` · `Model` · `Year` | Ruhsattan okunur; parçacıya giden mesajda gerekir |
 | `Engine` | Parçacının doğru parçayı bulması için (T-14) |
 | `Vin` | Ruhsatta var, alınır. Zorunlu değil |
-| `OwnerName` · `OwnerPhone` | **Telefon hatırlatmanın ön koşulu.** Ad özette geçer |
+| `OwnerName` · `OwnerPhone` | **Telefon hatırlatmanın ön koşulu.** Ad özette geçer. **Ruhsat sahibi FİRMA da olabilir** (04.09) — ayrı bir "tüzel kişi" işareti tutulmaz, ad neyse o yazılır |
+| `ContactName` · `ContactPhone` | **İkinci iletişim** (04.09, Cemil: *"Eğer ikinci bir iletişim varsa adı ve Telefonu"*). Ruhsat firmanınsa aranacak kişi başkasıdır; firmanın numarası santraldir. **Adsız telefon işe yaramaz** — usta kimi aradığını bilmeden aramaz. İkisi de boş olabilir |
 | `Note` | Serbest — *"arka cam kolu kırık"* |
 
+> **İkinci iletişim iki alandır, tablo değil.** v1'de müşteri dünyası
+> üç tabloydu (`Party`, `Contact`, `VehicleContact`) ve tamircinin
+> *"karmaşık"* dediği yığının içindeydi. İhtiyaç *"aracı kim getiriyor,
+> kimi arayacağım"*; bu iki alanla cevaplanıyor. **Üçüncü bir iletişim
+> gerekirse tablo o zaman konuşulur** — şimdi değil.
+>
 > **`Customer` diye ayrı tablo YOK.** Tamirci araçla düşünüyor; müşteri, aracın üstünde iki alan. Bir müşterinin iki aracı varsa ad iki kez yazılır — bunun tek maliyeti hatırlatmanın iki kez gitmesi (A-17: kabul edilmiş).
 >
 > **Kontrol tarihleri YOK** (muayene, sigorta, kasko). v1'de vardı; tamirci hiç bahsetmedi.

@@ -10,6 +10,125 @@
 
 ---
 
+## K-019 · Araç ekranları Cemil'in tarifiyle yeniden kuruldu (04.09.2026)
+
+**Karar:** Cemil araçlar listesinin satırını ve araç detayının sırasını
+satır satır tarif etti. Tarif **olduğu gibi uygulandı**; bizim üç
+gerekçemiz düştü. Aşağıda her biri ve neyi kaybettiğimiz yazıyor —
+kaybı yazmayan bir karar, aynı tartışmayı altı ay sonra yeniden açar.
+
+### 19.1 · Ana ekranda bakım hatırlatması YOK
+
+> *"Anasayfada bir aracın bakımı geldi alanini istemiyorum. Sadece
+> bildirimlerde gözüksün."*
+
+**Düşen gerekçe:** K-011 ve T-17 *"ustanın 'bugün kimi arayacağım'
+sorusu ilk ekranda cevaplanmalı"* diyordu ve şerit bu yüzden menüde
+kalmıştı. **Ana ekran bir MENÜDÜR, pano değil** — Cemil haklı.
+
+**Bilgi kaybolmadı:** aynı hatırlatmalar çekmecenin **Bildirimler**
+bölümünde duruyor ve menü düğmesinin **rozeti** sayıyı ana ekrandan
+gösteriyor. Soru hâlâ ilk ekranda cevaplanıyor, bir rakamla.
+
+**Yan etkisi bir hatayı ortaya çıkardı:** aynı soru İKİ YERDE
+süzülüyordu. Çekmece kendi `bekleyenHatirlatmalar()`'ını yazmıştı,
+veri katmanındaki `hatirlatmasiGelenler()` ise ayrıca `tur === 'bakim'`
+süzüyordu — hatırlatma tarihi olan bir **tamirat** kaydı çekmecede
+*"Bakım zamanı geldi"* diye görünüyor, ana ekranda görünmüyordu.
+Şerit kalkınca tek kaynak kaldı. **Aynı soruyu iki yerde cevaplamak,
+iki ayrı cevap demektir.**
+
+### 19.2 · Araçlar listesi: araç kartı, servis kaydı satırı değil
+
+> *"Araç iconı olmayacak. Sol üstte plaka, altında marka model motor
+> renk (renk yazmak yerine kutucuk içerisinde rengi olsun). Altında
+> ruhsat sahibi. İçeride olanları üstte olsun. Div çerçeve farklı olsun
+> fakat divin içerisinde text olarak içeride yazmasına gerek yok.
+> Ruhsat sahibi telefon. Eğer ikinci bir iletişim varsa adı ve
+> Telefonu. Ruhsat sahibi firma da olabilir hani."*
+> *"Altında 1 kayıt, son bakım vb yazmasın."*
+> *"Ayrıca liste telefondan okunmak için daha iyi gözüksün."*
+
+**Düşen gerekçe:** 03.09'da Cemil *"araçlar listesi yine detaylı
+olmalı"* demişti ve satıra model, motor, yakıt, son km, kayıt sayısı,
+son bakım tarihi doldurulmuştu. **Detay ile kalabalık aynı şey
+değilmiş.** Kalabalık listede plaka bile geç bulunuyor.
+
+**Kaldırılanlar:** araç ikonu · *"içeride"* rozeti · kayıt sayısı ·
+son bakım tarihi · son km · model yılı · yakıt.
+**İçerideki araç** yalnız **çerçeveden** ve **sıradan** belli oluyor.
+
+### 19.3 · Ruhsat sahibi firma olabilir → ikinci iletişim
+
+`Vehicle`'a iki alan girdi: `ContactName` · `ContactPhone`
+(`VERI-MODELI.md §1`). **Yeni tablo açılmadı** — K-012'nin kuralı
+sürüyor: ekran gerekiyorsa tablo gerekmiyor olabilir.
+
+**Adsız telefon yazılmaz.** Usta kimi aradığını bilmeden aramaz;
+numara tek başına bir eylem değil, bir veri parçasıdır.
+
+> **Cemil onayına açık (A-M2):** özet ve bakım hatırlatması hangi
+> numaraya gidecek — ruhsattaki mi, ikinci iletişim mi? Varsayım:
+> **ikinci iletişim varsa o**, çünkü aracı getiren o. Mesaj ekranı
+> şu an hâlâ ruhsattaki numarayı kullanıyor.
+
+### 19.4 · Araç detayının sırası: önce EYLEM, sonra BAŞVURU
+
+> *"Araç detayda, işlem buttonlarının altında ruhsat bilgileri akordion
+> olarak yer alsın. Altında km bilgileri yine akordion olarak olsun.
+> Altına km bakım bilgileri diğer divler gibi başlıklı olsun."*
+> *"Araç detayda işlem buttonları tek satırda yer alsın."*
+> *"Buttonlarla ruhsat arasında not alanı olsun. v1'deki ile aynı."*
+
+Yeni sıra: **künye → üç düğme (tek satır) → NOT → ruhsat (açılır) →
+kilometre (açılır) → bakım bilgileri → geçmiş.**
+
+Ruhsat ve kilometre **başvuru** bilgisidir — günde bir kez bakılır ama
+ekranın yarısını kaplıyorlardı ve usta geçmişi görmek için iki ekran
+boyu kaydırıyordu. Not ise aracın **en taze** bilgisi (*"arka cam kolu
+kırık"*) ve ekranın dibinde kimse görmüyordu.
+
+Üç düğme 375 px'e sığsın diye etiketler kısaldı (*Kayıt aç · Mesaj ·
+Sesle*); 48 px dokunma hedefi korunuyor.
+
+### 19.5 · Kilometre geçmişinde TAHMİN YOK
+
+> *"Km geçmişinde tahmin için alanı olmasın. Tahmin de olmasın.
+> Tarih ve km."*
+
+Günlük ortalama satırı ve iki ölçüm arasındaki `+8.700` farkı **ekrandan
+kalktı.**
+
+**⚠️ HESAP KALKMADI.** K-002'nin *"ay veya km, hangisi önce gelirse"*
+kuralı `gunlukKm()` ile çalışmaya devam ediyor; sonucu **Bakım
+bilgileri** kartında **tek bir tarih** olarak duruyor. Kalkan şey,
+ustanın önüne konan **ham tahmin**. Ara hesabı göstermek, ustadan onu
+denetlemesini istemek demekti — o iş bizim.
+
+### 19.6 · Araç geçmişi sadeleşti — ve K-005'in rozeti düştü
+
+> *"Geçmiş altında listele: Başında icon yok. Bakım mı tamirat mı
+> başlık. Marka model yazmasın. Ad soyad zaten belli. Başlık, açıklama,
+> Tarih, teslim durumu. Basit olsun."*
+
+**⚠️ BU BİR ÇELİŞKİ VE KAYBEDEN BİZİZ.** Araç ekranının var oluş
+gerekçesi K-005'ti: *"bu parçayı geçen sefer müşteri getirmişti"*
+bilgisi araç ikinci kez geldiğinde **karşıya çıkmalı** — çünkü
+sorumluluğu o belirliyor (T-8: müşteri getirdiyse tekrar işçilik
+alınır, tamirci aldıysa ücretsiz değişir). O bilgi geçmiş satırında
+bir rozet olarak duruyordu; Cemil'in saydığı dört alanın içinde yok.
+
+**Rozet kaldırıldı.** Tamircinin/Cemil'in sözü bizim akıl yürütmemizi
+yener. Bilgi **kaybolmadı**: `SuppliedBy` satırın kendi verisi ve
+kaydın kendi ekranında duruyor.
+
+> **Cemil onayına açık (A-M3):** geçmiş satırında *"parçayı müşteri
+> getirmişti"* uyarısı olmadan usta tartışmaya hazırlıksız yakalanır
+> mı? Alternatif: liste sade kalır, **kaydı açınca** en üstte görünür.
+> Şu anki hâl bu — kaydın kendi ekranında görünüyor.
+
+---
+
 ## K-018 · Türkçe metinde `\b` kullanılmaz (04.09.2026)
 
 **Karar:** Kelime atmak/aramak için JavaScript'in `\b` sınırı
@@ -463,3 +582,6 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-5** | Ruhsat okuma hangi teknolojiyle — OCR servisi, doğruluk, elle düzeltme | 9. iş |
 | **A-6** | WhatsApp API sağlayıcısı ve maliyeti | 8. iş |
 | **A-7** | SMS sağlayıcısı + **İYS kaydı** (yasal zorunluluk) | 10. iş |
+| **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi? Varsayım: **ikinci iletişim varsa o** (K-019.3) | Cemil |
+| **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi (K-019.6) | Cemil |
+| **A-M4** | Çekmecedeki **Bildirimler başlığı** üstte sabit (sticky) duruyor — kalsın mı, içerikle birlikte mi kaysın? *(Cemil'in 04.09 notu bu noktada iki türlü okunuyordu; **hiçbir şey değiştirilmedi**)* | Cemil |

@@ -17,7 +17,9 @@
 |---|---|---|
 | **Araç** | **Vehicle** | ⭐ Ürünün merkezi. Müşteri **aracın üstünde** durur — ayrı müşteri tablosu yok |
 | Plaka | `Vehicle.Plate` | Kimlik. Kayıt buna bağlanır; yanlış okunursa yanlış araca bağlanır |
-| Sahip · Telefon | `OwnerName` · `OwnerPhone` | **Ruhsatta yazmaz** (`RUHSAT-OKUMA.md`), elle girilir, **zorunlu değil** (A-29) |
+| Sahip · Telefon | `OwnerName` · `OwnerPhone` | **Ruhsatta yazmaz** (`RUHSAT-OKUMA.md`), elle girilir, **zorunlu değil** (A-29). **Firma da olabilir** (K-019.3) |
+| İkinci iletişim | `ContactName` · `ContactPhone` | Ruhsat firmanınsa aranacak kişi. **Adsız telefon yazılmaz** — K-019.3 |
+| Renk | `Vehicle.Color` | Arayüzde **ad değil kutucuk** (`renkKutuHtml`). Ruhsatta tek kelime olmayabilir: *"Gri Metalik"* |
 | **Servis kaydı** | **ServiceRecord** | ⭐ Araç her gelişinde açılan tek kayıt. **Teslim edilene kadar açıktır** (K-003) |
 | İş türü | `ServiceRecord.Type` | `Repair` (tamirat) \| `Maintenance` (bakım) — **K-006** |
 | Ne istiyor | `Complaint` | Adım 2. **Tek** serbest alan — şikâyet/tespit ayrımı yok (Kol A) |
@@ -48,7 +50,7 @@
 | **Kol** | İstisna. Ana yola **var olan bir adımın içinden** bağlanır; yeni adım/ekran açamaz |
 | **İçerideki araç** | `DeliveredAt` boş olan kayıt. Ayrı bir "durum" değil, türetilmiş |
 | **Onay isteme** | Bir **eylem**, akış değil (K-003). Kayıt beklemeye geçmez |
-| **Hatırlatma** | Bakım teslimlerinde kurulan tek olay. Km ile değil **ay** ile (K-002) |
+| **Hatırlatma** | Bakım teslimlerinde kurulan tek olay. **Ay veya km — hangisi önce gelirse** (K-002, 04.09 güncellemesi). Ana ekranda **görünmez**, yalnız çekmecedeki Bildirimler ve menü rozeti (K-019.1) |
 
 ---
 
@@ -58,9 +60,12 @@ Tasarım sistemi bir belge değil, bağlayıcı bir **sınıf sözlüğüdür** 
 tam liste `TASARIM-SISTEMI.md`'nin sonunda. Yeni ekran oradaki sınıfları
 kullanır; olmayan bir sınıf açacaksa önce sözlüğe girer.
 
-Üç nesneyi **yalnız kod üretir**, elle yazılmaz:
+Yedi nesneyi **yalnız kod üretir**, elle yazılmaz:
 `plakaHtml()` → `.plate` · `kayitSatiriHtml()` → `.tl-item` ·
-`bosDurumHtml()` → `.bos-durum`. Balonu yalnız `balon()` yönetir.
+`bosDurumHtml()` → `.bos-durum` · `aracKartiHtml()` → `.arac-kart` ·
+`renkKutuHtml()` → `.renk-kutu` · `akordiyonHtml()` → `.akordiyon` ·
+`telLinkHtml()` → `.tel-link`. Balonu yalnız `balon()`, akordiyonun
+açılıp kapanmasını yalnız `Akordiyon` modülü yönetir.
 
 ---
 

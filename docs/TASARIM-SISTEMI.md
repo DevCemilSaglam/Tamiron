@@ -417,6 +417,11 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Alan | `.field` · ikili: `.field-2` · arama: `.search-box` |
 | Plaka | `.plate` + `.plate-sm` / `.plate-lg` (yalnız `plakaHtml()` üretir) |
 | Araç künyesi | `.arac-bas` > `.plate-lg` + `.veh-title` (`.yr`) + `.spec-strip` > `.spec-val` `.spec-sep` |
+| Araç kartı | `.arac-kart` (+`.icerde`) > `.ak-ust` + `.ak-arac` (`.ak-motor`) + `.ak-sahip` + `.ak-kisi` > `.ak-kisi-ad` — yalnız `aracKartiHtml()` üretir |
+| Araç rengi | `.renk-kutu` + `.r-<renk>` (yalnız `renkKutuHtml()` üretir) |
+| Açılır bölüm | `.akordiyon` > `.akd-bas` (`.akd-say` `.akd-ok`) + `.akd-govde` — yalnız `akordiyonHtml()` üretir, davranışı `Akordiyon` modülünde |
+| Kilometre satırı | `.km-sat` > `.km-tarih` + `.km-deger` |
+| Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |
 | Kalem | `.kalem-list` > `.kalem` > `.k-tip` `.k-ad` `.k-tutar` `.k-sil` · boş: `.kalem-bos` |
 | Tutar | `.tutar-serit` > `.tutar-sat` / `.tutar-sat.genel` > `.tv` |
@@ -437,3 +442,69 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 
 Denetimin **TANIMSIZ-SINIF** ve **OLU-SINIF** testleri bu sözlüğün bekçisidir:
 biri sözlükte olmayan sınıfı, öteki sözlükte kalıp kullanılmayanı yakalar.
+
+---
+
+## 04.09.2026 — Araç kartı, renk kutucuğu, açılır bölüm (Cemil tarif etti)
+
+Cemil araçlar listesinin satırını ve araç detayının sırasını **satır
+satır tarif etti**. Üç yeni desen girdi, biri de kalktı.
+
+### Araç kartı — servis kaydı satırının kopyası olmaktan çıktı
+
+Araçlar listesi `.tl-item` giyiyordu; oysa `.tl-item` bir **servis
+kaydı** satırıdır (sol ikon + tür şeridi + durum rozeti + tarih).
+Araç listesine zorla giydirilince liste, ustanın sormadığı şeyleri
+gösteriyordu: araç ikonu, *"1 kayıt"*, *"son bakım 15.03.2026"*,
+*"içeride"* rozeti.
+
+`.arac-kart`'ın okuma sırası: **plaka → marka/model/motor + renk →
+ruhsat sahibi → telefon → ikinci iletişim.** Başka hiçbir şey yok.
+
+**İçerideki araç yalnız ÇERÇEVEDEN belli** (Cemil: *"Div çerçeve
+farklı olsun fakat divin içerisinde text olarak içeride yazmasına
+gerek yok"*) ve listenin başında durur. Rozeti ve yazıyı birlikte
+kaldırmak mümkün oldu, çünkü **sıra da aynı şeyi söylüyor.**
+
+### Renk kutucuğu — renk ADI değil, rengin KENDİSİ
+
+`--renk-*` token'ları `tokens.css`'te ve **tema bloklarının dışında**:
+bunlar tema rengi değil, **boya rengi**. Beyaz araç koyu temada da
+beyazdır.
+
+**Sınıf adı kodda birleştirilmez, haritadan okunur.** `'r-' + norm(renk)`
+yazmak kolaydı ama ruhsatta *"Gri Metalik"* yazan araç `.r-gri-metalik`
+gibi hiç tanımlanmamış bir sınıf üretirdi — tanımsız sınıf sessizce
+hiçbir şey yapmaz, kutucuk boş çıkar ve **boş kutucuk "beyaz" diye
+okunur.** Harita tanımsız her şeyi `.r-bilinmeyen`'e (çapraz çizgili)
+düşürüyor.
+
+> Aynı tuzağın token hâli daha da sinsi: `var('--renk-' + ad + ')'`
+> yazsaydık derleyicinin **TANIMSIZ TOKEN** denetimi onu göremezdi —
+> o denetim yalnız CSS metnini tarıyor, JS'te birleştirilen adı değil.
+> Sınıf hâlinde bırakınca denetimin **TANIMSIZ-SINIF** testi bekçilik
+> ediyor.
+
+### Açılır bölüm (akordiyon) + 28. denetim testi
+
+Ruhsat bilgileri ve kilometre listesi araç ekranının yarısını
+kaplıyordu; ikisi de günde bir kez bakılan **başvuru** bilgisi. İkisi
+`.akordiyon` içine girdi, kapalı açılıyor.
+
+**Yeni bir hata sınıfı doğurdu:** kapalı bir bölüm, **çalışmayan** bir
+bölümden görsel olarak ayırt edilemez — ikisi de aynı durur.
+`aria-controls` yanlış yazılsa, gövde `id`'si değişse ya da dinleyici
+bağlanmasa ekran yine "doğru" görünür ve ruhsat bilgileri kimsenin
+ulaşamadığı bir yerde kalır. Denetime **28. test (ACILMAYAN-BOLUM)**
+eklendi: her başlığa dokunuyor, gövdenin gerçekten açıldığını,
+`aria-expanded`'ın güncellendiğini ve tekrar kapandığını ölçüyor.
+İki negatif testle doğrulandı (bozuk `aria-controls` → 2 bulgu;
+tıklama engellenince → 4 bulgu; düzeltilince → 0).
+
+### Kalkan desen: düğme olan uyarı şeridi
+
+`button.notice` ve `.n-ok` **silindi**. Tek kullanıcısı ana ekrandaki
+bakım hatırlatma şeridiydi; Cemil o şeridi kaldırınca (*"Anasayfada
+bir aracın bakımı geldi alanını istemiyorum"*) kural ölü kaldı.
+**Ölü CSS bırakılmaz** — bırakılsaydı denetimin OLU-SINIF testi
+`.n-ok`'u bulgu sayardı ve haklı olurdu.
