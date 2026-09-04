@@ -16,7 +16,7 @@
      başlatılabiliyor; mikrofon o satırın BAĞLAMIYLA sesli işleme gider.
 
      BİLEŞENLER v1'DEN: .greeting · .menu-list .menu-row .main
-     .ic-badge .txt .lbl .sub .mic · .notice .n-ic .n-body.
+     .ic-badge .txt .lbl .sub .mic.
      Yeni bileşen yazılmadı (K-008). -->
 <section class="screen" id="screen-home">
 
@@ -25,7 +25,16 @@
     <p>Mikrofona basıp <b>plaka söyleyebilir</b>, ne yapılacağını <b>yazdırabilirsin</b>.</p>
   </div>
 
-  <div id="homeHatirlatma"></div>
+  <!-- ⚠️ 04.09 — BAKIM HATIRLATMA ŞERİDİ BURADAN KALKTI.
+       Cemil: "Anasayfada bir aracın bakımı geldi alanını istemiyorum.
+       Sadece bildirimlerde gözüksün."
+
+       Bizim gerekçemiz (T-17 · "usta 'bugün kimi arayacağım'ı ilk
+       ekranda görmeli") ustanın istediğine YENİLDİ ve yenilmesi
+       gerekiyor — ana ekran bir MENÜDÜR, pano değil. Bilgi kaybolmadı:
+       aynı hatırlatmalar çekmecedeki BİLDİRİMLER bölümünde duruyor ve
+       üstteki menü düğmesinin ROZETİ sayıyı ana ekrandan gösteriyor.
+       Yani soru ilk ekranda hâlâ cevaplanıyor — bir rozetle. -->
 
   <nav class="menu-list" aria-label="Ana menü">
 
@@ -134,24 +143,9 @@ Ekran.tanim('home', {
       'Bugün ' + tutar(bugunTahsilat()) + ' ₺ · ' +
       tutar(veresiyeToplami()) + ' ₺ veresiye';
 
-    /* Bakım hatırlatması ana ekranda KALIYOR (T-17): ustanın "bugün
-       kimi arayacağım" sorusu ilk ekranda cevaplanmalı. */
-    var h = hatirlatmasiGelenler();
-
-    /* ŞERİT TIKLANABİLİR. "Bakım zamanı geldi" deyip hiçbir yere
-       götürmeyen bir uyarı ustaya iş çıkarıyordu: plakayı okuyup
-       listeden aramak zorunda kalıyordu. Tek araçsa doğrudan aracına,
-       birden fazlaysa listeye. */
-    document.getElementById('homeHatirlatma').innerHTML = h.length
-      ? '<button class="notice warn"' +
-          (h.length === 1 ? ' data-arac="' + h[0].plaka + '"' : ' data-git="kayitlar"') +
-          ' aria-label="Bakım zamanı gelen araçları aç">' +
-          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
-          '<span class="n-body"><b>' + h.length + ' aracın</b> bakım zamanı geldi — ' +
-            h.map(function (k) { return k.plaka; }).join(', ') + '</span>' +
-          '<svg class="ico ico-sm n-ok"><use href="#i-chevron-right"></use></svg>' +
-        '</button>'
-      : '';
+    /* Bakım hatırlatması ana ekranda ÇİZİLMİYOR (Cemil, 04.09).
+       Rozet çekmece düğmesinde; Cekmece.ciz() onu güncelliyor. */
+    Cekmece.ciz();
   }
 });
 

@@ -365,17 +365,19 @@ var Cekmece = (function () {
   }
 
   /* BİLDİRİM = BAKIM HATIRLATMASI (yedinci iş). Uydurulmuş bildirim
-     yok: yalnız tarihi gelmiş ve henüz gönderilmemiş hatırlatmalar. */
-  function bekleyenHatirlatmalar() {
-    if (typeof KAYITLAR === 'undefined') return [];
-    return KAYITLAR.filter(function (k) {
-      return k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
-             tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
-    });
-  }
+     yok: yalnız tarihi gelmiş ve henüz gönderilmemiş hatırlatmalar.
 
+     ⚠️ 04.09 — BURADA İKİNCİ BİR SÜZGEÇ VARDI ve ötekinden farklıydı.
+     Çekmece kendi bekleyenHatirlatmalar()'ını yazmıştı; veri
+     katmanındaki hatirlatmasiGelenler() ise ayrıca tur === 'bakim'
+     süzüyordu. Yani hatırlatma tarihi olan bir TAMİRAT kaydı çekmecede
+     "Bakım zamanı geldi" diye görünüyor, ana ekranda görünmüyordu.
+     Aynı soruyu iki yerde cevaplamak, iki ayrı cevap demektir.
+     Ana ekrandaki şerit 04.09'da kalkınca (Cemil: "Anasayfada bir
+     aracın bakımı geldi alanını istemiyorum") tek kaynak kaldı. */
   function cizBildirimler() {
-    var liste = bekleyenHatirlatmalar();
+    var liste = (typeof hatirlatmasiGelenler === 'function')
+      ? hatirlatmasiGelenler() : [];
     var bol = document.getElementById('notifSection');
     var rozet = document.getElementById('menuBadge');
     if (rozet) rozet.textContent = liste.length ? String(liste.length) : '';
@@ -410,6 +412,46 @@ var Cekmece = (function () {
   return { ac: ac, kapa: kapa, ciz: cizBildirimler,
            acikMi: function () { return acikMi; } };
 })();
+
+/* ============ AÇILIR BÖLÜM (akordiyon) ============
+   04.09, Cemil: "ruhsat bilgileri akordion olarak yer alsın. Altında
+   km bilgileri yine akordion olarak olsun."
+
+   DAVRANIŞ TEK YERDE (ortak nesne kuralı). Her ekran kendi açma
+   kapama kodunu yazsaydı biri aria-expanded'ı unuturdu ve bölüm
+   ekran okuyucuda "kapalı" görünürken açık dururdu.
+
+   Açık/kapalı hâl EKRAN YENİDEN ÇİZİLİNCE SIFIRLANIR — bölümler
+   innerHTML ile yeniden yazılıyor. Bu kasıtlı: usta bir ekrandan
+   çıkıp döndüğünde ekranı yine sade bulur. */
+var Akordiyon = (function () {
+  function ac(bas, acik) {
+    var govde = document.getElementById(bas.getAttribute('aria-controls'));
+    if (!govde) return;
+    bas.setAttribute('aria-expanded', acik ? 'true' : 'false');
+    govde.hidden = !acik;
+  }
+  document.addEventListener('click', function (e) {
+    var bas = e.target.closest('.akd-bas');
+    if (!bas) return;
+    ac(bas, bas.getAttribute('aria-expanded') !== 'true');
+  });
+  return { ac: ac };
+})();
+
+/* Akordiyon başlığı — govde id'si ile bağlanır. Sayaç (kaç satır var)
+   açmadan içeriğin dolu mu boş mu olduğunu söyler; "içinde bir şey var
+   mı" diye açtırmak, hiç açtırmamaktan kötüdür. */
+function akordiyonHtml(id, ikon, baslik, sayac, govdeHtml) {
+  return '<div class="akordiyon">' +
+    '<button class="akd-bas" aria-expanded="false" aria-controls="' + id + '">' +
+      '<svg class="ico ico-sm"><use href="#' + ikon + '"></use></svg>' + baslik +
+      (sayac ? '<span class="akd-say">' + sayac + '</span>' : '<span class="akd-say"></span>') +
+      '<svg class="ico ico-sm akd-ok"><use href="#i-chevron-down"></use></svg>' +
+    '</button>' +
+    '<div class="akd-govde" id="' + id + '" hidden>' + govdeHtml + '</div>' +
+  '</div>';
+}
 
 /* Denetimin 14. testi (DRAWER-ODAK-SIZINTISI) v1'in adlarini ariyor.
    Cekmece v2'de modul icinde; test yeniden yazilmasin diye kopru. */

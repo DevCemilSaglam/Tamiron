@@ -71,12 +71,8 @@ Ekran.tanim('musteriler', {
               '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
               /* TELEFON ARANABİLİR (v1'deki gibi) — mono metin değil,
                  dokunulunca arayan bir bağlantı. */
-              (m.tel
-                ? '<a class="tel-link" href="tel:' + m.tel.replace(/\s/g, '') + '"' +
-                    ' data-tel="1" aria-label="' + m.ad + ' ara">' +
-                    '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +
-                    m.tel + '</a>'
-                : '<div class="tl-sub">telefon yok</div>') +
+              (m.tel ? telLinkHtml(m.tel, m.ad)
+                     : '<div class="tl-sub">telefon yok</div>') +
               '<div class="tl-veri">' +
                 '<span><b>' + m.araclar.length + '</b> araç</span>' +
                 '<span><b>' + m.araclar.reduce(function (t, a) {

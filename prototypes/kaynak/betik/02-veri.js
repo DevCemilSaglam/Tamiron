@@ -12,7 +12,11 @@ var BUGUN = new Date(2026, 8, 3);   /* prototipin "bugün"ü — TEK KAYNAK */
 var ARACLAR = [
   { plaka: '34 ABC 123', marka: 'Renault', model: 'Mégane', yil: '2018',
     motor: '1.5 dCi', vin: 'VF1RFB00858123456',
-    renk: 'Gri', yakit: 'Dizel', motorNo: 'K9K872C123456',
+    /* "Gri Metalik" — ruhsatta renk TEK KELİME OLMAYABİLİR. Renk
+       kutucuğu bu yüzden boşluktan bölüp parça parça bakıyor
+       (renkSinifi, K-018). Tek kelime beklenseydi kutucuk boş
+       çıkardı ve boş kutucuk "beyaz" diye okunurdu. */
+    renk: 'Gri Metalik', yakit: 'Dizel', motorNo: 'K9K872C123456',
     silindir: '1461', guc: '110', koltuk: '5', ilkTescil: '14.06.2018',
     depo: '50',
     sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: 'Arka cam kolu kırık — müşteri biliyor.' },
@@ -21,7 +25,12 @@ var ARACLAR = [
     renk: 'Beyaz', yakit: 'Benzin', motorNo: '843A1000098765',
     silindir: '1368', guc: '95', koltuk: '5', ilkTescil: '02.03.2021',
     depo: '45',
-    sahipAd: 'Hasan Demir', sahipTel: '0542 331 90 07', not: '' },
+    /* RUHSAT SAHİBİ FİRMA (Cemil, 04.09: "Ruhsat sahibi firma da
+       olabilir hani"). Firmanın numarası santraldir; aracı getiren
+       ve aranacak kişi başkasıdır. İkinci iletişim olmadan usta
+       santrali arayıp "hangi araç" diye anlatmak zorunda kalıyordu. */
+    sahipAd: 'Demir Nakliyat Ltd. Şti.', sahipTel: '0312 395 12 00',
+    iletisimAd: 'Hasan Demir', iletisimTel: '0542 331 90 07', not: '' },
   { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
     motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
     renk: 'Lacivert', yakit: 'Dizel', motorNo: 'DV6FD10JBCE4455',

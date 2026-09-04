@@ -61,6 +61,35 @@
   /* Dokunma hedefi — 44px asgari (v1'de kural yaziliydi ama token
      degildi, her bilesende elle yaziliyordu). */
   --dokun: 48px;
+
+  /* ---- ARAÇ RENGİ (04.09.2026 — Cemil: "renk yazmak yerine
+     kutucuk içerisinde rengi olsun") ----
+     ⚠️ BUNLAR TEMA RENGİ DEĞİL, BOYA RENGİDİR. Ruhsatta yazan fiziksel
+     renk; açık temada da koyu temada da AYNI kalır. Tema bloklarında
+     yeniden tanımlanmazlar — "beyaz araç" koyu temada da beyazdır.
+     O yüzden burada, tema bloklarının DIŞINDA duruyorlar.
+
+     Doygunlukları kasten kırık: gerçek araç boyası ekran kırmızısı
+     kadar parlak değildir ve parlak kutucuk, yanındaki plakadan daha
+     çok bakış çekiyordu. */
+  --renk-beyaz:      #F4F5F3;
+  --renk-siyah:      #17191D;
+  --renk-gri:        #8B9098;
+  --renk-gumus:      #C4C9CF;
+  --renk-lacivert:   #1E2C52;
+  --renk-mavi:       #2C63C0;
+  --renk-kirmizi:    #B22B31;
+  --renk-bordo:      #6D2029;
+  --renk-yesil:      #256B49;
+  --renk-sari:       #DDB431;
+  --renk-turuncu:    #DC7020;
+  --renk-kahverengi: #6A4A30;
+  --renk-bej:        #D6C6A7;
+  --renk-mor:        #57307E;
+  /* Ruhsatta okunamayan / listede olmayan renk. Boş kutucuk
+     göstermek "rengi beyaz" diye okunuyordu — bu yüzden kendi
+     değeri var ve üstüne çapraz çizgi düşüyor (.r-bilinmeyen). */
+  --renk-bilinmeyen: #9AA3AE;
 }
 
 /* ============================================================

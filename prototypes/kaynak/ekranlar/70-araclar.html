@@ -2,17 +2,30 @@
      03.09'da menüden geldi. Ana ekran menüye dönünce "hangi araçlar
      kayıtlı" sorusunun gidecek yeri kalmamıştı.
 
-     ARAÇ ≠ İÇERİDEKİ ARAÇ. Burası kayıtlı araçların tamamı; içeride
-     olup olmadığı satırda ROZETLE söyleniyor. İki liste yapmak yerine
-     tek liste + işaret: usta "Mégane nerede" diye sorunca tek yere
-     bakıyor.
+     ⚠️ 04.09 — LİSTE SATIRI CEMİL'İN TARİFİYLE YENİDEN YAZILDI.
+     Önceden servis kaydı satırını (.tl-item) giyiyordu: sol tarafta
+     araç ikonu, altta "1 kayıt · son bakım 15.03.2026" şeridi, sağda
+     "içeride" rozeti. Cemil'in tarifi:
 
-     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .search-box
-     · .tl-item .tl-ic .tl-body .tl-title .tl-sub .tl-foot · .pill
-     · .bos-durum. Yeni bileşen yazılmadı.
+       "Araç iconı olmayacak. Sol üstte plaka, altında marka model
+        motor renk (renk yazmak yerine kutucuk içerisinde rengi
+        olsun). Altında ruhsat sahibi. İçeride olanları üstte olsun.
+        Div çerçeve farklı olsun fakat divin içerisinde text olarak
+        içeride yazmasına gerek yok. Ruhsat sahibi telefon. Eğer
+        ikinci bir iletişim varsa adı ve Telefonu. Ruhsat sahibi
+        firma da olabilir hani."
+       "Altında 1 kayıt, son bakım vb yazmasın."
+       "Ayrıca liste telefondan okunmak için daha iyi gözüksün."
 
-     ÜZERİNDE YOK: araç ekleme formu (ruhsattan gelir) · renk · VIN
-     · kontrol tarihleri · silme. -->
+     İÇERİDEKİLER ÜSTTE ve çerçeveleri farklı — iki liste yapmadan
+     "hangisi bende" sorusu cevaplanıyor. Yazı yok: sıra ve çerçeve
+     zaten söylüyor.
+
+     BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
+     · .arac-kart (yalnız aracKartiHtml() üretir) · .bos-durum.
+
+     ÜZERİNDE YOK: araç ekleme formu (ruhsattan gelir) · VIN
+     · kontrol tarihleri · silme · kayıt sayısı · son bakım tarihi. -->
 <section class="screen" id="screen-araclar">
 
   <div class="screen-head">
@@ -45,12 +58,22 @@ Ekran.tanim('araclar', {
       ARAMA_TERIMI = null;
     }
     var q = norm((document.getElementById('arcQ') || {}).value || '');
-    /* Arama plakada, markada, modelde VE SAHİPTE çalışır — usta
-       plakayı değil adı hatırlıyor olabilir. */
+    /* Arama plakada, markada, modelde, SAHİPTE ve İKİNCİ İLETİŞİMDE
+       çalışır — usta plakayı değil, arayan kişinin adını hatırlıyor
+       olabilir. */
     var liste = ARACLAR.filter(function (a) {
       if (!q) return true;
       return norm(a.plaka + ' ' + a.marka + ' ' + a.model + ' ' +
-                  (a.sahipAd || '')).indexOf(q) >= 0;
+                  (a.sahipAd || '') + ' ' + (a.iletisimAd || '')).indexOf(q) >= 0;
+    });
+
+    /* İÇERİDEKİLER ÜSTTE (Cemil, 04.09). Sıralama listenin KENDİSİNDE
+       yapılıyor, veri kaynağı bozulmuyor — slice() olmadan ARACLAR'ın
+       kendi sırası kalıcı olarak değişirdi. */
+    var icerdeMi = {};
+    icerideki().forEach(function (k) { icerdeMi[k.plaka] = true; });
+    liste = liste.slice().sort(function (x, y) {
+      return (icerdeMi[y.plaka] ? 1 : 0) - (icerdeMi[x.plaka] ? 1 : 0);
     });
 
     document.getElementById('arcSay').textContent =
@@ -59,56 +82,18 @@ Ekran.tanim('araclar', {
 
     document.getElementById('arcListe').innerHTML = liste.length
       ? liste.map(function (a) {
-          var ic = icerideki().filter(function (k) { return k.plaka === a.plaka; })[0];
-          var sayi = aracKayitlari(a.plaka).length;
-          var sb = sonBakim(a.plaka);
-          var g = kmGecmisi(a.plaka);
-          var sonKm = g.length ? g[g.length - 1].km.toLocaleString('tr-TR') : '';
-          return '<div class="tl-item' + (ic ? ' t-tamirat' : '') + '"' +
-              ' data-arac="' + a.plaka + '" role="button" tabindex="0">' +
-            '<span class="tl-ic"><svg class="ico ico-sm">' +
-              '<use href="#i-car"></use></svg></span>' +
-            '<div class="tl-body">' +
-              '<div class="tl-title">' +
-                '<span class="tl-tip">' + a.marka + ' ' + a.model + '</span>' +
-                plakaHtml(a.plaka) +
-              '</div>' +
-              '<div class="tl-sub">' + (a.sahipAd || 'sahip yazılmamış') + '</div>' +
-              /* LİSTE DETAYLI (Cemil, 03.09: "Araçlar listesi yine
-                 detaylı olmalı"). Ustanın araç kartını açmadan sorduğu
-                 şeyler: kaç model, hangi motor, kaç km, içeride mi,
-                 son bakım ne zaman, telefonu ne. */
-              '<div class="tl-veri">' +
-                (a.yil ? '<span>Model <b>' + a.yil + '</b></span>' : '') +
-                (a.motor ? '<span><b>' + a.motor + '</b></span>' : '') +
-                (a.yakit ? '<span>' + a.yakit + '</span>' : '') +
-                (a.renk ? '<span>' + a.renk + '</span>' : '') +
-                (sonKm ? '<span>Son <b>' + sonKm + '</b> km</span>' : '') +
-              '</div>' +
-              (a.sahipTel
-                ? '<a class="tel-link" href="tel:' + a.sahipTel.replace(/\s/g, '') + '"' +
-                    ' data-tel="1" aria-label="' + (a.sahipAd || 'sahibini') + ' ara">' +
-                    '<svg class="ico ico-sm"><use href="#i-phone"></use></svg>' +
-                    a.sahipTel + '</a>'
-                : '') +
-              '<div class="tl-foot">' +
-                (ic ? '<span class="pill accent">içeride</span>' : '') +
-                '<span class="tl-date">' + sayi + ' kayıt</span>' +
-                (sb ? '<span class="tl-date">son bakım ' + sb.teslimTarihi + '</span>' : '') +
-              '</div>' +
-            '</div>' +
-          '</div>';
+          return aracKartiHtml(a, !!icerdeMi[a.plaka]);
         }).join('')
       : bosDurumHtml('i-car',
           q ? 'Eşleşen araç yok' : 'Kayıtlı araç yok',
           q ? 'Plakanın ya da sahibin bir kısmını yazman yeter.'
-            : 'İlk aracı "Araç kaydı"ndan ruhsatı çekerek ekle.');
+            : 'İlk aracı "Servis kaydı ekle"den ruhsatı çekerek ekle.');
   }
 });
 
-/* [data-arac] davranisi 03-nesne.js'te — plaka iki ekranda tiklaniyor
-   (araclar, musteriler) ve ORTAK NESNE KURALI davranisin da ortak
-   olmasini soyluyor. */
+/* [data-arac] davranisi 03-nesne.js'te — arac karti iki ekranda
+   tiklaniyor (araclar, musteriler) ve ORTAK NESNE KURALI davranisin
+   da ortak olmasini soyluyor. */
 document.addEventListener('click', function (e) {
   if (e.target.closest('#arcQTemiz')) {
     document.getElementById('arcQ').value = ''; Ekran.tazele();

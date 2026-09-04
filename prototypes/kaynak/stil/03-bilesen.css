@@ -299,6 +299,20 @@ nowrap yuzunden yazi disari tasiyordu —
    satir icinde bu,
 her butonu ayri satira dusuruyordu. */
 
+/* TEK SATIR — sarmayı YASAKLAR (04.09, Cemil: "Araç detayda işlem
+   buttonları tek satırda yer alsın. Buna göre ayarla.").
+   .btn-row'un kendisi sarmalı KALIYOR: iki düğmeli satırlarda uzun
+   etiketin kırpılması, alt satıra inmesinden kötü. Fark burada
+   min-width: max-content'in kalkması — düğme küçülebiliyor.
+   375 px'te üç düğme: 343 px - 2x8 gap = 327 / 3 = 109 px. Dolgu ve
+   yazı buna göre kısıldı; 48 px dokunma hedefi korunuyor. */
+.btn-row.tek-satir { flex-wrap: nowrap; gap: 8px; }
+.btn-row.tek-satir .btn {
+  flex: 1 1 0; min-width: 0; padding: 14px 10px; gap: 6px;
+  font-size: var(--tip-sm); overflow: hidden;
+}
+.btn-row.tek-satir .btn .ico { flex: none; }
+
 /* ---------- ARAÇ KARTI ---------- */
 /* ---------- PLAKA — TEK BİLEŞEN,
 HER YERDE AYNI ----------
@@ -1270,14 +1284,138 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .tel-link .ico-sm { width: 14px; height: 14px; flex: none; }
 .tel-inline { font-family: var(--font-mono); color: var(--accent); text-decoration: none; }
 
-/* Uyarı şeridi DÜĞME olabilir: "bakım zamanı geldi" deyip hiçbir yere
-   götürmeyen bir uyarı, ustaya iş çıkarıyordu (03.09). */
-button.notice { width: 100%; text-align: left; cursor: pointer; }
-button.notice:hover { filter: brightness(.98); }
-.notice .n-ok { flex: none; margin-left: auto; opacity: .7; }
+/* ~~Uyarı şeridi DÜĞME olabilir~~ — 04.09'da kalktı. Tek kullanıcısı
+   ana ekrandaki bakım hatırlatma şeridiydi; Cemil o şeridi kaldırınca
+   (hatırlatmalar yalnız bildirimlerde) bu kural ve .n-ok oku ölü
+   kaldı. ÖLÜ CSS BIRAKILMAZ: kalsaydı denetimin OLU-SINIF testi
+   .n-ok'u bulgu olarak sayardı ve haklı olurdu. */
 
 /* Liste satırında ikincil bilgi kümesi — servis kaydına GİRMEDEN
    görülsün diye (Cemil, 03.09: "kayıtlar daha detaylı olsun"). */
 .tl-veri { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-top: 6px; }
 .tl-veri span { font-size: 12.5px; color: var(--muted); }
 .tl-veri b { font-weight: 600; color: var(--text); }
+
+/* ================= ARAÇ KARTI (04.09.2026 — Cemil tarif etti) =================
+   Araçlar listesinin satırı ARTIK .tl-item DEĞİL. Neden ayrıldı:
+   .tl-item bir SERVİS KAYDI satırıdır (sol ikon + tür şeridi + rozet
+   + tarih) ve araç listesi ona zorla giydirilmişti. Cemil'in tarifi
+   başka bir nesne: "Araç iconı olmayacak. Sol üstte plaka, altında
+   marka model motor renk, altında ruhsat sahibi."
+
+   OKUMA SIRASI (yukarıdan aşağı, telefonda tek elle):
+     1) PLAKA         — ustanın aradığı tek şey, en üstte ve BÜYÜK
+     2) marka/model/motor + renk kutucuğu
+     3) ruhsat sahibi (kişi ya da FİRMA olabilir)
+     4) sahibin telefonu — dokununca arar
+     5) varsa ikinci iletişim: adı + telefonu
+
+   ÜZERİNDE YOK: araç ikonu · "içeride" yazısı · "1 kayıt" · "son
+   bakım" tarihi. Hepsi 04.09'da kaldırıldı — liste okunmak için var,
+   özet çıkarmak için değil. */
+.arac-kart {
+  position: relative;
+  display: block; width: 100%; text-align: left;
+  padding: 14px; cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.arac-kart + .arac-kart { margin-top: 12px; }
+.arac-kart:hover { border-color: color-mix(in srgb, var(--primary) 35%, var(--line)); }
+
+/* İÇERİDEKİ ARAÇ = SADECE ÇERÇEVE FARKI (Cemil: "Div çerçeve farklı
+   olsun fakat divin içerisinde text olarak içeride yazmasına gerek
+   yok"). Rozet yok, yazı yok — çerçeve söylüyor. İçeridekiler
+   listenin BAŞINDA durduğu için sıra da aynı şeyi söylüyor. */
+.arac-kart.icerde {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  background: var(--surface);
+}
+
+.ak-ust { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+/* Marka · model · motor tek satır; renk kutucuğu sonda. */
+.ak-arac { display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 8px; font-size: var(--tip-md); font-weight: 600; color: var(--text); }
+.ak-arac .ak-motor { font-weight: 500; color: var(--muted); }
+/* Ruhsat sahibi — kişi ya da firma. */
+.ak-sahip { margin-top: 6px; font-size: var(--tip-sm); color: var(--muted); }
+.ak-sahip b { color: var(--text); font-weight: 600; }
+/* İkinci iletişim: ADI telefonun üstünde durur — usta numarayı değil,
+   "kimi arıyorum"u okur. */
+.ak-kisi { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.ak-kisi-ad { display: block; font-size: var(--tip-sm); color: var(--muted); }
+.ak-kisi-ad b { color: var(--text); font-weight: 600; }
+
+/* ---------- ARAÇ RENGİ KUTUCUĞU ----------
+   Renk ADI yerine rengin KENDİSİ (Cemil, 04.09). Renk değerleri
+   tokens.css'te ve TEMADAN BAĞIMSIZ — beyaz araç koyu temada da
+   beyazdır. Sınıf adı statiktir (r-gri): token adını kodda birleştirip
+   var(--renk-...) üretseydik derleyicinin "tanımsız token" denetimi
+   onu GÖREMEZDİ; sınıf hâlinde denetimin TANIMSIZ-SINIF testi yakalar. */
+.renk-kutu {
+  display: inline-block; width: 20px; height: 20px; flex: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.14);
+}
+.r-beyaz      { background: var(--renk-beyaz); }
+.r-siyah      { background: var(--renk-siyah); }
+.r-gri        { background: var(--renk-gri); }
+.r-gumus      { background: var(--renk-gumus); }
+.r-lacivert   { background: var(--renk-lacivert); }
+.r-mavi       { background: var(--renk-mavi); }
+.r-kirmizi    { background: var(--renk-kirmizi); }
+.r-bordo      { background: var(--renk-bordo); }
+.r-yesil      { background: var(--renk-yesil); }
+.r-sari       { background: var(--renk-sari); }
+.r-turuncu    { background: var(--renk-turuncu); }
+.r-kahverengi { background: var(--renk-kahverengi); }
+.r-bej        { background: var(--renk-bej); }
+.r-mor        { background: var(--renk-mor); }
+/* Bilinmeyen renk BOŞ bırakılmaz — boş kutucuk "beyaz" diye okunuyordu.
+   Çapraz çizgi "bu bilgi yok" demenin görsel hâli. */
+.r-bilinmeyen { background:
+  repeating-linear-gradient(45deg, var(--renk-bilinmeyen) 0 3px, transparent 3px 6px),
+  var(--surface); }
+
+/* ================= AÇILIR BÖLÜM (akordiyon) — 04.09.2026 =================
+   Cemil: "ruhsat bilgileri akordion olarak yer alsın. Altında km
+   bilgileri yine akordion olarak olsun."
+
+   NEDEN AÇILIR: ikisi de BAŞVURU bilgisi — usta günde bir kez bakar,
+   ama araç ekranının yarısını kaplıyorlardı. Açılır olunca ekranın
+   üstü eyleme kalıyor.
+
+   KAPALI AÇILIR — ama başlık ne olduğunu ve kaç satır olduğunu söyler;
+   "içinde bir şey var mı" diye açtırmak, açmamaktan kötüdür. */
+.akordiyon { border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--surface); overflow: hidden; }
+.akordiyon + .akordiyon { margin-top: 12px; }
+.akd-bas { display: flex; align-items: center; gap: 10px; width: 100%;
+  min-height: var(--dokun); padding: 12px 14px; cursor: pointer;
+  background: transparent; border: 0; text-align: left;
+  font-family: var(--font-display); font-size: var(--tip-md); font-weight: 600;
+  color: var(--text); }
+.akd-bas:hover { background: var(--nav-hover); }
+.akd-bas .ico { flex: none; color: var(--muted); }
+/* Sayaç: "9 alan" — açmadan içeride ne kadar bilgi olduğunu söyler. */
+.akd-say { margin-left: auto; font-family: var(--font-mono); font-size: var(--tip-xs);
+  color: var(--muted); font-weight: 500; }
+.akd-ok { flex: none; color: var(--muted); transition: transform .18s ease; }
+.akd-bas[aria-expanded="true"] .akd-ok { transform: rotate(180deg); }
+.akd-govde { padding: 0 14px 12px; border-top: 1px solid var(--line); }
+.akd-govde > :first-child { margin-top: 12px; }
+
+/* ---------- KM SATIRI — yalnız TARİH ve KM ----------
+   04.09, Cemil: "Km geçmişinde tahmin için alanı olmasın. Tahmin de
+   olmasın. Tarih ve km." Günlük ortalama ve "+8.700" farkı buradan
+   kalktı. HESAP KALKMADI: hatırlatmanın km yarısı (K-002) hâlâ
+   gunlukKm() ile kuruluyor, yalnız EKRANDA gösterilmiyor. */
+.km-sat { display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono); font-size: var(--tip-sm); }
+.km-sat:last-child { border-bottom: 0; }
+.km-sat .km-tarih { color: var(--muted); }
+.km-sat .km-deger { color: var(--text); font-weight: 600; }
