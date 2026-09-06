@@ -10,6 +10,86 @@
 
 ---
 
+## K-031 · Görünmeyen kaydırma, kırpmanın kardeşidir (05.09.2026)
+
+> *"Gider ve alacak tabloları telefonun ekranına sığmıyor, sağa kaydırmak
+> gerekiyor. **Kullanıcı sağa kaydıracağını bilmez.**"*
+
+### 31.1 · ⚠️ Bu, K-025'te verdiğim kararı DÜZELTİYOR
+
+K-025'te *"kesilen metin, taşan metinden tehlikelidir"* deyip tabloya
+`overflow-x: auto` koymuştum. Kırpmaya göre doğruydu — ama **üçüncü bir
+seçenek** vardı ve o daha doğru: **sığdırmak.**
+
+| | Kullanıcı ne görür | Eksik olduğunu bilir mi |
+|---|---|---|
+| Kırpma | yarım kelime | belki |
+| **Görünmeyen kaydırma** | **hiçbir şey** | **hayır** |
+| Sığdırma | hepsi | — |
+
+**Görünmeyen kaydırma, kırpmanın kardeşidir.** İkisinde de kullanıcı bir
+şeyin eksik olduğunu bilmez; fark, kırpmada yarım kelime görmesi,
+kaydırmada **hiç görmemesi.**
+
+### 31.2 · Nasıl sığdı: sütun sayısı azaldı
+
+**İkincil bilgi kendi sütununu istemiyor** — ana metnin altında küçük yazıyor
+(`.t-alt`).
+
+| Tablo | Önce | Sonra |
+|---|---|---|
+| Gider | Tarih · Açıklama · Tutar · sil | **Açıklama** *(altında tarih)* · Tutar · sil |
+| Alacak | Kim · Araç · Teslim · Tutar | **Müşteri** *(altında plaka · tarih)* · Tutar |
+| İş başına | Araç · İş · Teslim · Alınan · Parça · Fark | **İş** *(altında tür · marka · tarih · alınan · parça)* · **Fark** |
+
+**Ölçüldü (375 px):** üçü de **305 = 305** — taşma sıfır.
+Negatif test eski davranışı geri getirdiğinde: gider **36 px**, alacak
+**125 px**, iş başına **317 px** kayıyordu.
+
+`table-layout: fixed` + `overflow-wrap: anywhere` metni sarıyor; sayı sütunu
+`nowrap` ve sabit 96 px — rakam sarmaz, *"2.4"* alt satıra *"00"* olmaz.
+
+### 31.3 · 36. test: GIZLI-KAYDIRMA
+
+Ekran içinde yatay kaydırılabilen **ve gerçekten taşan** bir kutu varsa bulgu.
+Dikey kaydırma kapsam dışı: **telefonda aşağı kaydırmak öğrenilmiş
+davranıştır, sağa kaydırmak değil.**
+
+### 31.4 · Öteki dört madde
+
+| | |
+|---|---|
+| Gider başlığı | *"Ne için"* → **Açıklama** |
+| Alacak başlığı | *"Kim"* → **Müşteri** — ustanın kelimesi |
+| *"dönemden bağımsız"* şerhi | kalktı *(ve CSS'te ölü kalan `.lbl-not` denetimin `OLU-SINIF` testiyle yakalanıp silindi)* |
+| Gider ekle | mikrofonun **solunda, aynı yuvarlak içinde `+`** |
+
+**`.mic-round` → `.daire-btn`.** Aynı biçim artık iki iş yapıyor; sınıf adının
+*"mic"* demesi yanlış olurdu. Bileşen **yuvarlak eylem düğmesi**, içindeki
+ikon ne iş yaptığını söylüyor.
+
+**Neden aynı biçim:** elle giriş ve sesle giriş aynı işin iki yolu. Biri düz
+düğme, öteki yuvarlak dururken biri *"asıl"*, öteki *"yedek"* gibi okunuyordu
+— oysa elle giriş yedek değil: mikrofonsuz tarayıcıda **tek yol** o (K-021.1).
+
+### 31.5 · Giderlere araç işi yazılmaz
+
+> *"Giderlerde yedek parça olmamalı. Yedek parçalar işten alınarak düşülüyor.
+> Tabi kullanıcı isterse ekleyebilir."*
+
+Parçanın alış fiyatı **zaten servis satırında** duruyor ve iş başına farkta
+düşülüyor. Buraya elle yazmak **aynı parayı iki kez saymaktır.**
+
+**Tohum veriden çıkarıldı.** *"Öz Yedek Parça — triger seti 4.200 ₺"* örnek
+veride duruyordu ve ekran onu gider sayıyordu: **örneğin kendisi yanlış
+alışkanlık öğretiyordu.** Yerine *"Dükkân kirası"* kondu.
+
+**Yasak değil, uyarı** (Cemil: *"kullanıcı isterse ekleyebilir"*): ekran
+*"buraya araç işleri dışındaki giderler yazılır… ayrıca yazarsan iki kez
+sayılır"* diyor.
+
+---
+
 ## K-030 · `inputmode` bir kısıt değil, bir öneridir (05.09.2026)
 
 > *"Tutar alanına harf giremeyiz. Inputların veri doğruluğundan emin ol."*

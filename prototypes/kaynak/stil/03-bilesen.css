@@ -612,14 +612,20 @@ eylem butonu kisalmaz — yoksa
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-}.mic-round.ghost {
+}/* ⚠️ 05.09 — .mic-round -> .daire-btn.
+   Cemil: "Gider ekle button mikrofonun solunda olsun. Aynı yuvarlak
+   içinde + olan button."
+   Aynı biçim artık iki iş yapıyor (mikrofon ve ekleme); sınıf adının
+   "mic" demesi yanlış olurdu. Bileşen YUVARLAK EYLEM DÜĞMESİ, içindeki
+   ikon ne iş yaptığını söylüyor. */
+.daire-btn.ghost {
   background: transparent;
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
-}.mic-round.ghost:hover {
+}.daire-btn.ghost:hover {
   background: var(--accent-soft);
   filter: none;
-}.mic-round {
+}.daire-btn {
   flex: none;
   width: 44px;
   height: 44px;
@@ -630,9 +636,9 @@ eylem butonu kisalmaz — yoksa
   display: flex;
   align-items: center;
   justify-content: center;
-}.mic-round:hover {
+}.daire-btn:hover {
   filter: brightness(1.06);
-}.mic-round .ico {
+}.daire-btn .ico {
   width: 20px;
   height: 20px;
 }/* ---------- LİSTE EKRANLARI (Araçlar / Kişiler) ---------- */
@@ -683,7 +689,7 @@ eylem butonu kisalmaz — yoksa
    de yakalıyordu (aynı özgüllük, sonra gelen kazanır). Mikrofonun
    ikonu düğmenin kendi rengini almalı; yoksa aksan çerçeveli ama
    soluk ikonlu, yarı sönük bir düğme çıkıyor. */
-.search-box .mic-round .ico { color: currentColor; }
+.search-box .daire-btn .ico { color: currentColor; }
 .list {
   display: flex;
   flex-direction: column;
@@ -1538,24 +1544,43 @@ alanları ::before ile büyür. Ölçüm (30.08,
 
 /* ================= TABLO — 05.09.2026 =================
    Cemil: "Gider alanı excel gibi tablo şeklinde olsun."
-   "Alınamayan (Veresiye) değil Alacak olsun başlık. Yine tablo gibi
-   okunabilir olabilir."
 
    Neden GERÇEK <table>: rakam sütunu hizalı olmalı. .tutar-serit iki
    sütunluk bir şerit; üç-dört sütun gerekince satırlar birbirini
    tutmuyordu. Tablo ayrıca ekran okuyucuya "bu bir tablo" diyor.
 
-   ⚠️ DAR EKRANDA KIRPILMAZ, KAYDIRILIR (K-025'in dersi): sarmalayıcı
-   overflow-x:auto. Kesilen metin, taşan metinden tehlikelidir. */
-.tablo-sar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+   ⚠️ 05.09 (ikinci tur) — YATAY KAYDIRMA KALKTI, TABLO SIĞIYOR.
+   Cemil: "Gider ve alacak tabloları telefonun ekranına sığmıyor, sağa
+   kaydırmak gerekiyor. KULLANICI SAĞA KAYDIRACAĞINI BİLMEZ."
+
+   Haklı ve bu, K-025'te verdiğim kararı düzeltiyor. Orada "kesilen
+   metin taşan metinden tehlikelidir" deyip `overflow-x: auto` koymuştum
+   — kırpmaya göre doğruydu ama ÜÇÜNCÜ bir seçenek vardı ve o daha
+   doğru: SIĞDIRMAK.
+
+   Görünmeyen kaydırma, kırpmanın kardeşidir: ikisinde de kullanıcı
+   bir şeyin eksik olduğunu BİLMEZ. Fark, kırpmada yarım kelime
+   görmesi; kaydırmada hiç görmemesi.
+
+   Nasıl sığıyor: SÜTUN SAYISI AZALDI. İkincil bilgi (tarih, plaka)
+   kendi sütununda değil, ana metnin ALTINDA küçük yazıyor. */
+.tablo-sar { overflow-x: visible; }
 .tablo {
-  width: 100%; border-collapse: collapse;
+  width: 100%; border-collapse: collapse; table-layout: fixed;
   font-size: var(--tip-sm);
 }
 .tablo th, .tablo td {
-  padding: 10px 10px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--line);
-  text-align: left; white-space: nowrap;
+  text-align: left;
+  /* nowrap KALKTI: metin sarar, tablo genişlemez. */
+  overflow-wrap: anywhere;
+}
+/* İkincil bilgi ana metnin altında — kendi sütununu istemiyor. */
+.tablo .t-alt {
+  display: block; margin-top: 3px;
+  font-size: var(--tip-xs); color: var(--muted);
+  font-family: var(--font-mono);
 }
 .tablo th {
   font-size: var(--tip-xs); font-weight: 700; letter-spacing: .06em;
@@ -1568,7 +1593,10 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .tablo td.sayi, .tablo th.sayi {
   text-align: right; font-family: var(--font-mono);
   font-variant-numeric: tabular-nums; color: var(--text);
+  white-space: nowrap;      /* rakam SARMAZ — "2.4" alt satira "00" olmaz */
+  width: 96px;
 }
+.tablo td.eylem, .tablo th.eylem { width: 40px; padding-left: 0; }
 .tablo tbody tr:last-child td { border-bottom: 0; }
 .tablo tr.genel td {
   font-weight: 700; color: var(--text);
@@ -1634,13 +1662,10 @@ alanları ::before ile büyür. Ölçüm (30.08,
   .modul-kutu { min-height: 0; flex-direction: row; align-items: center; gap: 12px; }
 }
 
-/* Bölüm başlığının yanındaki küçük not — "dönemden bağımsız" gibi bir
-   şerh. Başlığın kendisi kadar bağırmamalı ama görünmeli (05.09). */
-.section-label .lbl-not {
-  margin-left: auto; flex: none;
-  font-size: var(--tip-xs); font-weight: 500; letter-spacing: 0;
-  text-transform: none; color: var(--muted);
-}
+/* .lbl-not KALDIRILDI (05.09): "dönemden bağımsız" şerhi Cemil'in
+   isteğiyle kalkınca sınıf ölü kaldı ve denetimin OLU-SINIF testi
+   yakaladı. Ölü CSS bırakılmaz — sözlükte duran ama kullanılmayan
+   sınıf, bir sonraki okuyucuya "bu var" der. */
 
 
 /* ================= YIĞIN (.yigin) — 05.09.2026 =================

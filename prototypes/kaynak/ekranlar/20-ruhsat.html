@@ -33,7 +33,7 @@
 
      BİLEŞENLER: .screen-head .eyebrow · .tab-grup .tab · .card
      .card.raised · .plate-input-wrap .plate-field .tr-tag · .field
-     .field-2 · .plate-hint · .cip-grup .cip · .notice · .mic-round
+     .field-2 · .plate-hint · .cip-grup .cip · .notice · .daire-btn
      · .btn. Yeni: yalnız .tab-grup/.tab (sözlüğe girdi). -->
 <section class="screen" id="screen-ruhsat">
 
@@ -73,7 +73,7 @@
             <span class="tr-tag">TR</span>
             <input id="rPlaka" type="text" data-giris="plaka" maxlength="11" placeholder="34 ABC 123"
                    autocomplete="off" spellcheck="false" aria-label="Plaka" />
-            <button class="mic-round ghost" data-sesle="servis-ekle"
+            <button class="daire-btn ghost" data-sesle="servis-ekle"
                     aria-label="Plakayı ve işi sesle söyle" title="Sesle">
               <svg class="ico"><use href="#i-mic"></use></svg>
             </button>
@@ -97,7 +97,7 @@
         <span class="lbl-txt">
           <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç bilgileri
         </span>
-        <button class="mic-round" id="rAracMik" aria-label="Araç bilgilerini sesle söyle" title="Sesle">
+        <button class="daire-btn" id="rAracMik" aria-label="Araç bilgilerini sesle söyle" title="Sesle">
           <svg class="ico"><use href="#i-mic"></use></svg>
         </button>
       </div>
@@ -386,6 +386,6 @@ document.addEventListener('input', function (e) {
 <style>
 /* Plaka alanının içindeki mikrofon — alan zaten çerçeveli, düğme
    içeride duruyor ve kutuyu şişirmiyor. */
-.plate-field .mic-round { width: 44px; height: 44px; align-self: center; margin-right: 2px; }
-.plate-field .mic-round .ico { width: 20px; height: 20px; }
+.plate-field .daire-btn { width: 44px; height: 44px; align-self: center; margin-right: 2px; }
+.plate-field .daire-btn .ico { width: 20px; height: 20px; }
 </style>

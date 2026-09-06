@@ -311,9 +311,16 @@ function odemeDagilimi() {
    rakam yalan söyler" diye ertelenmişti. SESLE GİRİLİYORSA o itiraz
    zayıflıyor: "beş yüz lira elektrik faturası" demek, form doldurmak
    değil. K-014'e bakılsın. */
+/* ⚠️ 05.09 — PARÇA GİDERİ TOHUM VERİDEN ÇIKARILDI.
+   Cemil: "Giderlerde yedek parça olmamalı. Yedek parçalar işten
+   alınarak düşülüyor."
+   Tohum veride "Öz Yedek Parça — triger seti 4.200 ₺" duruyordu ve
+   ekran onu gider olarak sayıyordu; oysa aynı para servis satırındaki
+   `alis` alanında da duruyor ve iş başına farkta düşülüyor. Örnek
+   verinin kendisi YANLIŞ ALIŞKANLIK öğretiyordu. */
 var GIDERLER = [
   { id: 1, tarih: '01.09.2026', aciklama: 'Elektrik faturası', tutar: 2400, tur: 'fatura' },
-  { id: 2, tarih: '02.09.2026', aciklama: 'Öz Yedek Parça — triger seti', tutar: 4200, tur: 'parca' }
+  { id: 2, tarih: '02.09.2026', aciklama: 'Dükkân kirası', tutar: 12000, tur: 'kira' }
 ];
 
 /* ---- KM GEÇMİŞİ ----

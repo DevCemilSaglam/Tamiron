@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 35 test.
+/* Tamiron prototip saglik denetimi — 36 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -712,7 +712,7 @@ function stilMetni() {
        Sonuc: denetimden sonra muhasebe "detayli" kipte aciliyordu ve
        bu, K-024.1'in AYNI hatasinin ikinci yuzuydu (arac olctugu seyi
        degistiriyor). Test etmedigi bir seye dokunmasin. */
-    var ELE = '[data-git], [data-sesle], [data-arac], [data-kayit], .mic-round, .clear, .akd-bas, .cip, [role="tab"]';
+    var ELE = '[data-git], [data-sesle], [data-arac], [data-kayit], .daire-btn, .clear, .akd-bas, .cip, [role="tab"]';
     ekranlar.forEach(function (a) {
       showScreen(a);
       var dugmeler = Array.prototype.slice.call(
@@ -989,6 +989,40 @@ function stilMetni() {
     });
     showScreen('home');
   }
+
+  /* 36) GORUNMEYEN YATAY KAYDIRMA (05.09.2026)
+     Cemil: "Gider ve alacak tablolari telefonun ekranina sigmiyor,
+     saga kaydirmak gerekiyor. KULLANICI SAGA KAYDIRACAGINI BILMEZ."
+
+     ⚠️ BU, K-025'TE VERDIGIM KARARIN ACIGI. Orada "kesilen metin,
+     tasan metinden tehlikelidir" deyip overflow-x:auto koymustum.
+     Kirpmaya gore dogruydu ama UCUNCU bir secenek vardi ve o daha
+     dogru: SIGDIRMAK.
+
+     Gorunmeyen kaydirma, kirpmanin kardesidir: ikisinde de kullanici
+     bir seyin eksik oldugunu BILMEZ. Fark, kirpmada yarim kelime
+     gormesi; kaydirmada HIC gormemesi.
+
+     Olculen: ekran icinde YATAY kaydirilabilen ve gercekten TASAN bir
+     kutu var mi. Dikey kaydirma (.screen'in kendisi, cekmece govdesi)
+     kapsam disi — telefonda asagi kaydirmak ogrenilmis davranistir,
+     saga kaydirmak degil.
+
+     NEGATIF DOGRULAMA (05.09): .tablo'ya table-layout:auto ve
+     white-space:nowrap geri konunca 3 bulgu; kaldirilinca 0. */
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' *').forEach(function (el) {
+      var c = getComputedStyle(el);
+      if (c.overflowX !== 'auto' && c.overflowX !== 'scroll') return;
+      var tasma = el.scrollWidth - el.clientWidth;
+      if (tasma <= 2) return;
+      ek('GIZLI-KAYDIRMA', a,
+         ((el.className || '').toString().split(' ')[0] || el.id || el.tagName) +
+         ' saga ' + Math.round(tasma) + 'px kayiyor');
+    });
+  });
+  showScreen('home');
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */

@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-06 13:13
+  Üretim: 2026-09-06 13:21
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -915,14 +915,20 @@ eylem butonu kisalmaz — yoksa
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-}.mic-round.ghost {
+}/* ⚠️ 05.09 — .mic-round -> .daire-btn.
+   Cemil: "Gider ekle button mikrofonun solunda olsun. Aynı yuvarlak
+   içinde + olan button."
+   Aynı biçim artık iki iş yapıyor (mikrofon ve ekleme); sınıf adının
+   "mic" demesi yanlış olurdu. Bileşen YUVARLAK EYLEM DÜĞMESİ, içindeki
+   ikon ne iş yaptığını söylüyor. */
+.daire-btn.ghost {
   background: transparent;
   color: var(--accent);
   border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--line));
-}.mic-round.ghost:hover {
+}.daire-btn.ghost:hover {
   background: var(--accent-soft);
   filter: none;
-}.mic-round {
+}.daire-btn {
   flex: none;
   width: 44px;
   height: 44px;
@@ -933,9 +939,9 @@ eylem butonu kisalmaz — yoksa
   display: flex;
   align-items: center;
   justify-content: center;
-}.mic-round:hover {
+}.daire-btn:hover {
   filter: brightness(1.06);
-}.mic-round .ico {
+}.daire-btn .ico {
   width: 20px;
   height: 20px;
 }/* ---------- LİSTE EKRANLARI (Araçlar / Kişiler) ---------- */
@@ -986,7 +992,7 @@ eylem butonu kisalmaz — yoksa
    de yakalıyordu (aynı özgüllük, sonra gelen kazanır). Mikrofonun
    ikonu düğmenin kendi rengini almalı; yoksa aksan çerçeveli ama
    soluk ikonlu, yarı sönük bir düğme çıkıyor. */
-.search-box .mic-round .ico { color: currentColor; }
+.search-box .daire-btn .ico { color: currentColor; }
 .list {
   display: flex;
   flex-direction: column;
@@ -1841,24 +1847,43 @@ alanları ::before ile büyür. Ölçüm (30.08,
 
 /* ================= TABLO — 05.09.2026 =================
    Cemil: "Gider alanı excel gibi tablo şeklinde olsun."
-   "Alınamayan (Veresiye) değil Alacak olsun başlık. Yine tablo gibi
-   okunabilir olabilir."
 
    Neden GERÇEK <table>: rakam sütunu hizalı olmalı. .tutar-serit iki
    sütunluk bir şerit; üç-dört sütun gerekince satırlar birbirini
    tutmuyordu. Tablo ayrıca ekran okuyucuya "bu bir tablo" diyor.
 
-   ⚠️ DAR EKRANDA KIRPILMAZ, KAYDIRILIR (K-025'in dersi): sarmalayıcı
-   overflow-x:auto. Kesilen metin, taşan metinden tehlikelidir. */
-.tablo-sar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+   ⚠️ 05.09 (ikinci tur) — YATAY KAYDIRMA KALKTI, TABLO SIĞIYOR.
+   Cemil: "Gider ve alacak tabloları telefonun ekranına sığmıyor, sağa
+   kaydırmak gerekiyor. KULLANICI SAĞA KAYDIRACAĞINI BİLMEZ."
+
+   Haklı ve bu, K-025'te verdiğim kararı düzeltiyor. Orada "kesilen
+   metin taşan metinden tehlikelidir" deyip `overflow-x: auto` koymuştum
+   — kırpmaya göre doğruydu ama ÜÇÜNCÜ bir seçenek vardı ve o daha
+   doğru: SIĞDIRMAK.
+
+   Görünmeyen kaydırma, kırpmanın kardeşidir: ikisinde de kullanıcı
+   bir şeyin eksik olduğunu BİLMEZ. Fark, kırpmada yarım kelime
+   görmesi; kaydırmada hiç görmemesi.
+
+   Nasıl sığıyor: SÜTUN SAYISI AZALDI. İkincil bilgi (tarih, plaka)
+   kendi sütununda değil, ana metnin ALTINDA küçük yazıyor. */
+.tablo-sar { overflow-x: visible; }
 .tablo {
-  width: 100%; border-collapse: collapse;
+  width: 100%; border-collapse: collapse; table-layout: fixed;
   font-size: var(--tip-sm);
 }
 .tablo th, .tablo td {
-  padding: 10px 10px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--line);
-  text-align: left; white-space: nowrap;
+  text-align: left;
+  /* nowrap KALKTI: metin sarar, tablo genişlemez. */
+  overflow-wrap: anywhere;
+}
+/* İkincil bilgi ana metnin altında — kendi sütununu istemiyor. */
+.tablo .t-alt {
+  display: block; margin-top: 3px;
+  font-size: var(--tip-xs); color: var(--muted);
+  font-family: var(--font-mono);
 }
 .tablo th {
   font-size: var(--tip-xs); font-weight: 700; letter-spacing: .06em;
@@ -1871,7 +1896,10 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .tablo td.sayi, .tablo th.sayi {
   text-align: right; font-family: var(--font-mono);
   font-variant-numeric: tabular-nums; color: var(--text);
+  white-space: nowrap;      /* rakam SARMAZ — "2.4" alt satira "00" olmaz */
+  width: 96px;
 }
+.tablo td.eylem, .tablo th.eylem { width: 40px; padding-left: 0; }
 .tablo tbody tr:last-child td { border-bottom: 0; }
 .tablo tr.genel td {
   font-weight: 700; color: var(--text);
@@ -1937,13 +1965,10 @@ alanları ::before ile büyür. Ölçüm (30.08,
   .modul-kutu { min-height: 0; flex-direction: row; align-items: center; gap: 12px; }
 }
 
-/* Bölüm başlığının yanındaki küçük not — "dönemden bağımsız" gibi bir
-   şerh. Başlığın kendisi kadar bağırmamalı ama görünmeli (05.09). */
-.section-label .lbl-not {
-  margin-left: auto; flex: none;
-  font-size: var(--tip-xs); font-weight: 500; letter-spacing: 0;
-  text-transform: none; color: var(--muted);
-}
+/* .lbl-not KALDIRILDI (05.09): "dönemden bağımsız" şerhi Cemil'in
+   isteğiyle kalkınca sınıf ölü kaldı ve denetimin OLU-SINIF testi
+   yakaladı. Ölü CSS bırakılmaz — sözlükte duran ama kullanılmayan
+   sınıf, bir sonraki okuyucuya "bu var" der. */
 
 
 /* ================= YIĞIN (.yigin) — 05.09.2026 =================
@@ -1970,8 +1995,8 @@ alanları ::before ile büyür. Ölçüm (30.08,
 /* ===== ekran: 20-ruhsat.html ===== */
 /* Plaka alanının içindeki mikrofon — alan zaten çerçeveli, düğme
    içeride duruyor ve kutuyu şişirmiyor. */
-.plate-field .mic-round { width: 44px; height: 44px; align-self: center; margin-right: 2px; }
-.plate-field .mic-round .ico { width: 20px; height: 20px; }
+.plate-field .daire-btn { width: 44px; height: 44px; align-self: center; margin-right: 2px; }
+.plate-field .daire-btn .ico { width: 20px; height: 20px; }
 
 /* ===== ekran: 30-kayit.html ===== */
 /* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
@@ -2304,7 +2329,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
 
      BİLEŞENLER: .screen-head .eyebrow · .tab-grup .tab · .card
      .card.raised · .plate-input-wrap .plate-field .tr-tag · .field
-     .field-2 · .plate-hint · .cip-grup .cip · .notice · .mic-round
+     .field-2 · .plate-hint · .cip-grup .cip · .notice · .daire-btn
      · .btn. Yeni: yalnız .tab-grup/.tab (sözlüğe girdi). -->
 <section class="screen" id="screen-ruhsat">
 
@@ -2344,7 +2369,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
             <span class="tr-tag">TR</span>
             <input id="rPlaka" type="text" data-giris="plaka" maxlength="11" placeholder="34 ABC 123"
                    autocomplete="off" spellcheck="false" aria-label="Plaka" />
-            <button class="mic-round ghost" data-sesle="servis-ekle"
+            <button class="daire-btn ghost" data-sesle="servis-ekle"
                     aria-label="Plakayı ve işi sesle söyle" title="Sesle">
               <svg class="ico"><use href="#i-mic"></use></svg>
             </button>
@@ -2368,7 +2393,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
         <span class="lbl-txt">
           <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç bilgileri
         </span>
-        <button class="mic-round" id="rAracMik" aria-label="Araç bilgilerini sesle söyle" title="Sesle">
+        <button class="daire-btn" id="rAracMik" aria-label="Araç bilgilerini sesle söyle" title="Sesle">
           <svg class="ico"><use href="#i-mic"></use></svg>
         </button>
       </div>
@@ -2427,7 +2452,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
      Kayıt TESLİM EDİLENE KADAR AÇIK ve satır eklenebilir (K-003).
 
      BİLEŞENLER v1'DEN: .card · .section-label .with-action .lbl-txt
-     · .mic-round · .field · .kalem .k-tip .k-ad .k-tutar .k-sil
+     · .daire-btn · .field · .kalem .k-tip .k-ad .k-tutar .k-sil
      · .tutar-serit .tutar-sat .tv · .btn .btn-row · .cip
      · .arac-bas .plate-lg. Yeni bileşen yazılmadı.
 
@@ -2448,7 +2473,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
   <div class="card">
     <div class="section-label with-action">
       <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne istiyor?</span>
-      <button class="mic-round" id="kSikayetMik" aria-label="Ne istediğini sesle yaz" title="Sesle">
+      <button class="daire-btn" id="kSikayetMik" aria-label="Ne istediğini sesle yaz" title="Sesle">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -2659,7 +2684,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Not
       </span>
-      <button class="mic-round" id="arNotMik" aria-label="Notu sesle yaz" title="Sesle">
+      <button class="daire-btn" id="arNotMik" aria-label="Notu sesle yaz" title="Sesle">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -2726,7 +2751,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <button class="clear" id="arcQTemiz" aria-label="Aramayı temizle">
       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
     </button>
-    <button class="mic-round ghost" data-sesle="araclar" aria-label="Araçlarda sesle ara">
+    <button class="daire-btn ghost" data-sesle="araclar" aria-label="Araçlarda sesle ara">
       <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
@@ -2783,7 +2808,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <button class="clear" id="kytQTemiz" aria-label="Aramayı temizle">
       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
     </button>
-    <button class="mic-round ghost" data-sesle="kayitlar" aria-label="Kayıtlarda sesle ara">
+    <button class="daire-btn ghost" data-sesle="kayitlar" aria-label="Kayıtlarda sesle ara">
       <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
@@ -2831,7 +2856,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
       <!-- 04.09: seçim ekranında mikrofon yoktu — "34 ABC 123
            sahibine mesaj gönder" diyebilmek için önce menüye dönmek
            gerekiyordu. -->
-      <button class="mic-round" id="msjSecimMik" aria-label="Kime göndereceğini sesle söyle" title="Sesle">
+      <button class="daire-btn" id="msjSecimMik" aria-label="Kime göndereceğini sesle söyle" title="Sesle">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -2842,7 +2867,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
       <button class="clear" id="msjQTemiz" aria-label="Aramayı temizle">
         <svg class="ico ico-sm"><use href="#i-x"></use></svg>
       </button>
-      <button class="mic-round ghost" data-sesle="mesaj" aria-label="Müşteriyi sesle bul">
+      <button class="daire-btn ghost" data-sesle="mesaj" aria-label="Müşteriyi sesle bul">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -2860,7 +2885,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <div class="card">
       <div class="section-label with-action">
         <span class="lbl-txt">Mesaj</span>
-        <button class="mic-round" id="msjMik" aria-label="Sesle yazdır" title="Sesle">
+        <button class="daire-btn" id="msjMik" aria-label="Sesle yazdır" title="Sesle">
           <svg class="ico"><use href="#i-mic"></use></svg>
         </button>
       </div>
@@ -2921,7 +2946,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <button class="clear" id="msQTemiz" aria-label="Aramayı temizle">
       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
     </button>
-    <button class="mic-round ghost" data-sesle="musteriler" aria-label="Müşterilerde sesle ara">
+    <button class="daire-btn ghost" data-sesle="musteriler" aria-label="Müşterilerde sesle ara">
       <svg class="ico"><use href="#i-mic"></use></svg>
     </button>
   </div>
@@ -2966,7 +2991,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
      · .cip-grup .cip · .card · .section-label .with-action .lbl-txt
      · .tutar-serit .tutar-sat .tv · .tablo-sar .tablo · .menu-list
      .menu-row .main .ic-badge .txt .lbl .sub · .field · .btn .btn-row
-     · .mic-round · .pill · .bos-durum. Yeni bileşen yazılmadı. -->
+     · .daire-btn · .pill · .bos-durum. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-muhasebe">
 
   <div class="screen-head">
@@ -3000,27 +3025,28 @@ alanları ::before ile büyür. Ölçüm (30.08,
       <div class="tutar-serit" id="muhOzet"></div>
     </div>
 
+    <!-- İKİ YUVARLAK DÜĞME, AYNI BİÇİM (Cemil, 05.09: "Gider ekle
+         button mikrofonun solunda olsun. Aynı yuvarlak içinde + olan
+         button"). Elle giriş ve sesle giriş aynı işin iki yolu; ikisi
+         iki farklı biçimde durursa biri "asıl", öteki "yedek" gibi
+         okunuyordu. Elle giriş yedek değil (K-021.1: mikrofonsuz
+         tarayıcıda tek yol o). -->
     <div class="section-label with-action">
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Giderler
       </span>
-      <button class="mic-round" id="muhSesleGider" aria-label="Gideri sesle ekle" title="Sesle ekle">
-        <svg class="ico"><use href="#i-mic"></use></svg>
+      <button class="daire-btn ghost" id="muhGiderEkle" aria-label="Gider ekle" title="Gider ekle">
+        <svg class="ico"><use href="#i-plus"></use></svg>
       </button>
-    </div>
-
-    <!-- Gider ELLE DE girilebiliyor (K-021.1): Web Speech Firefox'ta yok
-         ve mikrofonsuz tarayıcıda bu bölüm tamamen kullanılamıyordu. -->
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="muhGiderEkle">
-        <svg class="ico"><use href="#i-plus"></use></svg> Gider ekle
+      <button class="daire-btn" id="muhSesleGider" aria-label="Gideri sesle ekle" title="Sesle ekle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
 
     <div class="card" id="muhGiderForm" hidden>
       <div class="field">
-        <label for="muhGiderAd">Ne için</label>
-        <input id="muhGiderAd" placeholder="ör. elektrik faturası" autocomplete="off" />
+        <label for="muhGiderAd">Açıklama</label>
+        <input id="muhGiderAd" placeholder="ör. elektrik faturası, kira, çay ocağı" autocomplete="off" />
       </div>
       <div class="field">
         <label for="muhGiderTutar">Tutar (₺)</label>
@@ -3039,7 +3065,6 @@ alanları ::before ile büyür. Ölçüm (30.08,
          duruyor — yalnız henüz alınmadı. -->
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Alacak
-      <span class="lbl-not">dönemden bağımsız</span>
     </div>
     <div id="muhAlacak"></div>
 
@@ -4342,9 +4367,16 @@ function odemeDagilimi() {
    rakam yalan söyler" diye ertelenmişti. SESLE GİRİLİYORSA o itiraz
    zayıflıyor: "beş yüz lira elektrik faturası" demek, form doldurmak
    değil. K-014'e bakılsın. */
+/* ⚠️ 05.09 — PARÇA GİDERİ TOHUM VERİDEN ÇIKARILDI.
+   Cemil: "Giderlerde yedek parça olmamalı. Yedek parçalar işten
+   alınarak düşülüyor."
+   Tohum veride "Öz Yedek Parça — triger seti 4.200 ₺" duruyordu ve
+   ekran onu gider olarak sayıyordu; oysa aynı para servis satırındaki
+   `alis` alanında da duruyor ve iş başına farkta düşülüyor. Örnek
+   verinin kendisi YANLIŞ ALIŞKANLIK öğretiyordu. */
 var GIDERLER = [
   { id: 1, tarih: '01.09.2026', aciklama: 'Elektrik faturası', tutar: 2400, tur: 'fatura' },
-  { id: 2, tarih: '02.09.2026', aciklama: 'Öz Yedek Parça — triger seti', tutar: 4200, tur: 'parca' }
+  { id: 2, tarih: '02.09.2026', aciklama: 'Dükkân kirası', tutar: 12000, tur: 'kira' }
 ];
 
 /* ---- KM GEÇMİŞİ ----
@@ -6911,25 +6943,38 @@ Ekran.tanim('muhasebe', {
     /* ---- GİDERLER — TABLO. Silinebilir: gider sesle giriliyor ve ses
        yanlış duyabilir; geri alınamayan bir giriş ustayı sesle
        girmekten caydırır. */
+    /* ⚠️ ÜÇ SÜTUN, DÖRT DEĞİL. Tarih kendi sütununda değil, açıklamanın
+       ALTINDA — dört sütun 375 px'e sığmıyordu ve tablo sağa kayıyordu
+       (Cemil: "kullanıcı sağa kaydıracağını bilmez"). */
     var gid = GIDERLER.filter(function (g) { return donemIcinde(g.tarih, muhDonemSecili); });
     document.getElementById('muhGiderler').innerHTML = gid.length
       ? '<div class="card"><div class="tablo-sar"><table class="tablo">' +
-          '<thead><tr><th>Tarih</th><th>Ne için</th>' +
-            '<th class="sayi">Tutar</th><th></th></tr></thead><tbody>' +
+          '<thead><tr><th>Açıklama</th>' +
+            '<th class="sayi">Tutar</th><th class="eylem"></th></tr></thead><tbody>' +
           gid.slice().reverse().map(function (g) {
-            return '<tr><td>' + g.tarih + '</td>' +
-              '<td class="metin">' + g.aciklama + '</td>' +
-              '<td class="sayi">' + tutar(g.tutar) + '</td>' +
-              '<td><button class="satir-sil" data-gider-sil="' + g.id + '"' +
+            return '<tr><td>' + g.aciklama +
+                '<span class="t-alt">' + g.tarih + '</span></td>' +
+              '<td class="sayi">' + tutar(g.tutar) + ' ₺</td>' +
+              '<td class="eylem"><button class="satir-sil" data-gider-sil="' + g.id + '"' +
                 ' aria-label="' + g.aciklama + ' giderini kaldır">' +
                 '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button></td></tr>';
           }).join('') +
-          '<tr class="genel"><td colspan="2">Toplam</td>' +
+          '<tr class="genel"><td>Toplam</td>' +
             '<td class="sayi">' + tutar(gid.reduce(function (t, g) {
-              return t + (g.tutar || 0); }, 0)) + '</td><td></td></tr>' +
-          '</tbody></table></div></div>'
+              return t + (g.tutar || 0); }, 0)) + ' ₺</td><td class="eylem"></td></tr>' +
+          '</tbody></table></div></div>' +
+        /* ⚠️ ARAÇ İŞLERİ BURAYA YAZILMAZ (Cemil, 05.09: "Giderlerde
+           yedek parça olmamalı. Yedek parçalar işten alınarak
+           düşülüyor"). Parçanın alış fiyatı zaten servis satırında
+           duruyor ve iş başına farkta düşülüyor; buraya elle yazmak
+           AYNI PARAYI İKİ KEZ saymaktır. Kullanıcı yine de yazabilir —
+           yasak değil, uyarı. */
+        '<p class="plate-hint">Buraya <b>araç işleri dışındaki</b> giderler ' +
+        'yazılır: kira, elektrik, çay ocağı… Parça alışı servis kaydından ' +
+        'düşülüyor, ayrıca yazarsan iki kez sayılır.</p>'
       : bosDurumHtml('i-receipt', 'Gider yazılmamış',
-          '"Gider ekle"ye dokun ya da mikrofona basıp ' +
+          'Araç işleri dışındaki giderler buraya: kira, elektrik, çay ocağı. ' +
+          'Yuvarlak + düğmesine dokun ya da mikrofona basıp ' +
           '"2400 TL elektrik faturası ekle" de.');
 
     /* ---- ALACAK — TABLO. "Almadım" bir ödeme yoludur (K-004), yani
@@ -6944,21 +6989,24 @@ Ekran.tanim('muhasebe', {
     var borclu = KAYITLAR.filter(function (k) {
       return k.odemeYolu === 'almadim';
     });
+    /* İKİ SÜTUN. Plaka ve teslim tarihi müşterinin ALTINDA — dört
+       sütun 375 px'e sığmıyordu. Başlık "Kim" değil MÜŞTERİ
+       (Cemil, 05.09): ustanın kelimesi bu. */
     document.getElementById('muhAlacak').innerHTML = borclu.length
       ? '<div class="card"><div class="tablo-sar"><table class="tablo">' +
-          '<thead><tr><th>Kim</th><th>Araç</th><th>Teslim</th>' +
+          '<thead><tr><th>Müşteri</th>' +
             '<th class="sayi">Tutar</th></tr></thead><tbody>' +
           borclu.slice().reverse().map(function (k) {
             var a = aracBul(k.plaka) || {};
             return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
-              '<td class="metin">' + (a.sahipAd || 'sahip yazılmamış') + '</td>' +
-              '<td>' + k.plaka + '</td>' +
-              '<td>' + (k.teslimTarihi || '—') + '</td>' +
-              '<td class="sayi">' + tutar(kayitToplami(k)) + '</td></tr>';
+              '<td>' + (a.sahipAd || 'sahip yazılmamış') +
+                '<span class="t-alt">' + k.plaka +
+                (k.teslimTarihi ? ' · ' + k.teslimTarihi : '') + '</span></td>' +
+              '<td class="sayi">' + tutar(kayitToplami(k)) + ' ₺</td></tr>';
           }).join('') +
-          '<tr class="genel"><td colspan="3">Toplam alacak</td>' +
+          '<tr class="genel"><td>Toplam alacak</td>' +
             '<td class="sayi">' + tutar(borclu.reduce(function (t, k) {
-              return t + kayitToplami(k); }, 0)) + '</td></tr>' +
+              return t + kayitToplami(k); }, 0)) + ' ₺</td></tr>' +
           '</tbody></table></div></div>'
       : bosDurumHtml('i-circle-check', 'Alacak yok',
           'Teslim edilen her işin parası alınmış.');
@@ -7059,30 +7107,29 @@ Ekran.tanim('is-basina', {
       var a = aracBul(k.plaka) || {};
       tAlinan += kr.alinan; tParca += kr.parca; tFark += kr.fark;
       return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
-        '<td class="metin"><b>' + k.plaka + '</b>' +
-          (a.marka ? '<br><span class="k-katalog">' + a.marka + ' ' + a.model + '</span>' : '') +
+        '<td><b>' + k.plaka + '</b>' +
+          '<span class="t-alt">' + TUR_AD[k.tur] +
+            (a.marka ? ' · ' + a.marka : '') + ' · ' + k.teslimTarihi + '</span>' +
+          '<span class="t-alt">alınan ' + tutar(kr.alinan) +
+            ' · parça ' + tutar(kr.parca) + '</span>' +
         '</td>' +
-        '<td class="metin">' + TUR_AD[k.tur] +
-          (k.sikayet ? '<br><span class="k-katalog">' + k.sikayet + '</span>' : '') +
-        '</td>' +
-        '<td>' + k.teslimTarihi + '</td>' +
-        '<td class="sayi">' + tutar(kr.alinan) + '</td>' +
-        '<td class="sayi">' + tutar(kr.parca) + '</td>' +
-        '<td class="sayi">' + tutar(kr.fark) + '</td>' +
+        '<td class="sayi">' + tutar(kr.fark) + ' ₺</td>' +
       '</tr>';
     }).join('');
 
+    /* ⚠️ İKİ SÜTUN, ALTI DEĞİL (05.09). Altı sütunlu tablo 375 px'e
+       sığmıyordu ve sağa kayıyordu; kullanıcı sağa kaydıracağını
+       bilmez. İş, tarih, alınan ve parça artık plakanın ALTINDA
+       küçük yazıyor — hepsi görünüyor, hiçbiri kaydırma istemiyor.
+       Sayı sütununda yalnız ASIL RAKAM var: fark. */
     document.getElementById('ibTablo').innerHTML =
-      '<thead><tr>' +
-        '<th>Araç</th><th>İş</th><th>Teslim</th>' +
-        '<th class="sayi">Alınan</th><th class="sayi">Parça</th><th class="sayi">Fark</th>' +
-      '</tr></thead>' +
+      '<thead><tr><th>İş</th><th class="sayi">Fark</th></tr></thead>' +
       '<tbody>' + satirlar +
         '<tr class="genel">' +
-          '<td colspan="3">Toplam</td>' +
-          '<td class="sayi">' + tutar(tAlinan) + '</td>' +
-          '<td class="sayi">' + tutar(tParca) + '</td>' +
-          '<td class="sayi">' + tutar(tFark) + '</td>' +
+          '<td>Toplam' +
+            '<span class="t-alt">alınan ' + tutar(tAlinan) +
+            ' · parça ' + tutar(tParca) + '</span></td>' +
+          '<td class="sayi">' + tutar(tFark) + ' ₺</td>' +
         '</tr>' +
       '</tbody>';
   }

@@ -414,8 +414,8 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Bölüm başlığı | `.section-label` · eylemli: `.section-label.with-action` > `.lbl-txt` |
 | Ana düğme | `.btn.btn-primary.btn-lg` · ikincil: `.btn.btn-ghost` · yan yana: `.btn-row` |
 | Seçim | `.cip-grup` > `.cip` (`aria-pressed`) |
-| Alan | `.field` · ikili: `.field-2` · arama: `.search-box` (sağ ucunda `.mic-round.ghost`) |
-| Mikrofon düğmesi | `.mic-round` (+`.ghost`) — serbest metin alanının ve arama kutusunun kendi mikrofonu; menü satırındaki ise `.menu-row > .mic` |
+| Alan | `.field` · ikili: `.field-2` · arama: `.search-box` (sağ ucunda `.daire-btn.ghost`) |
+| Yuvarlak düğme | `.daire-btn` (+`.ghost`) — serbest metin alanının ve arama kutusunun kendi mikrofonu; menü satırındaki ise `.menu-row > .mic` |
 | Plaka | `.plate` + `.plate-sm` / `.plate-lg` (yalnız `plakaHtml()` üretir) |
 | Araç künyesi | `.arac-bas` > `.plate-lg` + `.veh-title` (`.yr`) + `.spec-strip` > `.spec-val` `.spec-sep` |
 | Araç kartı | `.arac-kart` (+`.icerde`) > `.ak-ust` + `.ak-arac` (`.ak-motor`) + `.ak-sahip` + `.ak-kisi` > `.ak-kisi-ad` — yalnız `aracKartiHtml()` üretir |
@@ -427,8 +427,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | **Giriş koruması** | `data-giris="tutar\|km\|yil\|tel\|plaka"` — biçimli her alan bunu taşır. `inputmode` bir öneridir, kısıt değil (K-030) |
 | **Yığın** | `.yigin` — ekran gövdesindeki her sarmalayıcı kap. **Boşluğu kap verir**: yeni bir sarmalayıcı `.yigin` almazsa ritim sessizce kırılır |
 | Modül kutusu | `.modul-grid` > `.modul-kutu` > `.mk-ic` + `.mk-ad` + `.mk-alt` — ızgara; `.menu-row` ise liste (sırası anlam taşır) |
-| Başlık şerhi | `.section-label` içinde `.lbl-not` |
-| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono, `.metin` sarabilir) · toplam satırı: `tr.genel` · satır silme: `.satir-sil` |
+| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono sabit genişlik, `.eylem` 40 px) · ikincil bilgi: `.t-alt` (ana metnin **altında**) · toplam: `tr.genel` · silme: `.satir-sil`. **Yatay kaydırma YOK** (K-031) |
 | Servis kaydı kartı | `.arac-kart` + `.ak-is` > `.ak-is-ne` + `.ak-alt` (yalnız `kayitKartiHtml()` üretir) |
 | Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |

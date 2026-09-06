@@ -34,7 +34,7 @@
      · .cip-grup .cip · .card · .section-label .with-action .lbl-txt
      · .tutar-serit .tutar-sat .tv · .tablo-sar .tablo · .menu-list
      .menu-row .main .ic-badge .txt .lbl .sub · .field · .btn .btn-row
-     · .mic-round · .pill · .bos-durum. Yeni bileşen yazılmadı. -->
+     · .daire-btn · .pill · .bos-durum. Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-muhasebe">
 
   <div class="screen-head">
@@ -68,27 +68,28 @@
       <div class="tutar-serit" id="muhOzet"></div>
     </div>
 
+    <!-- İKİ YUVARLAK DÜĞME, AYNI BİÇİM (Cemil, 05.09: "Gider ekle
+         button mikrofonun solunda olsun. Aynı yuvarlak içinde + olan
+         button"). Elle giriş ve sesle giriş aynı işin iki yolu; ikisi
+         iki farklı biçimde durursa biri "asıl", öteki "yedek" gibi
+         okunuyordu. Elle giriş yedek değil (K-021.1: mikrofonsuz
+         tarayıcıda tek yol o). -->
     <div class="section-label with-action">
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Giderler
       </span>
-      <button class="mic-round" id="muhSesleGider" aria-label="Gideri sesle ekle" title="Sesle ekle">
-        <svg class="ico"><use href="#i-mic"></use></svg>
+      <button class="daire-btn ghost" id="muhGiderEkle" aria-label="Gider ekle" title="Gider ekle">
+        <svg class="ico"><use href="#i-plus"></use></svg>
       </button>
-    </div>
-
-    <!-- Gider ELLE DE girilebiliyor (K-021.1): Web Speech Firefox'ta yok
-         ve mikrofonsuz tarayıcıda bu bölüm tamamen kullanılamıyordu. -->
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="muhGiderEkle">
-        <svg class="ico"><use href="#i-plus"></use></svg> Gider ekle
+      <button class="daire-btn" id="muhSesleGider" aria-label="Gideri sesle ekle" title="Sesle ekle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
 
     <div class="card" id="muhGiderForm" hidden>
       <div class="field">
-        <label for="muhGiderAd">Ne için</label>
-        <input id="muhGiderAd" placeholder="ör. elektrik faturası" autocomplete="off" />
+        <label for="muhGiderAd">Açıklama</label>
+        <input id="muhGiderAd" placeholder="ör. elektrik faturası, kira, çay ocağı" autocomplete="off" />
       </div>
       <div class="field">
         <label for="muhGiderTutar">Tutar (₺)</label>
@@ -107,7 +108,6 @@
          duruyor — yalnız henüz alınmadı. -->
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Alacak
-      <span class="lbl-not">dönemden bağımsız</span>
     </div>
     <div id="muhAlacak"></div>
 
@@ -241,25 +241,38 @@ Ekran.tanim('muhasebe', {
     /* ---- GİDERLER — TABLO. Silinebilir: gider sesle giriliyor ve ses
        yanlış duyabilir; geri alınamayan bir giriş ustayı sesle
        girmekten caydırır. */
+    /* ⚠️ ÜÇ SÜTUN, DÖRT DEĞİL. Tarih kendi sütununda değil, açıklamanın
+       ALTINDA — dört sütun 375 px'e sığmıyordu ve tablo sağa kayıyordu
+       (Cemil: "kullanıcı sağa kaydıracağını bilmez"). */
     var gid = GIDERLER.filter(function (g) { return donemIcinde(g.tarih, muhDonemSecili); });
     document.getElementById('muhGiderler').innerHTML = gid.length
       ? '<div class="card"><div class="tablo-sar"><table class="tablo">' +
-          '<thead><tr><th>Tarih</th><th>Ne için</th>' +
-            '<th class="sayi">Tutar</th><th></th></tr></thead><tbody>' +
+          '<thead><tr><th>Açıklama</th>' +
+            '<th class="sayi">Tutar</th><th class="eylem"></th></tr></thead><tbody>' +
           gid.slice().reverse().map(function (g) {
-            return '<tr><td>' + g.tarih + '</td>' +
-              '<td class="metin">' + g.aciklama + '</td>' +
-              '<td class="sayi">' + tutar(g.tutar) + '</td>' +
-              '<td><button class="satir-sil" data-gider-sil="' + g.id + '"' +
+            return '<tr><td>' + g.aciklama +
+                '<span class="t-alt">' + g.tarih + '</span></td>' +
+              '<td class="sayi">' + tutar(g.tutar) + ' ₺</td>' +
+              '<td class="eylem"><button class="satir-sil" data-gider-sil="' + g.id + '"' +
                 ' aria-label="' + g.aciklama + ' giderini kaldır">' +
                 '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button></td></tr>';
           }).join('') +
-          '<tr class="genel"><td colspan="2">Toplam</td>' +
+          '<tr class="genel"><td>Toplam</td>' +
             '<td class="sayi">' + tutar(gid.reduce(function (t, g) {
-              return t + (g.tutar || 0); }, 0)) + '</td><td></td></tr>' +
-          '</tbody></table></div></div>'
+              return t + (g.tutar || 0); }, 0)) + ' ₺</td><td class="eylem"></td></tr>' +
+          '</tbody></table></div></div>' +
+        /* ⚠️ ARAÇ İŞLERİ BURAYA YAZILMAZ (Cemil, 05.09: "Giderlerde
+           yedek parça olmamalı. Yedek parçalar işten alınarak
+           düşülüyor"). Parçanın alış fiyatı zaten servis satırında
+           duruyor ve iş başına farkta düşülüyor; buraya elle yazmak
+           AYNI PARAYI İKİ KEZ saymaktır. Kullanıcı yine de yazabilir —
+           yasak değil, uyarı. */
+        '<p class="plate-hint">Buraya <b>araç işleri dışındaki</b> giderler ' +
+        'yazılır: kira, elektrik, çay ocağı… Parça alışı servis kaydından ' +
+        'düşülüyor, ayrıca yazarsan iki kez sayılır.</p>'
       : bosDurumHtml('i-receipt', 'Gider yazılmamış',
-          '"Gider ekle"ye dokun ya da mikrofona basıp ' +
+          'Araç işleri dışındaki giderler buraya: kira, elektrik, çay ocağı. ' +
+          'Yuvarlak + düğmesine dokun ya da mikrofona basıp ' +
           '"2400 TL elektrik faturası ekle" de.');
 
     /* ---- ALACAK — TABLO. "Almadım" bir ödeme yoludur (K-004), yani
@@ -274,21 +287,24 @@ Ekran.tanim('muhasebe', {
     var borclu = KAYITLAR.filter(function (k) {
       return k.odemeYolu === 'almadim';
     });
+    /* İKİ SÜTUN. Plaka ve teslim tarihi müşterinin ALTINDA — dört
+       sütun 375 px'e sığmıyordu. Başlık "Kim" değil MÜŞTERİ
+       (Cemil, 05.09): ustanın kelimesi bu. */
     document.getElementById('muhAlacak').innerHTML = borclu.length
       ? '<div class="card"><div class="tablo-sar"><table class="tablo">' +
-          '<thead><tr><th>Kim</th><th>Araç</th><th>Teslim</th>' +
+          '<thead><tr><th>Müşteri</th>' +
             '<th class="sayi">Tutar</th></tr></thead><tbody>' +
           borclu.slice().reverse().map(function (k) {
             var a = aracBul(k.plaka) || {};
             return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
-              '<td class="metin">' + (a.sahipAd || 'sahip yazılmamış') + '</td>' +
-              '<td>' + k.plaka + '</td>' +
-              '<td>' + (k.teslimTarihi || '—') + '</td>' +
-              '<td class="sayi">' + tutar(kayitToplami(k)) + '</td></tr>';
+              '<td>' + (a.sahipAd || 'sahip yazılmamış') +
+                '<span class="t-alt">' + k.plaka +
+                (k.teslimTarihi ? ' · ' + k.teslimTarihi : '') + '</span></td>' +
+              '<td class="sayi">' + tutar(kayitToplami(k)) + ' ₺</td></tr>';
           }).join('') +
-          '<tr class="genel"><td colspan="3">Toplam alacak</td>' +
+          '<tr class="genel"><td>Toplam alacak</td>' +
             '<td class="sayi">' + tutar(borclu.reduce(function (t, k) {
-              return t + kayitToplami(k); }, 0)) + '</td></tr>' +
+              return t + kayitToplami(k); }, 0)) + ' ₺</td></tr>' +
           '</tbody></table></div></div>'
       : bosDurumHtml('i-circle-check', 'Alacak yok',
           'Teslim edilen her işin parası alınmış.');

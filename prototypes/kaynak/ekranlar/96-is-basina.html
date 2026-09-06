@@ -70,30 +70,29 @@ Ekran.tanim('is-basina', {
       var a = aracBul(k.plaka) || {};
       tAlinan += kr.alinan; tParca += kr.parca; tFark += kr.fark;
       return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
-        '<td class="metin"><b>' + k.plaka + '</b>' +
-          (a.marka ? '<br><span class="k-katalog">' + a.marka + ' ' + a.model + '</span>' : '') +
+        '<td><b>' + k.plaka + '</b>' +
+          '<span class="t-alt">' + TUR_AD[k.tur] +
+            (a.marka ? ' · ' + a.marka : '') + ' · ' + k.teslimTarihi + '</span>' +
+          '<span class="t-alt">alınan ' + tutar(kr.alinan) +
+            ' · parça ' + tutar(kr.parca) + '</span>' +
         '</td>' +
-        '<td class="metin">' + TUR_AD[k.tur] +
-          (k.sikayet ? '<br><span class="k-katalog">' + k.sikayet + '</span>' : '') +
-        '</td>' +
-        '<td>' + k.teslimTarihi + '</td>' +
-        '<td class="sayi">' + tutar(kr.alinan) + '</td>' +
-        '<td class="sayi">' + tutar(kr.parca) + '</td>' +
-        '<td class="sayi">' + tutar(kr.fark) + '</td>' +
+        '<td class="sayi">' + tutar(kr.fark) + ' ₺</td>' +
       '</tr>';
     }).join('');
 
+    /* ⚠️ İKİ SÜTUN, ALTI DEĞİL (05.09). Altı sütunlu tablo 375 px'e
+       sığmıyordu ve sağa kayıyordu; kullanıcı sağa kaydıracağını
+       bilmez. İş, tarih, alınan ve parça artık plakanın ALTINDA
+       küçük yazıyor — hepsi görünüyor, hiçbiri kaydırma istemiyor.
+       Sayı sütununda yalnız ASIL RAKAM var: fark. */
     document.getElementById('ibTablo').innerHTML =
-      '<thead><tr>' +
-        '<th>Araç</th><th>İş</th><th>Teslim</th>' +
-        '<th class="sayi">Alınan</th><th class="sayi">Parça</th><th class="sayi">Fark</th>' +
-      '</tr></thead>' +
+      '<thead><tr><th>İş</th><th class="sayi">Fark</th></tr></thead>' +
       '<tbody>' + satirlar +
         '<tr class="genel">' +
-          '<td colspan="3">Toplam</td>' +
-          '<td class="sayi">' + tutar(tAlinan) + '</td>' +
-          '<td class="sayi">' + tutar(tParca) + '</td>' +
-          '<td class="sayi">' + tutar(tFark) + '</td>' +
+          '<td>Toplam' +
+            '<span class="t-alt">alınan ' + tutar(tAlinan) +
+            ' · parça ' + tutar(tParca) + '</span></td>' +
+          '<td class="sayi">' + tutar(tFark) + ' ₺</td>' +
         '</tr>' +
       '</tbody>';
   }
