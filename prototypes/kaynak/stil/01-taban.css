@@ -48,3 +48,15 @@ button { min-height: var(--dokun); cursor: pointer; }
 
 /* İkon — currentColor ile boyanır, token rengine uyar */
 .ico { width: 24px; height: 24px; flex: none; }
+
+/* ⚠️ 05.09 — GİZLİ OLAN GERÇEKTEN GİZLİ KALIR.
+   `hidden` özniteliği tarayıcının kendi stilinde `display: none`
+   demektir — ama bu, YAZDIĞIMIZ HER `display` KURALINA YENİLİR.
+   Bugün `.card { display: flex }` eklendi ve gider formu KAPALIYKEN
+   EKRANDA DURDU: `hidden` duruyordu, form görünüyordu.
+
+   Hiçbir test görmedi (hiçbiri "gizli olan görünüyor mu" diye
+   bakmıyordu) ve derleme de görmedi — ekran görüntüsünde yakalandı.
+   Kural tek satır ve bir daha hangi bileşene display verilirse
+   verilsin geçerli. */
+[hidden] { display: none !important; }

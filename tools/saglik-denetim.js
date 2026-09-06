@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 33 test.
+/* Tamiron prototip saglik denetimi — 34 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -828,7 +828,15 @@ function stilMetni() {
      6 px'i KASITLI (birbirine ait olduklarini soyluyor). Olculen sey,
      BIRBIRINE AIT OLMAYAN iki blogun arasi. */
   {
-    var ESIK = 8;
+    /* ⚠️ ESIK 8 -> 16 (05.09, ikinci tur). Ilk esik 8 px'ti ve
+       "0 bulgu" veriyordu — ama Cemil ekrana bakip "yine yakin" dedi
+       ve olcum onu dogruladi: on bir ekranda araliklar 14 px'te
+       kalmisti, yani ESIGIN ALTINDA ama HEDEFIN ALTINDA.
+
+       Test bir seyi olcmuyorsa degil, YANLIS ESIKLE olcuyorsa da
+       yanlis guven verir. Esik artik tasarim hedefiyle ayni: kap
+       gap'i 16-18, dolayisiyla 16'nin altina dusen her sey bulgu. */
+    var ESIK = 16;
     ekranlar.forEach(function (a) {
       showScreen(a);
       document.querySelectorAll('#screen-' + a + ', #screen-' + a + ' .card').forEach(function (kap) {
@@ -853,6 +861,34 @@ function stilMetni() {
     });
     showScreen('home');
   }
+
+  /* 34) GIZLI AMA GORUNUR — `hidden` ozniteligi var, oge EKRANDA
+     (05.09.2026).
+
+     `hidden`, tarayicinin kendi stilinde `display: none` demektir ve
+     YAZDIGIMIZ HER `display` KURALINA YENILIR. Bugun `.card` flex
+     yapildi ve gider formu KAPALIYKEN ekranda durdu: oznitelik
+     duruyordu, form goruunuyordu.
+
+     Hicbir test gormedi cunku hicbiri "gizli olan gercekten gizli mi"
+     diye sormuyordu; ekran goruntusunde yakalandi. Bu, sessiz
+     bozulmanin ders kitabi hali: kod dogru, oznitelik dogru, GORUNUS
+     yanlis.
+
+     NEGATIF DOGRULAMA (05.09): [hidden]{display:none!important}
+     kurali gecici olarak kapatildi -> 3 bulgu; acilinca -> 0. */
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' [hidden]').forEach(function (el) {
+      var r = el.getBoundingClientRect();
+      if (r.width > 0 || r.height > 0) {
+        ek('GIZLI-AMA-GORUNUR', a,
+           ((el.id || (el.className || '').toString().split(' ')[0]) || el.tagName) +
+           ' ' + Math.round(r.width) + 'x' + Math.round(r.height));
+      }
+    });
+  });
+  showScreen('home');
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */

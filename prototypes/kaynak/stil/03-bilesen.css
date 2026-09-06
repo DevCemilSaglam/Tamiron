@@ -160,7 +160,10 @@ akordiyon 2 px'e inmisti (31.08). Tek tek
   display: flex;
   flex-direction: column;
   gap: 5px;
-  margin-bottom: -4px;
+  /* ⚠️ margin-bottom: -4px KALKTI (05.09). Ekran gövdesinin gap'i
+     18 px'e çıkarılmıştı ama bu negatif margin onu 14'e geri
+     çekiyordu — ritmi büyüttüğümüzü sanırken başlığın altı eskisi
+     gibi kalmıştı. On bir ekranda ölçüldü. */
 }.screen-head h1 {
   font-size: 28px;
   font-weight: 700;
@@ -201,13 +204,28 @@ kontroller ustte olsun".
 }.eyebrow .eb-say:empty {
   display: none;
 }/* ---------- KART / YÜZEY ---------- */
+/* ⚠️ 05.09 (ikinci tur) — KART İÇİ RİTİM DE TEK YERDEN.
+   Birinci turda .screen gap'i 18'e çıkarılmıştı ama KART İÇİ hâlâ
+   margin'lerle yürüyordu ve her yer 14 px'te kalmıştı: Cemil "yine
+   yakın" dedi ve ölçüm onu doğruladı (on bir ekranda 14 px).
+
+   Kart artık flex sütun + gap. Böylece kartın içindeki her blok
+   arasında AYNI nefes var ve bir sonraki bileşen eklendiğinde kimse
+   margin yazmayı unutamaz — v1'in "boyut bileşene gömülü" hatasının
+   aynısı burada margin'le tekrarlanıyordu. */
 .card {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm);
   padding: 18px;
-}.card.raised {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+/* Kartın çocukları KÜÇÜLMEZ (.screen'deki aynı kural, aynı sebep:
+   kutu içerikten kısa kalırsa içerik görünmez). */
+.card > * { flex-shrink: 0; }.card.raised {
   box-shadow: var(--shadow);
 }/* ALT BASLIKLAR RENKLI (Cemil,
 01.09): gri degil birincil renk.
@@ -221,8 +239,12 @@ kontroller ustte olsun".
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--primary);
-  margin-bottom: 14px;
-}/* Baslik ile altindaki ipucu 4 px kaliyordu (olcum). */
+  /* Kart içindeyken boşluğu KART'ın gap'i verir; dışarıda (ekran
+     gövdesinde) .screen gap'i verir. İki kaynak olsaydı toplanırdı. */
+  margin-bottom: 0;
+}
+/* Ekran gövdesinde başlıktan sonra gelen liste/şerit .screen gap'iyle
+   ayrılıyor; kart içinde gap zaten var. *//* Baslik ile altindaki ipucu 4 px kaliyordu (olcum). */
 .section-label + /* Ipucu metni notr gri degil — kendi tokeni var. */
 .plate-hint {
   margin-top: 2px;
@@ -551,19 +573,10 @@ textarea:focus {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-}/* Form satirlari kart icinde alt alta gelince yapisiyordu.
-   05.09: 14 -> 18. Bir alanin ETIKETI, ustundeki alanin KUTUSUNA
-   14 px'te yapisik duruyordu ve hangi etiketin hangi kutuya ait
-   oldugu bir an duraksatiyordu. */
-.field-2 + .field-2,
-.field-2 + .field,
-.field + .field-2,
-.field + .field {
-  margin-top: 18px;
-}.plate-hint + .field-2,
-.plate-hint + .field {
-  margin-top: 16px;
-}/* ---------- DİNLEME göstergesi ---------- */
+}/* ⚠️ Form satırlarının margin'leri KALKTI (05.09, ikinci tur).
+   Boşluğu artık kabın gap'i veriyor (.card ya da .screen). İkisi
+   birden olsaydı toplanır ve alanlar arası 34 px'e çıkardı — "çok
+   yakın"ın tersi kadar yanlış. Kural: BOŞLUĞU KAP VERİR. *//* ---------- DİNLEME göstergesi ---------- */
 /* Plaka alani altindaki canli ipucu (format / gecerlilik) */
 /* İpucu satırı: BOŞKEN YER TUTMAZ — doğrulama gelince araya girer.
    (Plaka ekranında tek ipucu olduğu için orada yeri sabit tutulur.) */
@@ -685,7 +698,7 @@ eylem butonu kisalmaz — yoksa
 }/* ⚠️ 05.09 — 0 PX ÖLÇÜLDÜ: kalem listesinin son satırı ile "+ Parça /
    + İşçilik" düğmeleri BİTİŞİKTİ; düğmeler listenin bir parçası gibi
    okunuyordu. */
-.kalem-list + .btn-row { margin-top: 16px; }
+.kalem-list + .btn-row { margin-top: 18px; }
 /* URUN ADI USTTE TEK SATIR,
 FIYAT ALTTA (Cemil,
 01.09) — urun ismi
@@ -915,9 +928,11 @@ eylem düğmesi taşır
 baska yerlerde de kullanilir. */
 .cip-grup {
   display: flex;
-  gap: 6px;
+  /* Dikey 10, yatay 6: çipler SARDIĞINDA alt satırla arası 6 px
+     kalıyordu ve iki sıra tek bir blok gibi okunuyordu (05.09). */
+  gap: 10px 6px;
   flex-wrap: wrap;
-  margin-top: 8px;
+  margin-top: 0;
 }.cip {
   min-height: 44px;
   padding: 0 14px;
@@ -1436,7 +1451,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
    "içinde bir şey var mı" diye açtırmak, açmamaktan kötüdür. */
 .akordiyon { border: 1px solid var(--line); border-radius: var(--radius-md);
   background: var(--surface); overflow: hidden; }
-.akordiyon + .akordiyon { margin-top: 12px; }
+.akordiyon + .akordiyon { margin-top: 18px; }
 .akd-bas { display: flex; align-items: center; gap: 10px; width: 100%;
   min-height: var(--dokun); padding: 12px 14px; cursor: pointer;
   background: transparent; border: 0; text-align: left;
@@ -1559,3 +1574,65 @@ alanları ::before ile büyür. Ölçüm (30.08,
   width: 36px; height: 36px; border-radius: var(--radius-sm);
 }
 .tablo .satir-sil:hover { color: var(--crit); background: var(--crit-bg); }
+
+
+/* ================= MODÜL IZGARASI (Detaylı muhasebe) — 05.09.2026
+   Cemil: "Detaylı muhasebe alanı Otomix gibi olacak. Buttonlar buna
+   göre olmalı."
+
+   OtoMixSQL'in modül dili incelendi (arastirma/OTOMIX-HARITA.md):
+   Cari · Fatura · Kasa · Banka · Çek · POS · Stok · Teklif ·
+   e-Fatura/e-Arşiv · SMS. Masaüstü programların klasik modül tahtası:
+   IKONLU KARE KUTULAR, ızgara hâlinde.
+
+   Neden .menu-row DEĞİL: menü satırı bir LİSTE — yukarıdan aşağı
+   okunur ve sırası anlam taşır. Modül tahtası bir HARİTA: usta gözüyle
+   tarar, sırası önemli değil, hepsi aynı ağırlıkta. Ana menü satır,
+   modüller ızgara.
+
+   Dokunma hedefi kutunun kendisi (en az 88 px). */
+.modul-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+.modul-kutu {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  min-height: 88px; padding: 14px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text); text-align: left;
+  transition: border-color .15s, transform .1s;
+}
+.modul-kutu:hover:not(:disabled) {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+}
+.modul-kutu .mk-ic {
+  width: 38px; height: 38px; flex: none; border-radius: var(--radius-md);
+  background: var(--accent-soft); color: var(--accent);
+  display: flex; align-items: center; justify-content: center;
+}
+.modul-kutu .mk-ad {
+  font-family: var(--font-display); font-weight: 600; font-size: var(--tip-md);
+  line-height: 1.2;
+}
+.modul-kutu .mk-alt { font-size: var(--tip-xs); color: var(--muted); line-height: 1.35; }
+/* YAZILMAMIŞ MODÜL: solgun ve dokunulamaz. Görünüp hiçbir şey
+   yapmayan bir kutu, ustaya "bu program bunu yapıyor" dedirtir. */
+.modul-kutu:disabled { opacity: .5; cursor: not-allowed; }
+.modul-kutu:disabled .mk-ic { background: var(--surface-2); color: var(--faint); }
+/* Dar ekranda tek sütun — iki sütunda ad kırpılıyordu (K-025). */
+@media (max-width: 359px) {
+  .modul-grid { grid-template-columns: 1fr; }
+  .modul-kutu { min-height: 0; flex-direction: row; align-items: center; gap: 12px; }
+}
+
+/* Bölüm başlığının yanındaki küçük not — "dönemden bağımsız" gibi bir
+   şerh. Başlığın kendisi kadar bağırmamalı ama görünmeli (05.09). */
+.section-label .lbl-not {
+  margin-left: auto; flex: none;
+  font-size: var(--tip-xs); font-weight: 500; letter-spacing: 0;
+  text-transform: none; color: var(--muted);
+}

@@ -43,7 +43,10 @@ var ARAMA_TERIMI = null;     /* {hedef, terim, suzgec} */
    ayrı dönem tutulsaydı usta muhasebede "Eylül" seçip iş başına
    sayfasına gelince "Bugün" bulurdu ve rakamların neden tutmadığını
    anlamazdı. Ekranlar arası devredilen her değer çekirdekte durur. */
-var muhDonemSecili = 'ay';
+/* Varsayılan BUGÜN (Cemil, 05.09: "Basit modda bugün seçilmeli").
+   Ustanın günlük sorusu "bugün ne kaldı"; ay ve yıl ikinci sorudur.
+   Ekran açıldığında birinci soruyu cevaplar. */
+var muhDonemSecili = 'bugun';
 
 /* Sesli isleme BAGLAMLA gitmenin TEK yolu.
    Once her mikrofon "SESLI_NIYET = x; Ekran.ac('ses')" yaziyordu ve

@@ -10,6 +10,112 @@
 
 ---
 
+## K-028 · Modül tahtası OtoMix dilinde; boşluğu KAP verir; gizli olan gizli kalır (05.09.2026)
+
+### 28.1 · "Otomix gibi" — tahmin edilmedi, bakıldı
+
+> *"Detaylı muhasebe alanı Otomix gibi olacak. Buttonlar buna göre olmalı."*
+
+OtoMixSQL'in modül dili çıkarıldı (`arastirma/OTOMIX-HARITA.md`):
+**Cari · Fatura · Kasa · Banka · Çek · POS · Stok · Teklif · e-Fatura/e-Arşiv
+· SMS.** Paraşüt ve LucaNet'te olduğu gibi **ölçülmüş bir referans**, tahmin
+değil.
+
+**Alınan şey düzen ve dil, kapsam değil.** Masaüstü programların klasik modül
+tahtası: **ikonlu kare kutular, ızgara hâlinde.**
+
+| | Ana menü | Modül tahtası |
+|---|---|---|
+| Biçim | `.menu-row` — **liste** | `.modul-kutu` — **ızgara** |
+| Neden | Yukarıdan aşağı okunur, **sırası anlam taşır** | Gözle **taranır**, hepsi aynı ağırlıkta |
+
+**Sıra OtoMix'in sırası değil, Tamiron'un sırası: çalışanlar önce.** OtoMix'te
+modüller klasik sırada duruyor çünkü hepsi yazılmış; burada yarısı yazılmadı
+ve çalışanı aşağı atmak, ustayı **çalışmayanların arasında aratmak** olurdu.
+
+| Çalışan | Yazılmadı *(solgun, dokunulamaz)* |
+|---|---|
+| **Kasa** *(basit kipin kendisi)* · **Raporlar** *(iş başına)* · **SMS** *(mesaj)* | Cari · Fatura · Banka · Çek · POS · Stok · Teklif |
+
+> **OtoMix, Tamiron'un en yakın rakibi:** tek program hem servis hem muhasebe
+> yapıyor. Paraşüt ve LucaNet'in gövdesi fatura; ikisinin gövdesi **iş emri**.
+> Fark, OtoMix'in muhasebeyi **altı modüle** açması — tamirci tam bu yığına
+> *"karmaşık geldi"* demişti (T-1).
+
+### 28.2 · Gezinme hedefi kodda BİRLEŞTİRİLMEZ
+
+Modül düğmeleri `' data-git="' + m.git + '"'` diye yazılıyordu. Sonuç:
+derlemedeki *"ölü data-git hedefi"* denetimi ve sağlık denetiminin **YETİM**
+testi bu hedefi **göremiyordu** — ekran açılıyordu ama hiçbir araç bunu
+bilmiyordu. `git` alanına bir yazım hatası girseydi düğme **sessizce** hiçbir
+şey yapmazdı.
+
+**Aynı sınıf renk kutucuğunda yaşanmıştı** (K-019: sınıf adı kodda
+birleştirilmez, haritadan okunur). Hedef artık bir **etiket**; ekran adı
+işleyicide **literal** yazılıyor ve bilinmeyen etiket **balon** veriyor —
+menüye modül ekleyip bağlamayı unutmak sessiz kalmıyor.
+
+### 28.3 · Boşluğu KAP verir — kart içi ritim de tek yerden
+
+> *"Elementler yine birbirine yakın. Kontrol et."*
+
+Birinci turda (K-026.6) `.screen` gap'i 18'e çıkarılmıştı ama **kart içi hâlâ
+margin'lerle** yürüyordu ve her yer **14 px**'te kalmıştı. Cemil haklıydı;
+ölçüm onu doğruladı: **on bir ekranda 14 px.**
+
+İki sessiz sebep vardı:
+- `.screen-head { margin-bottom: -4px }` — ritmi 18'den **14'e geri çekiyordu**
+- `.section-label { margin-bottom: 14px }` — kart içinde ikinci bir kaynak
+
+Artık `.card` da **flex sütun + gap: 16**. Form alanlarının `margin-top`
+kuralları **kaldırıldı**: boşluğu artık kabın gap'i veriyor. İkisi birden
+olsaydı **toplanır** ve alanlar arası 34 px'e çıkardı — *"çok yakın"*ın tersi
+kadar yanlış.
+
+> **Kural: BOŞLUĞU KAP VERİR.** Bileşen kendi dışındaki boşluğu yazmaz.
+
+**33. testin eşiği 8 → 16.** İlk eşik *"0 bulgu"* veriyordu ama hedefin
+altındaki her şeyi geçiriyordu. **Bir test ölçmüyorsa değil, YANLIŞ EŞİKLE
+ölçüyorsa da yanlış güven verir.** Eşik artık tasarım hedefiyle aynı.
+
+### 28.4 · ⚠️ GİZLİ OLAN GÖRÜNÜYORDU — ve bunu ekran görüntüsü buldu
+
+`.card`'ı flex yapmak **gider formunu kapalıyken ekranda bıraktı.** `hidden`
+özniteliği tarayıcının kendi stilinde `display: none` demektir — ve
+**yazdığımız her `display` kuralına yenilir.**
+
+Öznitelik duruyordu, form görünüyordu. **Hiçbir test görmedi**, derleme de
+görmedi; ekran görüntüsüne bakarken yakalandı. Sessiz bozulmanın ders kitabı
+hâli: **kod doğru, öznitelik doğru, görünüş yanlış.**
+
+Çözüm tek satır ve bundan sonra hangi bileşene `display` verilirse verilsin
+geçerli: `[hidden] { display: none !important; }`
+
+**34. test (GIZLI-AMA-GORUNUR)** eklendi ve negatif testle doğrulandı
+(kural kapatılınca 13 bulgu, açılınca 0).
+
+### 28.5 · Basit kipte varsayılan BUGÜN
+
+> *"Basit modda bugün seçilmeli."*
+
+Ustanın günlük sorusu *"bugün ne kaldı"*; ay ve yıl **ikinci** sorudur. Ekran
+açıldığında birinci soruyu cevaplar — servis kayıtlarındaki *"içeride açık
+gelir"* kuralının aynısı.
+
+### 28.6 · Alacak DÖNEME TABİ DEĞİL
+
+> *"Alacak olmalı."*
+
+Alacak bir **hareket** değil, bir **bakiye**: geçen aydan kalan alacak bu ay da
+alacaktır. Dönem süzgecine sokunca *"Bugün"* seçiliyken alacak **gizleniyordu**
+— ustanın en çok sorduğu şey ekrandan kayboluyordu. Tahsilat ve gider döneme
+tabi, **alacak değil**; başlığın yanında bu yazıyor.
+
+**Ölçüldü:** *Bugün* seçiliyken alacak görünüyor — Demir Nakliyat, 06 TMR 07,
+28.08.2026, **3.450 ₺**.
+
+---
+
 ## K-027 · Muhasebe: dönem her şeyi süzer, rakamlar tabloda, derinlik menüde (05.09.2026)
 
 Cemil'in muhasebe turu. Dokuz düzeltme, üçü **kural** değiştirdi.
