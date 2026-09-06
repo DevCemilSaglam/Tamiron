@@ -13,13 +13,13 @@ tıklanabilir prototip.
 
 | | |
 |---|---|
-| Ekran | **13** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
+| Ekran | **14** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe · **is-basina** + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
 | Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
 | Dokunuş | ana yol **12** · kısa yol **9** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 05.09'da yürütülerek ölçüldü* |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
 | Sağlık denetimi | **33 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-026** |
+| Kararlar | **K-001 … K-027** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---

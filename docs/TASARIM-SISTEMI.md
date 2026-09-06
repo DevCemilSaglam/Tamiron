@@ -424,6 +424,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Kilometre satırı | `.km-sat` > `.km-tarih` + `.km-deger` |
 | Müşteri özeti başlığı | `.ozet-bas` > `.oz-ad` + `.oz-alt` · parça markası: `.oz-marka` |
 | Sekme | `.tab-grup` > `.tab` (`aria-selected`) — GÖRÜNÜM değiştirir; `.cip` ise SEÇİM yapar, ikisi karıştırılmaz |
+| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono, `.metin` sarabilir) · toplam satırı: `tr.genel` · satır silme: `.satir-sil` |
 | Servis kaydı kartı | `.arac-kart` + `.ak-is` > `.ak-is-ne` + `.ak-alt` (yalnız `kayitKartiHtml()` üretir) |
 | Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |

@@ -409,10 +409,39 @@ function giderToplami() {
    zaten kayıtlı. Yalnız üç pencere var — gün, ay, hepsi. Dördüncüsü
    (hafta, çeyrek, yıl) ustanın sormadığı sorulardır ve her biri bir
    karar daha demek (K-022.4 karar bütçesi). */
+/* ⚠️ 05.09 — DÖNEM DÜĞMELERİ AYIN VE YILIN ADINI SÖYLER (Cemil:
+   "Bugün, bulunduğumuz ay hangisi ise, sonra da bulunduğumuz yıl
+   hangisi ise butonları olacak").
+
+   "Bu ay" değil **Eylül**, "Hepsi" değil **2026**. Fark küçük görünüyor
+   ama "bu ay" ustaya HANGİ ay olduğunu söylemiyor; ekran görüntüsü
+   alınıp bir hafta sonra bakıldığında ya da ay dönüldüğünde rakamın
+   hangi pencereye ait olduğu kayboluyordu. Ad yazınca rakam kendi
+   tarihini taşıyor. */
+var AYLAR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+             'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+
+var DONEMLER = ['bugun', 'ay', 'yil'];
+
+function donemAdi(donem) {
+  if (donem === 'bugun') return 'Bugün';
+  if (donem === 'ay') return AYLAR[BUGUN.getMonth()];
+  return String(BUGUN.getFullYear());
+}
+
+function donemCipleriHtml() {
+  return DONEMLER.map(function (d) {
+    return '<button class="cip" data-donem="' + d + '" aria-pressed="' +
+      (muhDonemSecili === d) + '">' + donemAdi(d) + '</button>';
+  }).join('');
+}
+
 function donemBasi(donem) {
   if (donem === 'bugun') return new Date(BUGUN.getFullYear(), BUGUN.getMonth(), BUGUN.getDate());
   if (donem === 'ay') return new Date(BUGUN.getFullYear(), BUGUN.getMonth(), 1);
-  return null;    /* hepsi */
+  /* yıl — 1 Ocak'tan bugüne. "Hepsi" penceresi kalktı: dükkânın açılış
+     tarihinden beri toplam, ustanın sorduğu bir soru değil. */
+  return new Date(BUGUN.getFullYear(), 0, 1);
 }
 function donemIcinde(tarihMetni, donem) {
   if (!tarihMetni) return false;

@@ -10,6 +10,122 @@
 
 ---
 
+## K-027 · Muhasebe: dönem her şeyi süzer, rakamlar tabloda, derinlik menüde (05.09.2026)
+
+Cemil'in muhasebe turu. Dokuz düzeltme, üçü **kural** değiştirdi.
+
+### 27.1 · Dönem düğmeleri ADINI söylüyor — ve her şeyi süzüyor
+
+> *"Basit tabının altına Bugün, bulunduğumuz ay hangisi ise, sonra da
+> bulunduğumuz yıl hangisi ise butonları olacak."*
+> *"Sayfadaki alanları yukarı gün, ay filtresine göre yap."*
+
+**"Bu ay" değil `Eylül`, "Hepsi" değil `2026`.** Fark küçük görünüyor ama
+*"bu ay"* ustaya **hangi** ay olduğunu söylemiyor; ekran görüntüsü alınıp bir
+hafta sonra bakıldığında ya da ay dönüldüğünde rakamın hangi pencereye ait
+olduğu kayboluyordu. Ad yazınca **rakam kendi tarihini taşıyor**.
+
+**Süzgeç artık ekranın tamamına işliyor.** Önce yalnız *"bugün"* kartı sabitti
+ve ödeme dağılımı **bütün** kayıtları topluyordu: iki rakam aynı ekranda **iki
+farklı pencereye** bakıyordu ve hangisinin ne olduğu yazmıyordu.
+
+*"Hepsi"* penceresi kalktı — dükkânın açılışından beri toplam, ustanın sorduğu
+bir soru değil.
+
+### 27.2 · "Kâr değil" açıklaması kalktı — RAKAM DA KALKTI
+
+> *"Bu rakam kâr değil diye açıklama var. Onu kaldır."*
+
+Açıklamayı kaldırıp **rakamı bırakmak, uyarısız bir yanlış rakam bırakmak**
+olurdu. K-014 hâlâ geçerli: *eksik giderle çıkan kâr, kârdan kötüdür — çünkü
+usta ona inanır.* O yüzden *"Kalan"* satırının kendisi kaldırıldı.
+
+**Yerine geçen şey daha iyi:** iş başına fark. O rakam **her zaman doğru**,
+çünkü iki bileşeni de zaten kayıtlı (satır fiyatı ve `alis`, T-9). Girilmemiş
+bir şeye bağlı değil, dolayısıyla yalan söyleyemez.
+
+### 27.3 · Rakamlar tabloya geçti
+
+> *"Gider alanı excel gibi tablo şeklinde olsun."*
+> *"Alınamayan (Veresiye) değil Alacak olsun başlık. Yine tablo gibi
+> okunabilir olabilir."*
+
+Gerçek `<table>` kullanıldı: rakam sütunu **hizalı** olmalı. `.tutar-serit`
+iki sütunluk bir şerit; üç–dört sütun gerekince satırlar birbirini tutmuyordu.
+Tablo ayrıca ekran okuyucuya *"bu bir tablo"* diyor.
+
+**Dar ekranda kırpılmaz, kaydırılır** — K-025'in dersi doğrudan uygulandı:
+sarmalayıcı `overflow-x: auto`.
+
+**"Alacak" ustanın kelimesi.** *"Alınamayan"* bir **kayıp** gibi okunuyordu;
+oysa para duruyor, yalnız henüz alınmadı. İlk sütun **KİM** — ustanın sorusu
+*"ne kadar alacağım"* değil, **"kimden alacağım"** (K-013).
+
+### 27.4 · İş başına kendi sayfasına çıktı
+
+> *"Hatta iş başına bu ay başka sayfa olabilir, tamamını içerecek,
+> filtrelenebilecek."*
+
+Muhasebenin basit kipi bir **bakış** ekranı: açılır, okunur, kapanır. İş başına
+liste ise **taranan** bir şey — usta hangi işin ne bıraktığını arar,
+karşılaştırır, dönemi değiştirir. İkisi aynı ekranda dururken muhasebe **iki
+farklı işi** birden yapıyordu.
+
+Ekran 13 → **14**. *"Toplam parça alışı"* bölümü basit kipten kalktı; parça
+alışı artık her işin **kendi satırında** duruyor. İki yerde iki liste, iki ayrı
+bakım ve zamanla **iki ayrı rakam** demektir.
+
+### 27.5 · Detaylı sekmesi bir MENÜ — ve yazılmamış modül açılır gibi durmaz
+
+> *"Detaylı alanda ise, muhasebe modüllerine gidebilsin. Çek, senet, fatura vb.
+> Menü şeklinde olsun."*
+
+| Modül | Durum |
+|---|---|
+| İş başına · Parça alışı | **açılır** |
+| Fatura · KDV · Çek · Senet · Cari hesap | **devre dışı**, *"yazılmadı"* rozetiyle |
+
+**Menüde görünüp dokununca hiçbir şey yapmayan bir madde**, tam olarak 27.
+testin kovaladığı şeydir (ölü uç) — ve en pahalı hâli budur, çünkü usta *"bu
+program bunu yapıyor"* sanır. Devre dışı düğme ölü uç değildir: dokunulamaz ve
+nedenini söyler.
+
+**Kapsam genişlemedi, YERİ AÇILDI.** `hazir: false` olanların hepsi ustadan
+**yeni veri** ister ve K-022'nin gerekçesi duruyor. Cemil kapsamı genişletirse
+menü zaten yerinde.
+
+> **Cemil onayına açık (A-M11):** bu beş modül **kapsama girdi mi**, yoksa
+> yalnız *"ileride buraya gelecek"* mi? Varsayım: **yeri açıldı, kapsam
+> açılmadı** — K-022 duruyor.
+
+### 27.6 · Dönem çipleri iki ekranda; delegasyon çekirdekte
+
+`[data-donem]` dinleyicisi muhasebe ekranında yazılmıştı ve başında
+`if (Ekran.adi() !== 'muhasebe') return;` vardı. Sonuç: **iş başına
+sayfasındaki dönem düğmeleri ölüydü** — basıyorsun, çip seçili görünmüyor,
+tablo değişmiyor, hata da yok.
+
+**Bu, K-020.2'nin AYNI hatası:** iki ekranın kullandığı bir denetimin davranışı
+tek bir ekranın dosyasında duruyordu. Ortak nesnenin **davranışı da ortaktır**
+— çekirdeğe taşındı. Aynı sebeple `muhDonemSecili` de çekirdekte: iki ekranda
+iki ayrı dönem tutulsaydı usta muhasebede *Eylül* seçip iş başına sayfasında
+*Bugün* bulurdu ve rakamların neden tutmadığını anlamazdı.
+
+**Ölçüldü:** Eylül → 1 iş / 2.800 ₺ · 2026 → 5 iş / 12.970 alınan · 7.160 parça
+· **5.810 fark**. Dönem iki ekran arasında taşınıyor.
+
+### 27.7 · Kapsam notu ekrandan kalktı
+
+> *"En alttaki karar bilgisini kaldır. Sende var zaten karar."*
+
+Haklı: ekran, kendi kapsam tartışmasını **kullanıcıya** anlatıyordu. O tartışma
+`KARARLAR.md`'de ve `arastirma/MUHASEBE-KAPSAMI.md`'de duruyor — ustanın
+ekranında değil. Ekranın *"burası yarım"* demesi (K-013) hâlâ doğru bir ilke,
+ama **kime** dediği önemli: yarımlık artık *"yazılmadı"* rozetiyle **modül
+menüsünde** söyleniyor.
+
+---
+
 ## K-026 · Plaka kapının kendisi; ses bir kapı değil; muhasebe iki kipli (05.09.2026)
 
 Cemil dokuz madde verdi. Hepsi uygulandı; üçü bir **kararı** değiştirdi.
@@ -1140,6 +1256,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
+| **A-M11** | Detaylı menüdeki beş modül (fatura/KDV · çek · senet · cari) **kapsama girdi mi**, yoksa yeri mi açıldı? | Yeri açıldı; K-022 duruyor |
 | **A-M10** | *"Tamirat + Bakım"* tek kayıt mı olmalı, yoksa liste satırında iki kaydın özeti mi? | Tek kayıt varsayıldı |
 | **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no). Backend fazında kapatılacak — kabul mü | Cemil |
 | ~~A-2~~ | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya | Kısmen kapandı |

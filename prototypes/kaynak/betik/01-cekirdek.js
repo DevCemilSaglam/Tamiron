@@ -39,6 +39,11 @@ var MESAJ_HEDEF = null;      /* {plaka, sablon} */
    önizliyorsa o. */
 var OZET_KAYIT = null;      /* kayit id */
 var ARAMA_TERIMI = null;     /* {hedef, terim, suzgec} */
+/* Muhasebe ve "iş başına" ekranı AYNI dönemi kullanır. İki ekranda iki
+   ayrı dönem tutulsaydı usta muhasebede "Eylül" seçip iş başına
+   sayfasına gelince "Bugün" bulurdu ve rakamların neden tutmadığını
+   anlamazdı. Ekranlar arası devredilen her değer çekirdekte durur. */
+var muhDonemSecili = 'ay';
 
 /* Sesli isleme BAGLAMLA gitmenin TEK yolu.
    Once her mikrofon "SESLI_NIYET = x; Ekran.ac('ses')" yaziyordu ve
@@ -469,6 +474,24 @@ var Cekmece = (function () {
   return { ac: ac, kapa: kapa, ciz: cizBildirimler,
            acikMi: function () { return acikMi; } };
 })();
+
+/* ============ DÖNEM DÜĞMELERİ — TEK DELEGASYON ============
+   Dönem çipleri İKİ ekranda duruyor: muhasebe ve iş başına.
+
+   ⚠️ 05.09'da bu dinleyici MUHASEBE EKRANINDA yazılmıştı ve başında
+   `if (Ekran.adi() !== 'muhasebe') return;` vardı. Sonuç: iş başına
+   sayfasındaki dönem düğmeleri ÖLÜYDÜ — basıyorsun, çip seçili
+   görünmüyor, tablo değişmiyor, hata da yok.
+
+   Bu, K-020.2'nin AYNI hatası: iki ekranın kullandığı bir denetimin
+   davranışı tek bir ekranın dosyasında duruyordu. Ortak nesnenin
+   davranışı da ortaktır — çekirdekte. */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-donem]');
+  if (!t) return;
+  muhDonemSecili = t.getAttribute('data-donem');
+  Ekran.tazele();
+});
 
 /* ============ MİKROFONLAR — TEK DELEGASYON ============
    Mikrofon sesli işleme NE İÇİN basıldığı bilgisiyle gider (K-017):

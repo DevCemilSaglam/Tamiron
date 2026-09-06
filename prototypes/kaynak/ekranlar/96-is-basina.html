@@ -1,0 +1,104 @@
+<!-- ekran: is-basina · İŞ BAŞINA (05.09.2026)
+     Cemil: "Hatta iş başına bu ay başka sayfa olabilir, tamamını
+     içerecek, filtrelenebilecek."
+
+     NEDEN AYRI SAYFA: muhasebenin basit kipi bir BAKIŞ ekranı — açılır,
+     okunur, kapanır. İş başına liste ise TARANAN bir şey: usta hangi
+     işin ne bıraktığını arar, karşılaştırır, dönemi değiştirir. İkisi
+     aynı ekranda dururken muhasebe iki farklı işi birden yapıyordu.
+
+     ⚠️ BURADAKİ RAKAM DÜKKÂN KÂRI DEĞİL, İŞİN KENDİ FARKI:
+     müşteriden alınan − o iş için parçaya ödenen. Kira, elektrik, maaş
+     BURAYA GİRMEZ. İkisi de zaten kayıtlı (fiyat ve alis, T-9), o
+     yüzden bu rakam girilmemiş bir şeye bağlı değil — yalan söyleyemez.
+     Dükkân kârı söylerdi (K-014) ve o yüzden hiçbir yerde yok.
+
+     ÜZERİNDE YOK: yüzde/marj · hedef · grafik · dışa aktarma ·
+     iş kırılımı (parça/işçilik ayrı kâr). Hiçbiri yedi işe hizmet
+     etmiyor; istenirse konuşulur.
+
+     BİLEŞENLER: .screen-head .eyebrow .eb-say · .cip-grup .cip
+     · .card · .tablo-sar .tablo · .bos-durum. -->
+<section class="screen" id="screen-is-basina">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> İş başına
+      <span class="eb-say" id="ibSay"></span>
+    </span>
+  </div>
+
+  <!-- Dönem, muhasebeyle AYNI değişkeni kullanır (muhDonemSecili).
+       İki ekranda iki ayrı dönem tutulsaydı usta muhasebede "Eylül"
+       seçip buraya gelince "Bugün" bulurdu ve rakamların neden
+       tutmadığını anlamazdı. -->
+  <div class="cip-grup" id="ibDonem" role="group" aria-label="Dönem"></div>
+
+  <div class="card">
+    <div class="tablo-sar">
+      <table class="tablo" id="ibTablo"></table>
+    </div>
+  </div>
+
+  <div id="ibBos"></div>
+
+</section>
+
+<script>
+Ekran.tanim('is-basina', {
+  ciz: function () {
+    document.getElementById('ibDonem').innerHTML = donemCipleriHtml();
+
+    var kayitlar = donemKayitlari(muhDonemSecili).slice().reverse();
+    document.getElementById('ibSay').textContent =
+      kayitlar.length + ' teslim · ' + donemAdi(muhDonemSecili).toLocaleLowerCase('tr');
+
+    if (!kayitlar.length) {
+      document.getElementById('ibTablo').innerHTML = '';
+      document.getElementById('ibTablo').closest('.card').hidden = true;
+      document.getElementById('ibBos').innerHTML = bosDurumHtml(
+        'i-clipboard-list', 'Bu dönemde teslim edilmiş iş yok',
+        'Dönemi genişletirsen geçmiş işler görünür.');
+      return;
+    }
+    document.getElementById('ibTablo').closest('.card').hidden = false;
+    document.getElementById('ibBos').innerHTML = '';
+
+    var tAlinan = 0, tParca = 0, tFark = 0;
+    var satirlar = kayitlar.map(function (k) {
+      var kr = isKari(k);
+      var a = aracBul(k.plaka) || {};
+      tAlinan += kr.alinan; tParca += kr.parca; tFark += kr.fark;
+      return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
+        '<td class="metin"><b>' + k.plaka + '</b>' +
+          (a.marka ? '<br><span class="k-katalog">' + a.marka + ' ' + a.model + '</span>' : '') +
+        '</td>' +
+        '<td class="metin">' + TUR_AD[k.tur] +
+          (k.sikayet ? '<br><span class="k-katalog">' + k.sikayet + '</span>' : '') +
+        '</td>' +
+        '<td>' + k.teslimTarihi + '</td>' +
+        '<td class="sayi">' + tutar(kr.alinan) + '</td>' +
+        '<td class="sayi">' + tutar(kr.parca) + '</td>' +
+        '<td class="sayi">' + tutar(kr.fark) + '</td>' +
+      '</tr>';
+    }).join('');
+
+    document.getElementById('ibTablo').innerHTML =
+      '<thead><tr>' +
+        '<th>Araç</th><th>İş</th><th>Teslim</th>' +
+        '<th class="sayi">Alınan</th><th class="sayi">Parça</th><th class="sayi">Fark</th>' +
+      '</tr></thead>' +
+      '<tbody>' + satirlar +
+        '<tr class="genel">' +
+          '<td colspan="3">Toplam</td>' +
+          '<td class="sayi">' + tutar(tAlinan) + '</td>' +
+          '<td class="sayi">' + tutar(tParca) + '</td>' +
+          '<td class="sayi">' + tutar(tFark) + '</td>' +
+        '</tr>' +
+      '</tbody>';
+  }
+});
+
+/* Satıra dokunmak kaydı açar — [data-kayit] delegasyonu 03-nesne.js'te,
+   ortak nesne kuralı gereği burada yeniden yazılmıyor. */
+</script>

@@ -1515,3 +1515,47 @@ alanları ::before ile büyür. Ölçüm (30.08,
 }
 .arac-kart .ak-alt .tl-date { margin-left: 0; }
 .arac-kart .ak-alt .tl-date:last-child { margin-left: auto; }
+
+/* ================= TABLO — 05.09.2026 =================
+   Cemil: "Gider alanı excel gibi tablo şeklinde olsun."
+   "Alınamayan (Veresiye) değil Alacak olsun başlık. Yine tablo gibi
+   okunabilir olabilir."
+
+   Neden GERÇEK <table>: rakam sütunu hizalı olmalı. .tutar-serit iki
+   sütunluk bir şerit; üç-dört sütun gerekince satırlar birbirini
+   tutmuyordu. Tablo ayrıca ekran okuyucuya "bu bir tablo" diyor.
+
+   ⚠️ DAR EKRANDA KIRPILMAZ, KAYDIRILIR (K-025'in dersi): sarmalayıcı
+   overflow-x:auto. Kesilen metin, taşan metinden tehlikelidir. */
+.tablo-sar { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.tablo {
+  width: 100%; border-collapse: collapse;
+  font-size: var(--tip-sm);
+}
+.tablo th, .tablo td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--line);
+  text-align: left; white-space: nowrap;
+}
+.tablo th {
+  font-size: var(--tip-xs); font-weight: 700; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--muted);
+  background: var(--surface-2);
+  position: sticky; top: 0;
+}
+/* Metin sütunu sarabilir — tek uzun açıklama tabloyu enine germesin. */
+.tablo td.metin { white-space: normal; min-width: 140px; }
+.tablo td.sayi, .tablo th.sayi {
+  text-align: right; font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums; color: var(--text);
+}
+.tablo tbody tr:last-child td { border-bottom: 0; }
+.tablo tr.genel td {
+  font-weight: 700; color: var(--text);
+  border-top: 2px solid var(--line); background: var(--surface-2);
+}
+.tablo .satir-sil {
+  border: 0; background: transparent; color: var(--faint);
+  width: 36px; height: 36px; border-radius: var(--radius-sm);
+}
+.tablo .satir-sil:hover { color: var(--crit); background: var(--crit-bg); }
