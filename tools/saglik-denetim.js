@@ -837,9 +837,26 @@ function stilMetni() {
        yanlis guven verir. Esik artik tasarim hedefiyle ayni: kap
        gap'i 16-18, dolayisiyla 16'nin altina dusen her sey bulgu. */
     var ESIK = 16;
+    /* ⚠️ KAPSAM: yalniz BLOK KAPLARI (05.09, ucuncu tur).
+       Ilk yazimda yalniz .screen ve .card'a bakiliyordu ve Cemil'in
+       gordugu SIFIR bosluklari kaciriyordu: sarmalayici div'ler
+       (#muhBasitGovde, #ruhsatGovde, #sekmePlaka) araya girince
+       .screen'in gap'i icerideki kardeslere ISLEMIYORDU.
+
+       Butun kaplara bakmak da yanlis: bir BILESENIN ICI (.tl-body'de
+       baslik->alt satir 8 px, .arac-bas'ta plaka->baslik 12 px)
+       KASITLI olarak sikidir — o parcalar BIRBIRINE AITTIR ve
+       aralarindaki az bosluk tam da bunu soyler. Butun kaplari olcunce
+       165 "bulgu" cikti ve cogu mesruydu; boyle bir test okunmaz olur.
+
+       Olculen sey: BOLUM listeleyen kaplar. Sinif verilmis olmasi
+       sart — yeni bir sarmalayici eklendiginde .yigin yazilmazsa
+       ritim sessizce kirilir, testin gormesi de bu yuzden. */
+    var BLOK_KAP = '.screen, .card, .yigin';
     ekranlar.forEach(function (a) {
       showScreen(a);
-      document.querySelectorAll('#screen-' + a + ', #screen-' + a + ' .card').forEach(function (kap) {
+      document.querySelectorAll('#screen-' + a + ', #screen-' + a + ' ' +
+          BLOK_KAP.split(', ').join(', #screen-' + a + ' ')).forEach(function (kap) {
         var cocuk = Array.prototype.filter.call(kap.children, function (c) {
           var r = c.getBoundingClientRect();
           return r.height > 0 && getComputedStyle(c).display !== 'none';

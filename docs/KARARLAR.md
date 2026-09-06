@@ -10,6 +10,78 @@
 
 ---
 
+## K-029 · Boşluk kuralının açığı: SARMALAYICI KAP (05.09.2026)
+
+> *"Elementleri neden birbirine yapıştırıyorsun? Bunu genel olarak düzelt."*
+> — Cemil, **üçüncü kez** ve bu sefer sebep başkaydı.
+
+### 29.1 · Sebep: kabın gap'i torununa işlemez
+
+K-026.6'da `.screen`, K-028.3'te `.card` flex + gap oldu ve kural yazıldı:
+**boşluğu kap verir.** Ama aynı turlarda ekran gövdesine **düz `<div>`
+sarmalayıcılar** eklendi — sekmeler, kipler, gövdeler. Onların **kendi gap'i
+yoktu.**
+
+`.screen`'in gap'i sarmalayıcıya uygulanıyor, **içindeki kardeşlere
+uygulanmıyordu.** Ölçüldü:
+
+```
+muhBasitGovde: cip-grup -> card           = 0 px
+muhBasitGovde: card -> section-label      = 0 px
+muhBasitGovde: btn-row -> DIV             = 0 px
+ruhsatGovde:   section-label -> cip-grup  = 0 px
+sekmePlaka:    card -> notice             = 0 px
+```
+
+**Sekme eklemek ritmi sessizce kırdı.** Kural doğruydu, ama kuralın
+uygulanacağı yer bir turda **çoğaldı** ve yeni kaplar kuralın dışında kaldı.
+
+**Çözüm bir sınıf: `.yigin`** (flex sütun, gap 18). Sarmalayıcıya sınıf
+vermek, kuralı görünür ve **denetlenebilir** yapıyor — anonim bir `<div>`
+hiçbir araca kendini göstermiyordu.
+
+### 29.2 · 33. testin kapsamı yanlıştı — iki kez
+
+**İlk hâli** yalnız `.screen` ve `.card`'a bakıyordu: sarmalayıcıların içini
+**hiç görmüyordu**. Cemil'in gördüğü sıfırlar tam oradaydı.
+
+**Bütün kaplara bakmayı denedim: 165 "bulgu"** çıktı ve çoğu **meşruydu.** Bir
+bileşenin **içi** kasıtlı olarak sıkıdır:
+
+| Yer | Boşluk | Neden kasıtlı |
+|---|---|---|
+| `.tl-body`: başlık → alt satır | 8 px | **Birbirine ait** — az boşluk bunu söyler |
+| `.arac-bas`: plaka → başlık | 12 px | Aynı künyenin parçaları |
+| `.ozet-bas`: ad → adres | 2 px | Tek bir blok |
+
+165 bulgulu bir test **okunmaz** olur ve okunmayan test, olmayan testtir.
+
+**Doğru kapsam: blok kapları** — `.screen`, `.card`, `.yigin`. Bunlar **bölüm
+listeler**; içleri birbirine ait değildir.
+
+> **Ders:** bir testin eşiği kadar **kapsamı** da yanlış olabilir. İkisi de
+> "0 bulgu" der; biri gevşek olduğu için, öteki bakmadığı için.
+
+### 29.3 · Aynı turda açılan öteki boşluklar
+
+| Yer | Önce | Sonra | Neden |
+|---|---|---|---|
+| `.tutar-serit` satırları | 6 | **10** | *Teslim edilen / Nakit / Kart / Havale* tek blok gibi okunuyordu — Cemil'in ekran görüntüsü |
+| `.menu-list` | 9 | **12** | Menü satırları yapışıktı |
+| `.tl-item` arası | 10 | **12** | |
+| `.arac-kart` arası | 12 | **14** | |
+| `.notif-list` | 8 | **10** | |
+| `.kalem-list` | 10 | **12** | |
+
+`.tutar-serit`'in `margin-top`'u da **kaldırıldı** — kart içinde kabın gap'i
+zaten veriyordu, ikisi toplanıyordu.
+
+**Negatif doğrulama:** `.yigin { gap: 0 }` geri konunca test **12 bulgu**
+verdi ve bulguların ilk dördü **tam olarak Cemil'in gördüğü sıfırlardı**;
+kural açılınca 0.
+
+---
+
 ## K-028 · Modül tahtası OtoMix dilinde; boşluğu KAP verir; gizli olan gizli kalır (05.09.2026)
 
 ### 28.1 · "Otomix gibi" — tahmin edilmedi, bakıldı

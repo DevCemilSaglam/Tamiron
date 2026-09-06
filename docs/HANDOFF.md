@@ -137,6 +137,15 @@ diye okuyordu. Düzeltilir düzeltilmez, kirli durumun **gizlediği** gerçek bi
 ölü uç ortaya çıktı — test *"geçmiyordu"*, **yanlış şeye bakıyordu**
 (K-024.1).
 
+**Bir kuralın uygulanacağı yer çoğalabilir (05.09).** *"Boşluğu kap verir"*
+kuralı doğruydu; aynı turda eklenen sarmalayıcı div'ler kuralın **dışında**
+kaldı ve ritim sessizce kırıldı. Kurala sınıf verildi (`.yigin`) ki hem
+görünsün hem denetlenebilsin — anonim bir `<div>` hiçbir araca kendini
+göstermiyor. K-029.
+
+**Bir testin eşiği kadar KAPSAMI da yanlış olabilir (05.09).** İkisi de
+*"0 bulgu"* der: biri gevşek olduğu için, öteki bakmadığı için. K-029.2.
+
 **Kesilen metin, taşan metinden tehlikelidir.** `overflow:hidden` bir kutu
 taşmaz, **keser** — ve taşma testi taşmayan kutuları kasten atlar. 320 px'te
 bir düğme *"Açık kay"* yazıyordu ve hiçbir test görmedi (K-025).
