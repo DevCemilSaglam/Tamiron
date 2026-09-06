@@ -129,11 +129,17 @@ logo da 48 px. */
 }/* ============================================================
    EKRAN GÖVDESİ
    ============================================================ */
+/* ⚠️ 05.09 — DİKEY RİTİM 14 -> 18 px (Cemil: "elementler birbirine çok
+   yakın... bunu genel olarak kontrol et").
+   Ölçüldü: altı ekranda kart/alan araları hep 12–14 px'ti, bir yerde
+   0 px. Tek tek yamamak yerine ritim tek yerden büyütüldü — v1 dersi:
+   boyutlar bileşene gömülüyse "hepsini büyüt" demek yüzlerce satır
+   dokunmak demek. */
 .screen {
   display: none;
   flex-direction: column;
-  padding: 12px 16px 24px;
-  gap: 14px;
+  padding: 12px 16px 26px;
+  gap: 18px;
   animation: fade .24s ease;
 }.screen.active {
   display: flex;
@@ -215,7 +221,7 @@ kontroller ustte olsun".
   letter-spacing: .08em;
   text-transform: uppercase;
   color: var(--primary);
-  margin-bottom: 12px;
+  margin-bottom: 14px;
 }/* Baslik ile altindaki ipucu 4 px kaliyordu (olcum). */
 .section-label + /* Ipucu metni notr gri degil — kendi tokeni var. */
 .plate-hint {
@@ -545,14 +551,18 @@ textarea:focus {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
-}/* Form satirlari kart icinde alt alta gelince yapisiyordu. */
+}/* Form satirlari kart icinde alt alta gelince yapisiyordu.
+   05.09: 14 -> 18. Bir alanin ETIKETI, ustundeki alanin KUTUSUNA
+   14 px'te yapisik duruyordu ve hangi etiketin hangi kutuya ait
+   oldugu bir an duraksatiyordu. */
 .field-2 + .field-2,
 .field-2 + .field,
-.field + .field-2 {
-  margin-top: 14px;
+.field + .field-2,
+.field + .field {
+  margin-top: 18px;
 }.plate-hint + .field-2,
 .plate-hint + .field {
-  margin-top: 12px;
+  margin-top: 16px;
 }/* ---------- DİNLEME göstergesi ---------- */
 /* Plaka alani altindaki canli ipucu (format / gecerlilik) */
 /* İpucu satırı: BOŞKEN YER TUTMAZ — doğrulama gelince araya girer.
@@ -672,7 +682,11 @@ eylem butonu kisalmaz — yoksa
   display: flex;
   flex-direction: column;
   gap: 10px;
-}/* URUN ADI USTTE TEK SATIR,
+}/* ⚠️ 05.09 — 0 PX ÖLÇÜLDÜ: kalem listesinin son satırı ile "+ Parça /
+   + İşçilik" düğmeleri BİTİŞİKTİ; düğmeler listenin bir parçası gibi
+   okunuyordu. */
+.kalem-list + .btn-row { margin-top: 16px; }
+/* URUN ADI USTTE TEK SATIR,
 FIYAT ALTTA (Cemil,
 01.09) — urun ismi
    uzun olabiliyor; ad ile fiyat yan yanayken ad kirpiliyordu.
@@ -1449,3 +1463,55 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .km-sat:last-child { border-bottom: 0; }
 .km-sat .km-tarih { color: var(--muted); }
 .km-sat .km-deger { color: var(--text); font-weight: 600; }
+
+/* ================= SEKME (tab) — 05.09.2026 =================
+   Cemil: "Ruhsatı çek ve plakayı yaz tab olsun."
+
+   Neden .cip DEĞİL: çip bir SEÇİM (hangi tür, hangi ödeme), sekme bir
+   GÖRÜNÜM. İkisi aynı şeye benziyorsa usta çipe basınca da ekranın
+   değişmesini bekler. Sekme tam genişlikte, altı çizgili ve seçili
+   olanı zemin değil ÇİZGİ ile söylüyor — v1'in çip diliyle
+   karışmasın diye.
+
+   Dokunma hedefi 48 px (--dokun). */
+.tab-grup {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--line);
+}
+.tab {
+  flex: 1 1 0; min-width: 0;
+  min-height: var(--dokun);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  padding: 10px 8px;
+  background: transparent; border: 0;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  color: var(--muted);
+  font-family: var(--font-body); font-size: var(--tip-sm); font-weight: 600;
+}
+.tab .ico { width: 20px; height: 20px; flex: none; }
+.tab:hover { color: var(--text); background: var(--nav-hover); }
+.tab[aria-selected="true"] {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+}
+/* Dar ekranda ikon kalkar, yazı kalır — K-025'in dersi burada da
+   geçerli: anlamı yazı taşır. */
+@media (max-width: 359px) {
+  .tab .ico { display: none; }
+}
+
+/* Servis kaydı kartının iş satırı — araç kartının altına eklenen tek
+   fark (05.09). Tür rozeti solda, ne yapıldığı yanında. */
+.arac-kart .ak-is {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
+}
+.arac-kart .ak-is-ne { font-size: var(--tip-sm); color: var(--text); min-width: 0; }
+.arac-kart .ak-alt {
+  display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap;
+  margin-top: 10px;
+}
+.arac-kart .ak-alt .tl-date { margin-left: 0; }
+.arac-kart .ak-alt .tl-date:last-child { margin-left: auto; }

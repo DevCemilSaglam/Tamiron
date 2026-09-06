@@ -1,63 +1,105 @@
-<!-- ekran: ruhsat · RUHSATI ÇEK (EKRANLAR.md §2 · Akış Adım 1)
+<!-- ekran: ruhsat · SERVİS KAYDI EKLE (EKRANLAR.md §2 · Akış Adım 1)
      "Ruhsatı çekti, kayıt açıldı." (T-3)
+
+     ⚠️ 05.09 — AKIŞ CEMİL'İN TARİFİYLE YENİDEN KURULDU:
+
+       "Kayıtlı araç mı geldi kısmını kaldır. Manuel girebilir, sesle
+        girebilir. Sonra ruhsatı çekebilir. Eğer daha önce gelmiş araç
+        ise, ruhsata gerek yok. Daha çekilmiş araç ise servis kaydına
+        gider. Değilse ruhsatı çekmesini isteriz. Plakayı yaz alanı ve
+        tab olabilir. Ses açık tab olur. Diğer sekmede aracın
+        bilgilerini manuel girebilir. Sesle girişte beklediğimiz
+        bilgileri gösterelim."
+       "Ruhsatı çek ve plakayı yaz tab olsun. Ruhsat yoksa, elle
+        girebilir. Ve bu alanları sesle doldurabilir."
+
+     ESKİ HÂLİ NEDEN DÜŞTÜ: ekranın tepesinde *"Kayıtlı araç mı geldi?"*
+     diye bir çip listesi vardı ve dört aracı tek tek sayıyordu. Dört
+     araçta çalışır, kırk araçta çalışmaz. **Plakanın kendisi zaten bu
+     sorunun cevabı** — yazınca kayıtlı mı değil mi anlaşılıyor. Ayrı
+     bir liste, aynı soruyu ikinci kez sormaktı.
+
+     PLAKA ARTIK KAPININ KENDİSİ:
+       kayıtlı    → ruhsat İSTENMEZ, doğrudan tür seçilir
+       kayıtsız   → ruhsat çekilir, olmazsa alanlar elle/sesle doldurulur
+
+     İKİ SEKME:
+       "Plakayı yaz"  — varsayılan, MİKROFONLU (Cemil: "ses açık tab olur")
+       "Ruhsatı çek"  — kamera; okunanlar aynı alanlara düşer
 
      ARAŞTIRMADAN GELEN İKİ ŞEY (RUHSAT-OKUMA.md):
      · TELEFON ruhsatta YOK — ayrı alan, ZORUNLU DEĞİL (A-29)
      · TC kimlik no ve adres ruhsatta VAR ama OKUNMAZ, SAKLANMAZ
 
-     BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card .card.raised
-     · .plate-input-wrap .plate-field .tr-tag · .field .field-2
-     · .plate-hint · .cip-grup .cip · .btn. Yeni bileşen yazılmadı. -->
+     BİLEŞENLER: .screen-head .eyebrow · .tab-grup .tab · .card
+     .card.raised · .plate-input-wrap .plate-field .tr-tag · .field
+     .field-2 · .plate-hint · .cip-grup .cip · .notice · .mic-round
+     · .btn. Yeni: yalnız .tab-grup/.tab (sözlüğe girdi). -->
 <section class="screen" id="screen-ruhsat">
 
-  <!-- BAŞLIK "SERVİS KAYDI EKLE" (04.09). Menüden bu adla giriliyordu
-       ama ekran "Ruhsatı çek" diyordu; usta hangi işi yaptığını
-       ekrandan okuyamıyordu. Ruhsat çekmek işin ADI değil, ilk adımı. -->
   <div class="screen-head">
     <span class="eyebrow">
       <svg class="ico ico-sm"><use href="#i-plus"></use></svg> Servis kaydı ekle
     </span>
   </div>
 
-  <!-- Sesten gelen bilgi burada özetlenir: usta söylediğini ikinci kez
-       yazmasın, ama neyin yazıldığını da görsün. -->
-  <div id="ruhsatSesOzet"></div>
-
-  <!-- ⚠️ KAYITLI ARAÇ İÇİN RUHSAT ÇEKMEK GEREKMEZ (04.09).
-       Önce tek yol ruhsattı: dört aracı kayıtlı olan usta, aynı araç
-       ikinci kez geldiğinde ruhsatı yeniden çekiyordu. Aracın bilgisi
-       zaten elimizde; eksik olan yalnız "ne için geldi". -->
-  <div id="ruhsatKayitli"></div>
-
-  <button class="btn btn-primary btn-lg" id="ruhsatCek">
-    <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
-  </button>
-
-  <p class="plate-hint" style="text-align:center">
-    Ruhsat yoksa ya da okunmuyorsa
-    <button class="btn btn-ghost" id="ruhsatElle" style="margin-top:8px">
+  <div class="tab-grup" role="tablist" aria-label="Araç bilgisi nasıl girilecek">
+    <button class="tab" id="sekPlaka" role="tab" aria-selected="true" aria-controls="ruhsatGovde">
       <svg class="ico"><use href="#i-file-text"></use></svg> Plakayı yaz
     </button>
-  </p>
+    <button class="tab" id="sekRuhsat" role="tab" aria-selected="false" aria-controls="ruhsatGovde">
+      <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+    </button>
+  </div>
 
-  <div id="ruhsatSonuc" hidden>
+  <div id="ruhsatGovde" role="tabpanel">
 
-    <!-- PLAKA EN ÜSTTE VE BÜYÜK: yanlış okunursa kayıt YANLIŞ ARACA
-         bağlanır. Doğrulanan tek alan bu (RUHSAT-OKUMA §5). -->
-    <div class="card raised">
-      <div class="plate-input-wrap">
-        <div class="plate-field">
-          <span class="tr-tag">TR</span>
-          <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123"
-                 autocomplete="off" spellcheck="false" aria-label="Plaka" />
-        </div>
-        <div class="plate-hint" id="rPlakaIpucu" role="status"></div>
-      </div>
+    <!-- SEKME: RUHSATI ÇEK -->
+    <div id="sekmeRuhsat" hidden>
+      <button class="btn btn-primary btn-lg" id="ruhsatCek">
+        <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+      </button>
+      <p class="plate-hint" style="text-align:center">
+        Plaka, marka, model, yıl ve motor kendiliğinden dolar.
+        Yanlış okunanı düzeltebilirsin.
+      </p>
     </div>
 
-    <div class="card">
-      <div class="section-label">
-        <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç
+    <!-- SEKME: PLAKAYI YAZ — varsayılan, mikrofonlu -->
+    <div id="sekmePlaka">
+      <div class="card raised">
+        <div class="plate-input-wrap">
+          <div class="plate-field">
+            <span class="tr-tag">TR</span>
+            <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123"
+                   autocomplete="off" spellcheck="false" aria-label="Plaka" />
+            <button class="mic-round ghost" data-sesle="servis-ekle"
+                    aria-label="Plakayı ve işi sesle söyle" title="Sesle">
+              <svg class="ico"><use href="#i-mic"></use></svg>
+            </button>
+          </div>
+          <div class="plate-hint" id="rPlakaIpucu" role="status"></div>
+        </div>
+      </div>
+
+      <!-- SESLE NE SÖYLENEBİLECEĞİ YAZIYOR (Cemil: "Sesle girişte
+           beklediğimiz bilgileri gösterelim"). Boş bir mikrofon,
+           ustaya "ne diyeceğim" diye düşündürüyordu. -->
+      <div class="notice" id="rSesBekleniyor"></div>
+    </div>
+
+    <!-- PLAKA TANINDI MI — iki cevaptan biri, her zaman görünür -->
+    <div id="rTanima"></div>
+
+    <!-- ARAÇ BİLGİLERİ — yalnız araç KAYITSIZSA açılır -->
+    <div class="card" id="rAracKart" hidden>
+      <div class="section-label with-action">
+        <span class="lbl-txt">
+          <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç bilgileri
+        </span>
+        <button class="mic-round" id="rAracMik" aria-label="Araç bilgilerini sesle söyle" title="Sesle">
+          <svg class="ico"><use href="#i-mic"></use></svg>
+        </button>
       </div>
       <div class="field-2">
         <div class="field"><label for="rMarka">Marka</label><input id="rMarka" /></div>
@@ -67,7 +109,10 @@
         <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
         <div class="field"><label for="rMotor">Motor</label><input id="rMotor" /></div>
       </div>
-
+      <div class="field">
+        <label for="rSahip">Sahibi</label>
+        <input id="rSahip" placeholder="ad soyad ya da firma" autocomplete="off" />
+      </div>
       <div class="field">
         <label for="rTel">Telefon</label>
         <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
@@ -78,12 +123,17 @@
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-wrench"></use></svg> Ne için geldi?
     </div>
+    <!-- ÜÇÜNCÜ SEÇENEK "Tamirat + Bakım" (Cemil, 05.09). Gerçek ziyaret
+         ikisi birden olabiliyor; iki ayrı kayıt açmak ustayı aynı aracı
+         iki kez yazmaya zorluyordu. Bakım içeren her tür bakım
+         kurallarını işletir (km, hatırlatma). -->
     <div class="cip-grup" id="turGrup" role="group" aria-label="İş türü">
       <button class="cip" id="turTamirat" aria-pressed="false">Tamirat</button>
       <button class="cip" id="turBakim" aria-pressed="false">Bakım</button>
+      <button class="cip" id="turIkisi" aria-pressed="false">Tamirat + Bakım</button>
     </div>
 
-    <!-- Km YALNIZ BAKIMDA (K-002). Bir kez yazılır, güncellenmez. -->
+    <!-- Km BAKIM İÇEREN HER TÜRDE (K-002). Bir kez yazılır. -->
     <div class="field" id="kmAlan" hidden>
       <label for="rKm">Kilometre</label>
       <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
@@ -100,8 +150,8 @@
 
 <script>
 var rTur = null;
-/* Sesin taşıdığı ama ruhsatta karşılığı olmayanlar: sahip adı ve
-   yapılacak iş. Kayıt açılırken kullanılıyor. */
+var rSekme = 'plaka';
+/* Sesin taşıdığı ama ruhsatta karşılığı olmayan iş açıklaması. */
 var rSesNotu = null;
 
 /* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı). */
@@ -115,17 +165,67 @@ function plakaBicim(ham) {
 }
 function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
 
+function ruhsatSekme(hangi) {
+  rSekme = hangi;
+  document.getElementById('sekPlaka').setAttribute('aria-selected', String(hangi === 'plaka'));
+  document.getElementById('sekRuhsat').setAttribute('aria-selected', String(hangi === 'ruhsat'));
+  document.getElementById('sekmePlaka').hidden = (hangi !== 'plaka');
+  document.getElementById('sekmeRuhsat').hidden = (hangi !== 'ruhsat');
+}
+
+/* ---- PLAKA KAPININ KENDİSİ ----
+   Kayıtlı araçta ruhsat İSTENMEZ. Kayıtsız araçta alanlar açılır ve
+   ekran ne yapılacağını SÖYLER — usta "şimdi ne olacak" diye
+   düşünmesin. */
 function ruhsatDurum() {
   var p = plakaBicim(document.getElementById('rPlaka').value);
   var ip = document.getElementById('rPlakaIpucu');
+  var tanima = document.getElementById('rTanima');
+  var aracKart = document.getElementById('rAracKart');
+  var a = plakaGecerli(p) ? aracBul(p) : null;
+
   if (p && !plakaGecerli(p)) {
     ip.textContent = 'Plaka eksik — ör. 34 ABC 123';
     ip.className = 'plate-hint warn';
   } else {
-    var a = aracBul(p);
-    ip.textContent = a ? a.marka + ' ' + a.model + ' — bu araç kayıtlı' : '';
+    ip.textContent = '';
     ip.className = 'plate-hint';
   }
+
+  if (!plakaGecerli(p)) {
+    tanima.innerHTML = '';
+    aracKart.hidden = true;
+  } else if (a) {
+    /* DAHA ÖNCE GELMİŞ ARAÇ — RUHSATA GEREK YOK (Cemil, 05.09). */
+    var acik = icerideki().filter(function (k) { return k.plaka === p; })[0];
+    tanima.innerHTML =
+      '<div class="notice ok">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>' +
+        '<span class="n-body"><b>Bu araç kayıtlı</b> — ' + a.marka + ' ' + a.model +
+          (a.sahipAd ? ' · ' + a.sahipAd : '') + '.<br>' +
+          (acik
+            ? 'Zaten <b>içeride</b> ve açık bir kaydı var.'
+            : 'Ruhsat çekmene gerek yok — ne için geldiğini seç, kaydı aç.') +
+        '</span>' +
+      '</div>' +
+      (acik
+        ? '<button class="btn btn-ghost" data-kayit="' + acik.id + '" style="margin-top:12px">' +
+            '<svg class="ico"><use href="#i-clipboard-list"></use></svg>' +
+            ' Açık kayda git</button>'
+        : '');
+    aracKart.hidden = true;
+  } else {
+    /* KAYITSIZ ARAÇ — ruhsat isteriz, yoksa elle/sesle doldurulur. */
+    tanima.innerHTML =
+      '<div class="notice warn">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+        '<span class="n-body"><b>Bu araç kayıtlı değil.</b> ' +
+          '<b>Ruhsatı çek</b> — marka, model, yıl ve motor kendiliğinden dolar. ' +
+          'Ruhsat yoksa aşağıdaki alanları elle ya da sesle doldur.</span>' +
+      '</div>';
+    aracKart.hidden = false;
+  }
+
   document.getElementById('kaydiAc').disabled = !(plakaGecerli(p) && rTur);
 }
 
@@ -133,7 +233,9 @@ function turSec(t) {
   rTur = t;
   document.getElementById('turTamirat').setAttribute('aria-pressed', String(t === 'tamirat'));
   document.getElementById('turBakim').setAttribute('aria-pressed', String(t === 'bakim'));
-  document.getElementById('kmAlan').hidden = (t !== 'bakim');
+  document.getElementById('turIkisi').setAttribute('aria-pressed', String(t === 'ikisi'));
+  /* Km, BAKIM İÇEREN her türde sorulur — 'ikisi' de bakım sayılır. */
+  document.getElementById('kmAlan').hidden = !(t === 'bakim' || t === 'ikisi');
   ruhsatDurum();
 }
 
@@ -142,62 +244,41 @@ Ekran.tanim('ruhsat', {
     /* Ekran her açılışta TEMİZ başlar — yarım kalmış kayıt sonrakine
        sızmasın. */
     rTur = null;
-    kok.querySelector('#ruhsatSonuc').hidden = true;
-    ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rTel', 'rKm'].forEach(function (id) {
+    ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rSahip', 'rTel', 'rKm'].forEach(function (id) {
       var e = document.getElementById(id); if (e) e.value = '';
     });
+    ruhsatSekme('plaka');
     turSec(null);
 
-    /* SESTEN GELEN ÖN DOLGU (Cemil, 03.09: "Servis kaydı ekle
-       sayfasında, yapılan işlemleri, plakayı, sahibini, numarasını vb
-       söyleyecek. Sonra ruhsatı çekmesini isteyeceğiz.")
+    /* SESLE NE SÖYLENEBİLİR — mikrofonun yanında YAZIYOR (Cemil, 05.09:
+       "Sesle girişte beklediğimiz bilgileri gösterelim"). */
+    document.getElementById('rSesBekleniyor').innerHTML =
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-mic"></use></svg></span>' +
+      '<span class="n-body"><b>Sesle şunları söyleyebilirsin:</b> ' +
+        'plaka · ne için geldiği · sahibinin adı · telefonu · bakımsa kilometre.' +
+        '<br><i>"34 ABC 123 triger seti değişecek"</i></span>';
 
-       Usta söylediğini İKİNCİ KEZ yazmasın: ses ne duyduysa buraya
-       taşındı, ruhsat çekilince marka/model/motor üstüne yazılacak.
-       Not okunur ve TEMİZLENİR. */
+    /* SESTEN GELEN ÖN DOLGU — usta söylediğini İKİNCİ KEZ yazmasın.
+       Not okunur ve TEMİZLENİR; bırakılsa bir sonraki açılışa sızardı. */
     if (RUHSAT_ONDOLGU) {
       var o = RUHSAT_ONDOLGU; RUHSAT_ONDOLGU = null;
-      document.getElementById('ruhsatSonuc').hidden = false;
-      if (o.plaka) document.getElementById('rPlaka').value = o.plaka;
+      if (o.plaka) document.getElementById('rPlaka').value = plakaBicim(o.plaka);
+      if (o.sahipAd) document.getElementById('rSahip').value = o.sahipAd;
       if (o.sahipTel) document.getElementById('rTel').value = o.sahipTel;
       if (o.km) document.getElementById('rKm').value = o.km;
-      rSesNotu = { sahipAd: o.sahipAd || '', is: o.is || '' };
+      rSesNotu = { is: o.is || '' };
       if (o.tur) turSec(o.tur);
       ruhsatDurum();
-      document.getElementById('ruhsatSesOzet').innerHTML =
-        '<div class="notice accent">' +
+      if (o.is) {
+        document.getElementById('rSesBekleniyor').innerHTML =
           '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-mic"></use></svg></span>' +
-          '<span class="n-body">Söylediklerin yazıldı' +
-            (o.sahipAd ? ' · sahibi <b>' + o.sahipAd + '</b>' : '') +
-            (o.is ? ' · iş <b>' + o.is + '</b>' : '') +
-            '.<br>Şimdi <b>ruhsatı çek</b> — marka, model ve motor kendiliğinden dolacak.' +
-          '</span>' +
-        '</div>';
+          '<span class="n-body">Söylediğin yazıldı: <b>' + o.is + '</b>.' +
+          ' Kayıt açılınca "ne istiyor" alanına düşecek.</span>';
+      }
     } else {
       rSesNotu = null;
-      document.getElementById('ruhsatSesOzet').innerHTML = '';
+      ruhsatDurum();
     }
-
-    /* KAYITLI ARAÇLAR — ruhsat çekmeden kayıt açmanın yolu.
-       İçeride olan araç LİSTEDE YOK: aynı araca ikinci kayıt açmak,
-       ustanın işini ikiye bölmek olur. */
-    var secilebilir = ARACLAR.filter(function (a) {
-      return !icerideki().some(function (k) { return k.plaka === a.plaka; });
-    });
-    document.getElementById('ruhsatKayitli').innerHTML = secilebilir.length
-      ? '<div class="card">' +
-          '<div class="section-label">' +
-            '<svg class="ico ico-sm"><use href="#i-car"></use></svg> Kayıtlı araç mı geldi?' +
-          '</div>' +
-          '<div class="cip-grup">' +
-            secilebilir.map(function (a) {
-              return '<button class="cip" data-kayitli="' + a.plaka + '">' +
-                a.plaka + ' · ' + a.marka + '</button>';
-            }).join('') +
-          '</div>' +
-          '<p class="plate-hint">Dokun, ruhsat çekmeden aracın sayfasına git.</p>' +
-        '</div>'
-      : '';
   }
 });
 
@@ -213,12 +294,10 @@ var ruhsatSira = 0;
 
 document.addEventListener('click', function (e) {
   var t = e.target.closest('button');
-  if (!t) return;
+  if (!t || Ekran.adi() !== 'ruhsat') return;
 
-  /* Kayıtlı araca dokunuldu — aracın sayfasına gidiyor; kaydı oradan
-     tür seçerek açıyor. Ruhsat hiç çekilmiyor. */
-  var kp = t.getAttribute('data-kayitli');
-  if (kp) { ACIK_PLAKA = kp; Ekran.ac('arac'); return; }
+  if (t.id === 'sekPlaka') { ruhsatSekme('plaka'); return; }
+  if (t.id === 'sekRuhsat') { ruhsatSekme('ruhsat'); return; }
 
   if (t.id === 'ruhsatCek') {
     var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
@@ -228,19 +307,22 @@ document.addEventListener('click', function (e) {
     document.getElementById('rModel').value = r.model;
     document.getElementById('rYil').value = r.yil;
     document.getElementById('rMotor').value = r.motor;
-    document.getElementById('ruhsatSonuc').hidden = false;
+    /* Okunan bilgiler PLAKA SEKMESİNDE gösterilir — usta ne okunduğunu
+       görüp düzeltebilsin. Kamera sekmesinde bırakmak, okunanı
+       görünmez yapardı. */
+    ruhsatSekme('plaka');
     ruhsatDurum();
     balon('Okundu — yanlış varsa düzelt.');
+    return;
   }
 
-  if (t.id === 'ruhsatElle') {
-    document.getElementById('ruhsatSonuc').hidden = false;
-    document.getElementById('rPlaka').focus();
-    ruhsatDurum();
-  }
+  /* Araç alanlarının mikrofonu: bağlam "servis-ekle" — ses ekranı
+     plaka, sahip, telefon ve işi bekliyor ve bunu yazıyor (K-017). */
+  if (t.id === 'rAracMik') { sesleAc('servis-ekle'); return; }
 
-  if (t.id === 'turTamirat') turSec('tamirat');
-  if (t.id === 'turBakim') turSec('bakim');
+  if (t.id === 'turTamirat') { turSec('tamirat'); return; }
+  if (t.id === 'turBakim') { turSec('bakim'); return; }
+  if (t.id === 'turIkisi') { turSec('ikisi'); return; }
 
   if (t.id === 'kaydiAc') {
     var p = plakaBicim(document.getElementById('rPlaka').value);
@@ -251,14 +333,16 @@ document.addEventListener('click', function (e) {
         model: document.getElementById('rModel').value,
         yil: document.getElementById('rYil').value,
         motor: document.getElementById('rMotor').value,
-        vin: '', sahipAd: (rSesNotu && rSesNotu.sahipAd) || '',
+        vin: '', renk: '',
+        sahipAd: document.getElementById('rSahip').value,
         sahipTel: document.getElementById('rTel').value,
         not: ''
       });
     }
     var yeni = {
       id: KAYITLAR.length + 1, plaka: p, tur: rTur,
-      km: rTur === 'bakim' ? document.getElementById('rKm').value : '',
+      km: (rTur === 'bakim' || rTur === 'ikisi')
+            ? document.getElementById('rKm').value : '',
       /* Sesle söylenen iş şikâyet olarak düşer — usta aynı cümleyi
          servis kaydında tekrar yazmasın. */
       sikayet: (rSesNotu && rSesNotu.is) || '',
@@ -279,3 +363,10 @@ document.addEventListener('input', function (e) {
   }
 });
 </script>
+
+<style>
+/* Plaka alanının içindeki mikrofon — alan zaten çerçeveli, düğme
+   içeride duruyor ve kutuyu şişirmiyor. */
+.plate-field .mic-round { width: 44px; height: 44px; align-self: center; margin-right: 2px; }
+.plate-field .mic-round .ico { width: 20px; height: 20px; }
+</style>

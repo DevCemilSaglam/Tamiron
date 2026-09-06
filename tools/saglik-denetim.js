@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 32 test.
+/* Tamiron prototip saglik denetimi — 33 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -705,7 +705,14 @@ function stilMetni() {
     var toast = document.getElementById('toast');
     /* Gezinme ve mikrofon dugmeleri elenir: isleri baska bir ekrani
        acmak, kendileri bir sey "yapmiyor" ve yaptigini da soylemiyor. */
-    var ELE = '[data-git], [data-sesle], [data-arac], [data-kayit], .mic-round, .clear, .akd-bas, .cip';
+    /* ⚠️ role="tab" DE ELENIR (05.09). Sekme bir GORUNUM degistirici:
+       hicbir eylem IDDIA etmiyor, dolayisiyla "sahte eylem" olamaz.
+       Ama tiklaninca ekranin kipini degistiriyor ve o kip EKRANIN KENDI
+       degiskeninde duruyor — denetimin veri yedegi oraya ulasamaz.
+       Sonuc: denetimden sonra muhasebe "detayli" kipte aciliyordu ve
+       bu, K-024.1'in AYNI hatasinin ikinci yuzuydu (arac olctugu seyi
+       degistiriyor). Test etmedigi bir seye dokunmasin. */
+    var ELE = '[data-git], [data-sesle], [data-arac], [data-kayit], .mic-round, .clear, .akd-bas, .cip, [role="tab"]';
     ekranlar.forEach(function (a) {
       showScreen(a);
       var dugmeler = Array.prototype.slice.call(
@@ -804,6 +811,48 @@ function stilMetni() {
          el.scrollWidth + '>' + el.clientWidth);
     });
   });
+
+  /* 33) SIKISIK KUTU — iki kardes blok BITISIK duruyor (05.09.2026).
+
+     Cemil ekran goruntusu gonderdi: "elementler birbirine cok yakin.
+     Bunu genel olarak kontrol et." Olculdu — alti ekranda kart ve alan
+     aralari 12–14 px'ti, bir yerde SIFIR: kalem listesinin son satiri
+     ile "+ Parca / + Iscilik" dugmeleri bitisikti ve dugmeler listenin
+     bir parcasi gibi okunuyordu.
+
+     Neden hicbir test gormedi: bitisiklik bir HATA DEGIL, bir OLCU.
+     Kutu dogru yerde, metin dogru, dokunma hedefi yeterli — yalniz
+     nefes yok. Goz yakalar, test yakalamaz; o yuzden olculuyor.
+
+     ⚠️ YALNIZ UST DUZEY KARDESLER: .field icindeki etiket-kutu ciftinin
+     6 px'i KASITLI (birbirine ait olduklarini soyluyor). Olculen sey,
+     BIRBIRINE AIT OLMAYAN iki blogun arasi. */
+  {
+    var ESIK = 8;
+    ekranlar.forEach(function (a) {
+      showScreen(a);
+      document.querySelectorAll('#screen-' + a + ', #screen-' + a + ' .card').forEach(function (kap) {
+        var cocuk = Array.prototype.filter.call(kap.children, function (c) {
+          var r = c.getBoundingClientRect();
+          return r.height > 0 && getComputedStyle(c).display !== 'none';
+        });
+        for (var i = 1; i < cocuk.length; i++) {
+          var ust = cocuk[i - 1].getBoundingClientRect();
+          var alt = cocuk[i].getBoundingClientRect();
+          /* Yan yana duran ogeler (ayni satirda) dikey olcuye girmez. */
+          if (alt.top < ust.bottom - 2) continue;
+          var bosluk = alt.top - ust.bottom;
+          if (bosluk >= ESIK) continue;
+          ek('SIKISIK', a,
+             ((cocuk[i-1].className || '').toString().split(' ')[0] || cocuk[i-1].tagName) +
+             ' -> ' +
+             ((cocuk[i].className || '').toString().split(' ')[0] || cocuk[i].tagName) +
+             ' = ' + Math.round(bosluk) + 'px');
+        }
+      });
+    });
+    showScreen('home');
+  }
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */

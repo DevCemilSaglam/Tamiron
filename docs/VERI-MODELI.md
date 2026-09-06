@@ -48,7 +48,7 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 | Alan | Neden var |
 |---|---|
 | `VehicleId` | Kayıt bir araca aittir |
-| `Type` | `Repair` \| `Maintenance` — **K-006** |
+| `Type` | `Repair` \| `Maintenance` \| `Both` — **K-006, K-026.3'te genişledi.** `Both` bakım sayılır: km sorulur, hatırlatma kurulur (`bakimIceriyor`) |
 | `Km` | Yalnız bakımda istenir — **K-002** |
 | `Complaint` | *"Ne istiyor"* — Adım 2. Serbest metin, tek alan (şikâyet/tespit ayrımı yok) |
 | `DeliveredAt` | **Tek durum alanı** — **K-004.** Null ise araç içeride |

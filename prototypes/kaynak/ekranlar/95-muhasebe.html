@@ -37,12 +37,44 @@
     </span>
   </div>
 
+  <!-- ⚠️ 05.09 — İKİ KİP (Cemil: "Basit muhasebe olarak düşünelim.
+       Fakat daha fazlasına ihtiyaç duyanlar için de bir geliştirme
+       yapmalıyız.")
+
+       BASİT varsayılan ve hiçbir karar istemiyor — açılır, okunur.
+       DETAYLI opt-in: dönem seçimi ve iş başına kâr orada.
+
+       Karar bütçesi (K-022.4) böyle korunuyor: ustanın çoğunluğu için
+       ekran hâlâ sıfır kararlı; isteyen bir dokunuşla derinleşiyor.
+       Tek ekranda ikisini birden göstermek, T-18'in ("ben anlamam"
+       diyecek kullanıcı) tam karşıtı olurdu. -->
+  <div class="tab-grup" role="tablist" aria-label="Muhasebe görünümü">
+    <button class="tab" id="muhSekBasit" role="tab" aria-selected="true">
+      <svg class="ico"><use href="#i-wallet"></use></svg> Basit
+    </button>
+    <button class="tab" id="muhSekDetay" role="tab" aria-selected="false">
+      <svg class="ico"><use href="#i-receipt"></use></svg> Detaylı
+    </button>
+  </div>
+
+  <!-- DETAYLI kipin dönem seçimi — basit kipte hiç görünmez. -->
+  <div id="muhDonemSar" hidden>
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-calendar-clock"></use></svg> Dönem
+    </div>
+    <div class="cip-grup" id="muhDonem" role="group" aria-label="Dönem"></div>
+  </div>
+
   <div class="card">
     <div class="section-label">
-      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Bugün
+      <svg class="ico ico-sm"><use href="#i-wallet"></use></svg>
+      <span id="muhBugunBaslik">Bugün</span>
     </div>
     <div class="tutar-serit" id="muhBugun"></div>
   </div>
+
+  <!-- DETAYLI: dönem özeti ve iş başına kâr -->
+  <div id="muhDetay" hidden></div>
 
   <div class="card">
     <div class="section-label">
@@ -113,12 +145,35 @@
 <script>
 var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almadım' };
 
+var muhKip = 'basit';
+var muhDonemSecili = 'ay';
+var MUH_DONEM = [
+  { k: 'bugun', ad: 'Bugün' },
+  { k: 'ay', ad: 'Bu ay' },
+  { k: 'hepsi', ad: 'Hepsi' }
+];
+
+/* Kip DEĞİŞKENİ değiştirir, çizimi ciz() yapar — tek yerde. */
+function muhKipSec(kip) { muhKip = kip; Ekran.tazele(); }
+
 Ekran.tanim('muhasebe', {
   ciz: function () {
     /* Ekran her açıldığında form KAPALI başlar. Açık bırakılsaydı
        usta bir sonraki gelişinde yarım bir formla karşılaşırdı ve
        "ben bunu doldurmuş muydum" sorusu doğardı. */
     if (document.getElementById('muhGiderForm')) muhFormGoster(false);
+
+    /* ⚠️ EKRAN KENDİ KİPİNİ HER ÇİZİMDE UYGULAR (05.09).
+       Önce gizleme yalnız muhKipSec()'te yapılıyordu; yani hâl bir
+       TIKLAMANIN yan etkisiydi. Ekran başka bir yoldan çizilince
+       (Ekran.tazele, ekranı yeniden açmak, denetimin tıklamaları)
+       değişken "basit" diyor ama ekranda detay duruyordu.
+       Çizim, değişkenin dediğini göstermeli — tersi değil. */
+    document.getElementById('muhSekBasit').setAttribute('aria-selected', String(muhKip === 'basit'));
+    document.getElementById('muhSekDetay').setAttribute('aria-selected', String(muhKip === 'detay'));
+    document.getElementById('muhDonemSar').hidden = (muhKip !== 'detay');
+    document.getElementById('muhDetay').hidden = (muhKip !== 'detay');
+
     var bugun = bugunTahsilat();
     document.getElementById('muhBugun').innerHTML =
       '<div class="tutar-sat"><span>Teslim edilen</span><span class="tv">' +
@@ -201,6 +256,68 @@ Ekran.tanim('muhasebe', {
           '"Gider ekle"ye dokun ya da mikrofona basıp ' +
           '"2400 TL elektrik faturası ekle" de.');
 
+    /* ---- DETAYLI KİP ----
+       Hiçbir yeni alan istemiyor: teslim tarihi, satır fiyatı ve alış
+       fiyatı zaten kayıtlı. "Daha fazlası" demek, DAHA FAZLA VERİ
+       GİRMEK değil — var olan veriye başka bir pencereden bakmak. */
+    document.getElementById('muhDonem').innerHTML = MUH_DONEM.map(function (d) {
+      return '<button class="cip" data-muhdonem="' + d.k + '" aria-pressed="' +
+        (muhDonemSecili === d.k) + '">' + d.ad + '</button>';
+    }).join('');
+
+    if (muhKip === 'detay') {
+      var dTahsilat = tahsilatToplami(muhDonemSecili);
+      var dParca = parcaAlisiToplami(muhDonemSecili);
+      var dGider = giderToplamiDonem(muhDonemSecili);
+      var dKayit = donemKayitlari(muhDonemSecili);
+      var donemAd = MUH_DONEM.filter(function (d) { return d.k === muhDonemSecili; })[0].ad;
+
+      document.getElementById('muhDetay').innerHTML =
+        '<div class="card">' +
+          '<div class="section-label">' +
+            '<svg class="ico ico-sm"><use href="#i-receipt"></use></svg> ' +
+            donemAd + ' — para nereye gitti' +
+          '</div>' +
+          '<div class="tutar-serit">' +
+            '<div class="tutar-sat"><span>Tahsil edilen</span><span class="tv">' +
+              tutar(dTahsilat) + ' ₺</span></div>' +
+            '<div class="tutar-sat"><span>Parça alışı</span><span class="tv">−' +
+              tutar(dParca) + ' ₺</span></div>' +
+            '<div class="tutar-sat"><span>Yazılan gider</span><span class="tv">−' +
+              tutar(dGider) + ' ₺</span></div>' +
+            '<div class="tutar-sat genel"><span>Kalan</span><span class="tv">' +
+              tutar(dTahsilat - dParca - dGider) + ' ₺</span></div>' +
+          '</div>' +
+          '<p class="plate-hint"><b>Bu rakam kâr değil.</b> Yalnız ' +
+          'yazdığın giderleri düşüyor — kira, elektrik, maaş yazılmadıysa ' +
+          'burada yok. Parça alışı ise her zaman doğru: servis ' +
+          'kayıtlarından geliyor.</p>' +
+        '</div>' +
+        '<div class="section-label" style="margin-top:18px">' +
+          '<svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> ' +
+          'İş başına — ' + donemAd.toLocaleLowerCase('tr') +
+        '</div>' +
+        (dKayit.length
+          ? '<div class="tutar-serit">' +
+              dKayit.slice().reverse().map(function (k) {
+                var kr = isKari(k);
+                var a = aracBul(k.plaka) || {};
+                return '<div class="tutar-sat"><span>' + k.plaka +
+                  (a.marka ? ' · ' + a.marka : '') +
+                  '<br><span class="k-katalog">alınan ' + tutar(kr.alinan) +
+                  ' ₺ · parça ' + tutar(kr.parca) + ' ₺</span></span>' +
+                  '<span class="tv">' + tutar(kr.fark) + ' ₺</span></div>';
+              }).join('') +
+            '</div>' +
+            '<p class="plate-hint">Her satır o işin kendi farkı: ' +
+            'müşteriden alınan eksi o iş için parçaya ödenen. Dükkânın ' +
+            'genel giderleri buraya girmez.</p>'
+          : bosDurumHtml('i-clipboard-list', 'Bu dönemde teslim yok',
+              'Dönemi genişletirsen geçmiş işler görünür.'));
+    } else {
+      document.getElementById('muhDetay').innerHTML = '';
+    }
+
     /* ---- PARÇA ALIŞI ----
        Yeni alan İSTEMİYOR: satırdaki `alis` zaten kayıtlı (T-9).
        Bu yüzden "girildiği kadar doğru" değil, HER ZAMAN doğru. */
@@ -250,6 +367,10 @@ function muhFormGoster(acik) {
 
 document.addEventListener('click', function (e) {
   if (Ekran.adi() !== 'muhasebe') return;
+  if (e.target.closest('#muhSekBasit')) { muhKipSec('basit'); return; }
+  if (e.target.closest('#muhSekDetay')) { muhKipSec('detay'); return; }
+  var dn = e.target.closest('[data-muhdonem]');
+  if (dn) { muhDonemSecili = dn.getAttribute('data-muhdonem'); Ekran.tazele(); return; }
   if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
 
   if (e.target.closest('#muhGiderEkle')) { muhFormGoster(true); return; }

@@ -98,6 +98,50 @@ function aracKartiHtml(a, icerde) {
   '</div>';
 }
 
+/* ---- SERVİS KAYDI KARTI (05.09) ----
+   Cemil: "Servis kayıtları araç listelemesi gibi olsun. Araç bilgileri
+   belirgin olacak. Sonra altına Tamirat, Bakım veya Tamirat + Bakım
+   yazabilir."
+
+   ARAÇ KARTININ DİLİNİ KULLANIYOR — yeni bir görsel dil değil, aynı
+   kart. Usta iki listede iki ayrı okuma alışkanlığı kurmasın: plaka
+   aynı yerde, marka/model aynı yerde, renk aynı yerde.
+
+   ARAÇ SATIRINDAN FARKI, altına eklenen tek satır: ne yapıldığı.
+   İçerideki kayıt, araç listesindeki gibi ÇERÇEVEDEN belli — "içeride"
+   yazısı yok (K-019.2'nin kuralı burada da geçerli). */
+function kayitKartiHtml(k) {
+  var a = aracBul(k.plaka) || { marka: '', model: '', motor: '', renk: '', sahipAd: '' };
+  var icerde = !k.teslimTarihi;
+  var motor = a.motor ? '<span class="ak-motor">' + a.motor + '</span>' : '';
+  return '<div class="arac-kart' + (icerde ? ' icerde' : '') + '"' +
+      ' data-kayit="' + k.id + '" role="button" tabindex="0"' +
+      ' aria-label="' + k.plaka + ' — ' + TUR_AD[k.tur] + '">' +
+    '<div class="ak-ust">' + plakaHtml(k.plaka, 'plate-lg') + '</div>' +
+    '<div class="ak-arac">' +
+      '<span>' + a.marka + ' ' + a.model + '</span>' + motor +
+      renkKutuHtml(a.renk) +
+    '</div>' +
+    (a.sahipAd ? '<div class="ak-sahip"><b>' + a.sahipAd + '</b></div>' : '') +
+    /* İŞ SATIRI — türü ve ne yapıldığı. Türün kendi rengi var:
+       bakım içeren iş aksan, tamirat birincil (v1'in şerit kuralı). */
+    '<div class="ak-is">' +
+      '<span class="pill ' + (bakimIceriyor(k) ? 'accent' : 'info') + '">' +
+        TUR_AD[k.tur] + '</span>' +
+      (k.sikayet ? '<span class="ak-is-ne">' + k.sikayet + '</span>' : '') +
+    '</div>' +
+    '<div class="ak-alt">' +
+      (k.teslimTarihi
+        ? '<span class="pill ok">teslim edildi</span>'
+        : (fiyatiBekleyen(k)
+            ? '<span class="pill warn">parçası bekleniyor</span>' : '')) +
+      (kayitToplami(k)
+        ? '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' : '') +
+      '<span class="tl-date">' + (k.teslimTarihi || k.acilis || '—') + '</span>' +
+    '</div>' +
+  '</div>';
+}
+
 /* ---- TELEFON BAĞLANTISI ----
    Beş yerde elle yazılıydı ve beşi birbirinden ayrışmaya başlamıştı
    (birinde data-tel yoktu ve numaraya dokunmak hem arıyor hem kaydı
@@ -112,8 +156,17 @@ function telLinkHtml(tel, kimin) {
    v1'in .tl-item zaman tüneli satırı. Ana ekranda ve araç kartında
    AYNI nesne. v1'de dört ziyaret tipi vardı; v2'de iki tür var
    (K-006), o yüzden sol ikon ve şerit iki değer alıyor. */
-var TUR_IKON = { tamirat: 'i-wrench', bakim: 'i-clock' };
-var TUR_AD = { tamirat: 'Tamirat', bakim: 'Bakım' };
+/* ⚠️ 05.09 — ÜÇÜNCÜ TÜR: "Tamirat + Bakım" (Cemil).
+   K-006 iki tür tanımlamıştı (tamirat | bakim) ve gerekçesi sağlamdı:
+   ikisi farklı davranıyor (km, hatırlatma). Ama gerçek ziyaret ikisi
+   birden olabiliyor — araç triger için geliyor, madem açıldı bakımı da
+   yapılıyor. İki ayrı kayıt açmak ustayı aynı aracı iki kez yazmaya
+   zorluyordu.
+
+   `ikisi` BAKIM SAYILIR: km sorulur, hatırlatma kurulur. Kural tek
+   cümle — "bakım içeriyorsa bakım kuralları işler" (bakimIceriyor). */
+var TUR_IKON = { tamirat: 'i-wrench', bakim: 'i-clock', ikisi: 'i-wrench' };
+var TUR_AD = { tamirat: 'Tamirat', bakim: 'Bakım', ikisi: 'Tamirat + Bakım' };
 var ODEME_ETIKET = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Alınmadı' };
 
 function kayitSatiriHtml(k, s) {
@@ -135,7 +188,7 @@ function kayitSatiriHtml(k, s) {
      Cemil'in sözü bizim gerekçemizi yener (K-019); bilgi kaybolmadı,
      kaydın kendi ekranında duruyor. */
   if (s.sade) {
-    return '<div class="tl-item t-' + (k.tur === 'bakim' ? 'bakim' : 'tamirat') + '"' +
+    return '<div class="tl-item t-' + (bakimIceriyor(k) ? 'bakim' : 'tamirat') + '"' +
         ' data-kayit="' + k.id + '" role="button" tabindex="0">' +
       '<div class="tl-body">' +
         '<div class="tl-title"><span class="tl-tip">' + TUR_AD[k.tur] + '</span></div>' +
@@ -160,7 +213,7 @@ function kayitSatiriHtml(k, s) {
   });
   /* Şerit ve ikon rengi TÜRÜ söyler (v1 kuralı). Durum rozeti yok —
      v2'de tek durum var ve o da teslim (K-004). */
-  return '<div class="tl-item t-' + (k.tur === 'bakim' ? 'bakim' : 'tamirat') + '"' +
+  return '<div class="tl-item t-' + (bakimIceriyor(k) ? 'bakim' : 'tamirat') + '"' +
       ' data-kayit="' + k.id + '" role="button" tabindex="0">' +
     '<span class="tl-ic">' +
       '<svg class="ico ico-sm"><use href="#' + TUR_IKON[k.tur] + '"></use></svg></span>' +

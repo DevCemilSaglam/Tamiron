@@ -423,6 +423,8 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Açılır bölüm | `.akordiyon` > `.akd-bas` (`.akd-say` `.akd-ok`) + `.akd-govde` — yalnız `akordiyonHtml()` üretir, davranışı `Akordiyon` modülünde |
 | Kilometre satırı | `.km-sat` > `.km-tarih` + `.km-deger` |
 | Müşteri özeti başlığı | `.ozet-bas` > `.oz-ad` + `.oz-alt` · parça markası: `.oz-marka` |
+| Sekme | `.tab-grup` > `.tab` (`aria-selected`) — GÖRÜNÜM değiştirir; `.cip` ise SEÇİM yapar, ikisi karıştırılmaz |
+| Servis kaydı kartı | `.arac-kart` + `.ak-is` > `.ak-is-ne` + `.ak-alt` (yalnız `kayitKartiHtml()` üretir) |
 | Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |
 | Kalem | `.kalem-list` > `.kalem` > `.k-tip` `.k-ad` `.k-tutar` `.k-sil` · boş: `.kalem-bos` |

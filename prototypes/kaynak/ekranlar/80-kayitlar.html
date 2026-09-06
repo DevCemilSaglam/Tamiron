@@ -3,16 +3,18 @@
      araçlar" listesi buraya taşındı ve genişledi: artık teslim
      edilmişler de görünüyor.
 
-     SÜZGEÇ İÇERİDE AÇIK GELİR. Ustanın günlük sorusu "içeride ne var";
-     geçmiş ikinci sorudur. Ekran açıldığında birinci soruyu cevaplar.
+     ⚠️ 05.09 — LİSTE ARAÇ KARTI DİLİNE GEÇTİ (Cemil: "Servis kayıtları
+     araç listelemesi gibi olsun. Araç bilgileri belirgin olacak.
+     Sonra altına Tamirat, Bakım veya Tamirat + Bakım yazabilir.").
+     Usta iki listede iki ayrı okuma alışkanlığı kurmasın: plaka aynı
+     yerde, marka/model aynı yerde, renk aynı yerde.
 
-     ⚠️ SÜZGEÇ DURUM DEĞİLDİR. K-004 duruyor: tek durum alanı
-     teslimTarihi. "İçeride" ve "teslim edilmiş" bu alandan TÜRETİLİYOR,
-     kayda yazılan bir durum değil.
+     ⚠️ K-004 DURUYOR: tek durum alanı teslimTarihi. "İçeride" bir
+     DURUM değil, o alandan TÜRETİLEN bir görünüm — süzgeç kalktı ama
+     bilgi kalkmadı: içerideki kayıtlar ÜSTTE ve ÇERÇEVESİ FARKLI.
 
-     BİLEŞENLER v1'DEN: .screen-head .eyebrow .eb-say · .cip-grup .cip
-     · .search-box · .tl-item (ortak kayitSatiriHtml) · .bos-durum.
-     Yeni bileşen yazılmadı. -->
+     BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
+     · .arac-kart (ortak kayitKartiHtml) · .bos-durum. -->
 <section class="screen" id="screen-kayitlar">
 
   <div class="screen-head">
@@ -22,13 +24,20 @@
     </span>
   </div>
 
-  <!-- 04.09: bu ekran ölü uçtu — kayıtlara bakıyorsun ama yenisini
-       açmak için ana ekrana dönmen gerekiyordu. -->
-  <button class="btn btn-primary btn-lg" data-git="ruhsat">
-    <svg class="ico"><use href="#i-plus"></use></svg> Yeni servis kaydı
-  </button>
+  <!-- ⚠️ 05.09 — ÜSTTEKİ "Yeni servis kaydı" DÜĞMESİ VE SÜZGEÇ KALKTI
+       (Cemil: "Üstte yeni servis kaydı buttonunu kaldır. İçeride
+       teslim edilmiş filtresini kaldır.").
 
-  <div class="cip-grup" id="kytSuzgec" role="group" aria-label="Süzgeç"></div>
+       Düğme neden gereksizdi: menüde zaten "Servis kaydı ekle" satırı
+       var ve bu ekrana da oradan geliniyor. Aynı işi iki yerde
+       göstermek, "hangisinden gireceğim" sorusunu doğuruyordu — 03.09'da
+       "Araç kaydı" menü maddesi tam bu sebeple kalkmıştı.
+
+       Süzgeç neden gereksizdi: liste artık araç kartı dilini kullanıyor
+       ve İÇERİDEKİLER ÜSTTE, ÇERÇEVESİ FARKLI duruyor (araçlar
+       listesindeki kural). Süzgeç, çerçevenin zaten söylediği şeyi
+       ikinci kez soruyordu. K-004 duruyor: "içeride" bir DURUM değil,
+       teslimTarihi'nden türetilen bir görünüm. -->
 
   <div class="search-box" id="kytArama">
     <svg class="ico"><use href="#i-search"></use></svg>
@@ -47,57 +56,50 @@
 </section>
 
 <script>
-var KYT_SUZGEC = [
-  { k: 'iceride', ad: 'İçeride' },
-  { k: 'teslim', ad: 'Teslim edilmiş' },
-  { k: 'hepsi', ad: 'Hepsi' }
-];
-var kytSecili = 'iceride';        /* günlük soru önce cevaplanır */
 
 Ekran.tanim('kayitlar', {
   ciz: function () {
     /* Sesten gelen arama: "balata ara" ya da "içeridekileri göster". */
     if (ARAMA_TERIMI && ARAMA_TERIMI.hedef === 'kayitlar') {
       document.getElementById('kytQ').value = ARAMA_TERIMI.terim || '';
-      if (ARAMA_TERIMI.suzgec) kytSecili = ARAMA_TERIMI.suzgec;
       ARAMA_TERIMI = null;
     }
     var q = norm((document.getElementById('kytQ') || {}).value || '');
 
+    /* Arama araç bilgilerinde de çalışır: liste artık marka ve sahibi
+       GÖSTERDİĞİ için ustanın onları araması beklenir. Gösterilen bir
+       şeyin aranamaması, ustaya "yok" dedirtir. */
     var liste = KAYITLAR.filter(function (k) {
-      if (kytSecili === 'iceride' && k.teslimTarihi) return false;
-      if (kytSecili === 'teslim' && !k.teslimTarihi) return false;
       if (!q) return true;
-      return norm(k.plaka + ' ' + (k.sikayet || '')).indexOf(q) >= 0;
+      var a = aracBul(k.plaka) || {};
+      return norm(k.plaka + ' ' + (k.sikayet || '') + ' ' + TUR_AD[k.tur] + ' ' +
+                  (a.marka || '') + ' ' + (a.model || '') + ' ' +
+                  (a.sahipAd || '')).indexOf(q) >= 0;
     });
-    /* En yenisi üstte — usta dünü değil bugünü arıyor. */
-    liste = liste.slice().reverse();
 
-    document.getElementById('kytSuzgec').innerHTML = KYT_SUZGEC.map(function (s) {
-      return '<button class="cip" data-suzgec="' + s.k + '" aria-pressed="' +
-        (kytSecili === s.k) + '">' + s.ad + '</button>';
-    }).join('');
+    /* SIRA ARAÇ LİSTESİYLE AYNI (05.09): içeridekiler üstte, sonra en
+       yenisi. Süzgeç kalktı; sıra ve çerçeve onun işini yapıyor. */
+    liste = liste.slice().reverse().sort(function (x, y) {
+      return (y.teslimTarihi ? 0 : 1) - (x.teslimTarihi ? 0 : 1);
+    });
 
-    document.getElementById('kytSay').textContent =
-      liste.length + (q ? ' bulundu' : ' kayıt');
+    var icerdeSay = liste.filter(function (k) { return !k.teslimTarihi; }).length;
+    document.getElementById('kytSay').textContent = q
+      ? liste.length + ' bulundu'
+      : (icerdeSay ? icerdeSay + ' içeride · ' + liste.length + ' kayıt'
+                   : liste.length + ' kayıt');
     document.getElementById('kytArama').classList.toggle('filled', !!q);
 
     document.getElementById('kytListe').innerHTML = liste.length
-      ? liste.map(kayitSatiriHtml).join('')
-      : bosDurumHtml(
-          kytSecili === 'iceride' ? 'i-circle-check' : 'i-clipboard-list',
-          q ? 'Eşleşen kayıt yok'
-            : kytSecili === 'iceride' ? 'İçeride araç yok' : 'Kayıt yok',
-          q ? 'Plakanın ya da işin bir kısmını yazman yeter.'
-            : kytSecili === 'iceride'
-              ? 'Hepsi teslim edilmiş. Yeni iş için "Servis kaydı ekle".'
-              : 'Henüz teslim edilmiş bir iş yok.');
+      ? liste.map(kayitKartiHtml).join('')
+      : bosDurumHtml('i-clipboard-list',
+          q ? 'Eşleşen kayıt yok' : 'Kayıt yok',
+          q ? 'Plakanın, markanın, sahibin ya da işin bir kısmını yazman yeter.'
+            : 'İlk işi menüdeki "Servis kaydı ekle"den aç.');
   }
 });
 
 document.addEventListener('click', function (e) {
-  var s = e.target.closest('[data-suzgec]');
-  if (s) { kytSecili = s.getAttribute('data-suzgec'); Ekran.tazele(); }
   if (e.target.closest('#kytQTemiz')) {
     document.getElementById('kytQ').value = ''; Ekran.tazele();
   }

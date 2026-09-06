@@ -88,7 +88,7 @@ function tsCiz() {
   /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın.
      Hangi tarihin kurulacağını da söylüyor: "6 ay sonra" demek yetmez,
      km'den gelen tarih daha erken olabilir. */
-  if (k.tur === 'bakim') {
+  if (bakimIceriyor(k)) {
     var hs2 = hatirlatmaHesapla(k);
     document.getElementById('tsNot').innerHTML =
       '<div class="notice accent">' +
@@ -130,7 +130,7 @@ document.addEventListener('click', function (e) {
        ⚠️ Burada kendi hesabımı yapıyordum: yalnız ay sayıyordu ve araç
        ekranı ay+km gösteriyordu. Aynı soruya iki ekran iki ayrı cevap
        veriyordu. Hesap artık TEK YERDE: hatirlatmaHesapla(). */
-    if (k.tur === 'bakim') {
+    if (bakimIceriyor(k)) {
       var hs = hatirlatmaHesapla(k);
       k.hatirlatmaTarihi = gunAyYil(hs.tarih);
       k.hatirlatmaGonderildi = false;

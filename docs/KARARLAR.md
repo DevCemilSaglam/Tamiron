@@ -10,6 +10,144 @@
 
 ---
 
+## K-026 · Plaka kapının kendisi; ses bir kapı değil; muhasebe iki kipli (05.09.2026)
+
+Cemil dokuz madde verdi. Hepsi uygulandı; üçü bir **kararı** değiştirdi.
+
+### 26.1 · "Sesli işlem" menüden kalktı — ses kalktı DEĞİL
+
+> *"En üstten sesli işlemi kaldıralım. Çünkü karışıklık olacak orada."*
+
+Menüde altı satır var ve **her birinin sağında kendi mikrofonu** duruyor —
+*"o satırın işini söyleyerek yap."* Yedinci satır olarak duran *"Sesli işlem"*
+ise hangi işi yapacağını söylemiyordu; usta için iki ayrı şey gibi görünüyordu,
+oysa aynı şey.
+
+**Kalkan bir KAPI, yetenek değil.** Altı mikrofon duruyor, arama kutularının
+mikrofonları duruyor (K-020), ses ekranı bağlamıyla açılmaya devam ediyor
+(K-017). K-016 hâlâ tutuyor: sesin yaptığı her işin elle yolu var.
+
+### 26.2 · PLAKA, "kayıtlı mı" sorusunun kendisi
+
+> *"Kayıtlı araç mı geldi kısmını kaldır… Eğer daha önce gelmiş araç ise
+> ruhsata gerek yok… Değilse ruhsatı çekmesini isteriz. Plakayı yaz alanı ve
+> tab olabilir. Ses açık tab olur."*
+> *"Ruhsatı çek ve plakayı yaz tab olsun."*
+
+Ekranın tepesinde *"Kayıtlı araç mı geldi?"* diye bir çip listesi vardı ve
+kayıtlı araçları **tek tek sayıyordu**. Dört araçta çalışır, kırk araçta
+çalışmaz. **Plakanın kendisi zaten bu sorunun cevabı.**
+
+| Plaka yazıldı | Ne oluyor |
+|---|---|
+| **Kayıtlı** | *"Bu araç kayıtlı — Renault Mégane · Mehmet Kaya"* · **ruhsat istenmez**, tür seçilir; açık kaydı varsa oraya götüren düğme çıkar |
+| **Kayıtsız** | *"Bu araç kayıtlı değil"* · ruhsat istenir; ruhsat yoksa araç alanları açılır ve **elle ya da sesle** doldurulur |
+
+**İki sekme:** *Plakayı yaz* (varsayılan, **mikrofonlu** — Cemil: *"ses açık
+tab olur"*) ve *Ruhsatı çek*. Ruhsat okununca ekran **plaka sekmesine düşer**:
+okunanı görmeden düzeltilemez.
+
+**Sesle ne söylenebileceği YAZIYOR** (*"Sesle girişte beklediğimiz bilgileri
+gösterelim"*). Boş bir mikrofon, ustaya *"ne diyeceğim"* diye düşündürüyordu.
+
+### 26.3 · Üçüncü tür: "Tamirat + Bakım" — K-006 genişledi
+
+> *"Sonra altına Tamirat, Bakım veya Tamirat + Bakım yazabilir."*
+
+K-006 iki tür tanımlamıştı ve gerekçesi sağlamdı (km ve hatırlatma yalnız
+bakımda). Ama **gerçek ziyaret ikisi birden olabiliyor** — araç triger için
+geliyor, madem açıldı bakımı da yapılıyor. İki ayrı kayıt açmak ustayı aynı
+aracı iki kez yazmaya zorluyordu.
+
+**Kural tek cümle:** *bakım içeriyorsa bakım kuralları işler* — `bakimIceriyor()`.
+Bu fonksiyon olmadan `tur === 'bakim'` kontrolü **sekiz yerde** duruyordu; üçüncü
+tür eklenince sekizinin de değişmesi gerekirdi ve biri unutulsa **hatırlatma
+sessizce kurulmazdı.**
+
+> **Cemil onayına açık (A-M10):** *"Tamirat + Bakım"* tek kayıt mı olmalıydı,
+> yoksa liste satırında iki kaydın **özeti** mi? Tek kayıt varsayıldı.
+
+### 26.4 · Servis kayıtları araç kartı diline geçti
+
+> *"Servis kayıtları araç listelemesi gibi olsun. Araç bilgileri belirgin
+> olacak."* · *"Üstte yeni servis kaydı buttonunu kaldır. İçeride teslim
+> edilmiş filtresini kaldır."*
+
+**Düğme neden gereksiz:** menüde zaten *"Servis kaydı ekle"* var ve bu ekrana da
+oradan geliniyor. Aynı işi iki yerde göstermek *"hangisinden gireceğim"*
+sorusunu doğuruyordu — 03.09'da *"Araç kaydı"* menü maddesi tam bu sebeple
+kalkmıştı.
+
+**Süzgeç neden gereksiz:** liste artık araç kartı dilini kullanıyor ve
+**içeridekiler üstte, çerçevesi farklı** duruyor. Süzgeç, çerçevenin zaten
+söylediğini ikinci kez soruyordu. **K-004 duruyor:** *"içeride"* bir durum
+değil, `teslimTarihi`'nden türetilen bir görünüm.
+
+**Arama genişledi:** liste artık marka ve sahibi **gösterdiği** için onlarda da
+aranıyor. Gösterilen bir şeyin aranamaması, ustaya *"yok"* dedirtir.
+
+### 26.5 · Muhasebe iki kipli — basit varsayılan, detaylı opt-in
+
+> *"Basit muhasebe olarak düşünelim. Fakat daha fazlasına ihtiyaç duyanlar için
+> de bir geliştirme yapmalıyız."*
+
+| Kip | İçinde ne var | Ustadan istediği karar |
+|---|---|---|
+| **Basit** *(varsayılan)* | bugün tahsilat · ödeme dağılımı · giderler · parça alışı · veresiye | **sıfır** |
+| **Detaylı** *(opt-in)* | dönem (bugün/bu ay/hepsi) · para nereye gitti · **iş başına fark** | 1 (dönem) |
+
+**Karar bütçesi (K-022.4) böyle korunuyor:** ustanın çoğunluğu için ekran hâlâ
+sıfır kararlı; isteyen bir dokunuşla derinleşiyor.
+
+**Detaylı kip HİÇBİR YENİ ALAN İSTEMİYOR.** *"Daha fazlası"* demek **daha fazla
+veri girmek** değil — var olan veriye başka bir pencereden bakmak. Teslim
+tarihi, satır fiyatı ve alış fiyatı zaten kayıtlı.
+
+**"Kâr" denmedi, "Kalan" dendi.** Kira, elektrik, maaş girilmemiş olabilir;
+*kâr* deseydik usta ona **inanırdı** (K-014). Ekran bunu açıkça yazıyor.
+**İş başına fark** ise her zaman doğru: müşteriden alınan eksi o iş için
+parçaya ödenen — ikisi de kayıtlı.
+
+### 26.6 · Dikey ritim 14 → 18 px
+
+> *"Elementler birbirine çok yakın. Bunu genel olarak kontrol et."*
+
+Ölçüldü: altı ekranda kart ve alan araları **12–14 px**, bir yerde **0 px**
+(kalem listesi ile *"+ Parça"* düğmeleri bitişikti ve düğmeler listenin bir
+parçası gibi okunuyordu).
+
+Tek tek yamamak yerine **ritim tek yerden büyütüldü** — v1 dersi: boyutlar
+bileşene gömülüyse *"hepsini büyüt"* demek yüzlerce satıra dokunmak demek.
+
+**33. test (SIKISIK)** eklendi: iki kardeş blok arası **8 px'ten az** ise bulgu.
+`.field` içindeki etiket–kutu 6 px'i **kasıtlı** ve ölçüme girmiyor — birbirine
+ait olduklarını söylüyor. Negatif testle doğrulandı (0 px geri konunca 1 bulgu).
+
+### 26.7 · Denetim ölçtüğü şeyi YİNE bozuyordu — ikinci yüz
+
+K-024.1 veri kirliliğini kapatmıştı. Bu turda aynı hatanın **ikinci yüzü**
+çıktı: 30. test (SAHTE-EYLEM) her düğmeye basarken **sekmelere de** basıyordu ve
+sekme, ekranın kipini **ekranın kendi değişkeninde** değiştiriyor — denetimin
+veri yedeği oraya ulaşamaz. Sonuç: denetimden sonra muhasebe **detaylı kipte**
+açılıyordu.
+
+İki düzeltme:
+- `role="tab"` sahte-eylem testinden **elendi** — sekme hiçbir eylem *iddia*
+  etmiyor, dolayısıyla sahte eylem olamaz. **Test etmediği bir şeye dokunmasın.**
+- Muhasebe ekranı **kipini her çizimde uyguluyor**. Önce gizleme yalnız
+  tıklamanın yan etkisiydi; ekran başka bir yoldan çizilince değişken *"basit"*
+  diyor ama ekranda detay duruyordu. **Çizim, değişkenin dediğini göstermeli.**
+
+### 26.8 · "Müşteri getirdi" bir bakışta okunuyor
+
+Bilgi zaten çiplerde vardı ama **çip bir seçim aracı**: hangisinin basılı
+olduğunu anlamak için bakmak gerekiyordu. Oysa bu K-005'in **sorumluluk
+anahtarı** — sorun çıktığında işçilik alınıp alınmayacağını belirler. Rozet
+yalnız **müşteri** getirdiyse çıkıyor; tamirci getirmesi normal hâl, her satıra
+rozet koymak gürültü olurdu.
+
+---
+
 ## K-025 · Ölçüm üç genişlikte yapılır; kırpılan metin taşma sayılmaz (04.09.2026)
 
 **Karar:** Sağlık denetimi bundan sonra **320 · 375 · 430 px**'te koşulur.
@@ -1002,5 +1140,6 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
+| **A-M10** | *"Tamirat + Bakım"* tek kayıt mı olmalı, yoksa liste satırında iki kaydın özeti mi? | Tek kayıt varsayıldı |
 | **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no). Backend fazında kapatılacak — kabul mü | Cemil |
 | ~~A-2~~ | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya | Kısmen kapandı |

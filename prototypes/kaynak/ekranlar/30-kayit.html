@@ -128,7 +128,7 @@ function kayitCiz() {
         (a && a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
       '<div class="spec-strip">' +
         (a && a.motor ? '<span class="spec-val">' + a.motor + '</span>' : '') +
-        (k.tur === 'bakim' && k.km
+        (bakimIceriyor(k) && k.km
           ? '<span class="spec-sep">·</span><span class="spec-val mono">' + k.km + ' km</span>' : '') +
       '</div>' +
     '</div>';
@@ -153,6 +153,15 @@ function kayitCiz() {
                getirse bile bu rakam kayıtta kalır — "ne kadara
                alabileceği" bilgisi değerli (IS-AKISI Kol D). */
             (s.alis ? '<span class="k-katalog">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
+            /* ⚠️ 05.09 — "MÜŞTERİ GETİRDİ" BİR BAKIŞTA OKUNUYOR.
+               Bilgi zaten aşağıdaki çiplerde vardı ama çip bir SEÇİM
+               aracı: hangisinin basılı olduğunu anlamak için bakmak
+               gerekiyordu. Oysa bu, K-005'in sorumluluk anahtarı —
+               sorun çıktığında işçilik alınıp alınmayacağını belirler.
+               Rozet yalnız MÜŞTERİ getirdiyse çıkar: tamirci getirmesi
+               normal hâl, her satıra rozet koymak gürültü olurdu. */
+            (s.tip === 'parca' && s.kimGetirdi === 'musteri'
+              ? '<span class="pill muted">müşteri getirdi</span>' : '') +
           '</span>' +
           /* KOL B · cevap kimden geldi. Tek parçacıya sorulduysa çip
              çıkmaz — ana yol kalınlaşmaz. */

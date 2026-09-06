@@ -177,6 +177,15 @@ function kayitBul(id) {
   for (var i = 0; i < KAYITLAR.length; i++) if (KAYITLAR[i].id === id) return KAYITLAR[i];
   return null;
 }
+/* BAKIM İÇERİYOR MU — tür `bakim` ya da `ikisi` ise evet (05.09).
+   Tek cümlelik kural: bakım içeren her kayıtta km sorulur ve hatırlatma
+   kurulur. Bu fonksiyon olmadan `tur === 'bakim'` kontrolü SEKİZ yerde
+   duruyordu ve üçüncü tür eklenince sekizinin de yanlış cevap vermesi
+   gerekirdi — biri unutulsa hatırlatma sessizce kurulmazdı. */
+function bakimIceriyor(k) {
+  return !!k && (k.tur === 'bakim' || k.tur === 'ikisi');
+}
+
 /* İÇERİDEKİ = teslim edilmemiş. Başka tanım yok (K-004). */
 function icerideki() {
   return KAYITLAR.filter(function (k) { return !k.teslimTarihi; });
@@ -374,7 +383,7 @@ function bugunMetin() { return gunAyYil(BUGUN); }
    rozeti ve araç ekranı AYNI kaynaktan besleniyor. */
 function hatirlatmasiGelenler() {
   return KAYITLAR.filter(function (k) {
-    return k.tur === 'bakim' && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
+    return bakimIceriyor(k) && k.hatirlatmaTarihi && !k.hatirlatmaGonderildi &&
            tariheCevir(k.hatirlatmaTarihi) <= BUGUN;
   });
 }
@@ -382,13 +391,59 @@ function hatirlatmasiGelenler() {
 /* Bir aracın SON bakımı ve bir sonraki hatırlatması. */
 function sonBakim(plaka) {
   var b = aracKayitlari(plaka).filter(function (k) {
-    return k.tur === 'bakim' && k.teslimTarihi;
+    return bakimIceriyor(k) && k.teslimTarihi;
   });
   return b.length ? b[b.length - 1] : null;
 }
 
 function giderToplami() {
   return GIDERLER.reduce(function (t, g) { return t + (g.tutar || 0); }, 0);
+}
+
+/* ---- DÖNEM SÜZGECİ (05.09 — muhasebenin "detaylı" kipi) ----
+   Cemil: "Muhasebe sayfasında daha detaylı işlem yapılabilir. Basit
+   muhasebe olarak düşünelim. Fakat daha fazlasına ihtiyaç duyanlar
+   için de bir geliştirme yapmalıyız."
+
+   Dönem HİÇBİR YENİ ALAN İSTEMİYOR: teslim tarihi ve gider tarihi
+   zaten kayıtlı. Yalnız üç pencere var — gün, ay, hepsi. Dördüncüsü
+   (hafta, çeyrek, yıl) ustanın sormadığı sorulardır ve her biri bir
+   karar daha demek (K-022.4 karar bütçesi). */
+function donemBasi(donem) {
+  if (donem === 'bugun') return new Date(BUGUN.getFullYear(), BUGUN.getMonth(), BUGUN.getDate());
+  if (donem === 'ay') return new Date(BUGUN.getFullYear(), BUGUN.getMonth(), 1);
+  return null;    /* hepsi */
+}
+function donemIcinde(tarihMetni, donem) {
+  if (!tarihMetni) return false;
+  var bas = donemBasi(donem);
+  if (!bas) return true;
+  var t = tariheCevir(tarihMetni);
+  return t >= bas && t <= BUGUN;
+}
+
+/* Teslim edilmiş kayıtlar — döneme göre. */
+function donemKayitlari(donem) {
+  return KAYITLAR.filter(function (k) {
+    return k.teslimTarihi && donemIcinde(k.teslimTarihi, donem);
+  });
+}
+
+/* ---- İŞ BAŞINA KÂR (yalnız DETAYLI kipte) ----
+   ⚠️ BU DÜKKÂN KÂRI DEĞİL. Bir işin kendi içindeki fark: müşteriden
+   alınan − o iş için parçaya ödenen. Kira, elektrik, maaş BURAYA
+   GİRMEZ ve ekran bunu yazıyor.
+
+   Neden gösterilebiliyor: iki rakam da ZATEN KAYITLI (fiyat ve alis,
+   T-9). Girilmeyen bir şey yok, o yüzden yalan söyleyemez. Dükkân kârı
+   ise girilmemiş giderler yüzünden yalan söylerdi — K-014'ün itirazı
+   orada hâlâ geçerli. */
+function isKari(k) {
+  var alinan = kayitToplami(k);
+  var parca = (k.satirlar || []).reduce(function (t, s) {
+    return t + ((s.tip === 'parca' && s.kimGetirdi === 'tamirci') ? (s.alis || 0) : 0);
+  }, 0);
+  return { alinan: alinan, parca: parca, fark: alinan - parca };
 }
 
 /* ---- PARÇA ALIŞI — BEDAVAYA GELEN DÖRDÜNCÜ RAKAM (04.09) ----
@@ -408,10 +463,11 @@ function giderToplami() {
    YALNIZ TESLİM EDİLMİŞ KAYITLAR: içerideki araçta parça daha
    alınmamış olabilir — henüz olmamış bir harcamayı gider saymak,
    ustayı olduğundan yoksul gösterir. */
-function parcaAlislari() {
+function parcaAlislari(donem) {
   var liste = [];
   KAYITLAR.forEach(function (k) {
     if (!k.teslimTarihi) return;
+    if (donem && !donemIcinde(k.teslimTarihi, donem)) return;
     (k.satirlar || []).forEach(function (s) {
       if (s.tip !== 'parca' || s.kimGetirdi !== 'tamirci') return;
       if (!s.alis) return;
@@ -421,6 +477,16 @@ function parcaAlislari() {
   });
   return liste;
 }
-function parcaAlisiToplami() {
-  return parcaAlislari().reduce(function (t, x) { return t + x.tutar; }, 0);
+function parcaAlisiToplami(donem) {
+  return parcaAlislari(donem).reduce(function (t, x) { return t + x.tutar; }, 0);
+}
+function giderToplamiDonem(donem) {
+  return GIDERLER.reduce(function (t, g) {
+    return t + (donemIcinde(g.tarih, donem) ? (g.tutar || 0) : 0);
+  }, 0);
+}
+function tahsilatToplami(donem) {
+  return donemKayitlari(donem).reduce(function (t, k) {
+    return t + ((k.odemeYolu && k.odemeYolu !== 'almadim') ? kayitToplami(k) : 0);
+  }, 0);
 }
