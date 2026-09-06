@@ -17,7 +17,7 @@ tıklanabilir prototip.
 | Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
 | Dokunuş | ana yol **12** · kısa yol **9** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 05.09'da yürütülerek ölçüldü* |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
-| Sağlık denetimi | **34 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **35 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | 5 kontrol, bulursa `exit 1` |
 | Kararlar | **K-001 … K-028** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
@@ -142,6 +142,11 @@ kuralı doğruydu; aynı turda eklenen sarmalayıcı div'ler kuralın **dışın
 kaldı ve ritim sessizce kırıldı. Kurala sınıf verildi (`.yigin`) ki hem
 görünsün hem denetlenebilsin — anonim bir `<div>` hiçbir araca kendini
 göstermiyor. K-029.
+
+**`inputmode` bir kısıt değil, bir öneridir (05.09).** Tutar alanlarına harf
+giriyordu; okuma tarafı temiz olduğu için **veri** bozulmuyordu ama ustaya
+**gösterilen** bozuluyordu — `abc12x3` yazan usta kayda 12.345 ₺ düşürüyordu.
+K-030.
 
 **Bir testin eşiği kadar KAPSAMI da yanlış olabilir (05.09).** İkisi de
 *"0 bulgu"* der: biri gevşek olduğu için, öteki bakmadığı için. K-029.2.

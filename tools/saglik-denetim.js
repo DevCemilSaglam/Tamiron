@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 34 test.
+/* Tamiron prototip saglik denetimi — 35 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -906,6 +906,89 @@ function stilMetni() {
     });
   });
   showScreen('home');
+
+  /* 35) SAYISAL ALANA HARF GIRIYOR (05.09.2026)
+     Cemil: "Tutar alanina harf giremeyiz. Inputlarin veri
+     dogrulugundan emin ol."
+
+     ⚠️ inputmode="numeric" HICBIR SEYI ENGELLEMEZ — telefonun hangi
+     klavyeyi acacagini soyler, bir ONERIDIR. Masaustunde, yapistirmada
+     ve sesle giriste harf rahatca giriyordu. Uc tutar alaninda da yoktu.
+
+     NEDEN SESSIZ VE PAHALI: okuma tarafi zaten temizdi
+     (replace(/[^0-9]/g,'')), yani VERI bozulmuyordu — ama ustaya
+     GOSTERILEN sey bozuluyordu. "abc12x3" yazan usta ekranda onu
+     goruyor, kayda 12.345 TL dusuyordu.
+
+     IKI SEY OLCULUYOR:
+       a) data-giris olan alana harf yazilinca harf KALIYOR mu
+       b) sayisal gorunen (inputmode=numeric/tel) ama data-giris
+          TASIMAYAN alan var mi — yani korumasi UNUTULMUS alan
+
+     (b) olmadan test yalniz bugunku alanlari korur; yarin eklenen
+     alan yine korumasiz girer ve kimse gormez.
+
+     NEGATIF DOGRULAMA (05.09): data-giris oznitelikleri gecici olarak
+     silindi -> 6 bulgu; geri konunca -> 0. */
+  {
+    var HARFLI = 'abc12x3,4.5 TL';
+    ekranlar.forEach(function (a) {
+      showScreen(a);
+      /* Gider formu kapali gelir; alanini gorebilmek icin acilir. */
+      var ge = document.getElementById('muhGiderEkle');
+      if (a === 'muhasebe' && ge) ge.click();
+
+      /* ⚠️ GORUNURLUK SARTI YOK. Ilk yazimda `if (!el.offsetHeight)
+         return;` vardi ve negatif test bunu ele verdi: ruhsat
+         ekranindaki yil/km/telefon alanlari ancak KAYITSIZ bir plaka
+         yazilinca aciliyor, o yuzden test onlari HIC gormuyordu —
+         korumalari silinse bile "0 bulgu" derdi.
+         Bir alanin korumasi, o an gorunur olup olmamasindan bagimsizdir. */
+      document.querySelectorAll('#screen-' + a + ' input').forEach(function (el) {
+        if (el.type === 'search' || el.type === 'hidden') return;
+        var tip = el.getAttribute('data-giris');
+        var mod = el.getAttribute('inputmode');
+        var ad = el.id || (el.className || '').toString().split(' ')[0] || 'input';
+        /* BICIMLI ALAN = sayisal klavye isteyen ya da mono yazan alan.
+           Mono yaziyorsa bir BICIMI vardir (plaka, km, tutar, telefon);
+           bicimi olan alan korumasiz birakilmaz. */
+        var bicimli = (mod === 'numeric' || mod === 'tel' || mod === 'decimal') ||
+                      /(^| )mono( |$)/.test((el.className || '').toString());
+
+        /* (b) bicimli gorunuyor ama korumasi yok */
+        if (!tip && bicimli) {
+          ek('KORUMASIZ-ALAN', a, ad + ' bicimli alan ama data-giris yok');
+          return;
+        }
+        if (!tip) return;
+
+        /* (a) bicim disi karakter kaliyor mu.
+           ⚠️ "HARF VAR MI" diye sormak YANLIS: plaka HARF ICERIR
+           (34 ABC 123) ve ilk yazimda test onu bulgu sandi. Her tipin
+           kendi KABUL DESENI var; olculen sey harf degil, tipin
+           disina cikan karakter. */
+        var KABUL = {
+          tutar: /^[0-9.]*$/,
+          km:    /^[0-9.]*$/,
+          yil:   /^[0-9]*$/,
+          tel:   /^[0-9 ]*$/,
+          plaka: /^[0-9A-ZÇĞİÖŞÜ ]*$/
+        };
+        var eski = el.value;
+        el.value = HARFLI;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+        var desen = KABUL[tip];
+        if (!desen) {
+          ek('KORUMASIZ-ALAN', a, ad + ' data-giris="' + tip + '" — boyle bir tip yok');
+        } else if (!desen.test(el.value)) {
+          ek('SAYISAL-ALANDA-HARF', a, ad + ' (' + tip + ') -> "' + el.value + '"');
+        }
+        el.value = eski;
+        el.dispatchEvent(new Event('input', { bubbles: true }));
+      });
+    });
+    showScreen('home');
+  }
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */

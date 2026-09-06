@@ -424,6 +424,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Kilometre satırı | `.km-sat` > `.km-tarih` + `.km-deger` |
 | Müşteri özeti başlığı | `.ozet-bas` > `.oz-ad` + `.oz-alt` · parça markası: `.oz-marka` |
 | Sekme | `.tab-grup` > `.tab` (`aria-selected`) — GÖRÜNÜM değiştirir; `.cip` ise SEÇİM yapar, ikisi karıştırılmaz |
+| **Giriş koruması** | `data-giris="tutar\|km\|yil\|tel\|plaka"` — biçimli her alan bunu taşır. `inputmode` bir öneridir, kısıt değil (K-030) |
 | **Yığın** | `.yigin` — ekran gövdesindeki her sarmalayıcı kap. **Boşluğu kap verir**: yeni bir sarmalayıcı `.yigin` almazsa ritim sessizce kırılır |
 | Modül kutusu | `.modul-grid` > `.modul-kutu` > `.mk-ic` + `.mk-ad` + `.mk-alt` — ızgara; `.menu-row` ise liste (sırası anlam taşır) |
 | Başlık şerhi | `.section-label` içinde `.lbl-not` |

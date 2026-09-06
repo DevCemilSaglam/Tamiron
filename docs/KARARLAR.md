@@ -10,6 +10,82 @@
 
 ---
 
+## K-030 · `inputmode` bir kısıt değil, bir öneridir (05.09.2026)
+
+> *"Tutar alanına harf giremeyiz. Inputların veri doğruluğundan emin ol."*
+
+### 30.1 · Ölçüldü: üç tutar alanı da harf kabul ediyordu
+
+`inputmode="numeric"` yalnız **telefonun hangi klavyeyi açacağını söyler.**
+Masaüstünde, **yapıştırmada** ve sesle girişte harf rahatça giriyordu.
+
+| Alan | Yazılan | Kalan *(önce)* |
+|---|---|---|
+| Servis satırı tutarı | `abc12x3,4.5 TL` | `abc12x3,4.5 TL` |
+| Gider tutarı | `abc12x3,4.5 TL` | `abc12x3,4.5 TL` |
+
+**Neden sessiz ve pahalı:** okuma tarafı **zaten temizdi**
+(`replace(/[^0-9]/g,'')`), yani **veri bozulmuyordu** — ama ustaya
+**gösterilen** şey bozuluyordu. `abc12x3` yazan usta ekranda onu görüyor,
+kayda **12.345 ₺** düşüyordu. Yanlış rakam göstermek, rakam göstermemekten
+kötüdür (K-013'ün aynı kuralı, başka bir yerde).
+
+### 30.2 · Tek delegasyon, `data-giris` sözleşmesi
+
+Her alan kendi temizleyicisini yazsaydı biri unutulurdu — **nitekim üçünde de
+yoktu.** `data-giris` bir sözleşme: alanı işaretlemek yeter, davranış
+çekirdekten gelir.
+
+| Tip | Kural | Örnek |
+|---|---|---|
+| `tutar` | tam sayı, binlik nokta. **Kuruş yok** — tamirci *"1900"* der | `abc12x3,4.5 TL` → **12.345** |
+| `km` | tam sayı, binlik nokta | `142500xy` → **142.500** |
+| `yil` | dört hane | `20a18999` → **2018** |
+| `tel` | 11 hane, gruplanır. Ülke kodu **kabul edilmiyor** — tek biçim tutmak, iki biçimi karşılaştırmaktan kolay | `0532abc2153000999` → **0532 215 30 00** |
+| `plaka` | v1'in biçimleyicisi, **çekirdeğe taşındı** | `34abc123` → **34 ABC 123** |
+
+**Sıfır geçerli:** müşteri parçası 0 ₺ durur (S2, K-005).
+
+**İmleç korunuyor.** Değeri yeniden yazmak imleci sona atar; usta ortadan
+düzeltmek isteyince her tuşta sona fırlıyordu. Solunda kaç **rakam** varsa o
+kadar rakamdan sonraya konuluyor — binlik noktası eklense bile aynı yerde.
+
+**Yakalama evresinde dinleniyor** (`addEventListener(..., true)`): ekranların
+kendi `input` dinleyicileri **temizlenmiş** değeri görüyor, hamı değil.
+
+### 30.3 · Yazarken azarlanmaz, yazıldıktan sonra söylenir
+
+Yıl ve telefon **aralığı** yazarken denetlenmiyor: *"20"* yazan biri henüz
+2018'e gidiyordur. Alan **dolduğunda** söyleniyor ve *"Kaydı aç"* kapanıyor.
+
+**Telefon eksik olabilir ama yanlış olamaz** — yanlış numaraya giden bir
+hatırlatma, gitmeyen hatırlatmadan kötüdür.
+
+### 30.4 · 35. test ve iki kez düzeltilen ölçüt
+
+Test **iki şeyi** ölçüyor:
+- **(a)** işaretli alana biçim dışı karakter girip kalıyor mu
+- **(b)** biçimli görünen *(sayısal klavye ya da `.mono`)* ama **işaretsiz**
+  alan var mı — yani koruması **unutulmuş** alan
+
+(b) olmadan test yalnız bugünkü alanları korurdu; yarın eklenen alan yine
+korumasız girer ve kimse görmezdi.
+
+**Ölçüt iki kez yanlıştı, ikisini de negatif test buldu:**
+
+1. *"Harf var mı"* diye soruyordu — **plaka harf içerir** (34 ABC 123) ve test
+   onu bulgu sandı. Her tipin kendi **kabul deseni** var; ölçülen şey harf
+   değil, **tipin dışına çıkan karakter**.
+2. `if (!el.offsetHeight) return;` vardı — ruhsattaki yıl/km/telefon **ancak
+   kayıtsız plaka yazılınca** açılıyor, o yüzden test onları **hiç
+   görmüyordu**: korumaları silinse bile *"0 bulgu"* derdi. **Bir alanın
+   koruması, o an görünür olup olmamasından bağımsızdır.**
+
+**Negatif doğrulama:** bütün `data-giris` öznitelikleri silindi → **4 bulgu**
+(üçü gizli alanlardan), geri konunca **0**.
+
+---
+
 ## K-029 · Boşluk kuralının açığı: SARMALAYICI KAP (05.09.2026)
 
 > *"Elementleri neden birbirine yapıştırıyorsun? Bunu genel olarak düzelt."*

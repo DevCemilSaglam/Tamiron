@@ -147,7 +147,8 @@ function kayitCiz() {
             '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>' +
           '<span class="k-tutar-satir">' +
             '<input class="k-tutar mono" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
-              '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="fiyat" aria-label="Tutar" />' +
+              '" data-satir-fiyat="' + i + '" data-giris="tutar" inputmode="numeric"' +
+            ' placeholder="fiyat" aria-label="Tutar" />' +
             /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM DEĞİL:
                soluk ve küçük durur. Kol D'de müşteri parçayı kendi
                getirse bile bu rakam kayıtta kalır — "ne kadara

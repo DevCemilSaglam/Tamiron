@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-06 12:56
+  Üretim: 2026-09-06 13:13
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2364,7 +2364,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
         <div class="plate-input-wrap">
           <div class="plate-field">
             <span class="tr-tag">TR</span>
-            <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123"
+            <input id="rPlaka" type="text" data-giris="plaka" maxlength="11" placeholder="34 ABC 123"
                    autocomplete="off" spellcheck="false" aria-label="Plaka" />
             <button class="mic-round ghost" data-sesle="servis-ekle"
                     aria-label="Plakayı ve işi sesle söyle" title="Sesle">
@@ -2399,7 +2399,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
         <div class="field"><label for="rModel">Model</label><input id="rModel" /></div>
       </div>
       <div class="field-2">
-        <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
+        <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" data-giris="yil" inputmode="numeric" placeholder="2018" /></div>
         <div class="field"><label for="rMotor">Motor</label><input id="rMotor" /></div>
       </div>
       <div class="field">
@@ -2408,7 +2408,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
       </div>
       <div class="field">
         <label for="rTel">Telefon</label>
-        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
+        <input id="rTel" class="mono" data-giris="tel" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
         <div class="plate-hint">Ruhsatta yazmaz — isteğe bağlı. Bakım hatırlatması ve özet buraya gider.</div>
       </div>
     </div>
@@ -2429,9 +2429,11 @@ alanları ::before ile büyür. Ölçüm (30.08,
     <!-- Km BAKIM İÇEREN HER TÜRDE (K-002). Bir kez yazılır. -->
     <div class="field" id="kmAlan" hidden>
       <label for="rKm">Kilometre</label>
-      <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
+      <input id="rKm" class="mono" data-giris="km" inputmode="numeric" placeholder="142.500" autocomplete="off" />
       <div class="plate-hint">Göstergeden oku. Bir sonraki bakımda işine yarar.</div>
     </div>
+
+    <div id="rUyari"></div>
 
     <button class="btn btn-primary btn-lg" id="kaydiAc" disabled>
       <svg class="ico"><use href="#i-check"></use></svg> Kaydı aç
@@ -3044,7 +3046,7 @@ alanları ::before ile büyür. Ölçüm (30.08,
       </div>
       <div class="field">
         <label for="muhGiderTutar">Tutar (₺)</label>
-        <input id="muhGiderTutar" inputmode="numeric" placeholder="0" autocomplete="off" />
+        <input id="muhGiderTutar" class="mono" data-giris="tutar" inputmode="numeric" placeholder="0" autocomplete="off" />
       </div>
       <div class="btn-row">
         <button class="btn btn-primary" id="muhGiderKaydet">Ekle</button>
@@ -3788,6 +3790,114 @@ var Cekmece = (function () {
   return { ac: ac, kapa: kapa, ciz: cizBildirimler,
            acikMi: function () { return acikMi; } };
 })();
+
+/* ============ GİRİŞ TEMİZLEYİCİ — TEK DELEGASYON ============
+   Cemil, 05.09: *"Tutar alanına harf giremeyiz. Inputların veri
+   doğruluğundan emin ol."*
+
+   ⚠️ `inputmode="numeric"` HİÇBİR ŞEYİ ENGELLEMEZ. Yalnız telefonun
+   hangi klavyeyi açacağını SÖYLER — bir öneridir, bir kısıt değil.
+   Masaüstünde, yapıştırmada ve sesle girişte harf rahatça giriyor.
+   Ölçüldü: üç tutar alanına da "abc12x3,4.5 TL" yazılabiliyordu.
+
+   NEDEN SESSİZ VE PAHALI: okuma tarafı zaten temizdi
+   (`replace(/[^0-9]/g,'')`), yani VERİ bozulmuyordu — ama ustaya
+   gösterilen şey bozuluyordu. "abc12x3" yazan usta ekranda onu
+   görüyor, kayda **12.345 ₺** düşüyordu. Yanlış rakam göstermek,
+   rakam göstermemekten kötüdür (K-013'ün aynı kuralı).
+
+   TEK YERDE: her alan kendi temizleyicisini yazsaydı biri unutulurdu
+   — nitekim üçünde de yoktu. `data-giris` özniteliği bir SÖZLEŞME:
+   alanı işaretlemek yeter, davranış buradan gelir. */
+
+/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı).
+   ⚠️ Ruhsat ekranının IIFE'sindeydi ve oradan çıkamıyordu; plaka üç
+   ekranda görünen ORTAK NESNE, biçimi de ortak olmalı. */
+function plakaBicim(ham) {
+  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
+  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
+  var kalan = t.slice(il.length);
+  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
+  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
+  return [il, harf, rakam].filter(Boolean).join(' ');
+}
+function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+
+/* Rakamları binlik nokta ile ayırır: 12345 -> 12.345 (Türkçe biçim). */
+function binlikAyir(rakamlar) {
+  return rakamlar.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+var GIRIS_TEMIZ = {
+  /* TUTAR — tam sayı. Kuruş YOK: tamirci "1900" der, "1900,50" demez.
+     Sıfır GEÇERLİ (müşteri parçası 0 TL durur — S2, K-005). */
+  tutar: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    return r ? binlikAyir(r.slice(0, 9)) : '';
+  },
+  /* KİLOMETRE — tam sayı, binlik ayraçlı. 7 hane yeter (9.999.999 km). */
+  km: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    return r ? binlikAyir(r.slice(0, 7)) : '';
+  },
+  /* YIL — dört hane. Aralık BURADA denetlenmez: 1899 yazan ustaya
+     yazarken kızmak yerine, alan dolunca söylemek doğru (yilGecerli). */
+  yil: function (h) {
+    return String(h || '').replace(/[^0-9]/g, '').slice(0, 4);
+  },
+  /* TELEFON — yalnız rakam, "0532 215 30 00" biçiminde gruplanır.
+     11 haneden fazlası atılır. Ülke kodu (+90) KABUL EDİLMİYOR:
+     tek biçim tutmak, iki biçmi karşılaştırmaktan kolay. */
+  tel: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').slice(0, 11);
+    if (!r) return '';
+    var p = [r.slice(0, 4), r.slice(4, 7), r.slice(7, 9), r.slice(9, 11)];
+    return p.filter(Boolean).join(' ');
+  },
+  plaka: function (h) { return plakaBicim(h); }
+};
+
+/* Alan geçerli mi — DOLDURULDUKTAN sonra sorulur, yazarken değil. */
+function yilGecerli(y) {
+  var n = parseInt(String(y).replace(/[^0-9]/g, ''), 10);
+  return !y || (n >= 1950 && n <= BUGUN.getFullYear() + 1);
+}
+function telGecerli(t) {
+  var r = String(t || '').replace(/[^0-9]/g, '');
+  return !r || (r.length === 11 && r.charAt(0) === '0');
+}
+
+/* İMLEÇ KORUNUR. Değeri yeniden yazmak imleci sona atar; usta ortadan
+   düzeltmek isteyince her tuşta sona fırlıyordu. Solunda kaç RAKAM
+   varsa o kadar rakamdan sonraya konuluyor — binlik noktası eklense
+   bile aynı yerde kalıyor. */
+function imlecKonumu(sonra, solRakamSayisi) {
+  var i = 0, sayac = 0;
+  while (i < sonra.length && sayac < solRakamSayisi) {
+    if (sonra.charAt(i) >= '0' && sonra.charAt(i) <= '9') sayac++;
+    i++;
+  }
+  return i;
+}
+
+document.addEventListener('input', function (e) {
+  var t = e.target;
+  if (!t || !t.getAttribute) return;
+  var tip = t.getAttribute('data-giris');
+  if (!tip || !GIRIS_TEMIZ[tip]) return;
+  var once = t.value;
+  var sonra = GIRIS_TEMIZ[tip](once);
+  if (sonra === once) return;
+  var konum = 0;
+  try { konum = t.selectionStart || 0; } catch (x) {}
+  var solRakam = (once.slice(0, konum).match(/[0-9]/g) || []).length;
+  t.value = sonra;
+  try {
+    var y = imlecKonumu(sonra, solRakam);
+    t.setSelectionRange(y, y);
+  } catch (x) {}
+}, true);   /* YAKALAMA evresinde: ekranların kendi input dinleyicileri
+               TEMİZLENMİŞ değeri görsün, ham değeri değil. */
 
 /* ============ DÖNEM DÜĞMELERİ — TEK DELEGASYON ============
    Dönem çipleri İKİ ekranda duruyor: muhasebe ve iş başına.
@@ -5454,16 +5564,9 @@ var rSekme = 'plaka';
 /* Sesin taşıdığı ama ruhsatta karşılığı olmayan iş açıklaması. */
 var rSesNotu = null;
 
-/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı). */
-function plakaBicim(ham) {
-  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
-  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
-  var kalan = t.slice(il.length);
-  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
-  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
-  return [il, harf, rakam].filter(Boolean).join(' ');
-}
-function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+/* plakaBicim() ve plakaGecerli() ÇEKİRDEKTE — plaka üç ekranda
+   görünen ortak nesne, biçimi de ortak. Burada kopyası duruyordu ve
+   ruhsat ekranının IIFE'sinden dışarı çıkamıyordu. */
 
 function ruhsatSekme(hangi) {
   rSekme = hangi;
@@ -5526,7 +5629,31 @@ function ruhsatDurum() {
     aracKart.hidden = false;
   }
 
-  document.getElementById('kaydiAc').disabled = !(plakaGecerli(p) && rTur);
+  /* ---- YIL ve TELEFON: yazarken değil, YAZILDIKTAN sonra denetlenir.
+     Her tuşta "geçersiz" demek, ustayı yazarken azarlamaktır: "20"
+     yazan biri henüz 2018'e gidiyordur. Alan dolduğunda söylenir. */
+  var yilEl = document.getElementById('rYil');
+  var telEl = document.getElementById('rTel');
+  var uyari = [];
+  if (yilEl && yilEl.value.length === 4 && !yilGecerli(yilEl.value)) {
+    uyari.push('Model yılı 1950 ile ' + (BUGUN.getFullYear() + 1) + ' arasında olmalı.');
+  }
+  if (telEl && telEl.value && !telGecerli(telEl.value)) {
+    uyari.push('Telefon 11 hane olmalı ve 0 ile başlamalı.');
+  }
+  var uy = document.getElementById('rUyari');
+  if (uy) {
+    uy.innerHTML = uyari.length
+      ? '<div class="notice warn">' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+          '<span class="n-body">' + uyari.join('<br>') + '</span></div>'
+      : '';
+  }
+
+  /* Telefon EKSİK olabilir (isteğe bağlı) ama YANLIŞ olamaz: yanlış
+     numaraya giden bir hatırlatma, gitmeyen hatırlatmadan kötüdür. */
+  document.getElementById('kaydiAc').disabled =
+    !(plakaGecerli(p) && rTur) || uyari.length > 0;
 }
 
 function turSec(t) {
@@ -5655,12 +5782,12 @@ document.addEventListener('click', function (e) {
   }
 });
 
+/* Biçimleme ÇEKİRDEKTE (data-giris="plaka"), burada yalnız ekranın
+   durumu tazeleniyor. Çekirdek yakalama evresinde temizlediği için
+   buraya gelen değer ZATEN biçimli. */
 document.addEventListener('input', function (e) {
-  if (e.target && e.target.id === 'rPlaka') {
-    e.target.value = plakaBicim(e.target.value);
-    try { e.target.setSelectionRange(e.target.value.length, e.target.value.length); } catch (x) {}
-    ruhsatDurum();
-  }
+  if (!e.target || Ekran.adi() !== 'ruhsat') return;
+  if (['rPlaka', 'rYil', 'rTel'].indexOf(e.target.id) >= 0) ruhsatDurum();
 });
 })();
 
@@ -5705,7 +5832,8 @@ function kayitCiz() {
             '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>' +
           '<span class="k-tutar-satir">' +
             '<input class="k-tutar mono" value="' + (s.fiyat ? tutar(s.fiyat) : '') +
-              '" data-satir-fiyat="' + i + '" inputmode="numeric" placeholder="fiyat" aria-label="Tutar" />' +
+              '" data-satir-fiyat="' + i + '" data-giris="tutar" inputmode="numeric"' +
+            ' placeholder="fiyat" aria-label="Tutar" />' +
             /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM DEĞİL:
                soluk ve küçük durur. Kol D'de müşteri parçayı kendi
                getirse bile bu rakam kayıtta kalır — "ne kadara
@@ -7157,7 +7285,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>c6a50db9</b><br>' +
+      'Sürüm <b>22ff65f8</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

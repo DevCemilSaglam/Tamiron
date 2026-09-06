@@ -71,7 +71,7 @@
         <div class="plate-input-wrap">
           <div class="plate-field">
             <span class="tr-tag">TR</span>
-            <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123"
+            <input id="rPlaka" type="text" data-giris="plaka" maxlength="11" placeholder="34 ABC 123"
                    autocomplete="off" spellcheck="false" aria-label="Plaka" />
             <button class="mic-round ghost" data-sesle="servis-ekle"
                     aria-label="Plakayı ve işi sesle söyle" title="Sesle">
@@ -106,7 +106,7 @@
         <div class="field"><label for="rModel">Model</label><input id="rModel" /></div>
       </div>
       <div class="field-2">
-        <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" /></div>
+        <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" data-giris="yil" inputmode="numeric" placeholder="2018" /></div>
         <div class="field"><label for="rMotor">Motor</label><input id="rMotor" /></div>
       </div>
       <div class="field">
@@ -115,7 +115,7 @@
       </div>
       <div class="field">
         <label for="rTel">Telefon</label>
-        <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
+        <input id="rTel" class="mono" data-giris="tel" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" />
         <div class="plate-hint">Ruhsatta yazmaz — isteğe bağlı. Bakım hatırlatması ve özet buraya gider.</div>
       </div>
     </div>
@@ -136,9 +136,11 @@
     <!-- Km BAKIM İÇEREN HER TÜRDE (K-002). Bir kez yazılır. -->
     <div class="field" id="kmAlan" hidden>
       <label for="rKm">Kilometre</label>
-      <input id="rKm" class="mono" inputmode="numeric" placeholder="142.500" autocomplete="off" />
+      <input id="rKm" class="mono" data-giris="km" inputmode="numeric" placeholder="142.500" autocomplete="off" />
       <div class="plate-hint">Göstergeden oku. Bir sonraki bakımda işine yarar.</div>
     </div>
+
+    <div id="rUyari"></div>
 
     <button class="btn btn-primary btn-lg" id="kaydiAc" disabled>
       <svg class="ico"><use href="#i-check"></use></svg> Kaydı aç
@@ -154,16 +156,9 @@ var rSekme = 'plaka';
 /* Sesin taşıdığı ama ruhsatta karşılığı olmayan iş açıklaması. */
 var rSesNotu = null;
 
-/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı). */
-function plakaBicim(ham) {
-  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
-  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
-  var kalan = t.slice(il.length);
-  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
-  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
-  return [il, harf, rakam].filter(Boolean).join(' ');
-}
-function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+/* plakaBicim() ve plakaGecerli() ÇEKİRDEKTE — plaka üç ekranda
+   görünen ortak nesne, biçimi de ortak. Burada kopyası duruyordu ve
+   ruhsat ekranının IIFE'sinden dışarı çıkamıyordu. */
 
 function ruhsatSekme(hangi) {
   rSekme = hangi;
@@ -226,7 +221,31 @@ function ruhsatDurum() {
     aracKart.hidden = false;
   }
 
-  document.getElementById('kaydiAc').disabled = !(plakaGecerli(p) && rTur);
+  /* ---- YIL ve TELEFON: yazarken değil, YAZILDIKTAN sonra denetlenir.
+     Her tuşta "geçersiz" demek, ustayı yazarken azarlamaktır: "20"
+     yazan biri henüz 2018'e gidiyordur. Alan dolduğunda söylenir. */
+  var yilEl = document.getElementById('rYil');
+  var telEl = document.getElementById('rTel');
+  var uyari = [];
+  if (yilEl && yilEl.value.length === 4 && !yilGecerli(yilEl.value)) {
+    uyari.push('Model yılı 1950 ile ' + (BUGUN.getFullYear() + 1) + ' arasında olmalı.');
+  }
+  if (telEl && telEl.value && !telGecerli(telEl.value)) {
+    uyari.push('Telefon 11 hane olmalı ve 0 ile başlamalı.');
+  }
+  var uy = document.getElementById('rUyari');
+  if (uy) {
+    uy.innerHTML = uyari.length
+      ? '<div class="notice warn">' +
+          '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+          '<span class="n-body">' + uyari.join('<br>') + '</span></div>'
+      : '';
+  }
+
+  /* Telefon EKSİK olabilir (isteğe bağlı) ama YANLIŞ olamaz: yanlış
+     numaraya giden bir hatırlatma, gitmeyen hatırlatmadan kötüdür. */
+  document.getElementById('kaydiAc').disabled =
+    !(plakaGecerli(p) && rTur) || uyari.length > 0;
 }
 
 function turSec(t) {
@@ -355,12 +374,12 @@ document.addEventListener('click', function (e) {
   }
 });
 
+/* Biçimleme ÇEKİRDEKTE (data-giris="plaka"), burada yalnız ekranın
+   durumu tazeleniyor. Çekirdek yakalama evresinde temizlediği için
+   buraya gelen değer ZATEN biçimli. */
 document.addEventListener('input', function (e) {
-  if (e.target && e.target.id === 'rPlaka') {
-    e.target.value = plakaBicim(e.target.value);
-    try { e.target.setSelectionRange(e.target.value.length, e.target.value.length); } catch (x) {}
-    ruhsatDurum();
-  }
+  if (!e.target || Ekran.adi() !== 'ruhsat') return;
+  if (['rPlaka', 'rYil', 'rTel'].indexOf(e.target.id) >= 0) ruhsatDurum();
 });
 </script>
 

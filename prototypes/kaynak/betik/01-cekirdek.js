@@ -478,6 +478,114 @@ var Cekmece = (function () {
            acikMi: function () { return acikMi; } };
 })();
 
+/* ============ GİRİŞ TEMİZLEYİCİ — TEK DELEGASYON ============
+   Cemil, 05.09: *"Tutar alanına harf giremeyiz. Inputların veri
+   doğruluğundan emin ol."*
+
+   ⚠️ `inputmode="numeric"` HİÇBİR ŞEYİ ENGELLEMEZ. Yalnız telefonun
+   hangi klavyeyi açacağını SÖYLER — bir öneridir, bir kısıt değil.
+   Masaüstünde, yapıştırmada ve sesle girişte harf rahatça giriyor.
+   Ölçüldü: üç tutar alanına da "abc12x3,4.5 TL" yazılabiliyordu.
+
+   NEDEN SESSİZ VE PAHALI: okuma tarafı zaten temizdi
+   (`replace(/[^0-9]/g,'')`), yani VERİ bozulmuyordu — ama ustaya
+   gösterilen şey bozuluyordu. "abc12x3" yazan usta ekranda onu
+   görüyor, kayda **12.345 ₺** düşüyordu. Yanlış rakam göstermek,
+   rakam göstermemekten kötüdür (K-013'ün aynı kuralı).
+
+   TEK YERDE: her alan kendi temizleyicisini yazsaydı biri unutulurdu
+   — nitekim üçünde de yoktu. `data-giris` özniteliği bir SÖZLEŞME:
+   alanı işaretlemek yeter, davranış buradan gelir. */
+
+/* Plaka biçimi — yazarken de okunurken de AYNI biçimleyici (v1 kuralı).
+   ⚠️ Ruhsat ekranının IIFE'sindeydi ve oradan çıkamıyordu; plaka üç
+   ekranda görünen ORTAK NESNE, biçimi de ortak olmalı. */
+function plakaBicim(ham) {
+  var t = (ham || '').toLocaleUpperCase('tr').replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '');
+  var il = t.slice(0, 2).replace(/[^0-9]/g, '');
+  var kalan = t.slice(il.length);
+  var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
+  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
+  return [il, harf, rakam].filter(Boolean).join(' ');
+}
+function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+
+/* Rakamları binlik nokta ile ayırır: 12345 -> 12.345 (Türkçe biçim). */
+function binlikAyir(rakamlar) {
+  return rakamlar.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+}
+
+var GIRIS_TEMIZ = {
+  /* TUTAR — tam sayı. Kuruş YOK: tamirci "1900" der, "1900,50" demez.
+     Sıfır GEÇERLİ (müşteri parçası 0 TL durur — S2, K-005). */
+  tutar: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    return r ? binlikAyir(r.slice(0, 9)) : '';
+  },
+  /* KİLOMETRE — tam sayı, binlik ayraçlı. 7 hane yeter (9.999.999 km). */
+  km: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').replace(/^0+(?=\d)/, '');
+    return r ? binlikAyir(r.slice(0, 7)) : '';
+  },
+  /* YIL — dört hane. Aralık BURADA denetlenmez: 1899 yazan ustaya
+     yazarken kızmak yerine, alan dolunca söylemek doğru (yilGecerli). */
+  yil: function (h) {
+    return String(h || '').replace(/[^0-9]/g, '').slice(0, 4);
+  },
+  /* TELEFON — yalnız rakam, "0532 215 30 00" biçiminde gruplanır.
+     11 haneden fazlası atılır. Ülke kodu (+90) KABUL EDİLMİYOR:
+     tek biçim tutmak, iki biçmi karşılaştırmaktan kolay. */
+  tel: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').slice(0, 11);
+    if (!r) return '';
+    var p = [r.slice(0, 4), r.slice(4, 7), r.slice(7, 9), r.slice(9, 11)];
+    return p.filter(Boolean).join(' ');
+  },
+  plaka: function (h) { return plakaBicim(h); }
+};
+
+/* Alan geçerli mi — DOLDURULDUKTAN sonra sorulur, yazarken değil. */
+function yilGecerli(y) {
+  var n = parseInt(String(y).replace(/[^0-9]/g, ''), 10);
+  return !y || (n >= 1950 && n <= BUGUN.getFullYear() + 1);
+}
+function telGecerli(t) {
+  var r = String(t || '').replace(/[^0-9]/g, '');
+  return !r || (r.length === 11 && r.charAt(0) === '0');
+}
+
+/* İMLEÇ KORUNUR. Değeri yeniden yazmak imleci sona atar; usta ortadan
+   düzeltmek isteyince her tuşta sona fırlıyordu. Solunda kaç RAKAM
+   varsa o kadar rakamdan sonraya konuluyor — binlik noktası eklense
+   bile aynı yerde kalıyor. */
+function imlecKonumu(sonra, solRakamSayisi) {
+  var i = 0, sayac = 0;
+  while (i < sonra.length && sayac < solRakamSayisi) {
+    if (sonra.charAt(i) >= '0' && sonra.charAt(i) <= '9') sayac++;
+    i++;
+  }
+  return i;
+}
+
+document.addEventListener('input', function (e) {
+  var t = e.target;
+  if (!t || !t.getAttribute) return;
+  var tip = t.getAttribute('data-giris');
+  if (!tip || !GIRIS_TEMIZ[tip]) return;
+  var once = t.value;
+  var sonra = GIRIS_TEMIZ[tip](once);
+  if (sonra === once) return;
+  var konum = 0;
+  try { konum = t.selectionStart || 0; } catch (x) {}
+  var solRakam = (once.slice(0, konum).match(/[0-9]/g) || []).length;
+  t.value = sonra;
+  try {
+    var y = imlecKonumu(sonra, solRakam);
+    t.setSelectionRange(y, y);
+  } catch (x) {}
+}, true);   /* YAKALAMA evresinde: ekranların kendi input dinleyicileri
+               TEMİZLENMİŞ değeri görsün, ham değeri değil. */
+
 /* ============ DÖNEM DÜĞMELERİ — TEK DELEGASYON ============
    Dönem çipleri İKİ ekranda duruyor: muhasebe ve iş başına.
 
