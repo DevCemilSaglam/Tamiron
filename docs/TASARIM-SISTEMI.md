@@ -427,7 +427,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | **Giriş koruması** | `data-giris="tutar\|km\|yil\|tel\|plaka"` — biçimli her alan bunu taşır. `inputmode` bir öneridir, kısıt değil (K-030) |
 | **Yığın** | `.yigin` — ekran gövdesindeki her sarmalayıcı kap. **Boşluğu kap verir**: yeni bir sarmalayıcı `.yigin` almazsa ritim sessizce kırılır |
 | Modül kutusu | `.modul-grid` > `.modul-kutu` > `.mk-ic` + `.mk-ad` + `.mk-alt` — ızgara; `.menu-row` ise liste (sırası anlam taşır) |
-| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono sabit genişlik, `.eylem` 40 px) · ikincil bilgi: `.t-alt` (ana metnin **altında**) · toplam: `tr.genel` · silme: `.satir-sil`. **Yatay kaydırma YOK** (K-031) |
+| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono sabit genişlik, `.eylem` 40 px) · ikincil bilgi: `.t-alt` · toplam: `tr.genel` · zebra: `tbody tr:nth-child(odd)` · silme: `tr.kaydirilir` → sola kaydırınca `tr.silme-onay` > `.onay-btn.evet\|.hayir`. **Yatay kaydırma YOK** (K-031) |
 | Servis kaydı kartı | `.arac-kart` + `.ak-is` > `.ak-is-ne` + `.ak-alt` (yalnız `kayitKartiHtml()` üretir) |
 | Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |

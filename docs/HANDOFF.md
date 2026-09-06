@@ -143,6 +143,9 @@ kaldı ve ritim sessizce kırıldı. Kurala sınıf verildi (`.yigin`) ki hem
 görünsün hem denetlenebilsin — anonim bir `<div>` hiçbir araca kendini
 göstermiyor. K-029.
 
+**Kaydırma silmez, sorar (05.09).** Görünmeyen bir hareket, görünmeyen bir
+sonuç doğurmamalı — cepte kazara kaydırmak bir gideri silmemeli. K-032.
+
 **Görünmeyen kaydırma, kırpmanın kardeşidir (05.09).** K-025'te *"kesilen
 metin taşan metinden tehlikelidir"* deyip yatay kaydırma koymuştum; üçüncü
 seçenek vardı ve daha doğruydu — **sığdırmak**. Kullanıcı sağa kaydıracağını

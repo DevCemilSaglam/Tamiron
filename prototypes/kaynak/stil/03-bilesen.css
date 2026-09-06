@@ -603,7 +603,9 @@ eylem butonu kisalmaz — yoksa
    "Yapilacak isler / Fotograftan" satiri tasiyordu (olcum: 381 > 373). */
 .section-label.with-action {
   justify-content: space-between;
-  margin-bottom: 14px;
+  /* Kart icinde boslugu KAP verir (K-028.3); burada 14 px kalinca
+     ustune biniyordu. */
+  margin-bottom: 0;
   gap: 10px;
 }.section-label .lbl-txt {
   display: flex;
@@ -627,8 +629,14 @@ eylem butonu kisalmaz — yoksa
   filter: none;
 }.daire-btn {
   flex: none;
-  width: 44px;
-  height: 44px;
+  /* ⚠️ 44 -> 48 (05.09). Olculdu: dugme 44x48 cikiyordu, yani DAIRE
+     DEGIL OVAL. Sebep, genel bir `min-height: var(--dokun)` kuralinin
+     44 px'lik yuksekligi ezmesi — dokunma hedefi kurali (48) hakliydi,
+     yanlis olan genislikti. Iki olcu de --dokun oldu; daire artik
+     gercekten daire ve iki dugme birbiriyle hizali. */
+  width: var(--dokun);
+  height: var(--dokun);
+  min-height: var(--dokun);
   border-radius: var(--radius-pill);
   border: 0;
   background: var(--accent);
@@ -1602,11 +1610,8 @@ alanları ::before ile büyür. Ölçüm (30.08,
   font-weight: 700; color: var(--text);
   border-top: 2px solid var(--line); background: var(--surface-2);
 }
-.tablo .satir-sil {
-  border: 0; background: transparent; color: var(--faint);
-  width: 36px; height: 36px; border-radius: var(--radius-sm);
-}
-.tablo .satir-sil:hover { color: var(--crit); background: var(--crit-bg); }
+/* .satir-sil KALDIRILDI (05.09): silme sütunu kalkıp sola kaydırmaya
+   geçince sınıf ölü kaldı ve denetimin OLU-SINIF testi yakaladı. */
 
 
 /* ================= MODÜL IZGARASI (Detaylı muhasebe) — 05.09.2026
@@ -1687,3 +1692,49 @@ alanları ::before ile büyür. Ölçüm (30.08,
    OLMALI. Kurala sınıf verildi ki unutulmasın ve denetim görebilsin. */
 .yigin { display: flex; flex-direction: column; gap: 18px; }
 .yigin > * { flex-shrink: 0; }
+
+
+/* ---- TABLO ZEBRASI (05.09, Cemil: "odd even kullanilabilir") ----
+   Iki sutunlu bir tabloda goz satiri kaybetmez ama uc sutunda ve uzun
+   listede kaybeder: tutarin hangi acikclamaya ait oldugu, satir seridi
+   olmadan bir an duraksatiyor. Cok hafif — zemin degil, bir ton. */
+.tablo tbody tr:nth-child(odd):not(.genel):not(.silme-onay) {
+  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+}
+
+/* ---- SOLA KAYDIRARAK SILME (05.09) ----
+   Cemil: "Giderde sola kaydirirsa sorarak silsin."
+
+   ⚠️ SILME SUTUNU KALKTI ve bu tutari da duzeltti: x dugmesi 40 px yer
+   kapliyordu, tutarlar kartin sag kenarindan 40 px iceride duruyordu
+   ("Tutarlari saga yasla").
+
+   ⚠️ KAYDIRMA TEK BASINA SILMEZ. K-031'in dersi burada da gecerli:
+   gorunmeyen bir hareket, gorunmeyen bir sonuc dogurmamali. Kaydirma
+   yalniz ONAY SATIRINI aciyor; silme ikinci bir dokunusla oluyor.
+   Boylece cepte kazara kaydirmak bir gideri silmiyor. */
+.tablo tr.kaydirilir { touch-action: pan-y; }
+.tablo tr.kayiyor td { transition: none; }
+.tablo tr.kaydirilir td { transition: transform .18s ease; will-change: transform; }
+.tablo tr.silme-onay td {
+  background: var(--crit-bg);
+  color: var(--crit);
+}
+.tablo tr.silme-onay .onay-btn {
+  border: 0; border-radius: var(--radius-sm);
+  padding: 8px 12px; min-height: 40px;
+  font-family: var(--font-body); font-size: var(--tip-sm); font-weight: 600;
+}
+.tablo tr.silme-onay .onay-btn.evet { background: var(--crit); color: #fff; }
+.tablo tr.silme-onay .onay-btn.hayir {
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--line);
+}
+.tablo tr.silme-onay .onay-satir {
+  display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;
+}
+
+/* Alacak tablosunda plakanın yanındaki tarih — plaka bileşeni kendi
+   ölçüsünü taşıdığı için tarih ayrı bir sınıfla hizalanıyor (05.09). */
+.tablo .t-alt .plate { vertical-align: middle; }
+.tablo .t-alt .t-tarih { margin-left: 6px; }

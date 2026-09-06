@@ -10,6 +10,73 @@
 
 ---
 
+## K-032 · Kaydırma silmez, sorar (05.09.2026)
+
+### 32.1 · Sola kaydırma **onay satırını** açar
+
+> *"Giderde sola kaydırırsa sorarak silsin."*
+
+**Kaydırma tek başına silmez.** K-031'in dersi burada da geçerli: görünmeyen
+bir hareket, **görünmeyen bir sonuç doğurmamalı.** Cepte kazara kaydırmak bir
+gideri silmemeli.
+
+| Hareket | Sonuç |
+|---|---|
+| < 40 px sola | hiçbir şey — satır yerine döner |
+| ≥ 40 px sola | **onay satırı**: *"Dükkân kirası silinsin mi? · Vazgeç · Sil"* |
+| Onay satırında **Sil** | siler, balon söyler |
+
+**Onay satırı, silinecek satırın YERİNE çiziliyor:** ayrı bir kutu açmak
+tabloyu bozar, balon ise kaybolur gider.
+
+**Klavyeyle de silinebilir.** Kaydırma parmakla yapılır, klavyeyle yapılamaz;
+satır odaklanabilir ve **Delete** aynı onay satırını açıyor. Erişilebilirlik
+borcu, doğduğu turda kapandı.
+
+> **Cemil onayına açık (A-M12):** kaydırma **keşfedilebilir mi?** Ekranda onu
+> söyleyen bir şey yok — *"buraya araç işleri dışındaki giderler"* şeridi
+> senin isteğinle kalktığı için yerine ipucu koymadım. Bir kez öğrenilen bir
+> hareket ama **öğrenilene kadar** silme yolu görünmüyor.
+
+### 32.2 · Silme sütunu kalkınca tutarlar sağa yaslandı
+
+*"Tutarları sağa yasla"* ile *"kaydırarak sil"* **aynı düzeltmeyle** çözüldü:
+`×` düğmesi **40 px** yer kaplıyordu ve rakamlar kartın sağ kenarından o kadar
+içeride duruyordu.
+
+**Ölçüldü:** tutarların sağı **340**, kartın iç sağ kenarı **341** — tam yaslı.
+
+### 32.3 · Daire gerçekten daire değildi
+
+*"Giderler + butonu mikrofonla hizalı olsun."* Ölçtüm: düğmeler **44 × 48** —
+**oval**. Sebep, genel bir `min-height: var(--dokun)` kuralının 44 px'lik
+yüksekliği ezmesi. **Dokunma hedefi kuralı (48) haklıydı, yanlış olan
+genişlikti.** İki ölçü de `--dokun` oldu: **48 × 48**, ikisi aynı hizada.
+
+`.section-label.with-action`'ın `margin-bottom: 14px`'i de kalktı — kart içinde
+boşluğu **kap veriyor** (K-028.3) ve ikisi üst üste biniyordu.
+
+### 32.4 · Zebra, açıklama, plaka
+
+| | |
+|---|---|
+| **Zebra** | `tbody tr:nth-child(odd)` — çok hafif, zemin değil bir ton. İki sütunda göz satırı kaybetmez ama **uzun listede** kaybeder: tutarın hangi açıklamaya ait olduğu bir an duraksatıyordu |
+| **Açıklama şeridi** | kalktı. Kural duruyor ama **her açılışta tekrar etmek ustayı azarlamak** oluyordu; yeri **boş durum** — ilk kez gider yazan orada okur, sonra bir daha görmez |
+| **Alacakta plaka** | düz metin değil **gerçek plaka bileşeni** (`plakaHtml`). Plaka her ekranda aynı dili konuşur (K-008) |
+
+### 32.5 · Denetim iki ölü sınıf yakaladı
+
+Bu turda iki bileşen kaldırıldı (`.lbl-not` ve `.satir-sil`) ve **ikisini de
+denetimin `OLU-SINIF` testi** buldu. Ölü CSS bırakılmaz: sözlükte duran ama
+kullanılmayan sınıf, bir sonraki okuyucuya *"bu var"* der.
+
+**Bir de kendi hatam elle işletirken çıktı:** kaydırma eşiği `kayma >= 40` diye
+yazılmıştı ama `kayma` **negatif** (sola gidiyor). Kaydırma çalışıyor, onay hiç
+açılmıyordu — **hiçbir test görmezdi**, çünkü hepsi "0 bulgu" veriyordu.
+İşletmeden bilinmezdi.
+
+---
+
 ## K-031 · Görünmeyen kaydırma, kırpmanın kardeşidir (05.09.2026)
 
 > *"Gider ve alacak tabloları telefonun ekranına sığmıyor, sağa kaydırmak
@@ -1590,6 +1657,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
+| **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok | Bir kez öğrenilir; ipucu istenirse eklenir |
 | **A-M11** | Detaylı menüdeki beş modül (fatura/KDV · çek · senet · cari) **kapsama girdi mi**, yoksa yeri mi açıldı? | Yeri açıldı; K-022 duruyor |
 | **A-M10** | *"Tamirat + Bakım"* tek kayıt mı olmalı, yoksa liste satırında iki kaydın özeti mi? | Tek kayıt varsayıldı |
 | **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no). Backend fazında kapatılacak — kabul mü | Cemil |

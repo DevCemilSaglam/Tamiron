@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-06 13:21
+  Üretim: 2026-09-06 13:42
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -913,7 +913,9 @@ eylem butonu kisalmaz — yoksa
    "Yapilacak isler / Fotograftan" satiri tasiyordu (olcum: 381 > 373). */
 .section-label.with-action {
   justify-content: space-between;
-  margin-bottom: 14px;
+  /* Kart icinde boslugu KAP verir (K-028.3); burada 14 px kalinca
+     ustune biniyordu. */
+  margin-bottom: 0;
   gap: 10px;
 }.section-label .lbl-txt {
   display: flex;
@@ -937,8 +939,14 @@ eylem butonu kisalmaz — yoksa
   filter: none;
 }.daire-btn {
   flex: none;
-  width: 44px;
-  height: 44px;
+  /* ⚠️ 44 -> 48 (05.09). Olculdu: dugme 44x48 cikiyordu, yani DAIRE
+     DEGIL OVAL. Sebep, genel bir `min-height: var(--dokun)` kuralinin
+     44 px'lik yuksekligi ezmesi — dokunma hedefi kurali (48) hakliydi,
+     yanlis olan genislikti. Iki olcu de --dokun oldu; daire artik
+     gercekten daire ve iki dugme birbiriyle hizali. */
+  width: var(--dokun);
+  height: var(--dokun);
+  min-height: var(--dokun);
   border-radius: var(--radius-pill);
   border: 0;
   background: var(--accent);
@@ -1912,11 +1920,8 @@ alanları ::before ile büyür. Ölçüm (30.08,
   font-weight: 700; color: var(--text);
   border-top: 2px solid var(--line); background: var(--surface-2);
 }
-.tablo .satir-sil {
-  border: 0; background: transparent; color: var(--faint);
-  width: 36px; height: 36px; border-radius: var(--radius-sm);
-}
-.tablo .satir-sil:hover { color: var(--crit); background: var(--crit-bg); }
+/* .satir-sil KALDIRILDI (05.09): silme sütunu kalkıp sola kaydırmaya
+   geçince sınıf ölü kaldı ve denetimin OLU-SINIF testi yakaladı. */
 
 
 /* ================= MODÜL IZGARASI (Detaylı muhasebe) — 05.09.2026
@@ -1997,6 +2002,52 @@ alanları ::before ile büyür. Ölçüm (30.08,
    OLMALI. Kurala sınıf verildi ki unutulmasın ve denetim görebilsin. */
 .yigin { display: flex; flex-direction: column; gap: 18px; }
 .yigin > * { flex-shrink: 0; }
+
+
+/* ---- TABLO ZEBRASI (05.09, Cemil: "odd even kullanilabilir") ----
+   Iki sutunlu bir tabloda goz satiri kaybetmez ama uc sutunda ve uzun
+   listede kaybeder: tutarin hangi acikclamaya ait oldugu, satir seridi
+   olmadan bir an duraksatiyor. Cok hafif — zemin degil, bir ton. */
+.tablo tbody tr:nth-child(odd):not(.genel):not(.silme-onay) {
+  background: color-mix(in srgb, var(--surface-2) 55%, transparent);
+}
+
+/* ---- SOLA KAYDIRARAK SILME (05.09) ----
+   Cemil: "Giderde sola kaydirirsa sorarak silsin."
+
+   ⚠️ SILME SUTUNU KALKTI ve bu tutari da duzeltti: x dugmesi 40 px yer
+   kapliyordu, tutarlar kartin sag kenarindan 40 px iceride duruyordu
+   ("Tutarlari saga yasla").
+
+   ⚠️ KAYDIRMA TEK BASINA SILMEZ. K-031'in dersi burada da gecerli:
+   gorunmeyen bir hareket, gorunmeyen bir sonuc dogurmamali. Kaydirma
+   yalniz ONAY SATIRINI aciyor; silme ikinci bir dokunusla oluyor.
+   Boylece cepte kazara kaydirmak bir gideri silmiyor. */
+.tablo tr.kaydirilir { touch-action: pan-y; }
+.tablo tr.kayiyor td { transition: none; }
+.tablo tr.kaydirilir td { transition: transform .18s ease; will-change: transform; }
+.tablo tr.silme-onay td {
+  background: var(--crit-bg);
+  color: var(--crit);
+}
+.tablo tr.silme-onay .onay-btn {
+  border: 0; border-radius: var(--radius-sm);
+  padding: 8px 12px; min-height: 40px;
+  font-family: var(--font-body); font-size: var(--tip-sm); font-weight: 600;
+}
+.tablo tr.silme-onay .onay-btn.evet { background: var(--crit); color: #fff; }
+.tablo tr.silme-onay .onay-btn.hayir {
+  background: transparent; color: var(--muted);
+  border: 1px solid var(--line);
+}
+.tablo tr.silme-onay .onay-satir {
+  display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;
+}
+
+/* Alacak tablosunda plakanın yanındaki tarih — plaka bileşeni kendi
+   ölçüsünü taşıdığı için tarih ayrı bir sınıfla hizalanıyor (05.09). */
+.tablo .t-alt .plate { vertical-align: middle; }
+.tablo .t-alt .t-tarih { margin-left: 6px; }
 
 
 /* ===== ekran: 20-ruhsat.html ===== */
@@ -6848,6 +6899,8 @@ document.addEventListener('input', function (e) {
 (function () {
 var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almadım' };
 var muhKip = 'basit';
+/* Hangi gider silinmek üzere — onay satırı bu id'ye göre çiziliyor. */
+var muhSilinecek = null;
 
 /* ---- MUHASEBE MODÜLLERİ (Detaylı sekmesi) ----
    Cemil: "Detaylı alanda ise, muhasebe modüllerine gidebilsin. Çek,
@@ -6968,34 +7021,45 @@ Ekran.tanim('muhasebe', {
     /* ⚠️ ÜÇ SÜTUN, DÖRT DEĞİL. Tarih kendi sütununda değil, açıklamanın
        ALTINDA — dört sütun 375 px'e sığmıyordu ve tablo sağa kayıyordu
        (Cemil: "kullanıcı sağa kaydıracağını bilmez"). */
+    /* ⚠️ SİLME SÜTUNU YOK (05.09). Sola kaydırma onay satırını açıyor;
+       böylece tutarlar kartın SAĞ KENARINA yaslanıyor — x düğmesi
+       40 px yer kaplıyor ve rakamlar içeride duruyordu. */
     var gid = GIDERLER.filter(function (g) { return donemIcinde(g.tarih, muhDonemSecili); });
     document.getElementById('muhGiderler').innerHTML = gid.length
       ? '<div class="card"><div class="tablo-sar"><table class="tablo">' +
           '<thead><tr><th>Açıklama</th>' +
-            '<th class="sayi">Tutar</th><th class="eylem"></th></tr></thead><tbody>' +
+            '<th class="sayi">Tutar</th></tr></thead><tbody>' +
           gid.slice().reverse().map(function (g) {
-            return '<tr><td>' + g.aciklama +
+            /* Onay satırı, silinecek satırın YERİNE çizilir: ayrı bir
+               kutu açmak tabloyu bozar, balon ise kaybolur gider. */
+            if (muhSilinecek === g.id) {
+              return '<tr class="silme-onay"><td colspan="2">' +
+                '<b>' + g.aciklama + '</b> silinsin mi?' +
+                '<span class="onay-satir">' +
+                  '<button class="onay-btn hayir" data-sil-vazgec="1">Vazgeç</button>' +
+                  '<button class="onay-btn evet" data-sil-onay="' + g.id + '">Sil</button>' +
+                '</span></td></tr>';
+            }
+            return '<tr class="kaydirilir" data-kaydir="' + g.id + '"' +
+                ' tabindex="0" aria-label="' + g.aciklama + ' — silmek için sola kaydır">' +
+              '<td>' + g.aciklama +
                 '<span class="t-alt">' + g.tarih + '</span></td>' +
-              '<td class="sayi">' + tutar(g.tutar) + ' ₺</td>' +
-              '<td class="eylem"><button class="satir-sil" data-gider-sil="' + g.id + '"' +
-                ' aria-label="' + g.aciklama + ' giderini kaldır">' +
-                '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button></td></tr>';
+              '<td class="sayi">' + tutar(g.tutar) + ' ₺</td></tr>';
           }).join('') +
           '<tr class="genel"><td>Toplam</td>' +
             '<td class="sayi">' + tutar(gid.reduce(function (t, g) {
-              return t + (g.tutar || 0); }, 0)) + ' ₺</td><td class="eylem"></td></tr>' +
+              return t + (g.tutar || 0); }, 0)) + ' ₺</td></tr>' +
           '</tbody></table></div></div>' +
-        /* ⚠️ ARAÇ İŞLERİ BURAYA YAZILMAZ (Cemil, 05.09: "Giderlerde
-           yedek parça olmamalı. Yedek parçalar işten alınarak
-           düşülüyor"). Parçanın alış fiyatı zaten servis satırında
-           duruyor ve iş başına farkta düşülüyor; buraya elle yazmak
-           AYNI PARAYI İKİ KEZ saymaktır. Kullanıcı yine de yazabilir —
-           yasak değil, uyarı. */
-        '<p class="plate-hint">Buraya <b>araç işleri dışındaki</b> giderler ' +
-        'yazılır: kira, elektrik, çay ocağı… Parça alışı servis kaydından ' +
-        'düşülüyor, ayrıca yazarsan iki kez sayılır.</p>'
+        /* ⚠️ AÇIKLAMA ŞERİDİ KALDIRILDI (Cemil, 05.09: "Buraya araç
+           işleri dışında açıklamayı kaldır"). Kural duruyor — araç
+           işleri buraya yazılmaz, parça alışı servis kaydından
+           düşülüyor — ama kuralı HER AÇILIŞTA tekrar etmek ustayı
+           azarlamak oluyordu. Yeri BOŞ DURUM: ilk kez gider yazan
+           usta orada okuyor, sonra bir daha görmüyor. */
+        ''
       : bosDurumHtml('i-receipt', 'Gider yazılmamış',
           'Araç işleri dışındaki giderler buraya: kira, elektrik, çay ocağı. ' +
+          'Parça alışı servis kaydından düşülüyor, buraya yazılmaz. ' +
           'Yuvarlak + düğmesine dokun ya da mikrofona basıp ' +
           '"2400 TL elektrik faturası ekle" de.');
 
@@ -7021,9 +7085,14 @@ Ekran.tanim('muhasebe', {
           borclu.slice().reverse().map(function (k) {
             var a = aracBul(k.plaka) || {};
             return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
+              /* Plaka DÜZ METİN DEĞİL, gerçek plaka bileşeni (Cemil,
+                 05.09: "Alacakta plaka geçerli plakalar şeklinde
+                 olsun"). Plaka her ekranda aynı dili konuşur —
+                 plakaHtml() ortak nesnesi (K-008). */
               '<td>' + (a.sahipAd || 'sahip yazılmamış') +
-                '<span class="t-alt">' + k.plaka +
-                (k.teslimTarihi ? ' · ' + k.teslimTarihi : '') + '</span></td>' +
+                '<span class="t-alt">' + plakaHtml(k.plaka) +
+                (k.teslimTarihi ? ' <span class="t-tarih">' + k.teslimTarihi +
+                  '</span>' : '') + '</span></td>' +
               '<td class="sayi">' + tutar(kayitToplami(k)) + ' ₺</td></tr>';
           }).join('') +
           '<tr class="genel"><td>Toplam alacak</td>' +
@@ -7088,18 +7157,87 @@ document.addEventListener('click', function (e) {
     return;
   }
 
-  var gs = e.target.closest('[data-gider-sil]');
-  if (gs) {
-    e.stopPropagation();
-    var id = parseInt(gs.getAttribute('data-gider-sil'), 10);
+  if (e.target.closest('[data-sil-vazgec]')) {
+    muhSilinecek = null; Ekran.tazele(); return;
+  }
+
+  var so = e.target.closest('[data-sil-onay]');
+  if (so) {
+    var id = parseInt(so.getAttribute('data-sil-onay'), 10);
     var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
     if (i >= 0) {
       var silinen = GIDERLER.splice(i, 1)[0];
-      balon(silinen.aciklama + ' kaldırıldı.', false, 2400);
+      balon(silinen.aciklama + ' silindi.', false, 2400);
+    }
+    muhSilinecek = null;
+    Ekran.tazele();
+  }
+});
+
+/* ---- SOLA KAYDIRMA ----
+   ⚠️ KAYDIRMA TEK BAŞINA SİLMEZ, onay satırını açar. Görünmeyen bir
+   hareket görünmeyen bir sonuç doğurmamalı (K-031'in dersi): cepte
+   kazara kaydırmak bir gideri silmemeli.
+
+   Pointer olayları kullanılıyor — dokunmatikte de farede de aynı kod.
+   Dikey kaydırma serbest (touch-action: pan-y); yatay hareket 40 px'i
+   geçerse onay açılıyor. */
+(function () {
+  var basX = 0, basY = 0, satir = null, yatay = false;
+
+  document.addEventListener('pointerdown', function (e) {
+    if (Ekran.adi() !== 'muhasebe') return;
+    var tr = e.target.closest('.tablo tr.kaydirilir');
+    if (!tr) return;
+    satir = tr; basX = e.clientX; basY = e.clientY; yatay = false;
+  });
+
+  document.addEventListener('pointermove', function (e) {
+    if (!satir) return;
+    var dx = e.clientX - basX, dy = e.clientY - basY;
+    if (!yatay && Math.abs(dy) > Math.abs(dx)) { satir = null; return; }
+    if (dx > 0) return;                       /* yalnız SOLA */
+    yatay = true;
+    satir.classList.add('kayiyor');
+    var kayma = Math.max(dx, -96);
+    Array.prototype.forEach.call(satir.children, function (td) {
+      td.style.transform = 'translateX(' + kayma + 'px)';
+    });
+  });
+
+  function birak() {
+    if (!satir) return;
+    var tr = satir; satir = null;
+    tr.classList.remove('kayiyor');
+    var kayma = 0;
+    try {
+      kayma = parseFloat((tr.children[0].style.transform || '').replace(/[^-\d.]/g, '')) || 0;
+    } catch (x) {}
+    Array.prototype.forEach.call(tr.children, function (td) { td.style.transform = ''; });
+    /* kayma NEGATİF (sola gidiyor) — ilk yazımda `kayma >= 40` yazdım
+       ve onay hiç açılmadı: kaydırma çalışıyor, sonucu gelmiyordu.
+       Elle işletince yakalandı. */
+    if (yatay && -kayma >= 40) {
+      muhSilinecek = parseInt(tr.getAttribute('data-kaydir'), 10);
       Ekran.tazele();
     }
   }
-});
+  document.addEventListener('pointerup', birak);
+  document.addEventListener('pointercancel', birak);
+
+  /* KLAVYEYLE DE SİLİNEBİLİR: kaydırma parmakla yapılır, klavyeyle
+     yapılamaz. Erişilebilirlik borcu burada kapanıyor — satır
+     odaklanabilir ve Delete onay satırını açıyor. */
+  document.addEventListener('keydown', function (e) {
+    if (Ekran.adi() !== 'muhasebe') return;
+    if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+    var tr = e.target.closest && e.target.closest('.tablo tr.kaydirilir');
+    if (!tr) return;
+    e.preventDefault();
+    muhSilinecek = parseInt(tr.getAttribute('data-kaydir'), 10);
+    Ekran.tazele();
+  });
+})();
 })();
 
 /* ===== ekran: 96-is-basina.html ===== */
@@ -7332,7 +7470,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>44309da2</b><br>' +
+      'Sürüm <b>9403cc09</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
