@@ -5,102 +5,250 @@
 > tutar. HANDOFF *durumu* söyler, bu dosya *sırayı*.
 >
 > **Kural:** bir iş bitmeden bir sonrakine geçilmez. Her iş bitince
-> · derleme denetimi · 375 px'te sağlık denetimi (0 bulgu) · commit
-> · push · bu dosyada **BİTTİ** işareti + tek satır sonuç.
+> · derleme denetimi · sağlık denetimi 320/375/430 px'te **0 bulgu**
+> · commit (gerekçesiyle) · push · bu dosyada **BİTTİ** işareti + tek
+> satır sonuç.
 >
 > **Karar gerektiren yerde durulmaz:** varsayım yazılır, *"Cemil
 > onayına açık"* işaretlenir, iş bitirilir. Yalnız yanlış varsayım
 > işi çöpe çıkaracaksa durulur ve buraya **BEKLİYOR** yazılır.
-
-Başlangıç: 04.09.2026 · son commit `4a6dfe5`
+>
+> **Yeni özellik yok.** Bu kuyruk hiçbir yeni özellik içermiyor;
+> hepsi **doğrulama, uzlaştırma ve ölçüm**. Kuyruk sırasında yeni bir
+> özellik ihtiyacı doğarsa yazılmaz — buraya *öneri* olarak düşülür.
 
 ---
 
-## Sıra
+## Tur 3 · 06.09.2026 · son commit `906c553`
+
+Önceki iki kuyruk (04.09 ve 05.09) **bitti**, aşağıda arşivde.
+Bu kuyruk **K-033 turundan sonra açık kalan borçları** kapatıyor.
+Sırası **riske göre**: en üstteki, yanlışsa en çok şeyi bozan.
 
 | # | İş | Durum | Sonuç |
 |---|---|---|---|
-| 1 | **Ölü uç turu** — 12 ekranın hepsini gerçekten işlet | **BİTTİ** | 3 bulgu: muhasebede elle gider yok · "Onay iste" sahte · `Ekran.ac()` zaten açık ekranda ölü. Üçü de düzeltildi, 30. test eklendi (K-021) |
-| 2 | **A-M2** — özet/hatırlatma ikinci iletişime gitsin | **BİTTİ** | Hedef seçilebilir, kime gittiği göndermeden önce yazıyor; firmaya "Bey/Hanım" denmiyor (K-021.3) |
-| 3 | **Muhasebe kapsamı (MUH)** — üç seçeneği ölç, öneri + karar taslağı | **BİTTİ** | `arastirma/MUHASEBE-KAPSAMI.md` + K-022 taslağı. Öneri B (kasa+gider), cari hesap kapsam dışı. Parça alışı yeni alan istemeden eklendi (7.160 ₺ ölçüldü) + karar bütçesi kısıtı önerildi |
-| 4 | **Müşteri özeti (T-19/20/21)** — WhatsApp'tan gidecek özet | **BİTTİ** | `ozet` ekranı: müşterinin gördüğü salt-okunur sayfa. Mesaj artık liste değil **link** taşıyor. Ustanın önizlemesi mesaj ekranından (K-023) |
-| 5 | **Sesli işlem kapsam denetimi** — K-016 gerçekten tutuyor mu | **BİTTİ** | Tutuyor (9/9 işin elle yolu var) ama **denetimin kendisi bozuktu**: ölçtüğü durumu kirletiyordu. Düzeltilince özet ekranında gizli ölü uç çıktı. K-018 üçüncü kez (31. test) (K-024) |
-| 6 | **Dar ve geniş ekran ölçümü** — 320 px ve 430 px | **BİTTİ** | 320'de düğme metni **sessizce kırpılıyordu** (`overflow:hidden` taşma testinden gizliyordu). Dar ekranda ikon kalktı; 32. test eklendi. Üç genişlikte de 0 bulgu (K-025) |
-| 7 | **Belge tazeleme** — HANDOFF · EKRANLAR · IS-AKISI + dokunuş sayımı | **BİTTİ** | Bütün yollar yürütülerek yeniden ölçüldü: ana yol **12** (belgede 13 yazıyordu), kısa yol **9**, kayıtlı araç **8**, sesli **2+konuşma**, özet **2** |
+| 1 | **Veri modeli uzlaştırması** — `parcaBekliyor` ve `turElle` modelde YOK, model bunları açıkça yasaklıyor | AÇIK | |
+| 2 | **Ölü uç turu** — bu turda değişen 8 ekran elle işletilecek | AÇIK | |
+| 3 | **Dokunuş sayımı** — ana yol değişti, HANDOFF'taki `12` artık yalan olabilir | AÇIK | |
+| 4 | **İki "bekliyor" ayrımı** — `fiyatiBekleyen` ≠ `parcaBekliyor`, her ekranda doğru olan mı yazıyor | AÇIK | |
+| 5 | **Muhasebe hâlâ doğru mu** — "hepsi müşteriden" anahtarı fiyat→alış taşıyor, iş başına farkını bozuyor olabilir | AÇIK | |
+| 6 | **Müşteri özeti** — yeni yapıya uydu mu; "parça bekliyor" müşteriye söylenmeli mi | AÇIK | |
+| 7 | **Açık tema turu** — bu turun bileşenleri çoğunlukla koyu temada görüldü | AÇIK | |
+| 8 | **İki yeni denetim testi** — bugün hiçbir testin yakalamadığı iki hata sınıfı | AÇIK | |
+| 9 | **320 px elle turu** — denetim 0 diyor; K-025 sessiz kırpmayı da 0 demişti | AÇIK | |
+| 10 | **Belge tazeleme** — EKRANLAR · IS-AKISI · SOZLUK · HANDOFF sayıları | AÇIK | |
 
 ---
 
-## Kuyruk bitti — 05.09.2026
+## 1 · Veri modeli uzlaştırması
 
-Yedi işin yedisi de **BİTTİ**. Yeni iş Cemil'den gelir.
+**Neden ilk sırada:** `VERI-MODELI.md §2` şunu yazıyor —
 
-**Bu turda ne oldu:** K-019 … K-025 (yedi karar) · denetim **27 → 32 test**
-(beşi bu turda yaşanmış hatalardan doğdu, beşi de negatif testle
-doğrulandı) · ekran 12 → 13 (yeni olan **müşterinin** sayfası, ustanın
-değil).
+> *"`Status` YOK… **'Parçası bekleniyor' gibi bilgiler bu kaydın
+> verisinden türetilir, saklanmaz.**"*
 
-**Cemil'i bekleyen dokuz açık madde** `HANDOFF.md §5`'te; hepsinin yanında
-bir öneri var, hiçbiri işi durdurmadı.
+Dün (K-033.5) ben o kaydın üstüne **`parcaBekliyor` diye saklanan bir
+alan** koydum. Ayrıca `turElle` diye ikinci bir saklanan alan var.
+**CLAUDE.md açık:** *"Alanlar VERI-MODELI.md ile BİREBİR — modelde
+olmayan alan buraya da girmez."* Şu anda prototip belgeyi çiğniyor.
+
+İki yoldan biri seçilecek ve **gerekçesi yazılacak**:
+
+* **(a) Alanlar kalır, model güncellenir.** Savunması: ikisi de
+  türetilemez. *"Parça yolda"* ustanın **bildirdiği bir gerçek** — veride
+  onu söyleyen hiçbir şey yok (fiyatın boş olması başka şey demek,
+  K-033.5). `turElle` ise ustanın **kararı**; karar türetilemez, yoksa
+  bir sonraki tahmin onu ezer (K-033.12).
+* **(b) Alanlar kalkar.** O zaman K-033.5 ve K-033.12 geri alınır ve
+  Cemil'in *"parça bekliyor alanı olmalı"* maddesi karşılıksız kalır.
+
+**Önerim (a)** — ama karar `K-004`'ün sınırını genişlettiği için
+gerekçesi KARARLAR'a yazılmalı: **bayrak ≠ durum.** `parcaBekliyor`
+akışı değiştirmiyor, hiçbir ekranı kilitlemiyor, teslimi engellemiyor;
+`DeliveredAt` hâlâ tek durum alanı.
+
+**Bitti sayılır:** `VERI-MODELI.md` ve `SOZLUK.md` alanları içeriyor,
+K-004'ün notu *"bayrak durum değildir"* diye genişletilmiş, karar
+KARARLAR'a düşmüş, `02-veri.js`'in tohum verisi belgeyle birebir.
+
+## 2 · Ölü uç turu — bu turda değişen sekiz ekran
+
+**Neden:** 27. test *"ekranda hiç eylem yok"* der; söylemediği şey
+**eylem VAR ama işi ilerletmiyor.** 04.09'da bu tur üç yalan buldu
+(K-021), 06.09'da elle işletme dört hata daha buldu ki **hiçbirini
+36 test yakalamamıştı.**
+
+**Hangi ekranlar:** `ruhsat · kayit · teslim · arac · kayitlar ·
+musteriler · mesaj · ozet`.
+
+**Nasıl:** her düğmeye/çipe/alana **gerçekten dokun**, nereye
+gittiğini ve **veride ne değiştiğini** yaz. Şu üç soruyu her düğmeye
+sor:
+
+1. Düğmenin **adı**, yaptığı işi söylüyor mu?
+2. Balonu **olan** bir şeyi mi söylüyor, yoksa *"gönderildi"* gibi
+   **olmayan** bir şeyi mi? (Bu turda bir tane daha çıktı — K-033.6.)
+3. Basınca **hiçbir şey olmuyorsa**, ekran nedenini söylüyor mu?
+
+**Özellikle bak:** `parca-sor` ekranı satır ekliyor mu, hâlâ eski
+`.kalem` dilinde ve yeni tabloyla tutarlı mı; `sesUygula`'nın açtığı
+kayıt yeni alanları taşıyor mu; `RUHSAT_ONDOLGU.tur` artık kullanılmıyor
+(ruhsat ekranı türü metinden okuyor) — **ölü veri mi kaldı?**
+
+**Bitti sayılır:** bulgular düzeltildi; yeni bir hata sınıfı çıktıysa
+8. işe test önerisi olarak yazıldı.
+
+## 3 · Dokunuş sayımı yeniden ölçülür
+
+**Neden:** HANDOFF *"ana yol 12 dokunuş"* diyor ve o sayı **05.09'da**
+ölçüldü. O gün ana yolda bir **tür seçimi** vardı; kalktı. Yerine
+kayıtsız araçta bir **ruhsat teklifi** geldi. Sayı değişti ve
+**değiştiğini bilmiyoruz.**
+
+**Kural (v1'den):** sayı ölçülmeden yazılmaz. *"Herhalde azalmıştır"*
+bir ölçüm değildir.
+
+**Nasıl:** beş yol da baştan sona **yürütülecek** ve her dokunuş
+sayılacak: ana yol (yeni araç) · kısa yol · kayıtlı araç yolu · sesli
+yol · müşteriye özet. Yeni bir yol daha var: **ruhsatı çekerek** açılan
+kayıt.
+
+**Bitti sayılır:** HANDOFF tablosundaki sayılar yenilendi; ekran
+bütçesi (A-2) aşıldıysa **söylendi**, sessizce geçilmedi.
+
+## 4 · İki "bekliyor" birbirine karışıyor mu
+
+**Neden:** artık iki ayrı şey var ve **ikisi de "bekliyor" diyor**:
+
+| | Ne demek | Nereden gelir |
+|---|---|---|
+| `fiyatiBekleyen(k)` | **fiyatı** gelmemiş satır var | türetilir |
+| `k.parcaBekliyor` | **parça** yolda | usta işaretler |
+
+Bunlar ayrı gerçekler: parça elde olup fiyatı belirsiz olabilir, ya da
+fiyatı belli olup parça yolda olabilir. **Ekranların hangisini
+söylediği tek tek kontrol edilecek:** ana ekran · servis kayıtları
+kartı · araç geçmişi · teslim ekranı · özet · muhasebe.
+
+**Şüphelendiğim yer:** `kayitKartiHtml` şu an ikisini **tek rozete**
+bindiriyor (`k.parcaBekliyor || fiyatiBekleyen(k)` → *"parça bekliyor"*).
+Bu, fiyatı girilmemiş bir satırı *"parça yolda"* diye gösteriyor
+olabilir — **yanlış rakam göstermek gibi, yanlış durum göstermek de
+göstermemekten kötüdür** (K-013'ün kuralı).
+
+**Bitti sayılır:** her ekranda hangisinin yazdığı belli; ikisi tek
+rozete biniyorsa ya ayrıldı ya da **neden bindiği yazıldı**.
+
+## 5 · Muhasebe hâlâ doğruyu mu söylüyor
+
+**Neden:** *"Parçaları müşteri getirdi"* anahtarı, satırın `fiyat`ını
+**`alis`e taşıyor** (K-005'in kuralı: rakam kaybolmasın). Ama
+`isKari()` iş başına farkını `alinan − parça alışı` diye hesaplıyor ve
+`parcaAlisiToplami()` bütün `alis` toplamını alıyor.
+
+**Soru:** müşteri kendi parçasını getirdiğinde o parça için **biz
+ödeme yapmadık** — ama `alis` dolu. Muhasebe o parayı **ödenmiş** gibi
+mi sayıyor? Öyleyse iş başına farkı ve parça alışı toplamı **yanlış**.
+
+**Nasıl:** rakamla ölç. Bugünkü tohum veride 2026 iş başına
+`12.970 − 7.160 = 5.810` idi. *"Hepsi müşteriden"* anahtarını bir kayıtta
+aç, rakamları yeniden oku, **elle hesapla ve karşılaştır.**
+
+**Bitti sayılır:** ya rakam doğru çıktı (ve nedeni yazıldı), ya
+`parcaAlislari()` *"müşteri getirdiyse alış sayılmaz"* diye düzeltildi
+ve **eski/yeni rakam commit mesajına yazıldı.**
+
+## 6 · Müşteri özeti yeni yapıya uydu mu
+
+**Neden:** `ozet` ekranı müşterinin gördüğü sayfa (K-023) ve bu turda
+kaydın yapısı değişti. Kontrol: *"müşteri getirdi"* rozeti hâlâ doğru
+çiziliyor mu, boş satır ne gösteriyor, tür değişince başlık değişiyor mu.
+
+**Karar gerektiren yer:** **parça beklediği müşteriye söylensin mi?**
+Söylenirse müşteri aramaz — tamircinin şikâyet ettiği telefon trafiği
+azalır. Söylenmezse *"neden bu kadar sürdü"* sorusu kalır.
+**Varsayım: söylenir**, çünkü mesaj şablonu zaten söylüyor ve sayfanın
+mesajla çelişmesi daha kötü. *Cemil onayına açık.*
+
+**Bitti sayılır:** sayfa yeni yapıyla tutarlı; varsayım işaretlendi.
+
+## 7 · Açık tema turu
+
+**Neden:** bu turda yazılan bileşenlerin çoğunu **koyu temada** gördüm:
+tablo içindeki çerçevesiz alanlar, `.ms-kart`, `.ak-tutar`, balonun yeni
+hâli, `.k-alis`. 03.09'da tam bu sebeple bir hata çıkmıştı — *"iki
+temayı da çizmek gerekiyor, birini çizip ötekine bakmamak değil."*
+
+**Nasıl:** `Tema` üç hâlde de (sistem · açık · koyu) sekiz ekran
+gezilecek; özellikle **kontrast** ve **çerçevesiz alanların görünürlüğü**.
+Denetimin kontrast testi rakamı verir, ama *"bu alan buraya yazılır"*
+duygusunu vermez — ekran görüntüsü alınacak.
+
+**Bitti sayılır:** her iki temada ekran görüntüsü alındı, düzeltmeler
+token'la yapıldı (**ham hex YOK**).
+
+## 8 · İki yeni denetim testi
+
+Bugün **dört hata** elle işletince çıktı ve 36 test hepsine *"0 bulgu"*
+dedi. İkisi otomatikleştirilebilir:
+
+**Test 37 — SESSIZ-KAPALI-DUGME.** Her ekranda `button[disabled]` ara.
+Kapalı bir düğmenin **yakınında** nedenini söyleyen bir şey (bir
+`.notice`, `.plate-hint` ya da `aria-describedby`) yoksa bulgu.
+*Gerekçe:* K-033.3 — kapalı düğme sessizdir, Cemil bastı ve hiçbir şey
+olmadı.
+
+**Test 38 — TAZELEMEDE-KAYBOLAN-SECIM.** Her ekranı çiz, `aria-pressed="true"`
+olan öğeleri say, `Ekran.tazele()` çağır, yeniden say. Sayı düşüyorsa
+bulgu.
+*Gerekçe:* K-033.12 — `ciz()` içinde sıfırlanan bir ekran değişkeni,
+her tazelemede ustanın seçimini siliyordu. Aynı hatayı **bir turda iki
+kez** yaptım.
+
+**Her ikisi de NEGATİF TESTLE doğrulanacak:** hata kasten geri konacak,
+test bulgu verecek, sonra geri alınacak. *Delikli denetim, denetimsiz
+olmaktan kötüdür.*
+
+⚠️ **Denetimin kendisini kirletme (K-024.1):** test 38 `Ekran.tazele()`
+çağırıyor; çağırdığı ekranın durumunu **bozmadan** bırakmalı.
+
+**Bitti sayılır:** iki test eklendi, negatif testle doğrulandı, üç
+genişlikte 0 bulgu.
+
+## 9 · 320 px elle turu
+
+**Neden:** denetim üç genişlikte de 0 diyor. K-025'te de 0 diyordu ve
+düğme metni **sessizce kırpılıyordu** — kendi `overflow:hidden`'ım
+taşma testinden gizliyordu.
+
+**Nasıl:** 320 px'te sekiz ekranın **ekran görüntüsü** alınacak ve
+**gözle** okunacak. Özellikle: kayıt tablosunun iki sütunu (rozet + ad
++ tutar aynı satıra sığıyor mu), `.ms-kart` başlığı (uzun firma adı +
+sayaç), ruhsat akordiyonunun ikili alanları, teslim sonrası panel.
+
+**Bitti sayılır:** her ekranın 320 px görüntüsü alındı; kırpılan ya da
+üst üste binen hiçbir şey yok.
+
+## 10 · Belge tazeleme
+
+`EKRANLAR.md` (kayıt ve ruhsat ekranlarının tarifi değişti) ·
+`IS-AKISI.md` (akıştan **tür seçimi adımı** kalktı) · `SOZLUK.md`
+(yeni alanlar ve terimler) · `HANDOFF.md` (test sayısı, dokunuş
+sayıları, karar aralığı).
+
+**Bitti sayılır:** belgelerde prototiple çelişen tek cümle kalmadı.
 
 ---
 
-## 1 · Ölü uç turu
+## Arşiv
 
-**Neden:** 27. test *"ekranda hiç eylem yok"* diyor. Söylemediği şey:
-**eylem VAR ama işi ilerletmiyor.** Araç ekranı tam böyleydi ve ancak
-elle işletilince bulundu. On iki ekranın hepsi açılıp **işletilecek**.
+### Tur 2 · 05.09.2026 — yedi iş, yedisi de BİTTİ
 
-**Nasıl:** her ekranda her düğmeye/çipe/alana dokun, nereye gittiğini
-yaz. Gitmiyorsa ya da geldiği yere geri atıyorsa bulgu.
+Ölü uç turu (3 yalan) · A-M2 · muhasebe kapsamı (K-022) · müşteri
+özeti (13. ekran) · sesli işlem kapsam denetimi (denetimin kendisi
+bozuktu) · üç genişlikte ölçüm (320'de sessiz kırpma) · belge tazeleme
+(ana yol 13 değil **12** çıktı). Sonuç: K-019…K-025, denetim 27 → 32 test.
 
-**Çıktı:** bulgular düzeltilir; yeni bir hata sınıfı çıkarsa denetime
-testi eklenir ve **negatif testle** doğrulanır.
+### Tur 1 · 04.09.2026
 
-## 2 · A-M2 — özet ve hatırlatma hangi numaraya
-
-**Varsayım:** ikinci iletişim varsa **ona** gider (aracı getiren o),
-yoksa ruhsattaki numaraya. Mesaj ekranı şu an hep ruhsattakini
-kullanıyor.
-
-**Çıktı:** mesaj ekranı hedef numarayı **gösterir ve seçtirir** —
-usta yanlış kişiye özet göndermesin.
-
-## 3 · Muhasebe kapsamı (MUH) — Cemil'in en acil kararı
-
-Seçenekler: **günlük kasa** · **kasa + gider** · **cari hesap.**
-Referans: `arastirma/PARASUT-HARITA.md` · `arastirma/LUCANET-ONE-HARITA.md`.
-
-**Ölçüt yedi iş:** bir kalem yedi işten birine hizmet etmiyorsa girmez.
-Asıl soru *"ne kadar muhasebe"* değil, **"usta ne kadar veri girer"** —
-girilmeyen veriyle çıkan rakam yalan söyler (K-013).
-
-**Çıktı:** karşılaştırma belgesi + **öneri** + K-021 taslağı
-(Cemil onayına açık). Kod tarafında yalnız **zaten kayıtlı veriden**
-çıkan şey yapılır.
-
-## 4 · Müşteri özeti (T-19/20/21)
-
-Bugün tamirci müşteriye **PDF** gönderiyor: iş · parça açıklaması ·
-toplam tutar. Cemil *"WhatsApp'tan uygulama linki"* fikrini beğendi
-(A-2 önerisi: **özet linki evet, müşteri uygulaması sonra**).
-
-**Çıktı:** salt-okunur özet — kaydın satırları, toplam, dükkân bilgisi.
-Ekran bütçesine dikkat: bu **ustanın ekranı değil**, müşterinin gördüğü
-sayfa.
-
-## 5 · Sesli işlem kapsam denetimi
-
-K-016: *"ses var olan işi kısaltır, yeni yetenek açmaz."* Her niyet
-(`genel · servis-ekle · kayitlar · araclar · musteriler · mesaj ·
-muhasebe`) işletilip **elle de yapılabiliyor mu** diye bakılacak.
-Yapılamıyorsa ya elle yolu açılır ya ses kısılır.
-
-## 6 · Dar ve geniş ekran ölçümü
-
-Bütün ölçümler 375 px'te yapıldı. 320 px (küçük telefon) ve 430 px
-(büyük telefon) ölçülmedi. Denetim ikisinde de koşulacak.
-
-## 7 · Belge tazeleme
-
-HANDOFF durumu · EKRANLAR sayımı · IS-AKISI dokunuş ölçümü yeniden.
-**Ölçülmemiş sayı belgeye yazılmaz.**
+`4a6dfe5` öncesi; ayrıntısı git geçmişinde.
