@@ -404,6 +404,109 @@ var Tema = (function () {
    ERİŞİLEBİLİRLİK v1'den: aria-hidden + inert (arkadaki ekran
    klavyeye kapanır), ESC kapatır, odak çekmeceye girer ve
    kapanınca menü düğmesine döner. */
+/* ============ ARKA PLANI KLAVYEYE KAPAT — TEK YERDE ============
+   ⚠️ 07.09 — LİSTE DEĞİL YAPI. Eskiden `.topbar` ve `.screen`ler tek
+   tek sayılıyordu. Alt gezinme çubuğu eklenince (A3) o liste eksik
+   kaldı ve çekmece açıkken **footer'ın tuşları sekme sırasında
+   kaldı** — denetimin DRAWER-ODAK-SIZINTISI testi anında yakaladı.
+
+   Sayılan bir liste, her yeni kardeşte güncellenmeyi bekler ve bir gün
+   unutulur. Kural artık yapıdan okunuyor: **verilen istisnalar dışında
+   her `.device` çocuğu kapanır.**
+
+   İki kullanıcısı var — çekmece ve katman. İkisi de aynı işi ayrı ayrı
+   yazsaydı biri mutlaka eksik kalırdı; bugün tam bu oldu. */
+/* ⚠️ ÖRTÜLER YIĞIN OLUŞTURUR — 07.09, ölçümle bulundu.
+   İlk yazımda bu işlev "kapat" derken inert EKLİYOR, "aç" derken
+   KALDIRIYORDU. İki örtü (çekmece ve katman) aynı anda varken bu
+   yanlış: katman kapanınca **çekmecenin koyduğu kilidi de**
+   kaldırıyordu ve arkadaki 17 öğe sekme sırasına geri dönüyordu.
+
+   Ölçüldü: denetim iki kez koşturulunca ortaya çıkıyordu — denetim
+   katmanı açık bırakıyor, sonraki koşuda çekmece açılıp kapanıyor ve
+   herkesin kilidi birden kalkıyordu. Tek bir "aç/kapat" ikilisi, iki
+   sahibi olan bir duruma yetmiyor.
+
+   Çözüm SAYAÇ değil YIĞIN: hangi örtüler açık, sırasıyla tutuluyor;
+   kilit her zaman **en üstteki örtüye göre** yeniden hesaplanıyor.
+   Kapanan örtü kendi kaydını siliyor, altındakinin kilidi duruyor. */
+var ORTU_YIGINI = [];
+
+function ortuKilidiTazele() {
+  var cihaz = document.querySelector('.device');
+  if (!cihaz) return;
+  var ust = ORTU_YIGINI[ORTU_YIGINI.length - 1] || null;
+  Array.prototype.forEach.call(cihaz.children, function (el) {
+    if (!ust || ust.haric.indexOf(el.id) >= 0) el.removeAttribute('inert');
+    else el.setAttribute('inert', '');
+  });
+}
+
+function arkaPlaniKapat(kapali, haric, ad) {
+  ORTU_YIGINI = ORTU_YIGINI.filter(function (x) { return x.ad !== ad; });
+  if (kapali) ORTU_YIGINI.push({ ad: ad, haric: haric });
+  ortuKilidiTazele();
+}
+
+/* ============ KATMAN (popup) ============
+   Cemil, 07.09: *"Müşteri ne görecek popup açılsın"* ve *"telefon
+   yazabileceği basit bir popup"*.
+
+   TEK BİLEŞEN, İKİ KULLANICI. İki ayrı popup yazmak iki ayrı odak
+   tuzağı, iki ayrı kapatma davranışı ve iki ayrı Esc dinleyicisi
+   demekti. Ekran yalnız BAŞLIK ve GÖVDE veriyor; açılma, kapanma,
+   odak ve arka plan buranın işi.
+
+   `kapaninca` geri çağrısı: katman kapanınca ekranın tazelenmesi
+   gerekebilir (telefon eklendiyse düğmeler açılmalı). */
+var Katman = (function () {
+  var acikMi = false;
+  var kapaninca = null;
+  var oncekiOdak = null;
+
+  function oge(id) { return document.getElementById(id); }
+
+  function ac(baslik, govdeHtml, sonra) {
+    var k = oge('katman'), o = oge('katmanOrtu');
+    if (!k || acikMi) return;
+    acikMi = true;
+    kapaninca = sonra || null;
+    oncekiOdak = document.activeElement;
+    oge('katmanBaslik').textContent = baslik || '';
+    oge('katmanGovde').innerHTML = govdeHtml || '';
+    k.hidden = false; o.hidden = false;
+    k.removeAttribute('inert');
+    arkaPlaniKapat(true, ['katman', 'katmanOrtu'], 'katman');
+    var ilk = k.querySelector('input, button, [tabindex]');
+    if (ilk) { try { ilk.focus(); } catch (e) {} }
+  }
+
+  function kapa() {
+    var k = oge('katman'), o = oge('katmanOrtu');
+    if (!k || !acikMi) return;
+    acikMi = false;
+    k.hidden = true; o.hidden = true;
+    k.setAttribute('inert', '');
+    /* ⚠️ GÖVDE BOŞALTILIR. Gizlenen ama duran içerik `textContent` ile
+       okunuyor ve "temizlenmemiş" sanılıyor (K-040.5). */
+    oge('katmanGovde').innerHTML = '';
+    arkaPlaniKapat(false, ['katman', 'katmanOrtu'], 'katman');
+    if (oncekiOdak && oncekiOdak.focus) { try { oncekiOdak.focus(); } catch (e) {} }
+    oncekiOdak = null;
+    var f = kapaninca; kapaninca = null;
+    if (f) f();
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#katmanKapat') || e.target.closest('#katmanOrtu')) kapa();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && acikMi) kapa();
+  });
+
+  return { ac: ac, kapa: kapa, acikMi: function () { return acikMi; } };
+})();
+
 var Cekmece = (function () {
   var acikMi = false;
 
@@ -419,24 +522,7 @@ var Cekmece = (function () {
      yetmiyor: sekme tuşu arkadaki ekranın düğmelerinde gezinmeye
      devam ediyordu. Denetimin DRAWER-ODAK-SIZINTISI testi tam bu
      hatayı otomatikleştiriyor ve ilk yazımda yakaladı. */
-  /* ⚠️ 07.09 — LİSTE DEĞİL YAPI. Eskiden `.topbar` ve `.screen`ler tek
-     tek sayılıyordu. Alt gezinme çubuğu eklenince (A3) o liste eksik
-     kaldı ve çekmece açıkken **footer'ın tuşları sekme sırasında
-     kaldı** — denetimin DRAWER-ODAK-SIZINTISI testi anında yakaladı.
-
-     Sayılan bir liste, her yeni kardeşte güncellenmeyi bekler ve bir
-     gün unutulur. Kural artık yapıdan okunuyor: **çekmece ve örtüsü
-     dışındaki her `.device` çocuğu kapanır.** Yarın bir çubuk daha
-     eklenirse kendiliğinden kapsanır. */
-  function arkaPlan(kapali) {
-    var cihaz = document.querySelector('.device');
-    if (!cihaz) return;
-    Array.prototype.forEach.call(cihaz.children, function (el) {
-      if (el.id === 'drawer' || el.id === 'drawerOverlay') return;
-      if (kapali) el.setAttribute('inert', '');
-      else el.removeAttribute('inert');
-    });
-  }
+  function arkaPlan(kapali) { arkaPlaniKapat(kapali, ['drawer', 'drawerOverlay'], 'cekmece'); }
 
   function ac() {
     var o = ogeler();

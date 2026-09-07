@@ -52,8 +52,10 @@ cinsten değil ve karıştırılırsa iş tıkanır.
 | A11 | **A-M13**: satır başına *"kim getirdi"* geri | **BİTTİ** |
 | A12 | **A-M15**: parça beklendiğini müşteriye söylemek **seçenek** olsun | **BİTTİ** |
 | A13 | Serviste **olmayan** araca *"işin özeti"* ve *"parça bekliyoruz"* şablonları çıkmasın | **BİTTİ** |
-| A14 | *"Müşteri ne görecek"* → **popup**, yalnız mesaj görünsün | AÇIK |
-| A15 | Mesajda **telefon yoksa**: düğmeler pasif + *"telefon eklemelisiniz"* + telefonu yazıp/söyleyip ekleyebileceği **basit popup** | AÇIK |
+| A14 | *"Müşteri ne görecek"* → **popup**, yalnız mesaj görünsün | **BİTTİ** |
+| A15 | Mesajda **telefon yoksa**: düğmeler pasif + *"telefon eklemelisiniz"* + telefonu yazıp/söyleyip ekleyebileceği **basit popup** | **BİTTİ** |
+
+| A16 | Telefon katmanında **sesle giriş** — ses ekranına yeni bir niyet (`telefon`) ve çözümleyici işi gerektiriyor | AÇIK |
 
 > ⚠️ **A15'i ilk triyajda ATLAMIŞIM.** Cemil'in listesinde vardı,
 > kuyruğa geçmemiş. Otuz beş maddeyi elle ayırırken bir tanesi düştü —

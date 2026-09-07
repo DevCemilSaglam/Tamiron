@@ -36,20 +36,11 @@
        ustanın ekranıyla müşterinin sayfası karışmasın. -->
   <div class="notice" id="ozOnizleme"></div>
 
-  <div class="card">
-    <div class="ozet-bas" id="ozDukkan"></div>
-  </div>
-
-  <div class="card">
-    <div id="ozArac"></div>
-  </div>
-
-  <div class="section-label">
-    <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılan işler
-  </div>
-  <div id="ozKalemler"></div>
-
-  <div id="ozDurum"></div>
+  <!-- ⚠️ GÖVDE ORTAK NESNE (07.09). Dört ayrı kap yerine tek kap:
+       içeriği `ozetGovdeHtml()` üretiyor ve aynı işlevi mesaj
+       ekranındaki katman da çağırıyor. İki kopya olsaydı biri düzelir
+       öteki kalırdı. -->
+  <div id="ozGovde"></div>
 
 </section>
 
@@ -64,9 +55,6 @@ Ekran.tanim('ozet', {
     var k = (OZET_KAYIT !== null) ? kayitBul(OZET_KAYIT) : null;
     if (!k) {
       document.getElementById('ozOnizleme').innerHTML = '';
-      document.getElementById('ozDukkan').innerHTML = '';
-      document.getElementById('ozArac').innerHTML = '';
-      document.getElementById('ozDurum').innerHTML = '';
       /* ⚠️ 04.09 — BURASI ÖLÜ UÇTU ve denetim BUNU GÖREMİYORDU.
          Boş durumda ekranda tek bir dokunulabilir şey yoktu; 27. test
          (OLU-UC) bunu ancak denetim KENDİ KİRLETTİĞİ durumu geri
@@ -76,7 +64,7 @@ Ekran.tanim('ozet', {
 
          Müşteri boş özet görmez (link hep bir kayda ait). Bu hâli
          yalnız usta görür — ve buradan çıkabilmeli. */
-      document.getElementById('ozKalemler').innerHTML = bosDurumHtml(
+      document.getElementById('ozGovde').innerHTML = bosDurumHtml(
         'i-clipboard-list', 'Özet seçilmedi',
         'Müşteriye gönderilecek özet bir servis kaydına ait olur.',
         '<button class="btn btn-primary" data-git="kayitlar">' +
@@ -84,125 +72,12 @@ Ekran.tanim('ozet', {
           ' Servis kayıtlarına git</button>');
       return;
     }
-    var a = aracBul(k.plaka);
-
     document.getElementById('ozOnizleme').innerHTML =
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
       '<span class="n-body"><b>Müşterinin gördüğü sayfa.</b> Bu şerit ' +
       'yalnız sende görünüyor. Link: <b>' + ozetLinki(k) + '</b></span>';
 
-    /* DÜKKÂN ÜSTTE: müşteri sayfayı WhatsApp'tan açıyor ve ilk sorusu
-       "bu kimden geldi". Telefon aranabilir — sorusu varsa arayacak. */
-    document.getElementById('ozDukkan').innerHTML =
-      '<div class="oz-ad">' + DUKKAN.ad + '</div>' +
-      (DUKKAN.adres ? '<div class="oz-alt">' + DUKKAN.adres + '</div>' : '') +
-      (DUKKAN.tel ? telLinkHtml(DUKKAN.tel, DUKKAN.ad) : '');
-
-    document.getElementById('ozArac').innerHTML = a
-      ? '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
-          '<div class="veh-title">' + a.marka + ' ' + a.model +
-            (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
-          '<div class="spec-strip">' +
-            '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
-            (k.km ? '<span class="spec-sep">·</span><span class="spec-val">' +
-              k.km + ' km</span>' : '') +
-          '</div>' +
-        '</div>' +
-        /* ⚠️ SATIR SONLARI KORUNUYOR (06.09, kuyruk 6). Dün "ne
-           istiyor" alanı textarea oldu ve *"alt satıra ekle"* düğmesi
-           geldi (K-033.5): usta artık üç ayrı iş yazıyor. Burada metin
-           düz basılıyordu, HTML satır sonlarını boşluğa çeviriyordu ve
-           müşteri üç işi tek cümle hâlinde okuyordu.
-
-           Ustanın ekranında sorun yoktu — orası textarea, satırları
-           kendi gösteriyor. Kırılan yer, metnin METİN OLARAK basıldığı
-           tek yerdi. Alanı çok satırlı yapmak, onu gösteren her yeri
-           gözden geçirmeyi gerektiriyormuş. */
-        (k.sikayet
-          ? '<p class="plate-hint">' + k.sikayet.replace(/\n/g, '<br>') + '</p>'
-          : '')
-      : '';
-
-    /* KALEMLER — "iş, parça açıklaması ve toplam tutar" (S8).
-       ⚠️ MÜŞTERİ PARÇASI 0 TL DURUYOR (S2, K-005) ve BUNU SÖYLÜYOR.
-       Fiyatsız bir satırı sessizce göstermek, müşteriye "bu bedavaydı"
-       diye okunur; oysa parayı o ödemiş. */
-    /* ⚠️ YARIM SATIR MÜŞTERİYE GÖSTERİLMEZ (06.09, kuyruk 6).
-       Usta *"+ Parça"*ya basıp adını henüz yazmamışsa satır boş
-       duruyor; müşterinin sayfasında bu **"Parça — "** diye çıkıyordu.
-       Müşteri için bu bir bilgi değil, bir soru işareti: *"bu ne?"*
-
-       ÖLÇÜ: adı DA fiyatı DA yoksa satır yok sayılır. Biri varsa
-       gösterilir — adı olup fiyatı olmayan satır gerçek bir iştir
-       (fiyatı henüz girilmemiş), fiyatı olup adı olmayan satır gerçek
-       bir paradır. Yalnız ikisi birden boşsa ortada bir şey yoktur.
-
-       ⚠️ USTANIN EKRANINDA ELENMİYOR — orada yarım satır GÖRÜNMELİ ki
-       usta onu doldursun ya da silsin. Aynı veri, iki okuyucuya iki
-       gösterim (K-037.4'ün kuralı). */
-    var satirlar = (k.satirlar || []).filter(function (s) {
-      return (s.ad && s.ad.trim()) || s.fiyat;
-    });
-    document.getElementById('ozKalemler').innerHTML = satirlar.length
-      ? '<div class="tutar-serit">' +
-          satirlar.map(function (s) {
-            var etiket = s.ad || (s.tip === 'iscilik' ? 'İşçilik' : 'Parça');
-            var ek = (s.tip === 'parca' && s.marka)
-              ? ' <span class="oz-marka">' + s.marka +
-                (s.kod ? ' · ' + s.kod : '') + '</span>' : '';
-            var musterinin = (s.tip === 'parca' && s.kimGetirdi === 'musteri');
-            return '<div class="tutar-sat"><span>' + etiket + ek +
-              (musterinin ? ' <span class="pill muted">parçayı siz getirdiniz</span>' : '') +
-              /* ⚠️ MÜŞTERİ PARÇASINDA RAKAM YOK — fiyat kayıtta dursa
-                 bile (K-037'den sonra duruyor). Müşteriye o rakamı
-                 göstermek, ödemediği bir parça için ücret istiyormuş
-                 gibi okunur; toplam da onu içermiyor. Ekranda bir
-                 rakam var ama toplamda yok — müşteri açısından bu
-                 açıklanamaz bir çelişkidir. */
-              '</span><span class="tv">' +
-              ((s.tip === 'parca' && s.kimGetirdi === 'musteri') || !s.fiyat
-                ? '—' : tutar(s.fiyat) + ' ₺') + '</span></div>';
-          }).join('') +
-          '<div class="tutar-sat genel"><span>Toplam</span><span class="tv">' +
-            tutar(kayitToplami(k)) + ' ₺</span></div>' +
-        '</div>'
-      : bosDurumHtml('i-clipboard-list', 'Henüz iş yazılmadı',
-          'Araç işleme alındığında yapılanlar burada görünecek.');
-
-    /* DURUM: müşterinin ikinci sorusu "aracım hazır mı".
-       Tek durum var (K-004) ve burada da tek durum gösteriliyor. */
-    document.getElementById('ozDurum').innerHTML =
-      '<div class="notice ' + (k.teslimTarihi ? 'ok' : 'accent') + '">' +
-        '<span class="n-ic"><svg class="ico ico-sm"><use href="#' +
-          (k.teslimTarihi ? 'i-circle-check' : 'i-clock') + '"></use></svg></span>' +
-        '<span class="n-body">' +
-          (k.teslimTarihi
-            ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
-              (k.odemeYolu === 'almadim'
-                ? ' Ödeme <b>alınmadı</b>.'
-                : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
-                    k.odemeYolu) + '</b>.' : ''))
-            /* ⚠️ PARÇA BEKLENİYORSA SAYFA DA SÖYLER (06.09, kuyruk 6).
-               Mesaj şablonu bunu zaten söylüyordu ("Parça bekliyoruz",
-               K-033.9); sayfa susuyordu. Müşteri mesajı okuyup linke
-               dokununca **iki farklı hikâye** görüyordu — ve canlı
-               olan, yani doğru saydığı, sayfaydı.
-
-               SÖZ VERİLMİYOR: "yarın hazır" demiyoruz. Parçanın ne
-               zaman geleceğini biz de bilmiyoruz ve tutulmayan söz,
-               hiç verilmemiş sözden kötüdür.
-
-               `fiyatiBekleyen` BURADA YOK ve olmayacak: o dükkânın
-               kendi işi (parçacıdan rakam gelmedi). Müşteriyi
-               ilgilendiren şey parçanın yolda olması. */
-            /* ⚠️ USTANIN SEÇİMİNE BAĞLI (A-M15, 07.09). Bayrak açık
-               olsa bile müşteriye söylemek ayrı bir karar. */
-            : (k.parcaBekliyor && k.bekliyorMusteriye
-                ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
-                  'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
-                : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +
-        '</span>' +
-      '</div>';
+    document.getElementById('ozGovde').innerHTML = ozetGovdeHtml(k);
   }
 });
 </script>

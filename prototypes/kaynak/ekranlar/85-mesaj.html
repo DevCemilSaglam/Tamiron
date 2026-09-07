@@ -310,11 +310,21 @@ function msjYazimCiz() {
   /* TELEFON YOKSA GÖNDERİLEMEZ ve bu ÖNCEDEN söylenir — düğmeye
      bastıktan sonra öğrenmek, ustayı boşuna uğraştırır. */
   var tel = hedef && hedef.tel;
+  /* ⚠️ TELEFON YOKSA ÇIKIŞ YOLU BURADA (Cemil, 07.09: "Telefon
+     eklemelisiniz uyarı mesajı ve telefon yazabileceği basit bir
+     popup açılabilir.").
+
+     Eskiden uyarı *"önce araç kaydına telefon yaz"* diyordu ve usta
+     mesaj ekranından çıkıp aracı bulup telefonu yazıp geri gelmek
+     zorundaydı — dört ekran. Uyarının çözümü kendi yanında olmalı:
+     ölü uç turunun (K-021) kuralı. */
   document.getElementById('msjUyari').innerHTML = tel ? '' :
     '<div class="notice warn">' +
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
-      '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
-      'önce araç kaydına telefon yaz.</span></div>';
+      '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez.' +
+      '</span></div>' +
+    '<button class="btn btn-primary" id="msjTelEkle" style="margin-top:10px">' +
+      '<svg class="ico"><use href="#i-phone"></use></svg> Telefon ekle</button>';
   ['msjGonder', 'msjSms', 'msjAra'].forEach(function (id) {
     var d = document.getElementById(id);
     if (d) d.disabled = !tel;
@@ -371,11 +381,101 @@ document.addEventListener('click', function (e) {
 
   /* Özet sayfasını AÇAR — usta linkin ucundakini görsün. Geri düğmesi
      mesaja döndürüyor, mesaj yazımı bozulmuyor (msjPlaka duruyor). */
+  /* ⚠️ EKRAN DEĞİL KATMAN (Cemil, 07.09: "Müşteri ne görecek popup
+     açılsın. Sadece mesaj gözüksün.").
+
+     Eskiden ayrı bir ekrana gidiyordu: usta mesajı yazıyor, önizlemeye
+     bakmak için ekrandan çıkıyor, geri geliyor. Bakmak için işi
+     bırakmak gerekiyordu.
+
+     "SADECE MESAJ": katman `ozetGovdeHtml()` çağırıyor — müşterinin
+     gerçekten göreceği. Ustanın önizleme şeridi ("bu şerit yalnız
+     sende görünüyor") KATMANDA YOK; olsaydı "sadece müşterinin
+     gördüğü" olmazdı.
+
+     ⚠️ YORUM: Cemil "sadece mesaj gözüksün" dedi; bunu *"bizim
+     eklediğimiz açıklama olmasın, yalnız müşterinin gördüğü"* diye
+     okudum. Mesaj METNİNİN kendisi zaten üstteki alanda duruyor ve
+     ikinci kez göstermek onu tekrar etmek olurdu. Cemil onayına açık
+     (A-M18). */
   if (t.id === 'msjOzetGor') {
     var ok = msjOzetKaydi(msjPlaka);
     if (!ok) return;
-    OZET_KAYIT = ok.id;
+    /* ⚠️ ÖZET EKRANI YETİM KALMASIN (07.09). Önizleme katmana
+       taşınınca `ozet` ekranına giden tek yol koptu ve denetimin YETIM
+       testi anında söyledi: *"ozet | gidilmiyor"*.
+
+       Ekran silinmedi çünkü o **müşterinin sayfasının kendisi** —
+       linkin ucundaki şey. Katmanda hızlı bakış var; tam sayfayı
+       görmek isteyen usta buradan açıyor. Ana yolda değil, katmanın
+       dibinde: bakmak isteyene açık, akışa binmiyor. */
+    Katman.ac('Müşteri ne görecek',
+      ozetGovdeHtml(ok) +
+      '<button class="btn btn-ghost" id="ktmOzetSayfa">' +
+        '<svg class="ico"><use href="#i-file-text"></use></svg>' +
+        ' Tam sayfayı aç</button>');
+    return;
+  }
+
+  if (t.id === 'ktmOzetSayfa') {
+    var os = msjOzetKaydi(msjPlaka);
+    if (!os) return;
+    OZET_KAYIT = os.id;
+    Katman.kapa();
     Ekran.ac('ozet');
+    return;
+  }
+
+  /* A15 — telefon ekleme katmanı. */
+  if (t.id === 'msjTelEkle') {
+    var av = aracBul(msjPlaka);
+    if (!av) return;
+    Katman.ac('Telefon ekle',
+      '<div class="card">' +
+        '<div class="arac-bas">' + plakaHtml(av.plaka, 'plate-lg') +
+          '<div class="veh-title">' + av.marka + ' ' + av.model + '</div>' +
+          '<div class="spec-strip"><span class="spec-val">' +
+            (av.sahipAd || 'sahip yazılmamış') + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label for="ktmTel">Telefon</label>' +
+        '<input id="ktmTel" class="mono" data-giris="tel" inputmode="tel"' +
+          ' placeholder="0532 000 00 00" autocomplete="off" />' +
+        '<div class="plate-hint" id="ktmTelIpucu" role="status">' +
+          '11 hane, 0 ile başlar. Özet ve bakım hatırlatması buraya gider.' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-lg" id="ktmTelKaydet">' +
+        '<svg class="ico"><use href="#i-check"></use></svg> Kaydet</button>',
+      /* Katman kapanınca ekran tazelenir: telefon eklendiyse gönderme
+         düğmeleri kendiliğinden açılmalı. */
+      function () { if (Ekran.adi() === 'mesaj') Ekran.tazele(); });
+    return;
+  }
+
+  if (t.id === 'ktmTelKaydet') {
+    var ay = aracBul(msjPlaka);
+    var alan = document.getElementById('ktmTel');
+    if (!ay || !alan) return;
+    var deg = alan.value.trim();
+    /* ⚠️ KAPALI DÜĞME YOK, KONUŞAN DÜĞME VAR (K-040.3). */
+    if (!deg) {
+      balon('Telefonu yaz — 11 hane, 0 ile başlar.', false, 2800);
+      try { alan.focus(); } catch (x) {}
+      return;
+    }
+    if (!telGecerli(deg)) {
+      balon('Telefon 11 hane olmalı ve 0 ile başlamalı.', false, 3000);
+      try { alan.focus(); } catch (x) {}
+      return;
+    }
+    /* Telefonu OLMAYAN araçta ruhsat sahibinin numarası da boştur —
+       o yüzden hedef net: `sahipTel`. İkinci iletişim ayrı bir karar
+       ve araç ekranından yazılıyor. */
+    ay.sahipTel = deg;
+    balon(ay.plaka + ' için telefon kaydedildi.', false, 2600);
+    Katman.kapa();
     return;
   }
   if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }

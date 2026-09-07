@@ -17,9 +17,9 @@ tıklanabilir prototip.
 | Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
-| Sağlık denetimi | **39 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — hem veriyi (K-024.1) hem **DOM durumunu** (K-041.2) — ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **40 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — hem veriyi (K-024.1) hem **DOM durumunu** (K-041.2) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` — 06.09'da üçü eklendi: **yorum içinde etiket** · **üretilen betik ayrışıyor mu** · **kapanmamış yorum** (K-033.11) |
-| Kararlar | **K-001 … K-041** |
+| Kararlar | **K-001 … K-043** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---

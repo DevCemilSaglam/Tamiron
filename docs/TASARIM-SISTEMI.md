@@ -440,6 +440,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | İpucu satırı | `.plate-hint` |
 | Müşteri kartı | `.ms-kart` > `.ms-bas` (`.ms-ad` + `.ms-say`) + `.tel-link` + `.ms-araclar` > `.ms-arac` (`.plate` + `.ms-arac-ad`). **Plaka çipin içine konmaz** — çip seçim aracıdır, plaka veridir (K-033.8) |
 | Balon | tek `#toast`, `.show` ile görünür (yalnız `balon()` yönetir). `width: max-content` + `max-width` — `left:50%` ile ortalanan bir öğe aksi hâlde kapsayıcının **yarısını** geçemez (K-033.10) |
+| **Katman (popup)** | `.katman-ortu` + `.katman` > `.katman-bas` (`.katman-baslik`) + `.katman-govde` — yalnız `Katman.ac(baslik, govde, kapaninca)` açar. **İkinci bir popup yazılmaz**: ekran yalnız başlık ve gövde verir; odak, Esc, örtü ve arka plan kilidi bileşenin işi (K-043) |
 | Çekmece | `.drawer-overlay` + `.drawer` > `.drawer-head` `.drawer-title` + `.drawer-body` |
 | Çekmece satırı | `.drawer-item` > `.di-ic` · başlık: `.drawer-sec-label` · ayraç: `.divider` |
 | Ayar satırı | `.setting-row` > `.sr-txt` > `.sr-label` + `.sr-sub` |

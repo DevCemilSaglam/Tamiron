@@ -10,6 +10,96 @@
 
 ---
 
+## K-043 · İki popup değil bir katman; ve örtüler yığın oluşturur (07.09.2026)
+
+**Kuyruk 4/A14-A15.** Cemil iki yerde popup istedi: *"Müşteri ne görecek
+popup açılsın"* ve *"telefon yazabileceği basit bir popup"*.
+
+### 43.1 · İki popup yazılmadı, bir bileşen yazıldı
+
+İki ayrı overlay demek iki ayrı odak tuzağı, iki ayrı kapatma
+davranışı, iki ayrı Esc dinleyicisi demekti — **biri mutlaka eksik
+kalırdı.** Aynı gün, aynı sebeple çekmecenin odak tuzağı zaten
+delinmişti (K-042.2).
+
+`Katman` çekirdekte: ekran yalnız **başlık** ve **gövde** veriyor;
+açılma, kapanma, odak, Esc, örtüye dokunma ve arka planın kilidi
+bileşenin işi.
+
+> Çekmecenin kardeşi ama aynısı değil: **çekmece yandan girer ve
+> gezinmedir; katman ortada durur ve tek bir soruyu sorar.** İkisini
+> tek bileşen yapmak, iki farklı işi tek ada sıkıştırmak olurdu.
+
+### 43.2 · Önizleme artık ekran değil katman
+
+Eskiden *"Müşteri ne görecek?"* ayrı bir ekrana gidiyordu: usta mesajı
+yazıyor, bakmak için ekrandan çıkıyor, geri geliyordu. **Bakmak için
+işi bırakmak gerekiyordu.**
+
+*"Sadece mesaj gözüksün"* şöyle okundu: katman **müşterinin gerçekten
+göreceğini** gösteriyor, ustanın önizleme şeridi (*"bu şerit yalnız
+sende görünüyor"*) katmanda **yok**. Olsaydı zaten *"sadece müşterinin
+gördüğü"* olmazdı. Mesaj metninin kendisi üstteki alanda duruyor;
+ikinci kez göstermek onu tekrar etmek olurdu. **Cemil onayına açık
+(A-M18).**
+
+Gövde artık **ortak nesne** (`ozetGovdeHtml`): hem `ozet` ekranı hem
+katman aynı işlevi çağırıyor. İki kopya olsaydı biri düzelir öteki
+kalırdı — bu turda bunun üç örneğini gördük.
+
+⚠️ **Önizleme taşınınca `ozet` ekranı YETİM KALDI** ve denetimin YETIM
+testi anında söyledi: *"ozet | gidilmiyor"*. Ekran silinmedi — o
+**müşterinin sayfasının kendisi**, linkin ucundaki şey. Katmanın
+dibine *"Tam sayfayı aç"* kondu: bakmak isteyene açık, ana yola
+binmiyor.
+
+### 43.3 · Telefon yoksa çözüm uyarının yanında
+
+Uyarı *"önce araç kaydına telefon yaz"* diyordu ve usta mesaj
+ekranından çıkıp aracı bulup telefonu yazıp geri gelmek zorundaydı —
+**dört ekran**. Artık uyarının altında **Telefon ekle** düğmesi var;
+katman açılıyor, numara yazılıyor, kaydediliyor ve gönderme düğmeleri
+kendiliğinden açılıyor.
+
+Ölçüldü uçtan uca: boş kaydet → *"Telefonu yaz"*; geçersiz → *"11 hane
+olmalı"*; `05321112233` → **`0532 111 22 33`** olarak biçimlendi, araca
+yazıldı, üç düğme de açıldı.
+
+> **Sesle giriş bu turda yazılmadı.** Cemil *"yazabileceği/
+> söyleyebileceği"* dedi; mikrofon ses ekranına yeni bir niyet
+> (`telefon`) ve çözümleyici işi gerektiriyor. **Yarım çalışan bir
+> mikrofon koymaktansa yazmadım** — kuyruğa A16 olarak düşüldü.
+
+### 43.4 · Asıl bulgu: örtüler **yığın** oluşturur
+
+İlk yazımda arka planı kapatan işlev *"aç"* derken `inert` **ekliyor**,
+*"kapat"* derken **kaldırıyordu**. Tek örtü varken doğru; ikinci örtü
+gelince yanlış:
+
+**Katman kapanınca çekmecenin koyduğu kilidi de kaldırıyordu** ve
+arkadaki **17 öğe** sekme sırasına geri dönüyordu.
+
+Ölçüm ilginçti: hata ancak denetim **iki kez** koşturulunca çıkıyordu.
+Sebep zincirleme — denetimin 30. testi her düğmeye basıyor, düğmelerden
+biri artık **katman açıyor**, denetim onu **açık bırakıyor**, sonraki
+koşuda çekmece açılıp kapanıyor ve herkesin kilidi birden kalkıyor.
+*(K-041.2'nin akordiyonlar için öğrendiği ders, yeni bir örtüye
+uygulanmamıştı — bu turun dördüncü kez tekrarlayan dersi.)*
+
+Çözüm sayaç değil **yığın**: hangi örtüler açık sırasıyla tutuluyor,
+kilit her zaman **en üstteki örtüye göre** yeniden hesaplanıyor.
+Kapanan örtü kendi kaydını siliyor, altındakinin kilidi duruyor.
+
+**40. test** eklendi (KATMAN-ODAK-SIZINTISI + ORTU-YIGINI) ve **iki
+negatif testle** doğrulandı: odak tuzağı bozulunca 26 öğe, yığın
+bozulunca *"çekmecenin kilidi kalktı"*; düzeltilince ikisi de sustu.
+
+**Ölçüm:** derleme temiz · 14 ekran · **40 test** / 0 bulgu ·
+`load` koşusu 0 · 320 / 375 / 430 px · katman ve telefon ekleme uçtan
+uca işletildi.
+
+---
+
 ## K-042 · Alt gezinme bir kopya değil, aynı denetimin ikinci gövdesi (07.09.2026)
 
 **Kuyruk 4/A.** Cemil'in on dört maddesi; onu metin ve kaldırma, dördü
@@ -2685,6 +2775,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M18** | *"Sadece mesaj gözüksün"* — katmanda **müşterinin gördüğü sayfa** gösteriliyor, mesaj metni değil (o zaten üstteki alanda). Doğru okuma mı? (K-043.2) | Cemil |
 | **A-M17** | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta hâlâ çıkıyor. Cemil yalnız iki şablonu saymıştı (*özet*, *parça bekliyoruz*); üçüncüsü de mantıken yanlış görünüyor — elensin mi? | Cemil |
 | **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? Kalkarsa prototipte sesli yol denenemez (K-042.4) | Cemil |
 | **A-M14** | *(07.09: Cemil anlamadı — soru sadeleştirildi)* Araç teslim edilince ekran **kapanmıyor**, *"müşteriye özet gönder / geç"* diye soruyor. Bu **bir dokunuş** ekliyor. Sorulmasın, teslim edilir edilmez ana ekrana dönülsün mü? | Cemil |

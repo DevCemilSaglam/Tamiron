@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 20:48
+  Üretim: 2026-09-07 21:02
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -1163,7 +1163,50 @@ kirpilsin. */
 .tl-item.secili {
   border-color: var(--primary);
   box-shadow: inset 0 0 0 1px var(--primary);
-}/* ---------- TOAST (sahte sesli komut) ---------- */
+}/* ============ KATMAN (popup) — 07.09 ============
+   Çekmecenin kardeşi ama davranışı farklı: çekmece YANDAN girer ve
+   gezinmedir; katman ORTADA durur ve tek bir soruyu sorar. İkisini
+   aynı bileşen yapmak, iki farklı işi tek ada sıkıştırmak olurdu.
+
+   Dar ekranda alta yaslanır (parmağa yakın), geniş ekranda ortalanır.
+   Yüksekliği içeriğe göre ama ekranın %85'ini geçmez — geçerse
+   kendi içinde kayar. */
+.katman-ortu {
+  position: absolute; inset: 0;
+  background: color-mix(in srgb, var(--text) 45%, transparent);
+  z-index: 70;
+}
+.katman {
+  position: absolute;
+  left: 12px; right: 12px; bottom: 12px;
+  max-height: 85%;
+  display: flex; flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  z-index: 71;
+  overflow: hidden;
+}
+.katman-bas {
+  flex: none;
+  display: flex; align-items: center; gap: 10px;
+  padding: 12px 12px 12px 16px;
+  border-bottom: 1px solid var(--line);
+}
+.katman-baslik {
+  flex: 1; min-width: 0;
+  font-family: var(--font-display);
+  font-size: var(--tip-lg); font-weight: 700; color: var(--text);
+  overflow-wrap: anywhere;
+}
+.katman-govde {
+  flex: 1; min-height: 0; overflow-y: auto;
+  padding: 14px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-direction: column; gap: 14px;
+}
+
+/* ---------- TOAST (sahte sesli komut) ---------- */
 /* BALON (toast)
    Onceden background:var(--text) / color:var(--bg) idi — ters kontrast.
    Koyu temada BEYAZ balon cikiyordu ve arayuzun geri kalanindan kopuktu
@@ -3677,20 +3720,11 @@ kirpilsin. */
        ustanın ekranıyla müşterinin sayfası karışmasın. -->
   <div class="notice" id="ozOnizleme"></div>
 
-  <div class="card">
-    <div class="ozet-bas" id="ozDukkan"></div>
-  </div>
-
-  <div class="card">
-    <div id="ozArac"></div>
-  </div>
-
-  <div class="section-label">
-    <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılan işler
-  </div>
-  <div id="ozKalemler"></div>
-
-  <div id="ozDurum"></div>
+  <!-- ⚠️ GÖVDE ORTAK NESNE (07.09). Dört ayrı kap yerine tek kap:
+       içeriği `ozetGovdeHtml()` üretiyor ve aynı işlevi mesaj
+       ekranındaki katman da çağırıyor. İki kopya olsaydı biri düzelir
+       öteki kalırdı. -->
+  <div id="ozGovde"></div>
 
 </section>
 
@@ -3798,6 +3832,28 @@ kirpilsin. */
 
     </div>
   </aside>
+
+  <!-- KATMAN (popup) — ORTAK BİLEŞEN (07.09).
+       Cemil iki yerde istedi: *"Müşteri ne görecek popup açılsın"* ve
+       *"telefon yazabileceği/söyleyebileceği basit bir popup"*.
+
+       ⚠️ İKİ POPUP YAZILMADI, BİR BİLEŞEN YAZILDI. İki ayrı overlay,
+       iki ayrı odak tuzağı ve iki ayrı kapatma davranışı demekti;
+       biri mutlaka eksik kalırdı — çekmecenin odak tuzağı bugün tam
+       böyle delindi (K-042.2).
+
+       Gövdesi boş: içeriği `Katman.ac()` dolduruyor. -->
+  <div class="katman-ortu" id="katmanOrtu" hidden></div>
+  <div class="katman" id="katman" role="dialog" aria-modal="true"
+       aria-labelledby="katmanBaslik" hidden inert>
+    <div class="katman-bas">
+      <span class="katman-baslik" id="katmanBaslik"></span>
+      <button class="icon-btn" id="katmanKapat" aria-label="Kapat" title="Kapat">
+        <svg class="ico"><use href="#i-x"></use></svg>
+      </button>
+    </div>
+    <div class="katman-govde" id="katmanGovde"></div>
+  </div>
 
 </div>
 
@@ -4259,6 +4315,109 @@ var Tema = (function () {
    ERİŞİLEBİLİRLİK v1'den: aria-hidden + inert (arkadaki ekran
    klavyeye kapanır), ESC kapatır, odak çekmeceye girer ve
    kapanınca menü düğmesine döner. */
+/* ============ ARKA PLANI KLAVYEYE KAPAT — TEK YERDE ============
+   ⚠️ 07.09 — LİSTE DEĞİL YAPI. Eskiden `.topbar` ve `.screen`ler tek
+   tek sayılıyordu. Alt gezinme çubuğu eklenince (A3) o liste eksik
+   kaldı ve çekmece açıkken **footer'ın tuşları sekme sırasında
+   kaldı** — denetimin DRAWER-ODAK-SIZINTISI testi anında yakaladı.
+
+   Sayılan bir liste, her yeni kardeşte güncellenmeyi bekler ve bir gün
+   unutulur. Kural artık yapıdan okunuyor: **verilen istisnalar dışında
+   her `.device` çocuğu kapanır.**
+
+   İki kullanıcısı var — çekmece ve katman. İkisi de aynı işi ayrı ayrı
+   yazsaydı biri mutlaka eksik kalırdı; bugün tam bu oldu. */
+/* ⚠️ ÖRTÜLER YIĞIN OLUŞTURUR — 07.09, ölçümle bulundu.
+   İlk yazımda bu işlev "kapat" derken inert EKLİYOR, "aç" derken
+   KALDIRIYORDU. İki örtü (çekmece ve katman) aynı anda varken bu
+   yanlış: katman kapanınca **çekmecenin koyduğu kilidi de**
+   kaldırıyordu ve arkadaki 17 öğe sekme sırasına geri dönüyordu.
+
+   Ölçüldü: denetim iki kez koşturulunca ortaya çıkıyordu — denetim
+   katmanı açık bırakıyor, sonraki koşuda çekmece açılıp kapanıyor ve
+   herkesin kilidi birden kalkıyordu. Tek bir "aç/kapat" ikilisi, iki
+   sahibi olan bir duruma yetmiyor.
+
+   Çözüm SAYAÇ değil YIĞIN: hangi örtüler açık, sırasıyla tutuluyor;
+   kilit her zaman **en üstteki örtüye göre** yeniden hesaplanıyor.
+   Kapanan örtü kendi kaydını siliyor, altındakinin kilidi duruyor. */
+var ORTU_YIGINI = [];
+
+function ortuKilidiTazele() {
+  var cihaz = document.querySelector('.device');
+  if (!cihaz) return;
+  var ust = ORTU_YIGINI[ORTU_YIGINI.length - 1] || null;
+  Array.prototype.forEach.call(cihaz.children, function (el) {
+    if (!ust || ust.haric.indexOf(el.id) >= 0) el.removeAttribute('inert');
+    else el.setAttribute('inert', '');
+  });
+}
+
+function arkaPlaniKapat(kapali, haric, ad) {
+  ORTU_YIGINI = ORTU_YIGINI.filter(function (x) { return x.ad !== ad; });
+  if (kapali) ORTU_YIGINI.push({ ad: ad, haric: haric });
+  ortuKilidiTazele();
+}
+
+/* ============ KATMAN (popup) ============
+   Cemil, 07.09: *"Müşteri ne görecek popup açılsın"* ve *"telefon
+   yazabileceği basit bir popup"*.
+
+   TEK BİLEŞEN, İKİ KULLANICI. İki ayrı popup yazmak iki ayrı odak
+   tuzağı, iki ayrı kapatma davranışı ve iki ayrı Esc dinleyicisi
+   demekti. Ekran yalnız BAŞLIK ve GÖVDE veriyor; açılma, kapanma,
+   odak ve arka plan buranın işi.
+
+   `kapaninca` geri çağrısı: katman kapanınca ekranın tazelenmesi
+   gerekebilir (telefon eklendiyse düğmeler açılmalı). */
+var Katman = (function () {
+  var acikMi = false;
+  var kapaninca = null;
+  var oncekiOdak = null;
+
+  function oge(id) { return document.getElementById(id); }
+
+  function ac(baslik, govdeHtml, sonra) {
+    var k = oge('katman'), o = oge('katmanOrtu');
+    if (!k || acikMi) return;
+    acikMi = true;
+    kapaninca = sonra || null;
+    oncekiOdak = document.activeElement;
+    oge('katmanBaslik').textContent = baslik || '';
+    oge('katmanGovde').innerHTML = govdeHtml || '';
+    k.hidden = false; o.hidden = false;
+    k.removeAttribute('inert');
+    arkaPlaniKapat(true, ['katman', 'katmanOrtu'], 'katman');
+    var ilk = k.querySelector('input, button, [tabindex]');
+    if (ilk) { try { ilk.focus(); } catch (e) {} }
+  }
+
+  function kapa() {
+    var k = oge('katman'), o = oge('katmanOrtu');
+    if (!k || !acikMi) return;
+    acikMi = false;
+    k.hidden = true; o.hidden = true;
+    k.setAttribute('inert', '');
+    /* ⚠️ GÖVDE BOŞALTILIR. Gizlenen ama duran içerik `textContent` ile
+       okunuyor ve "temizlenmemiş" sanılıyor (K-040.5). */
+    oge('katmanGovde').innerHTML = '';
+    arkaPlaniKapat(false, ['katman', 'katmanOrtu'], 'katman');
+    if (oncekiOdak && oncekiOdak.focus) { try { oncekiOdak.focus(); } catch (e) {} }
+    oncekiOdak = null;
+    var f = kapaninca; kapaninca = null;
+    if (f) f();
+  }
+
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('#katmanKapat') || e.target.closest('#katmanOrtu')) kapa();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && acikMi) kapa();
+  });
+
+  return { ac: ac, kapa: kapa, acikMi: function () { return acikMi; } };
+})();
+
 var Cekmece = (function () {
   var acikMi = false;
 
@@ -4274,24 +4433,7 @@ var Cekmece = (function () {
      yetmiyor: sekme tuşu arkadaki ekranın düğmelerinde gezinmeye
      devam ediyordu. Denetimin DRAWER-ODAK-SIZINTISI testi tam bu
      hatayı otomatikleştiriyor ve ilk yazımda yakaladı. */
-  /* ⚠️ 07.09 — LİSTE DEĞİL YAPI. Eskiden `.topbar` ve `.screen`ler tek
-     tek sayılıyordu. Alt gezinme çubuğu eklenince (A3) o liste eksik
-     kaldı ve çekmece açıkken **footer'ın tuşları sekme sırasında
-     kaldı** — denetimin DRAWER-ODAK-SIZINTISI testi anında yakaladı.
-
-     Sayılan bir liste, her yeni kardeşte güncellenmeyi bekler ve bir
-     gün unutulur. Kural artık yapıdan okunuyor: **çekmece ve örtüsü
-     dışındaki her `.device` çocuğu kapanır.** Yarın bir çubuk daha
-     eklenirse kendiliğinden kapsanır. */
-  function arkaPlan(kapali) {
-    var cihaz = document.querySelector('.device');
-    if (!cihaz) return;
-    Array.prototype.forEach.call(cihaz.children, function (el) {
-      if (el.id === 'drawer' || el.id === 'drawerOverlay') return;
-      if (kapali) el.setAttribute('inert', '');
-      else el.removeAttribute('inert');
-    });
-  }
+  function arkaPlan(kapali) { arkaPlaniKapat(kapali, ['drawer', 'drawerOverlay'], 'cekmece'); }
 
   function ac() {
     var o = ogeler();
@@ -5588,6 +5730,110 @@ function kayitSatiriHtml(k, s) {
       '</div>' +
     '</div>' +
   '</div>';
+}
+
+
+/* ---- MÜŞTERİNİN GÖRDÜĞÜ GÖVDE (07.09) ----
+   Cemil: *"Müşteri ne görecek popup açılsın. Sadece mesaj gözüksün."*
+
+   Bu gövde İKİ YERDE çiziliyor artık: `ozet` ekranında (usta tam
+   sayfayı görsün diye) ve mesaj ekranındaki KATMANDA (hızlı bakış).
+   Ortak nesne kuralı: bir nesne bir yerde çizilir. İki kopya olsaydı
+   biri düzelir öteki kalırdı — bu turda tam olarak bunun üç örneğini
+   gördük.
+
+   ⚠️ ÖNİZLEME ŞERİDİ BURADA YOK. *"Müşterinin gördüğü sayfa. Bu şerit
+   yalnız sende görünüyor"* satırı ekranın kendi işi; katmanda
+   gösterilseydi *"sadece müşterinin gördüğü"* olmazdı. Gövde yalnız
+   müşterinin gerçekten göreceğini üretir. */
+function ozetGovdeHtml(k) {
+  if (!k) return '';
+  var a = aracBul(k.plaka);
+
+  /* DÜKKÂN ÜSTTE: müşteri sayfayı WhatsApp'tan açıyor ve ilk sorusu
+     "bu kimden geldi". Telefon aranabilir — sorusu varsa arayacak. */
+  var dukkan = '<div class="card"><div class="ozet-bas">' +
+    '<div class="oz-ad">' + DUKKAN.ad + '</div>' +
+    (DUKKAN.adres ? '<div class="oz-alt">' + DUKKAN.adres + '</div>' : '') +
+    (DUKKAN.tel ? telLinkHtml(DUKKAN.tel, DUKKAN.ad) : '') +
+  '</div></div>';
+
+  var arac = a
+    ? '<div class="card">' +
+        '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
+          '<div class="veh-title">' + a.marka + ' ' + a.model +
+            (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+          '<div class="spec-strip">' +
+            '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
+            (k.km ? '<span class="spec-sep">·</span><span class="spec-val">' +
+              k.km + ' km</span>' : '') +
+          '</div>' +
+        '</div>' +
+        /* ⚠️ SATIR SONLARI KORUNUYOR (K-038.1). "Açıklama" alanı çok
+           satırlı; HTML satır sonlarını boşluğa çeviriyor ve müşteri
+           üç ayrı işi tek cümle hâlinde okuyordu. */
+        (k.sikayet
+          ? '<p class="plate-hint">' + k.sikayet.replace(/\n/g, '<br>') + '</p>'
+          : '') +
+      '</div>'
+    : '';
+
+  /* ⚠️ YARIM SATIR MÜŞTERİYE GÖSTERİLMEZ (K-038.2).
+     Adı DA fiyatı DA yoksa satır yok sayılır. Biri varsa gösterilir —
+     adı olup fiyatı olmayan satır gerçek bir iştir, fiyatı olup adı
+     olmayan satır gerçek bir paradır. Ustanın ekranında ELENMEZ:
+     orada yarım satır görünmeli ki doldurulsun ya da silinsin. */
+  var satirlar = (k.satirlar || []).filter(function (s) {
+    return (s.ad && s.ad.trim()) || s.fiyat;
+  });
+  var kalemler = '<div class="section-label">' +
+      '<svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılan işler' +
+    '</div>' +
+    (satirlar.length
+      ? '<div class="tutar-serit">' +
+          satirlar.map(function (s) {
+            var etiket = s.ad || (s.tip === 'iscilik' ? 'İşçilik' : 'Parça');
+            var ek = (s.tip === 'parca' && s.marka)
+              ? ' <span class="oz-marka">' + s.marka +
+                (s.kod ? ' · ' + s.kod : '') + '</span>' : '';
+            var musterinin = (s.tip === 'parca' && s.kimGetirdi === 'musteri');
+            /* ⚠️ MÜŞTERİ PARÇASINDA RAKAM YOK — fiyat kayıtta dursa bile
+               (K-037). Ödemediği bir parçanın yanında rakam görmek,
+               ondan ücret isteniyormuş gibi okunur; toplam da onu
+               içermiyor. Ekranda olup toplamda olmayan bir rakam,
+               müşteri açısından açıklanamaz bir çelişkidir. */
+            return '<div class="tutar-sat"><span>' + etiket + ek +
+              (musterinin ? ' <span class="pill muted">parçayı siz getirdiniz</span>' : '') +
+              '</span><span class="tv">' +
+              (musterinin || !s.fiyat ? '—' : tutar(s.fiyat) + ' ₺') + '</span></div>';
+          }).join('') +
+          '<div class="tutar-sat genel"><span>Toplam</span><span class="tv">' +
+            tutar(kayitToplami(k)) + ' ₺</span></div>' +
+        '</div>'
+      : bosDurumHtml('i-clipboard-list', 'Henüz iş yazılmadı',
+          'Araç işleme alındığında yapılanlar burada görünecek.'));
+
+  /* DURUM: müşterinin ikinci sorusu "aracım hazır mı".
+     Tek durum var (K-004) ve burada da tek durum gösteriliyor.
+     Parça beklendiği YALNIZ usta öyle seçtiyse söylenir (A-M15). */
+  var durum = '<div class="notice ' + (k.teslimTarihi ? 'ok' : 'accent') + '">' +
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#' +
+        (k.teslimTarihi ? 'i-circle-check' : 'i-clock') + '"></use></svg></span>' +
+      '<span class="n-body">' +
+        (k.teslimTarihi
+          ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
+            (k.odemeYolu === 'almadim'
+              ? ' Ödeme <b>alınmadı</b>.'
+              : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
+                  k.odemeYolu) + '</b>.' : ''))
+          : (k.parcaBekliyor && k.bekliyorMusteriye
+              ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
+                'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
+              : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +
+      '</span>' +
+    '</div>';
+
+  return dukkan + arac + kalemler + durum;
 }
 
 /* ---- ORTAK NESNENİN DAVRANIŞI DA ORTAK ----
@@ -7936,11 +8182,21 @@ function msjYazimCiz() {
   /* TELEFON YOKSA GÖNDERİLEMEZ ve bu ÖNCEDEN söylenir — düğmeye
      bastıktan sonra öğrenmek, ustayı boşuna uğraştırır. */
   var tel = hedef && hedef.tel;
+  /* ⚠️ TELEFON YOKSA ÇIKIŞ YOLU BURADA (Cemil, 07.09: "Telefon
+     eklemelisiniz uyarı mesajı ve telefon yazabileceği basit bir
+     popup açılabilir.").
+
+     Eskiden uyarı *"önce araç kaydına telefon yaz"* diyordu ve usta
+     mesaj ekranından çıkıp aracı bulup telefonu yazıp geri gelmek
+     zorundaydı — dört ekran. Uyarının çözümü kendi yanında olmalı:
+     ölü uç turunun (K-021) kuralı. */
   document.getElementById('msjUyari').innerHTML = tel ? '' :
     '<div class="notice warn">' +
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
-      '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
-      'önce araç kaydına telefon yaz.</span></div>';
+      '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez.' +
+      '</span></div>' +
+    '<button class="btn btn-primary" id="msjTelEkle" style="margin-top:10px">' +
+      '<svg class="ico"><use href="#i-phone"></use></svg> Telefon ekle</button>';
   ['msjGonder', 'msjSms', 'msjAra'].forEach(function (id) {
     var d = document.getElementById(id);
     if (d) d.disabled = !tel;
@@ -7997,11 +8253,101 @@ document.addEventListener('click', function (e) {
 
   /* Özet sayfasını AÇAR — usta linkin ucundakini görsün. Geri düğmesi
      mesaja döndürüyor, mesaj yazımı bozulmuyor (msjPlaka duruyor). */
+  /* ⚠️ EKRAN DEĞİL KATMAN (Cemil, 07.09: "Müşteri ne görecek popup
+     açılsın. Sadece mesaj gözüksün.").
+
+     Eskiden ayrı bir ekrana gidiyordu: usta mesajı yazıyor, önizlemeye
+     bakmak için ekrandan çıkıyor, geri geliyor. Bakmak için işi
+     bırakmak gerekiyordu.
+
+     "SADECE MESAJ": katman `ozetGovdeHtml()` çağırıyor — müşterinin
+     gerçekten göreceği. Ustanın önizleme şeridi ("bu şerit yalnız
+     sende görünüyor") KATMANDA YOK; olsaydı "sadece müşterinin
+     gördüğü" olmazdı.
+
+     ⚠️ YORUM: Cemil "sadece mesaj gözüksün" dedi; bunu *"bizim
+     eklediğimiz açıklama olmasın, yalnız müşterinin gördüğü"* diye
+     okudum. Mesaj METNİNİN kendisi zaten üstteki alanda duruyor ve
+     ikinci kez göstermek onu tekrar etmek olurdu. Cemil onayına açık
+     (A-M18). */
   if (t.id === 'msjOzetGor') {
     var ok = msjOzetKaydi(msjPlaka);
     if (!ok) return;
-    OZET_KAYIT = ok.id;
+    /* ⚠️ ÖZET EKRANI YETİM KALMASIN (07.09). Önizleme katmana
+       taşınınca `ozet` ekranına giden tek yol koptu ve denetimin YETIM
+       testi anında söyledi: *"ozet | gidilmiyor"*.
+
+       Ekran silinmedi çünkü o **müşterinin sayfasının kendisi** —
+       linkin ucundaki şey. Katmanda hızlı bakış var; tam sayfayı
+       görmek isteyen usta buradan açıyor. Ana yolda değil, katmanın
+       dibinde: bakmak isteyene açık, akışa binmiyor. */
+    Katman.ac('Müşteri ne görecek',
+      ozetGovdeHtml(ok) +
+      '<button class="btn btn-ghost" id="ktmOzetSayfa">' +
+        '<svg class="ico"><use href="#i-file-text"></use></svg>' +
+        ' Tam sayfayı aç</button>');
+    return;
+  }
+
+  if (t.id === 'ktmOzetSayfa') {
+    var os = msjOzetKaydi(msjPlaka);
+    if (!os) return;
+    OZET_KAYIT = os.id;
+    Katman.kapa();
     Ekran.ac('ozet');
+    return;
+  }
+
+  /* A15 — telefon ekleme katmanı. */
+  if (t.id === 'msjTelEkle') {
+    var av = aracBul(msjPlaka);
+    if (!av) return;
+    Katman.ac('Telefon ekle',
+      '<div class="card">' +
+        '<div class="arac-bas">' + plakaHtml(av.plaka, 'plate-lg') +
+          '<div class="veh-title">' + av.marka + ' ' + av.model + '</div>' +
+          '<div class="spec-strip"><span class="spec-val">' +
+            (av.sahipAd || 'sahip yazılmamış') + '</span></div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label for="ktmTel">Telefon</label>' +
+        '<input id="ktmTel" class="mono" data-giris="tel" inputmode="tel"' +
+          ' placeholder="0532 000 00 00" autocomplete="off" />' +
+        '<div class="plate-hint" id="ktmTelIpucu" role="status">' +
+          '11 hane, 0 ile başlar. Özet ve bakım hatırlatması buraya gider.' +
+        '</div>' +
+      '</div>' +
+      '<button class="btn btn-primary btn-lg" id="ktmTelKaydet">' +
+        '<svg class="ico"><use href="#i-check"></use></svg> Kaydet</button>',
+      /* Katman kapanınca ekran tazelenir: telefon eklendiyse gönderme
+         düğmeleri kendiliğinden açılmalı. */
+      function () { if (Ekran.adi() === 'mesaj') Ekran.tazele(); });
+    return;
+  }
+
+  if (t.id === 'ktmTelKaydet') {
+    var ay = aracBul(msjPlaka);
+    var alan = document.getElementById('ktmTel');
+    if (!ay || !alan) return;
+    var deg = alan.value.trim();
+    /* ⚠️ KAPALI DÜĞME YOK, KONUŞAN DÜĞME VAR (K-040.3). */
+    if (!deg) {
+      balon('Telefonu yaz — 11 hane, 0 ile başlar.', false, 2800);
+      try { alan.focus(); } catch (x) {}
+      return;
+    }
+    if (!telGecerli(deg)) {
+      balon('Telefon 11 hane olmalı ve 0 ile başlamalı.', false, 3000);
+      try { alan.focus(); } catch (x) {}
+      return;
+    }
+    /* Telefonu OLMAYAN araçta ruhsat sahibinin numarası da boştur —
+       o yüzden hedef net: `sahipTel`. İkinci iletişim ayrı bir karar
+       ve araç ekranından yazılıyor. */
+    ay.sahipTel = deg;
+    balon(ay.plaka + ' için telefon kaydedildi.', false, 2600);
+    Katman.kapa();
     return;
   }
   if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }
@@ -8503,9 +8849,6 @@ Ekran.tanim('ozet', {
     var k = (OZET_KAYIT !== null) ? kayitBul(OZET_KAYIT) : null;
     if (!k) {
       document.getElementById('ozOnizleme').innerHTML = '';
-      document.getElementById('ozDukkan').innerHTML = '';
-      document.getElementById('ozArac').innerHTML = '';
-      document.getElementById('ozDurum').innerHTML = '';
       /* ⚠️ 04.09 — BURASI ÖLÜ UÇTU ve denetim BUNU GÖREMİYORDU.
          Boş durumda ekranda tek bir dokunulabilir şey yoktu; 27. test
          (OLU-UC) bunu ancak denetim KENDİ KİRLETTİĞİ durumu geri
@@ -8515,7 +8858,7 @@ Ekran.tanim('ozet', {
 
          Müşteri boş özet görmez (link hep bir kayda ait). Bu hâli
          yalnız usta görür — ve buradan çıkabilmeli. */
-      document.getElementById('ozKalemler').innerHTML = bosDurumHtml(
+      document.getElementById('ozGovde').innerHTML = bosDurumHtml(
         'i-clipboard-list', 'Özet seçilmedi',
         'Müşteriye gönderilecek özet bir servis kaydına ait olur.',
         '<button class="btn btn-primary" data-git="kayitlar">' +
@@ -8523,125 +8866,12 @@ Ekran.tanim('ozet', {
           ' Servis kayıtlarına git</button>');
       return;
     }
-    var a = aracBul(k.plaka);
-
     document.getElementById('ozOnizleme').innerHTML =
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
       '<span class="n-body"><b>Müşterinin gördüğü sayfa.</b> Bu şerit ' +
       'yalnız sende görünüyor. Link: <b>' + ozetLinki(k) + '</b></span>';
 
-    /* DÜKKÂN ÜSTTE: müşteri sayfayı WhatsApp'tan açıyor ve ilk sorusu
-       "bu kimden geldi". Telefon aranabilir — sorusu varsa arayacak. */
-    document.getElementById('ozDukkan').innerHTML =
-      '<div class="oz-ad">' + DUKKAN.ad + '</div>' +
-      (DUKKAN.adres ? '<div class="oz-alt">' + DUKKAN.adres + '</div>' : '') +
-      (DUKKAN.tel ? telLinkHtml(DUKKAN.tel, DUKKAN.ad) : '');
-
-    document.getElementById('ozArac').innerHTML = a
-      ? '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
-          '<div class="veh-title">' + a.marka + ' ' + a.model +
-            (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
-          '<div class="spec-strip">' +
-            '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
-            (k.km ? '<span class="spec-sep">·</span><span class="spec-val">' +
-              k.km + ' km</span>' : '') +
-          '</div>' +
-        '</div>' +
-        /* ⚠️ SATIR SONLARI KORUNUYOR (06.09, kuyruk 6). Dün "ne
-           istiyor" alanı textarea oldu ve *"alt satıra ekle"* düğmesi
-           geldi (K-033.5): usta artık üç ayrı iş yazıyor. Burada metin
-           düz basılıyordu, HTML satır sonlarını boşluğa çeviriyordu ve
-           müşteri üç işi tek cümle hâlinde okuyordu.
-
-           Ustanın ekranında sorun yoktu — orası textarea, satırları
-           kendi gösteriyor. Kırılan yer, metnin METİN OLARAK basıldığı
-           tek yerdi. Alanı çok satırlı yapmak, onu gösteren her yeri
-           gözden geçirmeyi gerektiriyormuş. */
-        (k.sikayet
-          ? '<p class="plate-hint">' + k.sikayet.replace(/\n/g, '<br>') + '</p>'
-          : '')
-      : '';
-
-    /* KALEMLER — "iş, parça açıklaması ve toplam tutar" (S8).
-       ⚠️ MÜŞTERİ PARÇASI 0 TL DURUYOR (S2, K-005) ve BUNU SÖYLÜYOR.
-       Fiyatsız bir satırı sessizce göstermek, müşteriye "bu bedavaydı"
-       diye okunur; oysa parayı o ödemiş. */
-    /* ⚠️ YARIM SATIR MÜŞTERİYE GÖSTERİLMEZ (06.09, kuyruk 6).
-       Usta *"+ Parça"*ya basıp adını henüz yazmamışsa satır boş
-       duruyor; müşterinin sayfasında bu **"Parça — "** diye çıkıyordu.
-       Müşteri için bu bir bilgi değil, bir soru işareti: *"bu ne?"*
-
-       ÖLÇÜ: adı DA fiyatı DA yoksa satır yok sayılır. Biri varsa
-       gösterilir — adı olup fiyatı olmayan satır gerçek bir iştir
-       (fiyatı henüz girilmemiş), fiyatı olup adı olmayan satır gerçek
-       bir paradır. Yalnız ikisi birden boşsa ortada bir şey yoktur.
-
-       ⚠️ USTANIN EKRANINDA ELENMİYOR — orada yarım satır GÖRÜNMELİ ki
-       usta onu doldursun ya da silsin. Aynı veri, iki okuyucuya iki
-       gösterim (K-037.4'ün kuralı). */
-    var satirlar = (k.satirlar || []).filter(function (s) {
-      return (s.ad && s.ad.trim()) || s.fiyat;
-    });
-    document.getElementById('ozKalemler').innerHTML = satirlar.length
-      ? '<div class="tutar-serit">' +
-          satirlar.map(function (s) {
-            var etiket = s.ad || (s.tip === 'iscilik' ? 'İşçilik' : 'Parça');
-            var ek = (s.tip === 'parca' && s.marka)
-              ? ' <span class="oz-marka">' + s.marka +
-                (s.kod ? ' · ' + s.kod : '') + '</span>' : '';
-            var musterinin = (s.tip === 'parca' && s.kimGetirdi === 'musteri');
-            return '<div class="tutar-sat"><span>' + etiket + ek +
-              (musterinin ? ' <span class="pill muted">parçayı siz getirdiniz</span>' : '') +
-              /* ⚠️ MÜŞTERİ PARÇASINDA RAKAM YOK — fiyat kayıtta dursa
-                 bile (K-037'den sonra duruyor). Müşteriye o rakamı
-                 göstermek, ödemediği bir parça için ücret istiyormuş
-                 gibi okunur; toplam da onu içermiyor. Ekranda bir
-                 rakam var ama toplamda yok — müşteri açısından bu
-                 açıklanamaz bir çelişkidir. */
-              '</span><span class="tv">' +
-              ((s.tip === 'parca' && s.kimGetirdi === 'musteri') || !s.fiyat
-                ? '—' : tutar(s.fiyat) + ' ₺') + '</span></div>';
-          }).join('') +
-          '<div class="tutar-sat genel"><span>Toplam</span><span class="tv">' +
-            tutar(kayitToplami(k)) + ' ₺</span></div>' +
-        '</div>'
-      : bosDurumHtml('i-clipboard-list', 'Henüz iş yazılmadı',
-          'Araç işleme alındığında yapılanlar burada görünecek.');
-
-    /* DURUM: müşterinin ikinci sorusu "aracım hazır mı".
-       Tek durum var (K-004) ve burada da tek durum gösteriliyor. */
-    document.getElementById('ozDurum').innerHTML =
-      '<div class="notice ' + (k.teslimTarihi ? 'ok' : 'accent') + '">' +
-        '<span class="n-ic"><svg class="ico ico-sm"><use href="#' +
-          (k.teslimTarihi ? 'i-circle-check' : 'i-clock') + '"></use></svg></span>' +
-        '<span class="n-body">' +
-          (k.teslimTarihi
-            ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
-              (k.odemeYolu === 'almadim'
-                ? ' Ödeme <b>alınmadı</b>.'
-                : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
-                    k.odemeYolu) + '</b>.' : ''))
-            /* ⚠️ PARÇA BEKLENİYORSA SAYFA DA SÖYLER (06.09, kuyruk 6).
-               Mesaj şablonu bunu zaten söylüyordu ("Parça bekliyoruz",
-               K-033.9); sayfa susuyordu. Müşteri mesajı okuyup linke
-               dokununca **iki farklı hikâye** görüyordu — ve canlı
-               olan, yani doğru saydığı, sayfaydı.
-
-               SÖZ VERİLMİYOR: "yarın hazır" demiyoruz. Parçanın ne
-               zaman geleceğini biz de bilmiyoruz ve tutulmayan söz,
-               hiç verilmemiş sözden kötüdür.
-
-               `fiyatiBekleyen` BURADA YOK ve olmayacak: o dükkânın
-               kendi işi (parçacıdan rakam gelmedi). Müşteriyi
-               ilgilendiren şey parçanın yolda olması. */
-            /* ⚠️ USTANIN SEÇİMİNE BAĞLI (A-M15, 07.09). Bayrak açık
-               olsa bile müşteriye söylemek ayrı bir karar. */
-            : (k.parcaBekliyor && k.bekliyorMusteriye
-                ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
-                  'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
-                : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +
-        '</span>' +
-      '</div>';
+    document.getElementById('ozGovde').innerHTML = ozetGovdeHtml(k);
   }
 });
 })();
@@ -8714,7 +8944,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>3a3f84ea</b><br>' +
+      'Sürüm <b>e0bd9f49</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

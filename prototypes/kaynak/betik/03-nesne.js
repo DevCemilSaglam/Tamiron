@@ -254,6 +254,110 @@ function kayitSatiriHtml(k, s) {
   '</div>';
 }
 
+
+/* ---- MÜŞTERİNİN GÖRDÜĞÜ GÖVDE (07.09) ----
+   Cemil: *"Müşteri ne görecek popup açılsın. Sadece mesaj gözüksün."*
+
+   Bu gövde İKİ YERDE çiziliyor artık: `ozet` ekranında (usta tam
+   sayfayı görsün diye) ve mesaj ekranındaki KATMANDA (hızlı bakış).
+   Ortak nesne kuralı: bir nesne bir yerde çizilir. İki kopya olsaydı
+   biri düzelir öteki kalırdı — bu turda tam olarak bunun üç örneğini
+   gördük.
+
+   ⚠️ ÖNİZLEME ŞERİDİ BURADA YOK. *"Müşterinin gördüğü sayfa. Bu şerit
+   yalnız sende görünüyor"* satırı ekranın kendi işi; katmanda
+   gösterilseydi *"sadece müşterinin gördüğü"* olmazdı. Gövde yalnız
+   müşterinin gerçekten göreceğini üretir. */
+function ozetGovdeHtml(k) {
+  if (!k) return '';
+  var a = aracBul(k.plaka);
+
+  /* DÜKKÂN ÜSTTE: müşteri sayfayı WhatsApp'tan açıyor ve ilk sorusu
+     "bu kimden geldi". Telefon aranabilir — sorusu varsa arayacak. */
+  var dukkan = '<div class="card"><div class="ozet-bas">' +
+    '<div class="oz-ad">' + DUKKAN.ad + '</div>' +
+    (DUKKAN.adres ? '<div class="oz-alt">' + DUKKAN.adres + '</div>' : '') +
+    (DUKKAN.tel ? telLinkHtml(DUKKAN.tel, DUKKAN.ad) : '') +
+  '</div></div>';
+
+  var arac = a
+    ? '<div class="card">' +
+        '<div class="arac-bas">' + plakaHtml(a.plaka, 'plate-lg') +
+          '<div class="veh-title">' + a.marka + ' ' + a.model +
+            (a.yil ? ' <span class="yr">' + a.yil + '</span>' : '') + '</div>' +
+          '<div class="spec-strip">' +
+            '<span class="spec-val">' + TUR_AD[k.tur] + '</span>' +
+            (k.km ? '<span class="spec-sep">·</span><span class="spec-val">' +
+              k.km + ' km</span>' : '') +
+          '</div>' +
+        '</div>' +
+        /* ⚠️ SATIR SONLARI KORUNUYOR (K-038.1). "Açıklama" alanı çok
+           satırlı; HTML satır sonlarını boşluğa çeviriyor ve müşteri
+           üç ayrı işi tek cümle hâlinde okuyordu. */
+        (k.sikayet
+          ? '<p class="plate-hint">' + k.sikayet.replace(/\n/g, '<br>') + '</p>'
+          : '') +
+      '</div>'
+    : '';
+
+  /* ⚠️ YARIM SATIR MÜŞTERİYE GÖSTERİLMEZ (K-038.2).
+     Adı DA fiyatı DA yoksa satır yok sayılır. Biri varsa gösterilir —
+     adı olup fiyatı olmayan satır gerçek bir iştir, fiyatı olup adı
+     olmayan satır gerçek bir paradır. Ustanın ekranında ELENMEZ:
+     orada yarım satır görünmeli ki doldurulsun ya da silinsin. */
+  var satirlar = (k.satirlar || []).filter(function (s) {
+    return (s.ad && s.ad.trim()) || s.fiyat;
+  });
+  var kalemler = '<div class="section-label">' +
+      '<svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılan işler' +
+    '</div>' +
+    (satirlar.length
+      ? '<div class="tutar-serit">' +
+          satirlar.map(function (s) {
+            var etiket = s.ad || (s.tip === 'iscilik' ? 'İşçilik' : 'Parça');
+            var ek = (s.tip === 'parca' && s.marka)
+              ? ' <span class="oz-marka">' + s.marka +
+                (s.kod ? ' · ' + s.kod : '') + '</span>' : '';
+            var musterinin = (s.tip === 'parca' && s.kimGetirdi === 'musteri');
+            /* ⚠️ MÜŞTERİ PARÇASINDA RAKAM YOK — fiyat kayıtta dursa bile
+               (K-037). Ödemediği bir parçanın yanında rakam görmek,
+               ondan ücret isteniyormuş gibi okunur; toplam da onu
+               içermiyor. Ekranda olup toplamda olmayan bir rakam,
+               müşteri açısından açıklanamaz bir çelişkidir. */
+            return '<div class="tutar-sat"><span>' + etiket + ek +
+              (musterinin ? ' <span class="pill muted">parçayı siz getirdiniz</span>' : '') +
+              '</span><span class="tv">' +
+              (musterinin || !s.fiyat ? '—' : tutar(s.fiyat) + ' ₺') + '</span></div>';
+          }).join('') +
+          '<div class="tutar-sat genel"><span>Toplam</span><span class="tv">' +
+            tutar(kayitToplami(k)) + ' ₺</span></div>' +
+        '</div>'
+      : bosDurumHtml('i-clipboard-list', 'Henüz iş yazılmadı',
+          'Araç işleme alındığında yapılanlar burada görünecek.'));
+
+  /* DURUM: müşterinin ikinci sorusu "aracım hazır mı".
+     Tek durum var (K-004) ve burada da tek durum gösteriliyor.
+     Parça beklendiği YALNIZ usta öyle seçtiyse söylenir (A-M15). */
+  var durum = '<div class="notice ' + (k.teslimTarihi ? 'ok' : 'accent') + '">' +
+      '<span class="n-ic"><svg class="ico ico-sm"><use href="#' +
+        (k.teslimTarihi ? 'i-circle-check' : 'i-clock') + '"></use></svg></span>' +
+      '<span class="n-body">' +
+        (k.teslimTarihi
+          ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
+            (k.odemeYolu === 'almadim'
+              ? ' Ödeme <b>alınmadı</b>.'
+              : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
+                  k.odemeYolu) + '</b>.' : ''))
+          : (k.parcaBekliyor && k.bekliyorMusteriye
+              ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
+                'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
+              : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +
+      '</span>' +
+    '</div>';
+
+  return dukkan + arac + kalemler + durum;
+}
+
 /* ---- ORTAK NESNENİN DAVRANIŞI DA ORTAK ----
    Satır iki ekranda kullanılıyor; tıklamayı her ekrana ayrı yazmak
    nesneyi ikiye bölmek olurdu. */

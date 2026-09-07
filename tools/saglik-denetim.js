@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 39 test.
+/* Tamiron prototip saglik denetimi — 40 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -1227,6 +1227,53 @@ function stilMetni() {
   });
   showScreen('home');
 
+
+  /* 40) KATMAN ODAK TUZAGI + ORTU YIGINI (07.09.2026)
+     14. test cekmecenin odak tuzagini olcuyor. 07.09'da IKINCI bir
+     ortu geldi (katman/popup) ve ayni hata sinifi yeni bir yuzeyde
+     dogdu — ustelik yalnizca kendi tuzagi degil, IKISI BIRDEN acikken
+     ortaya cikan bir hata:
+
+     Ilk yazimda arka plani kapatan islev "ac" derken inert EKLIYOR,
+     "kapat" derken KALDIRIYORDU. Katman kapaninca CEKMECENIN koydugu
+     kilidi de kaldiriyor ve arkadaki 17 oge sekme sirasina donuyordu.
+     Elle bulundu ve ancak denetim IKI KEZ kosturulunca uretiliyordu —
+     cunku denetim katmani acik birakiyordu.
+
+     Bu test iki seyi birden olcuyor:
+       a) katman acikken disarida odaklanabilir oge var mi
+       b) cekmece acikken katman ac/kapa yapilinca CEKMECENIN kilidi
+          duruyor mu (ortu yigini)
+
+     Katmani denetim kendisi aciyor ve kendisi kapatiyor — olctugu
+     durumu geri birakiyor (K-024.1). */
+  if (typeof Katman !== 'undefined' && Katman.ac && typeof openDrawer === 'function') {
+    showScreen('home');
+    var kmOge = document.getElementById('katman');
+    Katman.ac('denetim', '<button id="denetimKatmanDugmesi">tamam</button>');
+    /* kapsa() 12. testin IIFE'sinin icinde; buradan gorunmuyor.
+       Odaklanabilir secici burada kendi basina yaziliyor. */
+    var ODAKLANABILIR = 'button, a[href], input, textarea, select, [tabindex]';
+    var kmDis = Array.prototype.slice.call(document.querySelectorAll(ODAKLANABILIR)).filter(function (el) {
+      return el.offsetParent !== null && !el.disabled && !kmOge.contains(el) && !el.closest('[inert]');
+    });
+    if (kmDis.length) ek('KATMAN-ODAK-SIZINTISI', 'katman', kmDis.length + ' oge');
+    Katman.kapa();
+
+    /* ORTU YIGINI: cekmece altta, katman ustte. */
+    openDrawer();
+    Katman.ac('denetim', '<button id="denetimKatmanDugmesi2">tamam</button>');
+    Katman.kapa();
+    if (!document.querySelector('.topbar').inert) {
+      ek('ORTU-YIGINI', 'katman', 'katman kapaninca cekmecenin kilidi kalkti');
+    }
+    closeDrawer();
+    if (document.querySelector('.topbar').inert) {
+      ek('ORTU-YIGINI', 'katman', 'hepsi kapaliyken kilit kaldi');
+    }
+  }
+  showScreen('home');
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 
@@ -1249,6 +1296,13 @@ function stilMetni() {
 
      Akordiyonun BELGELENMIS varsayilani KAPALI (akordiyonHtml
      `hidden` uretir), o yuzden hepsini kapatmak dogru geri yuklemedir. */
+  /* ⚠️ KATMAN DA KAPATILIR (07.09). 30. test her dugmeye basiyor ve
+     artik dugmelerden biri KATMAN aciyor ("Musteri ne gorecek").
+     Denetim onu acik birakinca sonraki kosuda ortu yigini karisiyor
+     ve odak tuzagi delik gorunuyordu. K-041.2'nin akordiyonlar icin
+     ogrendigi ders, yeni bir ortuye uygulanmamisti. */
+  if (typeof Katman !== 'undefined' && Katman.acikMi && Katman.acikMi()) Katman.kapa();
+
   document.querySelectorAll('.akd-bas').forEach(function (bas) {
     var g = document.getElementById(bas.getAttribute('aria-controls') || '');
     bas.setAttribute('aria-expanded', 'false');

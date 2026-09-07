@@ -185,6 +185,28 @@
     </div>
   </aside>
 
+  <!-- KATMAN (popup) — ORTAK BİLEŞEN (07.09).
+       Cemil iki yerde istedi: *"Müşteri ne görecek popup açılsın"* ve
+       *"telefon yazabileceği/söyleyebileceği basit bir popup"*.
+
+       ⚠️ İKİ POPUP YAZILMADI, BİR BİLEŞEN YAZILDI. İki ayrı overlay,
+       iki ayrı odak tuzağı ve iki ayrı kapatma davranışı demekti;
+       biri mutlaka eksik kalırdı — çekmecenin odak tuzağı bugün tam
+       böyle delindi (K-042.2).
+
+       Gövdesi boş: içeriği `Katman.ac()` dolduruyor. -->
+  <div class="katman-ortu" id="katmanOrtu" hidden></div>
+  <div class="katman" id="katman" role="dialog" aria-modal="true"
+       aria-labelledby="katmanBaslik" hidden inert>
+    <div class="katman-bas">
+      <span class="katman-baslik" id="katmanBaslik"></span>
+      <button class="icon-btn" id="katmanKapat" aria-label="Kapat" title="Kapat">
+        <svg class="ico"><use href="#i-x"></use></svg>
+      </button>
+    </div>
+    <div class="katman-govde" id="katmanGovde"></div>
+  </div>
+
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
