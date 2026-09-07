@@ -84,7 +84,19 @@ const kurulumDugmesi = `<button id="kurBtn" style="display:none;margin:10px 14px
     Uygulamayı yükle
   </button>
   <p id="kurNot" style="display:none;margin:6px 14px 0;color:var(--muted);font-size:var(--tip-sm)">Ana ekrana eklenir, tam ekran açılır.</p>
-  <p id="kurDurum" style="margin:6px 14px 0;color:var(--faint);font-size:var(--tip-xs);line-height:1.7"></p>`;
+  <!-- ⚠️ TANI SATIRI ARTIK GİZLİ (Cemil, 07.09: "Programda en üstte
+       sürüm notları yazıyor. Onu kaldıralım.").
+
+       Şerit bir hata ayıklama aracıydı: telefonda "yükle" seçeneği
+       çıkmadığında sebebini uzaktan göremiyorduk, o yüzden cihazın
+       KENDİSİNDE yazıyordu. Ama ustanın açtığı her ekranın en üstünde
+       duruyordu — ürünün ilk gördüğü şey sürüm damgası olmamalı.
+
+       SİLİNMEDİ, GİZLENDİ: bilgi hâlâ gerekiyor (hangi kopya
+       telefonda?). Konsola `TAMIRON_TESHIS()` yazınca çıkıyor. Görünür
+       olması gereken bir şey değil; SORULDUĞUNDA bulunabilir olması
+       gereken bir şey. -->
+  <p id="kurDurum" hidden style="margin:6px 14px 0;color:var(--faint);font-size:var(--tip-xs);line-height:1.7"></p>`;
 
 const yuva = '<div id="kurulumYuva"></div>';
 if (!html.includes(yuva)) {
@@ -169,6 +181,11 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
   }
 
   yaz();
+  /* Teshis satiri gizli; iceriginin okunabilecegi tek yer konsol. */
+  window.TAMIRON_TESHIS = function () {
+    yaz();
+    return durum ? durum.innerHTML.replace(/<br>/g, ' | ').replace(/<[^>]+>/g, '') : '';
+  };
   if ('serviceWorker' in navigator && navigator.serviceWorker.ready) {
     navigator.serviceWorker.ready.then(yaz).catch(function () {});
   }

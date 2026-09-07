@@ -162,9 +162,9 @@ function kayitKartiHtml(k) {
         ? '<span class="pill warn">parça bekliyor</span>' : '') +
       (!k.teslimTarihi && fiyatiBekleyen(k)
         ? '<span class="pill muted">fiyat bekleniyor</span>' : '') +
-      /* DURUM SAĞDA. "İçeride" burada YAZIYLA duruyor — Cemil:
-         "İçeride olarak yazdığımız durum için kullanmak gerekirse
-         serviste kullan." Araç listesinde çerçeve yetiyordu (K-019.2),
+      /* DURUM SAĞDA. Kelime **"Serviste"** — Cemil, 07.09:
+         *"İçeride kelimesi yerine serviste kelimesi kullanılacak."*
+         Araç listesinde çerçeve yetiyordu (K-019.2),
          çünkü orada tek soru "bu araç şu an bizde mi". Servis
          listesinde iki durum var (içeride · teslim edildi) ve ikisi
          de yazıyla söyleniyor; biri yazı öbürü çerçeve olsaydı usta
@@ -172,7 +172,7 @@ function kayitKartiHtml(k) {
       '<span class="ak-durum">' +
         (k.teslimTarihi
           ? '<span class="pill ok">Teslim edildi</span>'
-          : '<span class="pill accent">İçeride</span>') +
+          : '<span class="pill accent">Serviste</span>') +
       '</span>' +
     '</div>' +
     '<div class="ak-is-ne">' + (k.sikayet || 'ne yapılacağı yazılmamış') + '</div>' +
@@ -244,7 +244,7 @@ function kayitSatiriHtml(k, s) {
       '<div class="tl-foot">' +
         (k.teslimTarihi
           ? '<span class="pill ok">teslim edildi</span>'
-          : '<span class="pill accent">içeride</span>') +
+          : '<span class="pill accent">serviste</span>') +
         /* Araç geçmişinde de iki bekleme AYRI (kuyruk 4). */
         (!k.teslimTarihi && k.parcaBekliyor
           ? '<span class="pill warn">parça bekliyor</span>' : '') +

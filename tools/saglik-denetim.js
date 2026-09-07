@@ -10,7 +10,28 @@ function stilMetni() {
   return t.replace(/\/\*[\s\S]*?\*\//g, ' ');
 }
 
-  var b=[];function ek(t,e,d){b.push(t+' | '+e+' | '+d);}
+  /* ⚠️ ÖLÇÜLEMİYORSA DÜZEN TESTİ KONUŞMAZ (07.09).
+     `OLCULEBILIR` bayrağı 05.09'da yazılmıştı ama YALNIZ BİR TESTE
+     (YATAY-TASMA) bağlanmıştı. Sonradan eklenen düzen testleri onu
+     hiç sormadı; önizleme bölmesi sıfır genişlikte açılınca denetim
+     **on sahte bulgu** üretti — `olcum: ATLANDI` diye yazdığı hâlde.
+     Ölçmediğini bilen ama yine de suçlayan bir araç, susan bir araçtan
+     kötüdür.
+
+     Ders K-041.3'ün aynısı: bir kural bir yerde uygulanmışsa, ötekine
+     de uygulanacağı garanti değildir. Bu yüzden bayrak artık tek tek
+     testlere değil, **`ek()`in kendisine** bağlı — yeni bir düzen
+     testi yazan kişinin hatırlaması gerekmiyor. */
+  var OLCUME_BAGLI = {
+    'YATAY-TASMA': 1, 'IC-TASMA': 1, 'KIRPILAN-METIN': 1, 'KIRPILMIS-KUTU': 1,
+    'GIZLI-KAYDIRMA': 1, 'SESSIZCE-KIRPILAN-ALAN': 1, 'SIKISIK': 1,
+    'KUCUK-HEDEF': 1, 'ORTEN-YAPISKAN': 1, 'EZILEN-GOVDE': 1,
+    'GIZLI-AMA-GORUNUR': 1, 'DRAWER-ARKA-PLAN': 1, 'KOYU-SIYAH': 1
+  };
+  var b=[];function ek(t,e,d){
+    if (!OLCULEBILIR && OLCUME_BAGLI[t]) return;
+    b.push(t+' | '+e+' | '+d);
+  }
 
   /* ⚠️ DENETIM OLCTUGU SEYI BOZMAZ (04.09.2026).
      30. test (SAHTE-EYLEM) her dugmeye BASIYOR; 27. test ACIK_KAYIT ve
@@ -1186,8 +1207,13 @@ function stilMetni() {
      bu bir kayip degil — asil metin degil. */
   ekranlar.forEach(function (a) {
     showScreen(a);
-    document.querySelectorAll('#screen-' + a + ' input, #screen-' + a + ' textarea')
+    document.querySelectorAll('#screen-' + a + ' input')
       .forEach(function (el) {
+        /* ⚠️ TEXTAREA HARIC (07.09). Textarea metni SARAR; yatay
+           kirpma onun hata bicimi degil. Olculen 15-16 px fark,
+           dikey kaydirma cubugunun payiydi — testin kendi yanlis
+           pozitifi. Tek satirlik <input> ise gercekten keser. */
+        if (el.tagName === 'TEXTAREA') return;
         if (el.type === 'hidden' || el.type === 'checkbox' || el.type === 'radio') return;
         if (el.offsetParent === null && el.offsetHeight === 0) return;
         if (!el.value) return;

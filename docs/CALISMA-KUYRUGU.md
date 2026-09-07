@@ -39,16 +39,16 @@ cinsten değil ve karıştırılırsa iş tıkanır.
 
 | # | İş | Durum |
 |---|---|---|
-| A1 | *"İçeride"* → **"Serviste"** (her yerde, tek terim) | AÇIK |
-| A2 | Üstteki **sürüm/tanı şeridi** kalksın | AÇIK |
-| A3 | Footer'da gezinme tuşları — header'la **birlikte** çalışsın | AÇIK |
-| A4 | Gider ekle **+** düğmesi mikrofonla hizalı/yakın | AÇIK |
-| A5 | Servis kaydı ekle: **km ilk aşamada olmasın** | AÇIK |
-| A6 | Ses ekranı: *"şunları da diyebilirsin"* ve alttaki *"mikrofona dokun"* şeridi kalksın | AÇIK |
-| A7 | Kayıtsız araç metni yanlış → *"Araç kayıtlı değil. Ruhsatı çekebilirsin ya da bu aşamayı atlayabilirsin."* | AÇIK |
-| A8 | Kayıt detayı: sahibi ve iletişim **aynı font, büyük**; *"Sahibi"*den sonra boşluk | AÇIK |
-| A9 | *"Ne istiyor?"* → **"Açıklama"** | AÇIK |
-| A10 | *"Alt satıra ekle"* kalksın — textarea kendiliğinden kaydetsin | AÇIK |
+| A1 | *"İçeride"* → **"Serviste"** (her yerde, tek terim) | **BİTTİ** |
+| A2 | Üstteki **sürüm/tanı şeridi** kalksın | **BİTTİ** |
+| A3 | Footer'da gezinme tuşları — header'la **birlikte** çalışsın | **BİTTİ** |
+| A4 | Gider ekle **+** düğmesi mikrofonla hizalı/yakın | **BİTTİ** |
+| A5 | Servis kaydı ekle: **km ilk aşamada olmasın** | **BİTTİ** |
+| A6 | Ses ekranı: *"şunları da diyebilirsin"* ve alttaki *"mikrofona dokun"* şeridi kalksın | **BİTTİ** |
+| A7 | Kayıtsız araç metni yanlış → *"Araç kayıtlı değil. Ruhsatı çekebilirsin ya da bu aşamayı atlayabilirsin."* | **BİTTİ** |
+| A8 | Kayıt detayı: sahibi ve iletişim **aynı font, büyük**; *"Sahibi"*den sonra boşluk | **BİTTİ** |
+| A9 | *"Ne istiyor?"* → **"Açıklama"** | **BİTTİ** |
+| A10 | *"Alt satıra ekle"* kalksın — textarea kendiliğinden kaydetsin | **BİTTİ** |
 | A11 | **A-M13**: satır başına *"kim getirdi"* geri | AÇIK |
 | A12 | **A-M15**: parça beklendiğini müşteriye söylemek **seçenek** olsun | AÇIK |
 | A13 | Serviste **olmayan** araca *"işin özeti"* ve *"parça bekliyoruz"* şablonları çıkmasın | AÇIK |

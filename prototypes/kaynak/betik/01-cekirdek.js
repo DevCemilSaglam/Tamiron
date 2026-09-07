@@ -157,11 +157,16 @@ var Ekran = (function () {
     goster(ileriYigin.pop());
   }
 
+  /* ⚠️ TEK DURUM, KAÇ GÖVDE OLURSA OLSUN (07.09). Geri/ileri tuşları
+     artık hem üstte hem altta; `data-nav` ile işaretli HEPSİ aynı anda
+     soluklaşıyor. id ile arasaydık ikinci gövde sessizce hep açık
+     kalırdı — ve "geri" gidilemeyecek yerde basılabilir görünürdü. */
   function geriTazele() {
-    var b = document.getElementById('geriBtn');
-    if (b) b.disabled = gecmis.length === 0;
-    var f = document.getElementById('ileriBtn');
-    if (f) f.disabled = ileriYigin.length === 0;
+    var yok = { geri: gecmis.length === 0, ileri: ileriYigin.length === 0 };
+    document.querySelectorAll('[data-nav]').forEach(function (b) {
+      var y = b.getAttribute('data-nav');
+      if (y === 'geri' || y === 'ileri') b.disabled = yok[y];
+    });
   }
 
   return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
@@ -414,14 +419,23 @@ var Cekmece = (function () {
      yetmiyor: sekme tuşu arkadaki ekranın düğmelerinde gezinmeye
      devam ediyordu. Denetimin DRAWER-ODAK-SIZINTISI testi tam bu
      hatayı otomatikleştiriyor ve ilk yazımda yakaladı. */
+  /* ⚠️ 07.09 — LİSTE DEĞİL YAPI. Eskiden `.topbar` ve `.screen`ler tek
+     tek sayılıyordu. Alt gezinme çubuğu eklenince (A3) o liste eksik
+     kaldı ve çekmece açıkken **footer'ın tuşları sekme sırasında
+     kaldı** — denetimin DRAWER-ODAK-SIZINTISI testi anında yakaladı.
+
+     Sayılan bir liste, her yeni kardeşte güncellenmeyi bekler ve bir
+     gün unutulur. Kural artık yapıdan okunuyor: **çekmece ve örtüsü
+     dışındaki her `.device` çocuğu kapanır.** Yarın bir çubuk daha
+     eklenirse kendiliğinden kapsanır. */
   function arkaPlan(kapali) {
-    var ust = document.querySelector('.topbar');
-    if (ust) { if (kapali) ust.setAttribute('inert', ''); else ust.removeAttribute('inert'); }
-    var ekranlar = document.querySelectorAll('.screen');
-    for (var i = 0; i < ekranlar.length; i++) {
-      if (kapali) ekranlar[i].setAttribute('inert', '');
-      else ekranlar[i].removeAttribute('inert');
-    }
+    var cihaz = document.querySelector('.device');
+    if (!cihaz) return;
+    Array.prototype.forEach.call(cihaz.children, function (el) {
+      if (el.id === 'drawer' || el.id === 'drawerOverlay') return;
+      if (kapali) el.setAttribute('inert', '');
+      else el.removeAttribute('inert');
+    });
   }
 
   function ac() {
@@ -797,8 +811,16 @@ document.addEventListener('DOMContentLoaded', function () {
     if (e) e.addEventListener('click', fn);
   };
 
-  bagla('geriBtn', function () { Ekran.geri(); });
-  bagla('ileriBtn', function () { Ekran.ileri(); });
+  /* Gezinme tuşları DELEGASYONLA — üstteki ve alttaki gövdeler aynı
+     dinleyiciden besleniyor (ortak nesne kuralı). */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-nav]');
+    if (!t) return;
+    var y = t.getAttribute('data-nav');
+    if (y === 'geri') Ekran.geri();
+    else if (y === 'ileri') Ekran.ileri();
+    else if (y === 'ana') Ekran.ac('home');
+  });
   bagla('menuBtn', function () { Cekmece.ac(); });
   bagla('drawerClose', function () { Cekmece.kapa(); });
   bagla('drawerOverlay', function () { Cekmece.kapa(); });

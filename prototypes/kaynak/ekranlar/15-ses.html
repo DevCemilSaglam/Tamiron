@@ -84,7 +84,7 @@ var SES_BAGLAM = {
   kayitlar: {
     ad: 'Servis kayıtlarında ara',
     ipucu: 'Plaka ya da yapılan iş söyleyebilirsin.',
-    ornekler: ['34 ABC 123 ara', 'balata ara', 'içeridekileri göster']
+    ornekler: ['34 ABC 123 ara', 'balata ara', 'servistekileri göster']
   },
   musteriler: {
     ad: 'Müşterilerde ara',
@@ -428,7 +428,7 @@ function sesOzet(o) {
     baslik: 'Aranacak',
     satirlar: [['Nerede', ({ araclar: 'Araçlar', kayitlar: 'Servis kayıtları',
                              musteriler: 'Müşteriler' })[o.hedef]],
-               ['Ne', o.terim || 'içeridekiler']],
+               ['Ne', o.terim || 'servistekiler']],
     eylem: 'Ara' };
 
   if (o.tur === 'bilinmeyen-arac') return {
@@ -436,7 +436,7 @@ function sesOzet(o) {
     satirlar: [['Duyulan plaka', o.plaka]], eylem: 'Ruhsatı çek' };
 
   if (o.tur === 'teslim-edilecek-kayit-yok') return {
-    baslik: 'Bu araç zaten içeride değil',
+    baslik: 'Bu araç zaten serviste değil',
     satirlar: [['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model]],
     eylem: 'Aracın geçmişini aç' };
 
@@ -533,6 +533,21 @@ function sesCiz() {
   var durum = document.getElementById('sesDurum');
   var acik = document.getElementById('sesAciklama');
   var gov = document.getElementById('sesGovde');
+
+  /* ⚠️ ÖRNEKLER YALNIZ BOŞ HÂLDE (Cemil, 07.09): *"Ses kaydı alırken
+     'şunları da diyebilirsin' olmasın. Kafa karıştırmasın."*
+
+     Haklı: usta konuşmuşken ekranın altında ona başka cümleler
+     önermek, söylediğinin yanlış olduğunu ima ediyor. Örnek, cümleyi
+     KURMADAN ÖNCE işe yarar; kurulduktan sonra gürültü.
+
+     Tamamen silmedim çünkü prototipte **konuşmanın tek yolu** bu
+     çipler — gerçek mikrofon yalnız güvenli adreste çalışıyor (K-015).
+     Silseydim sesli yol prototipte denenemez olurdu. Cemil onayına
+     açık (A-M16). */
+  var ornekAcik = (sesDurumu === 'bos');
+  document.getElementById('sesOrnekBas').hidden = !ornekAcik;
+  document.getElementById('sesOrnekler').hidden = !ornekAcik;
 
   if (sesDurumu === 'bos') {
     durum.textContent = sesMotorVar() ? 'Dokun ve söyle' : 'Örneklerden birine dokun';
@@ -697,7 +712,12 @@ Ekran.tanim('ses', {
     document.getElementById('sesOrnekler').innerHTML = b.ornekler.map(function (c, i) {
       return '<button class="cip" data-ornek="' + i + '">' + c + '</button>';
     }).join('');
-    document.getElementById('sesMotorNot').textContent = sesMotorNotu();
+    /* ⚠️ MOTOR NOTU ARTIK YAZILMIYOR (Cemil, 07.09): *"Altta
+       mikrofona dokun ve şöyle alanı da olmasın. Bu bilgi gereksiz."*
+       Şerit "mikrofon yalnız güvenli adreste açılır" diyordu — bu
+       PROTOTIPIN sorunu, ustanın değil. Ustaya kendi telefonunda
+       hiç karşılaşmayacağı bir kısıtı anlatıyordu. */
+    document.getElementById('sesMotorNot').textContent = '';
     sesCiz();
   }
 });

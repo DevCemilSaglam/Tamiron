@@ -601,6 +601,22 @@ solda birak) */
 /* Baslik + eylem: baslik KISALIR,
 eylem butonu kisalmaz — yoksa
    "Yapilacak isler / Fotograftan" satiri tasiyordu (olcum: 381 > 373). */
+/* ⚠️ İKİ EYLEM DÜĞMESİ BİRLİKTE DURUR (Cemil, 07.09: "Gider ekle
+   alanında + buttonu mikrofon butonuna yakın, hizalı olsun").
+
+   Sebep `space-between`di: üç çocuk varsa (başlık · + · mikrofon)
+   tarayıcı ARALARINI eşitliyor ve **+ düğmesi ortada** kalıyordu.
+   İki düğme aynı işin iki yolu (elle / sesle) — ayrı yerlerde
+   durunca ayrı işler gibi okunuyorlar.
+
+   `.lbl-eylem` ikisini tek çocuğa indiriyor: başlık solda, ikili sağda,
+   aralarında 8 px. */
+.section-label .lbl-eylem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: none;
+}
 .section-label.with-action {
   justify-content: space-between;
   /* Kart icinde boslugu KAP verir (K-028.3); burada 14 px kalinca

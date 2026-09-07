@@ -217,16 +217,19 @@
       </div>
     </div>
 
-    <!-- KİLOMETRE — ARTIK HER ZAMAN GÖRÜNÜR, İSTEĞE BAĞLI (06.09).
-         Eskiden yalnız "Bakım" seçilince açılıyordu; tür seçimi
-         kalkınca alanı açacak bir şey kalmadı. Km'yi bakımda ZORUNLU
-         yapmak da doğru değil: usta göstergeye bakmadan kayıt açıyor
-         olabilir ve zorunlu alan onu yalan yazmaya iter. -->
-    <div class="field" id="kmAlan">
-      <label for="rKm">Kilometre</label>
-      <input id="rKm" class="mono" data-giris="km" inputmode="numeric" placeholder="142.500" autocomplete="off" />
-      <div class="plate-hint">İsteğe bağlı. Yazarsan bir sonraki bakım hatırlatması buna göre kurulur.</div>
-    </div>
+    <!-- ⚠️ KİLOMETRE BU EKRANDAN KALKTI (Cemil, 07.09):
+         *"Servis kaydı alanında km ilk aşamada olmayacak. Sesle
+         kaydedilir ve km varsa zaten işleyecektir."*
+
+         Doğru: kayıt AÇMA anı, ustanın göstergeye bakmadığı andır —
+         araç daha yeni girdi. Km bakımda gerekiyor (K-002) ama
+         gerektiği yer burası değil, **servis kaydının kendisi**: usta
+         aracın başına geçtiğinde yazıyor.
+
+         SESLE GELEN KM KAYBOLMUYOR: ses "kilometre 88 bin" duyarsa
+         RUHSAT_ONDOLGU.km ile geliyor ve kayda doğrudan işleniyor —
+         ekranda alan olmasa da. Söylenen bilgi, sorulmayan alandan
+         bağımsız. -->
 
     <div id="rUyari"></div>
 
@@ -248,7 +251,7 @@ var rSesNotu = null;
    görünen ortak nesne, biçimi de ortak. */
 
 var R_ALANLAR = ['rPlaka', 'rMarka', 'rModel', 'rYil', 'rMotor', 'rRenk',
-  'rYakit', 'rSahip', 'rTel', 'rKm', 'rVin', 'rMotorNo', 'rSilindir',
+  'rYakit', 'rSahip', 'rTel', 'rVin', 'rMotorNo', 'rSilindir',
   'rGuc', 'rKoltuk', 'rDepo', 'rIlkTescil'];
 
 function rDeger(id) {
@@ -305,7 +308,7 @@ function ruhsatDurum() {
         '<span class="n-body"><b>Bu araç kayıtlı</b> — ' + a.marka + ' ' + a.model +
           (a.sahipAd ? ' · ' + a.sahipAd : '') + '.<br>' +
           (acik
-            ? 'Zaten <b>içeride</b> ve açık bir kaydı var.'
+            ? 'Zaten <b>serviste</b> ve açık bir kaydı var.'
             : 'Ruhsat çekmene gerek yok.') +
         '</span>' +
       '</div>' +
@@ -321,11 +324,19 @@ function ruhsatDurum() {
       '<div class="notice warn">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
         '<span class="n-body"><b>Bu araç kayıtlı değil.</b> ' +
+          /* ⚠️ 07.09 — METİN CEMİL'İN DÜZELTMESİYLE.
+             Eskiden *"Söylediklerin ruhsat ekranına yazıldı; ruhsatı
+             çekince marka, model ve motor kendiliğinden dolar"* diyordu.
+             Cemil: *"Bu açıklama doğru değil. Araç kayıtlı değil.
+             Ruhsatı çekebilir ya da bu aşamayı atlayabilirsin."*
+
+             Haklı: uzun cümle ustaya BİR ŞEY ÖĞRETMEYE çalışıyordu.
+             Oysa ekranda zaten iki düğme var ve ikisi ne yapılacağını
+             söylüyor. Açıklama, düğmelerin söylediğini tekrar
+             ediyordu. */
           (rOkundu
             ? 'Ruhsat okundu — alanları kontrol et, yanlış varsa düzelt.'
-            : 'Ruhsatını çekersen alanlar kendiliğinden dolar. ' +
-              'Ruhsat yoksa aşağıdaki alanları elle ya da sesle doldur; ' +
-              '<b>ruhsatsız da kayıt açabilirsin</b>.') +
+            : 'Ruhsatı çekebilirsin ya da bu aşamayı atlayabilirsin.') +
         '</span>' +
       '</div>';
     aracKart.hidden = false;
@@ -410,7 +421,6 @@ Ekran.tanim('ruhsat', {
       if (o.plaka) document.getElementById('rPlaka').value = plakaBicim(o.plaka);
       if (o.sahipAd) document.getElementById('rSahip').value = o.sahipAd;
       if (o.sahipTel) document.getElementById('rTel').value = o.sahipTel;
-      if (o.km) document.getElementById('rKm').value = o.km;
       /* ⚠️ SESİN ÇÖZDÜĞÜ TÜR ÇÖPE GİDİYORDU (06.09, ölü uç turu).
          Ses ekranı "bakıma geldi" cümlesinden türü zaten çıkarıyor ve
          RUHSAT_ONDOLGU.tur'a yazıyor; dün buradaki okuma satırını
@@ -418,7 +428,7 @@ Ekran.tanim('ruhsat', {
          edilmeye başladı. İkinci tahmin birincisinden iyi değil —
          üstelik ses, türü `is` metninde geçmeyen bir sözden çıkarmış
          olabilir. Söylenen bilgi, tahmin edilen bilgiyi yener. */
-      rSesNotu = { is: o.is || '', tur: o.tur || null };
+      rSesNotu = { is: o.is || '', tur: o.tur || null, km: o.km || '' };
       ruhsatDurum();
       if (o.is) {
         document.getElementById('rSesBekleniyor').innerHTML =
@@ -542,7 +552,9 @@ document.addEventListener('click', function (e) {
          ekranında düzeltilebilir. */
       tur: (rSesNotu && rSesNotu.tur) || isTuruTahmin(isMetni),
       turElle: !!(rSesNotu && rSesNotu.tur),
-      km: rDeger('rKm'),
+      /* Km ekranda sorulmuyor (07.09); yalnız sesin duyduğu değer
+         geçiyor. Yoksa boş kalır ve servis kaydında yazılır. */
+      km: (rSesNotu && rSesNotu.km) || '',
       /* Sesle söylenen iş şikâyet olarak düşer. */
       sikayet: isMetni,
       acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,

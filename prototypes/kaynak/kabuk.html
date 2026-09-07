@@ -62,10 +62,14 @@
     </div>
     <span class="spacer"></span>
     <nav class="topbar-nav" aria-label="Gezinme">
-      <button class="icon-btn" id="geriBtn" aria-label="Geri" title="Geri">
+      <!-- ⚠️ id DEĞİL data-nav (07.09). Aynı iki tuş artık altta da
+           var; id tekil olmak zorunda olduğu için ikisi ayrı id'ler
+           alsaydı davranış da ikiye bölünürdü. `data-nav` ile ikisi
+           AYNI denetimin iki gövdesi: tek dinleyici, tek durum. -->
+      <button class="icon-btn" data-nav="geri" aria-label="Geri" title="Geri">
         <svg class="ico"><use href="#i-chevron-left"></use></svg>
       </button>
-      <button class="icon-btn" id="ileriBtn" aria-label="İleri" title="İleri">
+      <button class="icon-btn" data-nav="ileri" aria-label="İleri" title="İleri">
         <svg class="ico"><use href="#i-chevron-right"></use></svg>
       </button>
     </nav>
@@ -76,6 +80,29 @@
   <div id="kurulumYuva"></div>
 
   <!-- @@EKRANLAR@@ -->
+
+  <!-- ALT GEZİNME (Cemil, 07.09: "Footerda da navigasyon tuşları
+       olsun. Headerdaki ile entegre/birlikte çalışsın.")
+
+       ⚠️ KOPYA DEĞİL, AYNI DENETİM. Üstteki ile alttaki tuşlar
+       `data-nav` paylaşıyor: tek dinleyici ikisini de dinliyor, tek
+       `geriTazele()` ikisini de soluklaştırıyor. Bir gün geri
+       davranışı değişirse iki yerde değişmeyecek — v1'in en pahalı
+       hatası aynı işi iki yerde yazmaktı.
+
+       NEDEN ALTTA DA GEREKLİ: telefon büyüdükçe üst köşe başparmakla
+       ulaşılmaz oluyor. Aynı işin ikinci gövdesi, ulaşılabilir yerde. -->
+  <footer class="botbar" aria-label="Alt gezinme">
+    <button class="icon-btn" data-nav="geri" aria-label="Geri" title="Geri">
+      <svg class="ico"><use href="#i-chevron-left"></use></svg>
+    </button>
+    <button class="icon-btn" data-nav="ana" aria-label="Ana menü" title="Ana menü">
+      <svg class="ico"><use href="#i-menu"></use></svg>
+    </button>
+    <button class="icon-btn" data-nav="ileri" aria-label="İleri" title="İleri">
+      <svg class="ico"><use href="#i-chevron-right"></use></svg>
+    </button>
+  </footer>
 
   <!-- ================= ÇEKMECE =================
        v1'in bileşenleri, v2'nin içeriği. Üç bölüm:

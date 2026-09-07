@@ -10,6 +10,87 @@
 
 ---
 
+## K-042 · Alt gezinme bir kopya değil, aynı denetimin ikinci gövdesi (07.09.2026)
+
+**Kuyruk 4/A.** Cemil'in on dört maddesi; onu metin ve kaldırma, dördü
+yapısal. Yapısal olan biri üç kusur doğurdu ve üçü de **aynı cinsten**.
+
+### 42.1 · Aynı iş iki yerde durur, iki kere yazılmaz
+
+Cemil: *"Footerda da navigasyon tuşları olsun. Headerdaki ile
+entegre/birlikte çalışsın."*
+
+Kolay yol: alta iki düğme daha koyup `id`'lerini `geriBtnAlt`,
+`ileriBtnAlt` yapmak. **Yapılmadı** — o zaman geri davranışı iki yerde
+yazılırdı ve bir gün biri değişip öteki kalırdı. v1'in en pahalı
+alışkanlığı buydu.
+
+`id` yerine **`data-nav`**: üstteki ve alttaki tuşlar aynı denetimin
+iki gövdesi. Tek delegasyon ikisini de dinliyor, tek `geriTazele()`
+ikisini de soluklaştırıyor. Ölçüldü: gezinilmemişken **ikisi de** kapalı,
+gezinince **ikisi de** açık.
+
+> Alta ayrıca **ana menü** tuşu kondu. Logo zaten ana ekrana gidiyor
+> ama logo üstte; alt çubuğun amacı **başparmakla ulaşılabilirlik**ti,
+> ortasını boş bırakmak o amacı yarım bırakırdı.
+
+### 42.2 · Bir liste, bir gün eksik kalır
+
+Alt çubuk eklenir eklenmez denetim **DRAWER-ODAK-SIZINTISI** verdi:
+çekmece açıkken footer'ın tuşları sekme sırasında kalıyordu.
+
+Sebep: `arkaPlan()` kapanacak öğeleri **tek tek sayıyordu**
+(`.topbar` + `.screen`ler). Yeni kardeş o listeye kendini eklemez.
+
+Kural yapıdan okunacak biçimde yeniden yazıldı: **çekmece ve örtüsü
+dışındaki her `.device` çocuğu kapanır.** Yarın bir çubuk daha
+eklenirse kendiliğinden kapsanır. Ölçüldü: çekmece açıkken dışarıda
+odaklanabilir öğe **0**.
+
+### 42.3 · Ölçemediğini bilen araç, yine de suçluyordu
+
+Aynı anda yükleme koşusu **on bulgu** verdi. Hepsi sahteydi: önizleme
+bölmesi sıfır genişlikte açılıyor, her kutunun `clientWidth`i 0 ve
+taşma testleri patlıyor.
+
+⚠️ **`OLCULEBILIR` bayrağı zaten vardı** — 05.09'da tam bu iş için
+yazılmış, ama **yalnız bir teste** bağlanmıştı. Sonradan eklenen düzen
+testleri onu hiç sormadı. Denetim `olcum: ATLANDI` diye yazdığı hâlde
+on kutuyu suçluyordu.
+
+**K-041.3'ün aynı dersi:** bir kural bir yerde uygulanmışsa ötekine de
+uygulanacağı garanti değildir. Bayrak artık tek tek testlere değil,
+**`ek()`in kendisine** bağlı — yeni bir düzen testi yazanın
+hatırlaması gerekmiyor.
+
+Bir de 39. testin kendi yanlış pozitifi çıktı: `textarea` metni
+**sarar**, yatay kırpma onun hata biçimi değil. Ölçülen 15-16 px fark
+dikey kaydırma çubuğunun payıydı. Test artık yalnız `<input>`e bakıyor.
+
+### 42.4 · Kalanlar — hepsi Cemil'in tarifiyle
+
+| Ne | Neden |
+|---|---|
+| *"İçeride"* → **"Serviste"** | Tek terim. Tamircinin dili |
+| Sürüm/tanı şeridi **gizlendi** | Hata ayıklama aracıydı ve her ekranın en üstünde duruyordu. Silinmedi: `TAMIRON_TESHIS()` ile konsoldan okunuyor. **Görünür olması gereken değil, sorulduğunda bulunabilir olması gereken** bir şey |
+| Ruhsat ekranından **km kalktı** | Kayıt açma anı, ustanın göstergeye bakmadığı andır. Sesin duyduğu km kayboluyor değil — doğrudan kayda işleniyor |
+| *"Şunları diyebilirsin"* yalnız **boş hâlde** | Usta konuşmuşken ona başka cümleler önermek, söylediğinin yanlış olduğunu ima ediyor. Çipler silinmedi: prototipte konuşmanın tek yolu onlar (A-M16) |
+| Kayıtsız araç metni kısaldı | Uzun cümle, ekrandaki iki düğmenin zaten söylediğini tekrar ediyordu |
+| *"Ne istiyor?"* → **"Açıklama"** | Soru biçimi alanı daraltıyordu; alan işin kendisini taşıyor |
+| *"Alt satıra ekle"* **kalktı** | Benim uydurduğum bir sorunu çözüyordu — `textarea` zaten çok satırlı. Klavyenin işini ekrana taşımıştım |
+| Sahibi/iletişim **aynı dilde** | İkisi ayrı bileşenlerden geliyordu ve aynı soruya iki görünüm veriyordu. Rol küçük, **ad büyük**; boşluk `gap` ile — metnin içindeki tek boşluğa güvenilmiyor |
+| Gider **+** mikrofonla yan yana | `space-between` üç çocuğun **arasını** eşitliyordu; + ortada kalıyordu. `.lbl-eylem` ikisini tek çocuğa indirdi |
+
+**Ölçüm:** derleme temiz · 14 ekran · 39 test / **0 bulgu** ·
+`load` koşusu 0 (ve *"ATLANDI"* diyor) · 320 / 375 / 430 px · alt
+gezinme, çekmece odağı ve kişi satırı elle işletildi.
+
+> **Cemil onayına açık (A-M16):** ses ekranındaki örnek çipleri boş
+> hâlde duruyor. Tamamen kalksın mı? Kalkarsa prototipte sesli yol
+> denenemez (gerçek mikrofon yalnız https'te çalışır — K-015).
+
+---
+
 ## K-041 · 320 px'te göz gördü, 38 test görmedi (06.09.2026)
 
 **Kuyruk 9.** Denetim üç genişlikte de 0 diyordu. Ekran görüntüsüne
@@ -2604,6 +2685,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? Kalkarsa prototipte sesli yol denenemez (K-042.4) | Cemil |
 | **A-M14** | *(07.09: Cemil anlamadı — soru sadeleştirildi)* Araç teslim edilince ekran **kapanmıyor**, *"müşteriye özet gönder / geç"* diye soruyor. Bu **bir dokunuş** ekliyor. Sorulmasın, teslim edilir edilmez ana ekrana dönülsün mü? | Cemil |
 | ~~A-M13~~ | **CEVAPLANDI (07.09):** *"Evet, olabilir."* — *"balatayı müşteri getirdi, yağı ben aldım"* gerçek bir durum. Satır başına işaret **geri geliyor** (kuyruk 4/A11). K-033.5'teki gerekçem yanlıştı: Cemil'in *"gerek yok"* dediği şey satır başına **iki çipli soru**ydu, işaretin kendisi değil | — |
 | **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok. Artık **iki** tabloda var | Bir kez öğrenilir; ipucu istenirse eklenir |

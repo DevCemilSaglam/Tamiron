@@ -86,7 +86,7 @@ Ekran.tanim('kayitlar', {
     var icerdeSay = liste.filter(function (k) { return !k.teslimTarihi; }).length;
     document.getElementById('kytSay').textContent = q
       ? liste.length + ' bulundu'
-      : (icerdeSay ? icerdeSay + ' içeride · ' + liste.length + ' kayıt'
+      : (icerdeSay ? icerdeSay + ' serviste · ' + liste.length + ' kayıt'
                    : liste.length + ' kayıt');
     document.getElementById('kytArama').classList.toggle('filled', !!q);
 

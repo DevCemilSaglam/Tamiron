@@ -65,8 +65,12 @@
 
   <div class="card">
     <div class="section-label with-action">
-      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne istiyor?</span>
-      <button class="daire-btn" id="kSikayetMik" aria-label="Ne istediğini sesle yaz" title="Sesle">
+      <!-- ⚠️ "Ne istiyor?" DEĞİL "Açıklama" (Cemil, 07.09).
+           Soru biçimi alanı daraltıyordu: usta oraya yalnız müşterinin
+           İSTEĞİNİ yazacağını sanıyor. Oysa alan işin kendisini
+           taşıyor — sonradan eklenen işler, tespitler, notlar. -->
+      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Açıklama</span>
+      <button class="daire-btn" id="kSikayetMik" aria-label="Açıklamayı sesle yaz" title="Sesle">
         <svg class="ico"><use href="#i-mic"></use></svg>
       </button>
     </div>
@@ -75,16 +79,17 @@
            yapılan işlemler uzun olabilir"). Tek satırlık bir input,
            iki cümlelik bir şikâyetin başını gizliyordu: usta yazdığını
            göremeden yazıyordu. -->
-      <textarea id="kSikayet" rows="4" aria-label="Ne istiyor"
+      <!-- ⚠️ "ALT SATIRA EKLE" DÜĞMESİ KALKTI (Cemil, 07.09):
+           *"Gereksiz. Text area alanına yazınca kaydetsin."*
+
+           Haklı — düğme benim uydurduğum bir sorunu çözüyordu.
+           `textarea` zaten çok satırlı; Enter alt satıra geçiyor.
+           Düğme, klavyenin kendi işini ekrana taşımıştı. Yazılan
+           her tuşta kayda işleniyor (aşağıdaki input dinleyicisi),
+           ayrı bir "kaydet" adımı yok. -->
+      <textarea id="kSikayet" rows="4" aria-label="Açıklama"
                 placeholder="ör. triger seti değişecek"></textarea>
     </div>
-    <!-- SATIR SATIR EKLEME (Cemil: "x işi için geldi, sonra bir şey
-         daha eklemek isteyebilir"). Telefon klavyesinde Enter çoğu
-         zaman "bitti" demektir; alt satıra geçmenin görünür bir yolu
-         olmadan usta her şeyi tek satıra sıkıştırıyordu. -->
-    <button class="btn btn-ghost" id="kSikayetSatir">
-      <svg class="ico"><use href="#i-plus"></use></svg> Alt satıra ekle
-    </button>
 
     <!-- ⚠️ İŞ TÜRÜ BURADA, "SERVİS KAYDI EKLE"DE DEĞİL (06.09).
          Cemil kayıt açma ekranından "ne için geldi"yi kaldırdı: tür
@@ -192,6 +197,20 @@
 /* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
    içi henüz doldurulmamışken bile dokunma hedefinden küçük olamaz. */
 #kayitKunye { min-height: var(--dokun); }
+
+/* Kişi satırı: rol küçük ve soluk, ad büyük ve koyu; aradaki boşluk
+   `gap` ile — metnin içindeki tek boşluk yeterli değildi (A8). */
+#screen-kayit .k-kisi {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin-top: 8px;
+}
+#screen-kayit .k-kisi-rol {
+  font-size: var(--tip-sm); color: var(--muted); flex: none;
+}
+#screen-kayit .k-kisi-ad {
+  font-size: var(--tip-md); font-weight: 700; color: var(--text);
+  min-width: 0; overflow-wrap: anywhere;
+}
 
 /* Müşteri bloğu künyeden ayraçla ayrılır: üstü araç, altı kişi. */
 #kayitMusteri {
@@ -362,19 +381,30 @@ function kayitCiz() {
   /* ---- MÜŞTERİ ----
      Ruhsat sahibi FİRMA olabilir; o zaman aranacak kişi başkasıdır
      (A-M2). İkisi de gösteriliyor, ikisi de aranabiliyor. */
+  /* ⚠️ SAHİBİ ve İLETİŞİM AYNI DİLDE (Cemil, 07.09: "Servis kaydı
+     detay sayfasında sahibi ve iletişim aynı fonttan olsun. Büyük
+     olmalı." + "Sahibi yazısından sonra boşluk da olmalı.")
+
+     İkisi farklı bileşenlerden geliyordu: sahibi `.tl-veri` (küçük,
+     ikincil), iletişim `.ak-kisi` (araç kartından ödünç). Aynı soruya
+     — *"kimi arayacağım"* — iki farklı görünüm veriyorlardı ve
+     ikincisi birincisinden büyük duruyordu.
+
+     Artık tek bileşen: rol küçük ve soluk (Sahibi / İletişim), AD
+     büyük ve koyu. Rol ile ad arasındaki boşluk `gap` ile veriliyor —
+     metin içindeki tek boşluğa güvenmiyor. */
+  function kisiSatiri(rol, ad, tel) {
+    return '<div class="k-kisi">' +
+      '<span class="k-kisi-rol">' + rol + '</span>' +
+      '<b class="k-kisi-ad">' + (ad || 'yazılmamış') + '</b>' +
+    '</div>' + (tel ? telLinkHtml(tel, ad) : '');
+  }
   document.getElementById('kayitMusteri').innerHTML = a
-    ? '<div class="tl-veri">' +
-        '<span>Sahibi <b>' + (a.sahipAd || 'yazılmamış') + '</b></span>' +
-      '</div>' +
-      (a.sahipTel
-        ? telLinkHtml(a.sahipTel, a.sahipAd)
-        : '<p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>') +
+    ? kisiSatiri('Sahibi', a.sahipAd, a.sahipTel) +
+      (a.sahipTel ? '' :
+        '<p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>') +
       (a.iletisimTel || a.iletisimAd
-        ? '<div class="ak-kisi">' +
-            '<span class="ak-kisi-ad">İletişim: <b>' +
-              (a.iletisimAd || 'ad yazılmamış') + '</b></span>' +
-            (a.iletisimTel ? telLinkHtml(a.iletisimTel, a.iletisimAd) : '') +
-          '</div>'
+        ? kisiSatiri('İletişim', a.iletisimAd, a.iletisimTel)
         : '')
     : '<p class="plate-hint">Bu plaka araç listesinde yok.</p>';
 
@@ -575,17 +605,6 @@ document.addEventListener('click', function (e) {
     }
     MESAJ_HEDEF = { plaka: k.plaka, sablon: 'bekliyor' };
     Ekran.ac('mesaj'); return;
-  }
-
-  /* Alt satıra ekleme: metnin sonuna satır atlar ve imleci oraya
-     koyar. Yazılanı SİLMEZ — usta eklemek istiyor, değiştirmek değil. */
-  if (t.id === 'kSikayetSatir') {
-    var ta = document.getElementById('kSikayet');
-    var mevcut = ta.value.replace(/\s+$/, '');
-    ta.value = mevcut ? mevcut + '\n' : '';
-    k.sikayet = ta.value;
-    try { ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length); } catch (x) {}
-    return;
   }
 
   if (t.id === 'kSikayetMik' || t.id === 'kSesleEkle') {
