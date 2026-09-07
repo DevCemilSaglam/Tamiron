@@ -93,7 +93,7 @@ const kurulumDugmesi = `<button id="kurBtn" style="display:none;margin:10px 14px
        duruyordu — ürünün ilk gördüğü şey sürüm damgası olmamalı.
 
        SİLİNMEDİ, GİZLENDİ: bilgi hâlâ gerekiyor (hangi kopya
-       telefonda?). Konsola `TAMIRON_TESHIS()` yazınca çıkıyor. Görünür
+       telefonda?). Konsola TAMIRON_TESHIS() yazinca cikiyor. Gorunur
        olması gereken bir şey değil; SORULDUĞUNDA bulunabilir olması
        gereken bir şey. -->
   <p id="kurDurum" hidden style="margin:6px 14px 0;color:var(--faint);font-size:var(--tip-xs);line-height:1.7"></p>`;
@@ -275,6 +275,36 @@ html = html.replace('__SURUM__', surum);
 
 /* ---------- 8) yaz ---------- */
 fs.mkdirSync(APP, { recursive: true });
+/* ---------- URETILEN BETIK AYRISIYOR MU — YAZIMDAN ONCE ----------
+   ⚠️ 07.09 — pwa-build ENJEKTE ETTIGI JS'i hic dogrulamiyordu.
+   Bugun kendi kaynagimda bir sablon dizgesini yanlislikla kapattim;
+   onu Node yakaladi cunku kendi dosyasindaydi. Ama enjekte edilen
+   METIN icindeki bir sozdizimi hatasini kimse yakalamazdi: dosya
+   uretilir, telefona gider, orada sessizce olurdu.
+
+   prototip-derle'nin 7. denetimi tam bu isi yapiyor. Ders orada
+   ogrenilmisti, buraya uygulanmamisti — K-041.3'un aynisi.
+
+   ⚠️ VE BEKCI YAZIMDAN ONCE KOSAR. Ilk yazimda dosyalar yazildiktan
+   SONRA kontrol ediyordum ve hata mesaji "app/ YAZILMADI" diyordu —
+   yazilmisti. Yalan soyleyen bir hata mesaji, hatanin kendisinden
+   once duzeltilir. */
+{
+  const bloklar = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)];
+  let hatali = 0;
+  bloklar.forEach((m, i) => {
+    try { new Function(m[1]); }
+    catch (e) {
+      hatali++;
+      console.error('HATA: uretilen ' + (i + 1) + '. <script> ayrismiyor — ' + e.message);
+    }
+  });
+  if (hatali) {
+    console.error('app/ YAZILMADI. ' + hatali + ' bozuk betik blogu var.');
+    process.exit(1);
+  }
+}
+
 fs.writeFileSync(path.join(APP, 'fonts.css'), fontCss);
 fs.writeFileSync(path.join(APP, 'index.html'), html);
 fs.writeFileSync(path.join(APP, 'sw.js'), sw);
