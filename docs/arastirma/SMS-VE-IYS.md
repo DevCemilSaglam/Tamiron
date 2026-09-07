@@ -46,6 +46,11 @@ Bizim hâlimiz kelimesi kelimesine bu:
 
 **İdari para cezası** kanunda m.6 için 1.000–5.000 TL, m.8 için 2.000–15.000 TL olarak yazılı. ⚠️ Bunlar **2014 tutarları** ve her yıl yeniden değerleme oranıyla artıyor — **güncel rakam bunlar değildir.**
 
+> **✔️ 08.09.2026'da güncellendi** (`TOPLU-MESAJ.md` §1): onaysız ileti
+> **2.859–14.309 TL**, **toplu gönderimde 10 katına kadar**; ret
+> hakkının üç iş günü içinde işlenmemesi **3.799–28.544 TL**.
+> Şüphemiz doğruymuş — taban üç kat üstündeymiş.
+
 ---
 
 ## 2 · Muafiyete rağmen zorunlu olan iki şey

@@ -10,6 +10,130 @@
 
 ---
 
+## K-045 · Üç araştırma: ikisi "yazma", biri "başka türlü yaz" dedi (08.09.2026)
+
+**Kuyruk 4/D.** Kod yok; karar malzemesi. Üçü de aynı biçimde bitiyor:
+*yedi işe hizmet ediyor mu, etmiyorsa neden.*
+
+### 45.1 · Sanal POS — soru "yapabilir miyiz" değil, "parayı kim tutuyor"
+
+`arastirma/SANAL-POS.md`
+
+İki model var ve aralarındaki fark teknik değil **cezai**:
+
+| | Parayı BİZ topluyoruz | Parayı DÜKKÂN topluyor |
+|---|---|---|
+| Sıfat | **Ödeme kuruluşu** | **Teknik hizmet sağlayıcı** |
+| Lisans | TCMB izni **zorunlu** | gerekmiyor (6493 m.12/2-ğ) |
+| İzinsiz | **1–3 yıl hapis + 5.000 güne kadar adli para cezası** (m.28) | — |
+
+Ayırt edici ölçü tek cümle: **işlemin hiçbir anında fonun sahibi
+olmamak.** Para bir an bile bizim hesabımıza uğrarsa istisna düşer.
+
+> Bu, projede karşılaştığımız en sert kısıt. Muhasebede yanlış rakam
+> göstermek ustayı yanıltır; burada yanlış model **suçtur**.
+
+**Karar: Model A hiç konuşulmaz. Model B yazılabilir ama bu fazda
+yazılmaz** — ödeme kuruluşu sözleşmesi ve *"ödendi"* bilgisini okuyacak
+bir **backend** gerektiriyor, bu fazda backend yok.
+
+**Gerçek bitişiği ALACAK.** Tamircinin dördüncü isteği *"ödemeyi nasıl
+aldığını bilmek"* — bir **kayıt** isteği. Ama veresiyesi olan müşteriye
+özetle birlikte bir ödeme linki gitmesi, ustanın *"ne zaman alacağım"*
+sorusuna gerçekten dokunuyor. **Sıra: önce alacak (B), sonra link.**
+
+### 45.2 · Toplu mesaj — muafiyetimizin bittiği yer
+
+`arastirma/TOPLU-MESAJ.md`
+
+`SMS-VE-IYS.md`'de bulduğumuz muafiyet (bakım hatırlatmasına onay
+gerekmiyor) **kampanyayı kapsamıyor**: muafiyet *"temin edilen hizmete
+ilişkin bakıma yönelik"* iletiler için. *"Bu ay yağ değişiminde %20
+indirim"* temin edilmiş bir hizmete ilişkin değil, **yeni bir satışa**
+yöneliktir.
+
+**Aynı ürün, aynı liste, aynı kanal — farklı hukuk.**
+
+⚠️ **Ve daha ağırı: toplu mesaj WhatsApp modelimizi çökertiyor.**
+`WHATSAPP.md`'de A yolunu seçmiştik — *"usta kendi WhatsApp'ından
+gönderiyor, hiçbir kurulum yok"*. Kişisel hesaptan ya da Business
+**uygulamasından** toplu gönderim Meta'nın şartlarına aykırı ve
+**numaranın engellenmesine** yol açıyor.
+
+> **Ustanın numarası banlanırsa yalnız kampanya durmaz** — özet
+> gönderme, *"aracınız hazır"*, *"parça bekliyoruz"* ve bakım
+> hatırlatması da durur. **Kampanya özelliği, çalışan altı işi riske
+> atıyor.** Tek başına erteleme gerekçesi budur.
+
+**Karar: kampanya bu fazda yazılmaz.** Önündeki engel teknik değil,
+**onay toplama**: bugün araç kaydında telefon var ama **izin yok**.
+Önerilen küçük adım, iznin kaydı için tek bir alan — bugün hiçbir şeyi
+bozmaz, ileride önü açar.
+
+**Cezalar güncellendi:** `SMS-VE-IYS.md`'de *"1.000–5.000 TL, bunlar
+2014 tutarları, güncel değil"* diye işaretlemiştik. Doğruymuş — Eylül
+2026 taraması: onaysız ileti **2.859–14.309 TL**, **toplu gönderimde
+10 katına kadar**; ret hakkının işlenmemesi **3.799–28.544 TL**.
+*Bir araştırma notunun kendi belirsizliğini işaretlemesi, bir sonraki
+turda onu düzeltilebilir kılıyor.*
+
+### 45.3 · C3'ün cevabı buradan çıktı — arşiv seçenek değil, zorunluluk
+
+Kuyruk 4/C3'te mesaj arşivini *"saklanacak yeri belli olmayan veri"*
+diye ertelemiş, **ne kadar süre saklanacağını** D2'ye bırakmıştık.
+
+Cevap mevzuatta: onay kayıtları geçerlilik bittikten, **ticari
+elektronik iletilere ilişkin diğer kayıtlar** kayıt tarihinden itibaren
+**ÜÇ YIL** saklanır *(süre 04.01.2020'de bir yıldan üçe çıkarıldı)*.
+Ve **ispat yükü gönderende**.
+
+**C3'ün gerekçesi değişti:** arşiv *"spam kontrolü için"* değil,
+**yasal zorunluluk** olduğu için yazılacak — ve o zaman alanları da
+belli: kime, hangi kanaldan, ne zaman, hangi metin, hangi onaya
+dayanarak.
+
+### 45.4 · Dışa aktarma — kütüphane gerekmiyor
+
+`arastirma/DISA-AKTARMA.md`
+
+İlk refleks *"jsPDF + SheetJS ekleyelim"*di. Ölçünce ikisi de gereksiz
+çıktı:
+
+* **PDF = `window.print()`** + bir `@media print` stili. **0 KB**,
+  Türkçe sorunsuz (tarayıcının kendi metin motoru), her cihazda aynı.
+  jsPDF'in varsayılan yazı tipleri UTF-8 desteklemiyor; Türkçe için
+  **TTF gömmek** gerekiyor — yüz KB'lar.
+* **Excel = CSV**, ama **iki tuzağıyla**: başına **UTF-8 BOM** (yoksa
+  Excel ANSI sanıp `Dükkân` → `DÃ¼kkÃ¢n` yapıyor) ve ayraç olarak
+  **`;`** (Excel virgülü değil, **bölgesel liste ayırıcısını**
+  kullanıyor; Türkiye'de virgül ondalık ayırıcı olduğu için ayraç
+  noktalı virgül). Virgülle yazılan CSV Türkçe Excel'de **tek sütuna**
+  düşer.
+
+**Üçüncü tuzak bizim kendi kuralımızdan:** ekranda `1.900` yazıyoruz;
+CSV'ye **ham rakam** (`1900`) yazılmalı, yoksa Excel'de toplam
+alınamaz. K-037'nin kuralı: aynı veri, iki okuyucuya iki gösterim.
+
+**Karar: ikisi de yazılsın, kütüphanesiz** — ama B2 (ay bazında gider
+toplamı) olmadan dışa aktarılacak tablo yok.
+
+### 45.5 · Üçünün ortak sonucu
+
+Üç istek de **K-022'nin kapsam kararına** dayanıyor. Sanal POS alacağı,
+dışa aktarma gider tablosunu, kampanya da izin altyapısını bekliyor.
+
+> **Hiçbiri "olmaz" demiyor; üçü de "önce şu" diyor.** Ve o "şu" aynı
+> şey: muhasebe kapsamının Cemil tarafından açıkça genişletilmesi.
+
+**Ölçüm:** kod değişmedi; prototipe dokunulmadı. Üç belge, on üç
+kaynak, altı doğrulanamayan nokta işaretlendi.
+
+> **Cemil onayına açık:** **A-M20** (sanal POS faz dışı) ·
+> **A-M21** (kampanya ertelendi, yerine izin alanı önerildi) ·
+> **A-M22** (PDF için kütüphane değil tarayıcı yazdırması).
+
+---
+
 ## K-044 · Kaydırma artık siler — onay değil, GERİ ALMA (07.09.2026)
 
 **Kuyruk 4/C.** Üç karar; biri uygulandı, ikisi gerekçesiyle yazıldı ve
@@ -2854,6 +2978,9 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M22** | Dışa aktarmada PDF için **kütüphane yerine tarayıcı yazdırması** öneriliyor — *"PDF olarak kaydet"* yeter mi? (K-045.4) | Cemil |
+| **A-M21** | **Kampanya ertelendi**; yerine araç/müşteri kaydına *"ticari ileti izni"* alanı öneriliyor. Kampanyayı bu fazda istiyorsan yol: İYS kaydı → onay toplama → WhatsApp Business API → şablon onayı (K-045.2) | Cemil |
+| **A-M20** | **Sanal POS faz dışı** bırakıldı. Amaç *"Tamiron müşterilerden para toplasın"*sa bu ürün kararı değil **şirket kararıdır** — ödeme kuruluşu lisansı gerektirir (K-045.1) | Cemil |
 | **A-M19** | Kaydırarak silme kayıt satırında da **doğrudan siliyor** — sen yalnız gider için söylemiştin; aynı jest iki anlama gelmesin diye hizaladım (K-044.1) | Cemil |
 | **A-M18** | *"Sadece mesaj gözüksün"* — katmanda **müşterinin gördüğü sayfa** gösteriliyor, mesaj metni değil (o zaten üstteki alanda). Doğru okuma mı? (K-043.2) | Cemil |
 | **A-M17** | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta hâlâ çıkıyor. Cemil yalnız iki şablonu saymıştı (*özet*, *parça bekliyoruz*); üçüncüsü de mantıken yanlış görünüyor — elensin mi? | Cemil |

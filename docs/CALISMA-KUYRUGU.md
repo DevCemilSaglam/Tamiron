@@ -94,9 +94,9 @@ cinsten değil ve karıştırılırsa iş tıkanır.
 
 | # | Konu | Çıktı |
 |---|---|---|
-| D1 | **Sanal POS**: şartları, maliyeti, tamirciye faydası var mı | `arastirma/SANAL-POS.md` + öneri |
-| D2 | **Toplu mesaj / kampanya**: İYS, ticari ileti izni, yasal sınır | `arastirma/TOPLU-MESAJ.md` — SMS-VE-IYS.md'nin devamı |
-| D3 | **PDF / Excel dışa aktarma**: çevrimdışı bir PWA'da nasıl | `arastirma/DISA-AKTARMA.md` |
+| ~~D1~~ | **BİTTİ** → `arastirma/SANAL-POS.md`. Soru *"yapabilir miyiz"* değil **"parayı kim tutuyor"**: parayı biz tutarsak ödeme kuruluşu oluruz, izinsizi **1–3 yıl hapis** (6493 m.28). Dükkânın kendi POS'una yönlendirme yasal (m.12/2-ğ) ama **backend ister**. Gerçek bitişiği **alacak** (K-045.1) |
+| ~~D2~~ | **BİTTİ** → `arastirma/TOPLU-MESAJ.md`. Bakım hatırlatması muafiyeti **kampanyayı kapsamıyor**; üstelik toplu gönderim **WhatsApp A yolunu çökertiyor** — ustanın numarası banlanırsa çalışan **altı iş** birden durur. C3'ün saklama sorusu da cevaplandı: **üç yıl**, ispat yükü gönderende (K-045.2, K-045.3) |
+| ~~D3~~ | **BİTTİ** → `arastirma/DISA-AKTARMA.md`. **Kütüphane gerekmiyor:** PDF = `window.print()` (0 KB, Türkçe sorunsuz — jsPDF'in varsayılan fontları UTF-8 desteklemiyor), Excel = CSV ama **BOM + `;` ayraç + ham rakam** olmadan Türkçe Excel'de bozuk açılıyor (K-045.4) |
 
 ### E · Faz dışı — yazılmaz, konuşulur
 
