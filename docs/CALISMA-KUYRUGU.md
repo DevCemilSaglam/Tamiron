@@ -36,7 +36,7 @@ Sırası **riske göre**: en üstteki, yanlışsa en çok şeyi bozan.
 | 7 | **Açık tema turu** — bu turun bileşenleri çoğunlukla koyu temada görüldü | **BİTTİ** | **Varsayımım tersmiş**: `prefers-color-scheme` açık — bütün tur açık temadaydı, ölçülmemiş olan **koyu**. Ölçüldü: üç tema hâlinde de 0 bulgu, kontrastlar AA üstü (en düşük **5.00**). Kuyruğa yazdığım *"denetimin kontrast testi"* de yokmuş. Asıl bulgu **ölçüm aracımda**: `color(srgb …)` okunamıyordu ve tema geçişinin ara karesi okunuyordu (K-039) |
 | 8 | **İki yeni denetim testi** — bugün hiçbir testin yakalamadığı iki hata sınıfı | **BİTTİ** | 36 → **38 test**. 38'in ilk tasarımı **boştu** — yazmadan önce dünkü iki hataya karşı denedim, ikisini de yakalamıyordu. Kök sebebe inince asıl mesele çıktı: `ciz` hem *"açıldım"* hem *"yeniden çiziliyorum"* demek. Çekirdeğe **`ac` kancası** eklendi, dört ekranın açılış işi taşındı — üçü latent hataydı. 37 iki kapalı düğme buldu, ikisi de **konuşan düğmeye** çevrildi (K-040) |
 | 9 | **320 px elle turu** — denetim 0 diyor; K-025 sessiz kırpmayı da 0 demişti | **BİTTİ** | **Göz gördü, 38 test görmedi:** tabloda *"Motor yağ", "Bakım işç"* — `<input>` sessizce kesiyor (taşma 5-23 px). Dar ekranda yer açıldı (ad alanı 65 → **108 px**), **39. test** eklendi. Kovalarken iki denetim kusuru daha çıktı: DOM geri yüklenmiyordu (akordiyon) ve **`load` koşusuna hiç bakmamışım** — orada bir yanlış pozitif duruyordu (K-041) |
-| 10 | **Belge tazeleme** — EKRANLAR · IS-AKISI · SOZLUK · HANDOFF sayıları | AÇIK | |
+| 10 | **Belge tazeleme** — EKRANLAR · IS-AKISI · SOZLUK · HANDOFF sayıları | **BİTTİ** | En geride kalan **EKRANLAR.md**'ydi: ruhsat ekranını hâlâ *"iki büyük düğme: TAMİRAT · BAKIM"* diye, kayıt ekranını *"fotoğraftan liste okuma YOK"* diye anlatıyordu — ikisi de tersine dönmüştü. Ekran sayısı 13 yerine 12 yazıyordu (iş başına eksikti). IS-AKISI'nde Kol E hâlâ *"Onay iste"*ydi (04.09'da adı değişmişti). Dokunuş tablosu 03.09'dan kalmaydı |
 
 ---
 
@@ -257,6 +257,35 @@ sayaç), ruhsat akordiyonunun ikili alanları, teslim sonrası panel.
 sayıları, karar aralığı).
 
 **Bitti sayılır:** belgelerde prototiple çelişen tek cümle kalmadı.
+
+---
+
+## Kuyruk bitti — 06.09.2026
+
+**On işin onu da BİTTİ.**
+
+| | |
+|---|---|
+| Karar | **K-034 … K-041** (sekiz karar) |
+| Denetim | 36 → **39 test** (üçü bu turda yaşanmış hatalardan doğdu, üçü de negatif testle doğrulandı) |
+| Derleme denetimi | 5 → **8 kontrol** |
+| Ölçüm | derleme temiz · 14 ekran · 39 test · `load` koşusu ve elle koşu **0 bulgu** · 320 / 375 / 430 px · açık ve koyu tema |
+
+**Bu turun en pahalı dersi ölçüm aracıyla ilgili.** On işin altısında
+ilk *"bulgu"* diye görünen şey **ölçüm hatası** çıktı: kopmuş DOM
+düğümüne tıklamak · `innerHTML.length` imzası · paylaşılan
+`muhDonemSecili` kirlenmesi · tema geçişinin ara karesi ·
+`color(srgb …)` ayrıştırılamaması · `textContent`in gizli metni
+vermesi. Hepsi `HANDOFF.md §4`'teki tabloya yazıldı.
+
+İkinci ders: **belgede duran bir ders, uygulanmamışsa öğrenilmemiştir.**
+K-041.3'te `.plate-lg` için yıllar önce yazılmış bir not, aynı hatayı
+başka bir testte yapmamı engellemedi.
+
+**Cemil'i bekleyen yeni açık maddeler:** A-M13 (tek parçayı ayrı
+işaretleme), A-M14 (teslimden sonraki dokunuş), A-M15 (parça beklendiği
+müşteriye söylensin mi). Hepsi `HANDOFF.md §5`'te, hepsinin yanında bir
+öneri var ve hiçbiri işi durdurmadı.
 
 ---
 

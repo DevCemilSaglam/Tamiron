@@ -12,7 +12,7 @@
 
 | Akış adımı | Ekran |
 |---|---|
-| 1 · Ruhsatı çek, kayıt açıldı | **2 · Ruhsatı çek** |
+| 1 · Plaka yazıldı / ruhsat çekildi, kayıt açıldı | **2 · Servis kaydı ekle** |
 | 2 · Ne istiyor | **3 · Servis kaydı** |
 | 3 · Parçacıya sor | **4 · Parça fiyatı sor** |
 | 4 · Fiyat geldi | **3 · Servis kaydı** |
@@ -22,7 +22,7 @@
 
 **Yedi adım, beş ekran.** Dördü (2, 4, 5, 6) aynı ekranda toplanıyor — **servis kaydı bu ürünün kalbi.**
 
-Buna giriş noktası (**1 · İçerideki araçlar**) ve akış dışı başvuru ekranı (**6 · Araç**) eklenince **6** ediyor.
+Buna giriş noktası (menü) ve akış dışı başvuru ekranı (**6 · Araç**) eklenince **6** ediyor.
 
 ---
 
@@ -67,19 +67,30 @@ başlamak isteyen ustayı önce **gözle aramaya** zorluyordu.
 
 ---
 
-## 2 · RUHSATI ÇEK *(kayıt açma)*
+## 2 · SERVİS KAYDI EKLE *(kayıt açma)* — 06.09'da yeniden kuruldu
 
 **Hangi işe:** *"aracın bilgilerini girmek"* — tamircinin birinci isteği
 
+**İKİ SEKME** (Cemil, 06.09): *"Plakayı yaz"* (varsayılan, mikrofonlu)
+ve *"Ruhsatı çek"* (kamera + galeri). **Plaka kapının kendisidir**
+(K-026): yazınca aracın kayıtlı olup olmadığı anlaşılır.
+
 | Üzerinde ne var | Üzerinde ne YOK |
 |---|---|
-| Kamera — ruhsata tut | Uzun araç formu |
-| Okunanlar: plaka · marka · model · yıl · motor · şasi — **düzeltilebilir** | Renk, yakıt, anahtar kodu, radyo kodu |
-| **Plakayı yaz** kaçış yolu | Müşteri kaydı adımı |
-| İki büyük düğme: **TAMİRAT** · **BAKIM** (K-006) | Tür alt kırılımları |
-| Bakım seçilirse: **km** alanı (K-002) | Sigorta/muayene tarihleri |
+| **Plaka alanı** — mikrofonlu, örnek cümlelerle | Uzun araç formu |
+| **Kamerayı aç** · **Galeriden seç** | Müşteri kaydı adımı |
+| Okunanlar: plaka · marka · model · yıl · motor · **renk · yakıt** — düzeltilebilir | Sigorta/muayene tarihleri |
+| Akordiyon: şasi · motor no · hacim · güç · koltuk · depo · ilk tescil | **TC kimlik no · adres** *(ruhsatta var, tutulmuyor)* |
+| **Kilometre** — her zaman görünür, isteğe bağlı | Tür seçimi *(kalktı — K-033.1)* |
+| İki düğme: **Ruhsat adımını geç ve kaydı aç** · **Ruhsatı çek** | Kapalı düğme *(hiçbiri disabled değil — K-033.3)* |
 
-> Araç kayıtlıysa okuma sonucu doğrudan onu açar, yeni kayıt oluşturur. Aynı araç iki kez yaratılmaz.
+> **Tür artık sorulmuyor.** Cemil: *"Tamir, bakım vb çok önemli değil."*
+> İş metninden tahmin ediliyor ve **servis kaydında düzeltilebiliyor**
+> (K-033.1). Km bu yüzden türe bağlı değil: her zaman görünür, isteğe
+> bağlı.
+>
+> Araç kayıtlıysa **ruhsat istenmez** — açık kaydı varsa oraya götürür.
+> Aynı araç iki kez yaratılmaz.
 
 **Birleştirme seçeneği:** Bu ekran, ana ekranın üzerine açılan bir **tabaka** da olabilir — o zaman ana yol 4 ekrana iner. Prototipte deneyip karar veririz.
 
@@ -93,15 +104,17 @@ Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açı
 
 | Üzerinde ne var | Üzerinde ne YOK |
 |---|---|
-| Araç künyesi — plaka, marka model, tamirat/bakım | Durum rozeti, durum geçmişi |
-| **Satırlar** — parça ve işçilik, tek liste | Kesinlik kademeleri (kesin/olabilir/şartlı) |
-| Her parça satırında: **kim getirdi** (tamirci/müşteri — K-005) | Garanti süresi, kalan gün |
-| **Mikrofon** — yapılanı söyle (T-4) | Fotoğraftan liste okuma |
-| **+ Satır** düğmesi | Katalog seçici tabakası |
-| **Parça fiyatı sor** düğmesi → 4. ekran | Fiyat karşılaştırma tablosu |
-| **Toplam** | İskonto, düze yuvarlama, KDV kırılımı |
-| **Onay iste** düğmesi (Kol E) | Onay bekleme durumu, red paneli |
-| **Teslim et** düğmesi → 5. ekran | Kabul formu, teklif belgesi |
+| Araç künyesi + **müşteri bilgileri** (aranabilir telefon — K-033.5) | Durum rozeti, durum geçmişi |
+| **Ne istiyor** — çok satırlı, *"alt satıra ekle"* düğmesiyle | Kesinlik kademeleri (kesin/olabilir/şartlı) |
+| **İş türü çipleri** — tahmini düzeltmek için (K-033.1) | Garanti süresi, kalan gün |
+| **Yapılanlar TABLOSU** — parça ve işçilik tek tabloda (K-033.5) | Katalog seçici tabakası |
+| Listenin üstünde: **Parçaları müşteri getirdi** anahtarı (K-005) | Satır başına *"kim getirdi"* sorusu *(kalktı — K-033.5)* |
+| **Mikrofon** · **+ Parça** · **+ İşçilik** | Fiyat karşılaştırma tablosu |
+| **Fotoğraftan parça listesi** (K-033.5) | İskonto, düze yuvarlama, KDV kırılımı |
+| **Parça bekliyor** anahtarı + *"müşteriye haber ver"* (K-034) | Onay bekleme durumu, red paneli |
+| **Parça fiyatı sor** → 4. ekran · **Özet gönder** → mesaj | Kabul formu, teklif belgesi |
+| **Toplam** — müşteri parçası **girmez** (K-037) | |
+| **Teslim et** düğmesi → 5. ekran | |
 
 > **Satırlar tek liste.** Parça mı işçilik mi olduğu satırın kendi işareti — iki ayrı bölüm değil. Usta *"balata taktım, 800 lira işçilik"* der; sistem ikiye böler, ekran bölmez.
 
@@ -110,6 +123,11 @@ Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açı
 ---
 
 > **03.09 eklendi · cevap kimden geldi.** Birden fazla parçacıya sorulmuşsa parça satırının altında *"Cevap kimden geldi?"* çipleri çıkar (Kol B). **Tek parçacıya sorulduysa çıkmaz** — ana yol kalınlaşmıyor. Ayrı bir "fiyat karşılaştırma" ekranı böylece gerekmiyor.
+>
+> ⚠️ **Bu çipler 06.09'da bir gün boyunca KOPUKTU.** Tablo yeniden
+> yazılırken düştüler; `parca-sor` yazmaya devam etti, okuyan kalmadı
+> ve balon *"cevaplar kayda düşecek"* diye olmayan bir şey vaat etti.
+> Geri kondu (kuyruk 2).
 >
 > **03.09 eklendi · alış fiyatı.** Parçacıdan gelen rakam satırın altında soluk durur (*"parçacı 4.200 ₺"*). Müşteriye söylenecek rakam değil; müşteri parçayı kendi getirse bile **kayıtta kalır** (Kol D).
 
@@ -143,13 +161,18 @@ Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açı
 |---|---|
 | Toplam — büyük, net | Kısmi ödeme takibi, taksit planı |
 | **Ödeme yolu**: nakit · kart · havale · **almadım** | Cari hesap, borç yaşlandırma |
-| **TESLİM ET** | Teslim alan kişi seçimi |
-| Teslimden sonra: **müşteriye özet gönder** (T-19/T-20) | Fatura, e-arşiv |
-| Bakımsa: *"6 ay sonra hatırlatılacak"* bilgisi (K-002) | Hatırlatma düzenleme |
+| **TESLİM ET** — kapalı değil, eksikse **konuşur** (K-040.3) | Teslim alan kişi seçimi |
+| Teslimden sonra **soruyor**: özet gönder / geç (K-033.6) | Fatura, e-arşiv |
+| Bakımsa: hatırlatma tarihi — **ay veya km, hangisi önce** (K-002) | Hatırlatma düzenleme |
+| *"Parça bekliyor olarak işaretli"* uyarısı (K-036) | Teslimi engelleyen kilit |
 
 > **Ayrı ekran, çünkü ayrı an.** Servis kaydıyla birleştirilirse yanlışlıkla teslim edilir. Teslim geri alınamaz bir eylemdir.
 >
 > **"Almadım"** bir ödeme yoludur — veresiye gerçektir ve teslimi bekletmez.
+>
+> ⚠️ **06.09'a kadar burada bir yalan vardı:** teslim balonu telefonu olan
+> araçta *"Özet gönderildi."* diyor ve **hiçbir şey göndermiyordu.**
+> Artık ekran soruyor ve gönderim tek dokunuş (K-033.6).
 
 ---
 
@@ -201,21 +224,24 @@ geldi** (müşterinin gördüğü özet — ustanın ekranı değil, K-023).
 
 | | Sayı |
 |---|---|
-| Ana yolun geçtiği ekran | **5** — ruhsat · kayıt · parça sor · teslim (+ menü) |
+| Ana yolun geçtiği ekran | **5** — servis kaydı ekle · kayıt · parça sor · teslim (+ menü) |
 | Menüden açılan ekran | 6 — araçlar · servis kayıtları · müşteriler · muhasebe · müşteriye mesaj · sesli işlem |
+| Menü altından açılan | 1 — **iş başına** *(muhasebeden, 05.09)* |
 | Başvuru ekranı | 1 — araç |
-| **Ustanın ekranı — toplam** | **12** |
+| **Ustanın ekranı — toplam** | **13** |
 | Müşterinin sayfası *(bütçe dışı)* | 1 — özet |
-| **Prototipteki toplam** | **13** |
+| **Prototipteki toplam** | **14** |
 
 **Bütçe (A-1) 03.09'da menü isteğiyle cevaplandı.** 6 ekran benim önerimdi
 ve *"Cemil onayına açık"* işaretliydi.
 
-**Ölçülen asıl sayı 06.09'da yeniden ölçüldü: ana yol 13 dokunuş**
-(ruhsatsız yolda 8)
-(03.09'da 13'tü; menü satırı eski *"Ruhsatı çek"* düğmesinin yerini alınca
-bir dokunuş düştü ama belge o gün güncellenmemişti). **Kayıtlı araçta 8** —
-ikinci kez gelen her araç için geçerli, yani zamanla asıl yol o olacak.
+**Ölçülen asıl sayı 06.09'da yeniden ölçüldü: ana yol 13 dokunuş.**
+**Ruhsatsız yolda 8**, **kayıtlı araçta 8** — ikinci kez gelen her araç
+için geçerli, yani zamanla asıl yol o olacak.
+
+Sayı 05.09'da 12'ydi ve **arttı**: tür seçimi kalktı (−1) ama ruhsat
+sekmesi (+1) ve teslim sonrası kapatma (+1) geldi. Ayrıntısı ve
+gerekçesi **K-035**'te; *"herhalde azalmıştır"* bir ölçüm değildir.
 
 > Ekran sayısı bir bütçe kalemi, ama **tek başına ölçü değil.** Asıl
 > ölçü, işin kaç dokunuşta bittiği ve kaç ekranın ana yola **girdiği**.
@@ -248,17 +274,21 @@ yalnız **özet şablonunda** çıkar.
 
 **Kıyas:** v1 · 38 ekran.
 
-### Ölçülen dokunuş (03.09.2026, kollar eklendikten sonra)
+### Ölçülen dokunuş (06.09.2026 — üçüncü ölçüm)
 
 | Yol | Dokunuş |
 |---|---|
-| Tam yol — parça soruluyor | **13** |
-| Kısa yol — parça sorulmuyor | **9** |
-| Tam yol + Kol B (çok parçacı) | 15 · **+2, yalnız kol kullanılınca** |
+| Tam yol — ruhsat çekilerek, parça soruluyor | **13** |
+| Kısa yol — ruhsat çekilir, parça sorulmuyor | **10** |
+| **Ruhsatsız yol** — plaka yazılır, ruhsat atlanır | **8** |
+| Kayıtlı araç yolu | **8** |
+| Sesli yol | **2 + 1 konuşma** |
+| Müşteriye özet | **2** |
 
 Klavyeyle yazılanlar (parça adı, fiyat, şikâyet) sayılmadı — sayılan
 yalnız **dokunma** eylemleri. Ölçüm 375 px'te gerçek tıklamalarla
-yapıldı; beş kol eklendikten sonra tam ve kısa yol **değişmedi**.
+yapıldı. Kol B (çok parçacı) kullanılmadığında **sıfır** dokunuş
+ekliyor; kolun doğru ölçüsü budur.
 
 Ana yolun 6'sından yalnız **5'i akış adımı taşıyor**; 6. (Araç) başvuru ekranı. 2. ekran tabakaya dönüşürse akış **4 ekranda** biter.
 

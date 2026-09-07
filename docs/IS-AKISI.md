@@ -21,21 +21,29 @@ Bu bir **sipariş**tir, teşhis değil. v1'in omurgası teşhis varsayıyordu ve
 
 Her adımda: **kim** yapıyor · **hangi veri** giriyor · **hangi karar** veriliyor.
 
-### Adım 1 · Ruhsatı çek, kayıt açılsın
+### Adım 1 · Plakayı yaz ya da ruhsatı çek, kayıt açılsın
 
 | | |
 |---|---|
 | **Kim** | Usta |
-| **Ne yapıyor** | Telefonu ruhsata tutar |
-| **Sistem** | Plaka · marka · model · yıl · motor · şasi okur. Araç kayıtlıysa **açar**, değilse **oluşturur** |
-| **Karar** | **Tamirat mı, bakım mı?** (K-006) — iki büyük düğme |
-| **Dokunuş** | 2 |
+| **Ne yapıyor** | Plakayı yazar / söyler — ya da telefonu ruhsata tutar |
+| **Sistem** | Plaka · marka · model · yıl · motor · renk · yakıt · şasi ve ruhsatın gerisini okur. Araç kayıtlıysa **açar**, değilse **oluşturur** |
+| **Karar** | **Ruhsat çekilsin mi?** — çekilmeyebilir. Tür **sorulmuyor** (K-033.1) |
+| **Dokunuş** | ruhsat çekilerek 3 · ruhsatsız **1** |
 
-Tamircinin cümlesi: *"Ruhsatı çekti, kayıt açıldı."* (T-3) **Giriş noktası bu** — plaka yazmak değil.
+Tamircinin cümlesi: *"Ruhsatı çekti, kayıt açıldı."* (T-3)
 
-> **Kaçış yolu her zaman açık:** ruhsat yoksa, okunmuyorsa, araç zaten kayıtlıysa → **plakayı yaz.** Okuma bir kolaylıktır, ön koşul değildir.
+⚠️ **06.09'da giriş noktası değişti (K-026, K-033).** Cemil: *"Kullanıcı
+konuşacak ya da plaka girecek. Eğer aracın ruhsatı yoksa, ruhsat çekme
+ekranı açılacak. **Ruhsat çekmeden devam edebilir.**"*
 
-**Bakım seçildiyse:** km alanı çıkar (K-002). Usta göstergeden okur, bir kez yazar.
+Yani artık **plaka kapının kendisi**; ruhsat bir kolaylık. Ekranda iki
+sekme var (*"Plakayı yaz"* varsayılan, *"Ruhsatı çek"*), ve kayıtsız
+araçta iki düğme: **Ruhsat adımını geç ve kaydı aç** · **Ruhsatı çek**.
+
+**Kilometre** artık türe bağlı değil: her zaman görünür, **isteğe
+bağlı**. Yazılırsa bir sonraki bakım hatırlatması ona göre kurulur
+(K-002).
 
 ---
 
@@ -287,14 +295,21 @@ Parça gerekiyorsa Adım 3–4'e geri dönülür. Bu bir geri dönüş, yeni bir
 
 ---
 
-## Kol E · Onay isteme (K-003)
+## Kol E · Özet gönderme *(eski adı "onay isteme")* (K-003)
 
 **Nereden bağlanıyor:** Kayıt açıkken **her an**
 **Nerede bitiyor:** Hiçbir yerde — **akış onayı beklemez**
 
 > *"Müşteri onay vermek zorunda değil. Tamirciye sözlü olarak söylemiş olabilir. Onay iste diye ayrıca bir alan olabilir."*
 
-Tek düğme: **"Onay iste"** → müşteriye özet gider. Cevap gelirse kayda düşer, gelmezse hiçbir şey olmaz. **Kayıt beklemede kalmaz, durum değişmez** (K-004: tek durum var, o da teslim).
+Tek düğme: **"Özet gönder"** → müşteriye özet gider. Cevap gelirse kayda düşer, gelmezse hiçbir şey olmaz. **Kayıt beklemede kalmaz, durum değişmez** (K-004: tek durum var, o da teslim).
+
+> ⚠️ **Düğmenin adı 04.09'da değişti (K-021).** *"Onay iste"* yazıyordu,
+> bastığında balon *"Özet gönderildi"* diyordu ve **gerçekte hiçbir şey
+> göndermiyordu.** Ad artık yapılan işi söylüyor ve düğme gerçekten
+> mesaj ekranına götürüyor. Tamirci onay için *"işin içine
+> katmayalım"* demişti (S4); düğmenin yaptığı iş zaten yedi işten
+> altıncısıydı — müşteriye özet göndermek.
 
 > Bu, kolların en önemlisi — çünkü **kol olmayan** bir şey. v1'de onay bir akıştı ve ekranların dörtte birini tutuyordu.
 
@@ -308,7 +323,7 @@ Tek düğme: **"Onay iste"** → müşteriye özet gider. Cevap gelirse kayda d�
 | B · Büyük iş | — | — | Adım 3'te çoklu seçim |
 | C · Ek iş | — | — | Yok (zaten var) |
 | D · Müşteri parçası | — | — | Adım 5'te ikinci düğme |
-| E · Onay isteme | — | — | Bir düğme |
+| E · Özet gönderme | — | — | Bir düğme |
 
 **Beş kolun toplam maliyeti: sıfır yeni ekran, sıfır yeni adım.**
 
@@ -336,9 +351,16 @@ yolda 8**, kayıtlı araçta **8**.
 
 ## 1 · Ayrım nerede tutuluyor
 
-Servis kaydında **tek alan**: `tur` = `tamirat` | `bakim`.
+Servis kaydında **tek alan**: `tur` = `tamirat` | `bakim` | `ikisi`
+(üçüncü değer 05.09'da geldi — K-026.3; `ikisi` bakım sayılır).
 
-Adım 1'de, kayıt açılırken **iki büyük düğmeyle** seçilir. Ayrı kayıt türü, ayrı tablo, alt kırılım **yok**.
+⚠️ **06.09'dan beri EKRANDA SORULMUYOR** (K-033.1). Cemil: *"Tamir,
+bakım vb çok önemli değil."* Tür **iş metninden tahmin ediliyor**
+(`isTuruTahmin`) ve **servis kaydının kendi ekranında düzeltilebiliyor**
+— düzeltilemeyen bir tahmin, tahmin değil hükümdür. Sesle gelen kayıtta
+sesin çözdüğü tür kullanılır; tahmin onu ezmez.
+
+Ayrı kayıt türü, ayrı tablo, alt kırılım **yok**.
 
 ---
 
@@ -603,9 +625,9 @@ sağlık denetimi kolların **en ağır hâli açıkken** koşturuldu
 | **A · Teşhis** | Ekran 3'te *"Ne istiyor"* alanı sayıldı | **Tek** serbest alan · ayrı "tespit" alanı yok — kol ekran açmıyor |
 | **B · Büyük iş** | Ekran 4'te iki parçacı seçildi, gönderildi, Ekran 3'e dönüldü | Çip sayısı 2 · düğme *"WhatsApp ile 2 parçacıya gönder"* · satıra `sorulan: [0,1]` yazıldı · Ekran 3'te *"Cevap kimden geldi?"* iki çip çıktı, biri seçildi |
 | **C · Ek iş** | Açık kayda satır eklendi | Satır eklendi, hiçbir durum değişmedi — zaten var olan davranış |
-| **D · Müşteri parçası** | *"sonradan"* hâli: 4.200 ₺ girilmiş satırda *"Müşteri"* seçildi | Satır fiyatı 0, toplama girmiyor · **parçacı fiyatı korundu** ve `parçacı 4.200 ₺` olarak soluk duruyor |
+| **D · Müşteri parçası** | *"sonradan"* hâli: 4.200 ₺ girilmiş satırda *"Müşteri"* seçildi | Satır **toplama girmiyor** · fiyat **silinmiyor**, üzeri çizili duruyor (K-037) · parçacı fiyatı da soluk duruyor · geri alınca rakam **aynen dönüyor** |
 | **D · baştan belli** | Aynı satırla Ekran 4 açıldı | Sorulacak parça **0** · boş durum çıkıyor — müşterinin getireceği parçanın fiyatı sorulmuyor |
-| **E · Onay isteme** | Kayıt açıkken *"Onay iste"* | Özet gönderildi balonu · `teslimTarihi` değişmedi · `durum`/`onayBekliyor` diye bir alan **yok** (K-003, K-004) |
+| **E · Özet gönderme** | Kayıt açıkken *"Özet gönder"* | Mesaj ekranına gidiyor, metin hazır · `teslimTarihi` değişmedi · `durum`/`onayBekliyor` diye bir alan **yok** (K-003, K-004) |
 
 **Ekran sayısı kollardan sonra da 6.** Yeni adım eklenmedi.
 
