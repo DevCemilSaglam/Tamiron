@@ -17,7 +17,7 @@ tıklanabilir prototip.
 | Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
-| Sağlık denetimi | **38 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **39 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` — 06.09'da üçü eklendi: **yorum içinde etiket** · **üretilen betik ayrışıyor mu** · **kapanmamış yorum** (K-033.11) |
 | Kararlar | **K-001 … K-033** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
@@ -209,6 +209,7 @@ Hepsi *"bulgu"* gibi göründü, hiçbiri bulgu değildi. **Önce aracına bak.*
 | İmza olarak `innerHTML.length` | Sekme takasında bir `hidden` eklenip biri kalkar, `aria-pressed` true↔false olur → **uzunluk aynı**, çalışan düğme sessiz görünür |
 | Paylaşılan durumu sıfırlamadan taramak | `muhDonemSecili` iki ekranda ortak; önceki tıklama sonrakini kirletir (K-024.1) |
 | Tema değişiminden **hemen sonra** renk okumak | `0.15s` geçişin ara karesi okunur; iki `requestAnimationFrame` yetmez, ~700 ms beklenir (K-039.3) |
+| Yalnız `DENETIM_CALISTIR()` sonucuna bakmak | Denetim `load` anında da koşuyor ve sonucu `window.DENETIM`'e yazıyor. **İlk koşu farklı çıkabilir** — ekranlar henüz çizilmemiş olur. İkisine de bak (K-041.3) |
 | `textContent` ile "ekranda ne yazıyor" diye bakmak | **Gizli metni de verir.** `hidden` bir öğenin eski içeriği okunur ve "temizlenmemiş" sanılır — `innerText` kullan ya da `hidden`a bak (K-040.5) |
 
 Ayrıca: `getComputedStyle` zemini `color(srgb 0.88 0.92 0.96 / 0.55)`

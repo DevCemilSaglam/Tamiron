@@ -10,6 +10,84 @@
 
 ---
 
+## K-041 · 320 px'te göz gördü, 38 test görmedi (06.09.2026)
+
+**Kuyruk 9.** Denetim üç genişlikte de 0 diyordu. Ekran görüntüsüne
+bakınca servis kaydı tablosunda şunlar yazıyordu:
+
+> **Motor yağ** · **Yağ filtres** · **Bakım işç**
+
+### 41.1 · `<input>` sessizce keser
+
+Ölçüldü (320 px): ad alanı **65-66 px** görünüyor, metin **71-88 px**
+istiyor. Taşma **5-23 px**.
+
+`<input>` taşan metni ne sarar ne üç nokta koyar — **sessizce keser.**
+Ustanın gördüğü *"Bakım işç"*; eksik olduğunu söyleyen hiçbir işaret
+yok. K-025'in kuralı: **kesilen metin, taşan metinden tehlikelidir.**
+
+11. test (`KIRPILAN-METIN`) `overflow:hidden` kutulara bakıyor;
+**form alanları onun kapsamında değildi.** Kural belgede vardı, o
+yüzeye hiç uygulanmamıştı.
+
+**Düzeltme, yalnız dar ekranda:** tutar sütunu 96 → 74 px, tip rozeti
+küçülüyor. Kazanç ~35 px; ad alanı 65 → **108 px** oldu ve üç satırın
+üçünde de taşma **sıfır**. 375 px ve üstünde hiçbir şey değişmedi —
+dar ekranın çözümü geniş ekrana bulaşmaz.
+
+**39. test (SESSIZCE-KIRPILAN-ALAN)** eklendi: değeri olan görünür her
+`input`/`textarea` için `scrollWidth > clientWidth`. Negatif testle
+doğrulandı (alan 40 px'e daraltıldı → yakaladı; geri alındı → sustu).
+
+### 41.2 · Denetim VERİYİ geri yüklüyordu, DOM'u yüklemiyordu
+
+Düzeltmeyi ölçerken denetim ruhsat akordiyonu için iki bulgu vermeye
+başladı — akordiyon **çalışıyordu**.
+
+Mekanizma: 28. test her akordiyon başlığına **iki kez** basıyor (aç,
+kapat — restore). 30. test ise **her düğmeye bir kez** basıyor ve
+akordiyon başlığı da bir düğme. Net sonuç **tek tıklama**: denetim
+akordiyonu **açık bırakıyordu.** Bir sonraki koşuda 28. test onu açık
+buluyor, ilk tıklaması **kapatıyor** ve iki yanlış bulgu veriyordu.
+
+K-024.1'de denetimin **veriyi** kirletmesini düzeltmiştik (derin kopya
++ geri yükleme). Bu, aynı hatanın ikinci yüzü: **DOM durumu.**
+
+Uzun süre görünmedi çünkü ruhsat ekranı her çizimde alanlarını
+temizliyordu. `ac` kancası gelince (K-040) ekran durumunu korumaya
+başladı — **doğru davranış, gizlenen hatayı ortaya çıkardı.**
+
+### 41.3 · Aylardır hiç bakmadığım bir koşu vardı
+
+Bunu kovalarken şunu fark ettim: denetim `load` anında **kendiliğinden**
+koşuyor ve sonucu `window.DENETIM`'e yazıyor. Ben her seferinde
+`DENETIM_CALISTIR()` çağırıp **kendi koşumun** sonucunu okuyordum.
+
+`window.DENETIM`'e bakınca **1 bulgu** çıktı:
+
+> `OLU-ID | getElementById('kToplam') — böyle bir öge yok`
+
+Yanlış pozitifti: `#kToplam` servis kaydının tablosuyla birlikte **JS
+tarafından** yazılıyor; ekran çizilmeden DOM'da yok. Elle koşturunca
+30. test kayıt ekranını satırlarıyla çizmiş oluyor ve id var oluyordu —
+bu yüzden **yalnız ilk koşuda** görünüyordu ve ben ilk koşuya hiç
+bakmıyordum.
+
+⚠️ **Bu dersin bir kopyası `TASARIM-SISTEMI.md`'de zaten yazılıydı:**
+*"TANIMSIZ-SINIF testi `.plate-lg`'yi GEÇ yakaladı — onu JS üretiyor,
+ekran çizilmeden DOM'da olmuyor."* Ders belgede duruyordu, bu teste
+uygulanmamıştı. **Yazılmış bir ders, uygulanmamışsa öğrenilmemiştir.**
+
+Çözüm DOM'u kurcalamak değil: betiğin kendisi o id'yi yazıyorsa
+(`id="kToplam"`) referans ölü değildir. Statik, yan etkisiz; bir yazım
+hatası yine yakalanır — yanlış yazılan id ne DOM'da ne betikte bulunur.
+
+**Ölçüm:** derleme temiz · 14 ekran · **39 test** · `load` koşusu **0**,
+arka arkaya üç elle koşu **0** · 320 / 375 / 430 px · 320'de sekiz
+ekran gözle gezildi.
+
+---
+
 ## K-040 · `ciz` iki iş yapıyordu: açılış ile çizim ayrıldı (06.09.2026)
 
 **Kuyruk 8.** İki yeni denetim testi yazıldı (36 → **38**) ve biri

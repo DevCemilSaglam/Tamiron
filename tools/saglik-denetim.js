@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 38 test.
+/* Tamiron prototip saglik denetimi — 39 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -355,12 +355,34 @@ function stilMetni() {
     if (sc.textContent.indexOf('SAGLIK DENETIMI') >= 0) return;
     kod += sc.textContent;
   });
+  /* ⚠️ 06.09 — JS'IN URETTIGI ID'LER DE SAYILIR.
+     `#kToplam` servis kaydinin tablosuyla birlikte JS tarafindan
+     yaziliyor; ekran cizilmeden DOM'da YOK. Test onu "olu referans"
+     sanip her `load` kosusunda bulgu veriyordu — ve bu bulguyu aylarca
+     kimse gormedi, cunku hep ELLE kosturup o kosunun sonucunu okuduk;
+     manuel kosuda 30. test kayit ekranini satirlariyla cizmis oluyor
+     ve id var oluyordu.
+
+     Ayni dersin bir kopyasi TASARIM-SISTEMI'nde zaten yaziliydi:
+     "TANIMSIZ-SINIF testi .plate-lg'yi GEC yakaladi — onu JS uretiyor,
+     ekran cizilmeden DOM'da olmuyor." Ders belgede vardi, bu testte
+     uygulanmamisti.
+
+     Cozum DOM'u kurcalamak degil: betigin KENDISI o id'yi yaziyorsa
+     (id="kToplam") referans olu degildir. Statik, yan etkisiz.
+     Bir yazim hatasi yine yakalanir — yanlis yazilan id ne DOM'da
+     ne betikte bulunur. */
+  var uretilenId = {};
+  var uid = /id="([A-Za-z_][\w-]*)"/g, um;
+  while ((um = uid.exec(kod))) uretilenId[um[1]] = 1;
+
   var re = /getElementById\(\s*'([A-Za-z_][\w-]*)'\s*\)/g;
   var m, gorulen = {};
   while ((m = re.exec(kod))) {
     var id = m[1];
     if (gorulen[id]) continue;
     gorulen[id] = 1;
+    if (uretilenId[id]) continue;
     if (!document.getElementById(id)) ek('OLU-ID', '(betik)', "getElementById('" + id + "') — boyle bir oge yok");
   }
 })();
@@ -1143,8 +1165,69 @@ function stilMetni() {
   }
   showScreen('home');
 
+
+  /* 39) SESSIZCE KIRPILAN ALAN (06.09.2026)
+     11. test (KIRPILAN-METIN) `overflow:hidden` kutulara bakiyor;
+     `<input>` ve `<textarea>` ONUN KAPSAMINDA DEGIL. Oysa bir input
+     tasan metni ne sarar ne uc nokta koyar — SESSIZCE keser. Ekranda
+     "Bakim isc" yazar, ustanin "Bakim isciligi" yazdigini soyleyen
+     hicbir isaret olmaz.
+
+     320 px'te bulundu ve ELLE bulundu (kuyruk 9): 36 test "0 bulgu"
+     diyordu, ekran goruntusune bakinca uc alanin kirpildigi goruldu.
+     Olculen tasma 5-23 px idi.
+
+     K-025'in kurali burada da isliyor: KESILEN metin, TASAN metinden
+     tehlikelidir. Bu test o kurali, kuralin hic bakmadigi bir yuzeye
+     tasiyor.
+
+     ⚠️ DEGERI OLAN alanlara bakilir. Bos bir input'un scrollWidth'i
+     zaten clientWidth'e esittir; yer tutucu (placeholder) kirpilirsa
+     bu bir kayip degil — asil metin degil. */
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' input, #screen-' + a + ' textarea')
+      .forEach(function (el) {
+        if (el.type === 'hidden' || el.type === 'checkbox' || el.type === 'radio') return;
+        if (el.offsetParent === null && el.offsetHeight === 0) return;
+        if (!el.value) return;
+        var tasma = el.scrollWidth - el.clientWidth;
+        if (tasma <= 2) return;
+        ek('SESSIZCE-KIRPILAN-ALAN', a,
+           (el.id || el.getAttribute('data-satir-ad') !== null ? (el.id || 'satir adi') :
+            (el.className || 'input')) +
+           ' "' + el.value.slice(0, 20) + '" ' + tasma + 'px kesiliyor');
+      });
+  });
+  showScreen('home');
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
-     yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin. */
+     yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
+
+     ⚠️ 06.09 — VERIYI GERI YUKLEMEK YETMIYORDU, DOM'U DA GERI YUKLE.
+     K-024.1'de denetimin VERIYI kirletmesini duzeltmistik (derin kopya
+     + geri yukleme). Ayni hatanin ikinci yuzu bugun cikti: denetim
+     DOM DURUMUNU kirletiyordu.
+
+     Mekanizma: 28. test her akordiyon basligina iki kez basiyor (ac,
+     kapat — restore); 30. test ise HER DUGMEYE bir kez basiyor ve
+     akordiyon basligi da bir dugme. Net sonuc TEK tiklama: denetim
+     akordiyonu ACIK birakiyordu. Bir sonraki kosuda 28. test onu acik
+     buluyor, ilk tiklamasi KAPATIYOR ve "dokununca acilmiyor" +
+     "aria-expanded guncellenmiyor" diye IKI YANLIS BULGU veriyordu.
+
+     Uzun sure gorunmedi cunku ruhsat ekrani her cizimde alanlarini
+     temizliyordu; akordiyonun kabi gizleniyor ve tablo basa donuyordu.
+     `ac` kancasi gelince (K-040) ekran durumunu korumaya basladi —
+     dogru davranis, gizlenen hatayi ortaya cikardi.
+
+     Akordiyonun BELGELENMIS varsayilani KAPALI (akordiyonHtml
+     `hidden` uretir), o yuzden hepsini kapatmak dogru geri yuklemedir. */
+  document.querySelectorAll('.akd-bas').forEach(function (bas) {
+    var g = document.getElementById(bas.getAttribute('aria-controls') || '');
+    bas.setAttribute('aria-expanded', 'false');
+    if (g) g.hidden = true;
+  });
   yedegiGeriYukle();
   showScreen('home');
 

@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 14:24
+  Üretim: 2026-09-07 14:33
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2104,6 +2104,29 @@ kirpilsin. */
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 6px;
 }
+/* ⚠️ 320 px'TE AD ALANI SESSIZCE KIRPILIYORDU (06.09, kuyruk 9).
+   Ölçüldü: ad alanı 65 px görünüyor, "Bakım işçiliği" 88 px istiyor —
+   usta ekranda "Bakım işç" görüyor ve **eksik olduğunu anlamıyor.**
+   `<input>` taşan metni ne sarar ne üç nokta koyar; sessizce keser.
+   K-025'in kuralı: kesilen metin, taşan metinden tehlikelidir.
+
+   İki yerden yer açıldı, ikisi de yalnız dar ekranda:
+   · tutar sütunu 96 → 74 px ("1.900 ₺" 50 px'e sığıyor)
+   · tip rozeti küçülüyor (65 → ~52 px)
+   Kazanç ~35 px; ad alanı 65 → ~101 px oluyor.
+
+   375 px ve üstünde hiçbir şey değişmiyor — dar ekranın çözümü geniş
+   ekrana bulaşmaz. */
+@media (max-width: 359px) {
+  #screen-kayit .tablo td.sayi,
+  #screen-kayit .tablo th.sayi { width: 74px; }
+  #screen-kayit .k-satir .pill {
+    padding: 2px 5px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+}
+
 /* Toplama girmeyen tutar: üstü çizili ve soluk. */
 #screen-kayit .tablo td.tutar-disi input {
   color: var(--faint); text-decoration: line-through;
@@ -8479,7 +8502,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>1fc5c4a7</b><br>' +
+      'Sürüm <b>9cb45fa9</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
