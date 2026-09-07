@@ -3,19 +3,32 @@
      K-005'in işe yaraması için — "bu parçayı geçen sefer müşteri
      getirmişti" bilgisi araç ikinci kez geldiğinde karşıya çıkmalı.
 
-     ⚠️ 04.09 — EKRANIN SIRASI CEMİL'İN TARİFİYLE YENİDEN KURULDU:
+     ⚠️ 06.09 — SIRA CEMİL'İN İKİNCİ TARİFİYLE:
 
-       künye → İŞLEM BUTONLARI (tek satır) → NOT → ruhsat (akordiyon)
-       → kilometre (akordiyon) → bakım bilgileri → geçmiş
+       künye+müşteri → İŞLEM BUTONLARI → ÖDEME DURUMU (varsa)
+       → ruhsat (akordiyon) → kilometre (akordiyon) → bakım bilgileri
+       → NOT (akordiyon) → geçmiş
 
-     Neden bu sıra: üstte EYLEM var, altta BAŞVURU. Önceki sırada
-     ruhsat bilgileri ve km listesi ekranın yarısını kaplıyordu ve
-     usta geçmişi görmek için iki ekran boyu kaydırıyordu. İkisi de
-     günde bir kez bakılan bilgi — akordiyona girdiler.
+     Cemil: *"Aracın borcu, ödemesi varsa, araç bilgilerinin altında bir
+     alan açıp burada gösterebilirsin. Araç bilgileri, varsa ödeme
+     durumu, ruhsat, kilometre, bakım bilgileri altına. Not alanı
+     buttonlarda geçmişten önce gelsin. Not alanı gizli olsun. V1'de bu
+     alanı güzel yapmıştık."*
 
-     "Not" v1'deki yerine döndü: düğmelerle ruhsatın ARASINDA. Not,
-     aracın hakkındaki en taze bilgi ("arka cam kolu kırık") ve
-     ekranın dibinde kimse görmüyordu.
+     ⚠️ NOT ARTIK AKORDİYONDA — ve bu 04.09'da verdiğim kararı
+     düzeltiyor. O gün notu düğmelerin hemen altına koymuştum, gerekçem
+     "not en taze bilgi, dipte kimse görmüyor" idi. Gerekçe yanlış
+     değildi ama ÖLÇÜ yanlıştı: dört araçtan üçünün notu BOŞ ve boş bir
+     textarea, ekranın en üstünde iki satır yer kaplıyordu. Akordiyonun
+     sayaçı notun dolu olup olmadığını AÇMADAN söylüyor — dolu not
+     görünür, boş not yer kaplamaz.
+
+     ÖDEME DURUMU NEDEN BURADA: veresiye ("almadım") bir ödeme yoludur
+     (K-004) ve muhasebede "kimden alacağım" diye zaten okunuyor. Ama
+     usta alacağını muhasebede değil, MÜŞTERİ KARŞISINDAYKEN hatırlamak
+     istiyor — araç geldiğinde. Alan yalnız BORÇ VARSA açılır; borcu
+     olmayan araçta "borç yok" yazmak, olmayan bir sorunu her açılışta
+     hatırlatmak olurdu.
 
      BİLEŞENLER: .card · .arac-bas .plate-lg .veh-title .spec-strip
      · .section-label (.with-action .lbl-txt) · .btn-row .btn .btn-lg
@@ -45,28 +58,38 @@
        satıra sığıyor ve üçü de 48 px dokunma hedefini koruyor. -->
   <div id="arEylem"></div>
 
-  <!-- NOT — v1'deki gibi: kendi başlığı, kendi mikrofonu, serbest
-       metin. Düğmelerin hemen altında (Cemil, 04.09). -->
-  <div class="card">
-    <div class="section-label with-action">
-      <span class="lbl-txt">
-        <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Not
-      </span>
-      <button class="daire-btn" id="arNotMik" aria-label="Notu sesle yaz" title="Sesle">
-        <svg class="ico"><use href="#i-mic"></use></svg>
-      </button>
-    </div>
-    <div class="field">
-      <textarea id="arNot" rows="2" aria-label="Araç notu"
-                placeholder="ör. arka cam kolu kırık — müşteri biliyor"></textarea>
-    </div>
-  </div>
+  <!-- ÖDEME DURUMU — yalnız BORÇ VARSA çizilir (06.09). -->
+  <div id="arOdeme"></div>
 
   <div id="arRuhsatBolum"></div>
 
   <div id="arKmBolum"></div>
 
   <div id="arBakim"></div>
+
+  <!-- NOT — GİZLİ, akordiyonun içinde (Cemil, 06.09: "Not alanı gizli
+       olsun"). Kendi mikrofonu duruyor: her serbest metin alanının
+       kendi mikrofonu var (TASARIM-SISTEMI). Yeri geçmişten hemen
+       önce — "not alanı geçmişten önce gelsin". -->
+  <div class="akordiyon">
+    <button class="akd-bas" aria-expanded="false" aria-controls="arNotGovde">
+      <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Not
+      <span class="akd-say" id="arNotSay"></span>
+      <svg class="ico ico-sm akd-ok"><use href="#i-chevron-down"></use></svg>
+    </button>
+    <div class="akd-govde" id="arNotGovde" hidden>
+      <div class="section-label with-action">
+        <span class="lbl-txt">Araç notu</span>
+        <button class="daire-btn" id="arNotMik" aria-label="Notu sesle yaz" title="Sesle">
+          <svg class="ico"><use href="#i-mic"></use></svg>
+        </button>
+      </div>
+      <div class="field">
+        <textarea id="arNot" rows="3" aria-label="Araç notu"
+                  placeholder="ör. arka cam kolu kırık — müşteri biliyor"></textarea>
+      </div>
+    </div>
+  </div>
 
   <div class="section-label">
     <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş
@@ -142,6 +165,33 @@ Ekran.tanim('arac', {
        Yazılan not ARACA yazılır ve kalır; prototipte de öyle davranır
        (kaydedilmeyen bir not alanı, ustayı bir kez kandırır). */
     document.getElementById('arNot').value = a.not || '';
+    arNotSayacCiz();
+
+    /* ---- ÖDEME DURUMU ----
+       Borç = teslim edilmiş ama ödemesi "almadım" olan kayıtların
+       toplamı. Uydurma bir alan değil, var olan verinin okunması —
+       muhasebedeki "Alacak" listesiyle AYNI kaynaktan. İki yerde iki
+       ayrı hesap olsaydı, biri diğerini yalanlardı. */
+    var borclular = aracKayitlari(a.plaka).filter(function (k) {
+      return k.teslimTarihi && k.odemeYolu === 'almadim';
+    });
+    var borc = borclular.reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+    document.getElementById('arOdeme').innerHTML = borc
+      ? '<div class="card">' +
+          '<div class="section-label">' +
+            '<svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme durumu' +
+          '</div>' +
+          '<div class="tutar-serit">' +
+            borclular.map(function (k) {
+              return '<div class="tutar-sat" data-kayit="' + k.id + '" role="button" tabindex="0">' +
+                '<span>' + (k.sikayet || TUR_AD[k.tur]) + ' · ' + k.teslimTarihi + '</span>' +
+                '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
+            }).join('') +
+            '<div class="tutar-sat genel"><span>Alacak</span>' +
+              '<span class="tv">' + tutar(borc) + ' ₺</span></div>' +
+          '</div>' +
+        '</div>'
+      : '';
 
     /* ---- RUHSAT BİLGİLERİ (akordiyon) ----
        ⚠️ TC kimlik no ve adres ruhsatta VAR ama BURADA YOK
@@ -233,12 +283,21 @@ Ekran.tanim('arac', {
   }
 });
 
+/* Akordiyonun sayaçı: notun DOLU olup olmadığını açmadan söyler.
+   "İçinde bir şey var mı" diye açtırmak, hiç açtırmamaktan kötüdür. */
+function arNotSayacCiz() {
+  var a = aracBul(ACIK_PLAKA);
+  var e = document.getElementById('arNotSay');
+  if (e) e.textContent = (a && a.not) ? 'dolu' : 'boş';
+}
+
 /* Not ARACA YAZILIR. Kaydedilmeyen not alanı, ustayı bir kez kandırır
    ve bir daha not yazmaz. */
 document.addEventListener('input', function (e) {
   if (!e.target || e.target.id !== 'arNot') return;
   var a = aracBul(ACIK_PLAKA);
   if (a) a.not = e.target.value;
+  arNotSayacCiz();
 });
 
 document.addEventListener('click', function (e) {
@@ -247,33 +306,24 @@ document.addEventListener('click', function (e) {
   var a = aracBul(ACIK_PLAKA);
   if (!a) return;
 
-  /* KAYITLI ARACA RUHSATSIZ SERVİS KAYDI: araç zaten kayıtlı, tek
-     eksik "ne için geldi". Tür seçilir seçilmez kayıt açılıyor. */
-  if (t.id === 'arYeniKayit') {
-    document.getElementById('arEylem').innerHTML =
-      '<div class="card">' +
-        '<div class="section-label">' +
-          '<svg class="ico ico-sm"><use href="#i-wrench"></use></svg> Ne için geldi?' +
-        '</div>' +
-        '<div class="cip-grup">' +
-          '<button class="cip" data-yenitur="tamirat">Tamirat</button>' +
-          '<button class="cip" data-yenitur="bakim">Bakım</button>' +
-        '</div>' +
-        '<p class="plate-hint">Ruhsat çekmene gerek yok — bu araç kayıtlı.</p>' +
-      '</div>';
-    return;
-  }
+  /* KAYITLI ARACA RUHSATSIZ SERVİS KAYDI: araç zaten kayıtlı.
+     ⚠️ 06.09 — ARADAKİ "NE İÇİN GELDİ?" ADIMI KALKTI. Cemil aynı
+     soruyu kayıt açma ekranından da kaldırdı: tür önemli değil,
+     yazılan işten çıkarılıyor (isTuruTahmin) ve kayıt ekranında
+     düzeltilebiliyor. Burada bırakmak, aynı soruyu iki ekranda iki
+     farklı biçimde sormak olurdu.
 
-  var yt = t.getAttribute('data-yenitur');
-  if (yt) {
+     Düğme artık DOĞRUDAN kaydı açıyor: bir dokunuş, bir sonuç. */
+  if (t.id === 'arYeniKayit') {
     var yeni = {
-      id: KAYITLAR.length + 1, plaka: a.plaka, tur: yt, km: '',
+      id: KAYITLAR.length + 1, plaka: a.plaka, tur: 'tamirat', km: '',
       sikayet: '', acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
-      hatirlatmaTarihi: null, hatirlatmaGonderildi: false, satirlar: []
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+      parcaBekliyor: false, satirlar: []
     };
     KAYITLAR.push(yeni);
     ACIK_KAYIT = yeni.id;
-    balon(a.plaka + ' için ' + TUR_AD[yt].toLowerCase() + ' kaydı açıldı.', false, 2800);
+    balon(a.plaka + ' için kayıt açıldı — ne istediğini yaz.', false, 2800);
     Ekran.ac('kayit');
     return;
   }

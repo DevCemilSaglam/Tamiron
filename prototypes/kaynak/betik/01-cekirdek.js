@@ -541,7 +541,27 @@ var GIRIS_TEMIZ = {
     var p = [r.slice(0, 4), r.slice(4, 7), r.slice(7, 9), r.slice(9, 11)];
     return p.filter(Boolean).join(' ');
   },
-  plaka: function (h) { return plakaBicim(h); }
+  plaka: function (h) { return plakaBicim(h); },
+  /* KOD — şasi no ve motor no. Ruhsatta BÜYÜK harf ve rakamla yazılır;
+     boşluk, tire, noktalama yok. Küçük harf yazan ustayı düzeltmek
+     yerine sessizce büyütüyoruz: aynı aracın iki farklı yazımı iki
+     farklı araç gibi görünmesin.
+     ⚠️ 17 hane SINIRI YOK: VIN 17 hanedir ama motor no değildir ve
+     ikisi aynı temizleyiciyi kullanıyor. Sınırı olmayan bir alan,
+     yanlış sınırı olan alandan iyidir. */
+  kod: function (h) {
+    return String(h || '').toLocaleUpperCase('tr')
+      .replace(/[^0-9A-ZÇĞİÖŞÜ]/g, '').slice(0, 24);
+  },
+  /* TARİH — gg.aa.yyyy. Nokta KENDİLİĞİNDEN düşüyor: usta "14062018"
+     yazınca "14.06.2018" oluyor. Geçerlilik BURADA denetlenmiyor
+     (yazarken "32" yazan biri henüz 3'ten sonra 2'ye basmıştır);
+     alan dolunca bakılır. */
+  tarih: function (h) {
+    var r = String(h || '').replace(/[^0-9]/g, '').slice(0, 8);
+    var p = [r.slice(0, 2), r.slice(2, 4), r.slice(4, 8)];
+    return p.filter(Boolean).join('.');
+  }
 };
 
 /* Alan geçerli mi — DOLDURULDUKTAN sonra sorulur, yazarken değil. */
@@ -645,6 +665,86 @@ var Akordiyon = (function () {
     ac(bas, bas.getAttribute('aria-expanded') !== 'true');
   });
   return { ac: ac };
+})();
+
+/* ============ SOLA KAYDIRMA — TEK YERDE (06.09) ============
+   ⚠️ KAYDIRMA TEK BAŞINA SİLMEZ, onay satırını açar (K-032). Görünmeyen
+   bir hareket görünmeyen bir sonuç doğurmamalı.
+
+   NEDEN ÇEKİRDEĞE TAŞINDI: aynı hareket artık İKİ tabloda var —
+   muhasebedeki giderler ve servis kaydındaki yapılanlar listesi. Kod
+   muhasebe ekranının IIFE'sinin içindeydi ve oradan çıkamıyordu;
+   kopyalansaydı iki ayrı eşik, iki ayrı yön hatası doğardı. Nitekim
+   yön hatasını (`kayma >= 40` — kayma negatif) bir kez zaten yapmıştım
+   ve hiçbir test yakalamamıştı.
+
+   ORTAK NESNE KURALI hareketlere de işliyor: bir nesne bir yerde
+   çizilir, bir hareket bir yerde tanımlanır.
+
+   Kullanımı: satıra `class="kaydirilir" data-kaydir="<anahtar>"` yaz,
+   ekranın betiğinde `Kaydirma.tanim('<ekran>', function (anahtar) {…})`
+   de. Pointer olayları kullanılıyor — dokunmatikte de farede de aynı
+   kod. Dikey kaydırma serbest; yatay hareket 40 px'i geçerse açılır. */
+var Kaydirma = (function () {
+  var isleyiciler = {};
+  var basX = 0, basY = 0, satir = null, yatay = false;
+
+  function tanim(ekran, fn) { isleyiciler[ekran] = fn; }
+
+  function tetikle(tr) {
+    var fn = isleyiciler[Ekran.adi()];
+    if (fn) fn(tr.getAttribute('data-kaydir'));
+  }
+
+  document.addEventListener('pointerdown', function (e) {
+    if (!isleyiciler[Ekran.adi()]) return;
+    var tr = e.target.closest('.tablo tr.kaydirilir');
+    if (!tr) return;
+    satir = tr; basX = e.clientX; basY = e.clientY; yatay = false;
+  });
+
+  document.addEventListener('pointermove', function (e) {
+    if (!satir) return;
+    var dx = e.clientX - basX, dy = e.clientY - basY;
+    if (!yatay && Math.abs(dy) > Math.abs(dx)) { satir = null; return; }
+    if (dx > 0) return;                       /* yalnız SOLA */
+    yatay = true;
+    satir.classList.add('kayiyor');
+    var kayma = Math.max(dx, -96);
+    Array.prototype.forEach.call(satir.children, function (td) {
+      td.style.transform = 'translateX(' + kayma + 'px)';
+    });
+  });
+
+  function birak() {
+    if (!satir) return;
+    var tr = satir; satir = null;
+    tr.classList.remove('kayiyor');
+    var kayma = 0;
+    try {
+      kayma = parseFloat((tr.children[0].style.transform || '').replace(/[^-\d.]/g, '')) || 0;
+    } catch (x) {}
+    Array.prototype.forEach.call(tr.children, function (td) { td.style.transform = ''; });
+    /* kayma NEGATİF (sola gidiyor). İlk yazımda `kayma >= 40` yazdım ve
+       onay hiç açılmadı: kaydırma çalışıyor, sonucu gelmiyordu. Hiçbir
+       test yakalamadı; elle işletince çıktı. */
+    if (yatay && -kayma >= 40) tetikle(tr);
+  }
+  document.addEventListener('pointerup', birak);
+  document.addEventListener('pointercancel', birak);
+
+  /* KLAVYEYLE DE: kaydırma parmakla yapılır, klavyeyle yapılamaz.
+     Satır odaklanabilir ve Delete onay satırını açar. */
+  document.addEventListener('keydown', function (e) {
+    if (!isleyiciler[Ekran.adi()]) return;
+    if (e.key !== 'Delete' && e.key !== 'Backspace') return;
+    var tr = e.target.closest && e.target.closest('.tablo tr.kaydirilir');
+    if (!tr) return;
+    e.preventDefault();
+    tetikle(tr);
+  });
+
+  return { tanim: tanim };
 })();
 
 /* Akordiyon başlığı — govde id'si ile bağlanır. Sayaç (kaç satır var)

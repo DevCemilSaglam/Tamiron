@@ -52,9 +52,37 @@ function siraliDosyalar(klasor, uzanti) {
 /* ---- 1. tokens (tek renk/tip/ölçü kaynağı — K-023) ---- */
 let css = '/* ===== tokens.css (docs/tokens.css) ===== */\n' + oku(TOKENS) + '\n';
 
+/* derleme denetimi 8: KAPANMAMIŞ YORUM (06.09)
+   ⚠️ BU HATA AYLARDIR SESSİZCE DURUYORDU. 03-bilesen.css'te bir yorum
+   `*` + `/` ile kapanmıyordu; CSS o noktadan sonraki HER ŞEYİ, bir
+   sonraki kapanışa kadar, yorum saydı. İçinde kalan kural
+   `.k-sil::before` idi — yani ikincil düğmelerin 44 px dokunma alanı.
+   Kural yazılmıştı, denetimden geçmişti, ölçülmüştü; sadece TARAYICI
+   onu hiç görmedi.
+
+   Kapanmamış yorum, silinen koddan tehlikelidir: silinen kod yoktur,
+   yorumlanan kod VAR GİBİ DURUR. Dosyada 140 açılış, 139 kapanış
+   vardı — tek bir sayma bunu söylerdi.
+
+   Sayma, dizge içindeki `/`+`*`ı da sayar; CSS'te dizge nadirdir ve
+   yanlış alarm bir yorum satırıyla susturulabilir. JS'te sayma
+   yapılmıyor (orada dizgeler yüzünden güvenilmez) — JS'in karşılığı
+   denetim 7: üretilen betik ayrışıyor mu. */
+function yorumDengesi(ad, metin) {
+  const ac = (metin.match(/\/\*/g) || []).length;
+  const kap = (metin.match(/\*\//g) || []).length;
+  if (ac !== kap) {
+    uyarilar.push(
+      `${ad}: KAPANMAMIŞ YORUM — ${ac} açılış, ${kap} kapanış. ` +
+      'Kapanmayan yorum, kendinden sonraki kuralları sessizce yutar.');
+  }
+}
+
 /* ---- 2. ortak stil ---- */
 for (const d of siraliDosyalar(path.join(KAYNAK, 'stil'), '.css')) {
-  css += `\n/* ===== stil/${d.ad} ===== */\n` + oku(d.yol) + '\n';
+  const metin = oku(d.yol);
+  yorumDengesi('stil/' + d.ad, metin);
+  css += `\n/* ===== stil/${d.ad} ===== */\n` + metin + '\n';
 }
 
 /* ---- 3. çekirdek betik ---- */
@@ -71,8 +99,27 @@ const sinifSahibi = {};   /* sınıf adı -> ilk tanımlayan dosya */
 for (const d of siraliDosyalar(path.join(KAYNAK, 'ekranlar'), '.html')) {
   let icerik = oku(d.yol);
 
+  /* derleme denetimi 6: YORUMUN İÇİNDE ETİKET (06.09)
+     Bir ekran başlığında "(aşağıdaki <style> içinde)" yazdım. Aşağıdaki
+     çıkarıcı kaçıncı <style> olduğuna bakmıyor: YORUMDAKİ etiketten
+     başlayıp dosyanın sonundaki gerçek </style> ile eşleşti ve arada
+     kalan HER ŞEYİ — <section>'ın tamamını — CSS sanıp sildi. Derleme
+     "id=screen-… bulunamadı" dedi; sebebi bir yorum satırıydı.
+
+     Yorum kod değildir ama derleyici için METİNDİR. Bu denetim o
+     hatayı adıyla söylüyor. */
+  (icerik.match(/<!--[\s\S]*?-->/g) || []).forEach((yorum) => {
+    const et = yorum.match(/<\/?(style|script)[ >]/);
+    if (et) {
+      uyarilar.push(
+        d.ad + ': YORUM İÇİNDE <' + et[1] + '> etiketi — ' +
+        'çıkarıcılar yorumu kod sanıyor. Etiketi yorumdan çıkar.');
+    }
+  });
+
   /* <style> çıkar */
   icerik = icerik.replace(/<style>([\s\S]*?)<\/style>/g, (_, blok) => {
+    yorumDengesi(d.ad + ' (style)', blok);
     css += `\n/* ===== ekran: ${d.ad} ===== */\n` + blok.trim() + '\n';
     /* derleme denetimi 1: sınıf çakışması
        DİKKAT: `m` bayrağı şart. Onsuz `^` yalnız 0. konumu tutuyor ve
@@ -181,6 +228,26 @@ let cikti = oku(path.join(KAYNAK, 'kabuk.html'))
   .replace('<!-- @@EKRANLAR@@ -->', ekranMarkup)
   .replace('<!-- @@IKONLAR@@ -->', ikonlar)
   .replace('/* @@BETIK@@ */', js);
+
+/* ---- derleme denetimi 7: ÜRETİLEN BETİK ÇALIŞIYOR MU (06.09) ----
+   ⚠️ BU DENETİM OLMADAN DERLEYİCİ YALAN SÖYLÜYORDU. Bir ekran
+   betiğinde dizge içinde gerçek satır sonu kalmıştı; derleyici
+   "derleme denetimi temiz" dedi, dosya üretildi, tarayıcıda AÇILDI —
+   ve içindeki BÜTÜN betik ayrıştırılamadığı için Ekran, showScreen,
+   hiçbir şey tanımlanmadı. Prototip sessizce ölü açıldı.
+
+   Beş denetim de doğruydu; hiçbiri betiğin ÇALIŞIP ÇALIŞMADIĞINA
+   bakmıyordu. Sınıf çakışması aramak, dosyanın ayrıştığını varsayar.
+   En temel soru en sona kalmıştı: bu JavaScript geçerli mi?
+
+   new Function ÇALIŞTIRMAZ, yalnız AYRIŞTIRIR — derleme sırasında
+   hiçbir yan etki doğmaz. */
+try {
+  new Function(js);
+} catch (e) {
+  uyarilar.push('ÜRETİLEN BETİK AYRIŞMIYOR — ' + e.message +
+    ' (prototip tarayıcıda ölü açılır)');
+}
 
 fs.writeFileSync(CIKTI, cikti, 'utf8');
 

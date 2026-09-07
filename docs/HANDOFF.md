@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 05.09.2026 *(K-019…K-026)*
+> **Son güncelleme:** 06.09.2026 *(K-033)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -14,12 +14,12 @@ tıklanabilir prototip.
 | | |
 |---|---|
 | Ekran | **14** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe · **is-basina** + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
-| Ana ekran | **Menü** — Sesli işlem üstte, altında altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1) |
+| Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
 | Dokunuş | ana yol **12** · kısa yol **9** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 05.09'da yürütülerek ölçüldü* |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
 | Sağlık denetimi | **36 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** (K-024.1) ve sekmelere dokunmuyor (K-026.7) |
-| Derleme denetimi | 5 kontrol, bulursa `exit 1` |
-| Kararlar | **K-001 … K-028** |
+| Derleme denetimi | **8** kontrol, bulursa `exit 1` — 06.09'da üçü eklendi: **yorum içinde etiket** · **üretilen betik ayrışıyor mu** · **kapanmamış yorum** (K-033.11) |
+| Kararlar | **K-001 … K-033** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -167,6 +167,37 @@ bir düğme *"Açık kay"* yazıyordu ve hiçbir test görmedi (K-025).
 geldi: *"yeni **araç**"* → arama, *"**beyaz** araba"* → mesaj, *"**gösterge**
 paneli"* → arama. Kural artık şöyle: **kısa komut kelimeleri içinde aranmaz**
 (K-024.2).
+
+### 06.09 turunda öğrenilen beş şey daha
+
+**Derleyici "temiz" derken yalan söyleyebilir.** Beş denetimi de geçen bir
+derleme, **ayrıştırılamayan** bir betik üretti: prototip tarayıcıda açıldı,
+hiçbir şey tanımlanmadı, hata da görünmedi. Denetimler dosyanın *ayrıştığını
+varsayıyordu.* En temel soru en sona kalmıştı — *bu JavaScript geçerli mi?*
+Artık `new Function(js)` ile soruluyor (denetim 7). K-033.11.
+
+**Kapanmamış bir yorum, silinen koddan tehlikelidir.** `.k-sil::before`
+kuralı — ikincil düğmelerin 44 px dokunma alanı — aylardır bir yorumun
+içindeydi. Silinen kod yoktur; **yorumlanan kod var gibi durur.** Dosyada
+140 açılış, 139 kapanış vardı: tek bir sayma bunu söylerdi (denetim 8).
+
+**`ciz()` ekranı çizer, KARARI değil.** Aynı turda iki kez düştüm: `ciz()`
+içinde sıfırlanan bir ekran değişkeni, `Ekran.tazele()` her koştuğunda
+kullanıcının seçimini siliyordu. Bir SEÇİM ekranın değil **verinin**
+bilgisidir. **İkisini de hiçbir test yakalamadı** — 36 test 0 bulgu
+veriyordu; ikisi de elle işletince çıktı. K-033.12.
+
+**Kapalı düğme sessizdir.** `disabled` bir düğme, neden kapalı olduğunu
+söylemez. Cemil *"Kaydı Aç"a bastı, bir şey olmadı* diye yazdı ve haklıydı.
+Düğmeler artık kapanmıyor: eksik varsa **basınca söylüyor** ve eksik alana
+götürüyor. K-033.3.
+
+**Yarıçapı düzeltmek, genişliği düzeltmez.** Balon yumurta gibi
+görünüyordu; teşhisim `border-radius` idi ve düzelttim — yarım çözümdü.
+Asıl sebep: `position:absolute; left:50%` ile ortalanan, `right` verilmeyen
+bir öğe kapsayıcının **yarısını** geçemiyor. 375 px'te tavan 187 px'ti,
+`max-width` yazmak işe yaramıyordu. **Belirtiyi düzeltmek, sebebi
+düzeltmek değildir.** K-033.10.
 
 ---
 

@@ -728,11 +728,6 @@ FIYAT ALTTA (Cemil,
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   background: var(--surface-2);
-}.kalem .k-tutar-satir {
-  grid-column: 2 / -1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }.kalem .k-tip {
   font-size: 10.5px;
   font-weight: 700;
@@ -754,42 +749,11 @@ kirpilsin. */
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}.kalem .k-tutar {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 15px;
-  white-space: nowrap;
-}/* Satır içi düzenlenebilir alanlar da 44 px dokunma hedefi olmalı
+}/* Satır içi düzenlenebilir alan da 44 px dokunma hedefi olmalı
    (Cemil: "44 px olsun. Kurala her yerde uyalım isterim").
    Bu alanlar liste BOŞKEN görünmediği için önceki denetimlerde kaçmıştı. */
-.kalem input.k-ad,
-.kalem input.k-tutar {
+.kalem input.k-ad {
   min-height: 44px;
-}/* .k-sil BAGIMSIZ olmali: stil .kalem'e kilitliyken hasar listesinde,
-fiyat detayinda ve fotodan liste ekraninda tarayicinin varsayilan
-   dugmesi (BEYAZ KUTU) olarak ciziliyordu. */
-.k-sil {
-  /* position: relative — ::before ile buyuyen 44 px dokunma alani
-     bunu gerektiriyor; ayri blokta durdugu icin denetim "iki kez
-     kurucu tanimlanmis" diyordu (03.09). */
-  position: relative;
-  border: 0;
-  background: transparent;
-  color: var(--faint);
-  width: 28px;
-  height: 28px;
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}.k-sil:hover {
-  color: var(--crit);
-  background: var(--crit-bg);
-}.kalem-bos {
-  padding: 18px 12px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 14.5px;
 }/* Toplam şeridi — müşteriye söylenen rakam */
 .tutar-serit {
   display: flex;
@@ -862,24 +826,61 @@ fiyat detayinda ve fotodan liste ekraninda tarayicinin varsayilan
    (Cemil 31.08). Artik yuzey renginde: kartlarla ayni dil,
 ince kenarlik
    ve golge ile one cikiyor. */
+/* ⚠️ 06.09 — BALON HAP DEĞİL, KUTU (Cemil, ekran görüntüsüyle:
+   "hata mesajları düzgün gözüksün. Mümkünse iki satır olabilir.
+   Kenar boşlukları vb düzgün olsun.")
+
+   NE OLMUŞTU: `border-radius: var(--radius-pill)` (999px) tek satırlık
+   bir balon için doğruydu. Ama uzun bir hata cümlesi ("Telefon yok —
+   özet gönderilemez. Araç kaydına telefon ekle.") üç satıra sarınca
+   kutu YÜKSELİYOR ve 999px yarıçap onu YUMURTAYA çeviriyordu: yanlar
+   şişiyor, ilk ve son satır eğrinin içine giriyor, sol/sağ boşluk
+   satırdan satıra değişiyordu. Metin kırpılmıyordu ama okunmuyordu.
+
+   DERS: yarıçap içeriğin BOYUTUNDAN bağımsız seçilemez. Hap biçimi
+   "içine tek satır sığar" diye bir söz verir; balon o sözü tutamıyor,
+   çünkü ne yazacağını önceden bilmiyor.
+
+   Artık: sabit köşe (--radius-lg), her yönde eşit iç boşluk, satır
+   aralığı okunacak kadar açık, en fazla ekranın 32px içi. */
 .toast {
   position: absolute;
   left: 50%;
   bottom: 22px;
   transform: translate(-50%, 12px);
   display: none;
-  align-items: center;
+  align-items: flex-start;   /* iki satırda ikon ÜST satıra hizalanır */
   gap: 10px;
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--line);
-  padding: 12px 18px;
-  border-radius: var(--radius-pill);
+  padding: 13px 16px;
+  border-radius: var(--radius-lg);
   font-size: 14.5px;
   font-weight: 600;
+  line-height: 1.38;
+  text-align: left;
+  /* ⚠️ `text-wrap: balance` DENENDİ VE GERİ ALINDI (06.09). Satırları
+     eşitlemek için kutuyu DARALTIYOR: 375 px'te 343 px yer varken
+     balon 188 px'e büzülüp metni ÜÇ satıra bölüyordu. Cemil "mümkünse
+     iki satır" dedi; dengeleme, satır sayısını azaltmıyor ARTIRIYOR.
+     Ölçüldü: balance ile 188×88, balance'sız 343×62. */
   box-shadow: var(--shadow);
   z-index: 60;
-  max-width: calc(100% - 40px);
+  /* ⚠️ ASIL SEBEP BURADAYDI — YARIÇAP DEĞİL, GENİŞLİK.
+     Balon `position:absolute; left:50%` ile ortalanıyor ve `right`
+     verilmiyor. Böyle bir öğe için tarayıcının hesapladığı KULLANILABİLİR
+     genişlik, kapsayıcının SAĞ YARISIDIR: 375 px'lik telefonda 187 px.
+     max-width 343 px yazsam da öğe hiç 188 px'i geçemiyordu; uzun hata
+     cümlesi üç satıra sarıyor, kutu yükseliyor ve 999 px yarıçapla
+     YUMURTAYA dönüyordu — Cemil'in gönderdiği ekran görüntüsü tam
+     buydu. Yarıçapı düzeltmek yarım çözümdü.
+
+     `width: max-content` shrink-to-fit hesabını devre dışı bırakır:
+     genişliği artık METİN belirler, max-width de tavanı koyar.
+     Ölçüldü (375 px): önce 188×88 (üç satır), sonra 343×62 (iki satır). */
+  width: max-content;
+  max-width: calc(100% - 32px);
 }.toast.show {
   display: inline-flex;
   animation: toastIn .2s ease forwards;
@@ -1033,29 +1034,6 @@ kirpilsin. */
   text-overflow: ellipsis;
   white-space: nowrap;
   ;
-}.kalem .k-tutar {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  font-size: 15px;
-  white-space: nowrap;
-}/* ---------- DOKUNMA HEDEFİ DÜZELTMELERİ (K-024 · en az 44px) ----------
-   GÖRSEL AĞIRLIK ≠ DOKUNMA ALANI: ikincil eylemler küçük GÖRÜNMEYE devam eder,
-alanları ::before ile büyür. Ölçüm (30.08,
-.k-sil::before {
-  content: '';
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  width: max(100%, 44px);
-  height: 44px;
-  /* görünmez — yalnız dokunma alanı */;
-}.kalem .k-tutar-satir {
-  grid-column: 2 / -1;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  ;
 }.tutar-sat .tv {
   font-family: var(--font-mono);
   color: var(--text);
@@ -1076,12 +1054,6 @@ alanları ::before ile büyür. Ölçüm (30.08,
   ;
 }.tutar-sat.kar .tv {
   color: var(--muted);
-  ;
-}.kalem-bos {
-  padding: 18px 12px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 14.5px;
   ;
 }/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
 /* Parca ve iscilik satirlari BITISIKTI (Cemil,
@@ -1115,25 +1087,12 @@ alanları ::before ile büyür. Ölçüm (30.08,
 .plate-sm .plate-tr { font-size: 9.5px; padding: 0 5px; }
 .plate-sm .plate-no { font-size: 12.5px; padding: 3px 7px; letter-spacing: .06em; }
 
-/* Katalog/alis fiyati SADECE BILGI — musteriye soylenecek rakam degil,
-   o yuzden .k-tutar gibi degil, soluk ve kucuk. v1'den geri alindi:
-   Kol D'de musteri parcayi kendi getirse bile parcacidan gelen fiyat
-   kayitta KALIYOR (IS-AKISI Kol D "sonradan" hali). */
-.kalem .k-katalog { font-size: 11.5px; color: var(--faint); white-space: nowrap; }
-
 /* Buyuk plaka — v1'den. TANIMSIZ-SINIF testi yakaladi ve GEC yakaladi:
    .plate-lg'yi JS uretiyor, ekran cizilmeden DOM'da olmuyor. Ders:
    denetim yalniz acik ekrani degil, CIZILMIS ekrani gormeli. */
 .plate-lg { align-self: flex-start; }
 .plate-lg .plate-tr { font-size: 13px; padding: 0 9px; }
 .plate-lg .plate-no { font-size: 22px; padding: 7px 13px; }
-
-/* Fiyat satiri SARMALI: yanina parcaci fiyati (.k-katalog) gelince
-   217 px'lik kutuya 281 px istiyordu (olcum 03.09, 375 px). Input'un
-   kucule bilmesi de sart -- flex cocugu varsayilan olarak icerigi
-   kadar genis kalir. */
-.kalem .k-tutar-satir { flex-wrap: wrap; }
-.kalem input.k-tutar { min-width: 0; }
 
 /* ============================================================
    ÇEKMECE (DRAWER) + OVERLAY — v1'den AYNEN geri (03.09.2026)
@@ -1248,24 +1207,23 @@ alanları ::before ile büyür. Ölçüm (30.08,
 }
 .icon-btn .badge:empty { display: none; }
 
-/* KALEM SATIRI ICINDEKI ALANLAR — koyu temada BEYAZ kaliyordu.
-   .field input kurali --field-bg veriyor ama bu ikisi .field icinde
-   degil, dogrudan .kalem'in cocugu; tarayicinin varsayilan beyaz
-   zemini duruyordu. Acik temada goze carpmiyor, koyu temada ekranin
-   ortasinda iki beyaz kutu. Iki temayi da cizmek gerekiyor, birini
-   cizip otekine bakmamak degil (03.09). */
-.kalem input.k-ad,
-.kalem input.k-tutar {
+/* KALEM SATIRI ICINDEKI ALAN — koyu temada BEYAZ kaliyordu.
+   .field input kurali --field-bg veriyor ama bu, .field icinde degil,
+   dogrudan .kalem'in cocugu; tarayicinin varsayilan beyaz zemini
+   duruyordu. Acik temada goze carpmiyor, koyu temada ekranin
+   ortasinda beyaz kutu. Iki temayi da cizmek gerekiyor, birini cizip
+   otekine bakmamak degil (03.09).
+   ⚠️ 06.09 — .k-tutar bu kuraldan DUSTU: servis kaydinin kalem
+   listesi tabloya dondu, tutar artik tablonun kendi alani. */
+.kalem input.k-ad {
   border: 1px solid var(--line);
   border-radius: var(--radius-sm);
   background: var(--field-bg);
   color: var(--text);
   padding: 8px 10px;
 }
-.kalem input.k-ad::placeholder,
-.kalem input.k-tutar::placeholder { color: var(--faint); }
-.kalem input.k-ad:focus,
-.kalem input.k-tutar:focus {
+.kalem input.k-ad::placeholder { color: var(--faint); }
+.kalem input.k-ad:focus {
   outline: none;
   border-color: var(--primary);
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
@@ -1536,19 +1494,43 @@ alanları ::before ile büyür. Ölçüm (30.08,
   .tab .ico { display: none; }
 }
 
-/* Servis kaydı kartının iş satırı — araç kartının altına eklenen tek
-   fark (05.09). Tür rozeti solda, ne yapıldığı yanında. */
+/* ⚠️ 06.09 — SERVİS KARTININ ALT YARISI CEMİL'İN TARİFİYLE:
+   "Araç sahibi adı altında border'ın altında solda Bakım ya da
+    Tamirat, o satırın sağında durum. Bu satırın altında açıklama.
+    En altta sağda tutar, solda tarih."
+
+   ÜÇ SATIR, HER BİRİNİN İŞİ AYRI:
+     1) tür (sol) ............... durum (sağ)
+     2) açıklama — TEK BAŞINA, kendi satırında
+     3) tarih (sol) ............. tutar (sağ)
+
+   Açıklama neden kendi satırında: eskiden türün yanındaydı ve uzun
+   bir şikâyet ("sağ ön amortisör ses yapıyor, balatalara da bakılacak")
+   satırı sarıp durumu aşağı itiyordu. Aynı listede kart kartına farklı
+   bir düzen çıkıyordu — göz sabit bir yere bakamıyordu. */
 .arac-kart .ak-is {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line);
 }
-.arac-kart .ak-is-ne { font-size: var(--tip-sm); color: var(--text); min-width: 0; }
+.arac-kart .ak-is .ak-durum { margin-left: auto; }
+.arac-kart .ak-is-ne {
+  display: block; margin-top: 8px;
+  font-size: var(--tip-sm); color: var(--text); min-width: 0;
+  overflow-wrap: anywhere;
+}
 .arac-kart .ak-alt {
-  display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap;
+  display: flex; align-items: baseline; gap: 6px 10px;
   margin-top: 10px;
 }
 .arac-kart .ak-alt .tl-date { margin-left: 0; }
-.arac-kart .ak-alt .tl-date:last-child { margin-left: auto; }
+/* Tutar SAĞDA ve rakam dilinde — listede iki kartın tutarı alt alta
+   hizalı okunsun (tabular-nums). */
+.arac-kart .ak-tutar {
+  margin-left: auto;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+  font-weight: 700; font-size: var(--tip-sm); color: var(--text);
+  white-space: nowrap;
+}
 
 /* ================= TABLO — 05.09.2026 =================
    Cemil: "Gider alanı excel gibi tablo şeklinde olsun."

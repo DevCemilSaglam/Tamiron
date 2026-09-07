@@ -590,8 +590,18 @@ function stilMetni() {
         var hedef = bas.getAttribute('aria-controls');
         var govde = hedef ? document.getElementById(hedef) : null;
         if (!govde) { ek('ACILMAYAN-BOLUM', a, (hedef || '(aria-controls yok)') + ' — govde yok'); continue; }
+        /* ⚠️ 06.09 — GORUNMEYEN BASLIK OLCULMEZ. Ruhsat ekraninda
+           "Ruhsattaki diger bilgiler" akordiyonu, arac KAYITSIZ oldugu
+           zaman acilan bir kartin icinde; plaka yazilmamisken o kart
+           hidden ve akordiyon da onunla birlikte gorunmuyor. Test
+           tiklayip "acilmiyor" diyordu — oysa olcemedigi bir seyi
+           bozuk ilan ediyordu (K-024'un tekrari: denetim olctugu seyi
+           bozmamali, olcemedigini de suclamamali).
+           aria-expanded KONTROLU YINE YAPILIYOR: o, gorunurlukten
+           bagimsiz ve gercek bir baglanti hatasini yakalar. */
+        var gorunur = bas.offsetParent !== null && bas.offsetHeight > 0;
         bas.click();
-        var acildi = !govde.hidden && govde.offsetHeight > 0;
+        var acildi = !govde.hidden && (govde.offsetHeight > 0 || !gorunur);
         if (!acildi) { ek('ACILMAYAN-BOLUM', a, hedef + ' — dokununca acilmiyor'); }
         if (bas.getAttribute('aria-expanded') !== 'true') {
           ek('ACILMAYAN-BOLUM', a, hedef + ' — aria-expanded guncellenmiyor');
@@ -972,7 +982,13 @@ function stilMetni() {
           km:    /^[0-9.]*$/,
           yil:   /^[0-9]*$/,
           tel:   /^[0-9 ]*$/,
-          plaka: /^[0-9A-ZÇĞİÖŞÜ ]*$/
+          plaka: /^[0-9A-ZÇĞİÖŞÜ ]*$/,
+      /* Ruhsatin sasi/motor numarasi ve ilk tescil tarihi (06.09).
+         Denetimin sozlugu, cekirdegin sozlugunden GERI KALAMAZ: yeni
+         bir data-giris tipi eklenip buraya yazilmazsa test "boyle bir
+         tip yok" der ve dogru kodu hata sanar. */
+      kod:   /^[0-9A-ZÇĞİÖŞÜ]*$/,
+      tarih: /^[0-9.]*$/
         };
         var eski = el.value;
         el.value = HARFLI;

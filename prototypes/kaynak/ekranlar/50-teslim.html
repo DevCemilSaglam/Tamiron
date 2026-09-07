@@ -48,6 +48,9 @@ var ODEME_YOLLARI = [
   { k: 'almadim', ad: 'Almadım' }
 ];
 var tsSecili = null;
+/* Teslim EDİLDİ mi — edildikten sonra ekran kapanmıyor, bir adım daha
+   var: müşteriye haber. */
+var tsBitti = false;
 
 function tsCiz() {
   var k = kayitBul(ACIK_KAYIT);
@@ -84,10 +87,48 @@ function tsCiz() {
   }).join('');
 
   document.getElementById('tsTeslim').disabled = !tsSecili;
+  document.getElementById('tsTeslim').hidden = tsBitti;
+  document.getElementById('tsOdeme').hidden = tsBitti;
 
   /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın.
      Hangi tarihin kurulacağını da söylüyor: "6 ay sonra" demek yetmez,
      km'den gelen tarih daha erken olabilir. */
+  /* ---- TESLİMDEN SONRA: MESAJ SORULUYOR (Cemil, 06.09) ----
+     *"Teslim et deyince ödemenin nasıl olduğu da sormalı ve mesaj
+     gönderilebilmeli veya geç deyip kapatabilir."*
+
+     ⚠️ ESKİDEN BURADA YALAN VARDI. Teslim balonu telefonu olan araçta
+     "Özet gönderildi." diyordu ve HİÇBİR ŞEY GÖNDERİLMİYORDU. Bir kez
+     böyle kanan usta, bir daha hiçbir "gönderildi" yazısına inanmaz
+     (04.09'da aynı hatayı "Onay iste" düğmesinde yapmıştım).
+
+     Artık gönderim BİR ADIM: mesaj ekranına götürüyor, usta kendi
+     WhatsApp'ından yolluyor (WHATSAPP.md A yolu). "Geç" de gerçek bir
+     seçenek — müşteri zaten yanındaysa mesaj gereksiz. */
+  if (tsBitti) {
+    var hedefT = mesajHedefi(k.plaka);
+    document.getElementById('tsNot').innerHTML =
+      '<div class="notice ok">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>' +
+        '<span class="n-body"><b>' + k.plaka + ' teslim edildi.</b> ' +
+          'Ödeme: ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) + '.' +
+          (k.hatirlatmaTarihi
+            ? '<br>Bakım hatırlatması <b>' + k.hatirlatmaTarihi + '</b> için kuruldu.'
+            : '') +
+        '</span>' +
+      '</div>' +
+      (hedefT && hedefT.tel
+        ? '<button class="btn btn-primary btn-lg" id="tsMesaj" style="margin-top:12px">' +
+            '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+            ' Müşteriye özet gönder</button>'
+        : '<p class="plate-hint" style="margin-top:12px">' +
+          'Telefon yok — mesaj gönderilemez. Araç kaydına telefon eklersen ' +
+          'bir sonrakinde gönderebilirsin.</p>') +
+      '<button class="btn btn-ghost" id="tsGec" style="margin-top:10px">' +
+        (hedefT && hedefT.tel ? 'Geç, gönderme' : 'Kapat') + '</button>';
+    return;
+  }
+
   if (bakimIceriyor(k)) {
     var hs2 = hatirlatmaHesapla(k);
     document.getElementById('tsNot').innerHTML =
@@ -109,7 +150,7 @@ function tsCiz() {
 }
 
 Ekran.tanim('teslim', {
-  ciz: function () { tsSecili = null; tsCiz(); }
+  ciz: function () { tsSecili = null; tsBitti = false; tsCiz(); }
 });
 
 document.addEventListener('click', function (e) {
@@ -121,7 +162,6 @@ document.addEventListener('click', function (e) {
 
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
-    var a = aracBul(k.plaka);
     k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */
     k.odemeYolu = tsSecili;
 
@@ -136,9 +176,26 @@ document.addEventListener('click', function (e) {
       k.hatirlatmaGonderildi = false;
     }
 
-    balon(k.plaka + ' teslim edildi.' +
-      (a && a.sahipTel ? ' Özet gönderildi.' : ' Telefon yok, özet gönderilemedi.'),
-      false, 3200);
+    /* ⚠️ BALON ARTIK GÖNDERİM İDDİA ETMİYOR. Ne olduğunu söylüyor,
+       ne olmadığını uydurmuyor. */
+    balon(k.plaka + ' teslim edildi.', false, 2600);
+    tsBitti = true;
+    tsCiz();
+    return;
+  }
+
+  /* Mesaj adımı — ACIK_KAYIT burada BIRAKILMIYOR, çünkü mesaj ekranı
+     özeti bu kayıttan üretecek. Kayıt teslim edilmiş olsa da özeti
+     hâlâ gönderilebilir (msjOzetKaydi son kayda da bakıyor). */
+  if (t.id === 'tsMesaj') {
+    var kk = kayitBul(ACIK_KAYIT);
+    if (!kk) return;
+    MESAJ_HEDEF = { plaka: kk.plaka, sablon: 'ozet' };
+    ACIK_KAYIT = null;
+    Ekran.ac('mesaj');
+    return;
+  }
+  if (t.id === 'tsGec') {
     ACIK_KAYIT = null;
     Ekran.ac('home');
   }

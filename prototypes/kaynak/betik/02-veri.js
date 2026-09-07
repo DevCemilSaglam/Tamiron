@@ -50,10 +50,12 @@ var ARACLAR = [
    `teslimTarihi` DOLUYSA araç çıkmıştır — TEK DURUM ALANI (K-004).
    `Total` alanı YOK: satırlardan hesaplanır. */
 var KAYITLAR = [
+  /* PARÇA BEKLİYOR — prototipte GÖRÜNSÜN diye bir kayıtta açık (06.09).
+     Çalıştığı görülemeyen bir alan, çalışmıyor sayılır. */
   { id: 1, plaka: '34 ABC 123', tur: 'tamirat', km: '',
     sikayet: 'Triger seti değişecek',
     acilis: '03.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true,
     satirlar: [
       { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' }
@@ -62,7 +64,7 @@ var KAYITLAR = [
   { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
     sikayet: 'Periyodik bakım',
     acilis: '02.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1900, alis: 1450, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -74,7 +76,7 @@ var KAYITLAR = [
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
     acilis: '01.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
@@ -89,7 +91,7 @@ var KAYITLAR = [
   { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
     sikayet: 'Periyodik bakım',
     acilis: '15.03.2026', teslimTarihi: '15.03.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -104,7 +106,7 @@ var KAYITLAR = [
   { id: 6, plaka: '34 ABC 123', tur: 'bakim', km: '151.200',
     sikayet: 'Ara bakım',
     acilis: '20.06.2026', teslimTarihi: '20.06.2026',
-    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false,
+    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -118,7 +120,7 @@ var KAYITLAR = [
   { id: 7, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön cam silecek motoru',
     acilis: '03.09.2026', teslimTarihi: '03.09.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
         marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
@@ -130,7 +132,7 @@ var KAYITLAR = [
   { id: 8, plaka: '06 TMR 07', tur: 'tamirat', km: '',
     sikayet: 'Akü değişimi',
     acilis: '28.08.2026', teslimTarihi: '28.08.2026',
-    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
@@ -142,7 +144,7 @@ var KAYITLAR = [
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
     sikayet: 'Periyodik bakım',
     acilis: '20.02.2026', teslimTarihi: '20.02.2026',
-    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false,
+    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
     satirlar: [
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
@@ -184,6 +186,53 @@ function kayitBul(id) {
    gerekirdi — biri unutulsa hatırlatma sessizce kurulmazdı. */
 function bakimIceriyor(k) {
   return !!k && (k.tur === 'bakim' || k.tur === 'ikisi');
+}
+
+/* ---- İŞ TÜRÜNÜ METİNDEN TAHMİN ET (06.09) ----
+   Cemil: *"Ne için geldi ekranı olmayacak. Tamir, bakım vb çok önemli
+   değil. Biz bu ai'ya json'da seçtirebiliriz."*
+
+   Tür ekrandan kalktı ama VERİDEN kalkmadı: K-002 bakımda km ister ve
+   hatırlatma kurar. O yüzden iş metninden okunuyor.
+
+   ⚠️ BU BİR TAHMİNDİR, HÜKÜM DEĞİL. Yanlış tahmin edilirse servis
+   kaydının kendi ekranından düzeltilir. Düzeltilemeyen bir tahmin,
+   ustanın hiç sormadığı bir kararı onun adına vermek olurdu.
+
+   ⚠️ TÜRKÇEDE KELİME SINIRI ARANMAZ (K-018) — ama burada kelimeVarMi()
+   de yetmiyor: usta "bakıma geldi", "yağı değişecek", "filtreleri"
+   diyor ve hiçbiri kök hâliyle eşit değil. Bu yüzden kelime kelime
+   bölünüp KÖKLE BAŞLIYOR MU diye bakılıyor.
+
+   Ön ek eşleşmesi bir arama süzgecinde tehlikeliydi (yanlış eşleşme
+   sonucu yok eder); burada tehlikesiz, çünkü sonuç DÜZELTİLEBİLİR bir
+   ön dolgu. Aynı tekniğin iki yerde farklı sonuç vermesinin sebebi bu:
+   önemli olan teknik değil, yanlışın BEDELİ. */
+var BAKIM_KOKLERI = ['bakim', 'yag', 'filtre', 'periyodik', 'servis'];
+var TAMIRAT_KOKLERI = ['ariza', 'degis', 'kacir', 'ses', 'titre', 'yanmi',
+                       'calismi', 'kirik', 'onar', 'tamir'];
+
+function kokleBasliyorMu(metin, kokler) {
+  var parcalar = norm(metin).split(/\s+/);
+  for (var i = 0; i < parcalar.length; i++) {
+    var kelime = parcalar[i].replace(/[.,!?;:]/g, '');
+    if (!kelime) continue;
+    for (var j = 0; j < kokler.length; j++) {
+      if (kelime.indexOf(kokler[j]) === 0) return true;
+    }
+  }
+  return false;
+}
+
+function isTuruTahmin(metin) {
+  var bakim = kokleBasliyorMu(metin, BAKIM_KOKLERI);
+  var tamirat = kokleBasliyorMu(metin, TAMIRAT_KOKLERI);
+  if (bakim && tamirat) return 'ikisi';
+  if (bakim) return 'bakim';
+  /* VARSAYILAN TAMİRAT. Boş metinde de tamirat: bakım demek, olmayan
+     bir hatırlatmayı kurmak demektir — sessizce yanlış hatırlatma
+     göndermektense sessizce hatırlatma kurmamak daha az zarar verir. */
+  return 'tamirat';
 }
 
 /* İÇERİDEKİ = teslim edilmemiş. Başka tanım yok (K-004). */

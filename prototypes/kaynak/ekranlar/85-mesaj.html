@@ -56,6 +56,19 @@
   </div>
 
   <div id="msjYazim" class="yigin" hidden>
+    <!-- ⚠️ MÜŞTERİ DEĞİŞTİRME YUKARIDA (Cemil, 06.09: "Müşteriye mesaj
+         alanında müşteri seçilebilir olmalı").
+
+         Düğme vardı ama EKRANIN DİBİNDEYDİ — metnin, önizlemenin ve
+         gönder düğmesinin altında. Yanlış müşteriyle açılan ekranda
+         usta önce metni okuyor, "bu kim" diyor ve geri düğmesine
+         basıyordu. Seçim, seçimin sonucundan ÖNCE görünmeli. -->
+    <div class="section-label with-action">
+      <span class="lbl-txt">
+        <svg class="ico ico-sm"><use href="#i-user"></use></svg> Kime gidiyor
+      </span>
+      <button class="cip" id="msjBaskasi">Değiştir</button>
+    </div>
     <div class="card" id="msjKunye"></div>
 
     <div class="section-label">
@@ -82,12 +95,30 @@
          gönderMEDEN önce burada. Gönderdikten sonra öğrenmek geç. -->
     <div id="msjOnizle"></div>
 
+    <!-- ⚠️ ÜÇ KANAL (Cemil, 06.09: "whatsapp, telefon uygulama, mesaj
+         olarak gönderebiliriz").
+
+         WHATSAPP BİRİNCİL ÇÜNKÜ BEDAVA. SMS paralı ve İYS kaydı
+         istiyor (SMS.md); yine de duruyor, çünkü WhatsApp'ı olmayan
+         müşteri var ve o zaman tek yol SMS. "Ara" bir mesaj kanalı
+         değil ama aynı sorunun cevabı: bazı müşteriye yazmak değil,
+         söylemek gerekir.
+
+         ÜÇÜ DE AYNI METNİ TAŞIR. Kanala göre farklı metin üretmek —
+         "SMS kısa olsun" gibi — ustanın gördüğü metinle giden metni
+         ayırırdı; gönderdiğinden başka bir şeyin gittiğini ancak
+         müşteri sorunca öğrenirdi. -->
     <button class="btn btn-primary btn-lg" id="msjGonder">
       <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
     </button>
-    <button class="btn btn-ghost" id="msjBaskasi">
-      <svg class="ico"><use href="#i-users"></use></svg> Başka müşteri seç
-    </button>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="msjSms">
+        <svg class="ico"><use href="#i-message-square"></use></svg> SMS
+      </button>
+      <button class="btn btn-ghost" id="msjAra">
+        <svg class="ico"><use href="#i-phone"></use></svg> Ara
+      </button>
+    </div>
   </div>
 
 </section>
@@ -98,11 +129,30 @@ var msjSablonSecili = 'ozet';
 /* Hangi hedefe gidiyor — null ise varsayilan (telefonu olan ilk sira). */
 var msjHedefSecili = null;
 
+/* ⚠️ 06.09 — DÖRDÜNCÜ ŞABLON: PARÇA BEKLİYORUZ (Cemil: "Parça
+   beklediğine dair mesaj da gönderebiliriz").
+
+   Bu mesaj yeni bir iş değil, VAR OLAN İŞİN sessiz kalan yarısı:
+   müşteri aracını bıraktı ve haber bekliyor. Haber gelmeyince
+   müşteri arıyor, usta telefonda vakit kaybediyor — tamircinin
+   şikâyet ettiği şeylerden biri. */
 var MSJ_SABLON = [
   { k: 'ozet', ad: 'İşin özeti' },
+  { k: 'bekliyor', ad: 'Parça bekliyoruz' },
   { k: 'hazir', ad: 'Aracınız hazır' },
   { k: 'hatirlatma', ad: 'Bakım hatırlatması' }
 ];
+
+/* Balonun ne diyeceği kanala göre değişir — ama HEPSİ "açılıyor" der,
+   "gönderildi" DEMEZ. Uygulama mesajı bizim yerimize göndermiyor;
+   ustanın WhatsApp'ını mesaj hazır hâlde açıyor (WHATSAPP.md A yolu).
+   "Gönderildi" demek, 04.09'da bir kez yaptığım yalanı tekrar etmek
+   olurdu. */
+var KANAL_METIN = {
+  whatsapp: 'WhatsApp açılıyor',
+  sms: 'Mesaj uygulaması açılıyor',
+  ara: 'Aranıyor'
+};
 
 /* Hangi kaydın özeti — TEK YERDE. Metin bir kayıttan, önizleme başka
    bir kayıttan üretilseydi usta gönderdiğinden farklı bir şey görürdü
@@ -124,6 +174,15 @@ function msjMetinUret(plaka, sablon) {
     : 'Merhaba, ';
   var arac = a.marka + ' ' + a.model + ' (' + plaka + ')';
 
+  if (sablon === 'bekliyor') {
+    /* SÖZ VERİLMİYOR. "Yarın hazır olur" demiyoruz: parçanın ne zaman
+       geleceğini biz de bilmiyoruz ve tutulmayan söz, hiç verilmemiş
+       sözden kötüdür. Söylenen tek şey doğru olan: parça bekleniyor,
+       gelince haber verilecek. */
+    return basi + arac + ' için parça bekliyoruz. ' +
+           'Parça gelir gelmez işe başlayıp size haber vereceğiz.' +
+           '\n\n' + DUKKAN.ad + '\n' + DUKKAN.tel;
+  }
   if (sablon === 'hazir') {
     return basi + arac + ' hazır, teslim alabilirsiniz.\n\n' +
            DUKKAN.ad + '\n' + DUKKAN.tel;
@@ -229,7 +288,10 @@ function msjYazimCiz() {
       '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
       '<span class="n-body">Bu aracın <b>telefonu yok</b>. Mesaj gönderilemez — ' +
       'önce araç kaydına telefon yaz.</span></div>';
-  document.getElementById('msjGonder').disabled = !tel;
+  ['msjGonder', 'msjSms', 'msjAra'].forEach(function (id) {
+    var d = document.getElementById(id);
+    if (d) d.disabled = !tel;
+  });
 
   /* Önizleme YALNIZ özet şablonunda: linki taşıyan tek şablon o.
      "Hazır" ve "hatırlatma" mesajlarında gösterilecek bir sayfa yok. */
@@ -310,19 +372,27 @@ document.addEventListener('click', function (e) {
     return;
   }
 
-  if (t.id === 'msjGonder') {
+  /* GÖNDERİM TEK YERDE, KANAL PARAMETRE. Üç ayrı işleyici yazsaydım
+     "hatırlatma gönderildi sayılır" kuralını üç yere kopyalamam
+     gerekirdi ve biri unutulunca aynı hatırlatma her gün çıkardı. */
+  var kanal = (t.id === 'msjGonder') ? 'whatsapp'
+            : (t.id === 'msjSms') ? 'sms'
+            : (t.id === 'msjAra') ? 'ara' : null;
+  if (kanal) {
     var a = aracBul(msjPlaka);
     var hedef = mesajHedefi(msjPlaka, msjHedefSecili);
     if (!a || !hedef || !hedef.tel) return;
     /* Şablon "hatırlatma" ise hatırlatma GÖNDERİLDİ sayılır — yedinci
-       işin döngüsü burada kapanıyor, yoksa aynı uyarı her gün çıkardı. */
+       işin döngüsü burada kapanıyor, yoksa aynı uyarı her gün çıkardı.
+       ARAMA DA SAYILIR: usta telefonla söylediyse hatırlatma yapılmıştır;
+       "yazmadın" diye ikinci kez uyarmak ustayı kızdırır. */
     if (msjSablonSecili === 'hatirlatma') {
       aracKayitlari(msjPlaka).forEach(function (k) {
         if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
       });
     }
-    balon('WhatsApp açılıyor — ' + hedef.ad + ' · ' + hedef.tel +
-          ', mesaj hazır.', false, 3200);
+    balon(KANAL_METIN[kanal] + ' — ' + hedef.ad + ' · ' + hedef.tel +
+          (kanal === 'ara' ? '.' : ', mesaj hazır.'), false, 3200);
     msjPlaka = null;
     msjHedefSecili = null;
     Ekran.ac('home');

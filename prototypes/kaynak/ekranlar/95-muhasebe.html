@@ -400,67 +400,12 @@ document.addEventListener('click', function (e) {
 });
 
 /* ---- SOLA KAYDIRMA ----
-   ⚠️ KAYDIRMA TEK BAŞINA SİLMEZ, onay satırını açar. Görünmeyen bir
-   hareket görünmeyen bir sonuç doğurmamalı (K-031'in dersi): cepte
-   kazara kaydırmak bir gideri silmemeli.
-
-   Pointer olayları kullanılıyor — dokunmatikte de farede de aynı kod.
-   Dikey kaydırma serbest (touch-action: pan-y); yatay hareket 40 px'i
-   geçerse onay açılıyor. */
-(function () {
-  var basX = 0, basY = 0, satir = null, yatay = false;
-
-  document.addEventListener('pointerdown', function (e) {
-    if (Ekran.adi() !== 'muhasebe') return;
-    var tr = e.target.closest('.tablo tr.kaydirilir');
-    if (!tr) return;
-    satir = tr; basX = e.clientX; basY = e.clientY; yatay = false;
-  });
-
-  document.addEventListener('pointermove', function (e) {
-    if (!satir) return;
-    var dx = e.clientX - basX, dy = e.clientY - basY;
-    if (!yatay && Math.abs(dy) > Math.abs(dx)) { satir = null; return; }
-    if (dx > 0) return;                       /* yalnız SOLA */
-    yatay = true;
-    satir.classList.add('kayiyor');
-    var kayma = Math.max(dx, -96);
-    Array.prototype.forEach.call(satir.children, function (td) {
-      td.style.transform = 'translateX(' + kayma + 'px)';
-    });
-  });
-
-  function birak() {
-    if (!satir) return;
-    var tr = satir; satir = null;
-    tr.classList.remove('kayiyor');
-    var kayma = 0;
-    try {
-      kayma = parseFloat((tr.children[0].style.transform || '').replace(/[^-\d.]/g, '')) || 0;
-    } catch (x) {}
-    Array.prototype.forEach.call(tr.children, function (td) { td.style.transform = ''; });
-    /* kayma NEGATİF (sola gidiyor) — ilk yazımda `kayma >= 40` yazdım
-       ve onay hiç açılmadı: kaydırma çalışıyor, sonucu gelmiyordu.
-       Elle işletince yakalandı. */
-    if (yatay && -kayma >= 40) {
-      muhSilinecek = parseInt(tr.getAttribute('data-kaydir'), 10);
-      Ekran.tazele();
-    }
-  }
-  document.addEventListener('pointerup', birak);
-  document.addEventListener('pointercancel', birak);
-
-  /* KLAVYEYLE DE SİLİNEBİLİR: kaydırma parmakla yapılır, klavyeyle
-     yapılamaz. Erişilebilirlik borcu burada kapanıyor — satır
-     odaklanabilir ve Delete onay satırını açıyor. */
-  document.addEventListener('keydown', function (e) {
-    if (Ekran.adi() !== 'muhasebe') return;
-    if (e.key !== 'Delete' && e.key !== 'Backspace') return;
-    var tr = e.target.closest && e.target.closest('.tablo tr.kaydirilir');
-    if (!tr) return;
-    e.preventDefault();
-    muhSilinecek = parseInt(tr.getAttribute('data-kaydir'), 10);
-    Ekran.tazele();
-  });
-})();
+   ⚠️ HAREKETİN KENDİSİ ÇEKİRDEKTE (06.09). Aynı hareket servis
+   kaydının "yapılanlar" tablosunda da var; iki kopya iki ayrı eşik ve
+   iki ayrı yön hatası demekti. Burada kalan tek şey, kaydırmanın BU
+   ekranda ne anlama geldiği: hangi gider silinecek. */
+Kaydirma.tanim('muhasebe', function (anahtar) {
+  muhSilinecek = parseInt(anahtar, 10);
+  Ekran.tazele();
+});
 </script>

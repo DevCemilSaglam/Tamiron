@@ -123,21 +123,50 @@ function kayitKartiHtml(k) {
       renkKutuHtml(a.renk) +
     '</div>' +
     (a.sahipAd ? '<div class="ak-sahip"><b>' + a.sahipAd + '</b></div>' : '') +
-    /* İŞ SATIRI — türü ve ne yapıldığı. Türün kendi rengi var:
-       bakım içeren iş aksan, tamirat birincil (v1'in şerit kuralı). */
+    /* ⚠️ 06.09 — TELEFON KARTA GİRDİ (Cemil: "Ayrıca ruhsat sahibi ya
+       da iletişim telefon no da olsun ve aranabilsin").
+
+       HANGİ NUMARA: mesajHedefi() ne diyorsa o. Ruhsat firmanınsa
+       santral değil, aracı getiren kişi aranır (A-M2). İki ayrı yerde
+       iki ayrı "kimi ararız" kuralı olsaydı, listeden aranan kişiyle
+       mesaj gönderilen kişi farklı olurdu. */
+    (function () {
+      var h = mesajHedefi(k.plaka);
+      return (h && h.tel) ? telLinkHtml(h.tel, h.ad) : '';
+    })() +
+    /* ---- AYRAÇ ALTINDAKİ ÜÇ SATIR (Cemil, 06.09) ----
+       "Araç sahibi adı altında border'ın altında solda Bakım ya da
+        Tamirat yazıyor, o satırın sağında durum olsun. Bu satırın
+        altında açıklama olsun. En altta sağda tutar, solda tarih."
+
+       ÜST YARISI ARAÇ, ALT YARISI İŞ. Ayraç ikisini ayırıyor: göz
+       önce hangi aracı okuyor, sonra o araçta ne olduğunu. Eskiden
+       tür, açıklama ve durum aynı satırda yarışıyordu ve uzun bir
+       şikâyet metni durumu bir alt satıra itiyordu — aynı listede
+       satırdan satıra farklı bir düzen. */
     '<div class="ak-is">' +
       '<span class="pill ' + (bakimIceriyor(k) ? 'accent' : 'info') + '">' +
         TUR_AD[k.tur] + '</span>' +
-      (k.sikayet ? '<span class="ak-is-ne">' + k.sikayet + '</span>' : '') +
+      (!k.teslimTarihi && (k.parcaBekliyor || fiyatiBekleyen(k))
+        ? '<span class="pill warn">parça bekliyor</span>' : '') +
+      /* DURUM SAĞDA. "İçeride" burada YAZIYLA duruyor — Cemil:
+         "İçeride olarak yazdığımız durum için kullanmak gerekirse
+         serviste kullan." Araç listesinde çerçeve yetiyordu (K-019.2),
+         çünkü orada tek soru "bu araç şu an bizde mi". Servis
+         listesinde iki durum var (içeride · teslim edildi) ve ikisi
+         de yazıyla söyleniyor; biri yazı öbürü çerçeve olsaydı usta
+         ikisini karşılaştıramazdı. */
+      '<span class="ak-durum">' +
+        (k.teslimTarihi
+          ? '<span class="pill ok">Teslim edildi</span>'
+          : '<span class="pill accent">İçeride</span>') +
+      '</span>' +
     '</div>' +
+    '<div class="ak-is-ne">' + (k.sikayet || 'ne yapılacağı yazılmamış') + '</div>' +
     '<div class="ak-alt">' +
-      (k.teslimTarihi
-        ? '<span class="pill ok">teslim edildi</span>'
-        : (fiyatiBekleyen(k)
-            ? '<span class="pill warn">parçası bekleniyor</span>' : '')) +
-      (kayitToplami(k)
-        ? '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' : '') +
       '<span class="tl-date">' + (k.teslimTarihi || k.acilis || '—') + '</span>' +
+      '<span class="ak-tutar">' +
+        (kayitToplami(k) ? tutar(kayitToplami(k)) + ' ₺' : '—') + '</span>' +
     '</div>' +
   '</div>';
 }

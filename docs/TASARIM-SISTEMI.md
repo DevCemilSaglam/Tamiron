@@ -424,20 +424,21 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Kilometre satırı | `.km-sat` > `.km-tarih` + `.km-deger` |
 | Müşteri özeti başlığı | `.ozet-bas` > `.oz-ad` + `.oz-alt` · parça markası: `.oz-marka` |
 | Sekme | `.tab-grup` > `.tab` (`aria-selected`) — GÖRÜNÜM değiştirir; `.cip` ise SEÇİM yapar, ikisi karıştırılmaz |
-| **Giriş koruması** | `data-giris="tutar\|km\|yil\|tel\|plaka"` — biçimli her alan bunu taşır. `inputmode` bir öneridir, kısıt değil (K-030) |
+| **Giriş koruması** | `data-giris="tutar\|km\|yil\|tel\|plaka\|kod\|tarih"` — biçimli her alan bunu taşır. `inputmode` bir öneridir, kısıt değil (K-030). **Denetimin sözlüğü çekirdekten geri kalamaz:** yeni tip eklenip `saglik-denetim.js`e yazılmazsa test doğru kodu hata sanar |
 | **Yığın** | `.yigin` — ekran gövdesindeki her sarmalayıcı kap. **Boşluğu kap verir**: yeni bir sarmalayıcı `.yigin` almazsa ritim sessizce kırılır |
 | Modül kutusu | `.modul-grid` > `.modul-kutu` > `.mk-ic` + `.mk-ad` + `.mk-alt` — ızgara; `.menu-row` ise liste (sırası anlam taşır) |
-| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono sabit genişlik, `.eylem` 40 px) · ikincil bilgi: `.t-alt` · toplam: `tr.genel` · zebra: `tbody tr:nth-child(odd)` · silme: `tr.kaydirilir` → sola kaydırınca `tr.silme-onay` > `.onay-btn.evet\|.hayir`. **Yatay kaydırma YOK** (K-031) |
-| Servis kaydı kartı | `.arac-kart` + `.ak-is` > `.ak-is-ne` + `.ak-alt` (yalnız `kayitKartiHtml()` üretir) |
+| Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono sabit genişlik, `.eylem` 40 px) · ikincil bilgi: `.t-alt` · toplam: `tr.genel` · zebra: `tbody tr:nth-child(odd)` · silme: `tr.kaydirilir` + `data-kaydir="<anahtar>"` → sola kaydırınca `tr.silme-onay` > `.onay-btn.evet\|.hayir`. **Hareket çekirdekte** (`Kaydirma.tanim(ekran, fn)`), ekran yalnız anlamını yazar. **Yatay kaydırma YOK** (K-031) |
+| Servis kaydı kartı | `.arac-kart` + ayracın altında üç satır: `.ak-is` (tür solda · `.ak-durum` sağda) → `.ak-is-ne` (açıklama, KENDİ satırında) → `.ak-alt` (tarih solda · `.ak-tutar` sağda). Yalnız `kayitKartiHtml()` üretir |
 | Düğme satırı · tek satır | `.btn-row.tek-satir` — sarmayı yasaklar, düğmeler küçülür |
 | Kayıt satırı | `.tl-item.t-tamirat\|t-bakim` (yalnız `kayitSatiriHtml()` üretir) |
-| Kalem | `.kalem-list` > `.kalem` > `.k-tip` `.k-ad` `.k-tutar` `.k-sil` · boş: `.kalem-bos` |
+| Kalem | `.kalem-list` > `.kalem` > `.k-tip` `.k-ad` — **yalnız "parça fiyatı sor" ekranında.** Servis kaydının kalem listesi 06.09'da `.tablo`ya döndü; `.k-tutar` `.k-sil` `.k-tutar-satir` `.kalem-bos` `.k-katalog` **silindi** (OLU-SINIF yakaladı) |
 | Tutar | `.tutar-serit` > `.tutar-sat` / `.tutar-sat.genel` > `.tv` |
 | Rozet | `.pill` + `.ok\|.warn\|.crit\|.accent\|.info\|.muted` |
 | Uyarı kutusu | `.notice` (+ hâl) > `.n-ic` + `.n-body` |
 | Boş durum | `.bos-durum` (yalnız `bosDurumHtml()` üretir) |
 | İpucu satırı | `.plate-hint` |
-| Balon | tek `#toast`, `.show` ile görünür (yalnız `balon()` yönetir) |
+| Müşteri kartı | `.ms-kart` > `.ms-bas` (`.ms-ad` + `.ms-say`) + `.tel-link` + `.ms-araclar` > `.ms-arac` (`.plate` + `.ms-arac-ad`). **Plaka çipin içine konmaz** — çip seçim aracıdır, plaka veridir (K-033.8) |
+| Balon | tek `#toast`, `.show` ile görünür (yalnız `balon()` yönetir). `width: max-content` + `max-width` — `left:50%` ile ortalanan bir öğe aksi hâlde kapsayıcının **yarısını** geçemez (K-033.10) |
 | Çekmece | `.drawer-overlay` + `.drawer` > `.drawer-head` `.drawer-title` + `.drawer-body` |
 | Çekmece satırı | `.drawer-item` > `.di-ic` · başlık: `.drawer-sec-label` · ayraç: `.divider` |
 | Ayar satırı | `.setting-row` > `.sr-txt` > `.sr-label` + `.sr-sub` |

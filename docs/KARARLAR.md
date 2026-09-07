@@ -10,6 +10,328 @@
 
 ---
 
+## K-033 · Tür ekrandan kalktı; kalem listesi tablo oldu; balon kutu oldu (06.09.2026)
+
+Cemil bir turda **otuz bir madde** yazdı. Hepsi uygulandı; aşağıda
+gerekçeleriyle, ve arada **yalnız elle işletince çıkan dört hata** ile.
+
+### 33.1 · *"Ne için geldi?"* ekrandan kalktı — tür artık METİNDEN okunuyor
+
+> *"Servis kaydı ekle sayfası: Ne için geldi ekranı olmayacak. Tamir,
+> bakım vb çok önemli değil. Biz bu ai'ya json'da seçtirebiliriz."*
+
+Üç çipli bir soruydu ve **ana yolda her kayıt açılışında** soruluyordu.
+Cemil haklı: tamirci zaten *"yağ filtre bakım"* diyor; türü ondan
+okumak, ona ikinci kez sormaktan iyi.
+
+**Tür VERİ MODELİNDEN kalkmadı, EKRANDAN kalktı.** K-002 duruyor: bakım
+kilometre ister ve teslimde hatırlatma kurar. Tür artık iş metninden
+tahmin ediliyor (`isTuruTahmin`) — bakım kökleri (`bakim · yag · filtre
+· periyodik · servis`) ve tamirat kökleri (`ariza · degis · kacir ·
+ses …`) aranıyor, ikisi birden geçerse *"Tamirat + Bakım"* oluyor.
+
+⚠️ **Burada K-018'i bilerek esnettim.** Türkçede kelime sınırı aranmaz
+diye `\b`'yi yasakladık ve `kelimeVarMi()` **eşitlikle** karşılaştırıyor.
+Ama usta *"bakıma geldi"*, *"yağı değişecek"*, *"filtreleri"* diyor ve
+hiçbiri kök hâliyle eşit değil. Bu yüzden burada **ön ek eşleşmesi**
+var (`kelime.indexOf(kok) === 0`).
+
+Aynı teknik aramada tehlikeliydi, burada değil — çünkü **yanlışın bedeli
+farklı**. Aramada yanlış eşleşme sonucu yok eder; burada yalnız bir ön
+dolgu yanlış gelir ve **düzeltilebilir**. Ölçü teknik değil, bedeldir.
+
+**Düzeltme yeri: servis kaydının kendi ekranı.** Orada üç çip duruyor ve
+metin değiştikçe tahmin kendini güncelliyor — ta ki usta elle bir şey
+seçene kadar. **Ustanın kararı bizim tahminimizi yener.**
+Düzeltilemeyen bir tahmin, tahmin değil hükümdür.
+
+> Aynı soru **araç ekranından da** kalktı: *"Kayıt aç"* düğmesi artık
+> ara bir panel açmıyor, doğrudan kaydı açıyor. Aynı soruyu iki ekranda
+> iki farklı biçimde sormak, hiç sormamaktan kötü.
+
+### 33.2 · Ruhsat sekmesi artık zıplamıyor; kamera **ve** galeri; alanlar tamamlandı
+
+Cemil üç şey bildirdi, üçü de doğruydu:
+
+**(a) Hata:** *"Ruhsatı çek butonuna basınca Plakayı yaz tabına döndü."*
+Bunu ben yazmıştım ve gerekçem *"okunanı plaka sekmesinde göstermek"*ti.
+Yanlıştı: usta **bastığı düğmenin sonucunu göremiyor**, ekran altından
+kayıyordu. Artık okuma bitince **sekmede kalınıyor** ve okunan plaka
+orada, plaka bileşeniyle gösteriliyor.
+
+**(b)** *"Ruhsat tabında ruhsatı çekebilir ya da galeriden seçebilir."*
+Ruhsat çoğu zaman **zaten çekilmiştir** — müşteri WhatsApp'tan
+yollamıştır. Yalnız kamera sunmak, o fotoğrafı ikinci kez çektiriyordu.
+
+**(c)** *"Ruhsat bilgileri eksik."* Araç ekranı şasi no, motor no, motor
+hacmi, güç, koltuk ve ilk tescili **gösteriyordu** ama hiçbir yerde
+**girilemiyordu**. Gösterilen ama girilemeyen alan sonsuza kadar boş
+kalır. Hepsi eklendi; ana yolu şişirmesin diye **akordiyonda**, sayacı
+kaç alanın dolu olduğunu açmadan söylüyor.
+
+TC kimlik no ve adres **yine girmedi** (RUHSAT-OKUMA.md Bulgu 2).
+
+İki yeni giriş koruması doğdu: `data-giris="kod"` (şasi/motor no —
+büyük harfe çeviriyor, noktalamayı atıyor) ve `data-giris="tarih"`
+(gg.aa.yyyy — noktayı kendisi koyuyor). **Denetimin sözlüğü de
+genişletildi:** yeni bir tip eklenip denetime yazılmazsa test *"böyle
+bir tip yok"* der ve doğru kodu hata sanar.
+
+### 33.3 · **Kapalı düğme sessizdir**
+
+> *"Kaydı Aç buttonuna bastım, bir şey olmuyor."*
+
+Düğme `disabled` idi: plaka **ve tür** ister, tür seçilmemişti. Ekran
+bunu hiçbir yerde söylemiyordu.
+
+**Kural:** bir düğme kapalıysa neden kapalı olduğunu söylemez.
+Düğmeler artık kapanmıyor — eksik varsa **basınca söylüyor** ve eksik
+alana götürüyor ("Önce plakayı yaz — ör. 34 ABC 123", imleç plakaya).
+
+### 33.4 · Servis kaydı kartı: ayracın üstü ARAÇ, altı İŞ
+
+> *"Listede araç sahibi adı altında border'ın altında solda Bakım ya da
+> Tamirat, o satırın sağında durum. Bu satırın altında açıklama. En
+> altta sağda tutar, solda tarih. Ayrıca ruhsat sahibi ya da iletişim
+> telefon no da olsun ve aranabilsin."*
+
+Üç satır, her birinin işi ayrı: **tür ↔ durum · açıklama · tarih ↔
+tutar.** Açıklama artık kendi satırında; eskiden türün yanındaydı ve
+uzun bir şikâyet satırı sarıp durumu aşağı itiyordu — aynı listede
+karttan karta farklı bir düzen çıkıyordu, göz sabit bir yere
+bakamıyordu.
+
+**Telefon karta girdi** ve `mesajHedefi()` ne diyorsa o: ruhsat
+firmanınsa santral değil, **aracı getiren kişi** aranıyor (A-M2). İki
+ayrı "kimi ararız" kuralı olsaydı listeden aranan kişiyle mesaj gönderilen
+kişi farklı olurdu.
+
+**"İçeride" burada YAZIYLA duruyor** — Cemil: *"İçeride olarak
+yazdığımız durum için kullanmak gerekirse serviste kullan."* Araç
+listesinde çerçeve yetiyordu (K-019.2), çünkü orada tek soru vardı: *bu
+araç şu an bizde mi.* Servis listesinde **iki durum** var (içeride ·
+teslim edildi) ve ikisi de yazıyla söyleniyor; biri yazı öbürü çerçeve
+olsaydı usta ikisini karşılaştıramazdı.
+
+### 33.5 · Kalem listesi **TABLO** oldu; müşteri kayda girdi; "parça bekliyor" kendi alanını aldı
+
+> *"Parça eklendikçe tablo olarak üstte dursun… Böyle 10 tane parça
+> eklense, okunabilir olmaz."*
+
+`.kalem` satırı bir **kart** gibi davranıyordu: tip rozeti, ad, fiyat,
+silme düğmesi ve altında **iki soru** ("cevap kimden geldi", "parçayı
+kim getirdi") — satır başına beş-altı öğe. Üç satırda idare ediyordu,
+on satırda duvar oluyordu.
+
+Tablo **iki sütun**: *İş* ve *Tutar*. Rakamlar tek hizada, sağa yaslı.
+İkincil bilgi adın altında küçük duruyor — kendi sütununu istemiyor
+(K-031: tablo **sığar**, kaydırılmaz).
+
+**Satır başına "kim getirdi" düğmesi kaldırıldı.** Önce küçük bir
+anahtar koymuştum; denetim beşini birden **26 px** ölçtü ve haklıydı.
+Büyütmek de çözüm değildi: on satırda on tane 44 px'lik düğme, Cemil'in
+kaldırttığı gürültünün aynısı. Cemil zaten söylemişti —
+*"parçayı müşteri getirdi alanına gerek yok. Listenin üzerinde müşteri
+getirdi seçilirse parçalara ücret yazmaz."* **K-005 kaybolmadı:**
+sorumluluk anahtarı listenin üstündeki tek düğmeden kuruluyor, satırda
+yalnız **sonucu** rozet olarak duruyor.
+
+Üstteki düğme bir **anahtar**: basınca hepsi müşteriye geçiyor
+(fiyat → alış, fiyat 0), tekrar basınca geri alınıyor. Sonradan parça
+eklenince düğme kendiliğinden sönüyor — çünkü artık "hepsi" doğru
+değil. **Geri alma şart:** yanlışlıkla basılan bir düğme on satırın
+fiyatını sıfırlıyor.
+
+**Ne istiyor** artık `textarea` (Cemil: *"text alanı daha büyük olmalı"*)
+ve **alt satıra ekleme** düğmesi var — telefon klavyesinde Enter çoğu
+zaman "bitti" demektir, alt satıra geçmenin görünür bir yolu olmadan
+usta her şeyi tek satıra sıkıştırıyordu.
+
+**Müşteri bilgileri kayda girdi.** Kayıt ekranı ustanın en çok durduğu
+ekran ve *"kimi arayacağım"*ın cevabı orada yoktu.
+
+**"Parça bekliyor" kendi bayrağını aldı.** Bugüne kadar bu bilgi
+`fiyatiBekleyen`'den türetiliyordu — o **başka bir şey**: fiyatı
+gelmemiş demek. Parça sipariş edilip yolda olabilir ve fiyatı belli
+olabilir; ya da fiyat belli olmayabilir ve parça elde olabilir. İkisini
+tek alana bindirmek, ikisini de yanlış söylemekti. **Bu yeni bir DURUM
+değil** — K-004 duruyor, tek durum alanı hâlâ `teslimTarihi`; bu bir
+bayrak, akışı değiştirmiyor. *(A-4 böylece kapandı.)*
+
+**Fotoğraftan parça listesi** eklendi: parçacı irsaliyeyi WhatsApp'tan
+yolluyor, on kalemi tek tek yazmak ustanın en sevmediği iş. Okunan
+satırların **fiyatı boş geliyor** — okunmamış bir rakamı doluymuş gibi
+göstermek, ustanın kontrol etmediği bir rakamı müşteriye söyletmek olurdu.
+
+### 33.6 · Teslimden sonra mesaj **sorulur** — ve bir yalan daha kalktı
+
+> *"Teslim et deyince ödemenin nasıl olduğu da sormalı ve mesaj
+> gönderilebilmeli veya geç deyip kapatabilir."*
+
+⚠️ **Eskiden burada yalan vardı.** Teslim balonu, telefonu olan araçta
+*"Özet gönderildi."* diyordu ve **hiçbir şey gönderilmiyordu.** 04.09'da
+aynı hatayı *"Onay iste"* düğmesinde yapmış ve düzeltmiştim (K-021);
+kural taşınmamış, ikinci kopyası burada kalmıştı. **Bir kez böyle kanan
+usta, bir daha hiçbir "gönderildi" yazısına inanmaz.**
+
+Artık teslim ekranı kapanmıyor: teslim edildi bilgisini, ödeme yolunu ve
+kurulan hatırlatma tarihini gösteriyor, sonra **"Müşteriye özet gönder"**
+ya da **"Geç, gönderme"** soruyor. "Geç" gerçek bir seçenek — müşteri
+zaten yanındaysa mesaj gereksiz.
+
+### 33.7 · Araç ekranı: **ödeme durumu** açıldı, **not gizlendi**
+
+> *"Aracın borcu, ödemesi varsa, araç bilgilerinin altında bir alan açıp
+> burada gösterebilirsin… Not alanı gizli olsun. V1'de bu alanı güzel
+> yapmıştık."*
+
+Sıra: künye+müşteri → düğmeler → **ödeme durumu (varsa)** → ruhsat →
+kilometre → bakım → **not (akordiyon)** → geçmiş.
+
+**Ödeme durumu yalnız borç varsa** çiziliyor; borcu olmayan araçta
+"borç yok" yazmak, olmayan bir sorunu her açılışta hatırlatmak olurdu.
+Hesap muhasebedeki *Alacak* listesiyle **aynı kaynaktan** — iki yerde
+iki ayrı hesap olsaydı biri diğerini yalanlardı.
+
+⚠️ **Not akordiyona girdi ve bu 04.09'da verdiğim kararı düzeltiyor.**
+O gün notu düğmelerin hemen altına koymuştum; gerekçem *"not en taze
+bilgi, dipte kimse görmüyor"* idi. Gerekçe yanlış değildi, **ölçü**
+yanlıştı: dört araçtan üçünün notu boş ve boş bir `textarea` ekranın
+en üstünde iki satır yer kaplıyordu. Akordiyonun sayacı notun dolu olup
+olmadığını **açmadan** söylüyor.
+
+### 33.8 · Müşteri kartı: plaka **çipin içinde değil, kendi satırında**
+
+> *"Müşteriler listesini düzenle, plaka belli olsun. Plaka listelerken
+> göstermesin. Bu alanı tekrar düzenle."*
+
+Araçlar en altta, `.cip` **düğmelerinin** içinde plaka bileşeni olarak
+duruyordu. Çip bir **seçim** aracıdır — süzgeç, şablon, tür seçimi hep
+çip. Plakayı çipin içine koyunca iki şey bozuldu: plaka *"seçilecek bir
+şey"* gibi göründü, ve çipin çerçevesi plakanın çerçevesiyle iç içe
+girdi. Yanında *"Mesaj"* çipi de vardı; plaka ile mesaj düğmesi aynı
+cinsten iki nesne gibi duruyordu.
+
+Müşteri artık bir **kart**: üstte adı ve kaç aracı olduğu, altında
+telefonu, ayracın altında araçları — her biri kendi satırında, gerçek
+plaka bileşeniyle. **Eylem eylemdir, plaka veridir.**
+
+### 33.9 · Mesaj: üç kanal, dördüncü şablon, seçim yukarıda
+
+> *"Müşteri seçilebilir olmalı… whatsapp, telefon uygulama, mesaj olarak
+> gönderebiliriz."*
+
+**"Değiştir" yukarı çıktı.** Düğme vardı ama ekranın **dibindeydi** —
+metnin, önizlemenin ve gönder düğmesinin altında. Yanlış müşteriyle
+açılan ekranda usta önce metni okuyor, *"bu kim"* diyordu. **Seçim,
+seçimin sonucundan önce görünmeli.**
+
+**Üç kanal:** WhatsApp (birincil, bedava) · SMS (paralı, İYS istiyor —
+ama WhatsApp'ı olmayan müşteri var) · Ara. Üçü de **aynı metni** taşır;
+kanala göre metin değiştirmek, ustanın gördüğüyle gidenin ayrılması
+demekti.
+
+**Dördüncü şablon: "Parça bekliyoruz."** Yeni bir iş değil, var olan
+işin sessiz kalan yarısı: müşteri aracını bıraktı ve haber bekliyor;
+haber gelmeyince arıyor, usta telefonda vakit kaybediyor. Mesaj
+**söz vermiyor** — *"yarın hazır"* demiyoruz, parçanın ne zaman
+geleceğini biz de bilmiyoruz ve **tutulmayan söz, hiç verilmemiş sözden
+kötüdür.**
+
+Balonlar artık hepsi *"açılıyor"* diyor, *"gönderildi"* demiyor.
+
+### 33.10 · Balonun sorunu yarıçap değil **GENİŞLİKTİ**
+
+Cemil bir ekran görüntüsü yolladı: hata mesajı **yumurta** gibi
+duruyordu, metin eğrinin içine giriyordu.
+
+İlk teşhisim yarıçaptı (`--radius-pill`, 999 px) ve düzelttim. **Yarım
+çözümdü.** Ölçünce asıl sebep çıktı: balon `position:absolute; left:50%`
+ile ortalanıyor ve `right` verilmiyor. Böyle bir öğe için tarayıcının
+hesapladığı **kullanılabilir genişlik, kapsayıcının sağ yarısıdır** —
+375 px'lik telefonda 187 px. `max-width: calc(100% - 32px)` yazsam da
+öğe hiç 188 px'i geçemiyordu; uzun cümle üç satıra sarıyor, kutu
+yükseliyor ve pill yarıçapıyla yumurtaya dönüyordu.
+
+`width: max-content` shrink-to-fit hesabını devre dışı bırakıyor:
+genişliği artık metin belirliyor, `max-width` tavanı koyuyor.
+**Ölçüldü (375 px): önce 188×88 (üç satır) → sonra 343×62 (iki satır).**
+
+> Arada `text-wrap: balance` denedim ve geri aldım: satırları eşitlemek
+> için kutuyu **daraltıyor** — satır sayısını azaltmıyor, artırıyor.
+
+### 33.11 · Üç yeni **derleme** denetimi — çünkü derleyici yalan söylüyordu
+
+**(6) Yorum içinde etiket.** Bir ekran başlığına *"(aşağıdaki `<style>`
+içinde)"* yazdım. Stil çıkarıcı kaçıncı etiket olduğuna bakmıyor:
+**yorumdaki** etiketten başlayıp dosyanın sonundaki gerçek kapanışa
+kadar her şeyi — `<section>`'ın tamamını — CSS sanıp sildi. Derleme
+*"id=screen-… bulunamadı"* dedi; sebebi bir yorum satırıydı. **Yorum kod
+değildir ama derleyici için metindir.**
+
+**(7) Üretilen betik ayrışıyor mu.** Bir ekran betiğinde dizge içinde
+gerçek satır sonu kaldı. Derleyici *"derleme denetimi temiz"* dedi, dosya
+üretildi, tarayıcıda **açıldı** — ve içindeki bütün betik
+ayrıştırılamadığı için `Ekran`, `showScreen`, hiçbir şey tanımlanmadı.
+**Prototip sessizce ölü açıldı.** Beş denetim de doğruydu; hiçbiri
+betiğin **çalışıp çalışmadığına** bakmıyordu. En temel soru en sona
+kalmıştı: *bu JavaScript geçerli mi?*
+
+**(8) Kapanmamış yorum.** `03-bilesen.css`'te bir yorum kapanmıyordu ve
+CSS o noktadan sonra bir sonraki kapanışa kadar her şeyi yorum saydı.
+İçinde kalan kural `.k-sil::before` idi — **ikincil düğmelerin 44 px
+dokunma alanı.** Kural yazılmıştı, denetimden geçmişti, ölçülmüştü;
+sadece tarayıcı onu hiç görmedi. Dosyada 140 açılış, 139 kapanış vardı;
+tek bir sayma bunu söylerdi. **Kapanmamış yorum, silinen koddan
+tehlikelidir: silinen kod yoktur, yorumlanan kod var gibi durur.**
+
+Üçü de negatif testle doğrulandı.
+
+### 33.12 · **ÇİZİM, KARARI SİLMEZ** — aynı hatayı bir turda iki kez yaptım
+
+`ciz()` fonksiyonuna ekran değişkenlerini sıfırlatmıştım:
+
+* `kTurElle` — usta *"Tamirat"* seçiyor, sonraki harfte tahmin yeniden
+  koşuyor ve **seçim geri alınıyordu**.
+* `kSilinecek` — kaydırma onayı açmak için `Ekran.tazele()` çağırıyor,
+  tazeleme onayı **siliyordu**; satır kayıyor, hiçbir şey açılmıyordu.
+
+İkincisi K-032'de yaşadığım işaret hatasının **birebir aynı belirtisi**,
+tamamen başka sebeple.
+
+**Kural:** `ciz()` **ekranı** çizer, **kararı** değil. Sıfırlanacak tek
+şey, *başka bir kayda geçildiğinde* sıfırlanandır. Bir SEÇİM ekranın
+değil **verinin** bilgisidir — ekran değişkeni çizimle ölür, kayıt
+yaşadığı sürece seçim de yaşamalı. (`turElle` kaydın üstüne taşındı.)
+
+⚠️ **İkisini de hiçbir test yakalamadı; ikisi de elle işletince çıktı.**
+Denetim 36 test koşuyor ve 0 bulgu veriyordu.
+
+### 33.13 · Kaydırma hareketi çekirdeğe taşındı
+
+Sola kaydırıp silme artık **iki** tabloda var: muhasebedeki giderler ve
+servis kaydındaki yapılanlar. Kod muhasebe ekranının IIFE'sinin
+içindeydi ve oradan çıkamıyordu; kopyalansaydı iki ayrı eşik, iki ayrı
+yön hatası doğardı — **yön hatasını K-032'de bir kez zaten yapmıştım ve
+hiçbir test yakalamamıştı.**
+
+`Kaydirma` modülü çekirdekte; ekranlar yalnız **ne anlama geldiğini**
+yazıyor. **Ortak nesne kuralı hareketlere de işliyor:** bir nesne bir
+yerde çizilir, bir hareket bir yerde tanımlanır.
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / **0 bulgu** ·
+320 / 375 / 430 px · ana yollar elle işletildi (ruhsat okuma, tür
+tahmini, hepsi-müşteri anahtarı, kaydırarak silme, teslim→mesaj,
+üç kanal).
+
+> **Cemil onayına açık (A-M13):** tek bir parçayı ayrı işaretlemenin yolu
+> artık **yok** — "hepsi müşteriden" anahtarı var, satır başına anahtar
+> yok. Senin sözün bizim gerekçemizi yener diye böyle yaptım; ama
+> gerçekte *"balatayı müşteri getirdi, yağı ben aldım"* durumu oluyorsa
+> satır başına bir yol gerekir.
+
+---
+
 ## K-032 · Kaydırma silmez, sorar (05.09.2026)
 
 ### 32.1 · Sola kaydırma **onay satırını** açar
@@ -1644,7 +1966,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-1** | **Ekran bütçesi** — ana yol için en fazla 6 önerildi. Onay? | Cemil |
 | **A-2** | Müşteri tarafı (T-19/T-20/T-21) **bu fazda mı**? Öneri: özet linki evet, müşteri uygulaması sonra | Cemil |
 | **A-3** | Bakım periyodu varsayılanı kaç ay? Öneri: 6 | Cemil |
-| **A-4** | *"Parça bekliyor"* listede türetilerek gösterilsin mi (K-004 notu) | Akış çizilirken |
+| ~~A-4~~ | **KAPANDI (K-033.5)** — türetilmiyor, kendi bayrağı var (`parcaBekliyor`). Türetilen `fiyatiBekleyen` başka bir şeydi: *fiyatı gelmemiş* | — |
 | **A-5** | Ruhsat okuma hangi teknolojiyle — OCR servisi, doğruluk, elle düzeltme | 9. iş |
 | **A-6** | WhatsApp API sağlayıcısı ve maliyeti | 8. iş |
 | **A-7** | SMS sağlayıcısı + **İYS kaydı** (yasal zorunluluk) | 10. iş |
@@ -1657,7 +1979,8 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
-| **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok | Bir kez öğrenilir; ipucu istenirse eklenir |
+| **A-M13** | Tek bir parçayı ayrı işaretlemenin yolu kalmadı (K-033.5). *"Balatayı müşteri getirdi, yağı ben aldım"* durumu oluyor mu? | Cemil |
+| **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok. Artık **iki** tabloda var | Bir kez öğrenilir; ipucu istenirse eklenir |
 | **A-M11** | Detaylı menüdeki beş modül (fatura/KDV · çek · senet · cari) **kapsama girdi mi**, yoksa yeri mi açıldı? | Yeri açıldı; K-022 duruyor |
 | **A-M10** | *"Tamirat + Bakım"* tek kayıt mı olmalı, yoksa liste satırında iki kaydın özeti mi? | Tek kayıt varsayıldı |
 | **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no). Backend fazında kapatılacak — kabul mü | Cemil |
