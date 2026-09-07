@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 11:18
+  Üretim: 2026-09-07 14:24
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2910,7 +2910,7 @@ kirpilsin. */
     <span class="n-body ps-mesaj" id="psMesaj"></span>
   </div>
 
-  <button class="btn btn-primary btn-lg" id="psGonder" disabled>
+  <button class="btn btn-primary btn-lg" id="psGonder">
     <svg class="ico"><use href="#i-message-square"></use></svg>
     <span>WhatsApp ile gönder</span>
   </button>
@@ -2954,7 +2954,7 @@ kirpilsin. */
   </div>
   <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu"></div>
 
-  <button class="btn btn-primary btn-lg" id="tsTeslim" disabled>
+  <button class="btn btn-primary btn-lg" id="tsTeslim">
     <svg class="ico"><use href="#i-check"></use></svg> Teslim et
   </button>
 
@@ -3282,14 +3282,19 @@ kirpilsin. */
          "SMS kısa olsun" gibi — ustanın gördüğü metinle giden metni
          ayırırdı; gönderdiğinden başka bir şeyin gittiğini ancak
          müşteri sorunca öğrenirdi. -->
-    <button class="btn btn-primary btn-lg" id="msjGonder">
+    <!-- ⚠️ SEBEP DUGMEYE BAGLI (37. test). Telefon yoksa uc dugme de
+         kapali kaliyor ve nedenini #msjUyari yaziyor; aria-describedby
+         o metni dugmeye BAGLIYOR. Ekranda bir yerde aciklama olmasi
+         yetmez: hangi aciklamanin hangi dugmeye ait oldugu, ne goz ne
+         ekran okuyucu icin belli olur. -->
+    <button class="btn btn-primary btn-lg" id="msjGonder" aria-describedby="msjUyari">
       <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
     </button>
     <div class="btn-row">
-      <button class="btn btn-ghost" id="msjSms">
+      <button class="btn btn-ghost" id="msjSms" aria-describedby="msjUyari">
         <svg class="ico"><use href="#i-message-square"></use></svg> SMS
       </button>
-      <button class="btn btn-ghost" id="msjAra">
+      <button class="btn btn-ghost" id="msjAra" aria-describedby="msjUyari">
         <svg class="ico"><use href="#i-phone"></use></svg> Ara
       </button>
     </div>
@@ -3782,7 +3787,12 @@ var muhDonemSecili = 'bugun';
    ornekler ve baslik ESKI kaliyordu. Tek yer olunca hata da tek. */
 function sesleAc(niyet) {
   SESLI_NIYET = niyet || 'genel';
-  if (Ekran.adi() === 'ses') Ekran.tazele();
+  /* ⚠️ tazele() DEGIL goster() (06.09, K-040). Ses ekrani zaten
+     acikken baska bir mikrofona basmak YENI BIR ACILISTIR: baglam
+     degisiyor ve az once duyulan cumle bayatliyor. tazele() `ac`
+     kancasini calistirmadigi icin eski cumle ekranda kaliyordu.
+     goster() gecmise yazmaz — geri dugmesi bozulmuyor. */
+  if (Ekran.adi() === 'ses') Ekran.goster('ses');
   else Ekran.ac('ses');
 }
 
@@ -3795,6 +3805,11 @@ var Ekran = (function () {
   var ileriYigin = [];
   var acik = null;
 
+  /* Ekran iki kanca tanımlayabilir:
+       ac(el)  — ekran AÇILDIĞINDA bir kez. Açılışa ait sıfırlamalar
+                 buraya yazılır (seçim temizleme, alan boşaltma).
+       ciz(el) — ekran her ÇİZİLDİĞİNDE. Yalnız DOM üretir.
+     `ac` isteğe bağlı; yazmayan ekran hiçbir şey kaybetmez. */
   function tanim(ad, o) {
     if (kayit[ad]) { console.warn('Ekran iki kez tanımlandı: ' + ad); return; }
     kayit[ad] = o || {};
@@ -3811,6 +3826,17 @@ var Ekran = (function () {
     el.classList.add('active');
     acik = ad;
     var k = kayit[ad];
+    /* ⚠️ AÇILIŞ, ÇİZİMDEN AYRI (06.09 — K-040).
+       `ciz` hem ekran açılınca hem her tazelemede koşuyordu ve ekran
+       ikisini AYIRT EDEMİYORDU. Açılışa ait bir sıfırlama `ciz`e
+       yazılınca, her tazeleme kullanıcının seçimini siliyordu — bu
+       hatayı 06.09'da bir turda İKİ KEZ yaptım (tür seçimi ve silme
+       onayı, K-033.12).
+
+       `ac` yalnız goster()'den çağrılır; tazele() ona hiç dokunmaz. */
+    if (k && typeof k.ac === 'function') {
+      try { k.ac(el); } catch (e) { console.error('ac(' + ad + '):', e); }
+    }
     if (k && typeof k.ciz === 'function') {
       try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); }
     }
@@ -3873,6 +3899,9 @@ var Ekran = (function () {
 
   return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
            goster: goster, tazele: tazele,
+           /* Denetimin 38. testi ekranların `ciz` kaynağını okuyor —
+              kayıt defterine erişimi olmadan bakamaz. */
+           tanimlar: function () { return kayit; },
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
            geriVarMi: function () { return gecmis.length > 0; } };
@@ -5942,9 +5971,17 @@ function sesCiz() {
      : sesDurumu === 'anlasildi' ? ' tamam'
      : sesDurumu === 'anlasilmadi' ? ' hata' : '');
 
+  /* ⚠️ GIZLEYINCE ICERIK DE SILINIR (06.09). Eskiden yalniz
+     `hidden` veriliyordu ve eski cumle iceride duruyordu. Gozle
+     gorunmuyor — ama `textContent` onu okuyor ve beni bir kez
+     yanilltti: `ac` kancasinin cumleyi temizlemedigini sandim,
+     oysa temizlemisti. Ekranda olmayan bir sey DOM'da da durmasin;
+     duran bir sey er ya da gec okunur. */
   var duy = document.getElementById('sesDuyulan');
   duy.hidden = !sesCumle;
-  if (sesCumle) duy.innerHTML = '<span class="sd-lbl">Duyulan</span>' + sesCumle;
+  duy.innerHTML = sesCumle
+    ? '<span class="sd-lbl">Duyulan</span>' + sesCumle
+    : '';
 
   var durum = document.getElementById('sesDurum');
   var acik = document.getElementById('sesAciklama');
@@ -6099,8 +6136,16 @@ function sesCumleIsle(cumle) {
 }
 
 Ekran.tanim('ses', {
-  ciz: function () {
+  /* ⚠️ DUYULAN CUMLE ACILISTA SILINIR, HER CIZIMDE DEGIL (K-040).
+     Bu ucu `ciz`in ilk satirindaydi: ekranı tazeleyen herhangi bir
+     sey ustanin az once soyledigi cumleyi siliyordu. Bugun tek
+     tazeleyen yol sesleAc()'ti ve orada silmek DOGRUydu (yeni baglam,
+     eski cumle bayat) — ama dogru olusu tesadüftü, kural degil.
+     sesleAc artik goster() cagiriyor: acilis acikca acilis. */
+  ac: function () {
     sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+  },
+  ciz: function () {
     var b = sesBaglam();
     document.getElementById('sesOrnekler').innerHTML = b.ornekler.map(function (c, i) {
       return '<button class="cip" data-ornek="' + i + '">' + c + '</button>';
@@ -6275,7 +6320,11 @@ function rEylemCiz(plakaTamam, kayitli) {
 }
 
 Ekran.tanim('ruhsat', {
-  ciz: function () {
+  /* ⚠️ HEPSİ AÇILIŞ İŞİ (K-040). Bu gövde `ciz`deyken her tazeleme
+     ustanın YAZDIĞI PLAKAYI siliyordu. Bugün ruhsat ekranında
+     tazeleyen bir yol yoktu — ama bir tane eklemek tek satırlık bir
+     iş ve o satırı yazan kişi bunun plakayı sileceğini bilemezdi. */
+  ac: function () {
     /* Ekran her açılışta TEMİZ başlar — yarım kalmış kayıt sonrakine
        sızmasın. */
     R_ALANLAR.forEach(function (id) {
@@ -6322,7 +6371,9 @@ Ekran.tanim('ruhsat', {
       rSesNotu = null;
       ruhsatDurum();
     }
-  }
+  },
+  /* Tazeleme yalnız DURUMU yeniden çizer; alanlara dokunmaz. */
+  ciz: function () { ruhsatDurum(); }
 });
 
 /* ---- sahte okuma ----
@@ -6655,29 +6706,23 @@ function kayitCiz() {
       'müşteriye tek dokunuşla haber verebilirsin.</p>';
 }
 
-/* Hangi kayıt çizili — silme onayının ne zaman sıfırlanacağını bu
-   söyler. */
-var kCizilenKayit = null;
-
 /* ⚠️ ÇİZİM, KARARI SİLMEZ (06.09 — bu hatayı BİR TURDA İKİ KEZ yaptım).
-   Önce burada `kSilinecek = null` vardı. `Ekran.tazele()` ciz()'i
+   Önce `ciz` içinde `kSilinecek = null` vardı. `Ekran.tazele()` ciz()'i
    çağırıyor; kaydırma onayı açmak için tazeliyor; tazeleme onayı
    siliyordu. Sonuç: satır kayıyor, hiçbir şey açılmıyor — K-032'de
    yaşadığım işaret hatasının birebir aynısı, başka sebeple.
 
    Aynı gün aynı hatayı `kTurElle` ile de yaptım (o, kaydın üstüne
-   taşındı). Kural: ciz() EKRANI çizer, KARARI değil. Sıfırlanacak tek
-   şey, BAŞKA BİR KAYDA geçildiğinde sıfırlanandır.
+   taşındı). İkisini de hiçbir test yakalamadı; elle işletince çıktı.
 
-   İkisini de hiçbir test yakalamadı; ikisi de elle işletince çıktı. */
+   ⚠️ İLK ÇÖZÜMÜM YETERSİZDİ: `kCizilenKayit` diye bir bekçi koyup
+   "kayıt değiştiyse sıfırla" demiştim. Doğru çalışıyordu ama sorunun
+   KENDİSİNİ çözmüyordu — `ciz` hâlâ açılış işi yapıyordu ve aynı tuzak
+   öteki ekranlarda duruyordu. Çekirdeğe `ac` kancası eklendi (K-040);
+   sıfırlama oraya taşındı ve bekçi gereksiz kaldı. */
 Ekran.tanim('kayit', {
-  ciz: function () {
-    if (kCizilenKayit !== ACIK_KAYIT) {
-      kSilinecek = null;
-      kCizilenKayit = ACIK_KAYIT;
-    }
-    kayitCiz();
-  }
+  ac: function () { kSilinecek = null; },
+  ciz: kayitCiz
 });
 
 /* Kaydırma davranışı ÇEKİRDEKTE (Kaydirma); burada yalnız bu ekranda
@@ -6880,13 +6925,24 @@ function psCiz() {
     k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
     '\n\n📎 ruhsat fotoğrafı eklenecek';
 
+  /* ⚠️ DUGME KAPANMIYOR, KONUSUYOR (K-033.3 · 37. test).
+     Once `g.disabled = (!psSecililer.length || !parcalar.length)`
+     yaziyordu: parcaci secmeyen usta olu bir dugmeye basiyor ve neden
+     olmadigini ogrenemiyordu. Kapali dugme sessizdir — ustelik burada
+     IKI ayri sebep vardi (parcaci secilmedi / sorulacak parca yok) ve
+     kapali dugme ikisini de ayni sessizlikle soyluyordu. */
   var g = document.getElementById('psGonder');
-  g.disabled = (!psSecililer.length || !parcalar.length);
   /* Düğme kaç kişiye gideceğini SÖYLER: çoklu seçimde "gönderdim
      sandım, birine gitti" hatası buradan çıkar. */
   g.querySelector('span').textContent = psSecililer.length > 1
     ? 'WhatsApp ile ' + psSecililer.length + ' parçacıya gönder'
     : 'WhatsApp ile gönder';
+}
+
+/* Sorulacak parca var mi — konusan dugme bunu soruyor. */
+function parcalar_var() {
+  var k = kayitBul(ACIK_KAYIT);
+  return !!(k && psParcaListesi(k).length);
 }
 
 Ekran.tanim('parca-sor', {
@@ -6904,6 +6960,14 @@ document.addEventListener('click', function (e) {
     psCiz();
   }
 
+  if (t.id === 'psGonder' && !parcalar_var()) {
+    balon('Sorulacak parça yok — önce servis kaydına parça ekle.', false, 3000);
+    return;
+  }
+  if (t.id === 'psGonder' && !psSecililer.length) {
+    balon('Önce kime soracağını seç.', false, 2600);
+    return;
+  }
   if (t.id === 'psGonder' && psSecililer.length) {
     var k = kayitBul(ACIK_KAYIT);
     /* SORULDUĞU SATIRA YAZILIR. Adım 4'te "cevap kimden geldi"
@@ -6993,7 +7057,8 @@ function tsCiz() {
       (tsSecili === o.k) + '">' + o.ad + '</button>';
   }).join('');
 
-  document.getElementById('tsTeslim').disabled = !tsSecili;
+  /* ⚠️ KAPANMIYOR, KONUSUYOR (K-033.3 · 37. test). Odeme yolu
+     secilmeden basan usta, dugmenin bozuk oldugunu saniyordu. */
   document.getElementById('tsTeslim').hidden = tsBitti;
   document.getElementById('tsOdeme').hidden = tsBitti;
 
@@ -7057,7 +7122,12 @@ function tsCiz() {
 }
 
 Ekran.tanim('teslim', {
-  ciz: function () { tsSecili = null; tsBitti = false; tsCiz(); }
+  /* Ödeme seçimi ve "teslim edildi" hâli AÇILIŞA aittir: ekran her
+     açılışta temiz başlar. Bunlar `ciz`de dururken her tazeleme
+     ustanın seçtiği ödeme yolunu siliyordu — bugün ulaşılabilir bir
+     yol yoktu ama olması an meselesiydi (K-040). */
+  ac: function () { tsSecili = null; tsBitti = false; },
+  ciz: tsCiz
 });
 
 document.addEventListener('click', function (e) {
@@ -7067,6 +7137,10 @@ document.addEventListener('click', function (e) {
   var o = t.getAttribute('data-odeme');
   if (o) { tsSecili = o; tsCiz(); }
 
+  if (t.id === 'tsTeslim' && !tsSecili) {
+    balon('Ödemeyi nasıl aldığını seç — almadıysan "Almadım" de.', false, 3000);
+    return;
+  }
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
     k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */
@@ -7166,8 +7240,13 @@ Ekran.tanim('arac', {
         /* Hedef ruhsat sahibi OLMAYABILIR (A-M2): firma ruhsatli araçta
            ikinci iletişim aranır. Düğme sahipTel'e bakınca, telefonu
            yalnız ikinci iletişimde olan araçta kapalı kalıyordu. */
+        /* Telefon yoksa dugme kapali VE nedeni uzerinde yaziyor
+           (37. test): kunyedeki "Telefon yok" satiri gozle gorunur,
+           title ise dugmenin KENDISINE bagli. */
         '<button class="btn btn-ghost" id="arMesaj"' +
-          (mesajHedefi(a.plaka) && mesajHedefi(a.plaka).tel ? '' : ' disabled') + '>' +
+          (mesajHedefi(a.plaka) && mesajHedefi(a.plaka).tel
+            ? ''
+            : ' disabled title="Telefon yok — önce araç kaydına telefon yaz"') + '>' +
           '<svg class="ico"><use href="#i-message-square"></use></svg> Mesaj</button>' +
         '<button class="btn btn-ghost" id="arSesle">' +
           '<svg class="ico"><use href="#i-mic"></use></svg> Sesle</button>' +
@@ -8400,7 +8479,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>21f6aa81</b><br>' +
+      'Sürüm <b>1fc5c4a7</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

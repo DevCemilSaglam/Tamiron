@@ -10,6 +10,109 @@
 
 ---
 
+## K-040 · `ciz` iki iş yapıyordu: açılış ile çizim ayrıldı (06.09.2026)
+
+**Kuyruk 8.** İki yeni denetim testi yazıldı (36 → **38**) ve biri
+yazılırken asıl mesele çıktı: bu turda aynı hatayı iki kez yapmamın
+sebebi dikkatsizlik değil, **çekirdeğin yapısıydı.**
+
+### 40.1 · Test 38'in ilk tasarımı boştu — yazmadan önce yakalandı
+
+Önce şöyle bir test tasarladım: *ekranı çiz, `aria-pressed="true"`
+sayısını say, `Ekran.tazele()` çağır, yeniden say; azaldıysa bulgu.*
+
+Yazmadan önce **dünkü iki hataya karşı denedim:**
+
+* `kTurElle` — tür seçimi kaydın üstünde durduğu için çip **basılı
+  kalıyor**; sayı düşmüyor. ✗
+* `kSilinecek` — silme onayında `aria-pressed` **hiç yok**. ✗
+
+**İkisini de yakalamıyordu.** 29. testte bir kez yaşadığımız şeyin
+aynısı olurdu: 0 bulgu veren, hiçbir şeye bakmayan bir test.
+**Boş test, testsizlikten kötüdür** — yanlış güven verir.
+
+### 40.2 · Kök sebep: `ciz` hem "açıldı" hem "yeniden çiz" demekti
+
+İki hatanın ortak yanı şuydu: **açılışa ait bir sıfırlama `ciz`
+içindeydi.** `Ekran.tazele()` de `ciz`i çağırdığı için her tazeleme
+kullanıcının seçimini siliyordu. Ekran, "açıldım" ile "yeniden
+çiziliyorum" arasını **ayırt edemiyordu.**
+
+Çekirdeğe `ac` kancası eklendi:
+
+```
+ac(el)   — ekran AÇILDIĞINDA bir kez  (yalnız goster'den)
+ciz(el)  — her çizimde               (goster ve tazele'den)
+```
+
+Açılışa ait sıfırlamalar taşındı: `teslim` (ödeme seçimi, teslim
+hâli), `ruhsat` (alanların temizlenmesi, sekme, ön dolgu), `kayit`
+(silme onayı), `ses` (duyulan cümle).
+
+**Üçü latent hataydı.** Bugün onlara ulaşan bir yol yoktu — ama
+ruhsat ekranına `Ekran.tazele()` çağıran tek satırlık bir ekleme,
+ustanın yazdığı plakayı silecekti ve o satırı yazan kişi bunu
+bilemezdi.
+
+> İlk çözümüm (`kCizilenKayit` bekçisi, K-033.12) doğru çalışıyordu ama
+> **sorunun kendisini çözmüyordu**: `ciz` hâlâ açılış işi yapıyordu ve
+> aynı tuzak öteki ekranlarda duruyordu. Bir örneği düzeltmek, sınıfı
+> düzeltmek değildir.
+
+`sesleAc` de düzeldi: ses ekranı açıkken başka bir mikrofona basmak
+**yeni bir açılıştır** (bağlam değişiyor, duyulan cümle bayatlıyor).
+`tazele()` yerine `goster()` çağırıyor.
+
+### 40.3 · Test 37: kapalı düğme sebebini KENDİ üstünde taşır
+
+Cemil'in *"Kaydı Aç'a bastım, bir şey olmuyor"* şikâyeti (K-033.3).
+Ölçülen: görünür ve `disabled` bir düğme, sebebini `aria-describedby`
+ya da `title` ile **kendine bağlı** taşıyor mu.
+
+⚠️ **Neden "ekranda bir yerde açıklama var mı" diye bakmıyor:**
+baksaydı K-033.3'ü **kaçırırdı**. O ekranda uyarı şeritleri vardı — ama
+başka şeyler hakkında. Ekranda bir açıklama bulunması, **bu** düğmenin
+neden kapalı olduğunu söylemez. Kural tek cümle: **ya düğmeye bağla, ya
+düğmeyi kapatma.**
+
+İki bulgu verdi, ikisi de düğmeyi **konuşturarak** kapandı:
+
+* `psGonder` — parçacı seçilmeden basılınca *"Önce kime soracağını
+  seç."*; sorulacak parça yokken *"Sorulacak parça yok."* (kapalı düğme
+  bu **iki ayrı sebebi aynı sessizlikle** söylüyordu)
+* `tsTeslim` — *"Ödemeyi nasıl aldığını seç — almadıysan 'Almadım' de."*
+
+Kapalı kalması doğru olan ikisinde sebep düğmeye bağlandı: mesaj
+ekranının üç kanalı `aria-describedby="msjUyari"`, araç ekranının
+mesaj düğmesi `title`.
+
+### 40.4 · Testin kendisi de ölçülür — 38 iki kez yanlış bulgu verdi
+
+`var tAlinan = 0, tParca = 0, tFark = 0;` dizisinde `var` yalnız
+ilkinin önünde duruyor; ikinci ve üçüncüyü **sıfırlama sandı**.
+İlk düzeltmem de yetmedi (virgülü dışladım ama `tFark`ın hemen solunda
+virgül değil **boşluk** vardı). Doğru çözüm karakter dışlamak değil,
+**bildirimin tamamını atmak**tı.
+
+Her ikisi de negatif testle doğrulandı: hata enjekte edilince ateşledi,
+`title` eklenince ve yerel bildirimde sustu.
+
+### 40.5 · Beşinci ölçüm tuzağı
+
+`ac` kancasının ses cümlesini temizlemediğini sandım. Temizlemişti —
+element `hidden` idi ve ben `textContent` okumuştum; **`textContent`
+gizli metni de verir.** `innerText` vermiyor.
+
+Bunun üstüne bir de gerçek bir küçük düzeltme çıktı: gizlenen öğenin
+içeriği DOM'da duruyordu. Görünmüyor ama okunuyor — beni yanılttıysa
+denetimi de yanıltır. **Ekranda olmayan şey DOM'da da durmasın.**
+
+**Ölçüm:** derleme temiz · 14 ekran · **38 test** / 0 bulgu ·
+320 / 375 / 430 px · dört ekranda açılış/tazeleme davranışı elle
+doğrulandı (plaka, ödeme seçimi, silme onayı, duyulan cümle).
+
+---
+
 ## K-039 · Tema turu temiz çıktı; asıl bulgu ÖLÇÜM ARACINDA (06.09.2026)
 
 **Kuyruk 7.** Bu iş bir hata bulmadı; **üç ölçüm hatası** buldu ve ikisi

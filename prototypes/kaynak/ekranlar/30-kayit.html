@@ -464,29 +464,23 @@ function kayitCiz() {
       'müşteriye tek dokunuşla haber verebilirsin.</p>';
 }
 
-/* Hangi kayıt çizili — silme onayının ne zaman sıfırlanacağını bu
-   söyler. */
-var kCizilenKayit = null;
-
 /* ⚠️ ÇİZİM, KARARI SİLMEZ (06.09 — bu hatayı BİR TURDA İKİ KEZ yaptım).
-   Önce burada `kSilinecek = null` vardı. `Ekran.tazele()` ciz()'i
+   Önce `ciz` içinde `kSilinecek = null` vardı. `Ekran.tazele()` ciz()'i
    çağırıyor; kaydırma onayı açmak için tazeliyor; tazeleme onayı
    siliyordu. Sonuç: satır kayıyor, hiçbir şey açılmıyor — K-032'de
    yaşadığım işaret hatasının birebir aynısı, başka sebeple.
 
    Aynı gün aynı hatayı `kTurElle` ile de yaptım (o, kaydın üstüne
-   taşındı). Kural: ciz() EKRANI çizer, KARARI değil. Sıfırlanacak tek
-   şey, BAŞKA BİR KAYDA geçildiğinde sıfırlanandır.
+   taşındı). İkisini de hiçbir test yakalamadı; elle işletince çıktı.
 
-   İkisini de hiçbir test yakalamadı; ikisi de elle işletince çıktı. */
+   ⚠️ İLK ÇÖZÜMÜM YETERSİZDİ: `kCizilenKayit` diye bir bekçi koyup
+   "kayıt değiştiyse sıfırla" demiştim. Doğru çalışıyordu ama sorunun
+   KENDİSİNİ çözmüyordu — `ciz` hâlâ açılış işi yapıyordu ve aynı tuzak
+   öteki ekranlarda duruyordu. Çekirdeğe `ac` kancası eklendi (K-040);
+   sıfırlama oraya taşındı ve bekçi gereksiz kaldı. */
 Ekran.tanim('kayit', {
-  ciz: function () {
-    if (kCizilenKayit !== ACIK_KAYIT) {
-      kSilinecek = null;
-      kCizilenKayit = ACIK_KAYIT;
-    }
-    kayitCiz();
-  }
+  ac: function () { kSilinecek = null; },
+  ciz: kayitCiz
 });
 
 /* Kaydırma davranışı ÇEKİRDEKTE (Kaydirma); burada yalnız bu ekranda

@@ -42,7 +42,7 @@
     <span class="n-body ps-mesaj" id="psMesaj"></span>
   </div>
 
-  <button class="btn btn-primary btn-lg" id="psGonder" disabled>
+  <button class="btn btn-primary btn-lg" id="psGonder">
     <svg class="ico"><use href="#i-message-square"></use></svg>
     <span>WhatsApp ile gönder</span>
   </button>
@@ -103,13 +103,24 @@ function psCiz() {
     k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
     '\n\n📎 ruhsat fotoğrafı eklenecek';
 
+  /* ⚠️ DUGME KAPANMIYOR, KONUSUYOR (K-033.3 · 37. test).
+     Once `g.disabled = (!psSecililer.length || !parcalar.length)`
+     yaziyordu: parcaci secmeyen usta olu bir dugmeye basiyor ve neden
+     olmadigini ogrenemiyordu. Kapali dugme sessizdir — ustelik burada
+     IKI ayri sebep vardi (parcaci secilmedi / sorulacak parca yok) ve
+     kapali dugme ikisini de ayni sessizlikle soyluyordu. */
   var g = document.getElementById('psGonder');
-  g.disabled = (!psSecililer.length || !parcalar.length);
   /* Düğme kaç kişiye gideceğini SÖYLER: çoklu seçimde "gönderdim
      sandım, birine gitti" hatası buradan çıkar. */
   g.querySelector('span').textContent = psSecililer.length > 1
     ? 'WhatsApp ile ' + psSecililer.length + ' parçacıya gönder'
     : 'WhatsApp ile gönder';
+}
+
+/* Sorulacak parca var mi — konusan dugme bunu soruyor. */
+function parcalar_var() {
+  var k = kayitBul(ACIK_KAYIT);
+  return !!(k && psParcaListesi(k).length);
 }
 
 Ekran.tanim('parca-sor', {
@@ -127,6 +138,14 @@ document.addEventListener('click', function (e) {
     psCiz();
   }
 
+  if (t.id === 'psGonder' && !parcalar_var()) {
+    balon('Sorulacak parça yok — önce servis kaydına parça ekle.', false, 3000);
+    return;
+  }
+  if (t.id === 'psGonder' && !psSecililer.length) {
+    balon('Önce kime soracağını seç.', false, 2600);
+    return;
+  }
   if (t.id === 'psGonder' && psSecililer.length) {
     var k = kayitBul(ACIK_KAYIT);
     /* SORULDUĞU SATIRA YAZILIR. Adım 4'te "cevap kimden geldi"

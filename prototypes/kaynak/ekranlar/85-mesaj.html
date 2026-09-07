@@ -108,14 +108,19 @@
          "SMS kısa olsun" gibi — ustanın gördüğü metinle giden metni
          ayırırdı; gönderdiğinden başka bir şeyin gittiğini ancak
          müşteri sorunca öğrenirdi. -->
-    <button class="btn btn-primary btn-lg" id="msjGonder">
+    <!-- ⚠️ SEBEP DUGMEYE BAGLI (37. test). Telefon yoksa uc dugme de
+         kapali kaliyor ve nedenini #msjUyari yaziyor; aria-describedby
+         o metni dugmeye BAGLIYOR. Ekranda bir yerde aciklama olmasi
+         yetmez: hangi aciklamanin hangi dugmeye ait oldugu, ne goz ne
+         ekran okuyucu icin belli olur. -->
+    <button class="btn btn-primary btn-lg" id="msjGonder" aria-describedby="msjUyari">
       <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder
     </button>
     <div class="btn-row">
-      <button class="btn btn-ghost" id="msjSms">
+      <button class="btn btn-ghost" id="msjSms" aria-describedby="msjUyari">
         <svg class="ico"><use href="#i-message-square"></use></svg> SMS
       </button>
-      <button class="btn btn-ghost" id="msjAra">
+      <button class="btn btn-ghost" id="msjAra" aria-describedby="msjUyari">
         <svg class="ico"><use href="#i-phone"></use></svg> Ara
       </button>
     </div>

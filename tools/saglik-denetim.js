@@ -1,4 +1,4 @@
-/* Tamiron prototip saglik denetimi — 36 test.
+/* Tamiron prototip saglik denetimi — 38 test.
    Kullanim: prototypes/omurga.html'i 375px genislikte ac, konsola yapistir. */
 (function(){
 /* Stil metni: yorumlar ATILIR. Yorumda gecen bir sinif adi TANIM
@@ -1038,6 +1038,109 @@ function stilMetni() {
          ' saga ' + Math.round(tasma) + 'px kayiyor');
     });
   });
+  showScreen('home');
+
+
+  /* 37) SESSIZ KAPALI DUGME (06.09.2026)
+     Cemil: *"Kaydi Ac buttonuna bastim, bir sey olmuyor."* Dugme
+     `disabled` idi ve NEDEN kapali oldugunu hicbir sey soylemiyordu
+     (K-033.3). Kapali dugme sessizdir: basan kisi ne eksik oldugunu
+     ogrenemez, dugmenin bozuk oldugunu saniir.
+
+     OLCULEN: gorunur ve `disabled` bir dugme, sebebini KENDINE BAGLI
+     olarak tasiyor mu — `aria-describedby` (dolu bir ogeye isaret
+     eden) ya da `title`.
+
+     ⚠️ NEDEN "EKRANDA BIR YERDE ACIKLAMA VAR MI" DIYE BAKMIYOR:
+     baksaydi K-033.3'u KACIRIRDI. O ekranda uyari seritleri vardi —
+     ama baska seyler hakkinda. Ekranda bir yerde bir aciklama olmasi,
+     BU dugmenin neden kapali oldugunu soylemez. Baglanti acik olmali:
+     ya dugmeye bagla, ya dugmeyi kapatma.
+
+     Ekran disi dugmeler (header'in geri/ileri oku) kapsam disi —
+     onlarda kapali olmak zaten "gidecek yer yok" demek. */
+  ekranlar.forEach(function (a) {
+    showScreen(a);
+    document.querySelectorAll('#screen-' + a + ' button[disabled]').forEach(function (d) {
+      if (d.offsetParent === null && d.offsetHeight === 0) return;   /* gorunmuyorsa olculmez */
+      var ad = d.id || (d.textContent || '').trim().slice(0, 24) || d.className;
+      var ac = d.getAttribute('aria-describedby');
+      var hedef = ac ? document.getElementById(ac) : null;
+      var acikli = (hedef && (hedef.textContent || '').trim().length > 0) ||
+                   ((d.getAttribute('title') || '').trim().length > 0);
+      if (!acikli) {
+        ek('SESSIZ-KAPALI-DUGME', a, ad + ' kapali ama sebebi dugmeye bagli degil');
+      }
+    });
+  });
+  showScreen('home');
+
+  /* 38) CIZIMDE SIFIRLAMA (06.09.2026)
+     06.09'da AYNI HATAYI BIR TURDA IKI KEZ yaptim: `ciz()` icine
+     acilisa ait bir sifirlama yazdim (`kSilinecek = null`,
+     `kTurElle = false`). `Ekran.tazele()` ciz'i cagiriyor; her
+     tazeleme kullanicinin SECIMINI siliyordu. Ikisini de 36 test
+     kacirdi; elle isletince cikti (K-033.12).
+
+     KOK SEBEP `ciz`in IKI ISI BIRDEN yapmasiydi: "ekran acildi" ve
+     "yeniden ciz". Ekran ikisini ayirt edemiyordu. Cekirdege `ac`
+     kancasi eklendi (K-040) — acilis isi oraya yazilir.
+
+     OLCULEN, STATIK: her ekranin `ciz` kaynaginda UST DUZEY bir
+     sifirlama var mi (`x = null|false|0|''`). Ust duzey sart: bir
+     `if` blogunun icindeki `MESAJ_HEDEF = null` mesru — o, "oku ve
+     temizle" desenidir ve tazelemede zaten kosmuyor.
+
+     ⚠️ NEDEN DAVRANIS TESTI DEGIL: once "ekrani ciz, aria-pressed
+     say, tazele, yeniden say" diye bir test tasarladim. Yazmadan once
+     dunku iki hataya karsi denedim: IKISINI DE YAKALAMIYORDU (tur
+     secimi kaydin ustunde durdugu icin cip basili kaliyor; silme
+     onayinda aria-pressed hic yok). Bos bir test, testsizlikten
+     kotudur — 29. testte bunu bir kez yasadik. */
+  {
+    var tanimlar = (typeof Ekran !== 'undefined' && Ekran.tanimlar) ? Ekran.tanimlar() : null;
+    if (!tanimlar) {
+      ek('CIZIMDE-SIFIRLAMA', '(cekirdek)', 'Ekran.tanimlar() yok — test bakamiyor');
+    } else {
+      Object.keys(tanimlar).forEach(function (a) {
+        var fn = tanimlar[a] && tanimlar[a].ciz;
+        if (typeof fn !== 'function') return;
+        var src = fn.toString();
+        var govde = src.slice(src.indexOf('{') + 1);
+        var derinlik = 1, i = 0, ustDuzey = '';
+        while (i < govde.length && derinlik > 0) {
+          var c = govde.charAt(i);
+          if (c === '{') derinlik++;
+          else if (c === '}') derinlik--;
+          if (derinlik === 1 && c !== '{' && c !== '}') ustDuzey += c;
+          i++;
+        }
+        /* Yorumlar atilir: yorumda gecen bir ornek kod TANIM degildir
+           (4. testin ogrettigi ders). */
+        ustDuzey = ustDuzey.replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
+        /* ⚠️ YEREL BILDIRIMLER BASTAN ATILIR. Ilk yazimda
+           `var a = 0, b = 0, c = 0;` dizisinin IKINCI ve UCUNCU
+           degiskenlerini sifirlama sandim: `var` yalniz ilkinin
+           onunde duruyor. is-basina ekraninin yerel toplayicisi
+           (`tFark = 0`) boyle yanlis bulgu verdi.
+
+           Ilk duzeltmem de yetmedi — virgulu disladim ama `tFark`in
+           HEMEN solunda virgul degil BOSLUK vardi. Dogru cozum tek
+           tek karakter dislamak degil, BILDIRIMIN TAMAMINI atmak:
+           yerel degisken tanimlamak sifirlama degildir.
+
+           Test iki kez yanlis bulgu verdi ve iki kez duzeltildi;
+           bir testin kendisi de olculur. */
+        ustDuzey = ustDuzey.replace(/(^|[^\w$])(?:var|let|const)\s[^;]*;/g, ' ');
+        var re = /(^|[^\w$.])([A-Za-z_$][\w$]*)\s*=(?!=)\s*(null|false|0|''|"")\s*;/g;
+        var m;
+        while ((m = re.exec(ustDuzey))) {
+          ek('CIZIMDE-SIFIRLAMA', a,
+             m[2] + ' = ' + m[3] + ' — acilis isi, `ac` kancasina tasinmali');
+        }
+      });
+    }
+  }
   showScreen('home');
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da

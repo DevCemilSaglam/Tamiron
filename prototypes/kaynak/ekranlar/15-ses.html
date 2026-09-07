@@ -518,9 +518,17 @@ function sesCiz() {
      : sesDurumu === 'anlasildi' ? ' tamam'
      : sesDurumu === 'anlasilmadi' ? ' hata' : '');
 
+  /* ⚠️ GIZLEYINCE ICERIK DE SILINIR (06.09). Eskiden yalniz
+     `hidden` veriliyordu ve eski cumle iceride duruyordu. Gozle
+     gorunmuyor — ama `textContent` onu okuyor ve beni bir kez
+     yanilltti: `ac` kancasinin cumleyi temizlemedigini sandim,
+     oysa temizlemisti. Ekranda olmayan bir sey DOM'da da durmasin;
+     duran bir sey er ya da gec okunur. */
   var duy = document.getElementById('sesDuyulan');
   duy.hidden = !sesCumle;
-  if (sesCumle) duy.innerHTML = '<span class="sd-lbl">Duyulan</span>' + sesCumle;
+  duy.innerHTML = sesCumle
+    ? '<span class="sd-lbl">Duyulan</span>' + sesCumle
+    : '';
 
   var durum = document.getElementById('sesDurum');
   var acik = document.getElementById('sesAciklama');
@@ -675,8 +683,16 @@ function sesCumleIsle(cumle) {
 }
 
 Ekran.tanim('ses', {
-  ciz: function () {
+  /* ⚠️ DUYULAN CUMLE ACILISTA SILINIR, HER CIZIMDE DEGIL (K-040).
+     Bu ucu `ciz`in ilk satirindaydi: ekranı tazeleyen herhangi bir
+     sey ustanin az once soyledigi cumleyi siliyordu. Bugun tek
+     tazeleyen yol sesleAc()'ti ve orada silmek DOGRUydu (yeni baglam,
+     eski cumle bayat) — ama dogru olusu tesadüftü, kural degil.
+     sesleAc artik goster() cagiriyor: acilis acikca acilis. */
+  ac: function () {
     sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+  },
+  ciz: function () {
     var b = sesBaglam();
     document.getElementById('sesOrnekler').innerHTML = b.ornekler.map(function (c, i) {
       return '<button class="cip" data-ornek="' + i + '">' + c + '</button>';

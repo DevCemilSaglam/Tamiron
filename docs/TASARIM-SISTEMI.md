@@ -425,6 +425,7 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Müşteri özeti başlığı | `.ozet-bas` > `.oz-ad` + `.oz-alt` · parça markası: `.oz-marka` |
 | Sekme | `.tab-grup` > `.tab` (`aria-selected`) — GÖRÜNÜM değiştirir; `.cip` ise SEÇİM yapar, ikisi karıştırılmaz |
 | **Giriş koruması** | `data-giris="tutar\|km\|yil\|tel\|plaka\|kod\|tarih"` — biçimli her alan bunu taşır. `inputmode` bir öneridir, kısıt değil (K-030). **Denetimin sözlüğü çekirdekten geri kalamaz:** yeni tip eklenip `saglik-denetim.js`e yazılmazsa test doğru kodu hata sanar |
+| **Ekran sözleşmesi** | `Ekran.tanim(ad, { ac, ciz })` — `ac` ekran AÇILINCA bir kez (açılışa ait sıfırlamalar), `ciz` her çizimde (yalnız DOM üretir). **Açılış işi `ciz`e yazılmaz**: `tazele()` de `ciz`i çağırır ve kullanıcının seçimini siler (K-040, 38. test bekçisi) |
 | **Yığın** | `.yigin` — ekran gövdesindeki her sarmalayıcı kap. **Boşluğu kap verir**: yeni bir sarmalayıcı `.yigin` almazsa ritim sessizce kırılır |
 | Modül kutusu | `.modul-grid` > `.modul-kutu` > `.mk-ic` + `.mk-ad` + `.mk-alt` — ızgara; `.menu-row` ise liste (sırası anlam taşır) |
 | Tablo | `.tablo-sar` > `table.tablo` > `th`/`td` (+`.sayi` sağa yaslı mono sabit genişlik, `.eylem` 40 px) · ikincil bilgi: `.t-alt` · toplam: `tr.genel` · zebra: `tbody tr:nth-child(odd)` · silme: `tr.kaydirilir` + `data-kaydir="<anahtar>"` → sola kaydırınca `tr.silme-onay` > `.onay-btn.evet\|.hayir`. **Hareket çekirdekte** (`Kaydirma.tanim(ekran, fn)`), ekran yalnız anlamını yazar. **Yatay kaydırma YOK** (K-031) |

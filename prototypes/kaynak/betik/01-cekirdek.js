@@ -54,7 +54,12 @@ var muhDonemSecili = 'bugun';
    ornekler ve baslik ESKI kaliyordu. Tek yer olunca hata da tek. */
 function sesleAc(niyet) {
   SESLI_NIYET = niyet || 'genel';
-  if (Ekran.adi() === 'ses') Ekran.tazele();
+  /* ⚠️ tazele() DEGIL goster() (06.09, K-040). Ses ekrani zaten
+     acikken baska bir mikrofona basmak YENI BIR ACILISTIR: baglam
+     degisiyor ve az once duyulan cumle bayatliyor. tazele() `ac`
+     kancasini calistirmadigi icin eski cumle ekranda kaliyordu.
+     goster() gecmise yazmaz — geri dugmesi bozulmuyor. */
+  if (Ekran.adi() === 'ses') Ekran.goster('ses');
   else Ekran.ac('ses');
 }
 
@@ -67,6 +72,11 @@ var Ekran = (function () {
   var ileriYigin = [];
   var acik = null;
 
+  /* Ekran iki kanca tanımlayabilir:
+       ac(el)  — ekran AÇILDIĞINDA bir kez. Açılışa ait sıfırlamalar
+                 buraya yazılır (seçim temizleme, alan boşaltma).
+       ciz(el) — ekran her ÇİZİLDİĞİNDE. Yalnız DOM üretir.
+     `ac` isteğe bağlı; yazmayan ekran hiçbir şey kaybetmez. */
   function tanim(ad, o) {
     if (kayit[ad]) { console.warn('Ekran iki kez tanımlandı: ' + ad); return; }
     kayit[ad] = o || {};
@@ -83,6 +93,17 @@ var Ekran = (function () {
     el.classList.add('active');
     acik = ad;
     var k = kayit[ad];
+    /* ⚠️ AÇILIŞ, ÇİZİMDEN AYRI (06.09 — K-040).
+       `ciz` hem ekran açılınca hem her tazelemede koşuyordu ve ekran
+       ikisini AYIRT EDEMİYORDU. Açılışa ait bir sıfırlama `ciz`e
+       yazılınca, her tazeleme kullanıcının seçimini siliyordu — bu
+       hatayı 06.09'da bir turda İKİ KEZ yaptım (tür seçimi ve silme
+       onayı, K-033.12).
+
+       `ac` yalnız goster()'den çağrılır; tazele() ona hiç dokunmaz. */
+    if (k && typeof k.ac === 'function') {
+      try { k.ac(el); } catch (e) { console.error('ac(' + ad + '):', e); }
+    }
     if (k && typeof k.ciz === 'function') {
       try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); }
     }
@@ -145,6 +166,9 @@ var Ekran = (function () {
 
   return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
            goster: goster, tazele: tazele,
+           /* Denetimin 38. testi ekranların `ciz` kaynağını okuyor —
+              kayıt defterine erişimi olmadan bakamaz. */
+           tanimlar: function () { return kayit; },
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
            geriVarMi: function () { return gecmis.length > 0; } };

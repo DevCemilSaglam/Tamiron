@@ -30,7 +30,7 @@
   </div>
   <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu"></div>
 
-  <button class="btn btn-primary btn-lg" id="tsTeslim" disabled>
+  <button class="btn btn-primary btn-lg" id="tsTeslim">
     <svg class="ico"><use href="#i-check"></use></svg> Teslim et
   </button>
 
@@ -96,7 +96,8 @@ function tsCiz() {
       (tsSecili === o.k) + '">' + o.ad + '</button>';
   }).join('');
 
-  document.getElementById('tsTeslim').disabled = !tsSecili;
+  /* ⚠️ KAPANMIYOR, KONUSUYOR (K-033.3 · 37. test). Odeme yolu
+     secilmeden basan usta, dugmenin bozuk oldugunu saniyordu. */
   document.getElementById('tsTeslim').hidden = tsBitti;
   document.getElementById('tsOdeme').hidden = tsBitti;
 
@@ -160,7 +161,12 @@ function tsCiz() {
 }
 
 Ekran.tanim('teslim', {
-  ciz: function () { tsSecili = null; tsBitti = false; tsCiz(); }
+  /* Ödeme seçimi ve "teslim edildi" hâli AÇILIŞA aittir: ekran her
+     açılışta temiz başlar. Bunlar `ciz`de dururken her tazeleme
+     ustanın seçtiği ödeme yolunu siliyordu — bugün ulaşılabilir bir
+     yol yoktu ama olması an meselesiydi (K-040). */
+  ac: function () { tsSecili = null; tsBitti = false; },
+  ciz: tsCiz
 });
 
 document.addEventListener('click', function (e) {
@@ -170,6 +176,10 @@ document.addEventListener('click', function (e) {
   var o = t.getAttribute('data-odeme');
   if (o) { tsSecili = o; tsCiz(); }
 
+  if (t.id === 'tsTeslim' && !tsSecili) {
+    balon('Ödemeyi nasıl aldığını seç — almadıysan "Almadım" de.', false, 3000);
+    return;
+  }
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
     k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */

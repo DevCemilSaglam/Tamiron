@@ -379,7 +379,11 @@ function rEylemCiz(plakaTamam, kayitli) {
 }
 
 Ekran.tanim('ruhsat', {
-  ciz: function () {
+  /* ⚠️ HEPSİ AÇILIŞ İŞİ (K-040). Bu gövde `ciz`deyken her tazeleme
+     ustanın YAZDIĞI PLAKAYI siliyordu. Bugün ruhsat ekranında
+     tazeleyen bir yol yoktu — ama bir tane eklemek tek satırlık bir
+     iş ve o satırı yazan kişi bunun plakayı sileceğini bilemezdi. */
+  ac: function () {
     /* Ekran her açılışta TEMİZ başlar — yarım kalmış kayıt sonrakine
        sızmasın. */
     R_ALANLAR.forEach(function (id) {
@@ -426,7 +430,9 @@ Ekran.tanim('ruhsat', {
       rSesNotu = null;
       ruhsatDurum();
     }
-  }
+  },
+  /* Tazeleme yalnız DURUMU yeniden çizer; alanlara dokunmaz. */
+  ciz: function () { ruhsatDurum(); }
 });
 
 /* ---- sahte okuma ----

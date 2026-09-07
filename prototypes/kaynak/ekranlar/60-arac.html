@@ -154,8 +154,13 @@ Ekran.tanim('arac', {
         /* Hedef ruhsat sahibi OLMAYABILIR (A-M2): firma ruhsatli araçta
            ikinci iletişim aranır. Düğme sahipTel'e bakınca, telefonu
            yalnız ikinci iletişimde olan araçta kapalı kalıyordu. */
+        /* Telefon yoksa dugme kapali VE nedeni uzerinde yaziyor
+           (37. test): kunyedeki "Telefon yok" satiri gozle gorunur,
+           title ise dugmenin KENDISINE bagli. */
         '<button class="btn btn-ghost" id="arMesaj"' +
-          (mesajHedefi(a.plaka) && mesajHedefi(a.plaka).tel ? '' : ' disabled') + '>' +
+          (mesajHedefi(a.plaka) && mesajHedefi(a.plaka).tel
+            ? ''
+            : ' disabled title="Telefon yok — önce araç kaydına telefon yaz"') + '>' +
           '<svg class="ico"><use href="#i-message-square"></use></svg> Mesaj</button>' +
         '<button class="btn btn-ghost" id="arSesle">' +
           '<svg class="ico"><use href="#i-mic"></use></svg> Sesle</button>' +
