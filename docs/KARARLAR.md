@@ -10,6 +10,82 @@
 
 ---
 
+## K-039 · Tema turu temiz çıktı; asıl bulgu ÖLÇÜM ARACINDA (06.09.2026)
+
+**Kuyruk 7.** Bu iş bir hata bulmadı; **üç ölçüm hatası** buldu ve ikisi
+benim kendi aracımdaydı. Yazılmasının sebebi bu.
+
+### 39.1 · Kuyruğun kendi varsayımı yanlıştı
+
+Kuyruğa şunu yazmıştım: *"bu turun bileşenlerini çoğunlukla koyu temada
+gördüm."* Ölçünce `prefers-color-scheme` **açık** çıktı — yani K-033
+turunun bütün ekran görüntüleri ve bütün denetim koşuları **açık
+temadaydı.** Ölçülmemiş olan koyu temaydı; tam tersi.
+
+> Kuyruğa yazılan gerekçe de bir iddiadır ve o da ölçülür.
+
+Kuyruğa ayrıca *"denetimin kontrast testi rakamı verir"* yazmıştım.
+**Öyle bir test yok.** Denetimin 36 testi arasında `KOYU-SIYAH` ve
+`TEMA-UYUSMAZLIGI` var; kontrast oranı ölçen bir test yok. Kontrast bu
+turda **elle** ölçüldü.
+
+### 39.2 · Sonuç: iki temada da temiz
+
+Denetim üç hâlde de koşturuldu — `data-theme="light"`, `"dark"` ve
+sistem: **üçünde de 0 bulgu.** K-033 turunun yeni bileşenleri için WCAG
+kontrast oranı elle hesaplandı (eşik: normal metin 4.5):
+
+| Bileşen | Açık | Koyu |
+|---|---|---|
+| Tablo ad alanı | 15.20 | 13.69 |
+| `tutar-disi` (üzeri çizili tutar) | **5.00** | **5.28** |
+| `k-alis` (parçacı fiyatı) | **5.00** | **5.28** |
+| Tablo başlığı · çipler | 6.28 | 7.75 |
+| `ak-tutar` · `ak-is-ne` · balon | 16.82 | 14.06 |
+| `ms-say` · `ms-arac-ad` | 7.57 | 8.15 |
+
+En düşük **5.00** — eşiğin üstünde. Koyu temada ekran görüntüsü de
+alındı: çerçevesiz tablo alanlarının kesik alt çizgisi, zebra şeridi ve
+üzeri çizili tutar okunuyor.
+
+### 39.3 · Ölçüm aracının iki hatası — ikisi de "bulgu" gibi göründü
+
+**(a) `color(srgb …)` okunamıyordu.** Zebra şeridinin zemini bu
+biçimde geliyor; ayrıştırıcım `0.886275` gibi 0–1 aralığındaki
+değerleri 0–255 sanıp parlaklığı sıfıra yakın hesapladı. Sonuç: tablo
+ad alanı için **1.24** kontrast — yani "görünmez". Gerçek değer
+**15.20**.
+
+**(b) Tema geçişinin ara karesi okunuyordu.** `data-theme` değişince
+`.icon-btn`in zemini `0.15s` geçişle kayıyor. Geçiş bitmeden okunan
+`backgroundColor`, iki temanın **arasında** bir renk veriyordu:
+geri düğmesi açık temada `rgb(48,58,72)`, koyu temada
+`rgb(175,179,184)` — ikisi de yanlış, ikisi de "kontrast 1.5" gibi
+korkutucu bir rakam üretiyordu. İki `requestAnimationFrame` **yetmedi**;
+geçiş süresi kadar (700 ms) beklemek gerekti.
+
+> **Kural:** tema değiştirdikten sonra renk okunmaz — **geçiş bitene
+> kadar beklenir.** Bir sonraki oturum aynı tuzağa düşmesin diye
+> `HANDOFF.md`'ye yazıldı.
+
+Bu, bu oturumda ölçüm aracımın beni **dördüncü** yanıltışı (önce
+kopmuş DOM düğümüne tıklama, sonra `innerHTML.length` imzası, sonra
+paylaşılan `muhDonemSecili` kirlenmesi). Hepsinin ortak dersi aynı:
+**önce "bulgu" diye görünen şeyin ölçüm hatası olup olmadığına bakılır.**
+K-024.1 sağlık denetimi için yazılmıştı; her ölçüm için geçerli.
+
+### 39.4 · Kontrast testi denetime girsin mi?
+
+Girebilir — bu turda elle yapılan hesap otomatikleştirilebilir. Ama iki
+şartı var: `color(srgb …)` biçimini okumalı ve **tema geçişini
+beklemeli**; ikisini de bugün elle öğrendik. **8. işe aday olarak
+düşüldü**, orada tartılacak.
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / 0 bulgu ·
+açık · koyu · sistem · 320 / 375 / 430 px.
+
+---
+
 ## K-038 · Müşterinin sayfası, ustanın ekranından geri kalmış (06.09.2026)
 
 **Kuyruk 6.** `ozet` müşterinin gördüğü tek sayfa (K-023). K-033 turunda

@@ -33,7 +33,7 @@ Sırası **riske göre**: en üstteki, yanlışsa en çok şeyi bozan.
 | 4 | **İki "bekliyor" ayrımı** — `fiyatiBekleyen` ≠ `parcaBekliyor`, her ekranda doğru olan mı yazıyor | **BİTTİ** | Şüphem doğruydu: kart ikisini `\|\|` ile tek rozete bindiriyordu, **fiyatı gelmemiş satır *"parça bekliyor"* diye okunuyordu**. İki ayrı rozet oldu; teslim ekranı da bayraktan haberdar edildi. **Beklemediğim bulgu:** `kayitSatiriHtml`in tam hâli (60 satır) bir gündür **ulaşılamazdı** — silindi (K-036) |
 | 5 | **Muhasebe hâlâ doğru mu** — "hepsi müşteriden" anahtarı fiyat→alış taşıyor, iş başına farkını bozuyor olabilir | **BİTTİ** | **Muhasebe doğruymuş** — müşteri parçası alış toplamına hiç girmiyordu (12.970−7.160=5.810 rakamla tutturuldu). Ama anahtar **satış fiyatını tek dokunuşta yok ediyordu**: 5.810→5.310→**3.710**. Kural artık silerek değil **toplamda eleyerek** işliyor; gidiş-dönüş tam (K-037) |
 | 6 | **Müşteri özeti** — yeni yapıya uydu mu; "parça bekliyor" müşteriye söylenmeli mi | **BİTTİ** | Üç yerden geri kalmış: çok satırlı şikâyet **tek satıra yapışıyordu**, yarım satır müşteriye *"Parça —"* diye gidiyordu, ve sayfa parça beklendiğini söylemiyorken **mesaj şablonu söylüyordu** — müşteri iki ayrı hikâye görüyordu. Üçü de düzeldi; A-M15 açıldı (K-038) |
-| 7 | **Açık tema turu** — bu turun bileşenleri çoğunlukla koyu temada görüldü | AÇIK | |
+| 7 | **Açık tema turu** — bu turun bileşenleri çoğunlukla koyu temada görüldü | **BİTTİ** | **Varsayımım tersmiş**: `prefers-color-scheme` açık — bütün tur açık temadaydı, ölçülmemiş olan **koyu**. Ölçüldü: üç tema hâlinde de 0 bulgu, kontrastlar AA üstü (en düşük **5.00**). Kuyruğa yazdığım *"denetimin kontrast testi"* de yokmuş. Asıl bulgu **ölçüm aracımda**: `color(srgb …)` okunamıyordu ve tema geçişinin ara karesi okunuyordu (K-039) |
 | 8 | **İki yeni denetim testi** — bugün hiçbir testin yakalamadığı iki hata sınıfı | AÇIK | |
 | 9 | **320 px elle turu** — denetim 0 diyor; K-025 sessiz kırpmayı da 0 demişti | AÇIK | |
 | 10 | **Belge tazeleme** — EKRANLAR · IS-AKISI · SOZLUK · HANDOFF sayıları | AÇIK | |
@@ -212,6 +212,12 @@ bulgu.
 *Gerekçe:* K-033.12 — `ciz()` içinde sıfırlanan bir ekran değişkeni,
 her tazelemede ustanın seçimini siliyordu. Aynı hatayı **bir turda iki
 kez** yaptım.
+
+**Test 40 — adayı (K-039.4'ten):** KONTRAST. Bu turda elle yapılan
+WCAG hesabı otomatikleştirilebilir. İki şartı var ve ikisi de bugün elle
+öğrenildi: `color(srgb …)` biçimini okumalı, ve **tema geçişini
+beklemeli** (~700 ms). Denetim eşzamanlı koştuğu için ikincisi zor;
+zorlanırsa yazılmaz ve sebebi buraya düşülür.
 
 **Test 39 — adayı (K-036.3'ten):** bir ortak nesnenin hiç geçilmeyen
 **seçeneği** ölüdür (`kayitSatiriHtml(k, {sade})` — `sade:false` bir

@@ -199,6 +199,21 @@ bir öğe kapsayıcının **yarısını** geçemiyor. 375 px'te tavan 187 px'ti,
 `max-width` yazmak işe yaramıyordu. **Belirtiyi düzeltmek, sebebi
 düzeltmek değildir.** K-033.10.
 
+### Ölçüm tuzakları — bu oturumda dört kez düşüldü
+
+Hepsi *"bulgu"* gibi göründü, hiçbiri bulgu değildi. **Önce aracına bak.**
+
+| Tuzak | Belirtisi |
+|---|---|
+| Ekranı tazeleyip **önceden yakalanmış** düğmeye tıklamak | Kopmuş düğüm hiçbir şey yapmaz → "sessiz düğme" |
+| İmza olarak `innerHTML.length` | Sekme takasında bir `hidden` eklenip biri kalkar, `aria-pressed` true↔false olur → **uzunluk aynı**, çalışan düğme sessiz görünür |
+| Paylaşılan durumu sıfırlamadan taramak | `muhDonemSecili` iki ekranda ortak; önceki tıklama sonrakini kirletir (K-024.1) |
+| Tema değişiminden **hemen sonra** renk okumak | `0.15s` geçişin ara karesi okunur; iki `requestAnimationFrame` yetmez, ~700 ms beklenir (K-039.3) |
+
+Ayrıca: `getComputedStyle` zemini `color(srgb 0.88 0.92 0.96 / 0.55)`
+biçiminde verebilir — `rgb()` bekleyen bir ayrıştırıcı bunu 0–255 sanıp
+kontrastı yanlış hesaplar.
+
 ---
 
 ## 5 · Cemil'in kararını bekleyenler
