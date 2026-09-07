@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 10:47
+  Üretim: 2026-09-07 10:53
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -6292,7 +6292,14 @@ Ekran.tanim('ruhsat', {
       if (o.sahipAd) document.getElementById('rSahip').value = o.sahipAd;
       if (o.sahipTel) document.getElementById('rTel').value = o.sahipTel;
       if (o.km) document.getElementById('rKm').value = o.km;
-      rSesNotu = { is: o.is || '' };
+      /* ⚠️ SESİN ÇÖZDÜĞÜ TÜR ÇÖPE GİDİYORDU (06.09, ölü uç turu).
+         Ses ekranı "bakıma geldi" cümlesinden türü zaten çıkarıyor ve
+         RUHSAT_ONDOLGU.tur'a yazıyor; dün buradaki okuma satırını
+         kaldırınca alan ölü veri oldu ve tür metinden YENİDEN tahmin
+         edilmeye başladı. İkinci tahmin birincisinden iyi değil —
+         üstelik ses, türü `is` metninde geçmeyen bir sözden çıkarmış
+         olabilir. Söylenen bilgi, tahmin edilen bilgiyi yener. */
+      rSesNotu = { is: o.is || '', tur: o.tur || null };
       ruhsatDurum();
       if (o.is) {
         document.getElementById('rSesBekleniyor').innerHTML =
@@ -6409,9 +6416,11 @@ document.addEventListener('click', function (e) {
     var isMetni = (rSesNotu && rSesNotu.is) || '';
     var yeni = {
       id: KAYITLAR.length + 1, plaka: p,
-      /* TÜR EKRANDA SORULMUYOR, İŞ METNİNDEN TAHMİN EDİLİYOR (Cemil,
-         06.09). Kayıt ekranında düzeltilebilir. */
-      tur: isTuruTahmin(isMetni),
+      /* TÜR EKRANDA SORULMUYOR (Cemil, 06.09). Sesle geldiyse SESİN
+         çözdüğü tür, yoksa iş metninden tahmin. İkisi de kayıt
+         ekranında düzeltilebilir. */
+      tur: (rSesNotu && rSesNotu.tur) || isTuruTahmin(isMetni),
+      turElle: !!(rSesNotu && rSesNotu.tur),
       km: rDeger('rKm'),
       /* Sesle söylenen iş şikâyet olarak düşer. */
       sikayet: isMetni,
@@ -6556,6 +6565,27 @@ function kayitCiz() {
                   (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') +
                   '" aria-label="Satır adı" />' +
               '</span>' +
+              /* ⚠️ KOL B GERİ KONDU (06.09, ölü uç turu).
+                 Dün tabloyu yazarken bu çipler düştü ve fark etmedim:
+                 `parca-sor` iki parçacıya soruyor, `s.sorulan`u
+                 yazıyor, balonu *"cevaplar kayda düşecek"* diyor — ama
+                 kaydı okuyan hiçbir şey kalmamıştı. `SelectedReplyId`
+                 (modelde duran, akışta karşılığı olan bir alan) hiç
+                 dolmuyordu: usta iki cevap aldığında hangisini
+                 kullandığını yazacak yer yoktu.
+
+                 TEK PARÇACIYA SORULDUYSA ÇIKMAZ — ana yol kalınlaşmaz.
+                 Satırı uzatıyor, evet; ama yalnız uzatması gereken
+                 durumda. */
+              ((s.sorulan || []).length > 1
+                ? '<span class="k-ikincil">Cevap kimden geldi?' +
+                    s.sorulan.map(function (pi) {
+                      return '<button class="cip" data-kaynak="' + i + '|' + pi +
+                        '" aria-pressed="' + (s.kaynak === pi) + '">' +
+                        PARCACILAR[pi].ad + '</button>';
+                    }).join('') +
+                  '</span>'
+                : '') +
               /* ROZET, DÜĞME DEĞİL. Yalnız MÜŞTERİ getirdiyse çıkar:
                  tamircinin getirmesi normal hâl, her satıra rozet
                  koymak gürültü olurdu. */
@@ -6724,6 +6754,15 @@ document.addEventListener('click', function (e) {
   var tur = t.getAttribute('data-kayit-tur');
   if (tur) { k.tur = tur; k.turElle = true; Ekran.tazele(); return; }
 
+  /* Hangi parçacının cevabı kullanıldı (Kol B). Seçim SATIRA yazılır,
+     ekrana değil: aynı kayıtta iki parça iki ayrı parçacıdan gelebilir. */
+  var kay = t.getAttribute('data-kaynak');
+  if (kay) {
+    var pk = kay.split('|');
+    k.satirlar[parseInt(pk[0], 10)].kaynak = parseInt(pk[1], 10);
+    Ekran.tazele(); return;
+  }
+
   if (e.target.closest('[data-ksil-vazgec]')) { kSilinecek = null; Ekran.tazele(); return; }
   var so = t.getAttribute('data-ksil-onay');
   if (so !== null) {
@@ -6844,14 +6883,26 @@ document.addEventListener('click', function (e) {
     /* SORULDUĞU SATIRA YAZILIR. Adım 4'te "cevap kimden geldi"
        sorusunun cevabı burada üretiliyor; kayıt ekranı bunu okuyup
        fiyat satırının altına çip olarak koyuyor — ayrı bir
-       karşılaştırma ekranı gerekmiyor (Kol B). */
+       karşılaştırma ekranı gerekmiyor (Kol B).
+
+       ⚠️ 06.09 — BU YORUM BİR GÜN BOYUNCA YALANDI. Kayıt ekranı
+       yeniden yazılırken çipler düştü; burası yazmaya devam etti,
+       okuyan kalmadı. Yorum kodla birlikte çürüyor: *"kayıt ekranı
+       bunu okuyor"* diyen bir cümle, kayıt ekranı değişince kendini
+       düzeltmiyor. Çipler geri kondu. */
     psParcaListesi(k).forEach(function (s) {
       s.sorulan = psSecililer.slice();
     });
+    /* ⚠️ BALON ARTIK VAAT ETMİYOR. Eskiden *"cevaplar kayda düşecek"*
+       diyordu — cevap gelmiyor, DÜŞMÜYOR; usta parçacının WhatsApp'tan
+       yazdığı rakamı kendi eliyle giriyor. Uygulamanın yapmadığı bir
+       işi yapacakmış gibi söylemek, K-021'de bir kez düzelttiğim
+       hatanın aynısı. */
     balon(psSecililer.length > 1
-      ? psSecililer.length + ' parçacıya soruldu — cevaplar kayda düşecek.'
+      ? psSecililer.length + ' parçacıya soruldu. Cevap gelince fiyatı sen yaz — ' +
+        'hangi parçacıdan geldiğini kayıtta işaretleyebilirsin.'
       : PARCACILAR[psSecililer[0]].ad + ' — WhatsApp açılıyor, mesaj hazır.',
-      false, 3000);
+      false, 3600);
     Ekran.ac('kayit');
   }
 });

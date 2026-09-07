@@ -381,6 +381,27 @@ function kayitCiz() {
                   (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') +
                   '" aria-label="Satır adı" />' +
               '</span>' +
+              /* ⚠️ KOL B GERİ KONDU (06.09, ölü uç turu).
+                 Dün tabloyu yazarken bu çipler düştü ve fark etmedim:
+                 `parca-sor` iki parçacıya soruyor, `s.sorulan`u
+                 yazıyor, balonu *"cevaplar kayda düşecek"* diyor — ama
+                 kaydı okuyan hiçbir şey kalmamıştı. `SelectedReplyId`
+                 (modelde duran, akışta karşılığı olan bir alan) hiç
+                 dolmuyordu: usta iki cevap aldığında hangisini
+                 kullandığını yazacak yer yoktu.
+
+                 TEK PARÇACIYA SORULDUYSA ÇIKMAZ — ana yol kalınlaşmaz.
+                 Satırı uzatıyor, evet; ama yalnız uzatması gereken
+                 durumda. */
+              ((s.sorulan || []).length > 1
+                ? '<span class="k-ikincil">Cevap kimden geldi?' +
+                    s.sorulan.map(function (pi) {
+                      return '<button class="cip" data-kaynak="' + i + '|' + pi +
+                        '" aria-pressed="' + (s.kaynak === pi) + '">' +
+                        PARCACILAR[pi].ad + '</button>';
+                    }).join('') +
+                  '</span>'
+                : '') +
               /* ROZET, DÜĞME DEĞİL. Yalnız MÜŞTERİ getirdiyse çıkar:
                  tamircinin getirmesi normal hâl, her satıra rozet
                  koymak gürültü olurdu. */
@@ -548,6 +569,15 @@ document.addEventListener('click', function (e) {
 
   var tur = t.getAttribute('data-kayit-tur');
   if (tur) { k.tur = tur; k.turElle = true; Ekran.tazele(); return; }
+
+  /* Hangi parçacının cevabı kullanıldı (Kol B). Seçim SATIRA yazılır,
+     ekrana değil: aynı kayıtta iki parça iki ayrı parçacıdan gelebilir. */
+  var kay = t.getAttribute('data-kaynak');
+  if (kay) {
+    var pk = kay.split('|');
+    k.satirlar[parseInt(pk[0], 10)].kaynak = parseInt(pk[1], 10);
+    Ekran.tazele(); return;
+  }
 
   if (e.target.closest('[data-ksil-vazgec]')) { kSilinecek = null; Ekran.tazele(); return; }
   var so = t.getAttribute('data-ksil-onay');

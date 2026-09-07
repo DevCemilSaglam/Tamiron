@@ -28,7 +28,7 @@ Sırası **riske göre**: en üstteki, yanlışsa en çok şeyi bozan.
 | # | İş | Durum | Sonuç |
 |---|---|---|---|
 | 1 | **Veri modeli uzlaştırması** — `parcaBekliyor` ve `turElle` modelde YOK, model bunları açıkça yasaklıyor | **BİTTİ** | Belge yanlıştı, alan değil: türetilen `fiyatiBekleyen` *fiyatı gelmemiş* demek, *parça yolda* demek değil. **Bayrak ≠ durum** sınırı yazıldı (K-034) — ayrım: *bu alan dolduğunda kullanıcının yapabilecekleri değişiyor mu?* Ayrıca sözlükte üç uzlaşmazlık düzeldi (`Plate`/`PlateNo`, türün üçüncü değeri, eksik `ReminderSent`) |
-| 2 | **Ölü uç turu** — bu turda değişen 8 ekran elle işletilecek | AÇIK | |
+| 2 | **Ölü uç turu** — bu turda değişen 8 ekran elle işletilecek | **BİTTİ** | **İki gerçek bulgu.** (a) **Kol B kopmuş**: parça-sor `sorulan`ı yazıyor, okuyan kalmamış, `SelectedReplyId` hiç dolmuyor — üstelik balon *"cevaplar kayda düşecek"* diye **olmayan bir şey vaat ediyordu**. Çipler geri kondu, balon dürüstleşti. (b) **Sesin çözdüğü tür çöpe gidiyordu**: `RUHSAT_ONDOLGU.tur` ölü veriydi, tür metinden yeniden tahmin ediliyordu. Kalan 40 düğmenin hepsi bir şey yapıyor |
 | 3 | **Dokunuş sayımı** — ana yol değişti, HANDOFF'taki `12` artık yalan olabilir | AÇIK | |
 | 4 | **İki "bekliyor" ayrımı** — `fiyatiBekleyen` ≠ `parcaBekliyor`, her ekranda doğru olan mı yazıyor | AÇIK | |
 | 5 | **Muhasebe hâlâ doğru mu** — "hepsi müşteriden" anahtarı fiyat→alış taşıyor, iş başına farkını bozuyor olabilir | AÇIK | |

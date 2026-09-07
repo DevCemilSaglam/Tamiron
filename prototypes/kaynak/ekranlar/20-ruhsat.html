@@ -396,7 +396,14 @@ Ekran.tanim('ruhsat', {
       if (o.sahipAd) document.getElementById('rSahip').value = o.sahipAd;
       if (o.sahipTel) document.getElementById('rTel').value = o.sahipTel;
       if (o.km) document.getElementById('rKm').value = o.km;
-      rSesNotu = { is: o.is || '' };
+      /* ⚠️ SESİN ÇÖZDÜĞÜ TÜR ÇÖPE GİDİYORDU (06.09, ölü uç turu).
+         Ses ekranı "bakıma geldi" cümlesinden türü zaten çıkarıyor ve
+         RUHSAT_ONDOLGU.tur'a yazıyor; dün buradaki okuma satırını
+         kaldırınca alan ölü veri oldu ve tür metinden YENİDEN tahmin
+         edilmeye başladı. İkinci tahmin birincisinden iyi değil —
+         üstelik ses, türü `is` metninde geçmeyen bir sözden çıkarmış
+         olabilir. Söylenen bilgi, tahmin edilen bilgiyi yener. */
+      rSesNotu = { is: o.is || '', tur: o.tur || null };
       ruhsatDurum();
       if (o.is) {
         document.getElementById('rSesBekleniyor').innerHTML =
@@ -513,9 +520,11 @@ document.addEventListener('click', function (e) {
     var isMetni = (rSesNotu && rSesNotu.is) || '';
     var yeni = {
       id: KAYITLAR.length + 1, plaka: p,
-      /* TÜR EKRANDA SORULMUYOR, İŞ METNİNDEN TAHMİN EDİLİYOR (Cemil,
-         06.09). Kayıt ekranında düzeltilebilir. */
-      tur: isTuruTahmin(isMetni),
+      /* TÜR EKRANDA SORULMUYOR (Cemil, 06.09). Sesle geldiyse SESİN
+         çözdüğü tür, yoksa iş metninden tahmin. İkisi de kayıt
+         ekranında düzeltilebilir. */
+      tur: (rSesNotu && rSesNotu.tur) || isTuruTahmin(isMetni),
+      turElle: !!(rSesNotu && rSesNotu.tur),
       km: rDeger('rKm'),
       /* Sesle söylenen iş şikâyet olarak düşer. */
       sikayet: isMetni,

@@ -132,14 +132,26 @@ document.addEventListener('click', function (e) {
     /* SORULDUĞU SATIRA YAZILIR. Adım 4'te "cevap kimden geldi"
        sorusunun cevabı burada üretiliyor; kayıt ekranı bunu okuyup
        fiyat satırının altına çip olarak koyuyor — ayrı bir
-       karşılaştırma ekranı gerekmiyor (Kol B). */
+       karşılaştırma ekranı gerekmiyor (Kol B).
+
+       ⚠️ 06.09 — BU YORUM BİR GÜN BOYUNCA YALANDI. Kayıt ekranı
+       yeniden yazılırken çipler düştü; burası yazmaya devam etti,
+       okuyan kalmadı. Yorum kodla birlikte çürüyor: *"kayıt ekranı
+       bunu okuyor"* diyen bir cümle, kayıt ekranı değişince kendini
+       düzeltmiyor. Çipler geri kondu. */
     psParcaListesi(k).forEach(function (s) {
       s.sorulan = psSecililer.slice();
     });
+    /* ⚠️ BALON ARTIK VAAT ETMİYOR. Eskiden *"cevaplar kayda düşecek"*
+       diyordu — cevap gelmiyor, DÜŞMÜYOR; usta parçacının WhatsApp'tan
+       yazdığı rakamı kendi eliyle giriyor. Uygulamanın yapmadığı bir
+       işi yapacakmış gibi söylemek, K-021'de bir kez düzelttiğim
+       hatanın aynısı. */
     balon(psSecililer.length > 1
-      ? psSecililer.length + ' parçacıya soruldu — cevaplar kayda düşecek.'
+      ? psSecililer.length + ' parçacıya soruldu. Cevap gelince fiyatı sen yaz — ' +
+        'hangi parçacıdan geldiğini kayıtta işaretleyebilirsin.'
       : PARCACILAR[psSecililer[0]].ad + ' — WhatsApp açılıyor, mesaj hazır.',
-      false, 3000);
+      false, 3600);
     Ekran.ac('kayit');
   }
 });
