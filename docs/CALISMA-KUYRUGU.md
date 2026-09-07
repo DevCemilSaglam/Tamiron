@@ -30,7 +30,7 @@ Sırası **riske göre**: en üstteki, yanlışsa en çok şeyi bozan.
 | 1 | **Veri modeli uzlaştırması** — `parcaBekliyor` ve `turElle` modelde YOK, model bunları açıkça yasaklıyor | **BİTTİ** | Belge yanlıştı, alan değil: türetilen `fiyatiBekleyen` *fiyatı gelmemiş* demek, *parça yolda* demek değil. **Bayrak ≠ durum** sınırı yazıldı (K-034) — ayrım: *bu alan dolduğunda kullanıcının yapabilecekleri değişiyor mu?* Ayrıca sözlükte üç uzlaşmazlık düzeldi (`Plate`/`PlateNo`, türün üçüncü değeri, eksik `ReminderSent`) |
 | 2 | **Ölü uç turu** — bu turda değişen 8 ekran elle işletilecek | **BİTTİ** | **İki gerçek bulgu.** (a) **Kol B kopmuş**: parça-sor `sorulan`ı yazıyor, okuyan kalmamış, `SelectedReplyId` hiç dolmuyor — üstelik balon *"cevaplar kayda düşecek"* diye **olmayan bir şey vaat ediyordu**. Çipler geri kondu, balon dürüstleşti. (b) **Sesin çözdüğü tür çöpe gidiyordu**: `RUHSAT_ONDOLGU.tur` ölü veriydi, tür metinden yeniden tahmin ediliyordu. Kalan 40 düğmenin hepsi bir şey yapıyor |
 | 3 | **Dokunuş sayımı** — ana yol değişti, HANDOFF'taki `12` artık yalan olabilir | **BİTTİ** | Yalanmış — ama beklediğim yönde değil: ana yol **12 → 13** (koca bir soru kalkmasına rağmen **arttı**). Tür −1, ruhsat sekmesi +1, teslim sonrası kapatma +1. Yeni **ruhsatsız yol 8**. Kayıtlı araç 8'de kaldı. **A-8 ölçümle kapandı**, A-M14 açıldı (K-035) |
-| 4 | **İki "bekliyor" ayrımı** — `fiyatiBekleyen` ≠ `parcaBekliyor`, her ekranda doğru olan mı yazıyor | AÇIK | |
+| 4 | **İki "bekliyor" ayrımı** — `fiyatiBekleyen` ≠ `parcaBekliyor`, her ekranda doğru olan mı yazıyor | **BİTTİ** | Şüphem doğruydu: kart ikisini `\|\|` ile tek rozete bindiriyordu, **fiyatı gelmemiş satır *"parça bekliyor"* diye okunuyordu**. İki ayrı rozet oldu; teslim ekranı da bayraktan haberdar edildi. **Beklemediğim bulgu:** `kayitSatiriHtml`in tam hâli (60 satır) bir gündür **ulaşılamazdı** — silindi (K-036) |
 | 5 | **Muhasebe hâlâ doğru mu** — "hepsi müşteriden" anahtarı fiyat→alış taşıyor, iş başına farkını bozuyor olabilir | AÇIK | |
 | 6 | **Müşteri özeti** — yeni yapıya uydu mu; "parça bekliyor" müşteriye söylenmeli mi | AÇIK | |
 | 7 | **Açık tema turu** — bu turun bileşenleri çoğunlukla koyu temada görüldü | AÇIK | |
@@ -212,6 +212,12 @@ bulgu.
 *Gerekçe:* K-033.12 — `ciz()` içinde sıfırlanan bir ekran değişkeni,
 her tazelemede ustanın seçimini siliyordu. Aynı hatayı **bir turda iki
 kez** yaptım.
+
+**Test 39 — adayı (K-036.3'ten):** bir ortak nesnenin hiç geçilmeyen
+**seçeneği** ölüdür (`kayitSatiriHtml(k, {sade})` — `sade:false` bir
+gündür hiç geçilmemişti ve 60 satır ulaşılamaz kalmıştı). Statik olarak
+ölçmek prototipin tek dosyalık yapısında güvenilmez; **yazılabilirliği
+8. işte tartılacak**, zorlanırsa yazılmaz ve sebebi buraya düşülür.
 
 **Her ikisi de NEGATİF TESTLE doğrulanacak:** hata kasten geri konacak,
 test bulgu verecek, sonra geri alınacak. *Delikli denetim, denetimsiz

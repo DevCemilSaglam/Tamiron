@@ -10,6 +10,77 @@
 
 ---
 
+## K-036 · İki "bekliyor" ayrıldı; ulaşılamaz kod silindi (06.09.2026)
+
+**Kuyruk 4.** K-034 ikisinin **ayrı gerçek** olduğunu yazmıştı; bu
+karar onu **ekranlara** uyguluyor.
+
+### 36.1 · Tek rozete binmişlerdi
+
+Servis kaydı kartı şöyle yazıyordu:
+
+```js
+(k.parcaBekliyor || fiyatiBekleyen(k)) ? 'parça bekliyor' : ''
+```
+
+Yani **fiyatı girilmemiş bir satır**, kartta *"parça bekliyor"* diye
+görünüyordu — parça tezgâhta dururken. Usta listeye bakıp *"bu araç
+parça bekliyor"* diye okuyor, aslında beklenen **parçacının rakamı**.
+
+Artık iki ayrı rozet:
+
+| Rozet | Kaynak | Ne demek |
+|---|---|---|
+| `parça bekliyor` (warn) | `parcaBekliyor` — usta işaretler | parça **yolda** |
+| `fiyat bekleniyor` (muted) | `fiyatiBekleyen()` — türetilir | **rakam** gelmemiş |
+
+İkisi aynı anda doğru olabilir; o zaman ikisi birden çıkar ve bu
+doğrudur. 320 px'te ölçüldü: dört rozet iki satıra sarıyor, durum
+yine sağda kalıyor, kırpılma yok.
+
+**Teslim ekranı da öğrendi.** Bayrak kayıtta duruyordu ama teslim
+ekranı ondan habersizdi: *"parça bekliyor"* işaretli bir araç, işaret
+hâlâ açıkken teslim edilebiliyordu ve ekran hiçbir şey demiyordu.
+Artık söylüyor — **engellemiyor**. Bayrak durum değildir (K-034);
+teslimi kilitlemez. Usta parçayı almış ve işareti kaldırmayı unutmuş
+olabilir, o zaman bu satır ona hatırlatır.
+
+### 36.2 · `kayitSatiriHtml`'in yarısı bir gündür ulaşılamazdı
+
+Fonksiyonun iki hâli vardı: `sade` ve tam. Tam hâl marka/model,
+sahibi, km, satır sayısı, telefon, ödeme yolu ve *"parçayı müşteri
+getirmişti"* rozetini çiziyordu — yaklaşık **60 satır**.
+
+**Hiçbir yer onu çağırmıyordu.** Tek çağrı `{sade:true}` ile ve tek
+yerden (araç ekranının geçmiş listesi). Ana liste 05.09'da
+`kayitKartiHtml`e geçmişti; tam hâl o gün ulaşılamaz kalmış ve kimse
+fark etmemişti.
+
+⚠️ **Ulaşılamaz JS, ölü CSS'ten sinsidir.** Denetimin OLU-SINIF testi
+**sınıfları** tarıyor; çağrılmayan bir JS dalını göremiyor. Kod
+duruyor, okunuyor, *"bu da var"* sanılıyor ve çürüyor — nitekim
+içindeki `s.tel`, `s.tutar`, `s.plaka` seçeneklerini kimse geçmiyordu.
+
+Silindi. *"İleride lazım olur"* gerekçe değildir (CLAUDE.md). **A-M3
+hâlâ açık** — Cemil *"o rozet geri gelsin"* derse o zaman yazılır;
+duran ama çalışmayan bir kod, o kararı vermiş gibi yapıyordu.
+
+### 36.3 · Bunu yakalayacak bir test yazılabilir mi?
+
+Kısmen. *"Hiç çağrılmayan fonksiyon"* denetimi statik analiz ister ve
+prototipin tek dosyalık yapısında güvenilmez (her şey global). Ama
+**ölçülebilir bir yakını var**: bir fonksiyonun bir **seçeneği** hiç
+geçilmiyorsa o seçenek ölüdür. Bu, 8. işteki test önerilerine eklendi
+— yazılabilirliği orada tartılacak.
+
+Bu kez yakalayan şey bir test değil, **kuyruğun kendisi** oldu: *"her
+ekranda hangisi yazıyor"* diye tek tek bakınca ortaya çıktı.
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / 0 bulgu ·
+320 / 375 / 430 px · rozetler sekiz kartta tek tek doğrulandı.
+
+---
+
 ## K-035 · Ana yol 12 değil 13; sadeleştirme bir yerde ödendi (06.09.2026)
 
 **Kuyruk 3.** K-033 turunda akış üç yerden değişti ve *"herhalde

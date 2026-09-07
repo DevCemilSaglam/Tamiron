@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 10:59
+  Üretim: 2026-09-07 11:02
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -5269,8 +5269,21 @@ function kayitKartiHtml(k) {
     '<div class="ak-is">' +
       '<span class="pill ' + (bakimIceriyor(k) ? 'accent' : 'info') + '">' +
         TUR_AD[k.tur] + '</span>' +
-      (!k.teslimTarihi && (k.parcaBekliyor || fiyatiBekleyen(k))
+      /* ⚠️ İKİ AYRI GERÇEK, İKİ AYRI ROZET (06.09, kuyruk 4).
+         Dün ikisini `||` ile tek roze te bindirmiştim ve kart, fiyatı
+         girilmemiş bir satır yüzünden *"parça bekliyor"* diyordu —
+         parça tezgâhta dururken. Yanlış durum göstermek, durum
+         göstermemekten kötüdür (K-013'ün kuralı).
+
+           parcaBekliyor      → parça YOLDA        (usta işaretler)
+           fiyatiBekleyen()   → FİYAT gelmemiş     (türetilir)
+
+         İkisi aynı anda doğru olabilir; o zaman iki rozet birden
+         çıkar ve bu doğrudur. */
+      (!k.teslimTarihi && k.parcaBekliyor
         ? '<span class="pill warn">parça bekliyor</span>' : '') +
+      (!k.teslimTarihi && fiyatiBekleyen(k)
+        ? '<span class="pill muted">fiyat bekleniyor</span>' : '') +
       /* DURUM SAĞDA. "İçeride" burada YAZIYLA duruyor — Cemil:
          "İçeride olarak yazdığımız durum için kullanmak gerekirse
          serviste kullan." Araç listesinde çerçeve yetiyordu (K-019.2),
@@ -5322,97 +5335,43 @@ var ODEME_ETIKET = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'A
 
 function kayitSatiriHtml(k, s) {
   s = s || {};
-  var a = aracBul(k.plaka);
 
-  /* ---- SADE HÂL (04.09, Cemil — araç ekranındaki "Geçmiş" listesi) ----
+  /* ---- 04.09, Cemil (araç ekranındaki "Geçmiş" listesi) ----
      "Başında icon yok. Bakım mı tamirat mı başlık. Marka model
      yazmasın. Ad soyad zaten belli. Başlık, açıklama, Tarih, teslim
      durumu. Basit olsun."
 
-     Neden AYRI BİR NESNE DEĞİL de aynı nesnenin bir hâli: satır aynı
-     satır, gösterdiği alan sayısı farklı. İkinci bir çizim yazmak,
-     ortak nesne kuralını (K-008 komşusu) kırmak olurdu — tıklama
-     davranışı, tür şeridi ve veri okuma tek yerde kalıyor.
+     ⚠️ 06.09 — BU FONKSİYONUN "TAM" HÂLİ SİLİNDİ (kuyruk 4).
+     İki hâli vardı: `sade` ve tam. Tam hâl marka/model, sahibi, km,
+     satır sayısı, telefon, ödeme yolu ve *"parçayı müşteri
+     getirmişti"* rozetini çiziyordu — yaklaşık 60 satır. **Hiçbir yer
+     onu çağırmıyordu.** Tek çağrı `{sade:true}` ile ve tek yerden
+     (araç ekranı); ana liste 05.09'da `kayitKartiHtml`e geçmişti ve
+     tam hâl o gün ulaşılamaz kaldı.
 
-     ⚠️ BURADA BİR ŞEY KAYBOLDU — "parçayı müşteri getirmişti" rozeti
-     bu listeden düştü. K-005'in araç ekranındaki görünür yeri oydu.
-     Cemil'in sözü bizim gerekçemizi yener (K-019); bilgi kaybolmadı,
-     kaydın kendi ekranında duruyor. */
-  if (s.sade) {
-    return '<div class="tl-item t-' + (bakimIceriyor(k) ? 'bakim' : 'tamirat') + '"' +
-        ' data-kayit="' + k.id + '" role="button" tabindex="0">' +
-      '<div class="tl-body">' +
-        '<div class="tl-title"><span class="tl-tip">' + TUR_AD[k.tur] + '</span></div>' +
-        '<div class="tl-sub">' + (k.sikayet || '—') + '</div>' +
-        '<div class="tl-foot">' +
-          (k.teslimTarihi
-            ? '<span class="pill ok">teslim edildi</span>'
-            : '<span class="pill accent">içeride</span>') +
-          '<span class="tl-date">' + (k.teslimTarihi || k.acilis || '—') + '</span>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
+     Ulaşılamaz kod, ölü CSS'ten daha sinsidir: denetimin OLU-SINIF
+     testi sınıfları tarıyor, **çağrılmayan bir JS dalını göremiyor.**
+     Duruyor, okunuyor, "bu da var" sanılıyor ve çürüyor — nitekim
+     içindeki `s.tel`, `s.tutar`, `s.plaka` seçeneklerini kimse
+     geçmiyordu.
 
-  var bekliyor = fiyatiBekleyen(k);
-  /* K-005'İN ASIL İŞE YARADIĞI YER: "bu parçayı geçen sefer müşteri
-     getirmişti" bilgisi satırın KENDİSİNE ait, ekrana değil. Araç
-     geçmişinde de ana listede de aynı yerde görünmeli — yoksa
-     araç ikinci kez geldiğinde tartışma çıkar. */
-  var musteriParcalari = (k.satirlar || []).filter(function (l) {
-    return l.tip === 'parca' && l.kimGetirdi === 'musteri';
-  });
-  /* Şerit ve ikon rengi TÜRÜ söyler (v1 kuralı). Durum rozeti yok —
-     v2'de tek durum var ve o da teslim (K-004). */
+     *"İleride lazım olur"* gerekçe değildir (CLAUDE.md). Tam hâl
+     gerekirse yeniden yazılır; A-M3 hâlâ açık ve cevabı *"evet, o
+     rozet gereksin"* olursa **o zaman** yazılacak. */
   return '<div class="tl-item t-' + (bakimIceriyor(k) ? 'bakim' : 'tamirat') + '"' +
       ' data-kayit="' + k.id + '" role="button" tabindex="0">' +
-    '<span class="tl-ic">' +
-      '<svg class="ico ico-sm"><use href="#' + TUR_IKON[k.tur] + '"></use></svg></span>' +
     '<div class="tl-body">' +
-      '<div class="tl-title">' +
-        '<span class="tl-tip">' + TUR_AD[k.tur] + '</span>' +
-        (s.plaka === false ? '' : plakaHtml(k.plaka)) +
-      '</div>' +
+      '<div class="tl-title"><span class="tl-tip">' + TUR_AD[k.tur] + '</span></div>' +
       '<div class="tl-sub">' + (k.sikayet || '—') + '</div>' +
-      /* SATIR DAHA ÇOK ŞEY SÖYLÜYOR (Cemil, 03.09: "servis kaydına
-         girmeden birçok bilgiye ulaşabilsin"). Ortak nesne olduğu için
-         bu detay üç listede birden düzeliyor; her listeye ayrı yazmak
-         üç ayrı görünüm demek olurdu. */
-      '<div class="tl-veri">' +
-        (a ? '<span><b>' + a.marka + ' ' + a.model + '</b>' +
-             (a.yil ? ' ' + a.yil : '') + '</span>' : '') +
-        (a && a.sahipAd ? '<span>' + a.sahipAd + '</span>' : '') +
-        (k.km ? '<span><b>' + k.km + '</b> km</span>' : '') +
-        ((k.satirlar || []).length
-          ? '<span><b>' + k.satirlar.length + '</b> satır</span>' : '') +
-        '<span>Açılış <b>' + (k.acilis || '—') + '</b></span>' +
-      '</div>' +
-      /* Telefon LİSTEDE aranabilir: usta "kimi arayacağım" sorusunun
-         cevabını satırda görüp oradan arıyor (v1'deki gibi). */
-      /* s.tel === false: aracın KENDİ ekranında sahibin telefonu zaten
-         tepede duruyor; her geçmiş satırında tekrar etmesi aynı
-         numarayı dört kez gösteriyordu (04.09). */
-      (s.tel !== false && a && a.sahipTel
-        ? telLinkHtml(a.sahipTel, a.sahipAd || 'sahibini')
-        : '') +
       '<div class="tl-foot">' +
-        (bekliyor
-          ? '<span class="pill warn"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> parçası bekleniyor</span>'
-          : '') +
         (k.teslimTarihi
           ? '<span class="pill ok">teslim edildi</span>'
           : '<span class="pill accent">içeride</span>') +
-        (s.tutar !== false && kayitToplami(k)
-          ? '<span class="tl-date">' + tutar(kayitToplami(k)) + ' ₺</span>' : '') +
-        (k.odemeYolu
-          ? '<span class="tl-date">' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) + '</span>' : '') +
-        (k.teslimTarihi ? '<span class="tl-date">' + k.teslimTarihi + '</span>' : '') +
+        /* Araç geçmişinde de iki bekleme AYRI (kuyruk 4). */
+        (!k.teslimTarihi && k.parcaBekliyor
+          ? '<span class="pill warn">parça bekliyor</span>' : '') +
+        '<span class="tl-date">' + (k.teslimTarihi || k.acilis || '—') + '</span>' +
       '</div>' +
-      (musteriParcalari.length
-        ? '<div class="tl-foot"><span class="pill muted">parçayı müşteri getirmişti: ' +
-            musteriParcalari.map(function (l) { return l.ad || 'parça'; }).join(', ') +
-          '</span></div>'
-        : '') +
     '</div>' +
   '</div>';
 }
@@ -6958,7 +6917,17 @@ function tsCiz() {
        toplandığını söyler. */
     '<div class="tutar-sat"><span>' + (k.satirlar || []).length + ' satır</span>' +
       (fiyatiBekleyen(k)
-        ? '<span class="pill warn">fiyatı girilmemiş satır var</span>' : '') +
+        ? '<span class="pill muted">fiyatı girilmemiş satır var</span>' : '') +
+      /* ⚠️ PARÇA HÂLÂ YOLDAYSA TESLİMDE SÖYLENİR (06.09, kuyruk 4).
+         Bayrak kayıtta duruyordu ama teslim ekranı ondan habersizdi:
+         usta *"parça bekliyor"* diye işaretlediği aracı, işaret hâlâ
+         açıkken teslim edebiliyor ve ekran hiçbir şey demiyordu.
+
+         ENGELLEMİYOR, SÖYLÜYOR. Bayrak durum değildir (K-034) —
+         teslimi kilitlemez. Usta parçayı almış ve işareti kaldırmayı
+         unutmuş olabilir; o zaman bu satır ona hatırlatır. */
+      (k.parcaBekliyor
+        ? '<span class="pill warn">parça bekliyor olarak işaretli</span>' : '') +
     '</div>' +
     '<div class="tutar-sat genel"><span>Alınacak</span>' +
       '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';

@@ -76,7 +76,17 @@ function tsCiz() {
        toplandığını söyler. */
     '<div class="tutar-sat"><span>' + (k.satirlar || []).length + ' satır</span>' +
       (fiyatiBekleyen(k)
-        ? '<span class="pill warn">fiyatı girilmemiş satır var</span>' : '') +
+        ? '<span class="pill muted">fiyatı girilmemiş satır var</span>' : '') +
+      /* ⚠️ PARÇA HÂLÂ YOLDAYSA TESLİMDE SÖYLENİR (06.09, kuyruk 4).
+         Bayrak kayıtta duruyordu ama teslim ekranı ondan habersizdi:
+         usta *"parça bekliyor"* diye işaretlediği aracı, işaret hâlâ
+         açıkken teslim edebiliyor ve ekran hiçbir şey demiyordu.
+
+         ENGELLEMİYOR, SÖYLÜYOR. Bayrak durum değildir (K-034) —
+         teslimi kilitlemez. Usta parçayı almış ve işareti kaldırmayı
+         unutmuş olabilir; o zaman bu satır ona hatırlatır. */
+      (k.parcaBekliyor
+        ? '<span class="pill warn">parça bekliyor olarak işaretli</span>' : '') +
     '</div>' +
     '<div class="tutar-sat genel"><span>Alınacak</span>' +
       '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
