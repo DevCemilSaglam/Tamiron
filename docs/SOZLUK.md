@@ -16,17 +16,20 @@
 | Türkçe (UI) | İngilizce (kod/DB) | Not |
 |---|---|---|
 | **Araç** | **Vehicle** | ⭐ Ürünün merkezi. Müşteri **aracın üstünde** durur — ayrı müşteri tablosu yok |
-| Plaka | `Vehicle.Plate` | Kimlik. Kayıt buna bağlanır; yanlış okunursa yanlış araca bağlanır |
+| Plaka | `Vehicle.PlateNo` | Kimlik. Kayıt buna bağlanır; yanlış okunursa yanlış araca bağlanır. *(06.09: burada `Plate`, VERI-MODELI'nde `PlateNo` yazıyordu — model belgesi esas alındı)* |
 | Sahip · Telefon | `OwnerName` · `OwnerPhone` | **Ruhsatta yazmaz** (`RUHSAT-OKUMA.md`), elle girilir, **zorunlu değil** (A-29). **Firma da olabilir** (K-019.3) |
 | İkinci iletişim | `ContactName` · `ContactPhone` | Ruhsat firmanınsa aranacak kişi. **Adsız telefon yazılmaz** — K-019.3 |
 | Renk | `Vehicle.Color` | Arayüzde **ad değil kutucuk** (`renkKutuHtml`). Ruhsatta tek kelime olmayabilir: *"Gri Metalik"* |
 | **Servis kaydı** | **ServiceRecord** | ⭐ Araç her gelişinde açılan tek kayıt. **Teslim edilene kadar açıktır** (K-003) |
-| İş türü | `ServiceRecord.Type` | `Repair` (tamirat) \| `Maintenance` (bakım) — **K-006** |
+| İş türü | `ServiceRecord.Type` | `Repair` \| `Maintenance` \| `Both` — **K-006, K-026.3'te genişledi.** 06.09'dan beri **ekranda sorulmuyor**, iş metninden tahmin ediliyor (K-033.1) ve kayıt ekranında düzeltilebiliyor |
 | Ne istiyor | `Complaint` | Adım 2. **Tek** serbest alan — şikâyet/tespit ayrımı yok (Kol A) |
 | Kilometre | `Km` | Yalnız bakımda istenir, **bir kez** yazılır — K-002 |
 | Teslim tarihi | `DeliveredAt` | ⭐ **Tek durum alanı** — K-004. Boşsa araç içeride |
 | Ödeme yolu | `PaymentMethod` | `Cash` \| `Card` \| `Transfer` \| **`Unpaid`** — *"almadım"* bir ödeme yoludur |
-| Hatırlatma tarihi | `ReminderDate` | Bakımsa teslimde hesaplanır (ay üzerinden) |
+| Hatırlatma tarihi | `ReminderDate` | Bakımsa teslimde hesaplanır — **ay VEYA km, hangisi önce gelirse** (K-002, 04.09) |
+| Hatırlatma gönderildi | `ReminderSent` | Aynı hatırlatma iki kez gitmesin. **Arama da gönderim sayılır** (K-033.9) |
+| Parça bekliyor | `WaitingForPart` | ⭐ Usta işaretler; *"parça yolda"*. **`fiyatiBekleyen` ile karıştırılmaz** — o *fiyatı gelmemiş* demek (K-034) |
+| Tür elle seçildi | `TypeSetManually` | Ustanın kararı, tahmini yener. Karar türetilemez (K-033.12) |
 | **Satır** | **ServiceLine** | ⭐ Parça **ve** işçilik aynı listede; ayrı liste değil, satırın işareti |
 | Satır türü | `Kind` | `Part` \| `Labor` |
 | Fiyat | `Price` | **Müşteriye söylenen.** Müşteri parçasında 0 |

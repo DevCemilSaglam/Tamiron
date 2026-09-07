@@ -27,7 +27,7 @@ Sırası **riske göre**: en üstteki, yanlışsa en çok şeyi bozan.
 
 | # | İş | Durum | Sonuç |
 |---|---|---|---|
-| 1 | **Veri modeli uzlaştırması** — `parcaBekliyor` ve `turElle` modelde YOK, model bunları açıkça yasaklıyor | AÇIK | |
+| 1 | **Veri modeli uzlaştırması** — `parcaBekliyor` ve `turElle` modelde YOK, model bunları açıkça yasaklıyor | **BİTTİ** | Belge yanlıştı, alan değil: türetilen `fiyatiBekleyen` *fiyatı gelmemiş* demek, *parça yolda* demek değil. **Bayrak ≠ durum** sınırı yazıldı (K-034) — ayrım: *bu alan dolduğunda kullanıcının yapabilecekleri değişiyor mu?* Ayrıca sözlükte üç uzlaşmazlık düzeldi (`Plate`/`PlateNo`, türün üçüncü değeri, eksik `ReminderSent`) |
 | 2 | **Ölü uç turu** — bu turda değişen 8 ekran elle işletilecek | AÇIK | |
 | 3 | **Dokunuş sayımı** — ana yol değişti, HANDOFF'taki `12` artık yalan olabilir | AÇIK | |
 | 4 | **İki "bekliyor" ayrımı** — `fiyatiBekleyen` ≠ `parcaBekliyor`, her ekranda doğru olan mı yazıyor | AÇIK | |
@@ -94,6 +94,14 @@ sor:
 `.kalem` dilinde ve yeni tabloyla tutarlı mı; `sesUygula`'nın açtığı
 kayıt yeni alanları taşıyor mu; `RUHSAT_ONDOLGU.tur` artık kullanılmıyor
 (ruhsat ekranı türü metinden okuyor) — **ölü veri mi kaldı?**
+
+**⚠️ ZATEN BİR BULGU VAR (1. iş sırasında çıktı):** `parca-sor` ekranı
+hâlâ `s.sorulan` yazıyor ama **onu okuyan kod kalmadı** — dünkü kayıt
+ekranı yeniden yazımında *"Cevap kimden geldi?"* çipleri düştü. Yani
+`s.kaynak` (`SelectedReplyId`, **Kol B**) artık hiç doldurulmuyor: usta
+iki parçacıya sorup iki cevap aldığında **hangisini kullandığını
+yazacak yer yok.** Modelde duran, akışta karşılığı olan bir alan
+sessizce koptu. Bu turda geri konacak.
 
 **Bitti sayılır:** bulgular düzeltildi; yeni bir hata sınıfı çıktıysa
 8. işe test önerisi olarak yazıldı.

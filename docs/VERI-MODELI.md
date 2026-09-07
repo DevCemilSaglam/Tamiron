@@ -55,8 +55,16 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 | `PaymentMethod` | `Cash` \| `Card` \| `Transfer` \| `Unpaid` — Adım 7 |
 | `ReminderDate` | Bakımsa teslimde hesaplanır |
 | `ReminderSent` | Aynı hatırlatma iki kez gitmesin |
+| `WaitingForPart` | **Parça yolda.** Usta işaretler — K-033.5, K-034. Türetilemez: veride bunu söyleyen hiçbir şey yok |
+| `TypeSetManually` | **Türü usta elle seçti.** `Type` iş metninden tahmin ediliyor (K-033.1); bu işaret olmadan bir sonraki tahmin ustanın seçimini ezer — K-034 |
 
-> **`Status` YOK.** Yedi durum yerine `DeliveredAt` — dolu ya da boş (K-004). *"Parçası bekleniyor"* gibi bilgiler bu kaydın **verisinden türetilir**, saklanmaz.
+> **`Status` YOK.** Yedi durum yerine `DeliveredAt` — dolu ya da boş (K-004).
+>
+> ⚠️ **06.09 — `WaitingForPart` bu kuralın istisnası değil, sınırın çizildiği yer (K-034).** Burada eskiden *"'parçası bekleniyor' gibi bilgiler türetilir, saklanmaz"* yazıyordu ve **yanlıştı**: türetilen `fiyatiBekleyen` **başka bir şeydir** — *fiyatı gelmemiş* demek. Parça elde olup fiyatı belirsiz olabilir; fiyatı belli olup parça yolda olabilir. İkisini tek şeye bindirmek, ikisini de yanlış söylemekti.
+>
+> **Bayrak ≠ durum.** `WaitingForPart` ve `TypeSetManually` akışı değiştirmez, hiçbir ekranı kilitlemez, teslimi engellemez. `DeliveredAt` **hâlâ tek durum alanıdır.** Ayrım şu soruyla yapılır: *bu alan dolduğunda kullanıcının yapabilecekleri değişiyor mu?* Değişiyorsa durumdur ve girmez; değişmiyorsa bayraktır.
+>
+> **`OpenedAt` YOK** — prototipteki `acilis`, her tabloda ortak olan `DateTimeCreated`'tır. Ayrı alan açmak aynı tarihi iki yerde tutmak olurdu.
 >
 > **`ApprovalStatus` YOK** (K-003). **`DiscountAmount` YOK** — toplam elle değiştirilebilir (A-15).
 >

@@ -10,6 +10,85 @@
 
 ---
 
+## K-034 · Bayrak durum değildir — K-004'ün sınırı çizildi (06.09.2026)
+
+**Kuyruk 1.** Dün kendi koyduğum bir alan, kendi belgemizle çelişiyordu.
+
+`VERI-MODELI.md §2` şunu yazıyordu:
+
+> *"`Status` YOK… **'Parçası bekleniyor' gibi bilgiler bu kaydın
+> verisinden türetilir, saklanmaz.**"*
+
+K-033.5'te servis kaydının üstüne **saklanan** bir `parcaBekliyor` alanı
+koydum. `CLAUDE.md` de açık: *"Alanlar VERI-MODELI.md ile BİREBİR —
+modelde olmayan alan buraya da girmez."* Yani prototip belgeyi
+çiğniyordu. **Belge ile kod çelişirken devam etmek, iki kaynaklı bir
+dünya kurmaktır** ve sonra hangisinin doğru olduğu tartışılır.
+
+### 34.1 · Belge yanlıştı, alan değil
+
+Eski cümlenin dayandığı varsayım şuydu: *"parçası bekleniyor"* zaten
+veriden okunabiliyor (`fiyatiBekleyen` — fiyatı girilmemiş satır var).
+
+**Okunamıyor. İkisi ayrı gerçek:**
+
+| | Ne demek | Nereden gelir |
+|---|---|---|
+| `fiyatiBekleyen(k)` | **fiyatı** gelmemiş satır var | türetilir |
+| `WaitingForPart` | **parça** yolda | usta işaretler |
+
+Parça elde olup fiyatı belirsiz olabilir; fiyatı belli olup parça yolda
+olabilir. İkisini tek şeye bindirmek **ikisini de yanlış söylemekti** —
+K-013'ün kuralı: yanlış bilgi göstermek, göstermemekten kötüdür.
+
+Aynısı `TypeSetManually` için de geçerli: tür artık iş metninden **tahmin
+ediliyor** (K-033.1) ve ustanın elle seçimi bu işaret olmadan bir sonraki
+tahminle **eziliyordu** (K-033.12'de tam bu yaşandı). **Karar türetilemez.**
+
+### 34.2 · Sınır: *"bu alan dolduğunda kullanıcının yapabilecekleri değişiyor mu?"*
+
+K-004 hâlâ duruyor — **tek durum alanı `DeliveredAt`.** Ama "durum" ile
+"bayrak" arasındaki fark bugüne kadar yazılı değildi ve bu yüzden her
+yeni alan aynı tartışmayı açıyordu.
+
+**Ayrım tek soruyla yapılıyor:**
+
+> Bu alan dolduğunda **kullanıcının yapabilecekleri** değişiyor mu?
+
+* **Değişiyorsa DURUMDUR** ve girmez. v1'in yedi durumu böyleydi: *onay
+  bekliyor* olan kayda satır eklenemiyordu, *kapalı* olan teslim
+  edilemiyordu. Tamircinin *"karmaşık"* dediği şey buydu.
+* **Değişmiyorsa BAYRAKTIR** ve girebilir.
+
+`WaitingForPart` işaretli kayıt hâlâ açık, satır eklenebilir, teslim
+edilebilir, mesaj gönderilebilir. **Hiçbir kapıyı kapatmıyor** — yalnız
+ekranda bir şey daha yazıyor. `TypeSetManually` ise kullanıcıya hiç
+görünmüyor; yalnız tahminin ne zaman susacağını söylüyor.
+
+### 34.3 · Yol ayrımında ikinci seçenek de gerçekti
+
+Alanları **kaldırmak** da bir yoldu. O zaman K-033.5 ve K-033.12 geri
+alınırdı — ve Cemil'in *"Parça bekliyor alanı olmalı"* maddesi
+karşılıksız kalırdı. **Tamircinin sözü bizim akıl yürütmemizi yener**
+(CLAUDE.md); burada Cemil'in isteği ile belgenin cümlesi çarpıştı ve
+belgenin cümlesi **yanlış olduğu için** düştü, isteğe yenildiği için
+değil. Fark önemli: belge doğru olsaydı istek reddedilirdi.
+
+### 34.4 · Bu turda çıkan iki küçük uzlaşmazlık daha
+
+* `SOZLUK.md` plaka alanına `Vehicle.Plate`, `VERI-MODELI.md`
+  `PlateNo` diyordu. **Model belgesi esas** — sözlük düzeltildi.
+* Sözlükte iş türü hâlâ **iki değerliydi** (`Repair | Maintenance`);
+  K-026.3'te `Both` eklenmişti. Düzeltildi.
+* `ReminderSent` sözlükte hiç yoktu; eklendi (*"arama da gönderim
+  sayılır"* notuyla — K-033.9).
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / 0 bulgu ·
+320 / 375 / 430 px. Kod değişmedi; değişen belgeler ve tohum verinin
+belgeyle birebirliği doğrulandı.
+
+---
+
 ## K-033 · Tür ekrandan kalktı; kalem listesi tablo oldu; balon kutu oldu (06.09.2026)
 
 Cemil bir turda **otuz bir madde** yazdı. Hepsi uygulandı; aşağıda
