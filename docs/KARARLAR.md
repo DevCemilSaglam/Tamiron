@@ -10,6 +10,85 @@
 
 ---
 
+## K-044 · Kaydırma artık siler — onay değil, GERİ ALMA (07.09.2026)
+
+**Kuyruk 4/C.** Üç karar; biri uygulandı, ikisi gerekçesiyle yazıldı ve
+bilerek yazılmadı.
+
+### 44.1 · C1 — K-032 geri alındı, gerekçesi alınmadı
+
+Cemil: *"Gideri sola kaydırdığında sil."*
+
+K-032'de onay satırı koymuştum ve gerekçem şuydu: **görünmeyen bir
+hareket, görünmeyen bir sonuç doğurmasın** — cepte kazara kaydırmak bir
+gideri silmemeli.
+
+**Gerekçe hâlâ doğru. Çözüm değişti:**
+
+| | Nasıl korur | Bedeli |
+|---|---|---|
+| Onay satırı | **Soru sorarak** — silmeden önce düşündürür | Her silme **iki dokunuş** |
+| Geri alma | **Cevabı geri vererek** — sildikten sonra düşündürür | Kaza olursa bir dokunuş |
+
+İkincisi hem ucuz hem de doğru anda çalışıyor: usta silmek istediğinde
+düşünmüyor zaten — **düşünmesi gereken an, yanlışlıkla sildiği an.**
+
+Sonuç **görünür** olduğu sürece hareket görünmez kalabilir: satır
+kayboluyor ve balonda ne olduğu yazıyor, yanında *"Geri al"* duruyor.
+Geri alınan satır **aynı yerine** dönüyor — sona eklenseydi usta
+*"geri aldım ama başka yere gitti"* derdi.
+
+⚠️ **AYNI HAREKET KAYIT TABLOSUNDA DA VAR.** Cemil yalnız gider için
+söyledi; ikisi farklı davranırsa **aynı jest iki anlama gelir** ve usta
+hangisinde ne olacağını akılda tutmak zorunda kalır. Aynısı yapıldı —
+K-040 (çekmece/katman) ve K-042 (header/footer) ile aynı kural: **bir
+hareket, bir anlam.** *Cemil onayına açık (A-M19).*
+
+Denetim üç ölü sınıfı anında söyledi (`.silme-onay`, `.onay-btn`,
+`.onay-satir`) ve silindi. Ölçüldü: gider 2→1→2 (sıra korundu), kayıt
+satırı 3→2→3, geri alma düğmesi **44 px**.
+
+### 44.2 · C2 — çek/senet tahsilat sayılmaz, YAZILMADI
+
+Cemil: *"Tahsilat çek ya da senetle yapılırsa tahsilat alanında
+gösterilmeli mi?"*
+
+**Karar: gösterilir ama AYRI.** Çek elde bir kâğıttır; kasaya **girmemiş**
+paradır. *"Tahsil edildi"* toplamına katılırsa muhasebe yalan söyler —
+usta *"bugün 8.000 aldım"* diye okur, kasada 3.000 vardır. Vadesi
+gelince tahsilata dönüşür.
+
+**Yazılmadı:** uygulaması `tahsilat kalemi` kavramını gerektiriyor ve o
+**B kümesinde** — K-022'nin kapsamını genişletme onayı Cemil'den
+gelmedi. Karar hazır, kod onayı bekliyor.
+
+### 44.3 · C3 — mesaj arşivi, YAZILMADI (bilerek)
+
+Cemil: *"Gönderilen mesajlar kayıt edilmeli. Ard arda spam olabilecek
+ya da kötü niyetli bir şey var mı kontrol edilebilir mi?"*
+
+**Karar:** arşiv **evet**; kontrol **kural tabanlı** başlar (aynı
+numaraya kısa sürede N mesaj → uyarı). Yapay zekâ ile içerik denetimi
+bu fazın dışında (E kümesi).
+
+**Neden şimdi yazılmadı:** arşiv **saklanacak ama gösterilecek yeri
+olmayan** bir veri olurdu. Bu turda tam bunu eleştirdim: gösterilen ama
+girilemeyen alan sonsuza kadar boş kalır (K-033.2), saklanan ama
+okunmayan alan da öyle. Arşivin bir yeri olmalı — çekmecede mi, mesaj
+ekranında bir sekme mi — ve o **ekran bütçesi** kararıdır (A-2).
+
+> Ayrıca yasal bir yanı var: gönderilen mesajı saklamak, müşteri
+> verisini saklamaktır. **Ne kadar süre?** `SMS-VE-IYS.md`'nin devamı
+> olarak D2 araştırmasında cevaplanacak. Veri modeline alan eklemeden
+> önce bu sorunun cevabı gerekiyor — *"tutmadığın veri en güvenli
+> veridir"* (RUHSAT-OKUMA.md Bulgu 2).
+
+**Ölçüm:** derleme temiz · 14 ekran · 40 test / 0 bulgu ·
+`load` koşusu 0 · 320 / 375 / 430 px · silme ve geri alma iki tabloda
+da uçtan uca işletildi.
+
+---
+
 ## K-043 · İki popup değil bir katman; ve örtüler yığın oluşturur (07.09.2026)
 
 **Kuyruk 4/A14-A15.** Cemil iki yerde popup istedi: *"Müşteri ne görecek
@@ -2775,6 +2854,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M19** | Kaydırarak silme kayıt satırında da **doğrudan siliyor** — sen yalnız gider için söylemiştin; aynı jest iki anlama gelmesin diye hizaladım (K-044.1) | Cemil |
 | **A-M18** | *"Sadece mesaj gözüksün"* — katmanda **müşterinin gördüğü sayfa** gösteriliyor, mesaj metni değil (o zaten üstteki alanda). Doğru okuma mı? (K-043.2) | Cemil |
 | **A-M17** | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta hâlâ çıkıyor. Cemil yalnız iki şablonu saymıştı (*özet*, *parça bekliyoruz*); üçüncüsü de mantıken yanlış görünüyor — elensin mi? | Cemil |
 | **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? Kalkarsa prototipte sesli yol denenemez (K-042.4) | Cemil |

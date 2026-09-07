@@ -86,9 +86,9 @@ cinsten değil ve karıştırılırsa iş tıkanır.
 
 | # | Soru | Varsayım |
 |---|---|---|
-| C1 | **Gideri sola kaydırınca doğrudan sil** — K-032 *"kaydırma silmez, sorar"* diyordu | **Cemil'in sözü kazanır**: siler. Ama **"geri al"** balonuyla (3 sn). Kaza kurtarılır, dokunuş artmaz |
-| C2 | Çek/senetle tahsilat, tahsilat alanında görünsün mü | **Evet ama ayrı**: kasaya *girmemiş* para; "tahsil edildi" sayılırsa kasa yalan söyler |
-| C3 | Mesaj arşivi + spam/kötü niyet kontrolü | Arşiv **evet** (gönderilen mesaj kaydedilir). Kontrol **kural tabanlı** başlar: aynı numaraya kısa sürede N mesaj → uyarı |
+| ~~C1~~ | **BİTTİ** — siler + *"Geri al"* (4,5 sn). Gerekçe değil çözüm değişti: onay **soru sorarak**, geri alma **cevabı geri vererek** korur. Kayıt tablosuna da taşındı (aynı jest iki anlama gelmesin — A-M19). Üç ölü sınıf denetimce yakalandı ve silindi (K-044.1) |
+| ~~C2~~ | **KARAR VERİLDİ, KOD BEKLİYOR** — gösterilir ama **ayrı**: çek kasaya girmemiş paradır, tahsilata katılırsa muhasebe yalan söyler. Uygulaması `tahsilat kalemi`ni gerektiriyor → **B kümesi**, onay bekliyor (K-044.2) |
+| ~~C3~~ | **KARAR VERİLDİ, BİLEREK YAZILMADI** — arşiv evet, kontrol kural tabanlı. Ama saklanacak yeri belli olmayan veri, gösterilmeyen alan kadar ölü; ayrıca **ne kadar süre saklanacağı** yasal bir soru → D2 araştırmasından sonra (K-044.3) |
 
 ### D · Araştırma — kod değil, belge
 

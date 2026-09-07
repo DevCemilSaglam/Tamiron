@@ -940,7 +940,21 @@ ince kenarlik
      Ölçüldü (375 px): önce 188×88 (üç satır), sonra 343×62 (iki satır). */
   width: max-content;
   max-width: calc(100% - 32px);
-}.toast.show {
+}/* Balonun içindeki eylem — 44 px dokunma hedefi (K-024). Balon
+   yükselir ama iki satırlık balon zaten tasarlandı (K-033.10). */
+.toast .balon-eylem {
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--primary);
+  font: inherit; font-weight: 700;
+  cursor: pointer;
+}
+.toast .balon-eylem:hover { background: var(--nav-hover); }
+.toast.show {
   display: inline-flex;
   animation: toastIn .2s ease forwards;
 }/* DINLEME hali marka aksaniyla ayrilir — sesli islem ozel bir durum,
@@ -1739,41 +1753,27 @@ kirpilsin. */
    Iki sutunlu bir tabloda goz satiri kaybetmez ama uc sutunda ve uzun
    listede kaybeder: tutarin hangi acikclamaya ait oldugu, satir seridi
    olmadan bir an duraksatiyor. Cok hafif — zemin degil, bir ton. */
-.tablo tbody tr:nth-child(odd):not(.genel):not(.silme-onay) {
+.tablo tbody tr:nth-child(odd):not(.genel) {
   background: color-mix(in srgb, var(--surface-2) 55%, transparent);
 }
 
-/* ---- SOLA KAYDIRARAK SILME (05.09) ----
-   Cemil: "Giderde sola kaydirirsa sorarak silsin."
+/* ---- SOLA KAYDIRARAK SILME ----
+   ⚠️ SILME SUTUNU KALKTI (05.09) ve bu tutari da duzeltti: x dugmesi
+   40 px yer kapliyordu, tutarlar kartin sag kenarindan 40 px iceride
+   duruyordu ("Tutarlari saga yasla").
 
-   ⚠️ SILME SUTUNU KALKTI ve bu tutari da duzeltti: x dugmesi 40 px yer
-   kapliyordu, tutarlar kartin sag kenarindan 40 px iceride duruyordu
-   ("Tutarlari saga yasla").
+   ⚠️ 07.09 — ONAY SATIRI KALKTI, DOGRUDAN SILIYOR (Cemil: "Gideri
+   sola kaydirdiginda sil."). K-032'nin gerekcesi duruyor —
+   "gorunmeyen bir hareket gorunmeyen bir sonuc dogurmasin" — ama
+   cozum degisti: onay SORU SORARAK koruyordu, GERI ALMA cevabi geri
+   vererek koruyor. Bir dokunus ucuz ve dusunmeyi silmeden SONRAYA
+   birakiyor.
 
-   ⚠️ KAYDIRMA TEK BASINA SILMEZ. K-031'in dersi burada da gecerli:
-   gorunmeyen bir hareket, gorunmeyen bir sonuc dogurmamali. Kaydirma
-   yalniz ONAY SATIRINI aciyor; silme ikinci bir dokunusla oluyor.
-   Boylece cepte kazara kaydirmak bir gideri silmiyor. */
+   .silme-onay / .onay-btn / .onay-satir SILINDI — denetimin OLU-SINIF
+   testi ucunu de ayni anda soyledi. Olu CSS birakilmaz. */
 .tablo tr.kaydirilir { touch-action: pan-y; }
 .tablo tr.kayiyor td { transition: none; }
 .tablo tr.kaydirilir td { transition: transform .18s ease; will-change: transform; }
-.tablo tr.silme-onay td {
-  background: var(--crit-bg);
-  color: var(--crit);
-}
-.tablo tr.silme-onay .onay-btn {
-  border: 0; border-radius: var(--radius-sm);
-  padding: 8px 12px; min-height: 40px;
-  font-family: var(--font-body); font-size: var(--tip-sm); font-weight: 600;
-}
-.tablo tr.silme-onay .onay-btn.evet { background: var(--crit); color: #fff; }
-.tablo tr.silme-onay .onay-btn.hayir {
-  background: transparent; color: var(--muted);
-  border: 1px solid var(--line);
-}
-.tablo tr.silme-onay .onay-satir {
-  display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;
-}
 
 /* Alacak tablosunda plakanın yanındaki tarih — plaka bileşeni kendi
    ölçüsünü taşıdığı için tarih ayrı bir sınıfla hizalanıyor (05.09). */

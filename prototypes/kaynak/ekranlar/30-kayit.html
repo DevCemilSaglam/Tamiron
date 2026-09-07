@@ -318,8 +318,6 @@
 
    Ders: bir SEÇİM, ekranın değil VERİNİN bilgisidir. Ekran değişkeni
    çizimle birlikte ölür; kayıt yaşadığı sürece seçim de yaşamalı. */
-/* Silme onayı bekleyen satırın sırası (index). */
-var kSilinecek = null;
 
 /* Fotoğraftan okunan sahte parça listesi. Gerçek okuma bir servise
    bağlanacak; burada gösterilen şey DAVRANIŞ: okunan satır olur ve
@@ -425,16 +423,6 @@ function kayitCiz() {
     ? '<div class="tablo-sar"><table class="tablo">' +
         '<thead><tr><th>İş</th><th class="sayi">Tutar</th></tr></thead><tbody>' +
         satirlar.map(function (s, i) {
-          /* Onay satırı, silinecek satırın YERİNE çizilir (K-032). */
-          if (kSilinecek === i) {
-            return '<tr class="silme-onay"><td colspan="2">' +
-              '<b>' + (s.ad || (s.tip === 'parca' ? 'parça' : 'işçilik')) +
-                '</b> silinsin mi?' +
-              '<span class="onay-satir">' +
-                '<button class="onay-btn hayir" data-ksil-vazgec="1">Vazgeç</button>' +
-                '<button class="onay-btn evet" data-ksil-onay="' + i + '">Sil</button>' +
-              '</span></td></tr>';
-          }
           return '<tr class="kaydirilir" data-kaydir="' + i + '" tabindex="0"' +
               ' aria-label="' + (s.ad || 'satır') + ' — silmek için sola kaydır">' +
             '<td>' +
@@ -558,15 +546,32 @@ function kayitCiz() {
    öteki ekranlarda duruyordu. Çekirdeğe `ac` kancası eklendi (K-040);
    sıfırlama oraya taşındı ve bekçi gereksiz kaldı. */
 Ekran.tanim('kayit', {
-  ac: function () { kSilinecek = null; },
   ciz: kayitCiz
 });
 
 /* Kaydırma davranışı ÇEKİRDEKTE (Kaydirma); burada yalnız bu ekranda
    ne anlama geldiği yazıyor: hangi satır silinecek. */
+/* ⚠️ 07.09 — BU TABLO DA DOĞRUDAN SİLİYOR.
+   Cemil yalnız GİDER için söyledi (*"Gideri sola kaydırdığında sil"*),
+   ama aynı hareket iki tabloda var. İkisi farklı davranırsa **aynı
+   jest iki anlama gelir** ve usta hangisinde ne olacağını akılda
+   tutmak zorunda kalır. K-040'ta çekmece/katman için, K-042'de
+   header/footer için verdiğim kararın aynısı: bir hareket, bir anlam.
+
+   Cemil onayına açık (A-M19): gider için istediğini kayıt satırına da
+   taşıdım. */
 Kaydirma.tanim('kayit', function (anahtar) {
-  kSilinecek = parseInt(anahtar, 10);
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var i = parseInt(anahtar, 10);
+  var silinen = k.satirlar[i];
+  if (!silinen) return;
+  k.satirlar.splice(i, 1);
   Ekran.tazele();
+  balonGeriAl((silinen.ad || 'Satır') + ' silindi.', function () {
+    k.satirlar.splice(i, 0, silinen);
+    Ekran.tazele();
+  });
 });
 
 document.addEventListener('click', function (e) {
@@ -580,11 +585,11 @@ document.addEventListener('click', function (e) {
   if (t.id === 'kParcaEkle') {
     k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
                       kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
-    kSilinecek = null; Ekran.tazele(); return;
+    Ekran.tazele(); return;
   }
   if (t.id === 'kIscilikEkle') {
     k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
-    kSilinecek = null; Ekran.tazele(); return;
+    Ekran.tazele(); return;
   }
 
   /* FOTOĞRAFTAN PARÇA LİSTESİ — okunanlar satır olur, fiyatları BOŞ. */
@@ -594,7 +599,7 @@ document.addEventListener('click', function (e) {
         kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     });
     balon(FOTO_PARCA_ORNEK.length + ' parça okundu — fiyatlarını yaz.', false, 3000);
-    kSilinecek = null; Ekran.tazele(); return;
+    Ekran.tazele(); return;
   }
 
   /* HEPSİ MÜŞTERİDEN — tek dokunuşta işaretler, ikinci dokunuşta geri
@@ -674,13 +679,6 @@ document.addEventListener('click', function (e) {
     Ekran.tazele(); return;
   }
 
-  if (e.target.closest('[data-ksil-vazgec]')) { kSilinecek = null; Ekran.tazele(); return; }
-  var so = t.getAttribute('data-ksil-onay');
-  if (so !== null) {
-    var silinen = k.satirlar.splice(parseInt(so, 10), 1)[0];
-    balon((silinen && silinen.ad ? silinen.ad : 'Satır') + ' silindi.', false, 2400);
-    kSilinecek = null; Ekran.tazele();
-  }
 });
 
 document.addEventListener('input', function (e) {

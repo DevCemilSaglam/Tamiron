@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 21:02
+  Üretim: 2026-09-07 21:08
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -1261,7 +1261,21 @@ ince kenarlik
      Ölçüldü (375 px): önce 188×88 (üç satır), sonra 343×62 (iki satır). */
   width: max-content;
   max-width: calc(100% - 32px);
-}.toast.show {
+}/* Balonun içindeki eylem — 44 px dokunma hedefi (K-024). Balon
+   yükselir ama iki satırlık balon zaten tasarlandı (K-033.10). */
+.toast .balon-eylem {
+  flex: none;
+  min-height: 44px;
+  padding: 0 14px;
+  border: 1px solid var(--primary);
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--primary);
+  font: inherit; font-weight: 700;
+  cursor: pointer;
+}
+.toast .balon-eylem:hover { background: var(--nav-hover); }
+.toast.show {
   display: inline-flex;
   animation: toastIn .2s ease forwards;
 }/* DINLEME hali marka aksaniyla ayrilir — sesli islem ozel bir durum,
@@ -2060,41 +2074,27 @@ kirpilsin. */
    Iki sutunlu bir tabloda goz satiri kaybetmez ama uc sutunda ve uzun
    listede kaybeder: tutarin hangi acikclamaya ait oldugu, satir seridi
    olmadan bir an duraksatiyor. Cok hafif — zemin degil, bir ton. */
-.tablo tbody tr:nth-child(odd):not(.genel):not(.silme-onay) {
+.tablo tbody tr:nth-child(odd):not(.genel) {
   background: color-mix(in srgb, var(--surface-2) 55%, transparent);
 }
 
-/* ---- SOLA KAYDIRARAK SILME (05.09) ----
-   Cemil: "Giderde sola kaydirirsa sorarak silsin."
+/* ---- SOLA KAYDIRARAK SILME ----
+   ⚠️ SILME SUTUNU KALKTI (05.09) ve bu tutari da duzeltti: x dugmesi
+   40 px yer kapliyordu, tutarlar kartin sag kenarindan 40 px iceride
+   duruyordu ("Tutarlari saga yasla").
 
-   ⚠️ SILME SUTUNU KALKTI ve bu tutari da duzeltti: x dugmesi 40 px yer
-   kapliyordu, tutarlar kartin sag kenarindan 40 px iceride duruyordu
-   ("Tutarlari saga yasla").
+   ⚠️ 07.09 — ONAY SATIRI KALKTI, DOGRUDAN SILIYOR (Cemil: "Gideri
+   sola kaydirdiginda sil."). K-032'nin gerekcesi duruyor —
+   "gorunmeyen bir hareket gorunmeyen bir sonuc dogurmasin" — ama
+   cozum degisti: onay SORU SORARAK koruyordu, GERI ALMA cevabi geri
+   vererek koruyor. Bir dokunus ucuz ve dusunmeyi silmeden SONRAYA
+   birakiyor.
 
-   ⚠️ KAYDIRMA TEK BASINA SILMEZ. K-031'in dersi burada da gecerli:
-   gorunmeyen bir hareket, gorunmeyen bir sonuc dogurmamali. Kaydirma
-   yalniz ONAY SATIRINI aciyor; silme ikinci bir dokunusla oluyor.
-   Boylece cepte kazara kaydirmak bir gideri silmiyor. */
+   .silme-onay / .onay-btn / .onay-satir SILINDI — denetimin OLU-SINIF
+   testi ucunu de ayni anda soyledi. Olu CSS birakilmaz. */
 .tablo tr.kaydirilir { touch-action: pan-y; }
 .tablo tr.kayiyor td { transition: none; }
 .tablo tr.kaydirilir td { transition: transform .18s ease; will-change: transform; }
-.tablo tr.silme-onay td {
-  background: var(--crit-bg);
-  color: var(--crit);
-}
-.tablo tr.silme-onay .onay-btn {
-  border: 0; border-radius: var(--radius-sm);
-  padding: 8px 12px; min-height: 40px;
-  font-family: var(--font-body); font-size: var(--tip-sm); font-weight: 600;
-}
-.tablo tr.silme-onay .onay-btn.evet { background: var(--crit); color: #fff; }
-.tablo tr.silme-onay .onay-btn.hayir {
-  background: transparent; color: var(--muted);
-  border: 1px solid var(--line);
-}
-.tablo tr.silme-onay .onay-satir {
-  display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;
-}
 
 /* Alacak tablosunda plakanın yanındaki tarih — plaka bileşeni kendi
    ölçüsünü taşıdığı için tarih ayrı bir sınıfla hizalanıyor (05.09). */
@@ -4085,6 +4085,33 @@ function balon(metin, dinliyor, sure) {
   if (balonSayaci) clearTimeout(balonSayaci);
   balonSayaci = setTimeout(function () { t.classList.remove('show'); }, sure || 2600);
 }
+
+/* ---- GERİ ALINABİLİR BALON (07.09) ----
+   Cemil: *"Gideri sola kaydırdığında sil."* Bu, K-032'yi geri alıyor —
+   orada *"kaydırma silmez, sorar"* demiştim.
+
+   ⚠️ ONUN SÖZÜ KAZANIR ama kaydırmanın sorunu ortadan kalkmıyor:
+   cepte kazara kaydırmak hâlâ mümkün. K-032'nin gerekçesi *"görünmeyen
+   bir hareket görünmeyen bir sonuç doğurmasın"*dı; onay satırı bunu
+   **soru sorarak** çözüyordu, geri alma **cevabı geri vererek**
+   çözüyor. İkisi de aynı kuralı korur, ikincisi bir dokunuş ucuz.
+
+   Sonuç GÖRÜNÜR olduğu sürece hareket görünmez kalabilir: satır
+   kayboluyor VE ekranda ne olduğunu söyleyen, geri almayı teklif eden
+   bir şerit çıkıyor. */
+var geriAlFn = null;
+function balonGeriAl(metin, fn, sure) {
+  geriAlFn = fn || null;
+  balon(metin + ' <button class="balon-eylem" data-geri-al="1">Geri al</button>',
+        false, sure || 4500);
+}
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('[data-geri-al]')) return;
+  var f = geriAlFn; geriAlFn = null;
+  var t = document.getElementById('toast');
+  if (t) t.classList.remove('show');
+  if (f) f();
+});
 
 /* ============ SELAMLAMA — v1'den, üstüne CUMA ============
    Cemil, 03.09: "Hayırlı akşamlar, usta alanı için değişen selamlamalar
@@ -6901,8 +6928,6 @@ document.addEventListener('input', function (e) {
 
    Ders: bir SEÇİM, ekranın değil VERİNİN bilgisidir. Ekran değişkeni
    çizimle birlikte ölür; kayıt yaşadığı sürece seçim de yaşamalı. */
-/* Silme onayı bekleyen satırın sırası (index). */
-var kSilinecek = null;
 
 /* Fotoğraftan okunan sahte parça listesi. Gerçek okuma bir servise
    bağlanacak; burada gösterilen şey DAVRANIŞ: okunan satır olur ve
@@ -7008,16 +7033,6 @@ function kayitCiz() {
     ? '<div class="tablo-sar"><table class="tablo">' +
         '<thead><tr><th>İş</th><th class="sayi">Tutar</th></tr></thead><tbody>' +
         satirlar.map(function (s, i) {
-          /* Onay satırı, silinecek satırın YERİNE çizilir (K-032). */
-          if (kSilinecek === i) {
-            return '<tr class="silme-onay"><td colspan="2">' +
-              '<b>' + (s.ad || (s.tip === 'parca' ? 'parça' : 'işçilik')) +
-                '</b> silinsin mi?' +
-              '<span class="onay-satir">' +
-                '<button class="onay-btn hayir" data-ksil-vazgec="1">Vazgeç</button>' +
-                '<button class="onay-btn evet" data-ksil-onay="' + i + '">Sil</button>' +
-              '</span></td></tr>';
-          }
           return '<tr class="kaydirilir" data-kaydir="' + i + '" tabindex="0"' +
               ' aria-label="' + (s.ad || 'satır') + ' — silmek için sola kaydır">' +
             '<td>' +
@@ -7141,15 +7156,32 @@ function kayitCiz() {
    öteki ekranlarda duruyordu. Çekirdeğe `ac` kancası eklendi (K-040);
    sıfırlama oraya taşındı ve bekçi gereksiz kaldı. */
 Ekran.tanim('kayit', {
-  ac: function () { kSilinecek = null; },
   ciz: kayitCiz
 });
 
 /* Kaydırma davranışı ÇEKİRDEKTE (Kaydirma); burada yalnız bu ekranda
    ne anlama geldiği yazıyor: hangi satır silinecek. */
+/* ⚠️ 07.09 — BU TABLO DA DOĞRUDAN SİLİYOR.
+   Cemil yalnız GİDER için söyledi (*"Gideri sola kaydırdığında sil"*),
+   ama aynı hareket iki tabloda var. İkisi farklı davranırsa **aynı
+   jest iki anlama gelir** ve usta hangisinde ne olacağını akılda
+   tutmak zorunda kalır. K-040'ta çekmece/katman için, K-042'de
+   header/footer için verdiğim kararın aynısı: bir hareket, bir anlam.
+
+   Cemil onayına açık (A-M19): gider için istediğini kayıt satırına da
+   taşıdım. */
 Kaydirma.tanim('kayit', function (anahtar) {
-  kSilinecek = parseInt(anahtar, 10);
+  var k = kayitBul(ACIK_KAYIT);
+  if (!k) return;
+  var i = parseInt(anahtar, 10);
+  var silinen = k.satirlar[i];
+  if (!silinen) return;
+  k.satirlar.splice(i, 1);
   Ekran.tazele();
+  balonGeriAl((silinen.ad || 'Satır') + ' silindi.', function () {
+    k.satirlar.splice(i, 0, silinen);
+    Ekran.tazele();
+  });
 });
 
 document.addEventListener('click', function (e) {
@@ -7163,11 +7195,11 @@ document.addEventListener('click', function (e) {
   if (t.id === 'kParcaEkle') {
     k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
                       kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
-    kSilinecek = null; Ekran.tazele(); return;
+    Ekran.tazele(); return;
   }
   if (t.id === 'kIscilikEkle') {
     k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
-    kSilinecek = null; Ekran.tazele(); return;
+    Ekran.tazele(); return;
   }
 
   /* FOTOĞRAFTAN PARÇA LİSTESİ — okunanlar satır olur, fiyatları BOŞ. */
@@ -7177,7 +7209,7 @@ document.addEventListener('click', function (e) {
         kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     });
     balon(FOTO_PARCA_ORNEK.length + ' parça okundu — fiyatlarını yaz.', false, 3000);
-    kSilinecek = null; Ekran.tazele(); return;
+    Ekran.tazele(); return;
   }
 
   /* HEPSİ MÜŞTERİDEN — tek dokunuşta işaretler, ikinci dokunuşta geri
@@ -7257,13 +7289,6 @@ document.addEventListener('click', function (e) {
     Ekran.tazele(); return;
   }
 
-  if (e.target.closest('[data-ksil-vazgec]')) { kSilinecek = null; Ekran.tazele(); return; }
-  var so = t.getAttribute('data-ksil-onay');
-  if (so !== null) {
-    var silinen = k.satirlar.splice(parseInt(so, 10), 1)[0];
-    balon((silinen && silinen.ad ? silinen.ad : 'Satır') + ' silindi.', false, 2400);
-    kSilinecek = null; Ekran.tazele();
-  }
 });
 
 document.addEventListener('input', function (e) {
@@ -8459,7 +8484,6 @@ document.addEventListener('input', function (e) {
 var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almadım' };
 var muhKip = 'basit';
 /* Hangi gider silinmek üzere — onay satırı bu id'ye göre çiziliyor. */
-var muhSilinecek = null;
 
 /* ---- MUHASEBE MODÜLLERİ (Detaylı sekmesi) ----
    Cemil: "Detaylı alanda ise, muhasebe modüllerine gidebilsin. Çek,
@@ -8589,16 +8613,6 @@ Ekran.tanim('muhasebe', {
           '<thead><tr><th>Açıklama</th>' +
             '<th class="sayi">Tutar</th></tr></thead><tbody>' +
           gid.slice().reverse().map(function (g) {
-            /* Onay satırı, silinecek satırın YERİNE çizilir: ayrı bir
-               kutu açmak tabloyu bozar, balon ise kaybolur gider. */
-            if (muhSilinecek === g.id) {
-              return '<tr class="silme-onay"><td colspan="2">' +
-                '<b>' + g.aciklama + '</b> silinsin mi?' +
-                '<span class="onay-satir">' +
-                  '<button class="onay-btn hayir" data-sil-vazgec="1">Vazgeç</button>' +
-                  '<button class="onay-btn evet" data-sil-onay="' + g.id + '">Sil</button>' +
-                '</span></td></tr>';
-            }
             return '<tr class="kaydirilir" data-kaydir="' + g.id + '"' +
                 ' tabindex="0" aria-label="' + g.aciklama + ' — silmek için sola kaydır">' +
               '<td>' + g.aciklama +
@@ -8716,21 +8730,6 @@ document.addEventListener('click', function (e) {
     return;
   }
 
-  if (e.target.closest('[data-sil-vazgec]')) {
-    muhSilinecek = null; Ekran.tazele(); return;
-  }
-
-  var so = e.target.closest('[data-sil-onay]');
-  if (so) {
-    var id = parseInt(so.getAttribute('data-sil-onay'), 10);
-    var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
-    if (i >= 0) {
-      var silinen = GIDERLER.splice(i, 1)[0];
-      balon(silinen.aciklama + ' silindi.', false, 2400);
-    }
-    muhSilinecek = null;
-    Ekran.tazele();
-  }
 });
 
 /* ---- SOLA KAYDIRMA ----
@@ -8738,9 +8737,31 @@ document.addEventListener('click', function (e) {
    kaydının "yapılanlar" tablosunda da var; iki kopya iki ayrı eşik ve
    iki ayrı yön hatası demekti. Burada kalan tek şey, kaydırmanın BU
    ekranda ne anlama geldiği: hangi gider silinecek. */
+/* ⚠️ 07.09 — KAYDIRMA ARTIK DOĞRUDAN SİLİYOR (Cemil: "Gideri sola
+   kaydırdığında sil.") ve K-032'yi geri alıyor.
+
+   K-032'de onay satırı koymuştum; gerekçe *"görünmeyen bir hareket
+   görünmeyen bir sonuç doğurmasın"*dı. Gerekçe duruyor ama çözüm
+   değişti: onay **soru sorarak** koruyordu, geri alma **cevabı geri
+   vererek** koruyor. İkincisi bir dokunuş ucuz ve silme işi bittikten
+   sonra düşünmeye izin veriyor — onay, düşünmeyi silmeden ÖNCE
+   zorunlu kılıyordu.
+
+   Sonuç GÖRÜNÜR olduğu sürece hareket görünmez kalabilir. */
 Kaydirma.tanim('muhasebe', function (anahtar) {
-  muhSilinecek = parseInt(anahtar, 10);
+  var id = parseInt(anahtar, 10);
+  var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
+  if (i < 0) return;
+  var silinen = GIDERLER[i];
+  var yeri = i;
+  GIDERLER.splice(i, 1);
   Ekran.tazele();
+  balonGeriAl(silinen.aciklama + ' silindi.', function () {
+    /* AYNI YERİNE geri konur — listenin sonuna eklenirse sıra değişir
+       ve usta "geri aldım ama başka yere gitti" der. */
+    GIDERLER.splice(yeri, 0, silinen);
+    Ekran.tazele();
+  });
 });
 })();
 

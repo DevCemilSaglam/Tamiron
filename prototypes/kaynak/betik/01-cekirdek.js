@@ -209,6 +209,33 @@ function balon(metin, dinliyor, sure) {
   balonSayaci = setTimeout(function () { t.classList.remove('show'); }, sure || 2600);
 }
 
+/* ---- GERİ ALINABİLİR BALON (07.09) ----
+   Cemil: *"Gideri sola kaydırdığında sil."* Bu, K-032'yi geri alıyor —
+   orada *"kaydırma silmez, sorar"* demiştim.
+
+   ⚠️ ONUN SÖZÜ KAZANIR ama kaydırmanın sorunu ortadan kalkmıyor:
+   cepte kazara kaydırmak hâlâ mümkün. K-032'nin gerekçesi *"görünmeyen
+   bir hareket görünmeyen bir sonuç doğurmasın"*dı; onay satırı bunu
+   **soru sorarak** çözüyordu, geri alma **cevabı geri vererek**
+   çözüyor. İkisi de aynı kuralı korur, ikincisi bir dokunuş ucuz.
+
+   Sonuç GÖRÜNÜR olduğu sürece hareket görünmez kalabilir: satır
+   kayboluyor VE ekranda ne olduğunu söyleyen, geri almayı teklif eden
+   bir şerit çıkıyor. */
+var geriAlFn = null;
+function balonGeriAl(metin, fn, sure) {
+  geriAlFn = fn || null;
+  balon(metin + ' <button class="balon-eylem" data-geri-al="1">Geri al</button>',
+        false, sure || 4500);
+}
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('[data-geri-al]')) return;
+  var f = geriAlFn; geriAlFn = null;
+  var t = document.getElementById('toast');
+  if (t) t.classList.remove('show');
+  if (f) f();
+});
+
 /* ============ SELAMLAMA — v1'den, üstüne CUMA ============
    Cemil, 03.09: "Hayırlı akşamlar, usta alanı için değişen selamlamalar
    hazırlamıştık. Onu buraya alalım. Buna bir de cuma günü için Hayırlı

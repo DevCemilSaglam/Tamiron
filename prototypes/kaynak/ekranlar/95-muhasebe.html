@@ -127,7 +127,6 @@
 var ODEME_AD = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale', almadim: 'Almadım' };
 var muhKip = 'basit';
 /* Hangi gider silinmek üzere — onay satırı bu id'ye göre çiziliyor. */
-var muhSilinecek = null;
 
 /* ---- MUHASEBE MODÜLLERİ (Detaylı sekmesi) ----
    Cemil: "Detaylı alanda ise, muhasebe modüllerine gidebilsin. Çek,
@@ -257,16 +256,6 @@ Ekran.tanim('muhasebe', {
           '<thead><tr><th>Açıklama</th>' +
             '<th class="sayi">Tutar</th></tr></thead><tbody>' +
           gid.slice().reverse().map(function (g) {
-            /* Onay satırı, silinecek satırın YERİNE çizilir: ayrı bir
-               kutu açmak tabloyu bozar, balon ise kaybolur gider. */
-            if (muhSilinecek === g.id) {
-              return '<tr class="silme-onay"><td colspan="2">' +
-                '<b>' + g.aciklama + '</b> silinsin mi?' +
-                '<span class="onay-satir">' +
-                  '<button class="onay-btn hayir" data-sil-vazgec="1">Vazgeç</button>' +
-                  '<button class="onay-btn evet" data-sil-onay="' + g.id + '">Sil</button>' +
-                '</span></td></tr>';
-            }
             return '<tr class="kaydirilir" data-kaydir="' + g.id + '"' +
                 ' tabindex="0" aria-label="' + g.aciklama + ' — silmek için sola kaydır">' +
               '<td>' + g.aciklama +
@@ -384,21 +373,6 @@ document.addEventListener('click', function (e) {
     return;
   }
 
-  if (e.target.closest('[data-sil-vazgec]')) {
-    muhSilinecek = null; Ekran.tazele(); return;
-  }
-
-  var so = e.target.closest('[data-sil-onay]');
-  if (so) {
-    var id = parseInt(so.getAttribute('data-sil-onay'), 10);
-    var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
-    if (i >= 0) {
-      var silinen = GIDERLER.splice(i, 1)[0];
-      balon(silinen.aciklama + ' silindi.', false, 2400);
-    }
-    muhSilinecek = null;
-    Ekran.tazele();
-  }
 });
 
 /* ---- SOLA KAYDIRMA ----
@@ -406,8 +380,30 @@ document.addEventListener('click', function (e) {
    kaydının "yapılanlar" tablosunda da var; iki kopya iki ayrı eşik ve
    iki ayrı yön hatası demekti. Burada kalan tek şey, kaydırmanın BU
    ekranda ne anlama geldiği: hangi gider silinecek. */
+/* ⚠️ 07.09 — KAYDIRMA ARTIK DOĞRUDAN SİLİYOR (Cemil: "Gideri sola
+   kaydırdığında sil.") ve K-032'yi geri alıyor.
+
+   K-032'de onay satırı koymuştum; gerekçe *"görünmeyen bir hareket
+   görünmeyen bir sonuç doğurmasın"*dı. Gerekçe duruyor ama çözüm
+   değişti: onay **soru sorarak** koruyordu, geri alma **cevabı geri
+   vererek** koruyor. İkincisi bir dokunuş ucuz ve silme işi bittikten
+   sonra düşünmeye izin veriyor — onay, düşünmeyi silmeden ÖNCE
+   zorunlu kılıyordu.
+
+   Sonuç GÖRÜNÜR olduğu sürece hareket görünmez kalabilir. */
 Kaydirma.tanim('muhasebe', function (anahtar) {
-  muhSilinecek = parseInt(anahtar, 10);
+  var id = parseInt(anahtar, 10);
+  var i = GIDERLER.map(function (g) { return g.id; }).indexOf(id);
+  if (i < 0) return;
+  var silinen = GIDERLER[i];
+  var yeri = i;
+  GIDERLER.splice(i, 1);
   Ekran.tazele();
+  balonGeriAl(silinen.aciklama + ' silindi.', function () {
+    /* AYNI YERİNE geri konur — listenin sonuna eklenirse sıra değişir
+       ve usta "geri aldım ama başka yere gitti" der. */
+    GIDERLER.splice(yeri, 0, silinen);
+    Ekran.tazele();
+  });
 });
 </script>
