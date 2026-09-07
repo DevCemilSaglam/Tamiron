@@ -2603,9 +2603,9 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
-| **A-M15** | Parça beklendiği **müşteriye söylensin mi**? Varsayım: evet — sayfa mesajla çelişmesin (K-038.3) | Cemil |
-| **A-M14** | Teslimden sonraki *"Geç / Kapat"* dokunuşu kabul mü? Ana yolu **12 → 13** yaptı; karşılığında bir yalan kalktı ve özet gönderimi 3+ dokunuştan 1'e indi (K-035.3) | Cemil |
-| **A-M13** | Tek bir parçayı ayrı işaretlemenin yolu kalmadı (K-033.5). *"Balatayı müşteri getirdi, yağı ben aldım"* durumu oluyor mu? | Cemil |
+| ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M14** | *(07.09: Cemil anlamadı — soru sadeleştirildi)* Araç teslim edilince ekran **kapanmıyor**, *"müşteriye özet gönder / geç"* diye soruyor. Bu **bir dokunuş** ekliyor. Sorulmasın, teslim edilir edilmez ana ekrana dönülsün mü? | Cemil |
+| ~~A-M13~~ | **CEVAPLANDI (07.09):** *"Evet, olabilir."* — *"balatayı müşteri getirdi, yağı ben aldım"* gerçek bir durum. Satır başına işaret **geri geliyor** (kuyruk 4/A11). K-033.5'teki gerekçem yanlıştı: Cemil'in *"gerek yok"* dediği şey satır başına **iki çipli soru**ydu, işaretin kendisi değil | — |
 | **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok. Artık **iki** tabloda var | Bir kez öğrenilir; ipucu istenirse eklenir |
 | **A-M11** | Detaylı menüdeki beş modül (fatura/KDV · çek · senet · cari) **kapsama girdi mi**, yoksa yeri mi açıldı? | Yeri açıldı; K-022 duruyor |
 | **A-M10** | *"Tamirat + Bakım"* tek kayıt mı olmalı, yoksa liste satırında iki kaydın özeti mi? | Tek kayıt varsayıldı |

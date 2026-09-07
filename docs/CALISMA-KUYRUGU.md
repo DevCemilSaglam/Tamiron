@@ -19,6 +19,95 @@
 
 ---
 
+## Tur 4 · 07.09.2026 · son commit `66c7870`
+
+Cemil bir mesaj dizisinde **otuz beş madde** yazdı ve üç açık maddeyi
+cevapladı. Aşağıda **triyaj** var: hepsi yapılacak, ama hepsi aynı
+cinsten değil ve karıştırılırsa iş tıkanır.
+
+### Açık maddelerin cevapları
+
+| Kod | Cevap | Sonuç |
+|---|---|---|
+| **A-M13** | *"Evet, olabilir."* | Satır başına *"kim getirdi"* **geri gelecek** — K-033.5'te kaldırmıştım, gerekçem yanlışmış |
+| **A-M14** | *"Anlamadım."* | **HÂLÂ AÇIK** — soru yeniden, sade dille soruldu (aşağıda) |
+| **A-M15** | *"İsterse, evet."* | Parça beklendiğini müşteriye söylemek **ustanın seçimi** olacak; zorla değil |
+
+---
+
+### A · Hemen yapılabilir — tarifi net, karar gerekmiyor
+
+| # | İş | Durum |
+|---|---|---|
+| A1 | *"İçeride"* → **"Serviste"** (her yerde, tek terim) | AÇIK |
+| A2 | Üstteki **sürüm/tanı şeridi** kalksın | AÇIK |
+| A3 | Footer'da gezinme tuşları — header'la **birlikte** çalışsın | AÇIK |
+| A4 | Gider ekle **+** düğmesi mikrofonla hizalı/yakın | AÇIK |
+| A5 | Servis kaydı ekle: **km ilk aşamada olmasın** | AÇIK |
+| A6 | Ses ekranı: *"şunları da diyebilirsin"* ve alttaki *"mikrofona dokun"* şeridi kalksın | AÇIK |
+| A7 | Kayıtsız araç metni yanlış → *"Araç kayıtlı değil. Ruhsatı çekebilirsin ya da bu aşamayı atlayabilirsin."* | AÇIK |
+| A8 | Kayıt detayı: sahibi ve iletişim **aynı font, büyük**; *"Sahibi"*den sonra boşluk | AÇIK |
+| A9 | *"Ne istiyor?"* → **"Açıklama"** | AÇIK |
+| A10 | *"Alt satıra ekle"* kalksın — textarea kendiliğinden kaydetsin | AÇIK |
+| A11 | **A-M13**: satır başına *"kim getirdi"* geri | AÇIK |
+| A12 | **A-M15**: parça beklendiğini müşteriye söylemek **seçenek** olsun | AÇIK |
+| A13 | Serviste **olmayan** araca *"işin özeti"* ve *"parça bekliyoruz"* şablonları çıkmasın | AÇIK |
+| A14 | *"Müşteri ne görecek"* → **popup**, yalnız mesaj görünsün | AÇIK |
+
+### B · Muhasebe — tarifi net ama BÜYÜK (kendi turunu hak ediyor)
+
+| # | İş | Durum |
+|---|---|---|
+| B1 | Gider: son eklenen üstte · **en fazla 5** · toplam · *"Hepsini listele"* → ayrı sayfa | AÇIK |
+| B2 | Gider listesi sayfası: **ay ve yıl bazında toplam** | AÇIK |
+| B3 | Alacak: **elle eklenebilir** (servis kaydı olmadan) | AÇIK |
+| B4 | Alacak: son 5 · tamamı ayrı sayfada · altta toplam | AÇIK |
+| B5 | Alacak: son ay detaylı, **önceki aylar ay ay toplam** (detaysız) | AÇIK |
+| B6 | Alacak **plakasız** olabilir — firmaya toplu alacak | AÇIK |
+| B7 | Alacağa dokununca **tahsilat** yapılabilsin | AÇIK |
+| B8 | Tahsilatta **hesap/POS** bilgisi (Akbank, Garanti, İş Bankası POS…) | AÇIK |
+
+> ⚠️ **B kümesi muhasebeyi K-022'nin çizdiği sınırın dışına taşıyor.**
+> K-022 kapsamı *"kasa + gider"* diye bağlamıştı; **cari hesap kapsam
+> dışıydı.** *"Firmaya toplu alacak"* + *"ay ay bakiye"* + *"tahsilat
+> kalemi"* = **cari hesabın kendisi.** Cemil kapsamı genişletebilir (tek
+> o genişletebilir) ama **K-022 yeniden yazılmalı**, sessizce
+> aşılmamalı.
+
+### C · Karar bekleyen — varsayımla yazılır ama Cemil görmeli
+
+| # | Soru | Varsayım |
+|---|---|---|
+| C1 | **Gideri sola kaydırınca doğrudan sil** — K-032 *"kaydırma silmez, sorar"* diyordu | **Cemil'in sözü kazanır**: siler. Ama **"geri al"** balonuyla (3 sn). Kaza kurtarılır, dokunuş artmaz |
+| C2 | Çek/senetle tahsilat, tahsilat alanında görünsün mü | **Evet ama ayrı**: kasaya *girmemiş* para; "tahsil edildi" sayılırsa kasa yalan söyler |
+| C3 | Mesaj arşivi + spam/kötü niyet kontrolü | Arşiv **evet** (gönderilen mesaj kaydedilir). Kontrol **kural tabanlı** başlar: aynı numaraya kısa sürede N mesaj → uyarı |
+
+### D · Araştırma — kod değil, belge
+
+| # | Konu | Çıktı |
+|---|---|---|
+| D1 | **Sanal POS**: şartları, maliyeti, tamirciye faydası var mı | `arastirma/SANAL-POS.md` + öneri |
+| D2 | **Toplu mesaj / kampanya**: İYS, ticari ileti izni, yasal sınır | `arastirma/TOPLU-MESAJ.md` — SMS-VE-IYS.md'nin devamı |
+| D3 | **PDF / Excel dışa aktarma**: çevrimdışı bir PWA'da nasıl | `arastirma/DISA-AKTARMA.md` |
+
+### E · Faz dışı — yazılmaz, konuşulur
+
+| # | İş | Neden burada |
+|---|---|---|
+| E1 | Servis kaydına **resim/video**, müşteri uygulamadan görsün | Depolama, boyut, gizlilik, müşteri uygulaması (T-21). **Backend gerektirir** |
+| E2 | **Toplu mesaj + yapay zekâ ile düzeltme** | Yeni bir ürün alanı; D2 bitmeden yazılmaz |
+| E3 | **Gelir-gider tablosu** | Cemil *"sonrasında"* dedi — B bitince |
+| E4 | Sesli kaydı **AI ile düzeltme** (tek müşteri + toplu) | E2 ile aynı altyapı |
+| E5 | Kayıt detayında **sağ üstte mikrofonla** ödeme/tahsilat/parça | Sesli işlem kapsamı genişliyor; K-016 (ses tek yol olamaz) korunmalı |
+
+---
+
+> **Sıra önerisi:** A → C → B → D. E, D bitmeden açılmaz.
+> A kümesi tek turda biter ve prototipi Cemil'in gördüğü hâle getirir;
+> B kendi turunu ister ve **önce K-022 yeniden yazılmalı**.
+
+---
+
 ## Tur 3 · 06.09.2026 · son commit `906c553`
 
 Önceki iki kuyruk (04.09 ve 05.09) **bitti**, aşağıda arşivde.
