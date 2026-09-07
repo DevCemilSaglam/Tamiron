@@ -211,7 +211,8 @@ geldi** (müşterinin gördüğü özet — ustanın ekranı değil, K-023).
 **Bütçe (A-1) 03.09'da menü isteğiyle cevaplandı.** 6 ekran benim önerimdi
 ve *"Cemil onayına açık"* işaretliydi.
 
-**Ölçülen asıl sayı 05.09'da yeniden ölçüldü: ana yol 12 dokunuş**
+**Ölçülen asıl sayı 06.09'da yeniden ölçüldü: ana yol 13 dokunuş**
+(ruhsatsız yolda 8)
 (03.09'da 13'tü; menü satırı eski *"Ruhsatı çek"* düğmesinin yerini alınca
 bir dokunuş düştü ama belge o gün güncellenmemişti). **Kayıtlı araçta 8** —
 ikinci kez gelen her araç için geçerli, yani zamanla asıl yol o olacak.

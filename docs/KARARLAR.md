@@ -10,6 +10,80 @@
 
 ---
 
+## K-035 · Ana yol 12 değil 13; sadeleştirme bir yerde ödendi (06.09.2026)
+
+**Kuyruk 3.** K-033 turunda akış üç yerden değişti ve *"herhalde
+azalmıştır"* diye düşünmek kolaydı: koca bir soru (tür seçimi) ana
+yoldan kalkmıştı. **Ölçünce arttığı çıktı.**
+
+### 35.1 · Ölçüm
+
+Beş yol da tarayıcıda **baştan sona yürütüldü**, dokunmalar sayıldı
+(klavye sayılmıyor — 05.09'un kuralı).
+
+| Yol | 05.09 | **06.09** | Fark |
+|---|---|---|---|
+| Tam yol (ruhsat çekilerek, parçacıya sorularak) | 12 | **13** | **+1** |
+| Kısa yol (ruhsat çekilir, fiyat sorulmaz) | 9 | **10** | **+1** |
+| **Ruhsatsız yol** *(yeni)* | — | **8** | — |
+| Kayıtlı araç yolu | 8 | **8** | 0 |
+| Sesli yol | 2 + konuşma | **2 + konuşma** | 0 |
+| Müşteriye özet | 2 | **2** | 0 |
+
+### 35.2 · +1 nereden geldi
+
+| Değişiklik | Etki |
+|---|---|
+| *"Ne için geldi?"* kalktı (K-033.1) | **−1** · her yolda |
+| Ruhsat sekmesine geçiş (K-033.2) | **+1** · yalnız kamera/galeri yolunda |
+| Teslimden sonra *"Geç / Kapat"* (K-033.6) | **+1** · her yolda |
+
+Kayıtlı araç yolunda sekme yok — −1 ile +1 birbirini götürdü, sayı
+değişmedi. **Ruhsat kullanılan yollarda net +1.**
+
+### 35.3 · Ödediğimiz şeyin karşılığında ne aldık
+
+**Teslim sonrası dokunuş, bir yalanın bedeli.** Eskiden teslim balonu
+telefonu olan araçta *"Özet gönderildi."* diyor ve hiçbir şey
+göndermiyordu (K-033.6). Şimdi ekran gerçekten soruyor.
+
+Ve bu dokunuş **müşteriye özet gönderen usta için ucuz**: eskiden
+teslimden sonra özet göndermek için menüye dönüp mesaj ekranını bulmak
+gerekiyordu (3+ dokunuş); şimdi tek dokunuş. Yani *altıncı işi yapan*
+usta kazandı, yapmayan **bir dokunuş** ödedi.
+
+> **Cemil onayına açık (A-M14):** teslimden sonraki *"Geç / Kapat"*
+> dokunuşu kabul mü? Alternatifi, teslim edilir edilmez ana ekrana
+> dönmek ve özet teklifini hiç göstermemek — o zaman altıncı iş yine
+> gömülür. Zamanlayıcıyla kendiliğinden kapanmak **istenmiyor**: gizli
+> bir sayaç, ustanın okumadığı bir şeyi kapatır.
+
+### 35.4 · A-8 ölçümle kapandı
+
+`IS-AKISI.md` A-8: *"Tamirat/bakım seçimi 1. adımda mı sorulsun?"* —
+o gün önerim **"açıkça sorulsun, belirsizlik bırakmaktan iyidir"** idi.
+Cemil sordurtmadı, ölçüm de onu haklı çıkardı: soru ana yolda bir
+dokunuş yiyordu ve kalkınca **hiçbir şey kaybolmadı** (tür metinden
+okunuyor, kayıt ekranında düzeltiliyor). **A-8 kapandı.**
+
+### 35.5 · Yan bulgu: aynı ad iki kez
+
+03.09'da ölçüm bir bulgu vermişti — *"ilk iki dokunuş aynı işi
+yapıyor"*: ana ekrandaki *"Ruhsatı çek"* ekranı açıyor, ekrandaki aynı
+adlı düğme kamerayı açıyordu. Menü gelince (K-011) düzelmişti.
+
+**06.09'da aynı bulgu geri geldi, başka yerde:** ruhsat sekmesinin adı
+*"Ruhsatı çek"*, içindeki düğmenin adı da *"Ruhsatı çek"*.
+
+Dokunuş sayısı düşmüyor (sekme Cemil'in istediği yapı) ama **ad
+çakışması kalktı**: sekme **kaynağı** söyler, düğme **eylemi** —
+*"Kamerayı aç"* ve *"Galeriden seç"*.
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / 0 bulgu ·
+320 / 375 / 430 px · beş yol da yürütülerek sayıldı.
+
+---
+
 ## K-034 · Bayrak durum değildir — K-004'ün sınırı çizildi (06.09.2026)
 
 **Kuyruk 1.** Dün kendi koyduğum bir alan, kendi belgemizle çelişiyordu.
@@ -2058,6 +2132,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
+| **A-M14** | Teslimden sonraki *"Geç / Kapat"* dokunuşu kabul mü? Ana yolu **12 → 13** yaptı; karşılığında bir yalan kalktı ve özet gönderimi 3+ dokunuştan 1'e indi (K-035.3) | Cemil |
 | **A-M13** | Tek bir parçayı ayrı işaretlemenin yolu kalmadı (K-033.5). *"Balatayı müşteri getirdi, yağı ben aldım"* durumu oluyor mu? | Cemil |
 | **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok. Artık **iki** tabloda var | Bir kez öğrenilir; ipucu istenirse eklenir |
 | **A-M11** | Detaylı menüdeki beş modül (fatura/KDV · çek · senet · cari) **kapsama girdi mi**, yoksa yeri mi açıldı? | Yeri açıldı; K-022 duruyor |

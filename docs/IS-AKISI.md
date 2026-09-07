@@ -130,7 +130,7 @@ Tamircinin dört isteğinden dördüncüsü buydu: *"teslim ettiğinde ödemeyi 
 | **Tam yol** (parçacıya sorularak) | **10–13** |
 | **Kısa yol** (usta fiyatı biliyor, 3–4. adım atlanıyor) | **7–9** |
 
-**Kıyas:** v1'de aynı işin *yalnız fiyat çalışmasına kadarki* kısmı 11 dokunuştu; teslim ve ödeme onun üstüneydi. Burada **baştan sona 12** (ölçüldü, 05.09) — kayıtlı araçta **8**.
+**Kıyas:** v1'de aynı işin *yalnız fiyat çalışmasına kadarki* kısmı 11 dokunuştu; teslim ve ödeme onun üstüneydi. Burada **baştan sona 13** (yeniden ölçüldü, 06.09) — **ruhsatsız yolda 8**, kayıtlı araçta **8**.
 
 > Bu sayı **ölçülmedi, tasarımdan çıkarıldı.** 14. işte prototipte gerçekten işletilip doğrulanacak — v1'de senaryoyu işletmek üç kırık ortaya çıkarmıştı.
 
@@ -202,7 +202,7 @@ Tamircinin dört isteğinden dördüncüsü buydu: *"teslim ettiğinde ödemeyi 
 
 | Kod | Karar |
 |---|---|
-| **A-8** | **Tamirat/bakım seçimi 1. adımda mı sorulsun?** Bir dokunuş ekliyor ama hangi alanların çıkacağını belirliyor (km, hatırlatma). Alternatif: varsayılan tamirat, bakımsa değiştir. Öneri: **açıkça sorulsun** — belirsizlik bırakmaktan iyidir |
+| ~~A-8~~ | **KAPANDI (K-033.1, 06.09).** *"Tamirat/bakım 1. adımda sorulsun mu?"* — **sorulmuyor.** Cemil: *"tamir, bakım vb çok önemli değil."* Tür iş metninden tahmin ediliyor ve kayıt ekranında düzeltilebiliyor. O gün önerim *"açıkça sorulsun"* idi; ölçüm de tersini söyledi — soru ana yolda **bir dokunuş** yiyordu ve kaldırılınca hiçbir şey kaybolmadı |
 | **A-9** | 3. adım atlandığında usta fiyatı **nereye** yazıyor — satırın üstüne mi, ayrı alana mı? |
 | **A-10** | Parçacı cevabı geldiğinde usta **nasıl haberdar oluyor** — bildirim mi, listede rozet mi? |
 | **A-4** | *"Parça bekliyor"* kayıtlar listede türetilerek gösterilsin mi (K-004 notu) — **bu akışta 3–4. adımda takılı kayıtlar demek** |
@@ -312,7 +312,8 @@ Tek düğme: **"Onay iste"** → müşteriye özet gider. Cevap gelirse kayda d�
 
 **Beş kolun toplam maliyeti: sıfır yeni ekran, sıfır yeni adım.**
 
-Ana yol yedi adım, **12 dokunuş** (ölçüldü, 05.09). Kayıtlı araçta **8**.
+Ana yol yedi adım, **13 dokunuş** (yeniden ölçüldü, 06.09). **Ruhsatsız
+yolda 8**, kayıtlı araçta **8**.
 
 ---
 
@@ -468,20 +469,37 @@ Ne yok: link tıklama zorunluluğu, kampanya, indirim kuponu, uzun metin.
 > taşıyordu; menü geldiğinde (K-011) bir dokunuş düştü ama belge
 > güncellenmemişti. **Ölçülmemiş sayı belgede durmaz.**
 
-| Yol | Tasarım | **Ölçüm (05.09)** |
-|---|---|---|
-| Tam yol (parçacıya sorularak) | 10–13 | **12** |
-| Kısa yol (usta fiyatı biliyor, Adım 3–4 atlanıyor) | 7–9 | **9** |
-| **Kayıtlı araç yolu** *(04.09'da açıldı, K-021)* | — | **8** |
-| **Sesli yol** | — | **2 dokunuş + 1 konuşma** |
-| **Müşteriye özet** *(6. iş, K-023)* | — | **2** |
+> **⚠️ 06.09'da ÜÇÜNCÜ KEZ ÖLÇÜLDÜ.** K-033 turunda akış değişti:
+> tür seçimi kalktı (−1), ruhsat sekmesi geldi (+1), teslimden sonra
+> mesaj adımı açıldı (+1). *"Herhalde azalmıştır"* bir ölçüm değildir —
+> ölçünce **arttığı** çıktı.
 
-### Tam yol, adım adım (ölçüldü)
+| Yol | Ölçüm 05.09 | **Ölçüm 06.09** | Fark |
+|---|---|---|---|
+| Tam yol (ruhsat çekilerek, parçacıya sorularak) | 12 | **13** | **+1** |
+| Kısa yol (ruhsat çekilir, fiyat sorulmaz) | 9 | **10** | **+1** |
+| **Ruhsatsız yol** *(06.09'da açıldı — plaka yaz, ruhsatı geç)* | — | **8** | yeni |
+| Kayıtlı araç yolu *(K-021)* | 8 | **8** | 0 |
+| Sesli yol | 2 + konuşma | **2 + konuşma** | 0 |
+| Müşteriye özet *(K-023)* | 2 | **2** | 0 |
+
+**+1 nereden geldi, tek tek:**
+
+| Değişiklik | Etki |
+|---|---|
+| *"Ne için geldi?"* çipleri kalktı (K-033.1) | **−1** — her yolda |
+| Ruhsat sekmesine geçiş (K-033.2) | **+1** — yalnız kamera/galeri kullanılan yolda |
+| Teslimden sonra *"Geç / Kapat"* (K-033.6) | **+1** — her yolda |
+
+Kayıtlı araç yolunda sekme yok, o yüzden −1 ile +1 birbirini götürdü ve
+sayı **değişmedi**. Ruhsat kullanılan yollarda net **+1**.
+
+### Tam yol, adım adım (ölçüldü 06.09)
 
 ```
  1  Servis kaydı ekle          → ruhsat ekranı
- 2  Ruhsatı çek                → 5 alan kendiliğinden doldu
- 3  Tamirat
+ 2  sekme: Ruhsatı çek
+ 3  Kamerayı aç                → 14 alan kendiliğinden doldu
  4  Kaydı aç                   → servis kaydı
  5  + Parça
  6  Parça fiyatı sor           → parçacı ekranı
@@ -490,7 +508,26 @@ Ne yok: link tıklama zorunluluğu, kampanya, indirim kuponu, uzun metin.
  9  + İşçilik
 10  Teslim et                  → teslim ekranı
 11  Nakit
-12  TESLİM ET                  → ana ekran
+12  TESLİM ET                  → teslim edildi, mesaj soruluyor
+13  Geç, gönderme              → ana ekran
+```
+
+### Ruhsatsız yol — 8 dokunuş *(06.09'da açıldı)*
+
+Cemil'in tarif ettiği yol: *"Ruhsat çekmeden devam edebilir."* Plaka
+yazılıyor, ruhsat adımı atlanıyor. **Ana yoldan beş dokunuş ucuz** ve
+kayıtsız araçta en olası yol bu — ruhsat çoğu zaman elde değil.
+
+```
+ 1  Servis kaydı ekle              → ruhsat ekranı
+    (plaka yazılıyor — dokunuş sayılmaz)
+ 2  Ruhsat adımını geç ve kaydı aç → servis kaydı
+ 3  + Parça
+ 4  + İşçilik
+ 5  Teslim et                      → teslim ekranı
+ 6  Nakit
+ 7  TESLİM ET
+ 8  Geç, gönderme                  → ana ekran
 ```
 
 ### Kayıtlı araç yolu — 8 dokunuş
@@ -502,12 +539,12 @@ düzeltmesi). Bu, ikinci kez gelen her araç için geçerli — yani zamanla
 ```
  1  Araçlar                    → liste
  2  Araç kartı                 → araç ekranı
- 3  Kayıt aç
- 4  Tamirat                    → servis kaydı
- 5  + Parça
- 6  Teslim et                  → teslim ekranı
- 7  Nakit
- 8  TESLİM ET                  → ana ekran
+ 3  Kayıt aç                   → servis kaydı (tür artık sorulmuyor)
+ 4  + Parça
+ 5  Teslim et                  → teslim ekranı
+ 6  Nakit
+ 7  TESLİM ET
+ 8  Geç, gönderme              → ana ekran
 ```
 
 ### Sesli yol — 2 dokunuş + 1 konuşma
@@ -523,6 +560,17 @@ yalnız **dokunma** eylemleri.
 ## Bulgu: ilk iki dokunuş aynı işi yapıyor
 
 `1` ana ekrandaki *"Ruhsatı çek"* düğmesi ekranı **açıyor**; `2` o ekrandaki aynı adlı düğme kamerayı **açıyor**. Kullanıcı açısından tek bir niyet, iki dokunuş.
+
+> **⚠️ AYNI BULGU 06.09'DA GERİ GELDİ — başka bir yerde.** Ana ekran
+> menüye dönünce (K-011) bu düzelmişti; ama K-033'te ruhsat ekranına
+> sekme gelince sekmenin adı *"Ruhsatı çek"*, içindeki düğmenin adı da
+> *"Ruhsatı çek"* oldu. Usta sekmeye dokunuyor, aynı adı taşıyan bir
+> düğmeyle karşılaşıyor.
+>
+> Dokunuş sayısı düşmedi (sekme Cemil'in istediği yapı) ama **ad
+> çakışması kalktı**: sekme KAYNAĞI söylüyor, düğme EYLEMİ —
+> *"Kamerayı aç"* ve *"Galeriden seç"*. Aynı adı iki kez okutmak,
+> ustayı *"az önce buna basmadım mı"* diye durduruyordu.
 
 > **A-14'e ölçülmüş kanıt.** Ekran 2 ana ekranın üstünde bir **tabaka** olsaydı — ya da ana ekrandaki düğme doğrudan kamerayı açsaydı — tam yol **12**, kısa yol **8** olurdu. Ekran sayısı da 6'dan 5'e inerdi.
 >

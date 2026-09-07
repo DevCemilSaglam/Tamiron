@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 10:53
+  Üretim: 2026-09-07 10:59
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2486,8 +2486,19 @@ kirpilsin. */
          müşteri WhatsApp'tan yollamıştır, usta bir kez fotoğraflamıştır.
          Yalnız kamera sunmak, o fotoğrafı ikinci kez çektiriyordu. -->
     <div id="sekmeRuhsat" class="yigin" hidden>
+      <!-- ⚠️ ADI "Ruhsatı çek" DEĞİL "Kamerayı aç" (06.09, dokunuş
+           ölçümünün yan bulgusu). Sekmenin adı da "Ruhsatı çek"ti:
+           usta sekmeye dokunuyor, karşısına AYNI ADI TAŞIYAN bir düğme
+           çıkıyor ve *"az önce buna basmadım mı"* diye duruyordu.
+           03.09'da ana ekranda birebir aynı şey vardı ve o zaman da
+           ölçüm yakalamıştı ("tek niyet, iki dokunuş").
+
+           SEKME KAYNAĞI söyler (ruhsattan gireceğim), DÜĞME EYLEMİ
+           (kamerayı aç / galeriden seç). İkisi aynı şeyi söylerse biri
+           gereksizdir; ama sekme Cemil'in istediği yapı, o yüzden
+           değişen düğmenin adı oldu. -->
       <button class="btn btn-primary btn-lg" id="ruhsatCek">
-        <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+        <svg class="ico"><use href="#i-camera"></use></svg> Kamerayı aç
       </button>
       <button class="btn btn-ghost" id="ruhsatGaleri">
         <svg class="ico"><use href="#i-image"></use></svg> Galeriden seç
