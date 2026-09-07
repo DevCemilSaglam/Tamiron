@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 20:43
+  Üretim: 2026-09-07 20:48
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2936,7 +2936,9 @@ kirpilsin. */
       <!-- Baslik ve cip birlikte okunuyor: "Parca bekliyor — Bekliyor"
            degil, "Parca bekliyor" bolumu icinde basili/basisiz bir
            anahtar. Uzun metin 375 px'te iki satira sariyordu. -->
-      <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
+      <span class="lbl-eylem">
+        <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
+      </span>
     </div>
     <div id="kBekliyorGovde"></div>
   </div>
@@ -4794,7 +4796,7 @@ var KAYITLAR = [
   { id: 1, plaka: '34 ABC 123', tur: 'tamirat', km: '',
     sikayet: 'Triger seti değişecek',
     acilis: '03.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true, bekliyorMusteriye: true,
     satirlar: [
       { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' }
@@ -4803,7 +4805,7 @@ var KAYITLAR = [
   { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
     sikayet: 'Periyodik bakım',
     acilis: '02.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1900, alis: 1450, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -4815,7 +4817,7 @@ var KAYITLAR = [
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
     acilis: '01.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
@@ -4830,7 +4832,7 @@ var KAYITLAR = [
   { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
     sikayet: 'Periyodik bakım',
     acilis: '15.03.2026', teslimTarihi: '15.03.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -4845,7 +4847,7 @@ var KAYITLAR = [
   { id: 6, plaka: '34 ABC 123', tur: 'bakim', km: '151.200',
     sikayet: 'Ara bakım',
     acilis: '20.06.2026', teslimTarihi: '20.06.2026',
-    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -4859,7 +4861,7 @@ var KAYITLAR = [
   { id: 7, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön cam silecek motoru',
     acilis: '03.09.2026', teslimTarihi: '03.09.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
         marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
@@ -4871,7 +4873,7 @@ var KAYITLAR = [
   { id: 8, plaka: '06 TMR 07', tur: 'tamirat', km: '',
     sikayet: 'Akü değişimi',
     acilis: '28.08.2026', teslimTarihi: '28.08.2026',
-    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
@@ -4883,7 +4885,7 @@ var KAYITLAR = [
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
     sikayet: 'Periyodik bakım',
     acilis: '20.02.2026', teslimTarihi: '20.02.2026',
-    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
@@ -6049,7 +6051,7 @@ function sesUygula(o) {
       km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
       acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
-      parcaBekliyor: false, satirlar: [] };
+      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: [] };
     KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
     balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
     Ekran.ac('kayit'); return;
@@ -6659,7 +6661,7 @@ document.addEventListener('click', function (e) {
       sikayet: isMetni,
       acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
-      parcaBekliyor: false, satirlar: []
+      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: []
     };
     KAYITLAR.push(yeni);
     ACIK_KAYIT = yeni.id;
@@ -6836,13 +6838,28 @@ function kayitCiz() {
                     }).join('') +
                   '</span>'
                 : '') +
-              /* ROZET, DÜĞME DEĞİL. Yalnız MÜŞTERİ getirdiyse çıkar:
-                 tamircinin getirmesi normal hâl, her satıra rozet
-                 koymak gürültü olurdu. */
-              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || s.alis)
+              /* ⚠️ A-M13 CEVAPLANDI (07.09) — SATIR BAŞINA GERİ GELDİ.
+                 Cemil: *"Evet, olabilir"* — *"balatayı müşteri getirdi,
+                 yağı ben aldım"* gerçek bir durum.
+
+                 K-033.5'te bunu kaldırırken gerekçemi yanlış kurmuştum:
+                 Cemil'in *"gerek yok"* dediği şey satır başına **iki
+                 çipli SORU**ydu (etiket + Tamirci + Müşteri = üç öğe),
+                 işaretin kendisi değil.
+
+                 Şimdi **tek çip**: üstünde şu anki hâli yazıyor,
+                 dokununca öbürüne geçiyor. Üç öğe yerine bir; ve `.cip`
+                 zaten 44 px, K-040'ta 26 px'lik düğmeyle düştüğüm
+                 tuzağa düşmüyor.
+
+                 Listenin üstündeki "hepsi" anahtarı duruyor — biri
+                 toptan, öteki tek tek. */
+              (s.tip === 'parca'
                 ? '<span class="k-ikincil">' +
-                    (s.kimGetirdi === 'musteri'
-                      ? '<span class="pill muted">müşteri getirdi</span>' : '') +
+                    '<button class="cip" data-getiren="' + i + '" aria-pressed="' +
+                      (s.kimGetirdi === 'musteri') + '">' +
+                      (s.kimGetirdi === 'musteri' ? 'müşteri getirdi' : 'tamirci getirdi') +
+                    '</button>' +
                     /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM
                        DEĞİL: soluk ve küçük durur. */
                     (s.alis ? '<span class="k-alis">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
@@ -6881,6 +6898,15 @@ function kayitCiz() {
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
         '<span class="n-body">Bu araç <b>parça bekliyor</b>. Servis kayıtları ' +
           'listesinde de böyle görünüyor.</span></div>' +
+      /* ⚠️ A-M15 CEVAPLANDI (07.09): *"İsterse, evet."* — müşterinin
+         özet sayfasında görünmesi ZORUNLU değil, USTANIN SEÇİMİ.
+         K-038.3'te varsayım olarak "hep söylenir" yazmıştım; Cemil
+         seçenek istedi. Bazı usta gecikmeyi duyurmak istemeyebilir ve
+         bu onun müşterisiyle arasındaki iş. */
+      '<div class="cip-grup" style="margin-top:10px">' +
+        '<button class="cip" id="kBekliyorMusteriye" aria-pressed="' +
+          (!!k.bekliyorMusteriye) + '">Müşterinin sayfasında da göster</button>' +
+      '</div>' +
       '<button class="btn btn-ghost" id="kBekliyorMesaj" style="margin-top:10px">' +
         '<svg class="ico"><use href="#i-message-square"></use></svg>' +
         ' Müşteriye haber ver</button>'
@@ -6966,6 +6992,12 @@ document.addEventListener('click', function (e) {
 
   if (t.id === 'kBekliyor') {
     k.parcaBekliyor = !k.parcaBekliyor;
+    /* Bayrak kapanınca müşteriye gösterme seçimi de anlamını yitirir. */
+    if (!k.parcaBekliyor) k.bekliyorMusteriye = false;
+    Ekran.tazele(); return;
+  }
+  if (t.id === 'kBekliyorMusteriye') {
+    k.bekliyorMusteriye = !k.bekliyorMusteriye;
     Ekran.tazele(); return;
   }
   if (t.id === 'kBekliyorMesaj') {
@@ -7002,6 +7034,14 @@ document.addEventListener('click', function (e) {
   if (kay) {
     var pk = kay.split('|');
     k.satirlar[parseInt(pk[0], 10)].kaynak = parseInt(pk[1], 10);
+    Ekran.tazele(); return;
+  }
+
+  /* Satır başına "kim getirdi" — tek çip, dokununca öbürüne geçer. */
+  var g = t.getAttribute('data-getiren');
+  if (g !== null && g !== undefined && g !== '') {
+    var sg = k.satirlar[parseInt(g, 10)];
+    kGetireniAyarla(sg, sg.kimGetirdi === 'musteri' ? 'tamirci' : 'musteri');
     Ekran.tazele(); return;
   }
 
@@ -7581,7 +7621,7 @@ document.addEventListener('click', function (e) {
       id: KAYITLAR.length + 1, plaka: a.plaka, tur: 'tamirat', km: '',
       sikayet: '', acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
-      parcaBekliyor: false, satirlar: []
+      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: []
     };
     KAYITLAR.push(yeni);
     ACIK_KAYIT = yeni.id;
@@ -7866,7 +7906,29 @@ function msjYazimCiz() {
       ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
 
-  document.getElementById('msjSablon').innerHTML = MSJ_SABLON.map(function (s) {
+  /* ⚠️ SERVİSTE OLMAYAN ARACA İŞ ŞABLONU ÇIKMAZ (Cemil, 07.09:
+     "Serviste olmayan araca işin özeti, parça bekliyoruz alanları
+     olmamalı.").
+
+     Doğru: iki şablon da AÇIK BİR İŞİ anlatıyor. Araç teslim
+     edilmişse *"parça bekliyoruz"* yalan olur; *"işin özeti"* ise
+     geçmiş bir işin özetini bugünkü işmiş gibi gönderir.
+
+     Bakım hatırlatması tam tersine YALNIZ teslim edilmiş araçta
+     anlamlı — o zaten kendi koşulunu taşıyor. */
+  var acikIs = !!icerideki().filter(function (x) { return x.plaka === msjPlaka; })[0];
+  var uygun = MSJ_SABLON.filter(function (s) {
+    if ((s.k === 'ozet' || s.k === 'bekliyor') && !acikIs) return false;
+    return true;
+  });
+  /* Seçili şablon elenmiş olabilir — o zaman ilk uyguna düşülür,
+     yoksa ekran "hiçbiri seçili değil" hâlinde kalır. */
+  if (!uygun.filter(function (s) { return s.k === msjSablonSecili; }).length) {
+    msjSablonSecili = uygun.length ? uygun[0].k : null;
+    document.getElementById('msjMetin').value =
+      msjSablonSecili ? msjMetinUret(msjPlaka, msjSablonSecili) : '';
+  }
+  document.getElementById('msjSablon').innerHTML = uygun.map(function (s) {
     return '<button class="cip" data-sablon="' + s.k + '" aria-pressed="' +
       (msjSablonSecili === s.k) + '">' + s.ad + '</button>';
   }).join('');
@@ -8572,7 +8634,9 @@ Ekran.tanim('ozet', {
                `fiyatiBekleyen` BURADA YOK ve olmayacak: o dükkânın
                kendi işi (parçacıdan rakam gelmedi). Müşteriyi
                ilgilendiren şey parçanın yolda olması. */
-            : (k.parcaBekliyor
+            /* ⚠️ USTANIN SEÇİMİNE BAĞLI (A-M15, 07.09). Bayrak açık
+               olsa bile müşteriye söylemek ayrı bir karar. */
+            : (k.parcaBekliyor && k.bekliyorMusteriye
                 ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
                   'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
                 : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +
@@ -8650,7 +8714,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>9c0a2086</b><br>' +
+      'Sürüm <b>3a3f84ea</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

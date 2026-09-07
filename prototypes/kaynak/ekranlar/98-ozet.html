@@ -195,7 +195,9 @@ Ekran.tanim('ozet', {
                `fiyatiBekleyen` BURADA YOK ve olmayacak: o dükkânın
                kendi işi (parçacıdan rakam gelmedi). Müşteriyi
                ilgilendiren şey parçanın yolda olması. */
-            : (k.parcaBekliyor
+            /* ⚠️ USTANIN SEÇİMİNE BAĞLI (A-M15, 07.09). Bayrak açık
+               olsa bile müşteriye söylemek ayrı bir karar. */
+            : (k.parcaBekliyor && k.bekliyorMusteriye
                 ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
                   'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
                 : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +

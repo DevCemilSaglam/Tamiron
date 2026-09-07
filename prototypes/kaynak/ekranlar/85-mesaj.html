@@ -280,7 +280,29 @@ function msjYazimCiz() {
       ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
 
-  document.getElementById('msjSablon').innerHTML = MSJ_SABLON.map(function (s) {
+  /* ⚠️ SERVİSTE OLMAYAN ARACA İŞ ŞABLONU ÇIKMAZ (Cemil, 07.09:
+     "Serviste olmayan araca işin özeti, parça bekliyoruz alanları
+     olmamalı.").
+
+     Doğru: iki şablon da AÇIK BİR İŞİ anlatıyor. Araç teslim
+     edilmişse *"parça bekliyoruz"* yalan olur; *"işin özeti"* ise
+     geçmiş bir işin özetini bugünkü işmiş gibi gönderir.
+
+     Bakım hatırlatması tam tersine YALNIZ teslim edilmiş araçta
+     anlamlı — o zaten kendi koşulunu taşıyor. */
+  var acikIs = !!icerideki().filter(function (x) { return x.plaka === msjPlaka; })[0];
+  var uygun = MSJ_SABLON.filter(function (s) {
+    if ((s.k === 'ozet' || s.k === 'bekliyor') && !acikIs) return false;
+    return true;
+  });
+  /* Seçili şablon elenmiş olabilir — o zaman ilk uyguna düşülür,
+     yoksa ekran "hiçbiri seçili değil" hâlinde kalır. */
+  if (!uygun.filter(function (s) { return s.k === msjSablonSecili; }).length) {
+    msjSablonSecili = uygun.length ? uygun[0].k : null;
+    document.getElementById('msjMetin').value =
+      msjSablonSecili ? msjMetinUret(msjPlaka, msjSablonSecili) : '';
+  }
+  document.getElementById('msjSablon').innerHTML = uygun.map(function (s) {
     return '<button class="cip" data-sablon="' + s.k + '" aria-pressed="' +
       (msjSablonSecili === s.k) + '">' + s.ad + '</button>';
   }).join('');

@@ -29,6 +29,7 @@
 | Hatırlatma tarihi | `ReminderDate` | Bakımsa teslimde hesaplanır — **ay VEYA km, hangisi önce gelirse** (K-002, 04.09) |
 | Hatırlatma gönderildi | `ReminderSent` | Aynı hatırlatma iki kez gitmesin. **Arama da gönderim sayılır** (K-033.9) |
 | Parça bekliyor | `WaitingForPart` | ⭐ Usta işaretler; *"parça yolda"*. **`fiyatiBekleyen` ile karıştırılmaz** — o *fiyatı gelmemiş* demek (K-034) |
+| Beklemeyi müşteriye göster | `ShowWaitingToCustomer` | Ustanın seçimi; `WaitingForPart` açıkken anlamlı (A-M15) |
 | Tür elle seçildi | `TypeSetManually` | Ustanın kararı, tahmini yener. Karar türetilemez (K-033.12) |
 | **Satır** | **ServiceLine** | ⭐ Parça **ve** işçilik aynı listede; ayrı liste değil, satırın işareti |
 | Satır türü | `Kind` | `Part` \| `Labor` |

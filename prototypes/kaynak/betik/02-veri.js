@@ -55,7 +55,7 @@ var KAYITLAR = [
   { id: 1, plaka: '34 ABC 123', tur: 'tamirat', km: '',
     sikayet: 'Triger seti değişecek',
     acilis: '03.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true, bekliyorMusteriye: true,
     satirlar: [
       { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' }
@@ -64,7 +64,7 @@ var KAYITLAR = [
   { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
     sikayet: 'Periyodik bakım',
     acilis: '02.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1900, alis: 1450, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -76,7 +76,7 @@ var KAYITLAR = [
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
     acilis: '01.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
@@ -91,7 +91,7 @@ var KAYITLAR = [
   { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
     sikayet: 'Periyodik bakım',
     acilis: '15.03.2026', teslimTarihi: '15.03.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -106,7 +106,7 @@ var KAYITLAR = [
   { id: 6, plaka: '34 ABC 123', tur: 'bakim', km: '151.200',
     sikayet: 'Ara bakım',
     acilis: '20.06.2026', teslimTarihi: '20.06.2026',
-    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -120,7 +120,7 @@ var KAYITLAR = [
   { id: 7, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön cam silecek motoru',
     acilis: '03.09.2026', teslimTarihi: '03.09.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
         marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
@@ -132,7 +132,7 @@ var KAYITLAR = [
   { id: 8, plaka: '06 TMR 07', tur: 'tamirat', km: '',
     sikayet: 'Akü değişimi',
     acilis: '28.08.2026', teslimTarihi: '28.08.2026',
-    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
@@ -144,7 +144,7 @@ var KAYITLAR = [
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
     sikayet: 'Periyodik bakım',
     acilis: '20.02.2026', teslimTarihi: '20.02.2026',
-    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false,
+    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' },

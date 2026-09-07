@@ -49,10 +49,16 @@ cinsten değil ve karıştırılırsa iş tıkanır.
 | A8 | Kayıt detayı: sahibi ve iletişim **aynı font, büyük**; *"Sahibi"*den sonra boşluk | **BİTTİ** |
 | A9 | *"Ne istiyor?"* → **"Açıklama"** | **BİTTİ** |
 | A10 | *"Alt satıra ekle"* kalksın — textarea kendiliğinden kaydetsin | **BİTTİ** |
-| A11 | **A-M13**: satır başına *"kim getirdi"* geri | AÇIK |
-| A12 | **A-M15**: parça beklendiğini müşteriye söylemek **seçenek** olsun | AÇIK |
-| A13 | Serviste **olmayan** araca *"işin özeti"* ve *"parça bekliyoruz"* şablonları çıkmasın | AÇIK |
+| A11 | **A-M13**: satır başına *"kim getirdi"* geri | **BİTTİ** |
+| A12 | **A-M15**: parça beklendiğini müşteriye söylemek **seçenek** olsun | **BİTTİ** |
+| A13 | Serviste **olmayan** araca *"işin özeti"* ve *"parça bekliyoruz"* şablonları çıkmasın | **BİTTİ** |
 | A14 | *"Müşteri ne görecek"* → **popup**, yalnız mesaj görünsün | AÇIK |
+| A15 | Mesajda **telefon yoksa**: düğmeler pasif + *"telefon eklemelisiniz"* + telefonu yazıp/söyleyip ekleyebileceği **basit popup** | AÇIK |
+
+> ⚠️ **A15'i ilk triyajda ATLAMIŞIM.** Cemil'in listesinde vardı,
+> kuyruğa geçmemiş. Otuz beş maddeyi elle ayırırken bir tanesi düştü —
+> triyajın kendisi de gözden geçirilecek bir iş. A14 ile A15 **aynı
+> bileşeni** istiyor (katman/popup), o yüzden birlikte yazılacaklar.
 
 ### B · Muhasebe — tarifi net ama BÜYÜK (kendi turunu hak ediyor)
 

@@ -454,7 +454,7 @@ function sesUygula(o) {
       km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
       acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
       hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
-      parcaBekliyor: false, satirlar: [] };
+      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: [] };
     KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
     balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
     Ekran.ac('kayit'); return;

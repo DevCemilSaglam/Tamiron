@@ -2685,6 +2685,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M17** | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta hâlâ çıkıyor. Cemil yalnız iki şablonu saymıştı (*özet*, *parça bekliyoruz*); üçüncüsü de mantıken yanlış görünüyor — elensin mi? | Cemil |
 | **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? Kalkarsa prototipte sesli yol denenemez (K-042.4) | Cemil |
 | **A-M14** | *(07.09: Cemil anlamadı — soru sadeleştirildi)* Araç teslim edilince ekran **kapanmıyor**, *"müşteriye özet gönder / geç"* diye soruyor. Bu **bir dokunuş** ekliyor. Sorulmasın, teslim edilir edilmez ana ekrana dönülsün mü? | Cemil |
 | ~~A-M13~~ | **CEVAPLANDI (07.09):** *"Evet, olabilir."* — *"balatayı müşteri getirdi, yağı ben aldım"* gerçek bir durum. Satır başına işaret **geri geliyor** (kuyruk 4/A11). K-033.5'teki gerekçem yanlıştı: Cemil'in *"gerek yok"* dediği şey satır başına **iki çipli soru**ydu, işaretin kendisi değil | — |

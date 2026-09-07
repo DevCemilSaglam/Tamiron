@@ -168,7 +168,9 @@
       <!-- Baslik ve cip birlikte okunuyor: "Parca bekliyor — Bekliyor"
            degil, "Parca bekliyor" bolumu icinde basili/basisiz bir
            anahtar. Uzun metin 375 px'te iki satira sariyordu. -->
-      <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
+      <span class="lbl-eylem">
+        <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
+      </span>
     </div>
     <div id="kBekliyorGovde"></div>
   </div>
@@ -465,13 +467,28 @@ function kayitCiz() {
                     }).join('') +
                   '</span>'
                 : '') +
-              /* ROZET, DÜĞME DEĞİL. Yalnız MÜŞTERİ getirdiyse çıkar:
-                 tamircinin getirmesi normal hâl, her satıra rozet
-                 koymak gürültü olurdu. */
-              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || s.alis)
+              /* ⚠️ A-M13 CEVAPLANDI (07.09) — SATIR BAŞINA GERİ GELDİ.
+                 Cemil: *"Evet, olabilir"* — *"balatayı müşteri getirdi,
+                 yağı ben aldım"* gerçek bir durum.
+
+                 K-033.5'te bunu kaldırırken gerekçemi yanlış kurmuştum:
+                 Cemil'in *"gerek yok"* dediği şey satır başına **iki
+                 çipli SORU**ydu (etiket + Tamirci + Müşteri = üç öğe),
+                 işaretin kendisi değil.
+
+                 Şimdi **tek çip**: üstünde şu anki hâli yazıyor,
+                 dokununca öbürüne geçiyor. Üç öğe yerine bir; ve `.cip`
+                 zaten 44 px, K-040'ta 26 px'lik düğmeyle düştüğüm
+                 tuzağa düşmüyor.
+
+                 Listenin üstündeki "hepsi" anahtarı duruyor — biri
+                 toptan, öteki tek tek. */
+              (s.tip === 'parca'
                 ? '<span class="k-ikincil">' +
-                    (s.kimGetirdi === 'musteri'
-                      ? '<span class="pill muted">müşteri getirdi</span>' : '') +
+                    '<button class="cip" data-getiren="' + i + '" aria-pressed="' +
+                      (s.kimGetirdi === 'musteri') + '">' +
+                      (s.kimGetirdi === 'musteri' ? 'müşteri getirdi' : 'tamirci getirdi') +
+                    '</button>' +
                     /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM
                        DEĞİL: soluk ve küçük durur. */
                     (s.alis ? '<span class="k-alis">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
@@ -510,6 +527,15 @@ function kayitCiz() {
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>' +
         '<span class="n-body">Bu araç <b>parça bekliyor</b>. Servis kayıtları ' +
           'listesinde de böyle görünüyor.</span></div>' +
+      /* ⚠️ A-M15 CEVAPLANDI (07.09): *"İsterse, evet."* — müşterinin
+         özet sayfasında görünmesi ZORUNLU değil, USTANIN SEÇİMİ.
+         K-038.3'te varsayım olarak "hep söylenir" yazmıştım; Cemil
+         seçenek istedi. Bazı usta gecikmeyi duyurmak istemeyebilir ve
+         bu onun müşterisiyle arasındaki iş. */
+      '<div class="cip-grup" style="margin-top:10px">' +
+        '<button class="cip" id="kBekliyorMusteriye" aria-pressed="' +
+          (!!k.bekliyorMusteriye) + '">Müşterinin sayfasında da göster</button>' +
+      '</div>' +
       '<button class="btn btn-ghost" id="kBekliyorMesaj" style="margin-top:10px">' +
         '<svg class="ico"><use href="#i-message-square"></use></svg>' +
         ' Müşteriye haber ver</button>'
@@ -595,6 +621,12 @@ document.addEventListener('click', function (e) {
 
   if (t.id === 'kBekliyor') {
     k.parcaBekliyor = !k.parcaBekliyor;
+    /* Bayrak kapanınca müşteriye gösterme seçimi de anlamını yitirir. */
+    if (!k.parcaBekliyor) k.bekliyorMusteriye = false;
+    Ekran.tazele(); return;
+  }
+  if (t.id === 'kBekliyorMusteriye') {
+    k.bekliyorMusteriye = !k.bekliyorMusteriye;
     Ekran.tazele(); return;
   }
   if (t.id === 'kBekliyorMesaj') {
@@ -631,6 +663,14 @@ document.addEventListener('click', function (e) {
   if (kay) {
     var pk = kay.split('|');
     k.satirlar[parseInt(pk[0], 10)].kaynak = parseInt(pk[1], 10);
+    Ekran.tazele(); return;
+  }
+
+  /* Satır başına "kim getirdi" — tek çip, dokununca öbürüne geçer. */
+  var g = t.getAttribute('data-getiren');
+  if (g !== null && g !== undefined && g !== '') {
+    var sg = k.satirlar[parseInt(g, 10)];
+    kGetireniAyarla(sg, sg.kimGetirdi === 'musteri' ? 'tamirci' : 'musteri');
     Ekran.tazele(); return;
   }
 

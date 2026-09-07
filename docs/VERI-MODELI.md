@@ -56,7 +56,8 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 | `ReminderDate` | Bakımsa teslimde hesaplanır |
 | `ReminderSent` | Aynı hatırlatma iki kez gitmesin |
 | `WaitingForPart` | **Parça yolda.** Usta işaretler — K-033.5, K-034. Türetilemez: veride bunu söyleyen hiçbir şey yok |
-| `TypeSetManually` | **Türü usta elle seçti.** `Type` iş metninden tahmin ediliyor (K-033.1); bu işaret olmadan bir sonraki tahmin ustanın seçimini ezer — K-034 |
+| `ShowWaitingToCustomer` | **Parça beklendiği müşteriye söylensin mi.** Bayrak açık olsa bile söylemek ayrı bir karar — A-M15, Cemil: *"İsterse, evet."* K-034'ün ölçüsünden geçiyor: kullanıcının yapabilecekleri değişmiyor |
+| `TypeSetManually` | **Türü usta elle seçti.**
 
 > **`Status` YOK.** Yedi durum yerine `DeliveredAt` — dolu ya da boş (K-004).
 >
