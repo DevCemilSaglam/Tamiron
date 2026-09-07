@@ -32,7 +32,7 @@
 | Tür elle seçildi | `TypeSetManually` | Ustanın kararı, tahmini yener. Karar türetilemez (K-033.12) |
 | **Satır** | **ServiceLine** | ⭐ Parça **ve** işçilik aynı listede; ayrı liste değil, satırın işareti |
 | Satır türü | `Kind` | `Part` \| `Labor` |
-| Fiyat | `Price` | **Müşteriye söylenen.** Müşteri parçasında 0 |
+| Fiyat | `Price` | **Müşteriye söylenen.** Müşteri parçasında **duruyor ama toplama girmiyor** — eleme `kayitToplami()`de, alan silinmiyor (K-037) |
 | Alış | `Cost` | **Parçacıdan gelen.** Müşteriye gitmez. Kol D'de müşteri parçayı kendi getirse bile **saklanır** |
 | Parçayı kim getirdi | `SuppliedBy` | ⭐ `Shop` \| `Customer` — **sorumluluk anahtarı**, K-005 |
 | **Parçacı** | **Supplier** | ⭐ Fiyat veren ve mal gönderen taraf. v1'in `Distribütör`/`B2B` alt türleri **yok** |

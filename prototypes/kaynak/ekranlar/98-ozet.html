@@ -126,8 +126,15 @@ Ekran.tanim('ozet', {
             var musterinin = (s.tip === 'parca' && s.kimGetirdi === 'musteri');
             return '<div class="tutar-sat"><span>' + etiket + ek +
               (musterinin ? ' <span class="pill muted">parçayı siz getirdiniz</span>' : '') +
+              /* ⚠️ MÜŞTERİ PARÇASINDA RAKAM YOK — fiyat kayıtta dursa
+                 bile (K-037'den sonra duruyor). Müşteriye o rakamı
+                 göstermek, ödemediği bir parça için ücret istiyormuş
+                 gibi okunur; toplam da onu içermiyor. Ekranda bir
+                 rakam var ama toplamda yok — müşteri açısından bu
+                 açıklanamaz bir çelişkidir. */
               '</span><span class="tv">' +
-              (s.fiyat ? tutar(s.fiyat) + ' ₺' : '—') + '</span></div>';
+              ((s.tip === 'parca' && s.kimGetirdi === 'musteri') || !s.fiyat
+                ? '—' : tutar(s.fiyat) + ' ₺') + '</span></div>';
           }).join('') +
           '<div class="tutar-sat genel"><span>Toplam</span><span class="tv">' +
             tutar(kayitToplami(k)) + ' ₺</span></div>' +

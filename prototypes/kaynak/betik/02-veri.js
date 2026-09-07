@@ -242,8 +242,23 @@ function icerideki() {
 function aracKayitlari(plaka) {
   return KAYITLAR.filter(function (k) { return k.plaka === plaka; });
 }
+/* MÜŞTERİYE SÖYLENEN RAKAM.
+   ⚠️ 06.09 — MÜŞTERİ PARÇASI TOPLAMA GİRMEZ ve bu artık BURADA
+   söyleniyor, satırın fiyatı silinerek değil (K-037).
+
+   Eskiden kural şöyle işliyordu: parça müşteriden geldi işaretlenince
+   `fiyat` **sıfırlanıyordu**. Sonuç doğruydu ama yol yanlıştı — bir
+   arayüz düğmesi, satırın satış fiyatını **geri dönüşsüz siliyordu**.
+   Anahtarı açıp kapatan usta, yazdığı rakamı kaybediyordu.
+
+   S2/K-005 hâlâ aynı: müşterinin getirdiği parça faturaya girmez.
+   Değişen tek şey, kuralın nerede işletildiği. Veri korunuyor,
+   TOPLAM karar veriyor. */
 function kayitToplami(k) {
-  return (k.satirlar || []).reduce(function (t, s) { return t + (s.fiyat || 0); }, 0);
+  return (k.satirlar || []).reduce(function (t, s) {
+    if (s.tip === 'parca' && s.kimGetirdi === 'musteri') return t;
+    return t + (s.fiyat || 0);
+  }, 0);
 }
 /* Parçası sorulmuş ama fiyatı gelmemiş — DURUM DEĞİL, veriden türetilir
    (K-004 notu, A-4). */

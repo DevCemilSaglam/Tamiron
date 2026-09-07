@@ -81,7 +81,7 @@ Akıştaki yeri: **Adım 2, 4, 5, 6** · Ekran 3
 | `ServiceRecordId` | Satır bir kayda aittir |
 | `Kind` | `Part` \| `Labor` — **satırın işareti, ayrı liste değil** |
 | `Name` | Ustanın yazdığı/söylediği: *"triger seti"* |
-| `Price` | Müşteriye söylenen. **Müşteri parçasında boş/0** (S2) |
+| `Price` | Müşteriye söylenen. **Müşteri parçasında yazılı kalır ama TOPLAMA GİRMEZ** (S2, K-037) — eleme okuma tarafında; bir arayüz düğmesi veriyi silmez |
 | `Cost` | Parçacıdan gelen — usta üstüne ekliyor (T-9). Müşteriye gitmez. **Kol D'de müşteri parçayı kendi getirse bile SİLİNMEZ** — *"ne kadara alabileceği"* bilgisi değerli (03.09) |
 | `SuppliedBy` | `Shop` \| `Customer` — **K-005, sorumluluk anahtarı** |
 | `PartBrand` · `PartCode` | Ayrıştırılabildiyse (K-001). **Boş olabilir** |

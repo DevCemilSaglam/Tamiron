@@ -10,6 +10,83 @@
 
 ---
 
+## K-037 · Kural veriyi silerek işletilmez — müşteri parçası toplamda elenir (06.09.2026)
+
+**Kuyruk 5.** Sorulan soru şuydu: *"Parçaları müşteri getirdi"* anahtarı
+`fiyat`ı `alis`e taşıyor; muhasebe o parayı **ödenmiş** gibi sayıyor mu?
+
+### 37.1 · Cevap: hayır. Muhasebe doğruydu
+
+`isKari()` ve `parcaAlislari()` zaten `kimGetirdi === 'tamirci'`
+süzüyordu; müşterinin getirdiği parça alış toplamına **hiç girmiyordu.**
+
+Rakamla doğrulandı — 2026 iş başına:
+
+| | alınan | parça alışı | fark |
+|---|---|---|---|
+| Başlangıç | 12.970 | 7.160 | **5.810** |
+| Bir parça müşteriye geçirilince | 10.870 | 5.560 | **5.310** |
+
+Elle hesap: alınan −2.100 (satış), alış −1.600 (o parçayı almadık),
+fark −500 (o parçanın kârı). **Tutuyor.** Şüphem yanlıştı ve bu, işin
+doğru sonucudur: doğrulama, hata bulmak zorunda değildir.
+
+### 37.2 · Ama anahtar, satış fiyatını yok ediyordu
+
+Kontrol sırasında başka bir şey çıktı. Anahtar şunu yapıyordu:
+
+```js
+if (kim === 'musteri') { if (s.fiyat && !s.alis) s.alis = s.fiyat; s.fiyat = 0; }
+```
+
+**Tek dokunuş, geri alınamaz kayıp.** Anahtarı açıp kapatan usta,
+yazdığı satış fiyatını bir daha bulamıyordu. Ölçüldü: 5.810 → 5.310 →
+**3.710**. Üçüncü rakam yanlıştı — iş, satmadığı bir parçayı almış
+görünüyordu.
+
+Bu, **K-032'nin kuralının aynısı**: görünmeyen bir sonuç doğuran bir
+dokunuş olmamalı. Orada sola kaydırma bir gideri siliyordu; burada bir
+anahtar bir fiyatı siliyor.
+
+İkinci sorun daha sessizdi: `alis` **bizim ödediğimiz** paradır. Müşteri
+kendi parçasını getirdiyse biz hiçbir şey ödemedik; oraya parçacının
+teklifini yazmak alanın anlamını bozuyordu.
+
+### 37.3 · Kural yerini değiştirdi, hükmünü değil
+
+**S2/K-005 aynen duruyor:** müşterinin getirdiği parça faturaya girmez.
+Değişen tek şey, kuralın **nerede işletildiği**:
+
+* önce: satırın `fiyat`ı **sıfırlanıyordu** → veri gitti
+* şimdi: `kayitToplami()` müşteri parçasını **toplama katmıyor** → veri duruyor
+
+> **Genel kural:** bir iş kuralı, veriyi **silerek** değil, **okurken
+> eleyerek** işletilir. Silme geri alınamaz; eleme her zaman geri
+> alınabilir ve nedeni okunabilir yerde durur.
+
+Ölçüldü, gidiş-dönüş tam: 5.810 → 5.310 → **5.810**.
+
+### 37.4 · Rakam duruyorsa GÖRÜNMESİ ayrı bir karar
+
+Fiyat artık silinmediği için iki ekranda ne göstereceğimizi ayrıca
+seçmek gerekti:
+
+* **Ustanın ekranı:** rakam duruyor ama **üstü çizili** ve soluk —
+  usta girdiğini görsün, toplamda aramasın. Alan düzenlenebilir kalıyor;
+  parçacının verdiği rakam ileride işine yarayabilir (Kol D).
+* **Müşterinin özeti:** rakam **hiç gösterilmiyor**, `—` yazıyor.
+  Ödemediği bir parçanın yanında rakam görmek, ondan ücret isteniyormuş
+  gibi okunur; üstelik toplam onu içermiyor — ekranda olup toplamda
+  olmayan bir rakam, müşteri açısından **açıklanamaz bir çelişkidir.**
+
+Aynı veri, iki okuyucuya iki farklı gösterim. Bu bir tutarsızlık değil:
+usta **kaydı**, müşteri **faturayı** okuyor.
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / 0 bulgu ·
+320 / 375 / 430 px · muhasebe rakamları gidiş-dönüş doğrulandı.
+
+---
+
 ## K-036 · İki "bekliyor" ayrıldı; ulaşılamaz kod silindi (06.09.2026)
 
 **Kuyruk 4.** K-034 ikisinin **ayrı gerçek** olduğunu yazmıştı; bu

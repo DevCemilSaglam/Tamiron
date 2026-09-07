@@ -254,6 +254,10 @@
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 6px;
 }
+/* Toplama girmeyen tutar: üstü çizili ve soluk. */
+#screen-kayit .tablo td.tutar-disi input {
+  color: var(--faint); text-decoration: line-through;
+}
 #screen-kayit .k-alis {
   font-size: var(--tip-xs); color: var(--faint);
   font-family: var(--font-mono);
@@ -295,16 +299,22 @@ function kHepsiMusteriMi(k) {
   });
 }
 
-/* MÜŞTERİ PARÇASI FİYATSIZ KALIR (S2, K-005) — AMA gelen fiyat
-   SİLİNMEZ, alışa taşınır. Kol D'nin "sonradan" hâlinde ("ucuza
-   buldum, kendim alayım") parçacının verdiği rakam kayıttan
-   uçmasın diye. */
+/* ⚠️ 06.09 — BU FONKSİYON ARTIK HİÇBİR ŞEY SİLMİYOR (K-037).
+   Eskiden müşteri parçasında `fiyat`ı sıfırlıyor, kaybolmasın diye
+   `alis`e taşıyordu. İki sorun vardı:
+
+   1. **Tek dokunuş, geri alınamaz kayıp.** "Parçaları müşteri getirdi"
+      anahtarını açıp kapatan usta, yazdığı satış fiyatını bir daha
+      bulamıyordu. K-032'nin kuralı burada da geçerli: görünmeyen bir
+      sonuç doğuran bir dokunuş olmamalı.
+   2. **`alis` başka bir şeydir** — BİZİM ödediğimiz. Müşteri kendi
+      parçasını getirdiyse biz hiçbir şey ödemedik; oraya parçacının
+      teklifini yazmak alanın anlamını bozuyordu.
+
+   S2/K-005 aynen duruyor: müşteri parçası faturaya girmez. Kural artık
+   `kayitToplami()`de işliyor — veri korunuyor, TOPLAM karar veriyor. */
 function kGetireniAyarla(s, kim) {
   s.kimGetirdi = kim;
-  if (kim === 'musteri') {
-    if (s.fiyat && !s.alis) s.alis = s.fiyat;
-    s.fiyat = 0;
-  }
 }
 
 function kayitCiz() {
@@ -415,10 +425,18 @@ function kayitCiz() {
                   '</span>'
                 : '') +
             '</td>' +
-            '<td class="sayi">' +
+            /* Müşteri parçasının tutarı YAZILI ama TOPLAMA GİRMİYOR;
+               üstü çizili duruyor ki usta rakamı görsün ama toplamda
+               aramasın. Alan düzenlenebilir kalıyor: parçacının verdiği
+               rakam ileride işine yarayabilir (Kol D). */
+            '<td class="sayi' +
+              (s.tip === 'parca' && s.kimGetirdi === 'musteri' ? ' tutar-disi' : '') + '">' +
               '<input value="' + (s.fiyat ? tutar(s.fiyat) : '') +
                 '" data-satir-fiyat="' + i + '" data-giris="tutar" inputmode="numeric"' +
-                ' placeholder="0" aria-label="Tutar" /></td>' +
+                ' placeholder="0" aria-label="Tutar"' +
+                (s.tip === 'parca' && s.kimGetirdi === 'musteri'
+                  ? ' title="Müşteri getirdi — toplama girmiyor"' : '') +
+                ' /></td>' +
           '</tr>';
         }).join('') +
         '<tr class="genel"><td>Toplam</td>' +
@@ -514,9 +532,10 @@ document.addEventListener('click', function (e) {
     (k.satirlar || []).forEach(function (s) {
       if (s.tip !== 'parca') return;
       if (hepsi) {
-        /* Geri alırken alıştan gelen rakam fiyata DÖNMÜYOR: o rakam
-           parçacının fiyatıydı, müşteriye söylenecek fiyat değil.
-           Usta kendi rakamını yazar. */
+        /* Geri alma artık TAM: fiyat hiç silinmediği için satır
+           olduğu gibi geri geliyor (K-037). Eskiden burada bir not
+           vardı — "usta kendi rakamını yeniden yazar" — ve o not, bir
+           veri kaybını kural gibi anlatıyordu. */
         s.kimGetirdi = 'tamirci';
       } else {
         kGetireniAyarla(s, 'musteri');
