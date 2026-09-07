@@ -10,6 +10,72 @@
 
 ---
 
+## K-038 · Müşterinin sayfası, ustanın ekranından geri kalmış (06.09.2026)
+
+**Kuyruk 6.** `ozet` müşterinin gördüğü tek sayfa (K-023). K-033 turunda
+kaydın yapısı değişti; sayfa değişmedi. Üç yerden geri kalmış:
+
+### 38.1 · Çok satırlı şikâyet tek satıra yapışıyordu
+
+Dün *"ne istiyor"* alanı `textarea` oldu ve **alt satıra ekleme**
+düğmesi geldi (K-033.5) — Cemil'in isteği: *"x işi için geldi, sonra
+bir şey daha eklemek isteyebilir."* Usta artık üç ayrı iş yazıyor.
+
+Özet sayfası metni düz basıyordu; HTML satır sonlarını **boşluğa**
+çeviriyor. Müşteri üç işi tek cümle hâlinde okuyordu.
+
+Ustanın ekranında sorun yoktu — orası `textarea`, satırları kendi
+gösteriyor. Kırılan yer, metnin **metin olarak basıldığı tek yerdi**.
+
+> **Ders:** bir alanı çok satırlı yapmak, onu **gösteren her yeri**
+> gözden geçirmeyi gerektirir. Alanın kendisi çalışıyordu; kırılan,
+> onu okuyan uçtu.
+
+### 38.2 · Yarım satır müşteriye soru işareti gibi gidiyordu
+
+Usta *"+ Parça"*ya basıp adını henüz yazmamışsa satır boş duruyor.
+Müşterinin sayfasında bu **"Parça — "** diye çıkıyordu: bilgi değil,
+soru işareti.
+
+**Ölçü:** adı **da** fiyatı **da** yoksa satır yok sayılır. Biri varsa
+gösterilir — adı olup fiyatı olmayan satır gerçek bir iştir (fiyatı
+henüz girilmemiş), fiyatı olup adı olmayan satır gerçek bir paradır.
+Yalnız ikisi birden boşsa ortada bir şey yoktur.
+
+⚠️ **Ustanın ekranında elenmiyor** — orada yarım satır **görünmeli** ki
+usta onu doldursun ya da silsin. K-037.4'ün kuralı burada da işliyor:
+aynı veri, iki okuyucuya iki gösterim. Usta **kaydı**, müşteri
+**faturayı** okuyor.
+
+### 38.3 · Sayfa ile mesaj iki farklı hikâye anlatıyordu
+
+Mesaj şablonu *"Parça bekliyoruz"* diyordu (K-033.9); sayfa *"Aracınız
+serviste. Hazır olduğunda haber vereceğiz."* diyordu. Müşteri mesajı
+okuyup linke dokununca **iki ayrı hikâye** görüyordu — ve **canlı olan,
+yani doğru saydığı, sayfaydı.**
+
+Sayfa artık parça beklendiğini söylüyor. **Söz vermiyor:** *"yarın
+hazır"* demiyoruz — parçanın ne zaman geleceğini biz de bilmiyoruz ve
+tutulmayan söz, hiç verilmemiş sözden kötüdür (aynı gerekçe mesaj
+şablonunda da yazılı).
+
+**`fiyatiBekleyen` burada YOK ve olmayacak:** o dükkânın kendi işi
+(parçacıdan rakam gelmedi). Müşteriyi ilgilendiren şey parçanın yolda
+olması. K-036'da ayırdığımız iki bekleme, burada da ayrı kalıyor.
+
+> Varsayım — **Cemil onayına açık (A-M15):** parça beklendiğini
+> müşteriye **söylüyoruz**. Söylemezsek *"neden bu kadar sürdü"* sorusu
+> havada kalır; söylersek müşteri aramaz — tamircinin şikâyet ettiği
+> telefon trafiği azalır. Ters düşünen varsa: bazı usta işin
+> gecikmesini müşteriye duyurmak istemeyebilir.
+
+**Ölçüm:** derleme temiz · 14 ekran · 36 test / 0 bulgu ·
+320 / 375 / 430 px · dört davranış tek tek yürütüldü (durum metni,
+üç satırlık şikâyet, yarım satırın elenmesi, adı olup fiyatı olmayan
+satırın görünmesi).
+
+---
+
 ## K-037 · Kural veriyi silerek işletilmez — müşteri parçası toplamda elenir (06.09.2026)
 
 **Kuyruk 5.** Sorulan soru şuydu: *"Parçaları müşteri getirdi"* anahtarı
@@ -2280,6 +2346,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
+| **A-M15** | Parça beklendiği **müşteriye söylensin mi**? Varsayım: evet — sayfa mesajla çelişmesin (K-038.3) | Cemil |
 | **A-M14** | Teslimden sonraki *"Geç / Kapat"* dokunuşu kabul mü? Ana yolu **12 → 13** yaptı; karşılığında bir yalan kalktı ve özet gönderimi 3+ dokunuştan 1'e indi (K-035.3) | Cemil |
 | **A-M13** | Tek bir parçayı ayrı işaretlemenin yolu kalmadı (K-033.5). *"Balatayı müşteri getirdi, yağı ben aldım"* durumu oluyor mu? | Cemil |
 | **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok. Artık **iki** tabloda var | Bir kez öğrenilir; ipucu istenirse eklenir |

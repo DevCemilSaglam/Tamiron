@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 11:07
+  Üretim: 2026-09-07 11:13
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -8213,14 +8213,41 @@ Ekran.tanim('ozet', {
               k.km + ' km</span>' : '') +
           '</div>' +
         '</div>' +
-        (k.sikayet ? '<p class="plate-hint">' + k.sikayet + '</p>' : '')
+        /* ⚠️ SATIR SONLARI KORUNUYOR (06.09, kuyruk 6). Dün "ne
+           istiyor" alanı textarea oldu ve *"alt satıra ekle"* düğmesi
+           geldi (K-033.5): usta artık üç ayrı iş yazıyor. Burada metin
+           düz basılıyordu, HTML satır sonlarını boşluğa çeviriyordu ve
+           müşteri üç işi tek cümle hâlinde okuyordu.
+
+           Ustanın ekranında sorun yoktu — orası textarea, satırları
+           kendi gösteriyor. Kırılan yer, metnin METİN OLARAK basıldığı
+           tek yerdi. Alanı çok satırlı yapmak, onu gösteren her yeri
+           gözden geçirmeyi gerektiriyormuş. */
+        (k.sikayet
+          ? '<p class="plate-hint">' + k.sikayet.replace(/\n/g, '<br>') + '</p>'
+          : '')
       : '';
 
     /* KALEMLER — "iş, parça açıklaması ve toplam tutar" (S8).
        ⚠️ MÜŞTERİ PARÇASI 0 TL DURUYOR (S2, K-005) ve BUNU SÖYLÜYOR.
        Fiyatsız bir satırı sessizce göstermek, müşteriye "bu bedavaydı"
        diye okunur; oysa parayı o ödemiş. */
-    var satirlar = k.satirlar || [];
+    /* ⚠️ YARIM SATIR MÜŞTERİYE GÖSTERİLMEZ (06.09, kuyruk 6).
+       Usta *"+ Parça"*ya basıp adını henüz yazmamışsa satır boş
+       duruyor; müşterinin sayfasında bu **"Parça — "** diye çıkıyordu.
+       Müşteri için bu bir bilgi değil, bir soru işareti: *"bu ne?"*
+
+       ÖLÇÜ: adı DA fiyatı DA yoksa satır yok sayılır. Biri varsa
+       gösterilir — adı olup fiyatı olmayan satır gerçek bir iştir
+       (fiyatı henüz girilmemiş), fiyatı olup adı olmayan satır gerçek
+       bir paradır. Yalnız ikisi birden boşsa ortada bir şey yoktur.
+
+       ⚠️ USTANIN EKRANINDA ELENMİYOR — orada yarım satır GÖRÜNMELİ ki
+       usta onu doldursun ya da silsin. Aynı veri, iki okuyucuya iki
+       gösterim (K-037.4'ün kuralı). */
+    var satirlar = (k.satirlar || []).filter(function (s) {
+      return (s.ad && s.ad.trim()) || s.fiyat;
+    });
     document.getElementById('ozKalemler').innerHTML = satirlar.length
       ? '<div class="tutar-serit">' +
           satirlar.map(function (s) {
@@ -8260,7 +8287,23 @@ Ekran.tanim('ozet', {
                 ? ' Ödeme <b>alınmadı</b>.'
                 : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
                     k.odemeYolu) + '</b>.' : ''))
-            : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.') +
+            /* ⚠️ PARÇA BEKLENİYORSA SAYFA DA SÖYLER (06.09, kuyruk 6).
+               Mesaj şablonu bunu zaten söylüyordu ("Parça bekliyoruz",
+               K-033.9); sayfa susuyordu. Müşteri mesajı okuyup linke
+               dokununca **iki farklı hikâye** görüyordu — ve canlı
+               olan, yani doğru saydığı, sayfaydı.
+
+               SÖZ VERİLMİYOR: "yarın hazır" demiyoruz. Parçanın ne
+               zaman geleceğini biz de bilmiyoruz ve tutulmayan söz,
+               hiç verilmemiş sözden kötüdür.
+
+               `fiyatiBekleyen` BURADA YOK ve olmayacak: o dükkânın
+               kendi işi (parçacıdan rakam gelmedi). Müşteriyi
+               ilgilendiren şey parçanın yolda olması. */
+            : (k.parcaBekliyor
+                ? 'Aracınız <b>serviste</b>, <b>parça bekleniyor</b>. ' +
+                  'Parça gelir gelmez işe başlayıp size haber vereceğiz.'
+                : 'Aracınız <b>serviste</b>. Hazır olduğunda haber vereceğiz.')) +
         '</span>' +
       '</div>';
   }
