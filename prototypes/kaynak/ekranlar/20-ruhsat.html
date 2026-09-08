@@ -385,8 +385,24 @@ function rEylemCiz(plakaTamam, kayitli) {
         ' Ruhsat adımını geç ve kaydı aç</button>' +
       '<button class="btn btn-ghost" id="ruhsataGit" style="margin-top:10px">' +
         '<svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek</button>'
-    : '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
-        '<svg class="ico"><use href="#i-check"></use></svg> Kaydı aç</button>';
+    /* ⚠️ 08.09 — PLAKA YOKKEN "KAYDI AÇ" GÖRÜNMÜYOR.
+       Cemil (telefon testi): *"Sayfada herşey yapılabiliyor gözüküyor.
+       Adımlar birbirini takip etmeli."* Bunu servis kaydı ekranı için
+       söyledi ama aynı kusurun küçük hâli buradaydı: ekran açılır
+       açılmaz, daha tek harf yazılmadan, en alttaki birincil düğme
+       *"Kaydı aç"* diyordu. Basılınca hiçbir şey olmuyordu (balon
+       plakayı isterdi) — yani ekranın en büyük, en renkli öğesi
+       ustadan bir şey yapmasını istiyor ama yapılacak şey henüz yok.
+
+       K-040.3 ("kapalı düğme yok, konuşan düğme var") burada
+       çiğnenmiyor: düğme SÖNÜK DEĞİL, HENÜZ YOK. Sönük düğme "burası
+       bozuk" der; olmayan düğme "sıra sende değil" der. Yerinde ne
+       yapılacağını söyleyen bir satır duruyor. */
+    : (plakaTamam
+        ? '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
+            '<svg class="ico"><use href="#i-check"></use></svg> Kaydı aç</button>'
+        : '<p class="plate-hint">Plakayı yaz ya da mikrofona söyle — ' +
+          'kaydı açan düğme burada çıkacak.</p>');
 }
 
 Ekran.tanim('ruhsat', {

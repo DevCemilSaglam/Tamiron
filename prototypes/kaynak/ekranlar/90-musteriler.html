@@ -26,16 +26,22 @@
      satırda "Mesaj" çipi de vardı; usta için plaka ile mesaj düğmesi
      aynı cinsten iki nesne gibi duruyordu.
 
-     ARTIK: müşteri bir KART. Üstte adı ve kaç aracı olduğu, altında
-     telefonu, ayracın altında araçları — her araç kendi satırında,
-     GERÇEK plaka bileşeniyle ve yanında marka/model. Satıra dokunmak
-     aracı açar. Mesaj düğmesi en altta, tek başına: eylem eylemdir,
-     plaka veridir.
+     06.09'da müşteri bir KART olmuştu: ad, telefon, ayracın altında
+     araç satırları, en altta mesaj düğmesi.
+
+     ⚠️ 08.09 — O KART SATIRA İNDİ (Cemil, telefon testi: "Müşteriler
+     sayfası neden çok boşluklu, bunu düzenleyelim." + "Müşteriler
+     listesinde müşteriye tıklayıp müşteri detayı görebilmeliyim.").
+
+     İki cümle aynı çözümü işaret ediyor: kartın taşıdığı ayrıntı
+     LİSTEDE olmamalı, DETAYDA olmalı. Liste satıra indi (`.tl-item` —
+     mesaj ekranındaki müşteri seçme listesiyle aynı satır), ayrıntı
+     91-musteri.html'e taşındı. Hiçbir şey silinmedi; yeri değişti.
 
      BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
-     · .card · .tel-link · .plate · .bos-durum · .btn .btn-ghost.
-     Bu ekrana özel: .ms-bas .ms-ad .ms-say .ms-araclar .ms-arac
-     .ms-arac-ad (ekranın kendi stil bloğunda, yalnız burada kullanılıyor).
+     · .tl-item .tl-ic .tl-body .tl-title .tl-tip .tl-sub .tl-foot
+     .tl-date · .tel-inline · .pill · .bos-durum.
+     Ekrana özel sınıf KALMADI.
 
      ⚠️ YORUMUN İÇİNE ETİKET YAZILMAZ: burada bir kez "(aşağıdaki
      &lt;style&gt; içinde)" yazdım ve derleyicinin stil çıkarıcısı YORUMDAKİ
@@ -88,43 +94,48 @@ Ekran.tanim('musteriler', {
       liste.length + (q ? ' bulundu' : ' müşteri');
     document.getElementById('msArama').classList.toggle('filled', !!q);
 
+    /* ⚠️ 08.09 — KART SATIRA İNDİ (Cemil: "Müşteriler sayfası neden
+       çok boşluklu, bunu düzenleyelim.").
+
+       NE OLMUŞTU: her müşteri bir KARTTI ve kart dört şey taşıyordu —
+       ad satırı, telefon bağlantısı, ayraçla ayrılmış araç satırları,
+       en altta mesaj düğmesi. Üç müşteride 18 px iç boşluklu üç kart,
+       telefon ekranının tamamını yiyordu; usta dördüncü müşteriyi
+       görmek için kaydırıyordu. Liste ARAMAK içindir; okumak için
+       değil.
+
+       ARTIK: satır. Ad, araç sayısı, plakalar, telefon. Satıra
+       dokunmak MÜŞTERİ DETAYINI açıyor — Cemil'in aynı turda istediği
+       ikinci şey (*"müşteriye tıklayıp müşteri detayı görebilmeliyim"*)
+       bu boşluğu doldurmanın da yolu oldu: taşınan ayrıntı silinmedi,
+       yeri değişti.
+
+       BİLEŞEN YENİ DEĞİL: `.tl-item` — mesaj ekranındaki müşteri seçme
+       listesi zaten bu satırı kullanıyor. İki yerde müşteri seçiliyor
+       ve ikisi artık aynı görünüyor. */
     document.getElementById('msListe').innerHTML = liste.length
       ? liste.map(function (m) {
           var kayitSay = m.araclar.reduce(function (t, a) {
             return t + aracKayitlari(a.plaka).length; }, 0);
-          /* Aracına dokunulunca araç ekranı açılır — müşterinin kendi
-             ekranı YOK ve gerekmiyor; bilgi zaten aracın üstünde. */
-          return '<div class="card ms-kart">' +
-            '<div class="ms-bas">' +
-              '<span class="ms-ad">' + m.ad + '</span>' +
-              '<span class="ms-say">' + m.araclar.length + ' araç · ' +
-                kayitSay + ' kayıt</span>' +
+          /* Plakalar SATIRIN İÇİNDE, düz metin olarak: usta plakayla
+             arıyor, gördüğü şey aradığı şeyle aynı yazılmalı. Üçten
+             fazlası satırı sarar — sayıyla söyleniyor. */
+          var plakalar = m.araclar.slice(0, 3).map(function (a) { return a.plaka; }).join(' · ') +
+            (m.araclar.length > 3 ? ' +' + (m.araclar.length - 3) : '');
+          return '<div class="tl-item" data-musteri="' + m.anahtar + '"' +
+              ' role="button" tabindex="0" aria-label="' + m.ad + ' — müşteriyi aç">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-user"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
+              '<div class="tl-sub">' + plakalar + '</div>' +
+              '<div class="tl-foot">' +
+                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
+                       : '<span class="pill warn">telefon yok</span>') +
+                '<span class="tl-date">' + m.araclar.length + ' araç · ' +
+                  kayitSay + ' kayıt</span>' +
+              '</div>' +
             '</div>' +
-            /* TELEFON ARANABİLİR (v1'deki gibi) — mono metin değil,
-               dokunulunca arayan bir bağlantı. */
-            (m.tel ? telLinkHtml(m.tel, m.ad)
-                   : '<p class="plate-hint">Telefon yok — mesaj gönderilemez.</p>') +
-            /* ARAÇLAR — her biri KENDİ SATIRINDA, gerçek plaka
-               bileşeniyle. Satırın tamamı dokunma hedefi (48 px);
-               plakanın kendisini düğmeye çevirmeye gerek yok. */
-            '<div class="ms-araclar">' +
-              m.araclar.map(function (a) {
-                return '<button class="ms-arac" data-arac="' + a.plaka +
-                    '" aria-label="' + a.plaka + ' aracını aç">' +
-                  plakaHtml(a.plaka) +
-                  '<span class="ms-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
-                  '<svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>' +
-                '</button>';
-              }).join('') +
-            '</div>' +
-            /* 04.09: müşteriyi buluyordun ama BURADAN mesaj
-               gönderemiyordun — mesaj ekranına gidip aynı müşteriyi
-               ikinci kez aramak gerekiyordu. */
-            (m.tel
-              ? '<button class="btn btn-ghost" data-mesajla="' + m.araclar[0].plaka + '">' +
-                  '<svg class="ico"><use href="#i-message-square"></use></svg>' +
-                  ' Mesaj gönder</button>'
-              : '') +
           '</div>';
         }).join('')
       : bosDurumHtml('i-users',
@@ -139,6 +150,9 @@ document.addEventListener('click', function (e) {
     document.getElementById('msQ').value = ''; Ekran.tazele();
     return;
   }
+  /* [data-mesajla] ARTIK MÜŞTERİ DETAYINDA — dinleyici burada kaldı
+     çünkü iki ekranda da aynı şeyi yapıyor ve ikiye bölmek onu iki
+     kez düzeltmek demek olurdu. */
   var mp = e.target.closest('[data-mesajla]');
   if (mp) {
     e.stopPropagation();
@@ -151,36 +165,8 @@ document.addEventListener('input', function (e) {
 });
 </script>
 
-<style>
-/* MÜŞTERİ KARTI — araç kartının dili, müşteriye uyarlanmış hâli.
-   Ayrı bir görsel dil değil: aynı kart, aynı yarıçap, aynı iç boşluk;
-   yalnız üstte plaka yerine AD duruyor. */
-.ms-kart + .ms-kart { margin-top: 14px; }
-.ms-bas {
-  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
-}
-.ms-ad { font-size: var(--tip-lg); font-weight: 700; color: var(--text); }
-.ms-say { margin-left: auto; font-size: var(--tip-xs); color: var(--muted); }
-
-/* Araç satırları ayracın altında — üstü kişi, altı araçları. */
-.ms-araclar {
-  margin-top: 12px; padding-top: 12px;
-  border-top: 1px solid var(--line);
-  display: flex; flex-direction: column; gap: 8px;
-}
-.ms-arac {
-  display: flex; align-items: center; gap: 10px;
-  width: 100%; min-height: var(--dokun);
-  padding: 6px 8px; border: 1px solid transparent; border-radius: var(--radius-md);
-  background: transparent; color: var(--text); font: inherit;
-  text-align: left; cursor: pointer;
-}
-.ms-arac:hover, .ms-arac:focus-visible {
-  border-color: var(--line); background: var(--surface-2);
-}
-.ms-arac-ad {
-  flex: 1; min-width: 0; font-size: var(--tip-sm); color: var(--muted);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.ms-arac .ico { color: var(--faint); flex: none; }
-</style>
+<!-- ⚠️ 08.09 — BU EKRANIN KENDİ STİLİ KALMADI.
+     .ms-* sınıfları müşteri DETAY ekranına (91-musteri.html) taşındı;
+     liste artık ortak `.tl-item` satırını kullanıyor. Sınıf, kullanan
+     ekranın yanında durur — iki ekranda tanımlı kalsaydı derleme
+     denetiminin "aynı sınıf iki ekranda" testi haklı olarak bağırırdı. -->

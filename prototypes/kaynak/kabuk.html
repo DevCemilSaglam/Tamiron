@@ -93,15 +93,19 @@
        NEDEN ALTTA DA GEREKLİ: telefon büyüdükçe üst köşe başparmakla
        ulaşılmaz oluyor. Aynı işin ikinci gövdesi, ulaşılabilir yerde. -->
   <footer class="botbar" aria-label="Alt gezinme">
-    <button class="icon-btn" data-nav="geri" aria-label="Geri" title="Geri">
-      <svg class="ico"><use href="#i-chevron-left"></use></svg>
-    </button>
-    <button class="icon-btn" data-nav="ana" aria-label="Ana menü" title="Ana menü">
-      <svg class="ico"><use href="#i-menu"></use></svg>
-    </button>
-    <button class="icon-btn" data-nav="ileri" aria-label="İleri" title="İleri">
-      <svg class="ico"><use href="#i-chevron-right"></use></svg>
-    </button>
+    <!-- SOL: neredeyim. Ekranın kendi başlığından okunur (yerTazele). -->
+    <span class="botbar-yer" id="botbarYer" aria-hidden="true"></span>
+    <nav class="botbar-nav" aria-label="Gezinme">
+      <button class="icon-btn" data-nav="geri" aria-label="Geri" title="Geri">
+        <svg class="ico"><use href="#i-chevron-left"></use></svg>
+      </button>
+      <button class="icon-btn" data-nav="ana" aria-label="Ana menü" title="Ana menü">
+        <svg class="ico"><use href="#i-menu"></use></svg>
+      </button>
+      <button class="icon-btn" data-nav="ileri" aria-label="İleri" title="İleri">
+        <svg class="ico"><use href="#i-chevron-right"></use></svg>
+      </button>
+    </nav>
   </footer>
 
   <!-- ================= ÇEKMECE =================

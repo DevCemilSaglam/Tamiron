@@ -25,6 +25,9 @@ window.addEventListener('unhandledrejection', function (e) {
    Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
 var ACIK_KAYIT = null;
 var ACIK_PLAKA = null;
+/* Hangi musteri acik. Musterinin id'si yok (kendi tablosu yok, A-M1);
+   tasinan sey musteriler()'in urettigi anahtar. */
+var ACIK_MUSTERI = null;
 /* Sesli isleme NE ICIN gidildigi. Ayni ekran farkli beklentilerle
    aciliyor: "servis-ekle" plaka bekler, "araclar" arama bekler. */
 var SESLI_NIYET = null;
@@ -110,6 +113,7 @@ var Ekran = (function () {
     el.scrollTop = 0;
     window.scrollTo(0, 0);
     geriTazele();
+    yerTazele();
     return true;
   }
 
@@ -123,6 +127,9 @@ var Ekran = (function () {
     if (k && el && typeof k.ciz === 'function') {
       try { k.ciz(el); } catch (e) { console.error('ciz(' + acik + '):', e); }
     }
+    /* Başlık çizimle değişebilir (kayıt ekranında iş türü) — alt
+       şeritteki yazı da onunla birlikte tazelenir. */
+    yerTazele();
   }
 
   function ac(ad) {
@@ -145,7 +152,38 @@ var Ekran = (function () {
     goster(ad);
   }
 
+  /* ⚠️ EKRAN İÇİ ADIM DA GERİDİR (08.09 — Cemil: "Müşteriye mesaj
+     gönder ekranında bir müşteri seçilip geri gelince ana menüye
+     atıyor.").
+
+     Sorun: bazı ekranların İÇİNDE adım var (mesajda "müşteri seç" →
+     "mesajı yaz"). Bu adımlar `tazele()` ile değişiyordu, yani geçmişe
+     hiç yazılmıyordu — geri tuşu ekranın TAMAMINDAN çıkıyordu ve usta
+     bir adım geri gitmek isterken ana menüde buluyordu kendini.
+
+     ÇÖZÜM ÇEKİRDEKTE, EKRANDA DEĞİL: ekran iki kanca tanımlayabilir —
+     `geriVar()` (içeride geri alınacak adım var mı) ve `geriAl()`
+     (adımı geri al). Geri tuşu ÖNCE ekrana sorar. Her ekranın kendi
+     geri düğmesini çizmesi de çözerdi, ama o zaman "geri" iki ayrı şey
+     olurdu: alttaki tuş bir yere, ekrandaki düğme başka yere. Tek tuş,
+     tek anlam (K-042'nin kuralı).
+
+     Kanca yazmayan ekran hiçbir şey kaybetmez. */
+  function ekranGeriVar() {
+    var k = acik ? kayit[acik] : null;
+    if (!k || typeof k.geriVar !== 'function') return false;
+    try { return !!k.geriVar(); }
+    catch (e) { console.error('geriVar(' + acik + '):', e); return false; }
+  }
+
   function geri() {
+    if (ekranGeriVar()) {
+      try { kayit[acik].geriAl(); }
+      catch (e) { console.error('geriAl(' + acik + '):', e); }
+      tazele();
+      geriTazele();
+      return;
+    }
     if (!gecmis.length) return;
     if (acik) ileriYigin.push(acik);
     goster(gecmis.pop());
@@ -162,11 +200,38 @@ var Ekran = (function () {
      soluklaşıyor. id ile arasaydık ikinci gövde sessizce hep açık
      kalırdı — ve "geri" gidilemeyecek yerde basılabilir görünürdü. */
   function geriTazele() {
-    var yok = { geri: gecmis.length === 0, ileri: ileriYigin.length === 0 };
+    /* Ekran İÇİNDE geri alınacak bir adım varsa tuş sönük olamaz —
+       yoksa gidilebilecek bir yer gidilemez görünür. */
+    var yok = { geri: gecmis.length === 0 && !ekranGeriVar(),
+                ileri: ileriYigin.length === 0 };
     document.querySelectorAll('[data-nav]').forEach(function (b) {
       var y = b.getAttribute('data-nav');
       if (y === 'geri' || y === 'ileri') b.disabled = yok[y];
     });
+  }
+
+  /* ⚠️ ÇEKİRDEK EKRANIN ADINI BİLMİYOR (08.09). Alt şeridin solunda
+     "neredeyim" yazacak; buraya bir { ad -> başlık } tablosu koysaydım
+     her yeni ekran İKİ yere yazılırdı ve biri mutlaka unutulurdu —
+     v1'in en pahalı hata sınıfı. Ekranın başlığı zaten DOM'da duruyor
+     (.screen-head .eyebrow); çekirdek onu okuyor.
+
+     Sayaç (.eb-say — "3 bulundu") ELENİYOR: o başlık değil, o an kaç
+     şey olduğu. Alt şeritte dursaydı yazı her tuşta değişirdi ve göz
+     onu okumayı bırakırdı. */
+  function yerTazele() {
+    var yuva = document.getElementById('botbarYer');
+    if (!yuva) return;
+    var bas = acik
+      ? document.querySelector('#screen-' + acik + ' .screen-head .eyebrow')
+      : null;
+    var yazi = '';
+    if (bas) {
+      var kopya = bas.cloneNode(true);
+      kopya.querySelectorAll('.eb-say').forEach(function (s) { s.remove(); });
+      yazi = (kopya.textContent || '').replace(/\s+/g, ' ').trim();
+    }
+    yuva.textContent = yazi;
   }
 
   return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
@@ -176,7 +241,7 @@ var Ekran = (function () {
            tanimlar: function () { return kayit; },
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
-           geriVarMi: function () { return gecmis.length > 0; } };
+           geriVarMi: function () { return gecmis.length > 0 || ekranGeriVar(); } };
 })();
 
 /* Denetim aracı (tools/saglik-denetim.js) bu ada göre çalışıyor —
@@ -192,6 +257,135 @@ document.addEventListener('click', function (e) {
   if (!t) return;
   e.preventDefault();
   Ekran.ac(t.getAttribute('data-git'));
+});
+
+/* ================= WEB SPEECH API =================
+   ÜCRETSİZ VE ANAHTARSIZ: tarayıcının kendi motoru. Chrome ve Edge'de
+   var, Firefox'ta yok. Sesi Google'ın sunucusuna gönderir (K-015).
+   Güvenli bağlam ister — file:// ile açılan dosyada çalışmaz. */
+function sesMotorSinifi() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+function sesMotorVar() {
+  return !!sesMotorSinifi() && (window.isSecureContext !== false);
+}
+
+function sesMotorNotu() {
+  if (!sesMotorSinifi()) {
+    return 'Bu tarayıcıda ses tanıma yok (Chrome ya da Edge gerekiyor). ' +
+           'Örneklerden birine dokunursan söylenmiş gibi işler.';
+  }
+  if (window.isSecureContext === false) {
+    return 'Mikrofon yalnız güvenli adreste (https) açılır; dosyadan açılan ' +
+           'sayfada çalışmaz. Örneklerden birine dokunursan söylenmiş gibi işler.';
+  }
+  return 'Mikrofona dokun ve söyle. Tarayıcının kendi tanıyıcısı kullanılıyor — ' +
+         'ek kurulum yok.';
+}
+
+/* ================= DİKTE =================
+   ⚠️ 08.09 — Cemil: *"Mesaj ekranında 'aracınız hazır teslim
+   alabilirsiniz' dedim, mesaj bölümü için yanlış anlamadıysam dedi.
+   Aslında burada text yazması gerek."*
+
+   Haklı ve hata benimdi: mesaj ekranındaki mikrofonun aria-label'ı
+   *"Sesle yazdır"* diyordu ama düğme `sesleAc('mesaj')` çağırıyordu —
+   yani cümleyi KOMUT sanıp çözümlemeye gönderiyordu. Usta mesajın
+   METNİNİ söylüyor; çözümleyecek bir komut yok, YAZILACAK bir cümle
+   var.
+
+   İKİ AYRI İŞ, İKİ AYRI YOL:
+     sesleAc(niyet)  → KOMUT. "34 ABC 123 sahibine mesaj gönder".
+                       Ses ekranı açılır, anlar, ONAY ister.
+     Dikte           → METİN. Söylenen ne ise alana yazılır. Anlam
+                       aranmaz, onay istenmez — çünkü yorum yok.
+
+   TEK YERDE: düğmeler `data-dikte="<alanId>"` taşıyor, dinleyici
+   burada. Her ekran kendi tanıyıcısını kurmuş olsaydı "izin verilmedi"
+   mesajı bir ekranda çıkar ötekinde çıkmazdı.
+
+   YAZILANIN ÜSTÜNE YAZMAZ: alanda ne varsa TEMEL alınır, duyulan onun
+   ARDINA eklenir. Şablondan gelen metni silmek, ustanın seçtiği şablonu
+   sessizce çöpe atmak olurdu. */
+var Dikte = (function () {
+  var tanima = null, alan = null, dugme = null, temel = '';
+
+  function isaretle(acik) {
+    if (dugme) dugme.setAttribute('aria-pressed', String(!!acik));
+  }
+
+  function dur() {
+    if (tanima) { try { tanima.abort(); } catch (x) {} }
+    tanima = null; isaretle(false); alan = null; dugme = null;
+  }
+
+  function yaz(ek) {
+    if (!alan) return;
+    var bosluk = (temel && !/\s$/.test(temel)) ? ' ' : '';
+    alan.value = temel + (ek ? bosluk + ek : '');
+    /* Ekranlar alanı `input` ile dinliyor (kayıt açıklaması gibi);
+       elle value yazmak o olayı doğurmaz. */
+    try { alan.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {}
+  }
+
+  function baslat(hedefAlan, hedefDugme) {
+    if (!hedefAlan) return;
+    /* İkinci dokunuş DURDURUR — açık kalan bir mikrofon, ustanın
+       farkında olmadan dinleyen bir mikrofondur. */
+    if (tanima) { dur(); balon('Dinleme kapandı.', false, 1600); return; }
+
+    var Sinif = sesMotorSinifi();
+    if (!Sinif || !sesMotorVar()) { balon(sesMotorNotu(), false, 4200); return; }
+
+    alan = hedefAlan; dugme = hedefDugme || null; temel = alan.value || '';
+    try {
+      tanima = new Sinif();
+      tanima.lang = 'tr-TR';
+      tanima.interimResults = true;
+      tanima.maxAlternatives = 1;
+
+      tanima.onresult = function (e) {
+        var kesin = '', gecici = '';
+        for (var i = 0; i < e.results.length; i++) {
+          if (e.results[i].isFinal) kesin += e.results[i][0].transcript;
+          else gecici += e.results[i][0].transcript;
+        }
+        yaz((kesin + gecici).trim());
+      };
+      tanima.onerror = function (e) {
+        var mesaj = ({
+          'not-allowed': 'Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden izin ver.',
+          'service-not-allowed': 'Tarayıcı mikrofonu engelledi. Sayfayı https ya da localhost üzerinden aç.',
+          'no-speech': 'Ses duyulmadı. Mikrofona biraz daha yakın söyle.',
+          'audio-capture': 'Mikrofon bulunamadı.',
+          'network': 'Tanıma sunucusuna ulaşılamadı — internet bağlantısını kontrol et.',
+          'aborted': ''
+        })[e.error];
+        if (mesaj === undefined) mesaj = 'Mikrofon hatası: ' + (e.error || 'bilinmiyor');
+        dur();
+        if (mesaj) balon(mesaj, false, 4000);
+      };
+      tanima.onend = function () {
+        var vardi = !!tanima;
+        dur();
+        if (vardi) balon('Yazıldı — istersen elle düzelt.', false, 2000);
+      };
+      isaretle(true);
+      balon('Dinliyorum — söylediğin yazıya geçiyor.', true, 30000);
+      tanima.start();
+    } catch (x) {
+      dur();
+      balon('Mikrofon başlatılamadı.', false, 2600);
+    }
+  }
+
+  return { baslat: baslat, dur: dur };
+})();
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-dikte]');
+  if (!t) return;
+  Dikte.baslat(document.getElementById(t.getAttribute('data-dikte')), t);
 });
 
 /* ---- balon ---- */

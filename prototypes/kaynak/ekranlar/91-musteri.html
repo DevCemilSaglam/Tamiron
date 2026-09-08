@@ -1,0 +1,212 @@
+<!-- ekran: musteri · MÜŞTERİ DETAYI
+     ⚠️ 08.09 — CEMİL İSTEDİ (telefon testi):
+       *"Müşteriler listesinde müşteriye tıklayıp müşteri detayı
+        görebilmeliyim."*  ·  *"Tıklayınca herhangi bir şey yapmıyor."*
+
+     BU EKRAN BİR KARARIN GERİ ALINMASIDIR. 90-musteriler.html'de şöyle
+     yazıyordu: *"Aracına dokunulunca araç ekranı açılır — müşterinin
+     kendi ekranı YOK ve gerekmiyor; bilgi zaten aracın üstünde."*
+     Gerekçe kâğıt üstünde doğruydu; telefonda yanlış çıktı. Usta
+     müşterinin ADINA dokunuyor çünkü aradığı şey MÜŞTERİ — hangi
+     aracı olduğunu zaten bilmiyor, ona bakmaya geliyor. Dokunulan
+     yerin hiçbir şey yapmaması, ekranın en pahalı hâlidir: usta
+     bozuk mu diye ikinci kez dokunuyor.
+
+     CLAUDE.md: *"Tamircinin sözü bizim akıl yürütmemizi yener."*
+
+     ⚠️ EKRAN SAYISI 14 -> 15. Ana yol büyümedi (A-2): bu ekran akışın
+     üstünde değil, LİSTENİN DİBİNDE. Ana yol hâlâ
+     ruhsat -> kayit -> teslim.
+
+     BU EKRAN LİSTEDEN NE ALDI: müşteriler listesi her kartta telefonu,
+     araç satırlarını ve mesaj düğmesini taşıyordu — Cemil'in
+     *"Müşteriler sayfası neden çok boşluklu"* dediği şey buydu.
+     Ayrıntı buraya taşındı, liste satıra indi. Yani bu ekran yeni bir
+     yük değil, listeden alınan yükün konduğu yer.
+
+     ÜZERİNDE YOK: müşteri düzenleme · birleştirme · bakiye · not ·
+     etiket. Müşteri hâlâ kendi tablosu olmayan, araçtan TÜRETİLEN bir
+     görünüm (VERI-MODELI'nde Customer yok, A-M1 açık).
+
+     BİLEŞENLER: .screen-head .eyebrow · .card · .section-label
+     · .tel-link · .plate · .tl-item · .btn .btn-primary .btn-lg
+     · .plate-hint · .bos-durum.
+     Bu ekrana özel: .ms-bas .ms-ad .ms-say .ms-araclar .ms-arac
+     .ms-arac-ad .mst-grup-bas -->
+<section class="screen" id="screen-musteri">
+
+  <div class="screen-head">
+    <!-- Başlık MÜŞTERİNİN ADI. Alt şeritteki "neredeyim" yazısı bu
+         başlığı okuyor (yerTazele) — usta listede on müşteri arasından
+         hangisini açtığını aşağı kaydırdığında da görüyor. -->
+    <span class="eyebrow" id="mstBaslik"></span>
+  </div>
+
+  <div class="card">
+    <div id="mstKunye"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçları
+    </div>
+    <div id="mstAraclar"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Servis geçmişi
+    </div>
+    <div id="mstGecmis"></div>
+  </div>
+
+  <div id="mstEylem"></div>
+
+</section>
+
+<script>
+Ekran.tanim('musteri', {
+  ciz: function () {
+    var m = musteriBul(ACIK_MUSTERI);
+
+    /* ⚠️ MÜŞTERİ SİLİNMİŞ OLABİLİR — daha doğrusu: müşteri bir KAYIT
+       DEĞİL, araçlardan türetilen bir görünüm. Aracın sahibi adı
+       değişirse anahtar değişir ve bu ekran boşa düşer. Boş ekran
+       göstermek yerine ne olduğunu söylüyoruz. */
+    if (!m) {
+      document.getElementById('mstBaslik').innerHTML =
+        '<svg class="ico ico-sm"><use href="#i-users"></use></svg> Müşteri';
+      document.getElementById('mstKunye').innerHTML = bosDurumHtml('i-users',
+        'Bu müşteri artık yok',
+        'Müşteri, aracın sahibi olarak tutuluyor. Ad ya da telefon değiştiyse ' +
+        'listede yeni hâliyle duruyor.');
+      document.getElementById('mstAraclar').innerHTML = '';
+      document.getElementById('mstGecmis').innerHTML = '';
+      /* ⚠️ ÖLÜ UÇ BIRAKMA (K-021, ve sağlık denetiminin OLU-UC testi
+         bunu ilk çizimde yakaladı): hiçbir eylemi olmayan bir ekran,
+         ustanın geri tuşunu bulmasını bekler. Çıkış yolu ekranın
+         kendi üstünde durmalı. */
+      document.getElementById('mstEylem').innerHTML =
+        '<button class="btn btn-ghost" data-git="musteriler">' +
+          '<svg class="ico"><use href="#i-users"></use></svg>' +
+          ' Müşteri listesine dön</button>';
+      return;
+    }
+
+    var kayitlar = m.araclar.reduce(function (t, a) {
+      return t.concat(aracKayitlari(a.plaka));
+    }, []);
+
+    document.getElementById('mstBaslik').innerHTML =
+      '<svg class="ico ico-sm"><use href="#i-user"></use></svg> ' + m.ad;
+
+    /* KÜNYE: ad, kaç araç · kaç kayıt, telefon. Telefon ARANABİLİR —
+       listede mono metindi, burada bağlantı: ustanın bu ekrana gelme
+       sebeplerinden biri numarayı bulmak. */
+    document.getElementById('mstKunye').innerHTML =
+      '<div class="ms-bas">' +
+        '<span class="ms-ad">' + m.ad + '</span>' +
+        '<span class="ms-say">' + m.araclar.length + ' araç · ' +
+          kayitlar.length + ' kayıt</span>' +
+      '</div>' +
+      (m.tel ? telLinkHtml(m.tel, m.ad)
+             : '<p class="plate-hint">Telefon yok — mesaj gönderilemez. ' +
+               'Aracın kaydından eklenebilir.</p>');
+
+    /* ARAÇLAR — satırın tamamı dokunma hedefi; [data-arac] delegasyonu
+       ortak nesnede (03-nesne.js), aracı açıyor. */
+    document.getElementById('mstAraclar').innerHTML =
+      '<div class="ms-araclar">' +
+        m.araclar.map(function (a) {
+          return '<button class="ms-arac" data-arac="' + a.plaka +
+              '" aria-label="' + a.plaka + ' aracını aç">' +
+            plakaHtml(a.plaka) +
+            '<span class="ms-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
+            '<svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>' +
+          '</button>';
+        }).join('') +
+      '</div>';
+
+    /* SERVİS GEÇMİŞİ — sıra listelerdekiyle AYNI: serviste olanlar
+       üstte, sonra en yenisi. Üç ayrı listede üç ayrı sıra, ustaya üç
+       ayrı şey öğretmek olurdu.
+
+       ⚠️ ARAÇ BAŞLIĞI YALNIZ BİRDEN ÇOK ARAÇTA. Tek araçlı müşteride
+       her satırın üstüne plaka yazmak, zaten bilinen bir şeyi on kez
+       tekrarlamak olur — Cemil'in bu turda "abartmışsın" dediği hata
+       sınıfı. */
+    var gecmisEl = document.getElementById('mstGecmis');
+    if (!kayitlar.length) {
+      gecmisEl.innerHTML = bosDurumHtml('i-clipboard-list', 'Kayıt yok',
+        'Bu müşterinin araçlarına henüz servis kaydı açılmadı.');
+    } else if (m.araclar.length === 1) {
+      gecmisEl.innerHTML = mstSirala(kayitlar).map(kayitSatiriHtml).join('');
+    } else {
+      gecmisEl.innerHTML = m.araclar.map(function (a) {
+        var kl = mstSirala(aracKayitlari(a.plaka));
+        if (!kl.length) return '';
+        return '<div class="mst-grup-bas">' + plakaHtml(a.plaka) +
+            '<span class="ms-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
+          '</div>' + kl.map(kayitSatiriHtml).join('');
+      }).join('');
+    }
+
+    /* MESAJ — telefonu olan ilk araç üzerinden. Mesaj ekranı aracı
+       bekliyor (hitap ve şablon araçtan üretiliyor), müşteriyi değil. */
+    var mesajlik = m.araclar.filter(function (a) {
+      var h = mesajHedefi(a.plaka);
+      return h && h.tel;
+    })[0];
+    document.getElementById('mstEylem').innerHTML = mesajlik
+      ? '<button class="btn btn-primary btn-lg" data-mesajla="' + mesajlik.plaka + '">' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+          ' Mesaj gönder</button>'
+      : '';
+  }
+});
+
+/* Serviste olanlar üstte, sonra en yenisi — kayitlar ve araclar
+   listeleriyle aynı kural, aynı satır. */
+function mstSirala(liste) {
+  return liste.slice().reverse().sort(function (x, y) {
+    return (y.teslimTarihi ? 0 : 1) - (x.teslimTarihi ? 0 : 1);
+  });
+}
+</script>
+
+<style>
+/* ⚠️ 08.09 — .ms-* SINIFLARI 90-musteriler.html'DEN BURAYA TAŞINDI.
+   Liste satıra indi (Cemil: "Müşteriler sayfası neden çok boşluklu"),
+   ayrıntı bu ekrana geldi; sınıflar da kullanıldıkları yere geldi.
+   İkisinde birden tanımlı kalsaydı derleme denetiminin "aynı sınıf iki
+   ekranda" testi haklı olarak bağırırdı. */
+.ms-bas {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+}
+.ms-ad { font-size: var(--tip-lg); font-weight: 700; color: var(--text); }
+.ms-say { margin-left: auto; font-size: var(--tip-xs); color: var(--muted); }
+
+.ms-araclar { display: flex; flex-direction: column; gap: 8px; }
+.ms-arac {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; min-height: var(--dokun);
+  padding: 6px 8px; border: 1px solid transparent; border-radius: var(--radius-md);
+  background: transparent; color: var(--text); font: inherit;
+  text-align: left; cursor: pointer;
+}
+.ms-arac:hover, .ms-arac:focus-visible {
+  border-color: var(--line); background: var(--surface-2);
+}
+.ms-arac-ad {
+  flex: 1; min-width: 0; font-size: var(--tip-sm); color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ms-arac .ico { color: var(--faint); flex: none; }
+
+/* Geçmiş, araç araç bölünüyor — başlık bir SATIR DEĞİL, ayraç. */
+.mst-grup-bas {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 8px;
+}
+.mst-grup-bas:first-child { margin-top: 0; }
+</style>

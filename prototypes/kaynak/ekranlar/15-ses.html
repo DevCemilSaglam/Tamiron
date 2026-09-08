@@ -590,29 +590,12 @@ function sesCiz() {
     '</div>';
 }
 
-/* ================= WEB SPEECH API =================
-   ÜCRETSİZ VE ANAHTARSIZ: tarayıcının kendi motoru. Chrome ve Edge'de
-   var, Firefox'ta yok. Sesi Google'ın sunucusuna gönderir (K-015).
-   Güvenli bağlam ister — file:// ile açılan dosyada çalışmaz. */
-function sesMotorSinifi() {
-  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
-}
-function sesMotorVar() {
-  return !!sesMotorSinifi() && (window.isSecureContext !== false);
-}
-
-function sesMotorNotu() {
-  if (!sesMotorSinifi()) {
-    return 'Bu tarayıcıda ses tanıma yok (Chrome ya da Edge gerekiyor). ' +
-           'Örneklerden birine dokunursan söylenmiş gibi işler.';
-  }
-  if (window.isSecureContext === false) {
-    return 'Mikrofon yalnız güvenli adreste (https) açılır; dosyadan açılan ' +
-           'sayfada çalışmaz. Örneklerden birine dokunursan söylenmiş gibi işler.';
-  }
-  return 'Mikrofona dokun ve söyle. Tarayıcının kendi tanıyıcısı kullanılıyor — ' +
-         'ek kurulum yok.';
-}
+/* ⚠️ MOTOR TESPİTİ ÇEKİRDEĞE TAŞINDI (08.09).
+   `sesMotorSinifi` / `sesMotorVar` / `sesMotorNotu` artık
+   betik/01-cekirdek.js içinde. Sebep: mikrofon ARTIK İKİ İŞ yapıyor —
+   bu ekranda KOMUT çözümlüyor, mesaj ekranında DİKTE ediyor. İkisi
+   aynı motoru soruyor; iki kopya olsaydı biri "https şart" der öteki
+   demezdi. Aşağıdaki çağrılar aynen duruyor. */
 
 function sesDinlemeyiBaslat() {
   var Sinif = sesMotorSinifi();

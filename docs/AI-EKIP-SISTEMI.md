@@ -83,7 +83,47 @@ docs/IS-AKISI.md, docs/SOZLUK.md  (+ oluşunca docs/ILERLEME.md, docs/VERI-MODEL
 ---
 
 ## 7. TELEFONDAN DEVAM
-Claude Code bilgisayarda çalışır, mobil uygulamadan uzaktan komut verilebilir. Bilgisayar açık kalır, telefondan görev/takip. Lider (Claude) mobil sohbetten de erişilebilir.
+
+İki ayrı şey; karıştırılmasın.
+
+### 7.1 · Telefondan İŞ VERMEK — Remote Control
+Claude Code **bilgisayarda** çalışır; telefondaki Claude uygulaması o oturuma
+bağlanır. Dosyalar, MCP'ler, komutlar hep bilgisayarda kalır — telefon
+yalnız bir penceredir.
+
+- **Açma:** masaüstü uygulamasında *Ayarlar → Claude Code → Enable remote
+  control by default*; ya da terminalde proje klasöründe
+  `claude --remote-control "Tamiron"`
+- **Telefonda:** Claude uygulaması → **Code** → oturum listesi (çevrimiçi
+  oturumlar yeşil noktalı)
+- Fotoğraf ve dosya gönderilebilir — ekran görüntüsü atmak yeter
+- Bilgisayar **uyumamalı**
+
+### 7.2 · Telefondan TEST ETMEK — Netlify
+Prototip `golden-alfajores-a0b955.netlify.app` adresinde yayında. Deploy
+atılınca telefondaki PWA güncellenir.
+
+```
+node tools/prototip-derle.js          # kaynak -> omurga.html
+node tools/pwa-build.js               # omurga.html -> app/
+npx --yes netlify-cli@latest deploy --prod --dir=app --message "ne degisti"
+```
+
+Site **GitHub'a bağlı değil**; deploy CLI ile elle atılıyor. Kimlik ve
+bağlantı 08.09.2026'da kuruldu (`netlify login` + `netlify link`);
+`.netlify/` gitignore'da.
+
+`--prod` bayrağı olmadan **taslak** deploy atılır: kendi URL'sini verir,
+üretimi etkilemez. Denemelik işler için o kullanılır.
+
+⚠️ **Telefonda eski içerik görünüyorsa** sebep service worker önbelleği
+olabilir: `app/sw.js` içindeki `SURUM` damgası her `pwa-build` ile
+yenilenir; değişmediği sürece sayfa önbellekten servis edilir.
+
+⚠️ **Yerel ağdan (http://192.168.x.x:8123) test etmenin sınırı var:**
+düz `http` güvenli bağlam değildir — mikrofon açılmaz, service worker
+kaydolmaz. Görsel/akış testi için yeter, ses ve "ana ekrana ekle" için
+yetmez. Netlify (https) ikisini de çalıştırır.
 
 ---
 

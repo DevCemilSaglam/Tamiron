@@ -25,10 +25,30 @@
   flex: none;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   gap: 10px;
   padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--line);
   background: var(--surface);
   z-index: 30;
 }
+
+/* ⚠️ 08.09 — TUŞLAR SAĞA YASLI, ORTA BOŞ (Cemil: "Footerda navigasyon
+   buttonlar sağa yaslı olsun. Ortasinda bir şey olmasın. Solda
+   herhangi bir şey koyabiliriz.").
+
+   Eskiden `space-around` üç tuşu şeride yayıyordu; ortadaki tuş
+   ekranın tam ortasında duruyordu. Üçü tek bir denetimin gövdesi —
+   öyleyse tek bir GRUP, ve grup sağda.
+
+   SOLDAKİ YAZI: bulunulan ekranın adı. Ekranın kendi başlığı
+   (.screen-head .eyebrow) sayfayla birlikte KAYIYOR; aşağı inen usta
+   nerede olduğunu göremiyordu. Alt şerit sabit — "neredeyim"in cevabı
+   da sabit olsun. Çekirdek ekranın adını BİLMİYOR, ekranın kendi
+   başlığını okuyor (bkz. yerTazele). */
+.botbar-yer {
+  min-width: 0; flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--tip-xs); color: var(--muted);
+}
+.botbar-nav { display: flex; align-items: center; gap: 10px; flex: none; }

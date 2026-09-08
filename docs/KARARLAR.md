@@ -10,6 +10,199 @@
 
 ---
 
+## K-046 · Telefon testi: sekiz geri bildirim, biri akışın kendisi (08.09.2026)
+
+Cemil prototipi **ilk kez telefondan** kullandı (Netlify'a deploy edilmiş
+PWA). Sekiz madde geldi. Yedisi tek tek düzeltilecek şeylerdi; sonuncusu
+ekranın kurgusuydu.
+
+⚠️ **BU TURUN DERSİ:** maddelerin en az üçü — boşluk, tekrar eden cümle,
+tıklanınca hiçbir şey yapmayan satır — masaüstü tarayıcıda **görünmeyen**
+hatalardı. Genişlik ölçüyorduk (320/375/430), dokunuş sayıyorduk; ama
+kimse telefonu eline alıp *"şimdi ne yapacağım"* diye bakmamıştı.
+**Ölçüm, kullanmanın yerine geçmiyor.**
+
+### 46.1 · Alt gezinme sağa yaslandı, solda "neredeyim" yazıyor
+
+Cemil: *"Footerda navigasyon buttonlar sağa yaslı olsun. Ortasinda bir
+şey olmasın. Solda herhangi bir şey koyabiliriz."*
+
+`space-around` üç tuşu şeride yayıyordu. Üçü **tek denetimin gövdesi**
+(K-042), öyleyse tek grup — ve grup sağda.
+
+Sol boş kalmadı: **bulunulan ekranın adı** yazıyor. Ekranın kendi başlığı
+(`.screen-head .eyebrow`) sayfayla birlikte kayıyor; aşağı inen usta
+nerede olduğunu göremiyordu. Alt şerit sabit, cevap da sabit olsun.
+
+⚠️ **Çekirdek ekranın adını BİLMİYOR.** Buraya bir `{ ad -> başlık }`
+tablosu koysaydım her yeni ekran iki yere yazılırdı ve biri unutulurdu —
+v1'in en pahalı hata sınıfı. `yerTazele()` ekranın kendi başlığını
+**DOM'dan okuyor**; sayaç (`.eb-say`) eleniyor, çünkü o başlık değil, o an
+kaç şey olduğu.
+
+### 46.2 · Müşteri listesi satıra indi, ayrıntı kendi ekranına çıktı
+
+İki cümle aynı yeri işaret ediyordu:
+*"Müşteriler sayfası neden çok boşluklu, bunu düzenleyelim."* ·
+*"Müşteriler listesinde müşteriye tıklayıp müşteri detayı görebilmeliyim.
+Tıklayınca herhangi bir şey yapmıyor."*
+
+06.09'da müşteri bir **kart** olmuştu: ad, telefon, ayraç, araç satırları,
+mesaj düğmesi. Üç müşteri telefon ekranını dolduruyordu. **Liste aramak
+içindir, okumak için değil.**
+
+Kart satıra indi (`.tl-item` — mesaj ekranındaki müşteri seçme listesinin
+aynısı), taşınan ayrıntı yeni `musteri` ekranına gitti. **Hiçbir şey
+silinmedi, yeri değişti.**
+
+⚠️ **BU BİR KARARIN GERİ ALINMASIDIR.** `90-musteriler.html` şöyle
+diyordu: *"müşterinin kendi ekranı YOK ve gerekmiyor; bilgi zaten aracın
+üstünde."* Gerekçe kâğıt üstünde doğruydu, telefonda yanlış çıktı: usta
+müşterinin **adına** dokunuyor çünkü aradığı şey müşteri; hangi aracı
+olduğunu zaten bilmiyor, ona bakmaya geliyor. Dokunulan yerin hiçbir şey
+yapmaması, ekranın en pahalı hâlidir — usta bozuk mu diye ikinci kez
+dokunuyor.
+
+**Ekran sayısı 14 → 15.** Ana yol büyümedi (A-1): ekran akışın üstünde
+değil, listenin dibinde. Ana yol hâlâ `ruhsat → kayit → teslim`.
+
+### 46.3 · "Parçayı müşteri getirdi" dört yerden bir yere indi
+
+Cemil: *"Her yere parçayı müşteri getirdi bilgisini yazma. Bu lazım
+olursa kullanılacak bir özellik."* + *"Servis kayıtlarında yine parçayı
+müşteri getirdi yazıyor. Bu konuyu abartmışsin sanki?"*
+
+Sayıyla haklıydı. Aynı cümle **dört yerde** duruyordu:
+
+| Nerede | Ne oldu |
+|---|---|
+| "Yapılanlar" başlığındaki toplu düğme | **kaldırıldı** |
+| Her parça satırının altındaki çip (basılı değilken *"tamirci getirdi"* yazıyordu) | **koşullu hâle geldi** |
+| Tutar hücresinin `title` metni | **kaldırıldı** |
+| Örnek verinin açıklama metni | **kaldırıldı** |
+
+**Yeni kural — tek slot, üç hâl:**
+
+| Satırın hâli | Slotta ne var |
+|---|---|
+| müşteri getirdi | **bilgi** — dokunulunca geri alınır; tutar hücresi `—` |
+| tutar yazılmamış | **teklif** — soluk, noktalı altı çizili bir bağlantı |
+| tutar yazılmış | **hiçbir şey** — parayı sen alıyorsan parçayı sen getirmişsindir |
+
+A-M13'ün cevabı korunuyor (*"balatayı müşteri getirdi, yağı ben aldım"*):
+işaret **hâlâ satır başına**. Değişen tek şey, sorulmadığı zaman
+görünmemesi.
+
+⚠️ **Üstü çizili tutar da kalktı.** Cemil: *"Değişen parça fiyatı yerine
+bilgi olarak sadece yazılabilir."* Üstü çizili bir rakam hâlâ bir
+rakamdır: göz onu toplamda arar, bulamaz ve tabloya güveni azalır. K-037
+duruyor — `s.fiyat` **silinmiyor**, yalnız gösterilmiyor.
+
+⚠️ **06.09'dan bugüne aynı satırın üç hâli oldu:** 26 px'lik iki çip (çok
+küçük) → 44 px'lik tek çip (ama her satırda) → koşullu slot. İlk iki
+turda sorduğum soru *"düğme ne kadar büyük olmalı"*ydı; doğru soru **"her
+satırda görünmesi gerekiyor mu"**ymuş.
+
+### 46.4 · Ekran içi adım da "geri"dir
+
+Cemil: *"Müşteriye mesaj gönder ekranında bir müşteri seçilip geri gelince
+ana menüye atıyor."*
+
+Mesaj ekranının **içinde** iki adım var (kime → ne). Bu adımlar
+`tazele()` ile değişiyordu, yani geçmişe hiç yazılmıyordu; geri tuşu
+ekranın tamamından çıkıyordu ve usta bir adım geri gitmek isterken ana
+menüde buluyordu kendini.
+
+**Çözüm çekirdekte, ekranda değil:** ekran iki kanca tanımlayabilir —
+`geriVar()` (içeride geri alınacak adım var mı) ve `geriAl()`. Geri tuşu
+**önce ekrana sorar**. Her ekranın kendi geri düğmesini çizmesi de
+çözerdi, ama o zaman "geri" iki ayrı şey olurdu: alttaki tuş bir yere,
+ekrandaki düğme başka yere. **Tek tuş, tek anlam** (K-042'nin kuralı).
+
+### 46.5 · Mesaj ekranındaki mikrofon KOMUT değil DİKTE
+
+Cemil: *"Mesaj ekranında 'aracınız hazır teslim alabilirsiniz' dedim,
+mesaj bölümü için yanlış anlamadıysam dedi. Aslında burada text yazması
+gerek."*
+
+Hata bendeydi ve ekranda yazılıydı: düğmenin `aria-label` metni *"Sesle
+yazdır"* diyordu ama düğme `sesleAc('mesaj')` çağırıyordu — cümleyi
+**komut** sanıp çözümlemeye gönderiyordu. Usta mesajın **metnini**
+söylüyor; çözümlenecek komut yok, yazılacak cümle var.
+
+**İki ayrı iş, iki ayrı yol:**
+
+| | Ne yapar | Nerede |
+|---|---|---|
+| `sesleAc(niyet)` | KOMUT — anlar, **onay ister** | arama kutuları, menü, kayıt içi satır ekleme |
+| `Dikte` | METİN — söylenen alana yazılır, onay yok | mesaj metni |
+
+`Dikte` çekirdekte ve `data-dikte="<alanId>"` ile bağlanıyor: her ekran
+kendi tanıyıcısını kursaydı *"izin verilmedi"* mesajı birinde çıkar
+ötekinde çıkmazdı. Motor tespiti (`sesMotorSinifi` · `sesMotorVar` ·
+`sesMotorNotu`) ses ekranından çekirdeğe taşındı — iki iş aynı motoru
+soruyor, tek yerden.
+
+**Yazılanın üstüne yazmıyor:** alanda ne varsa temel alınıp ardına
+ekleniyor. Şablondan gelen metni silmek, ustanın seçtiği şablonu sessizce
+çöpe atmak olurdu.
+
+### 46.6 · Servis kaydı üç adıma bölündü
+
+Cemil: *"Servis kaydı ekle, düzenle sayfalarını akışa uydurmak gerekiyor.
+Bunun için senaryolar oluştur ve buna uygun çalışmasını sağla. Sayfada
+herşey yapılabiliyor gözüküyor. Adımlar birbirini takip etmeli."*
+
+Ekran, `IS-AKISI.md`'nin 2., 3., 4., 5., 6. ve 7. adımlarının **hepsini
+aynı anda** gösteriyordu: açıklama, tablo, parça ekle, sesle ekle,
+fotoğraftan oku, parça bekliyor, parçacıya sor, özet gönder, teslim et.
+**Dokuz eylem, tek ekran, hiçbiri ötekinden önce değil.**
+
+| Adım | IS-AKISI karşılığı | Önkoşul |
+|---|---|---|
+| **1 · İş** | Adım 2 · ne istiyor | yok |
+| **2 · Yapılanlar** | Adım 3-4-5-6 | açıklama **ya da** satır var |
+| **3 · Teslim** | Adım 7 | en az bir satır |
+
+Senaryolar ayrı belgede: **`SENARYO-SERVIS-KAYDI.md`** — altı senaryo ve
+her turda koşulacak on bir maddelik kontrol listesi.
+
+⚠️ **ADIM KİLİTLİ DEĞİL, KONUŞUYOR** (K-040.3). Hiçbir sekme `disabled`
+değil; hazır olmayan adıma dokunulunca ekran ne eksik olduğunu söyler ve
+eksiğin durduğu adıma götürür. Sönük sekme ustaya *"burası bozuk"*
+dedirtir.
+
+⚠️ **K-003 DURUYOR.** Kayıt teslim edilene kadar açık; geriye serbestçe
+dönülür, her adımdan sonra satır eklenebilir (Kol C — *"ek iş yapılabilir
+teslim etmeden önce"*). Sıralanan şey ekranın **sunumu**, kaydın hayatı
+değil.
+
+**Adım kaydın üstünde** (`k.adim`), ekranın değil — bu dosyanın `turElle`
+dersinin aynısı. Yazılmamışsa veriden türetiliyor, yani örnek veri ve eski
+kayıtlar da doğru adımda açılıyor.
+
+**"Servis kaydı ekle" ekranı yeniden kurulmadı** çünkü zaten sıralıydı:
+plaka → tanıma → (kayıtsızsa) araç bilgileri → eylem. Tek kusuru
+düzeltildi: **plaka yokken "Kaydı aç" düğmesi görünüyordu.** Ekranın en
+büyük, en renkli öğesi henüz yapılamayacak bir şeyi teklif ediyordu.
+Düğme sönük yapılmadı, **henüz gösterilmiyor** — sönük düğme "bozuk" der,
+olmayan düğme "sıra sende değil" der.
+
+### 46.7 · Sağlık denetimi ilk çizimde bir ölü uç yakaladı
+
+Yeni `musteri` ekranı, müşteri bulunamadığında hiçbir eylemi olmayan bir
+ekran çiziyordu — denetim `OLU-UC | musteri | ekranda hicbir eylem yok`
+dedi ve çıkış yolu eklendi (K-021). **Aracın değeri tam burada: yeni bir
+ekran, eski bir hata sınıfına ilk çizimde düştü.**
+
+Denetim üç genişlikte (320 · 375 · 430) **0 bulgu** ile kapandı.
+
+⚠️ **`tools/tutarlilik-denetim.py` ÇALIŞMIYOR** — var olmayan bir belgeyi
+(`docs/PROTOTIP-SENARYO.md`) okumaya çalışıp hata veriyor. Bu turdan önce
+de böyleydi; burada yalnız **kayda geçiyor**.
+
+---
+
 ## K-045 · Üç araştırma: ikisi "yazma", biri "başka türlü yaz" dedi (08.09.2026)
 
 **Kuyruk 4/D.** Kod yok; karar malzemesi. Üçü de aynı biçimde bitiyor:
@@ -2978,6 +3171,8 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M24** | Servis kaydı **üç adım** doğru bölünme mi — "Yapılanlar" kendi içinde ikiye mi ayrılmalı (parça / işçilik)? (K-046.6) | Cemil |
+| **A-M23** | Tutarı **yazılmış** satır artık *"müşteri getirdi"* yapılamıyor; önce tutar silinecek. Her satırda düğme göstermemek için bilinçli daraltma — kabul mü? (K-046.3) | Cemil |
 | **A-M22** | Dışa aktarmada PDF için **kütüphane yerine tarayıcı yazdırması** öneriliyor — *"PDF olarak kaydet"* yeter mi? (K-045.4) | Cemil |
 | **A-M21** | **Kampanya ertelendi**; yerine araç/müşteri kaydına *"ticari ileti izni"* alanı öneriliyor. Kampanyayı bu fazda istiyorsan yol: İYS kaydı → onay toplama → WhatsApp Business API → şablon onayı (K-045.2) | Cemil |
 | **A-M20** | **Sanal POS faz dışı** bırakıldı. Amaç *"Tamiron müşterilerden para toplasın"*sa bu ürün kararı değil **şirket kararıdır** — ödeme kuruluşu lisansı gerektirir (K-045.1) | Cemil |

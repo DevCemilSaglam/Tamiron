@@ -1,3 +1,6 @@
 # uretim ciktisi degil, kaynak degil
 node_modules/
 prototypes/.omurga.denetim-yedek
+
+# Local Netlify folder
+.netlify

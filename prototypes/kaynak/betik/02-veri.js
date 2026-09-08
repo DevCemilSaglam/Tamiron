@@ -74,7 +74,13 @@ var KAYITLAR = [
     ] },
 
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
-    sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
+    /* ⚠️ 08.09 — AÇIKLAMADAN "parçayı müşteri getirdi" ÇIKARILDI.
+       Cemil: *"Servis kayıtlarında yine parçayı müşteri getirdi
+       yazıyor."* Doğrusu buydu: bilgi zaten satırın üstünde
+       (kimGetirdi: 'musteri'). Açıklamaya da yazılınca aynı şey
+       kayıt listesinde de, kayıt detayında da, müşterinin özet
+       sayfasında da görünüyordu — örnek veri, abartının kendisiydi. */
+    sikayet: 'Ön balata değişimi',
     acilis: '01.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
@@ -336,12 +342,26 @@ function musteriler() {
     if (!ad) return;                      /* sahibi yazılmamış araç listede yok */
     var anahtar = norm(ad) + '|' + (a.sahipTel || '');
     if (!harita[anahtar]) {
-      harita[anahtar] = { ad: ad, tel: a.sahipTel || '', araclar: [] };
+      /* ⚠️ ANAHTAR NESNENİN ÜSTÜNDE (08.09). Müşteri detayı ekranı
+         açılırken "hangi müşteri" bilgisini taşımak gerekiyor ve
+         müşterinin id'si YOK — kendi tablosu olmadığı için (A-M1).
+         Anahtarı burada bir kez üretip nesneye yazmak, onu çağıran
+         her yerde YENİDEN kurmaktan güvenli: kural değişirse tek
+         yerde değişir. */
+      harita[anahtar] = { anahtar: anahtar, ad: ad, tel: a.sahipTel || '', araclar: [] };
     }
     harita[anahtar].araclar.push(a);
   });
   return Object.keys(harita).map(function (k) { return harita[k]; })
     .sort(function (x, y) { return x.ad.localeCompare(y.ad, 'tr'); });
+}
+
+/* Müşteri TÜRETİLMİŞ bir görünüm; "bul" da türetmeden geçer. Aracın
+   sahibi adı değişirse anahtar değişir ve burası null döner — detay
+   ekranı bunu bir hata değil, bir durum olarak karşılıyor. */
+function musteriBul(anahtar) {
+  if (!anahtar) return null;
+  return musteriler().filter(function (m) { return m.anahtar === anahtar; })[0] || null;
 }
 
 /* ---- MUHASEBENİN HAMMADDESİ ----

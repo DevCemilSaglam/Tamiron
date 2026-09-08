@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-07 21:08
+  Üretim: 2026-09-08 14:15
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -309,13 +309,33 @@ button { min-height: var(--dokun); cursor: pointer; }
   flex: none;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   gap: 10px;
   padding: 8px 14px calc(8px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid var(--line);
   background: var(--surface);
   z-index: 30;
 }
+
+/* ⚠️ 08.09 — TUŞLAR SAĞA YASLI, ORTA BOŞ (Cemil: "Footerda navigasyon
+   buttonlar sağa yaslı olsun. Ortasinda bir şey olmasın. Solda
+   herhangi bir şey koyabiliriz.").
+
+   Eskiden `space-around` üç tuşu şeride yayıyordu; ortadaki tuş
+   ekranın tam ortasında duruyordu. Üçü tek bir denetimin gövdesi —
+   öyleyse tek bir GRUP, ve grup sağda.
+
+   SOLDAKİ YAZI: bulunulan ekranın adı. Ekranın kendi başlığı
+   (.screen-head .eyebrow) sayfayla birlikte KAYIYOR; aşağı inen usta
+   nerede olduğunu göremiyordu. Alt şerit sabit — "neredeyim"in cevabı
+   da sabit olsun. Çekirdek ekranın adını BİLMİYOR, ekranın kendi
+   başlığını okuyor (bkz. yerTazele). */
+.botbar-yer {
+  min-width: 0; flex: 1;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  font-size: var(--tip-xs); color: var(--muted);
+}
+.botbar-nav { display: flex; align-items: center; gap: 10px; flex: none; }
 
 
 /* ===== stil/03-bilesen.css ===== */
@@ -2171,19 +2191,19 @@ kirpilsin. */
   text-align: right;
   font-family: var(--font-mono); font-variant-numeric: tabular-nums;
 }
-/* Satırın ikincil bilgisi: kim getirdi rozeti + parçacı fiyatı.
-   ⚠️ SATIR BAŞINA DÜĞME YOK (06.09). Önce her parça satırına küçük bir
-   "tamirci getirdi / müşteri getirdi" düğmesi koymuştum; denetim beşini
-   birden 26 px ölçtü ve haklıydı — 26 px'lik bir düğmeyi yağlı parmakla
-   isabet ettiremezsin. Büyütmek de çözüm değildi: on satırda on tane
-   44 px'lik düğme, Cemil'in kaldırttığı gürültünün aynısı.
+/* Satırın ikincil bilgisi: "kim getirdi" slotu + parçacı fiyatı.
 
-   Cemil zaten kaldırmıştı: *"Servis kayıtları listesinde parçayı
-   müşteri getirdi alanına gerek yok. Listenin üzerinde müşteri getirdi
-   seçilirse parçalara ücret yazmaz."* Sorumluluk anahtarı (K-005)
-   kaybolmadı — LİSTENİN ÜSTÜNDEKİ düğmeden kuruluyor, satırda yalnız
-   SONUCU rozet olarak duruyor. Tek parçayı ayrı işaretlemek şimdilik
-   yok; gerekirse konuşulur (A-M13). */
+   ⚠️ 08.09 — BU SATIRIN TARİHİ, AYNI HATANIN İKİ UCU:
+     06.09  her parça satırına 26 px'lik iki çip koydum → denetim
+            beşini birden ölçtü, çok küçüktü.
+     07.09  tek çipe indi, 44 px oldu — ama HER SATIRDA duruyordu ve
+            basılı değilken *"tamirci getirdi"* yazıyordu.
+     08.09  Cemil: *"Bu konuyu abartmışsin sanki?"*
+
+   Küçültmek de büyütmek de çözüm değildi; asıl soru **her satırda
+   görünmesi gerekip gerekmediğiydi.** Gerekmiyor: slot yalnız
+   sorulacak bir şey varsa (fiyat yazılmamışsa) ya da söylenecek bir
+   şey varsa (müşteri getirmişse) doluyor. */
 #screen-kayit .k-ikincil {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
   margin-top: 6px;
@@ -2211,10 +2231,49 @@ kirpilsin. */
   }
 }
 
-/* Toplama girmeyen tutar: üstü çizili ve soluk. */
-#screen-kayit .tablo td.tutar-disi input {
-  color: var(--faint); text-decoration: line-through;
+/* ⚠️ ADIM ŞERİDİ SARMAZ (08.09, ölçüm). `.tab` varsayılanı
+   `flex: 1 1 0` — üç sekme eşit genişlikte oluyor ve "2 · Yapılanlar"
+   375 px'te İKİ SATIRA sarıyordu: şerit 48 px'ten 76 px'e çıkıyor ve
+   ekranın üstünden bir kart boyu yer yiyor. Sekmeler içeriklerine göre
+   genişliyor, taşarsa şerit kayıyor — sarmıyor. */
+#kAdimSerit { overflow-x: auto; }
+#kAdimSerit .tab {
+  flex: 1 1 auto; white-space: nowrap; padding-left: 6px; padding-right: 6px;
 }
+
+/* ⚠️ 08.09 — ÜSTÜ ÇİZİLİ TUTAR KALKTI (.tutar-disi).
+   Cemil: *"Değişen parça fiyatı yerine bilgi olarak sadece
+   yazılabilir."* Üstü çizili bir rakam hâlâ bir rakamdır: göz onu
+   toplamda arar, bulamaz ve tabloya güveni azalır. Müşteri parçasının
+   tutar hücresinde artık rakam değil, bir tire var. */
+#screen-kayit .k-tutar-yok {
+  color: var(--faint); font-family: var(--font-mono);
+}
+
+/* ---- "MÜŞTERİ GETİRDİ" — TEKLİF ve BİLGİ ----
+   İkisi de DÜĞME, ikisi de 48 px (K-024: görsel ağırlık ≠ dokunma
+   alanı — 06.09'da bu satıra 26 px'lik bir çip koymuştum ve denetim
+   beşini birden ölçtü).
+
+   TEKLİF soluk ve noktalı altı çizili: bir bağlantı gibi okunuyor,
+   "istersen" diyor. BİLGİ vurgu renginde ve kalın: artık bir durum,
+   ve dokunulunca geri alınıyor. */
+#screen-kayit .k-getiren-sor,
+#screen-kayit .k-getiren-bilgi {
+  display: inline-flex; align-items: center;
+  min-height: var(--dokun);
+  padding: 0; border: 0; background: transparent;
+  font-family: var(--font-body); font-size: var(--tip-xs);
+  cursor: pointer;
+}
+#screen-kayit .k-getiren-sor {
+  color: var(--muted); text-decoration: underline dotted;
+}
+#screen-kayit .k-getiren-sor:hover { color: var(--text); }
+#screen-kayit .k-getiren-bilgi { color: var(--accent); font-weight: 700; }
+/* Fiyat yazılınca teklif düşer — `hidden` tek başına yetmez, çünkü
+   display açıkça verilmiş. */
+#screen-kayit .k-getiren-sor[hidden] { display: none; }
 #screen-kayit .k-alis {
   font-size: var(--tip-xs); color: var(--faint);
   font-family: var(--font-mono);
@@ -2225,23 +2284,19 @@ kirpilsin. */
    tek satıra yapışıp okunmaz olur. v1'in .notice'ına takılan tek delta. */
 .notice .n-body.ps-mesaj { white-space: pre-wrap; }
 
-/* ===== ekran: 90-musteriler.html ===== */
-/* MÜŞTERİ KARTI — araç kartının dili, müşteriye uyarlanmış hâli.
-   Ayrı bir görsel dil değil: aynı kart, aynı yarıçap, aynı iç boşluk;
-   yalnız üstte plaka yerine AD duruyor. */
-.ms-kart + .ms-kart { margin-top: 14px; }
+/* ===== ekran: 91-musteri.html ===== */
+/* ⚠️ 08.09 — .ms-* SINIFLARI 90-musteriler.html'DEN BURAYA TAŞINDI.
+   Liste satıra indi (Cemil: "Müşteriler sayfası neden çok boşluklu"),
+   ayrıntı bu ekrana geldi; sınıflar da kullanıldıkları yere geldi.
+   İkisinde birden tanımlı kalsaydı derleme denetiminin "aynı sınıf iki
+   ekranda" testi haklı olarak bağırırdı. */
 .ms-bas {
   display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
 }
 .ms-ad { font-size: var(--tip-lg); font-weight: 700; color: var(--text); }
 .ms-say { margin-left: auto; font-size: var(--tip-xs); color: var(--muted); }
 
-/* Araç satırları ayracın altında — üstü kişi, altı araçları. */
-.ms-araclar {
-  margin-top: 12px; padding-top: 12px;
-  border-top: 1px solid var(--line);
-  display: flex; flex-direction: column; gap: 8px;
-}
+.ms-araclar { display: flex; flex-direction: column; gap: 8px; }
 .ms-arac {
   display: flex; align-items: center; gap: 10px;
   width: 100%; min-height: var(--dokun);
@@ -2257,6 +2312,13 @@ kirpilsin. */
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .ms-arac .ico { color: var(--faint); flex: none; }
+
+/* Geçmiş, araç araç bölünüyor — başlık bir SATIR DEĞİL, ayraç. */
+.mst-grup-bas {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 8px;
+}
+.mst-grup-bas:first-child { margin-top: 0; }
 
 /* ===== ekran: 98-ozet.html ===== */
 /* Müşteri sayfasının başlığı — dükkânın adı. Ustanın ekranlarında
@@ -2840,6 +2902,40 @@ kirpilsin. */
     <div id="kayitMusteri"></div>
   </div>
 
+  <!-- ⚠️ 08.09 — ADIM ŞERİDİ (Cemil, telefon testi: "Servis kaydı ekle,
+       düzenle sayfalarını akışa uydurmak gerekiyor. Sayfada herşey
+       yapılabiliyor gözüküyor. Adımlar birbirini takip etmeli.").
+
+       NE OLMUŞTU: bu ekran IS-AKISI.md'deki 2., 3., 4., 5., 6. ve 7.
+       adımların HEPSİNİ aynı anda gösteriyordu — açıklama, tablo,
+       parça ekle, sesle ekle, fotoğraftan oku, parça bekliyor, parçacıya
+       sor, özet gönder, teslim et. Dokuz eylem, tek ekran, hiçbiri
+       ötekinden önce değil. Usta hangisiyle başlayacağını ekrandan
+       okuyamıyordu; ekran ona bir SIRA önermiyordu.
+
+       ARTIK ÜÇ ADIM — ve üçü IS-AKISI'nın adımlarının birebir karşılığı:
+         1 · İş         → Adım 2 (ne istiyor)
+         2 · Yapılanlar → Adım 3-4-5-6 (fiyat sor · fiyat geldi ·
+                          parça geldi · iş yapıldı)
+         3 · Teslim     → Adım 7 (teslim ve ödeme)
+
+       ⚠️ ADIM KİLİTLİ DEĞİL, KONUŞUYOR (K-040.3: "kapalı düğme yok,
+       konuşan düğme var"). Şeritteki hiçbir adım `disabled` değil;
+       hazır olmayan bir adıma dokunulunca ekran NE EKSİK olduğunu
+       söylüyor ve eksiğin bulunduğu adıma götürüyor. Sönük bir sekme
+       ustaya "burası bozuk" dedirtir; konuşan bir sekme ne yapacağını
+       söyler.
+
+       ⚠️ K-003 DURUYOR: kayıt teslim edilene kadar AÇIK. Adımlar bir
+       sihirbaz değil — geriye serbestçe dönülür, satır her adımdan
+       sonra eklenebilir. Sıralanan şey ekranın SUNUMU, kaydın hayatı
+       değil. -->
+  <div class="tab-grup" id="kAdimSerit" role="tablist"
+       aria-label="Servis kaydı adımları"></div>
+
+  <!-- ================= ADIM 1 · İŞ ================= -->
+  <div class="yigin" id="kAdim1" role="tabpanel" aria-labelledby="kAdimTab1">
+
   <div class="card">
     <div class="section-label with-action">
       <!-- ⚠️ "Ne istiyor?" DEĞİL "Açıklama" (Cemil, 07.09).
@@ -2885,20 +2981,37 @@ kirpilsin. */
     <div class="cip-grup" id="kTurGrup" role="group" aria-label="İş türü"></div>
   </div>
 
+  <button class="btn btn-primary btn-lg" id="kDevam1">
+    Yapılanlara geç
+    <svg class="ico"><use href="#i-chevron-right"></use></svg>
+  </button>
+
+  </div><!-- /kAdim1 -->
+
+  <!-- ================= ADIM 2 · YAPILANLAR ================= -->
+  <div class="yigin" id="kAdim2" role="tabpanel" aria-labelledby="kAdimTab2">
+
   <div class="card">
-    <div class="section-label with-action">
+    <div class="section-label">
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılanlar
       </span>
-      <!-- ÜSTTE, LİSTENİN DIŞINDA (Cemil: "Üstte parçaları müşteri
-           getirdi button olsun. Buna basınca tüm parçaları
-           işaretlesin."). Tek dokunuşta hepsi; sonradan eklenen parça
-           tamirciye yazılır ve düğme kendiliğinden sönük hâle döner —
-           çünkü artık "hepsi" doğru değil. -->
-      <button class="cip" id="kHepsiMusteri" aria-pressed="false">
-        Parçaları müşteri getirdi
-      </button>
     </div>
+    <!-- ⚠️ 08.09 — "PARÇALARI MÜŞTERİ GETİRDİ" TOPLU DÜĞMESİ KALKTI.
+         Cemil: *"Her yere parçayı müşteri getirdi bilgisini yazma. Bu
+         lazım olursa kullanılacak bir özellik."* + *"Servis
+         kayıtlarında yine parçayı müşteri getirdi yazıyor. Bu konuyu
+         abartmışsin sanki?"*
+
+         Haklı, ve sayıyla haklı: aynı cümle DÖRT yerde duruyordu —
+         bölüm başlığındaki toplu düğmede, her parça satırının altındaki
+         çipte, tutar hücresinin `title`ında ve örnek verinin açıklama
+         metninde. Bir istisna kolu (IS-AKISI Kol D), ana yolun
+         görünümünü ele geçirmişti.
+
+         ARTIK TEK YER: satırın kendi ikincil satırı, ve orada da
+         yalnız FİYAT YAZILMAMIŞSA. Fiyat varsa soru zaten sorulmuyor
+         — parayı sen alıyorsan parçayı sen getirmişsindir. -->
 
     <div id="kSatirlar"></div>
 
@@ -2952,23 +3065,51 @@ kirpilsin. */
     <div id="kBekliyorGovde"></div>
   </div>
 
-  <div class="btn-row">
-    <button class="btn btn-ghost" data-git="parca-sor">
-      <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
-    </button>
-    <!-- ⚠️ 04.09 — "Onay iste" -> "Özet gönder" (ölü uç turu).
-         Düğme "Onay iste" diyordu, bastığında balon "Özet gönderildi"
-         diyordu ve GERÇEKTE HİÇBİR ŞEY GÖNDERİLMİYORDU. Ad artık
-         yapılan işi söylüyor ve gerçekten mesaj ekranına götürüyor.
-         Cemil onayına açık (A-M6). -->
-    <button class="btn btn-ghost" id="kOzetGonder">
-      <svg class="ico"><use href="#i-message-square"></use></svg> Özet gönder
-    </button>
+  <!-- PARÇA FİYATI SOR — IS-AKISI Adım 3, ve o adım BU adımın içinde.
+       Eskiden teslim düğmesinin yanında duruyordu: fiyat sormak ile
+       işi bitirmek yan yana iki eşit seçenek gibi görünüyordu. -->
+  <button class="btn btn-ghost" data-git="parca-sor">
+    <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
+  </button>
+
+  <button class="btn btn-primary btn-lg" id="kDevam2">
+    Teslime geç
+    <svg class="ico"><use href="#i-chevron-right"></use></svg>
+  </button>
+
+  </div><!-- /kAdim2 -->
+
+  <!-- ================= ADIM 3 · TESLİM ================= -->
+  <div class="yigin" id="kAdim3" role="tabpanel" aria-labelledby="kAdimTab3">
+
+  <!-- ⚠️ BU KART BİR ÖZET, BİR KAPI DEĞİL. Teslim ekranı ödemeyi
+       soruyor (IS-AKISI Adım 7); burada usta ne teslim ettiğini son bir
+       kez görüyor. Eksik varsa SÖYLENİYOR ama YOL KAPANMIYOR: fiyatı
+       gelmemiş bir satırla da teslim edilebilir — "fiyat bekleniyor"
+       gerçek bir durum (kayıt kartındaki rozet de bunu diyor). -->
+  <div class="card">
+    <div class="section-label">
+      <span class="lbl-txt">
+        <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Teslime hazır mı?
+      </span>
+    </div>
+    <div id="kTeslimOzet"></div>
   </div>
+
+  <!-- ⚠️ 04.09 — "Onay iste" -> "Özet gönder" (ölü uç turu).
+       Düğme "Onay iste" diyordu, bastığında balon "Özet gönderildi"
+       diyordu ve GERÇEKTE HİÇBİR ŞEY GÖNDERİLMİYORDU. Ad artık
+       yapılan işi söylüyor ve gerçekten mesaj ekranına götürüyor.
+       Cemil onayına açık (A-M6). -->
+  <button class="btn btn-ghost" id="kOzetGonder">
+    <svg class="ico"><use href="#i-message-square"></use></svg> Özet gönder
+  </button>
 
   <button class="btn btn-primary btn-lg" data-git="teslim">
     <svg class="ico"><use href="#i-wallet"></use></svg> Teslim et
   </button>
+
+  </div><!-- /kAdim3 -->
 
 </section>
 
@@ -3359,7 +3500,12 @@ kirpilsin. */
     <div class="card">
       <div class="section-label with-action">
         <span class="lbl-txt">Mesaj</span>
-        <button class="daire-btn" id="msjMik" aria-label="Sesle yazdır" title="Sesle">
+        <!-- ⚠️ DİKTE, KOMUT DEĞİL (08.09). Bu mikrofon mesajın METNİNİ
+             yazdırıyor; ses ekranını açmıyor. Kime gönderileceğini
+             söylemek isteyen usta yukarıdaki arama kutusunun
+             mikrofonunu kullanıyor — orası komut, burası metin. -->
+        <button class="daire-btn" id="msjMik" data-dikte="msjMetin"
+                aria-pressed="false" aria-label="Sesle yazdır" title="Sesle yazdır">
           <svg class="ico"><use href="#i-mic"></use></svg>
         </button>
       </div>
@@ -3436,16 +3582,22 @@ kirpilsin. */
      satırda "Mesaj" çipi de vardı; usta için plaka ile mesaj düğmesi
      aynı cinsten iki nesne gibi duruyordu.
 
-     ARTIK: müşteri bir KART. Üstte adı ve kaç aracı olduğu, altında
-     telefonu, ayracın altında araçları — her araç kendi satırında,
-     GERÇEK plaka bileşeniyle ve yanında marka/model. Satıra dokunmak
-     aracı açar. Mesaj düğmesi en altta, tek başına: eylem eylemdir,
-     plaka veridir.
+     06.09'da müşteri bir KART olmuştu: ad, telefon, ayracın altında
+     araç satırları, en altta mesaj düğmesi.
+
+     ⚠️ 08.09 — O KART SATIRA İNDİ (Cemil, telefon testi: "Müşteriler
+     sayfası neden çok boşluklu, bunu düzenleyelim." + "Müşteriler
+     listesinde müşteriye tıklayıp müşteri detayı görebilmeliyim.").
+
+     İki cümle aynı çözümü işaret ediyor: kartın taşıdığı ayrıntı
+     LİSTEDE olmamalı, DETAYDA olmalı. Liste satıra indi (`.tl-item` —
+     mesaj ekranındaki müşteri seçme listesiyle aynı satır), ayrıntı
+     91-musteri.html'e taşındı. Hiçbir şey silinmedi; yeri değişti.
 
      BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
-     · .card · .tel-link · .plate · .bos-durum · .btn .btn-ghost.
-     Bu ekrana özel: .ms-bas .ms-ad .ms-say .ms-araclar .ms-arac
-     .ms-arac-ad (ekranın kendi stil bloğunda, yalnız burada kullanılıyor).
+     · .tl-item .tl-ic .tl-body .tl-title .tl-tip .tl-sub .tl-foot
+     .tl-date · .tel-inline · .pill · .bos-durum.
+     Ekrana özel sınıf KALMADI.
 
      ⚠️ YORUMUN İÇİNE ETİKET YAZILMAZ: burada bir kez "(aşağıdaki
      &lt;style&gt; içinde)" yazdım ve derleyicinin stil çıkarıcısı YORUMDAKİ
@@ -3474,6 +3626,80 @@ kirpilsin. */
   </div>
 
   <div id="msListe"></div>
+
+</section>
+
+
+
+<!-- ⚠️ 08.09 — BU EKRANIN KENDİ STİLİ KALMADI.
+     .ms-* sınıfları müşteri DETAY ekranına (91-musteri.html) taşındı;
+     liste artık ortak `.tl-item` satırını kullanıyor. Sınıf, kullanan
+     ekranın yanında durur — iki ekranda tanımlı kalsaydı derleme
+     denetiminin "aynı sınıf iki ekranda" testi haklı olarak bağırırdı. -->
+
+<!-- ekran: musteri · MÜŞTERİ DETAYI
+     ⚠️ 08.09 — CEMİL İSTEDİ (telefon testi):
+       *"Müşteriler listesinde müşteriye tıklayıp müşteri detayı
+        görebilmeliyim."*  ·  *"Tıklayınca herhangi bir şey yapmıyor."*
+
+     BU EKRAN BİR KARARIN GERİ ALINMASIDIR. 90-musteriler.html'de şöyle
+     yazıyordu: *"Aracına dokunulunca araç ekranı açılır — müşterinin
+     kendi ekranı YOK ve gerekmiyor; bilgi zaten aracın üstünde."*
+     Gerekçe kâğıt üstünde doğruydu; telefonda yanlış çıktı. Usta
+     müşterinin ADINA dokunuyor çünkü aradığı şey MÜŞTERİ — hangi
+     aracı olduğunu zaten bilmiyor, ona bakmaya geliyor. Dokunulan
+     yerin hiçbir şey yapmaması, ekranın en pahalı hâlidir: usta
+     bozuk mu diye ikinci kez dokunuyor.
+
+     CLAUDE.md: *"Tamircinin sözü bizim akıl yürütmemizi yener."*
+
+     ⚠️ EKRAN SAYISI 14 -> 15. Ana yol büyümedi (A-2): bu ekran akışın
+     üstünde değil, LİSTENİN DİBİNDE. Ana yol hâlâ
+     ruhsat -> kayit -> teslim.
+
+     BU EKRAN LİSTEDEN NE ALDI: müşteriler listesi her kartta telefonu,
+     araç satırlarını ve mesaj düğmesini taşıyordu — Cemil'in
+     *"Müşteriler sayfası neden çok boşluklu"* dediği şey buydu.
+     Ayrıntı buraya taşındı, liste satıra indi. Yani bu ekran yeni bir
+     yük değil, listeden alınan yükün konduğu yer.
+
+     ÜZERİNDE YOK: müşteri düzenleme · birleştirme · bakiye · not ·
+     etiket. Müşteri hâlâ kendi tablosu olmayan, araçtan TÜRETİLEN bir
+     görünüm (VERI-MODELI'nde Customer yok, A-M1 açık).
+
+     BİLEŞENLER: .screen-head .eyebrow · .card · .section-label
+     · .tel-link · .plate · .tl-item · .btn .btn-primary .btn-lg
+     · .plate-hint · .bos-durum.
+     Bu ekrana özel: .ms-bas .ms-ad .ms-say .ms-araclar .ms-arac
+     .ms-arac-ad .mst-grup-bas -->
+<section class="screen" id="screen-musteri">
+
+  <div class="screen-head">
+    <!-- Başlık MÜŞTERİNİN ADI. Alt şeritteki "neredeyim" yazısı bu
+         başlığı okuyor (yerTazele) — usta listede on müşteri arasından
+         hangisini açtığını aşağı kaydırdığında da görüyor. -->
+    <span class="eyebrow" id="mstBaslik"></span>
+  </div>
+
+  <div class="card">
+    <div id="mstKunye"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçları
+    </div>
+    <div id="mstAraclar"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Servis geçmişi
+    </div>
+    <div id="mstGecmis"></div>
+  </div>
+
+  <div id="mstEylem"></div>
 
 </section>
 
@@ -3707,15 +3933,19 @@ kirpilsin. */
        NEDEN ALTTA DA GEREKLİ: telefon büyüdükçe üst köşe başparmakla
        ulaşılmaz oluyor. Aynı işin ikinci gövdesi, ulaşılabilir yerde. -->
   <footer class="botbar" aria-label="Alt gezinme">
-    <button class="icon-btn" data-nav="geri" aria-label="Geri" title="Geri">
-      <svg class="ico"><use href="#i-chevron-left"></use></svg>
-    </button>
-    <button class="icon-btn" data-nav="ana" aria-label="Ana menü" title="Ana menü">
-      <svg class="ico"><use href="#i-menu"></use></svg>
-    </button>
-    <button class="icon-btn" data-nav="ileri" aria-label="İleri" title="İleri">
-      <svg class="ico"><use href="#i-chevron-right"></use></svg>
-    </button>
+    <!-- SOL: neredeyim. Ekranın kendi başlığından okunur (yerTazele). -->
+    <span class="botbar-yer" id="botbarYer" aria-hidden="true"></span>
+    <nav class="botbar-nav" aria-label="Gezinme">
+      <button class="icon-btn" data-nav="geri" aria-label="Geri" title="Geri">
+        <svg class="ico"><use href="#i-chevron-left"></use></svg>
+      </button>
+      <button class="icon-btn" data-nav="ana" aria-label="Ana menü" title="Ana menü">
+        <svg class="ico"><use href="#i-menu"></use></svg>
+      </button>
+      <button class="icon-btn" data-nav="ileri" aria-label="İleri" title="İleri">
+        <svg class="ico"><use href="#i-chevron-right"></use></svg>
+      </button>
+    </nav>
   </footer>
 
   <!-- ================= ÇEKMECE =================
@@ -3902,6 +4132,9 @@ window.addEventListener('unhandledrejection', function (e) {
    Ortulu global birakilmiyor; nerede tanimlandigi belli olsun. */
 var ACIK_KAYIT = null;
 var ACIK_PLAKA = null;
+/* Hangi musteri acik. Musterinin id'si yok (kendi tablosu yok, A-M1);
+   tasinan sey musteriler()'in urettigi anahtar. */
+var ACIK_MUSTERI = null;
 /* Sesli isleme NE ICIN gidildigi. Ayni ekran farkli beklentilerle
    aciliyor: "servis-ekle" plaka bekler, "araclar" arama bekler. */
 var SESLI_NIYET = null;
@@ -3987,6 +4220,7 @@ var Ekran = (function () {
     el.scrollTop = 0;
     window.scrollTo(0, 0);
     geriTazele();
+    yerTazele();
     return true;
   }
 
@@ -4000,6 +4234,9 @@ var Ekran = (function () {
     if (k && el && typeof k.ciz === 'function') {
       try { k.ciz(el); } catch (e) { console.error('ciz(' + acik + '):', e); }
     }
+    /* Başlık çizimle değişebilir (kayıt ekranında iş türü) — alt
+       şeritteki yazı da onunla birlikte tazelenir. */
+    yerTazele();
   }
 
   function ac(ad) {
@@ -4022,7 +4259,38 @@ var Ekran = (function () {
     goster(ad);
   }
 
+  /* ⚠️ EKRAN İÇİ ADIM DA GERİDİR (08.09 — Cemil: "Müşteriye mesaj
+     gönder ekranında bir müşteri seçilip geri gelince ana menüye
+     atıyor.").
+
+     Sorun: bazı ekranların İÇİNDE adım var (mesajda "müşteri seç" →
+     "mesajı yaz"). Bu adımlar `tazele()` ile değişiyordu, yani geçmişe
+     hiç yazılmıyordu — geri tuşu ekranın TAMAMINDAN çıkıyordu ve usta
+     bir adım geri gitmek isterken ana menüde buluyordu kendini.
+
+     ÇÖZÜM ÇEKİRDEKTE, EKRANDA DEĞİL: ekran iki kanca tanımlayabilir —
+     `geriVar()` (içeride geri alınacak adım var mı) ve `geriAl()`
+     (adımı geri al). Geri tuşu ÖNCE ekrana sorar. Her ekranın kendi
+     geri düğmesini çizmesi de çözerdi, ama o zaman "geri" iki ayrı şey
+     olurdu: alttaki tuş bir yere, ekrandaki düğme başka yere. Tek tuş,
+     tek anlam (K-042'nin kuralı).
+
+     Kanca yazmayan ekran hiçbir şey kaybetmez. */
+  function ekranGeriVar() {
+    var k = acik ? kayit[acik] : null;
+    if (!k || typeof k.geriVar !== 'function') return false;
+    try { return !!k.geriVar(); }
+    catch (e) { console.error('geriVar(' + acik + '):', e); return false; }
+  }
+
   function geri() {
+    if (ekranGeriVar()) {
+      try { kayit[acik].geriAl(); }
+      catch (e) { console.error('geriAl(' + acik + '):', e); }
+      tazele();
+      geriTazele();
+      return;
+    }
     if (!gecmis.length) return;
     if (acik) ileriYigin.push(acik);
     goster(gecmis.pop());
@@ -4039,11 +4307,38 @@ var Ekran = (function () {
      soluklaşıyor. id ile arasaydık ikinci gövde sessizce hep açık
      kalırdı — ve "geri" gidilemeyecek yerde basılabilir görünürdü. */
   function geriTazele() {
-    var yok = { geri: gecmis.length === 0, ileri: ileriYigin.length === 0 };
+    /* Ekran İÇİNDE geri alınacak bir adım varsa tuş sönük olamaz —
+       yoksa gidilebilecek bir yer gidilemez görünür. */
+    var yok = { geri: gecmis.length === 0 && !ekranGeriVar(),
+                ileri: ileriYigin.length === 0 };
     document.querySelectorAll('[data-nav]').forEach(function (b) {
       var y = b.getAttribute('data-nav');
       if (y === 'geri' || y === 'ileri') b.disabled = yok[y];
     });
+  }
+
+  /* ⚠️ ÇEKİRDEK EKRANIN ADINI BİLMİYOR (08.09). Alt şeridin solunda
+     "neredeyim" yazacak; buraya bir { ad -> başlık } tablosu koysaydım
+     her yeni ekran İKİ yere yazılırdı ve biri mutlaka unutulurdu —
+     v1'in en pahalı hata sınıfı. Ekranın başlığı zaten DOM'da duruyor
+     (.screen-head .eyebrow); çekirdek onu okuyor.
+
+     Sayaç (.eb-say — "3 bulundu") ELENİYOR: o başlık değil, o an kaç
+     şey olduğu. Alt şeritte dursaydı yazı her tuşta değişirdi ve göz
+     onu okumayı bırakırdı. */
+  function yerTazele() {
+    var yuva = document.getElementById('botbarYer');
+    if (!yuva) return;
+    var bas = acik
+      ? document.querySelector('#screen-' + acik + ' .screen-head .eyebrow')
+      : null;
+    var yazi = '';
+    if (bas) {
+      var kopya = bas.cloneNode(true);
+      kopya.querySelectorAll('.eb-say').forEach(function (s) { s.remove(); });
+      yazi = (kopya.textContent || '').replace(/\s+/g, ' ').trim();
+    }
+    yuva.textContent = yazi;
   }
 
   return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
@@ -4053,7 +4348,7 @@ var Ekran = (function () {
            tanimlar: function () { return kayit; },
            adi: function () { return acik; },
            /* Android geri tusu icin — cikilacak mi, geri mi gidilecek */
-           geriVarMi: function () { return gecmis.length > 0; } };
+           geriVarMi: function () { return gecmis.length > 0 || ekranGeriVar(); } };
 })();
 
 /* Denetim aracı (tools/saglik-denetim.js) bu ada göre çalışıyor —
@@ -4069,6 +4364,135 @@ document.addEventListener('click', function (e) {
   if (!t) return;
   e.preventDefault();
   Ekran.ac(t.getAttribute('data-git'));
+});
+
+/* ================= WEB SPEECH API =================
+   ÜCRETSİZ VE ANAHTARSIZ: tarayıcının kendi motoru. Chrome ve Edge'de
+   var, Firefox'ta yok. Sesi Google'ın sunucusuna gönderir (K-015).
+   Güvenli bağlam ister — file:// ile açılan dosyada çalışmaz. */
+function sesMotorSinifi() {
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+function sesMotorVar() {
+  return !!sesMotorSinifi() && (window.isSecureContext !== false);
+}
+
+function sesMotorNotu() {
+  if (!sesMotorSinifi()) {
+    return 'Bu tarayıcıda ses tanıma yok (Chrome ya da Edge gerekiyor). ' +
+           'Örneklerden birine dokunursan söylenmiş gibi işler.';
+  }
+  if (window.isSecureContext === false) {
+    return 'Mikrofon yalnız güvenli adreste (https) açılır; dosyadan açılan ' +
+           'sayfada çalışmaz. Örneklerden birine dokunursan söylenmiş gibi işler.';
+  }
+  return 'Mikrofona dokun ve söyle. Tarayıcının kendi tanıyıcısı kullanılıyor — ' +
+         'ek kurulum yok.';
+}
+
+/* ================= DİKTE =================
+   ⚠️ 08.09 — Cemil: *"Mesaj ekranında 'aracınız hazır teslim
+   alabilirsiniz' dedim, mesaj bölümü için yanlış anlamadıysam dedi.
+   Aslında burada text yazması gerek."*
+
+   Haklı ve hata benimdi: mesaj ekranındaki mikrofonun aria-label'ı
+   *"Sesle yazdır"* diyordu ama düğme `sesleAc('mesaj')` çağırıyordu —
+   yani cümleyi KOMUT sanıp çözümlemeye gönderiyordu. Usta mesajın
+   METNİNİ söylüyor; çözümleyecek bir komut yok, YAZILACAK bir cümle
+   var.
+
+   İKİ AYRI İŞ, İKİ AYRI YOL:
+     sesleAc(niyet)  → KOMUT. "34 ABC 123 sahibine mesaj gönder".
+                       Ses ekranı açılır, anlar, ONAY ister.
+     Dikte           → METİN. Söylenen ne ise alana yazılır. Anlam
+                       aranmaz, onay istenmez — çünkü yorum yok.
+
+   TEK YERDE: düğmeler `data-dikte="<alanId>"` taşıyor, dinleyici
+   burada. Her ekran kendi tanıyıcısını kurmuş olsaydı "izin verilmedi"
+   mesajı bir ekranda çıkar ötekinde çıkmazdı.
+
+   YAZILANIN ÜSTÜNE YAZMAZ: alanda ne varsa TEMEL alınır, duyulan onun
+   ARDINA eklenir. Şablondan gelen metni silmek, ustanın seçtiği şablonu
+   sessizce çöpe atmak olurdu. */
+var Dikte = (function () {
+  var tanima = null, alan = null, dugme = null, temel = '';
+
+  function isaretle(acik) {
+    if (dugme) dugme.setAttribute('aria-pressed', String(!!acik));
+  }
+
+  function dur() {
+    if (tanima) { try { tanima.abort(); } catch (x) {} }
+    tanima = null; isaretle(false); alan = null; dugme = null;
+  }
+
+  function yaz(ek) {
+    if (!alan) return;
+    var bosluk = (temel && !/\s$/.test(temel)) ? ' ' : '';
+    alan.value = temel + (ek ? bosluk + ek : '');
+    /* Ekranlar alanı `input` ile dinliyor (kayıt açıklaması gibi);
+       elle value yazmak o olayı doğurmaz. */
+    try { alan.dispatchEvent(new Event('input', { bubbles: true })); } catch (x) {}
+  }
+
+  function baslat(hedefAlan, hedefDugme) {
+    if (!hedefAlan) return;
+    /* İkinci dokunuş DURDURUR — açık kalan bir mikrofon, ustanın
+       farkında olmadan dinleyen bir mikrofondur. */
+    if (tanima) { dur(); balon('Dinleme kapandı.', false, 1600); return; }
+
+    var Sinif = sesMotorSinifi();
+    if (!Sinif || !sesMotorVar()) { balon(sesMotorNotu(), false, 4200); return; }
+
+    alan = hedefAlan; dugme = hedefDugme || null; temel = alan.value || '';
+    try {
+      tanima = new Sinif();
+      tanima.lang = 'tr-TR';
+      tanima.interimResults = true;
+      tanima.maxAlternatives = 1;
+
+      tanima.onresult = function (e) {
+        var kesin = '', gecici = '';
+        for (var i = 0; i < e.results.length; i++) {
+          if (e.results[i].isFinal) kesin += e.results[i][0].transcript;
+          else gecici += e.results[i][0].transcript;
+        }
+        yaz((kesin + gecici).trim());
+      };
+      tanima.onerror = function (e) {
+        var mesaj = ({
+          'not-allowed': 'Mikrofon izni verilmedi. Adres çubuğundaki kilit simgesinden izin ver.',
+          'service-not-allowed': 'Tarayıcı mikrofonu engelledi. Sayfayı https ya da localhost üzerinden aç.',
+          'no-speech': 'Ses duyulmadı. Mikrofona biraz daha yakın söyle.',
+          'audio-capture': 'Mikrofon bulunamadı.',
+          'network': 'Tanıma sunucusuna ulaşılamadı — internet bağlantısını kontrol et.',
+          'aborted': ''
+        })[e.error];
+        if (mesaj === undefined) mesaj = 'Mikrofon hatası: ' + (e.error || 'bilinmiyor');
+        dur();
+        if (mesaj) balon(mesaj, false, 4000);
+      };
+      tanima.onend = function () {
+        var vardi = !!tanima;
+        dur();
+        if (vardi) balon('Yazıldı — istersen elle düzelt.', false, 2000);
+      };
+      isaretle(true);
+      balon('Dinliyorum — söylediğin yazıya geçiyor.', true, 30000);
+      tanima.start();
+    } catch (x) {
+      dur();
+      balon('Mikrofon başlatılamadı.', false, 2600);
+    }
+  }
+
+  return { baslat: baslat, dur: dur };
+})();
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-dikte]');
+  if (!t) return;
+  Dikte.baslat(document.getElementById(t.getAttribute('data-dikte')), t);
 });
 
 /* ---- balon ---- */
@@ -4950,7 +5374,13 @@ var KAYITLAR = [
     ] },
 
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
-    sikayet: 'Ön balata değişimi — parçayı müşteri getirdi',
+    /* ⚠️ 08.09 — AÇIKLAMADAN "parçayı müşteri getirdi" ÇIKARILDI.
+       Cemil: *"Servis kayıtlarında yine parçayı müşteri getirdi
+       yazıyor."* Doğrusu buydu: bilgi zaten satırın üstünde
+       (kimGetirdi: 'musteri'). Açıklamaya da yazılınca aynı şey
+       kayıt listesinde de, kayıt detayında da, müşterinin özet
+       sayfasında da görünüyordu — örnek veri, abartının kendisiydi. */
+    sikayet: 'Ön balata değişimi',
     acilis: '01.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
     satirlar: [
@@ -5212,12 +5642,26 @@ function musteriler() {
     if (!ad) return;                      /* sahibi yazılmamış araç listede yok */
     var anahtar = norm(ad) + '|' + (a.sahipTel || '');
     if (!harita[anahtar]) {
-      harita[anahtar] = { ad: ad, tel: a.sahipTel || '', araclar: [] };
+      /* ⚠️ ANAHTAR NESNENİN ÜSTÜNDE (08.09). Müşteri detayı ekranı
+         açılırken "hangi müşteri" bilgisini taşımak gerekiyor ve
+         müşterinin id'si YOK — kendi tablosu olmadığı için (A-M1).
+         Anahtarı burada bir kez üretip nesneye yazmak, onu çağıran
+         her yerde YENİDEN kurmaktan güvenli: kural değişirse tek
+         yerde değişir. */
+      harita[anahtar] = { anahtar: anahtar, ad: ad, tel: a.sahipTel || '', araclar: [] };
     }
     harita[anahtar].araclar.push(a);
   });
   return Object.keys(harita).map(function (k) { return harita[k]; })
     .sort(function (x, y) { return x.ad.localeCompare(y.ad, 'tr'); });
+}
+
+/* Müşteri TÜRETİLMİŞ bir görünüm; "bul" da türetmeden geçer. Aracın
+   sahibi adı değişirse anahtar değişir ve burası null döner — detay
+   ekranı bunu bir hata değil, bir durum olarak karşılıyor. */
+function musteriBul(anahtar) {
+  if (!anahtar) return null;
+  return musteriler().filter(function (m) { return m.anahtar === anahtar; })[0] || null;
 }
 
 /* ---- MUHASEBENİN HAMMADDESİ ----
@@ -5843,6 +6287,16 @@ document.addEventListener('click', function (e) {
   Ekran.ac('kayit');
 });
 
+/* Musteri satirina dokunmak MUSTERIYI ACAR (08.09). Kayit ve arac
+   ile ayni kalip: satir veriyi tasir, davranis tek yerde durur. */
+document.addEventListener('click', function (e) {
+  if (e.target.closest('[data-tel]')) { e.stopPropagation(); return; }
+  var t = e.target.closest('[data-musteri]');
+  if (!t) return;
+  ACIK_MUSTERI = t.getAttribute('data-musteri');
+  Ekran.ac('musteri');
+});
+
 /* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
    listesinde de. Iki ekrana ayri yazmak nesneyi ikiye bolerdi. */
 document.addEventListener('click', function (e) {
@@ -6426,29 +6880,12 @@ function sesCiz() {
     '</div>';
 }
 
-/* ================= WEB SPEECH API =================
-   ÜCRETSİZ VE ANAHTARSIZ: tarayıcının kendi motoru. Chrome ve Edge'de
-   var, Firefox'ta yok. Sesi Google'ın sunucusuna gönderir (K-015).
-   Güvenli bağlam ister — file:// ile açılan dosyada çalışmaz. */
-function sesMotorSinifi() {
-  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
-}
-function sesMotorVar() {
-  return !!sesMotorSinifi() && (window.isSecureContext !== false);
-}
-
-function sesMotorNotu() {
-  if (!sesMotorSinifi()) {
-    return 'Bu tarayıcıda ses tanıma yok (Chrome ya da Edge gerekiyor). ' +
-           'Örneklerden birine dokunursan söylenmiş gibi işler.';
-  }
-  if (window.isSecureContext === false) {
-    return 'Mikrofon yalnız güvenli adreste (https) açılır; dosyadan açılan ' +
-           'sayfada çalışmaz. Örneklerden birine dokunursan söylenmiş gibi işler.';
-  }
-  return 'Mikrofona dokun ve söyle. Tarayıcının kendi tanıyıcısı kullanılıyor — ' +
-         'ek kurulum yok.';
-}
+/* ⚠️ MOTOR TESPİTİ ÇEKİRDEĞE TAŞINDI (08.09).
+   `sesMotorSinifi` / `sesMotorVar` / `sesMotorNotu` artık
+   betik/01-cekirdek.js içinde. Sebep: mikrofon ARTIK İKİ İŞ yapıyor —
+   bu ekranda KOMUT çözümlüyor, mesaj ekranında DİKTE ediyor. İkisi
+   aynı motoru soruyor; iki kopya olsaydı biri "https şart" der öteki
+   demezdi. Aşağıdaki çağrılar aynen duruyor. */
 
 function sesDinlemeyiBaslat() {
   var Sinif = sesMotorSinifi();
@@ -6726,8 +7163,24 @@ function rEylemCiz(plakaTamam, kayitli) {
         ' Ruhsat adımını geç ve kaydı aç</button>' +
       '<button class="btn btn-ghost" id="ruhsataGit" style="margin-top:10px">' +
         '<svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek</button>'
-    : '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
-        '<svg class="ico"><use href="#i-check"></use></svg> Kaydı aç</button>';
+    /* ⚠️ 08.09 — PLAKA YOKKEN "KAYDI AÇ" GÖRÜNMÜYOR.
+       Cemil (telefon testi): *"Sayfada herşey yapılabiliyor gözüküyor.
+       Adımlar birbirini takip etmeli."* Bunu servis kaydı ekranı için
+       söyledi ama aynı kusurun küçük hâli buradaydı: ekran açılır
+       açılmaz, daha tek harf yazılmadan, en alttaki birincil düğme
+       *"Kaydı aç"* diyordu. Basılınca hiçbir şey olmuyordu (balon
+       plakayı isterdi) — yani ekranın en büyük, en renkli öğesi
+       ustadan bir şey yapmasını istiyor ama yapılacak şey henüz yok.
+
+       K-040.3 ("kapalı düğme yok, konuşan düğme var") burada
+       çiğnenmiyor: düğme SÖNÜK DEĞİL, HENÜZ YOK. Sönük düğme "burası
+       bozuk" der; olmayan düğme "sıra sende değil" der. Yerinde ne
+       yapılacağını söyleyen bir satır duruyor. */
+    : (plakaTamam
+        ? '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
+            '<svg class="ico"><use href="#i-check"></use></svg> Kaydı aç</button>'
+        : '<p class="plate-hint">Plakayı yaz ya da mikrofona söyle — ' +
+          'kaydı açan düğme burada çıkacak.</p>');
 }
 
 Ekran.tanim('ruhsat', {
@@ -6942,13 +7395,95 @@ function kayitToplamCiz(k) {
   if (el) el.textContent = tutar(kayitToplami(k)) + ' ₺';
 }
 
-/* Parçaların HEPSİ müşteriden mi — düğmenin basılı görünmesi buna
-   bakıyor. Hiç parça yoksa "hepsi" diye bir şey yok. */
-function kHepsiMusteriMi(k) {
-  var parcalar = (k.satirlar || []).filter(function (s) { return s.tip === 'parca'; });
-  return parcalar.length > 0 && parcalar.every(function (s) {
-    return s.kimGetirdi === 'musteri';
-  });
+/* ================= ADIMLAR (08.09) =================
+   Cemil: *"Adımlar birbirini takip etmeli."*
+
+   Üç adım, IS-AKISI.md'nin yedi adımının bu ekrana düşen kısmı:
+     1 · İş         → Adım 2 (ne istiyor)
+     2 · Yapılanlar → Adım 3-4-5-6
+     3 · Teslim     → Adım 7
+
+   ⚠️ ADIM KAYDIN ÜSTÜNDE (k.adim), EKRANIN DEĞİL. Bu dosyanın en
+   başındaki dersin aynısı (`k.turElle`): ekran değişkeni çizimle
+   birlikte ölür. Usta kayıttan çıkıp araç geçmişine bakıp geri
+   gelince, bıraktığı adımda olmalı — başa dönmemeli. */
+var K_ADIMLAR = [
+  { no: 1, ad: 'İş' },
+  { no: 2, ad: 'Yapılanlar' },
+  { no: 3, ad: 'Teslim' }
+];
+
+function kIsVar(k) { return !!(k.sikayet || '').trim(); }
+function kSatirVar(k) { return ((k.satirlar || []).length > 0); }
+
+/* Adım TAMAM MI — şeritteki onay işareti buna bakıyor. */
+function kAdimTamam(k, no) {
+  if (no === 1) return kIsVar(k);
+  if (no === 2) return kSatirVar(k);
+  return !!k.teslimTarihi;
+}
+
+/* Adıma GİDİLEBİLİR Mİ. Kilit değil, önkoşul: bir sonraki adımın
+   anlamı olması için öncekinin bir şey üretmiş olması gerekiyor. */
+function kAdimHazir(k, no) {
+  if (no === 2) return kIsVar(k) || kSatirVar(k);
+  if (no === 3) return kSatirVar(k);
+  return true;
+}
+
+/* Kaydın şu anki adımı. `k.adim` ustanın seçimi; yoksa VERİDEN
+   türetiliyor — eski kayıtlar ve örnek veri de doğru adımda açılsın.
+   Seçim artık geçerli değilse (satırlar silinmişse) geri çekiliyor:
+   var olmayan bir adımda durmak, boş ekran göstermektir. */
+function kAdimNo(k) {
+  var no = k.adim ||
+    (k.teslimTarihi ? 3 : (kSatirVar(k) ? 2 : (kIsVar(k) ? 2 : 1)));
+  while (no > 1 && !kAdimHazir(k, no)) no--;
+  return no;
+}
+
+/* ⚠️ KAPALI SEKME YOK, KONUŞAN SEKME VAR (K-040.3).
+   Hazır olmayan adıma dokunmak hiçbir şey yapmasaydı usta ekranı
+   bozuk sanardı — Cemil'in bu turda müşteri listesi için söylediği
+   şeyin aynısı: *"Tıklayınca herhangi bir şey yapmıyor."*
+   Sekme ne eksik olduğunu söylüyor ve eksiğin durduğu adıma
+   götürüyor. */
+function kAdimGit(k, no) {
+  if (kAdimHazir(k, no)) {
+    k.adim = no;
+    Ekran.tazele();
+    var el = document.getElementById('screen-kayit');
+    if (el) el.scrollTop = 0;
+    return;
+  }
+  if (no === 2) {
+    k.adim = 1; Ekran.tazele();
+    balon('Önce ne yapılacağını yaz.', false, 3000);
+    try { document.getElementById('kSikayet').focus(); } catch (x) {}
+  } else {
+    k.adim = 2; Ekran.tazele();
+    balon('Önce yapılanları yaz — en az bir parça ya da işçilik.', false, 3400);
+  }
+}
+
+/* Teslime hazır mı — EKSİKLERİ SÖYLER, YOLU KAPATMAZ.
+   "Fiyat bekleniyor" gerçek bir durumdur (kayıt kartındaki rozet de
+   onu diyor); teslimi engellemek, gerçek bir işi yazılıma
+   uydurmaya çalışmak olurdu. */
+function kEksikler(k) {
+  var satirlar = k.satirlar || [];
+  var eksik = [];
+  var adsiz = satirlar.filter(function (s) { return !(s.ad || '').trim(); }).length;
+  if (adsiz) eksik.push(adsiz + ' satırın adı yazılmamış');
+  var fiyatsiz = satirlar.filter(function (s) {
+    if (s.tip === 'parca' && s.kimGetirdi === 'musteri') return false;
+    return !s.fiyat;
+  }).length;
+  if (fiyatsiz) eksik.push(fiyatsiz + ' satırın tutarı yazılmamış');
+  if (k.parcaBekliyor) eksik.push('parça hâlâ "bekliyor" işaretli');
+  var h = mesajHedefi(k.plaka);
+  if (!h || !h.tel) eksik.push('telefon yok — özet gönderilemez');
+  return eksik;
 }
 
 /* ⚠️ 06.09 — BU FONKSİYON ARTIK HİÇBİR ŞEY SİLMİYOR (K-037).
@@ -7065,46 +7600,58 @@ function kayitCiz() {
                     }).join('') +
                   '</span>'
                 : '') +
-              /* ⚠️ A-M13 CEVAPLANDI (07.09) — SATIR BAŞINA GERİ GELDİ.
-                 Cemil: *"Evet, olabilir"* — *"balatayı müşteri getirdi,
-                 yağı ben aldım"* gerçek bir durum.
+              /* ⚠️ 08.09 — "KİM GETİRDİ" TEK SLOTA İNDİ (Cemil:
+                 *"Her yere parçayı müşteri getirdi bilgisini yazma. Bu
+                 lazım olursa kullanılacak bir özellik. Değişen parça
+                 fiyatı yerine bilgi olarak sadece yazılabilir ve sonra
+                 servis kaydında bilgi olarak görünecek."*).
 
-                 K-033.5'te bunu kaldırırken gerekçemi yanlış kurmuştum:
-                 Cemil'in *"gerek yok"* dediği şey satır başına **iki
-                 çipli SORU**ydu (etiket + Tamirci + Müşteri = üç öğe),
-                 işaretin kendisi değil.
+                 Önceki hâlde her parça satırında BASILI OLMAYAN bir çip
+                 duruyordu ve üstünde *"tamirci getirdi"* yazıyordu —
+                 yani hiçbir şey söylemeyen bir cümle, on satırda on kez.
+                 Ustanın okuduğu şey gürültüydü.
 
-                 Şimdi **tek çip**: üstünde şu anki hâli yazıyor,
-                 dokununca öbürüne geçiyor. Üç öğe yerine bir; ve `.cip`
-                 zaten 44 px, K-040'ta 26 px'lik düğmeyle düştüğüm
-                 tuzağa düşmüyor.
+                 ARTIK TEK SLOT, ÜÇ HÂLİ VAR:
+                   müşteri getirdiyse → BİLGİ. Dokunulunca geri alınır.
+                   fiyat yazılmamışsa → TEKLİF. "müşteri getirdi" yazan
+                                        küçük, soluk bir bağlantı.
+                   fiyat yazılmışsa   → HİÇBİR ŞEY. Parayı sen
+                                        alıyorsan parçayı sen
+                                        getirmişsindir; soru düşmüştür.
 
-                 Listenin üstündeki "hepsi" anahtarı duruyor — biri
-                 toptan, öteki tek tek. */
-              (s.tip === 'parca'
+                 A-M13'ün cevabı (*"balatayı müşteri getirdi, yağı ben
+                 aldım"*) korunuyor: işaret HÂLÂ SATIR BAŞINA. Değişen
+                 tek şey, sorulmadığı zaman görünmemesi. */
+              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || !s.fiyat || s.alis)
                 ? '<span class="k-ikincil">' +
-                    '<button class="cip" data-getiren="' + i + '" aria-pressed="' +
-                      (s.kimGetirdi === 'musteri') + '">' +
-                      (s.kimGetirdi === 'musteri' ? 'müşteri getirdi' : 'tamirci getirdi') +
-                    '</button>' +
+                    (s.kimGetirdi === 'musteri'
+                      ? '<button class="k-getiren-bilgi" data-getiren="' + i + '"' +
+                          ' title="Dokun — tutar yazmaya dön">müşteri getirdi</button>'
+                      : (!s.fiyat
+                          ? '<button class="k-getiren-sor" data-getiren="' + i + '">' +
+                              'müşteri getirdi</button>'
+                          : '')) +
                     /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM
                        DEĞİL: soluk ve küçük durur. */
                     (s.alis ? '<span class="k-alis">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
                   '</span>'
                 : '') +
             '</td>' +
-            /* Müşteri parçasının tutarı YAZILI ama TOPLAMA GİRMİYOR;
-               üstü çizili duruyor ki usta rakamı görsün ama toplamda
-               aramasın. Alan düzenlenebilir kalıyor: parçacının verdiği
-               rakam ileride işine yarayabilir (Kol D). */
-            '<td class="sayi' +
-              (s.tip === 'parca' && s.kimGetirdi === 'musteri' ? ' tutar-disi' : '') + '">' +
-              '<input value="' + (s.fiyat ? tutar(s.fiyat) : '') +
-                '" data-satir-fiyat="' + i + '" data-giris="tutar" inputmode="numeric"' +
-                ' placeholder="0" aria-label="Tutar"' +
-                (s.tip === 'parca' && s.kimGetirdi === 'musteri'
-                  ? ' title="Müşteri getirdi — toplama girmiyor"' : '') +
-                ' /></td>' +
+            /* ⚠️ MÜŞTERİ PARÇASINDA TUTAR HÜCRESİ BOŞ (08.09).
+               Eskiden rakam yazılı ama üstü çizili duruyordu. Cemil:
+               *"Değişen parça fiyatı yerine bilgi olarak sadece
+               yazılabilir."* Üstü çizili bir rakam hâlâ bir rakamdır —
+               göz onu toplamda arıyor, bulamıyor.
+
+               VERİ SİLİNMİYOR (K-037): `s.fiyat` kayıtta duruyor ve
+               işaret geri alınınca aynen geliyor. Görünmeyen şey rakam,
+               kaybolan şey değil. */
+            (s.tip === 'parca' && s.kimGetirdi === 'musteri'
+              ? '<td class="sayi"><span class="k-tutar-yok">—</span></td>'
+              : '<td class="sayi">' +
+                  '<input value="' + (s.fiyat ? tutar(s.fiyat) : '') +
+                    '" data-satir-fiyat="' + i + '" data-giris="tutar" inputmode="numeric"' +
+                    ' placeholder="0" aria-label="Tutar" /></td>') +
           '</tr>';
         }).join('') +
         '<tr class="genel"><td>Toplam</td>' +
@@ -7114,8 +7661,38 @@ function kayitCiz() {
         'Parça ya da işçilik ekle. Parçacının listesini fotoğraflayarak ' +
         'da girebilirsin. Satırı silmek için sola kaydır.');
 
-  document.getElementById('kHepsiMusteri')
-    .setAttribute('aria-pressed', String(kHepsiMusteriMi(k)));
+  /* ---- ADIM ŞERİDİ + PANOLAR ---- */
+  var adim = kAdimNo(k);
+  document.getElementById('kAdimSerit').innerHTML = K_ADIMLAR.map(function (a) {
+    return '<button class="tab" id="kAdimTab' + a.no + '" data-kadim="' + a.no + '"' +
+      ' role="tab" aria-selected="' + (adim === a.no) + '"' +
+      ' aria-controls="kAdim' + a.no + '">' +
+      (kAdimTamam(k, a.no)
+        ? '<svg class="ico ico-sm"><use href="#i-check"></use></svg>' : '') +
+      a.no + ' · ' + a.ad +
+    '</button>';
+  }).join('');
+  [1, 2, 3].forEach(function (n) {
+    document.getElementById('kAdim' + n).hidden = (adim !== n);
+  });
+
+  /* ---- ADIM 3 · TESLİM ÖZETİ ---- */
+  if (adim === 3) {
+    var sat = k.satirlar || [];
+    var eksik = kEksikler(k);
+    document.getElementById('kTeslimOzet').innerHTML =
+      '<div class="tutar-serit">' +
+        '<div class="tutar-sat"><span>' + sat.length + ' kalem</span>' +
+          '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>' +
+      '</div>' +
+      (eksik.length
+        ? '<div class="notice warn" style="margin-top:12px">' +
+            '<span class="n-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-triangle-alert"></use></svg></span>' +
+            '<span class="n-body">Eksik görünen: ' + eksik.join(' · ') +
+              '. Yine de teslim edebilirsin.</span></div>'
+        : '<p class="plate-hint">Her şey yazılmış görünüyor.</p>');
+  }
 
   /* ---- PARÇA BEKLİYOR ---- */
   document.getElementById('kBekliyor')
@@ -7212,27 +7789,12 @@ document.addEventListener('click', function (e) {
     Ekran.tazele(); return;
   }
 
-  /* HEPSİ MÜŞTERİDEN — tek dokunuşta işaretler, ikinci dokunuşta geri
-     alır. Geri alma şart: yanlışlıkla basılan bir düğme, on satırın
-     fiyatını sıfırlıyor. */
-  if (t.id === 'kHepsiMusteri') {
-    var hepsi = kHepsiMusteriMi(k);
-    (k.satirlar || []).forEach(function (s) {
-      if (s.tip !== 'parca') return;
-      if (hepsi) {
-        /* Geri alma artık TAM: fiyat hiç silinmediği için satır
-           olduğu gibi geri geliyor (K-037). Eskiden burada bir not
-           vardı — "usta kendi rakamını yeniden yazar" — ve o not, bir
-           veri kaybını kural gibi anlatıyordu. */
-        s.kimGetirdi = 'tamirci';
-      } else {
-        kGetireniAyarla(s, 'musteri');
-      }
-    });
-    balon(hepsi ? 'Parçalar tamirciye döndü.' : 'Tüm parçalar müşteriden sayıldı.',
-          false, 2600);
-    Ekran.tazele(); return;
-  }
+  /* ADIM ŞERİDİ ve "devam" düğmeleri AYNI YOLU kullanıyor (kAdimGit):
+     iki ayrı yol olsaydı biri önkoşulu sorar öteki sormazdı. */
+  var ad = t.getAttribute('data-kadim');
+  if (ad) { kAdimGit(k, parseInt(ad, 10)); return; }
+  if (t.id === 'kDevam1') { kAdimGit(k, 2); return; }
+  if (t.id === 'kDevam2') { kAdimGit(k, 3); return; }
 
   if (t.id === 'kBekliyor') {
     k.parcaBekliyor = !k.parcaBekliyor;
@@ -7321,10 +7883,16 @@ document.addEventListener('input', function (e) {
 
   var f = e.target.getAttribute('data-satir-fiyat');
   if (f !== null) {
-    k.satirlar[parseInt(f, 10)].fiyat =
-      parseInt((e.target.value || '').replace(/[^0-9]/g, ''), 10) || 0;
+    var sf = k.satirlar[parseInt(f, 10)];
+    sf.fiyat = parseInt((e.target.value || '').replace(/[^0-9]/g, ''), 10) || 0;
     /* Yalnız toplamı tazele — alanı yeniden çizmek imleci kaçırır. */
     kayitToplamCiz(k);
+    /* ⚠️ TEKLİF, YAZILAN RAKAMLA BİRLİKTE DÜŞER. Tam çizim yapılsaydı
+       imleç kaçardı; o yüzden bu tek öğe elle gizleniyor. Rakam
+       silinirse geri geliyor — kural tek cümle: fiyat varsa soru yok. */
+    var satirEl = e.target.closest('tr');
+    var teklif = satirEl ? satirEl.querySelector('.k-getiren-sor') : null;
+    if (teklif) teklif.hidden = !!sf.fiyat;
   }
 });
 })();
@@ -8205,6 +8773,16 @@ function msjYazimCiz() {
 }
 
 Ekran.tanim('mesaj', {
+  /* ⚠️ 08.09 — "MÜŞTERİ SEÇ" BİR ADIMDIR, EKRAN DEĞİL.
+     Cemil: *"Müşteriye mesaj gönder ekranında bir müşteri seçilip geri
+     gelince ana menüye atıyor."*
+
+     Doğrusu: seçim yapıldıysa geri tuşu SEÇİM LİSTESİNE döner; ekrandan
+     çıkmak ikinci geri. "Başkasına gönder" düğmesi duruyor ama artık
+     geri tuşunun işini yapan ikinci bir yol değil — aynı işin adı
+     konmuş hâli. */
+  geriVar: function () { return !!msjPlaka; },
+  geriAl: function () { msjPlaka = null; msjHedefSecili = null; },
   ciz: function () {
     /* Ses buraya hedef bırakmış olabilir. Okunur ve TEMİZLENİR;
        bırakılsa bir sonraki açılışa sızardı. */
@@ -8343,7 +8921,10 @@ document.addEventListener('click', function (e) {
   }
   if (t.id === 'msjQTemiz') { document.getElementById('msjQ').value = ''; Ekran.tazele(); return; }
 
-  if (t.id === 'msjMik' || t.id === 'msjSecimMik') {
+  /* msjMik ARTIK BURADA DEĞİL: `data-dikte` ile çekirdeğe bağlı.
+     Kalan tek komut mikrofonu seçim listesindeki — "kime" sorusunun
+     cevabını duyan o. */
+  if (t.id === 'msjSecimMik') {
     sesleAc('mesaj'); return;
   }
 
@@ -8416,43 +8997,48 @@ Ekran.tanim('musteriler', {
       liste.length + (q ? ' bulundu' : ' müşteri');
     document.getElementById('msArama').classList.toggle('filled', !!q);
 
+    /* ⚠️ 08.09 — KART SATIRA İNDİ (Cemil: "Müşteriler sayfası neden
+       çok boşluklu, bunu düzenleyelim.").
+
+       NE OLMUŞTU: her müşteri bir KARTTI ve kart dört şey taşıyordu —
+       ad satırı, telefon bağlantısı, ayraçla ayrılmış araç satırları,
+       en altta mesaj düğmesi. Üç müşteride 18 px iç boşluklu üç kart,
+       telefon ekranının tamamını yiyordu; usta dördüncü müşteriyi
+       görmek için kaydırıyordu. Liste ARAMAK içindir; okumak için
+       değil.
+
+       ARTIK: satır. Ad, araç sayısı, plakalar, telefon. Satıra
+       dokunmak MÜŞTERİ DETAYINI açıyor — Cemil'in aynı turda istediği
+       ikinci şey (*"müşteriye tıklayıp müşteri detayı görebilmeliyim"*)
+       bu boşluğu doldurmanın da yolu oldu: taşınan ayrıntı silinmedi,
+       yeri değişti.
+
+       BİLEŞEN YENİ DEĞİL: `.tl-item` — mesaj ekranındaki müşteri seçme
+       listesi zaten bu satırı kullanıyor. İki yerde müşteri seçiliyor
+       ve ikisi artık aynı görünüyor. */
     document.getElementById('msListe').innerHTML = liste.length
       ? liste.map(function (m) {
           var kayitSay = m.araclar.reduce(function (t, a) {
             return t + aracKayitlari(a.plaka).length; }, 0);
-          /* Aracına dokunulunca araç ekranı açılır — müşterinin kendi
-             ekranı YOK ve gerekmiyor; bilgi zaten aracın üstünde. */
-          return '<div class="card ms-kart">' +
-            '<div class="ms-bas">' +
-              '<span class="ms-ad">' + m.ad + '</span>' +
-              '<span class="ms-say">' + m.araclar.length + ' araç · ' +
-                kayitSay + ' kayıt</span>' +
+          /* Plakalar SATIRIN İÇİNDE, düz metin olarak: usta plakayla
+             arıyor, gördüğü şey aradığı şeyle aynı yazılmalı. Üçten
+             fazlası satırı sarar — sayıyla söyleniyor. */
+          var plakalar = m.araclar.slice(0, 3).map(function (a) { return a.plaka; }).join(' · ') +
+            (m.araclar.length > 3 ? ' +' + (m.araclar.length - 3) : '');
+          return '<div class="tl-item" data-musteri="' + m.anahtar + '"' +
+              ' role="button" tabindex="0" aria-label="' + m.ad + ' — müşteriyi aç">' +
+            '<span class="tl-ic"><svg class="ico ico-sm">' +
+              '<use href="#i-user"></use></svg></span>' +
+            '<div class="tl-body">' +
+              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
+              '<div class="tl-sub">' + plakalar + '</div>' +
+              '<div class="tl-foot">' +
+                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
+                       : '<span class="pill warn">telefon yok</span>') +
+                '<span class="tl-date">' + m.araclar.length + ' araç · ' +
+                  kayitSay + ' kayıt</span>' +
+              '</div>' +
             '</div>' +
-            /* TELEFON ARANABİLİR (v1'deki gibi) — mono metin değil,
-               dokunulunca arayan bir bağlantı. */
-            (m.tel ? telLinkHtml(m.tel, m.ad)
-                   : '<p class="plate-hint">Telefon yok — mesaj gönderilemez.</p>') +
-            /* ARAÇLAR — her biri KENDİ SATIRINDA, gerçek plaka
-               bileşeniyle. Satırın tamamı dokunma hedefi (48 px);
-               plakanın kendisini düğmeye çevirmeye gerek yok. */
-            '<div class="ms-araclar">' +
-              m.araclar.map(function (a) {
-                return '<button class="ms-arac" data-arac="' + a.plaka +
-                    '" aria-label="' + a.plaka + ' aracını aç">' +
-                  plakaHtml(a.plaka) +
-                  '<span class="ms-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
-                  '<svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>' +
-                '</button>';
-              }).join('') +
-            '</div>' +
-            /* 04.09: müşteriyi buluyordun ama BURADAN mesaj
-               gönderemiyordun — mesaj ekranına gidip aynı müşteriyi
-               ikinci kez aramak gerekiyordu. */
-            (m.tel
-              ? '<button class="btn btn-ghost" data-mesajla="' + m.araclar[0].plaka + '">' +
-                  '<svg class="ico"><use href="#i-message-square"></use></svg>' +
-                  ' Mesaj gönder</button>'
-              : '') +
           '</div>';
         }).join('')
       : bosDurumHtml('i-users',
@@ -8467,6 +9053,9 @@ document.addEventListener('click', function (e) {
     document.getElementById('msQ').value = ''; Ekran.tazele();
     return;
   }
+  /* [data-mesajla] ARTIK MÜŞTERİ DETAYINDA — dinleyici burada kaldı
+     çünkü iki ekranda da aynı şeyi yapıyor ve ikiye bölmek onu iki
+     kez düzeltmek demek olurdu. */
   var mp = e.target.closest('[data-mesajla]');
   if (mp) {
     e.stopPropagation();
@@ -8477,6 +9066,117 @@ document.addEventListener('click', function (e) {
 document.addEventListener('input', function (e) {
   if (e.target && e.target.id === 'msQ') Ekran.tazele();
 });
+})();
+
+/* ===== ekran: 91-musteri.html ===== */
+(function () {
+Ekran.tanim('musteri', {
+  ciz: function () {
+    var m = musteriBul(ACIK_MUSTERI);
+
+    /* ⚠️ MÜŞTERİ SİLİNMİŞ OLABİLİR — daha doğrusu: müşteri bir KAYIT
+       DEĞİL, araçlardan türetilen bir görünüm. Aracın sahibi adı
+       değişirse anahtar değişir ve bu ekran boşa düşer. Boş ekran
+       göstermek yerine ne olduğunu söylüyoruz. */
+    if (!m) {
+      document.getElementById('mstBaslik').innerHTML =
+        '<svg class="ico ico-sm"><use href="#i-users"></use></svg> Müşteri';
+      document.getElementById('mstKunye').innerHTML = bosDurumHtml('i-users',
+        'Bu müşteri artık yok',
+        'Müşteri, aracın sahibi olarak tutuluyor. Ad ya da telefon değiştiyse ' +
+        'listede yeni hâliyle duruyor.');
+      document.getElementById('mstAraclar').innerHTML = '';
+      document.getElementById('mstGecmis').innerHTML = '';
+      /* ⚠️ ÖLÜ UÇ BIRAKMA (K-021, ve sağlık denetiminin OLU-UC testi
+         bunu ilk çizimde yakaladı): hiçbir eylemi olmayan bir ekran,
+         ustanın geri tuşunu bulmasını bekler. Çıkış yolu ekranın
+         kendi üstünde durmalı. */
+      document.getElementById('mstEylem').innerHTML =
+        '<button class="btn btn-ghost" data-git="musteriler">' +
+          '<svg class="ico"><use href="#i-users"></use></svg>' +
+          ' Müşteri listesine dön</button>';
+      return;
+    }
+
+    var kayitlar = m.araclar.reduce(function (t, a) {
+      return t.concat(aracKayitlari(a.plaka));
+    }, []);
+
+    document.getElementById('mstBaslik').innerHTML =
+      '<svg class="ico ico-sm"><use href="#i-user"></use></svg> ' + m.ad;
+
+    /* KÜNYE: ad, kaç araç · kaç kayıt, telefon. Telefon ARANABİLİR —
+       listede mono metindi, burada bağlantı: ustanın bu ekrana gelme
+       sebeplerinden biri numarayı bulmak. */
+    document.getElementById('mstKunye').innerHTML =
+      '<div class="ms-bas">' +
+        '<span class="ms-ad">' + m.ad + '</span>' +
+        '<span class="ms-say">' + m.araclar.length + ' araç · ' +
+          kayitlar.length + ' kayıt</span>' +
+      '</div>' +
+      (m.tel ? telLinkHtml(m.tel, m.ad)
+             : '<p class="plate-hint">Telefon yok — mesaj gönderilemez. ' +
+               'Aracın kaydından eklenebilir.</p>');
+
+    /* ARAÇLAR — satırın tamamı dokunma hedefi; [data-arac] delegasyonu
+       ortak nesnede (03-nesne.js), aracı açıyor. */
+    document.getElementById('mstAraclar').innerHTML =
+      '<div class="ms-araclar">' +
+        m.araclar.map(function (a) {
+          return '<button class="ms-arac" data-arac="' + a.plaka +
+              '" aria-label="' + a.plaka + ' aracını aç">' +
+            plakaHtml(a.plaka) +
+            '<span class="ms-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
+            '<svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>' +
+          '</button>';
+        }).join('') +
+      '</div>';
+
+    /* SERVİS GEÇMİŞİ — sıra listelerdekiyle AYNI: serviste olanlar
+       üstte, sonra en yenisi. Üç ayrı listede üç ayrı sıra, ustaya üç
+       ayrı şey öğretmek olurdu.
+
+       ⚠️ ARAÇ BAŞLIĞI YALNIZ BİRDEN ÇOK ARAÇTA. Tek araçlı müşteride
+       her satırın üstüne plaka yazmak, zaten bilinen bir şeyi on kez
+       tekrarlamak olur — Cemil'in bu turda "abartmışsın" dediği hata
+       sınıfı. */
+    var gecmisEl = document.getElementById('mstGecmis');
+    if (!kayitlar.length) {
+      gecmisEl.innerHTML = bosDurumHtml('i-clipboard-list', 'Kayıt yok',
+        'Bu müşterinin araçlarına henüz servis kaydı açılmadı.');
+    } else if (m.araclar.length === 1) {
+      gecmisEl.innerHTML = mstSirala(kayitlar).map(kayitSatiriHtml).join('');
+    } else {
+      gecmisEl.innerHTML = m.araclar.map(function (a) {
+        var kl = mstSirala(aracKayitlari(a.plaka));
+        if (!kl.length) return '';
+        return '<div class="mst-grup-bas">' + plakaHtml(a.plaka) +
+            '<span class="ms-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
+          '</div>' + kl.map(kayitSatiriHtml).join('');
+      }).join('');
+    }
+
+    /* MESAJ — telefonu olan ilk araç üzerinden. Mesaj ekranı aracı
+       bekliyor (hitap ve şablon araçtan üretiliyor), müşteriyi değil. */
+    var mesajlik = m.araclar.filter(function (a) {
+      var h = mesajHedefi(a.plaka);
+      return h && h.tel;
+    })[0];
+    document.getElementById('mstEylem').innerHTML = mesajlik
+      ? '<button class="btn btn-primary btn-lg" data-mesajla="' + mesajlik.plaka + '">' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+          ' Mesaj gönder</button>'
+      : '';
+  }
+});
+
+/* Serviste olanlar üstte, sonra en yenisi — kayitlar ve araclar
+   listeleriyle aynı kural, aynı satır. */
+function mstSirala(liste) {
+  return liste.slice().reverse().sort(function (x, y) {
+    return (y.teslimTarihi ? 0 : 1) - (x.teslimTarihi ? 0 : 1);
+  });
+}
 })();
 
 /* ===== ekran: 95-muhasebe.html ===== */

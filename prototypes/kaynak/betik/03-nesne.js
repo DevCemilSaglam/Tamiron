@@ -372,6 +372,16 @@ document.addEventListener('click', function (e) {
   Ekran.ac('kayit');
 });
 
+/* Musteri satirina dokunmak MUSTERIYI ACAR (08.09). Kayit ve arac
+   ile ayni kalip: satir veriyi tasir, davranis tek yerde durur. */
+document.addEventListener('click', function (e) {
+  if (e.target.closest('[data-tel]')) { e.stopPropagation(); return; }
+  var t = e.target.closest('[data-musteri]');
+  if (!t) return;
+  ACIK_MUSTERI = t.getAttribute('data-musteri');
+  Ekran.ac('musteri');
+});
+
 /* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
    listesinde de. Iki ekrana ayri yazmak nesneyi ikiye bolerdi. */
 document.addEventListener('click', function (e) {
