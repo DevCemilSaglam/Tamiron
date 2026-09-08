@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 06.09.2026 *(K-033)*
+> **Son güncelleme:** 08.09.2026 *(K-045 · kuyruk 4 A/C/D bitti)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -16,10 +16,10 @@ tıklanabilir prototip.
 | Ekran | **14** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe · **is-basina** + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
 | Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
-| Kabuk | header (menü+rozet · logo · geri · ileri) + çekmece + tema (3 hâl) |
+| Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
 | Sağlık denetimi | **40 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — hem veriyi (K-024.1) hem **DOM durumunu** (K-041.2) — ve sekmelere dokunmuyor (K-026.7) |
-| Derleme denetimi | **8** kontrol, bulursa `exit 1` — 06.09'da üçü eklendi: **yorum içinde etiket** · **üretilen betik ayrışıyor mu** · **kapanmamış yorum** (K-033.11) |
-| Kararlar | **K-001 … K-043** |
+| Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
+| Kararlar | **K-001 … K-045** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -211,10 +211,31 @@ Hepsi *"bulgu"* gibi göründü, hiçbiri bulgu değildi. **Önce aracına bak.*
 | Tema değişiminden **hemen sonra** renk okumak | `0.15s` geçişin ara karesi okunur; iki `requestAnimationFrame` yetmez, ~700 ms beklenir (K-039.3) |
 | Yalnız `DENETIM_CALISTIR()` sonucuna bakmak | Denetim `load` anında da koşuyor ve sonucu `window.DENETIM`'e yazıyor. **İlk koşu farklı çıkabilir** — ekranlar henüz çizilmemiş olur. İkisine de bak (K-041.3) |
 | `textContent` ile "ekranda ne yazıyor" diye bakmak | **Gizli metni de verir.** `hidden` bir öğenin eski içeriği okunur ve "temizlenmemiş" sanılır — `innerText` kullan ya da `hidden`a bak (K-040.5) |
+| Derleme komutunu **boruya sokmak** | `node tools/pwa-build.js \| tail -1` — bir boru hattının çıkış kodu **son** komutundur (`tail`), o hep başarılı. Derleme çöker, zincir devam eder, **bozuk yapı commit'lenir.** 07.09'da tam bu oldu. Derleme komutları boruya sokulmaz; gerekirse `; echo "EXIT=$?"` eklenir |
+| Bir örtü açıkken **ikincisini** açıp kapamak | `inert` tek bir "aç/kapat" ikilisiyle yönetilirse, kapanan örtü **öbürünün** kilidini de kaldırır. Örtüler yığın oluşturur (K-043.4) |
 
 Ayrıca: `getComputedStyle` zemini `color(srgb 0.88 0.92 0.96 / 0.55)`
 biçiminde verebilir — `rgb()` bekleyen bir ayrıştırıcı bunu 0–255 sanıp
 kontrastı yanlış hesaplar.
+
+### 07–08.09 turunda öğrenilen üç şey daha
+
+**Bir yerde uygulanan kural, ötekine kendiliğinden geçmez.** Bu tur
+**dört kez** aynı biçimde tekrarlandı: `OLCULEBILIR` bayrağı tek teste
+bağlıydı · `arkaPlan()` kapanacakları tek tek sayıyordu · denetim
+akordiyonu geri yüklüyordu ama katmanı bırakıyordu · `prototip-derle`
+üretilen betiği doğruluyordu ama `pwa-build` doğrulamıyordu.
+**Çözüm hep aynı oldu: kuralı listeye değil YAPIYA bağlamak.**
+
+**Ölçüm aracına, ölçtüğü şey kadar bakılır.** Bu turun altı
+"bulgusu"ndan **altısı da** ölçüm hatası çıktı (yukarıdaki tablo).
+K-024.1 sağlık denetimi için yazılmıştı; her ölçüm için geçerli.
+
+**Bir araştırma notunun kendi belirsizliğini işaretlemesi işe yarıyor.**
+`SMS-VE-IYS.md` 03.09'da *"bunlar 2014 tutarları, güncel değil"* diye
+işaretlemişti; 08.09'da o not sayesinde doğrudan doğrulandı ve
+düzeltildi. **Bilmediğini yazan belge, bilmediğini gizleyenden
+kullanışlıdır.**
 
 ---
 
