@@ -1327,6 +1327,32 @@ function stilMetni() {
       }
     }
     if (mesajTanimA && mesajTanimA.geriAl) { try { mesajTanimA.geriAl(); } catch (e) {} }
+
+    /* IKINCI YOL: SESLI ISLEM (14.09). Cemil: "Buradan mesaj sesli
+       olarak gonderebilmeliyiz." Ayni kural iki yoldan da gecmeli —
+       ve tam bu yuzden test iki yolu da isletiyor: bir gun biri
+       degisir, oteki oldugu gibi kalir. */
+    if (typeof window.SES_SOYLE === 'function') {
+      showScreen('ses');
+      /* Baglam ve acik kayit, sesli cozumleyicinin ILK dalini
+         tetikleyebilir ("kayit-icinde" satir ekler). Ikisi de yedekte,
+         sonda geri yukleniyor. */
+      window.SESLI_NIYET = 'mesaj';
+      window.ACIK_KAYIT = null;
+      var sesArsivOnce = MESAJLAR.length;
+      window.SES_SOYLE('34 ABC 123 sahibine whatsapp selam mesaji gonder');
+      var sesOnayD = document.getElementById('sesOnayla');
+      if (!sesOnayD) {
+        ek('MESAJ-ARSIV', 'ses', 'sesli mesajin onay dugmesi cizilmedi');
+      } else {
+        sesOnayD.click();
+        if (MESAJLAR.length !== sesArsivOnce + 1) {
+          ek('MESAJ-ARSIV', 'ses', 'sesle gonderildi ama arsive yazilmadi');
+        } else if (!MESAJLAR[MESAJLAR.length - 1].metin) {
+          ek('MESAJ-ARSIV', 'ses', 'sesli gonderimin arsiv kaydinda metin bos');
+        }
+      }
+    }
     showScreen('home');
   }
 

@@ -185,6 +185,63 @@ var MESAJLAR = [
     metin: 'Hasan Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.' }
 ];
 
+/* ---- HAZIR METİNLER (14.09) ----
+   Cemil: *"Mesela tüm müşterilere bayram mesajı gönder diyecek sesli
+   olarak. Uygun bir bayram mesajı bulacak."* ve *"34 ABC 123 sahibine
+   WhatsApp üzerinden selam mesajı gönder."*
+
+   Usta metni yazmıyor, TÜRÜNÜ söylüyor. Üç tür var çünkü ustanın
+   söylediği üç şey bu; dördüncüsü icat edilmedi.
+
+   ⚠️ BAYRAMIN ADI YAZILMAZ. "Ramazan Bayramınız" yazsaydık Kurban'da
+   yanlış mesaj giderdi ve hangi bayram olduğunu bilen bir takvimimiz
+   yok. Bilmediğimiz şeyi söylememek, yanlış söylemekten iyidir.
+
+   ⚠️ TÜRKÇEDE KELİME SINIRI ARANMAZ (K-018): "bayramınız" kök hâliyle
+   eşit değil, o yüzden kelime kelime bölünüp KÖKLE BAŞLIYOR MU diye
+   bakılıyor (kokleBasliyorMu). */
+var HAZIR_METIN = [
+  { k: 'bayram', ad: 'Bayram mesajı', kokler: ['bayram'],
+    metin: 'Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.' },
+  /* ⚠️ METİN "MERHABA" İLE BAŞLAMAZ: hitap zaten başta duruyor ve
+     "Mehmet Bey/Hanım, Merhaba, nasılsınız?" diye iki selam çıkıyordu.
+     İlk denemede ekrana bakmadan görülmeyecek bir ayrıntı. */
+  { k: 'selam', ad: 'Selam mesajı', kokler: ['selam', 'merhaba'],
+    metin: 'nasılsınız? Aracınızla ilgili bir ihtiyacınız olursa bekleriz; ' +
+           'iyi günler dileriz.' },
+  { k: 'tesekkur', ad: 'Teşekkür mesajı', kokler: ['tesekkur'],
+    metin: 'Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.' }
+];
+
+function hazirMetinBul(cumle) {
+  for (var i = 0; i < HAZIR_METIN.length; i++) {
+    if (kokleBasliyorMu(cumle, HAZIR_METIN[i].kokler)) return HAZIR_METIN[i];
+  }
+  return null;
+}
+
+/* ---- HİTAP VE İMZA — TEK YERDE (14.09) ----
+   Hitap kuralı mesaj ekranının içinde yazılıydı (firma ise "Bey/Hanım"
+   yok, A-M2 hedefi). Sesli yol da mesaj üretmeye başlayınca kural
+   ikinci kez yazılacaktı; ikinci kopya, firmaya "Ltd. Şti. Bey/Hanım"
+   diye yazan ilk hatanın geri dönüş yoludur. */
+function mesajHitabi(plaka, hedefAnahtar) {
+  var h = plaka ? mesajHedefi(plaka, hedefAnahtar) : null;
+  if (!h || !h.ad) return 'Merhaba, ';
+  return h.kisi ? h.ad + ' Bey/Hanım, ' : h.ad + ', ';
+}
+function mesajImzasi() {
+  return '\n\n' + DUKKAN.ad + '\n' + DUKKAN.tel;
+}
+/* Hazır metnin tam hâli: hitap + metin + imza. Tek müşteriye de toplu
+   gönderime de aynı yerden çıkıyor — usta iki yerde iki farklı mesaj
+   görmesin. */
+function hazirMesajMetni(kod, plaka) {
+  var h = HAZIR_METIN.filter(function (x) { return x.k === kod; })[0];
+  if (!h) return '';
+  return mesajHitabi(plaka) + h.metin + mesajImzasi();
+}
+
 /* ŞABLONUN ADI TEK YERDE. Üç yerde yazılıydı: mesaj ekranının çipleri,
    sesli işlemin onay ekranı ("Yapılan işin özeti") ve şimdi arşiv
    satırı. Usta onay ekranında bir ad, çipte başka bir ad görüyordu. */
@@ -194,6 +251,23 @@ var SABLON_AD = {
   serbest: 'Serbest mesaj'
 };
 var KANAL_AD = { whatsapp: 'WhatsApp', sms: 'SMS', ara: 'Telefon' };
+/* Hazır metinlerin adları da şablon adıdır — arşiv satırı "bayram"
+   değil "Bayram mesajı" yazsın. Liste tek yerde, ad da tek yerde. */
+HAZIR_METIN.forEach(function (h) { SABLON_AD[h.k] = h.ad; });
+
+/* ---- TOPLU GÖNDERİMİN ALICILARI (14.09) ----
+   Telefonu olan her müşteri, bir kez. Hangi numara: satırda görünen
+   araç üzerinden mesajHedefi() — yani listede gördüğü kişi kim ise o
+   (firma santrali değil, aracı getiren kişi · A-M2). */
+function topluAlicilar() {
+  var liste = [];
+  musteriler().forEach(function (m) {
+    var a = musteriAraci(m);
+    var h = a ? mesajHedefi(a.plaka) : null;
+    if (h && h.tel) liste.push({ ad: h.ad, tel: h.tel, plaka: a.plaka });
+  });
+  return liste;
+}
 
 /* Mesaj kaydı TEK YERDEN düşer. İki gönderim yolu var (mesaj ekranı ve
    sesli işlem) ve ikisi ayrı yazsaydı biri arşive yazmayı unuturdu —

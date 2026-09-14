@@ -93,11 +93,13 @@ var SES_BAGLAM = {
   },
   mesaj: {
     ad: 'Müşteriye mesaj',
-    ipucu: 'Kime, ne göndereceğini söyle.',
+    ipucu: 'Kime, ne göndereceğini söyle. "Tüm müşterilere" dersen toplu gider.',
+    /* 14.09 — örnekler Cemil'in söylediği cümleler oldu: birincisi
+       ses kaydında geçen cümlenin aynısı, üçüncüsü toplu gönderim. */
     ornekler: [
-      '34 ABC 123 sahibine WhatsApp mesajı gönder',
+      '34 ABC 123 sahibine WhatsApp üzerinden selam mesajı gönder',
       '16 XY 8890 sahibine bakım hatırlatması gönder',
-      '06 TMR 07 sahibine aracınız hazır yaz'
+      'tüm müşterilere bayram mesajı gönder'
     ]
   },
   muhasebe: {
@@ -256,6 +258,22 @@ function sesTutarBul(d) {
   return 0;
 }
 
+/* KANAL: söylenmediyse WhatsApp (WHATSAPP.md A yolu — bedava ve
+   kurulumsuz). SMS parayla ve İYS kaydı istiyor; varsayılan olamaz. */
+function sesKanali(d) {
+  if (d.indexOf('sms') >= 0) return 'sms';
+  return 'whatsapp';
+}
+
+/* TOPLU MU — *"tüm müşterilere"*, *"bütün müşterilere"*, *"herkese"*.
+   ⚠️ Türkçede kelime sınırı aranmaz (K-018); "tum musteri" gibi İKİ
+   KELİMELİK bir dizi aranıyor — "müşteri" tek başına her cümlede
+   geçebilir ve tek kelimeye bakmak her mesajı toplu sanmaya götürürdü. */
+function sesTopluMu(d) {
+  return d.indexOf('tum musteri') >= 0 || d.indexOf('butun musteri') >= 0 ||
+         kelimeVarMi(d, ['herkese', 'hepsine']);
+}
+
 function sesCozumle(c) {
   /* Ham metnin düzeltmeleri BURADA, tek giriş noktasında: harf harf
      söylenen plaka birleşiyor, kelimeyle söylenen sayı rakama
@@ -294,15 +312,49 @@ function sesCozumle(c) {
   /* --- MESAJ GÖNDER --- */
   /* "yaz" KELİME OLARAK aranıyor: "beyaz" içinde geçiyordu ve
      "34 ABC 123 beyaz araba geldi" mesaj sanılıyordu (K-018). */
-  if (d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
-      kelimeVarMi(d, ['yaz', 'yazdir']) || d.indexOf('gonder') >= 0) {
-    if (p) {
-      var ar = aracBul(p.plaka);
-      if (!ar) return { tur: 'bilinmeyen-arac', plaka: p.plaka };
-      var sablon = d.indexOf('hatirlatma') >= 0 ? 'hatirlatma'
-                 : d.indexOf('hazir') >= 0 ? 'hazir' : 'ozet';
-      return { tur: 'mesaj', plaka: p.plaka, arac: ar, sablon: sablon };
-    }
+  var mesajKomutu = (d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
+                     kelimeVarMi(d, ['yaz', 'yazdir']) || d.indexOf('gonder') >= 0);
+
+  /* ⚠️ TOPLU MESAJ (14.09) — Cemil: *"Mesela tüm müşterilere bayram
+     mesajı gönder diyecek sesli olarak. Uygun bir bayram mesajı bulacak
+     ve onay ekranı ile SMS yada WhatsApp üzerinden mesaj gönderecek."*
+
+     TEK MESAJDAN ÖNCE BAKILIYOR çünkü cümlede plaka YOK; plakasız bir
+     mesaj komutu bugüne kadar sessizce düşüyordu.
+
+     ⚠️ Bu özellik K-045.2 ile ÇELİŞİYOR: orada *"kampanya bu fazda
+     yazılmaz"* demiştim, gerekçesi de sağlamdı (izin yok · toplu
+     gönderim ustanın WhatsApp numarasını riske atıyor). Cemil kapsamı
+     genişletti — onun sözü kazanır (CLAUDE.md). Gerekçe silinmedi:
+     onay ekranı riski YAZIYOR ve prototip hiçbir şey göndermiyor. */
+  if (mesajKomutu && sesTopluMu(d)) {
+    var hzT = hazirMetinBul(metin);
+    /* Hazır metin tanınmadıysa söylenen cümlenin kalanı metin olur —
+       usta "tüm müşterilere yarın kapalıyız yaz" diyebilir. */
+    var kalanT = kelimeleriAt(metin, ['tüm', 'tum', 'bütün', 'butun', 'herkese',
+      'hepsine', 'müşterilere', 'musterilere', 'müşteriye', 'musteriye',
+      'mesaj', 'mesajı', 'mesaji', 'gönder', 'gonder', 'at', 'yaz',
+      'whatsapp', 'sms', 'üzerinden', 'uzerinden', 'ile']);
+    if (!hzT && !kalanT) return { tur: 'plakasiz', metin: metin };
+    return { tur: 'toplu-mesaj', metinTuru: hzT ? hzT.k : 'serbest',
+             govde: hzT ? hzT.metin : kalanT, kanal: sesKanali(d) };
+  }
+
+  if (mesajKomutu && p) {
+    var ar = aracBul(p.plaka);
+    if (!ar) return { tur: 'bilinmeyen-arac', plaka: p.plaka };
+    /* ŞABLON: önce adı söylenen hazır metin, sonra iş şablonları.
+       "selam mesajı" bir şablon adı değil ama ustanın söylediği şey. */
+    var hz = hazirMetinBul(metin);
+    var sablon = hz ? hz.k
+               : d.indexOf('hatirlatma') >= 0 ? 'hatirlatma'
+               : d.indexOf('hazir') >= 0 ? 'hazir'
+               : d.indexOf('teslim') >= 0 ? 'teslim' : 'ozet';
+    return { tur: 'mesaj-gonder', plaka: p.plaka, arac: ar, sablon: sablon,
+             kanal: sesKanali(d),
+             /* Metin ŞİMDİ üretiliyor ve onay ekranında GÖRÜNÜYOR —
+                usta neyi gönderdiğini gönderMEDEN önce okuyor. */
+             govde: mesajMetniUret(p.plaka, sablon) };
   }
 
   /* --- ARAMA --- */
@@ -416,13 +468,58 @@ function sesOzet(o) {
                ['Tarih', bugunMetin()]],
     eylem: 'Gideri ekle' };
 
-  if (o.tur === 'mesaj') return {
-    baslik: 'Mesaj hazırlanacak',
-    satirlar: [['Kime', (o.arac.sahipAd || 'sahip yazılmamış') +
-                        (o.arac.sahipTel ? ' · ' + o.arac.sahipTel : ' · telefon yok')],
-               ['Araç', o.plaka],
-               ['Ne', SABLON_AD[o.sablon]]],
-    eylem: 'Mesajı hazırla' };
+  /* ⚠️ 14.09 — ONAY EKRANI ARTIK GÖNDERİYOR (Cemil: "Buradan mesaj
+     sesli olarak gönderebilmeliyiz." + "Burada da bir onay ekranı
+     gerekli.").
+
+     Eskiden sesli yol mesaj ekranını AÇIYORDU: usta söylüyor, ekran
+     açılıyor, bir kez daha gönder düğmesine basıyordu. Onay ekranı
+     zaten bir onaydı; ikinci onay, aynı soruyu iki kez sormaktı.
+
+     GÖNDERİLECEK METİN BURADA VE DÜZENLENEBİLİR: usta neyi gönderdiğini
+     gönderMEDEN önce okuyor. "Ekranda aç" duruyor — özet linkine
+     bakmak ya da hedefi değiştirmek isteyen oraya gider (ölü uç yok). */
+  if (o.tur === 'mesaj-gonder') {
+    var hd = mesajHedefi(o.plaka);
+    return {
+      baslik: 'Mesaj gönderilecek',
+      satirlar: [['Kime', (hd && hd.ad ? hd.ad : 'sahip yazılmamış') +
+                          (hd && hd.tel ? ' · ' + hd.tel : ' · telefon yok')],
+                 ['Araç', o.plaka],
+                 ['Ne', SABLON_AD[o.sablon] || 'Mesaj']],
+      kanal: true, metin: true,
+      notice: (hd && hd.tel) ? '' :
+        'Bu aracın telefonu yok — mesaj gönderilemez. "Ekranda aç" ile ' +
+        'numarayı ekleyebilirsin.',
+      eylem: (hd && hd.tel) ? 'Gönder' : 'Ekranda aç',
+      eylem2: (hd && hd.tel) ? 'Ekranda aç' : '' };
+  }
+
+  if (o.tur === 'toplu-mesaj') {
+    var alici = topluAlicilar();
+    return {
+      baslik: alici.length + ' müşteriye mesaj',
+      /* KİMLERE GİDİYOR, ADLARIYLA. "3 müşteri" demek yetmiyordu:
+         toplu gönderim geri alınamaz ve usta onayladığı şeyi
+         görmeli. Üçten fazlası satırı şişirir, sayıyla söyleniyor. */
+      satirlar: [['Kime', alici.length
+                    ? alici.slice(0, 3).map(function (x) { return x.ad; }).join(', ') +
+                      (alici.length > 3 ? ' +' + (alici.length - 3) : '')
+                    : 'telefonu olan müşteri yok'],
+                 ['Kaç kişi', alici.length + ' müşteri'],
+                 ['Ne', SABLON_AD[o.metinTuru] || 'Serbest mesaj']],
+      kanal: true, metin: true,
+      /* ⚠️ RİSK ONAY EKRANINDA YAZILI (K-045.2). Toplu gönderim,
+         ustanın KENDİ WhatsApp numarasından yapılırsa Meta'nın
+         şartlarına aykırı ve numara engellenebilir — engellenirse
+         yalnız kampanya değil, özet ve bakım hatırlatması da durur.
+         İzinsiz ticari ileti ayrıca cezalı. Cemil kapsamı genişletti;
+         gerekçeyi silmek yerine ustanın gözüne yazdım. */
+      notice: 'Toplu mesaj, izin vermiş müşterilere gönderilmelidir. ' +
+              'Kendi numaranızdan toplu gönderim, numaranızın ' +
+              'engellenmesine yol açabilir.',
+      eylem: alici.length ? 'Onayla ve gönder' : 'Telefonu olan müşteri yok' };
+  }
 
   if (o.tur === 'ara') return {
     baslik: 'Aranacak',
@@ -492,9 +589,48 @@ function sesUygula(o) {
     balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
     Ekran.ac('muhasebe'); return;
   }
-  if (o.tur === 'mesaj') {
-    MESAJ_HEDEF = { plaka: o.plaka, sablon: o.sablon };
-    Ekran.ac('mesaj'); return;
+  /* ⚠️ 14.09 — SESLİ YOL ARTIK GERÇEKTEN GÖNDERİYOR. Gönderim ve
+     ARŞİVE YAZMA aynı yerden: mesajKaydet(). Mesaj ekranı da onu
+     çağırıyor; iki yol iki ayrı kayıt yazsaydı biri er ya da geç
+     unutulurdu (43. denetim testi tam bunu ölçüyor). */
+  if (o.tur === 'mesaj-gonder') {
+    var hedef = mesajHedefi(o.plaka);
+    /* Telefon yoksa gönderilmez — ekrana götürülür, orada numara
+       eklenebiliyor (K-021: uyarının çözümü kendi yanında olmalı). */
+    if (!hedef || !hedef.tel || o.ekranaGit) {
+      MESAJ_HEDEF = { plaka: o.plaka, sablon: o.sablon };
+      Ekran.ac('mesaj');
+      if (!hedef || !hedef.tel) balon('Bu aracın telefonu yok — önce numarayı ekle.', false, 3200);
+      return;
+    }
+    if (o.sablon === 'hatirlatma') {
+      aracKayitlari(o.plaka).forEach(function (k) {
+        if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
+      });
+    }
+    var gk = acikKayit(o.plaka) || sonKayit(o.plaka);
+    mesajKaydet({ plaka: o.plaka, ad: hedef.ad, tel: hedef.tel, kanal: o.kanal,
+                  sablon: o.sablon, kayit: gk ? gk.id : null, metin: o.govde });
+    balon(KANAL_AD[o.kanal] + ' açılıyor — ' + hedef.ad + ', mesaj hazır.', false, 3200);
+    Ekran.ac('home');
+    return;
+  }
+
+  if (o.tur === 'toplu-mesaj') {
+    var alicilar = topluAlicilar();
+    if (!alicilar.length) { balon('Telefonu olan müşteri yok.', false, 2800); return; }
+    /* HER ALICI KENDİ KAYDINI ALIR. Tek bir "toplu gönderim" kaydı
+       yazmak kolaydı ama ispat yükü KİŞİ BAŞINA (K-045.3): hangi
+       numaraya, ne zaman, hangi metin. */
+    alicilar.forEach(function (x) {
+      mesajKaydet({ plaka: x.plaka, ad: x.ad, tel: x.tel, kanal: o.kanal,
+                    sablon: o.metinTuru, toplu: true,
+                    metin: mesajHitabi(x.plaka) + o.govde + mesajImzasi() });
+    });
+    balon(alicilar.length + ' müşteriye ' + KANAL_AD[o.kanal] + ' mesajı hazırlandı.',
+          false, 3400);
+    Ekran.ac('mesaj');
+    return;
   }
   if (o.tur === 'ara') {
     ARAMA_TERIMI = { hedef: o.hedef, terim: o.terim, suzgec: o.suzgec || null };
@@ -584,12 +720,39 @@ function sesCiz() {
                '<span class="tv">' + s[1] + '</span></div>';
       }).join('') +
     '</div>' +
+    /* KANAL SEÇİMİ ONAY EKRANINDA (Cemil: "SMS yada WhatsApp üzerinden
+       mesaj gönderecek"). Söylenmediyse WhatsApp seçili gelir; usta
+       tek dokunuşla değiştirir. Çip bir SEÇİM aracıdır — doğru bileşen. */
+    (o.kanal
+      ? '<div class="section-label" style="margin-top:14px">Nereden gitsin?</div>' +
+        '<div class="cip-grup" role="group" aria-label="Gönderim kanalı">' +
+          ['whatsapp', 'sms'].map(function (k) {
+            return '<button class="cip" data-ses-kanal="' + k + '" aria-pressed="' +
+              (sesIslem.kanal === k) + '">' + KANAL_AD[k] + '</button>';
+          }).join('') +
+        '</div>'
+      : '') +
+    /* GİDECEK METİN GÖRÜNÜR VE DÜZENLENEBİLİR. Onay ekranı "ne
+       yapılacağını" söylüyor; mesajda yapılacak şey METNİN KENDİSİ.
+       Göstermeseydik usta neyi onayladığını bilmeden onaylardı. */
+    (o.metin
+      ? '<div class="field" style="margin-top:12px">' +
+          '<label for="sesMesajMetni">Gidecek mesaj</label>' +
+          '<textarea id="sesMesajMetni" rows="5" aria-label="Gidecek mesaj">' +
+            (sesIslem.govde || '') + '</textarea>' +
+        '</div>'
+      : '') +
     '<div class="btn-row" style="margin-top:14px">' +
       '<button class="btn btn-ghost" id="sesVazgec">' +
         '<svg class="ico"><use href="#i-x"></use></svg> Tekrar söyle</button>' +
       '<button class="btn btn-primary" id="sesOnayla">' +
         '<svg class="ico"><use href="#i-check"></use></svg> ' + o.eylem + '</button>' +
-    '</div>';
+    '</div>' +
+    (o.eylem2
+      ? '<button class="btn btn-ghost" id="sesEkrandaAc" style="margin-top:10px">' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg> ' +
+          o.eylem2 + '</button>'
+      : '');
 }
 
 /* ⚠️ MOTOR TESPİTİ ÇEKİRDEĞE TAŞINDI (08.09).
@@ -725,6 +888,33 @@ document.addEventListener('click', function (e) {
     if (sesTanima) { try { sesTanima.abort(); } catch (x) {} }
     sesDurumu = 'bos'; sesCumle = ''; sesIslem = null; sesCiz(); return;
   }
-  if (t.id === 'sesOnayla' && sesIslem) { sesUygula(sesIslem); return; }
+  /* KANAL DEĞİŞİNCE YAZILAN METİN KAYBOLMAZ (14.09). Çizim `sesIslem`
+     üzerinden üretiliyor; usta metni elle düzeltmişse önce oraya
+     yazılır, sonra ekran tazelenir. Yoksa tek bir kanal dokunuşu
+     ustanın cümlesini siler — v1'in "ciz() kararı da siliyor"
+     hatasının (K-033.12) aynısı. */
+  var ka = t.getAttribute('data-ses-kanal');
+  if (ka && sesIslem) {
+    sesMetniAl();
+    sesIslem.kanal = ka;
+    sesCiz();
+    return;
+  }
+
+  if (t.id === 'sesEkrandaAc' && sesIslem) {
+    sesMetniAl();
+    sesIslem.ekranaGit = true;
+    sesUygula(sesIslem);
+    return;
+  }
+
+  if (t.id === 'sesOnayla' && sesIslem) { sesMetniAl(); sesUygula(sesIslem); return; }
 });
+
+/* Onay ekranındaki metin alanı varsa içeriğini işleme yaz — gönderilen
+   şey ustanın EKRANDA GÖRDÜĞÜ metin olsun. */
+function sesMetniAl() {
+  var el = document.getElementById('sesMesajMetni');
+  if (el && sesIslem) sesIslem.govde = el.value;
+}
 </script>

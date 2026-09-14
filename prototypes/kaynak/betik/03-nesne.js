@@ -248,6 +248,84 @@ function kayitKartiHtml(k) {
   '</div>';
 }
 
+/* ---- MESAJIN METNİ (14.09'da mesaj ekranından BURAYA taşındı) ----
+   Cemil: *"Buradan mesaj sesli olarak gönderebilmeliyiz."*
+
+   Metni bugüne kadar yalnız mesaj ekranı üretiyordu ve ekran
+   betikleri derlemede kendi IIFE'sine sarılıyor — sesli işlem o
+   fonksiyonu GÖREMİYORDU. Sesli yol mesaj göndermeye başlayınca iki
+   seçenek vardı: metni ikinci kez yazmak ya da metni ortak nesne
+   yapmak. Birincisi, ustanın onay ekranında gördüğü metinle gerçekte
+   giden metnin ayrılması demekti — ve bunu ancak müşteri sorunca
+   öğrenirdi.
+
+   `hedefAnahtar` ekranın durumu değil, PARAMETRE: mesaj ekranı hangi
+   hedefi seçtiyse onu geçiyor, ses ekranı varsayılanı bırakıyor.
+   Ekran durumunu okuyan bir ortak nesne, ortak olmaz. */
+function mesajMetniUret(plaka, sablon, hedefAnahtar) {
+  var a = aracBul(plaka);
+  if (!a) return '';
+  /* HİTAP HEDEFE GÖRE (A-M2, 04.09). Önceden hep ruhsat sahibine
+     yazıyordu ve firma ruhsatlı araçta mesaj "Demir Nakliyat Ltd.
+     Şti. Bey/Hanım," diye başlıyordu — müşteriye giden İLK cümle bu. */
+  var basi = mesajHitabi(plaka, hedefAnahtar);
+  var arac = a.marka + ' ' + a.model + ' (' + plaka + ')';
+
+  if (sablon === 'bekliyor') {
+    /* SÖZ VERİLMİYOR. "Yarın hazır olur" demiyoruz: parçanın ne zaman
+       geleceğini biz de bilmiyoruz ve tutulmayan söz, hiç verilmemiş
+       sözden kötüdür. Söylenen tek şey doğru olan: parça bekleniyor,
+       gelince haber verilecek. */
+    return basi + arac + ' için parça bekliyoruz. ' +
+           'Parça gelir gelmez işe başlayıp size haber vereceğiz.' + mesajImzasi();
+  }
+  if (sablon === 'hazir') {
+    return basi + arac + ' hazır, teslim alabilirsiniz.' + mesajImzasi();
+  }
+  /* TESLİM EDİLDİ (14.09) — "Hazır"dan farkı ZAMAN: biri teslimden
+     önce, öteki sonra. Tek şablona bindirilseydi metin yalan söylerdi —
+     teslim alınmış araca "teslim alabilirsiniz" yazmak gibi. */
+  if (sablon === 'teslim') {
+    var tk = sonKayit(plaka);
+    var tl = (tk && kayitToplami(tk)) ? 'Toplam: ' + tutar(kayitToplami(tk)) + ' ₺\n' : '';
+    return basi + arac + ' teslim edildi.\n' + tl +
+           (tk ? 'Ayrıntılı özet: ' + ozetLinki(tk) + '\n' : '') +
+           '\nBizi tercih ettiğiniz için teşekkür ederiz.' + mesajImzasi();
+  }
+  /* HAZIR METİNLER — "selam mesajı", "bayram mesajı" (14.09). Sesli yol
+     bunları isimle istiyor; mesaj ekranı da aynı metni üretebilsin. */
+  if (SABLON_AD[sablon] && hazirMesajMetni(sablon, plaka)) {
+    return hazirMesajMetni(sablon, plaka);
+  }
+  /* SERBEST — metni usta söyleyecek ya da yazacak. Boş bırakmıyoruz:
+     hitap ve imza zaten biliniyor, ustanın yazacağı yalnız orta kısım. */
+  if (sablon === 'serbest') {
+    return basi + mesajImzasi();
+  }
+  if (sablon === 'hatirlatma') {
+    var sb = sonBakim(plaka);
+    var ek = sb ? 'Son bakımı ' + sb.teslimTarihi +
+                  (sb.km ? ' · ' + sb.km + ' km' : '') + ' idi. ' : '';
+    return basi + arac + ' için bakım zamanı geldi. ' + ek +
+           'Uygun olduğunuzda bekleriz.' + mesajImzasi();
+  }
+  /* özet — açık ya da son kayıttan üretilir */
+  var k = acikKayit(plaka) || sonKayit(plaka);
+  if (!k) return basi + arac + ' için henüz bir kayıt yok.';
+  /* ⚠️ 04.09 — MESAJ ARTIK LİSTEYİ TAŞIMIYOR, LİNKİ TAŞIYOR (T-20).
+     Tamirci bugün PDF gönderiyor (S8). PDF ölü bir dosyadır: gönderildiği
+     anki hâli taşır, iş sürerken güncellenmez ve müşteri onu bir daha
+     bulamaz. Link canlıdır — müşteri istediği an bakar, güncelini görür.
+
+     LİSTE YİNE DE ÖZETLENİYOR: WhatsApp'ta linke dokunmayan da olur;
+     kalem sayısı ve toplam mesajın içinde duruyor ki link açılmasa bile
+     mesaj bir işe yarasın. Tam liste sayfada. */
+  var adet = (k.satirlar || []).length;
+  return basi + arac + ' için ' + (adet ? adet + ' kalem ' : '') +
+         'işlem yapıldı.\nToplam: ' + tutar(kayitToplami(k)) + ' ₺\n\n' +
+         'Ayrıntılı özet: ' + ozetLinki(k) + mesajImzasi();
+}
+
 /* ---- GÖNDERİLEN MESAJ SATIRI (14.09) ----
    Cemil: *"Gönderilen mesajlar listelenebilmeli."*
 
