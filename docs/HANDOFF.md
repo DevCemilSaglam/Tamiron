@@ -256,31 +256,26 @@ kullanışlıdır.**
 
 ## 5 · Cemil'in kararını bekleyenler
 
-| Kod | Soru | Öneri |
-|---|---|---|
-| **A-M25** | **Toplu mesaj yazıldı** (K-047.4) — K-045.2'deki *"kampanya bu fazda yazılmaz"* kararının tersine, senin isteğinle | Prototipte hiçbir şey gitmiyor; gerçek kullanımda İYS → onay → WhatsApp Business API |
-| **A-M26** | Arşive **kanal açılınca** yazılıyor; gerçek gönderim teyidi yok (WHATSAPP.md A yolu) | Prototipte kabul |
-| **A-M27** | Ses plakayı yanlış duyunca akış duruyor (*"34 qbc 123"*) | *"Bunu mu demek istedin"* önerisi yazılmadı — istersen yazılır |
-| **A-M28** | Müşteri satırı senin tarifinle uzadı | Ayrıntı hâlâ detayda; plaka küçültülebilir |
-| **A-M29** | Müşterinin **öteki aracına** mesaj: *"Tüm araçlar"* → detay yolu | Yeterli varsayıldı |
-| **A-2** | Müşteri tarafı bu fazda mı | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya |
-| **A-3** | Bakım periyodu · şu an 6 ay + 10.000 km | Onay |
-| **A-14** | Ruhsat ekranı tabaka mı olsun | Ölçüldü: bir dokunuş ve bir ekran kazandırır |
-| **Ç-2** | OEM kodu yönü — TecDoc'un kaderi | K-001'de kaldığı gibi |
-| **A-S3** | **Ses gizliliği:** Chrome sesi Google'a gönderiyor | Prototipte kabul, gerçek kullanımda yeniden konuşulur |
-| **MUH** | **Muhasebe kapsamı** — nereye kadar | **K-022 taslağı hazır:** kasa+gider. Cari hesap kapsam dışı. Ölçüm: `arastirma/MUHASEBE-KAPSAMI.md` |
-| **A-M1** | Müşteri adı iki araçta farklı yazılırsa iki müşteri görünüyor | Tamirci şikâyet edene kadar dokunma |
-| **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi | İkinci iletişim varsa o |
-| **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi | Kaydın kendi ekranında kalsın |
-| ~~A-M4~~ | **KAPANDI (K-020.3)** — ekran görüntüsü gösterdi ki yapışkan başlık bildirimi örtüyordu; kaldırıldı | — |
-| **A-M5** | Arama mikrofonu yalnız **araçlar** için istenmişti; **dört listeye birden** kondu. Kalsın mı? | Kalsın — dördü de aynı iş |
-| **A-M6** | *"Onay iste"* düğmesi **"Özet gönder"** oldu (artık gerçekten gönderiyor) — ad doğru mu? | Doğru: yaptığı iş T-19 |
-| **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, **yazılmadı** | Dükkân kârıyla karışma riski var |
-| **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Kabul — iki rakip incelemesi de istedi |
-| **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no) | Prototipte kabul, backend fazında kapatılacak |
+⚠️ **LİSTE BURADA DEĞİL, `KARARLAR.md`'NİN SONUNDA** (14.09).
 
-> **A-1 (ekran bütçesi 6) kapandı:** Cemil menüyü ve dört yeni ekranı
-> isteyince bütçe cevaplanmış oldu. Ölçülen asıl sayı değişmedi.
+Burada **ikinci bir liste** duruyordu ve iki liste ayrışmıştı: `A-14` ile
+`A-M1` yalnız burada vardı, `A-M18`…`A-M24` yalnız orada. Aynı soruyu iki
+yerde tutmak, iki ayrı cevap demektir (K-019.1) — bu deponun en sık
+tekrarlayan hatası. Maddeler `KARARLAR.md`'ye taşındı; burası artık
+**nereye bakılacağını** söylüyor.
+
+`KARARLAR.md` → **AÇIK — karara bağlanacak**, üç blok:
+
+| Blok | Ne demek | Kaç madde |
+|---|---|---|
+| **A · Kapsamı belirleyenler** | Cevap bir işi açar ya da kapatır | 7 *(MUH · A-M8 · A-M25 · A-M21 · A-M20 · A-M22 · A-2)* |
+| **B · Ekranı değiştirenler** | *"Evet"* dersen kod yazılır | 8 *(A-M14 · A-M7 · A-M28 · A-M29 · A-M16 · A-M12 · A-3 · A-14)* |
+| **C · "Böyle kalsın mı"** | *"Hayır"* dersen geri alınır; tamamına tek cümleyle *"hepsi kalsın"* denebilir | 13 |
+
+Ayrıca **sonraki fazın soruları** (A-5 · A-6 · A-7 · Ç-2 · A-S3) ve
+**kapandı/arşiv** bölümü orada. **En acili: `MUH`** — tek sayfalık karar
+belgesi [`MUHASEBE-KARARI.md`](MUHASEBE-KARARI.md).
+
 
 **Yapılmamış işler:** ~~müşteri özeti~~ **(K-023'te yazıldı)** · müşteri uygulaması (T-21) · gerçek ruhsat
 okuma (`RUHSAT-OKUMA.md` C yolu) · gerçek WhatsApp gönderimi

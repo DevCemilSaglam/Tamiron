@@ -32,7 +32,7 @@ hazırlığı** (kod yok), üçüncüsü kod.
 | # | İş | Durum |
 |---|---|---|
 | 5.1 | **MUH kararı karara hazır** — `MUHASEBE-KARARI.md`: tek sayfa, üç seçenek, bedeli, açtığı işler, öneri | **BİTTİ** — B (kasa+gider) önerildi; üç seçenek "usta ne girer" diliyle yazıldı, onay sonrası sıra belirlendi |
-| 5.2 | **Açık maddeler tazelensin** — kaynak KARARLAR.md'nin AÇIK tablosu; ikinci liste açılmaz (K-019.1). Kapananlar prototipte **doğrulanarak** işaretlenir | AÇIK |
+| 5.2 | **Açık maddeler tazelensin** — kaynak KARARLAR.md'nin AÇIK tablosu; ikinci liste açılmaz (K-019.1). Kapananlar prototipte **doğrulanarak** işaretlenir | **BİTTİ** — 33 madde üç bloğa ayrıldı (kapsam · ekran · "böyle kalsın mı"); HANDOFF §5'teki **ikinci liste kaldırıldı**, oradan gelen A-14 ve A-M1 tabloya alındı |
 | 5.3 | **A-M27** — ses plakayı yanlış duyunca *"bunu mu demek istedin"*; tek aday varsa öner, birden fazlaysa önerme. Yeni denetim testi + negatif test | AÇIK |
 
 ---

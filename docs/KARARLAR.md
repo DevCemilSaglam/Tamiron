@@ -3315,44 +3315,82 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 
 ## AÇIK — karara bağlanacak
 
-| Kod | Konu | Ne zaman |
+> **14.09'da tazelendi (Tur 5/5.2).** Üç şey yapıldı: ① kodda çoktan
+> karşılığı olan maddeler **prototipte açılıp doğrulandı** — iddia
+> edilmedi; ② aynı şeyi iki kez soran satırlar birleştirildi (A-2, A-M2
+> ve A-M17 tabloda **ikişer kez** duruyordu); ③ her açık maddeye tek
+> satır soru + net öneri yazıldı.
+>
+> **Hiçbir madde Cemil'in cevabı olmadan kapatılmadı.** Kapananlar
+> aşağıda, arşiv bölümünde ve hepsinin yanında *neyle* kapandığı yazılı.
+>
+> **Üç blok, üç farklı cevap cinsi:**
+> **A** kapsamı belirler (iş açar ya da kapatır) ·
+> **B** ekranı değiştirir (evet dersen kod yazılır) ·
+> **C** *"böyle kalsın mı"* onayıdır (hayır dersen geri alınır).
+> C bloğunun tamamına tek cümleyle *"hepsi kalsın"* denebilir.
+
+### A · Kapsamı belirleyenler
+
+| Kod | Soru | Öneri |
 |---|---|---|
-| **A-1** | **Ekran bütçesi** — ana yol için en fazla 6 önerildi. Onay? | Cemil |
-| **A-2** | Müşteri tarafı (T-19/T-20/T-21) **bu fazda mı**? Öneri: özet linki evet, müşteri uygulaması sonra | Cemil |
-| **A-3** | Bakım periyodu varsayılanı kaç ay? Öneri: 6 | Cemil |
-| ~~A-4~~ | **KAPANDI (K-033.5)** — türetilmiyor, kendi bayrağı var (`parcaBekliyor`). Türetilen `fiyatiBekleyen` başka bir şeydi: *fiyatı gelmemiş* | — |
+| **MUH** | Muhasebe nereye kadar — yalnız kasa / kasa+gider / cari hesap? Tek sayfa: [`MUHASEBE-KARARI.md`](MUHASEBE-KARARI.md) | **B — kasa + gider.** Cari hesap kapsam dışı |
+| **A-M8** | **Karar bütçesi** kısıt olarak kabul mü: menü ≤ 8 başlık · ana yolda bir ekranda ≤ 3 sabit karar · alan adında jargon 0 | Kabul. *(**A-1 buraya bağlandı:** "ekran bütçesi 6" fiilen aşıldı — 15 ekran var ama ana yol hâlâ üç ekran. Asıl kısıt ekran sayısı değil, ekrandaki karar sayısıymış)* |
+| **A-M25** | **Toplu mesaj yazıldı** (K-047.4) — K-045.2'deki *"kampanya bu fazda yazılmaz"* kararının tersine, senin isteğinle. Kabul mü? | Kabul, **ama izin altyapısı yazılana kadar gerçek gönderim yok**: prototipte hiçbir şey gitmiyor |
+| **A-M21** | Kampanya için gereken **"ticari ileti izni"** alanı araç/müşteri kaydına eklensin mi? | Eklensin — tek alan, bugün hiçbir şeyi bozmuyor, izinsiz gönderimin cezası 2.859–14.309 ₺ (toplu gönderimde 10 katına kadar) |
+| **A-M20** | **Sanal POS faz dışı** bırakıldı (K-045.1). Kabul mü? | Kabul. *"Tamiron parayı topluyor"* olsaydı bu ürün kararı değil **şirket kararı** olurdu — ödeme kuruluşu lisansı ister |
+| **A-M22** | Dışa aktarmada PDF için kütüphane yerine **tarayıcının kendi yazdırması** (*"PDF olarak kaydet"*) yeter mi? | Yeter — 0 KB, Türkçe sorunsuz. jsPDF Türkçe için yüz KB'lık yazı tipi gömmek ister (K-045.4) |
+| **A-2** | Müşteri **uygulaması** (T-21) bu fazda mı? *(Özet linki — T-19/T-20 — K-023'te yazıldı)* | Sonraya. Link zaten müşterinin sayfasını açıyor; ayrı uygulama backend ister |
+
+### B · Ekranı değiştirenler
+
+| Kod | Soru | Öneri |
+|---|---|---|
+| **A-M14** | Araç teslim edilince ekran *"müşteriye özet gönder / geç"* diye soruyor ve bu **bir dokunuş** ekliyor. Sorulmasın, doğrudan ana ekrana dönülsün mü? | **Sorulsun** — altıncı iş (müşteriye özet) tam orada doğuyor; "geç" tek dokunuş |
+| **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında da gösterilsin mi? *(Bugün yalnız `is-basina` sayfasında)* | Gösterilmesin — kayıt ekranında dükkân kârıyla karıştırılır (K-014) |
+| **A-M28** | Müşteri satırı senin tarifinle uzadı (ad · plaka · araç+renk · telefon · not). Plaka küçültülüp satır kısaltılsın mı? | **Telefonda bakıp söyle.** Ayrıntı hâlâ detay ekranında; kısaltmak bir satırlık iş |
+| **A-M29** | Mesaj ekranında satır, müşterinin **serviste olan ilk aracını** hedefliyor. Öteki aracına mesaj için *"Tüm araçlar"* → müşteri detayı yolu var. Yeterli mi? | Yeterli — satırda araç seçtirmek her satıra bir karar daha ekler |
+| **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? | Kalsın — mikrofon yalnız güvenli adreste açılıyor; çipler kalkarsa **sesli yol prototipte hiç denenemez** |
+| **A-M12** | Sola kaydırarak silme keşfedilebilir mi? Ekranda söyleyen bir şey yok; artık **iki** tabloda var (servis kaydı · giderler) | İpucu eklenmesin — bir kez öğrenilen bir jest; istersen tek satırlık ipucu eklenir |
+| **A-3** | Bakım periyodu varsayılanı kaç ay? *(Çekmecede 3 · 6 · 12 seçilebiliyor)* | **6 ay** — ve km ile birlikte: hangisi önce gelirse (K-002) |
+| **A-14** | Ruhsat ekranı ayrı ekran değil **katman** (popup) olsun mu? Ölçülmüştü: bir dokunuş ve bir ekran kazandırıyor | Şimdilik kalsın — katman bileşeni artık var (K-043), ama ruhsat ana yolun ilk adımı; katmana taşımak *"geri"* davranışını değiştirir |
+
+### C · "Böyle kalsın mı" onayları — hepsi bugün prototipte böyle çalışıyor
+
+| Kod | Bugün ne yapıyor | Öneri |
+|---|---|---|
+| **A-M1** | Aynı kişinin adı iki araçta **farklı yazılmışsa** listede iki müşteri görünüyor; birleştirme yok (müşterinin kendi tablosu yok — K-012) | Kalsın — tamirci şikâyet edene kadar dokunma. *(HANDOFF §5'te duruyordu, bu tabloda yoktu — 14.09'da buraya alındı)* |
+| **A-M2** | Özet/hatırlatma **ikinci iletişime** gidiyor (ruhsat firmanınsa santrale değil); usta hedefi değiştirebiliyor | Kalsın |
+| **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı **yok**; bilgi kaydın kendi ekranında | Kalsın |
+| **A-M5** | Arama mikrofonu **dört listede** (araçlar · kayıtlar · müşteriler · mesaj); sen yalnız araçlar için istemiştin | Kalsın — dördü de aynı iş |
+| **A-M6** | Kayıt ekranındaki düğme *"Onay iste"* değil **"Özet gönder"** ve gerçekten özet gönderiyor | Kalsın — ad yaptığı işi söylüyor (T-19) |
+| **A-M9** | Özet sayfasının linki **tahmin edilebilir** (plaka + kayıt no), kimlik doğrulama yok | Prototipte kabul; backend fazında kapatılacak |
+| **A-M10** | *"Tamirat + Bakım"* **tek kayıt** (üçüncü tür), iki ayrı kayıt değil | Kalsın — iki kayıt, aynı aracı iki kez yazdırıyordu |
+| **A-M11** | Muhasebe → Detaylı'daki beş modül (fatura/KDV · çek · senet · cari) **yalnız yer tutuyor**, hiçbiri yazılmadı | Kalsın — MUH kararına bağlı |
+| **A-M18** | *"Müşteri ne görecek"* katmanı **müşterinin gördüğü sayfayı** gösteriyor, mesaj metnini değil (o zaten üstteki alanda) | Kalsın |
+| **A-M19** | Sola kaydırma **kayıt satırında da doğrudan siliyor** (geri alma şeridiyle); sen yalnız gider için söylemiştin | Kalsın — aynı jest iki anlama gelmesin |
+| **A-M23** | Tutarı **yazılmış** satırda *"müşteri getirdi"* teklifi çıkmıyor; önce tutarı silmek gerekiyor | Kalsın — parayı sen alıyorsan parçayı sen getirmişsindir |
+| **A-M24** | Servis kaydı **üç adım**: İş · Yapılanlar · Teslim. *"Yapılanlar"* kendi içinde parça/işçilik diye ayrılmıyor | Kalsın — ayırmak dördüncü adım demek |
+| **A-M26** | Arşive **kanal açılınca** yazılıyor; usta WhatsApp'ta vazgeçerse kayıt yine *"gönderildi"* der | Prototipte kabul — A yolunda gerçek teyit alınamıyor |
+
+### Sonraki fazın soruları — şimdi cevap gerekmiyor
+
+| Kod | Soru | Ne zaman |
+|---|---|---|
 | **A-5** | Ruhsat okuma hangi teknolojiyle — OCR servisi, doğruluk, elle düzeltme | 9. iş |
 | **A-6** | WhatsApp API sağlayıcısı ve maliyeti | 8. iş |
 | **A-7** | SMS sağlayıcısı + **İYS kaydı** (yasal zorunluluk) | 10. iş |
-| **A-M2** | Özet/hatırlatma hangi numaraya gitsin — ruhsattaki mi, ikinci iletişim mi? Varsayım: **ikinci iletişim varsa o** (K-019.3) | Cemil |
-| **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı gerçekten gereksiz mi (K-019.6) | Cemil |
-| ~~A-M4~~ | **KAPANDI (K-020.3)** — ekran görüntüsü gösterdi ki başlık bildirimi örtüyordu; yapışkanlık kaldırıldı | — |
-| **A-M5** | Arama mikrofonu Cemil yalnız **araçlar** için istedi; **dört listeye birden** kondu. Kalsın mı? | Cemil |
-| ~~A-M2~~ | **UYGULANDI (K-021.3)** — ikinci iletişim varsa mesaj ona gider, usta hedefi değiştirebiliyor | Onay bekliyor |
-| **A-M6** | *"Onay iste"* düğmesi **"Özet gönder"** oldu — ad doğru mu? | Cemil |
-| **MUH** | **Muhasebe kapsamı** — K-022 taslağı hazır (öneri: B, kasa+gider). Onay? | Cemil |
-| **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
-| **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
-| ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
-| **A-M29** | Mesaj ekranında satır, müşterinin **serviste olan ilk aracını** hedefliyor. Başka aracına mesaj yazmak için *"Tüm araçlar"* → müşteri detayı yolu var. Yeterli mi, yoksa satırda araç seçilebilsin mi? (K-047.2) | Cemil |
-| **A-M28** | Müşteri satırı senin tarifinle **uzadı** (ad · plaka · araç+renk · telefon · not). 08.09'da *"çok boşluklu"* demiştin; ayrıntı hâlâ detayda ama satırın boyu büyüdü. Plaka küçültülsün mü? (K-047.2) | Cemil |
-| **A-M27** | Ses plakayı yanlış duyunca (*"34 qbc 123"*) akış **"bu araç kayıtlı değil"** deyip ruhsata götürüyor. *"Bunu mu demek istedin: 34 ABC 123"* önerisi **YAZILMADI** — yanlış araca mesaj gitme riski var. İstersen yazılır (K-047.4) | Cemil |
-| **A-M26** | Arşive **kanal açılınca** yazılıyor; usta WhatsApp'ta göndermekten vazgeçerse kayıt yine "gönderildi" der. WHATSAPP.md A yolunda gerçek teyit **alınamıyor**. Prototipte kabul mü? (K-047.3) | Cemil |
-| **A-M25** | **Toplu mesaj YAZILDI** — K-045.2'deki *"kampanya bu fazda yazılmaz"* kararının tersine, senin isteğinle. Prototipte hiçbir şey gönderilmiyor; gerçek kullanımda sıra: İYS kaydı → onay toplama → WhatsApp Business API → şablon onayı. Kendi numaradan toplu gönderim numarayı engelletebilir (K-047.4) | Cemil |
-| ~~A-M17~~ | **KAPANDI (K-047.3):** *"Aracınız hazır"* artık yalnız serviste olan araçta çıkıyor | — |
-| **A-M24** | Servis kaydı **üç adım** doğru bölünme mi — "Yapılanlar" kendi içinde ikiye mi ayrılmalı (parça / işçilik)? (K-046.6) | Cemil |
-| **A-M23** | Tutarı **yazılmış** satır artık *"müşteri getirdi"* yapılamıyor; önce tutar silinecek. Her satırda düğme göstermemek için bilinçli daraltma — kabul mü? (K-046.3) | Cemil |
-| **A-M22** | Dışa aktarmada PDF için **kütüphane yerine tarayıcı yazdırması** öneriliyor — *"PDF olarak kaydet"* yeter mi? (K-045.4) | Cemil |
-| **A-M21** | **Kampanya ertelendi**; yerine araç/müşteri kaydına *"ticari ileti izni"* alanı öneriliyor. Kampanyayı bu fazda istiyorsan yol: İYS kaydı → onay toplama → WhatsApp Business API → şablon onayı (K-045.2) | Cemil |
-| **A-M20** | **Sanal POS faz dışı** bırakıldı. Amaç *"Tamiron müşterilerden para toplasın"*sa bu ürün kararı değil **şirket kararıdır** — ödeme kuruluşu lisansı gerektirir (K-045.1) | Cemil |
-| **A-M19** | Kaydırarak silme kayıt satırında da **doğrudan siliyor** — sen yalnız gider için söylemiştin; aynı jest iki anlama gelmesin diye hizaladım (K-044.1) | Cemil |
-| **A-M18** | *"Sadece mesaj gözüksün"* — katmanda **müşterinin gördüğü sayfa** gösteriliyor, mesaj metni değil (o zaten üstteki alanda). Doğru okuma mı? (K-043.2) | Cemil |
-| ~~A-M17~~ | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta çıkıyordu. **KAPANDI (K-047.3)** — 14.09'da her şablona koşul yazılınca eledi | — |
-| **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? Kalkarsa prototipte sesli yol denenemez (K-042.4) | Cemil |
-| **A-M14** | *(07.09: Cemil anlamadı — soru sadeleştirildi)* Araç teslim edilince ekran **kapanmıyor**, *"müşteriye özet gönder / geç"* diye soruyor. Bu **bir dokunuş** ekliyor. Sorulmasın, teslim edilir edilmez ana ekrana dönülsün mü? | Cemil |
-| ~~A-M13~~ | **CEVAPLANDI (07.09):** *"Evet, olabilir."* — *"balatayı müşteri getirdi, yağı ben aldım"* gerçek bir durum. Satır başına işaret **geri geliyor** (kuyruk 4/A11). K-033.5'teki gerekçem yanlıştı: Cemil'in *"gerek yok"* dediği şey satır başına **iki çipli soru**ydu, işaretin kendisi değil | — |
-| **A-M12** | Sola kaydırarak silme **keşfedilebilir mi**? Ekranda söyleyen bir şey yok. Artık **iki** tabloda var | Bir kez öğrenilir; ipucu istenirse eklenir |
-| **A-M11** | Detaylı menüdeki beş modül (fatura/KDV · çek · senet · cari) **kapsama girdi mi**, yoksa yeri mi açıldı? | Yeri açıldı; K-022 duruyor |
-| **A-M10** | *"Tamirat + Bakım"* tek kayıt mı olmalı, yoksa liste satırında iki kaydın özeti mi? | Tek kayıt varsayıldı |
-| **A-M9** | Özet sayfasında **kimlik doğrulama yok**, link tahmin edilebilir (plaka + kayıt no). Backend fazında kapatılacak — kabul mü | Cemil |
-| ~~A-2~~ | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya | Kısmen kapandı |
+| **Ç-2** | OEM kodu yönü — TecDoc'un kaderi | K-001'de kaldığı gibi |
+| **A-S3** | Ses gizliliği: Chrome sesi Google'a gönderiyor (K-015) | Prototipte kabul; gerçek kullanımda konuşulur |
+
+### Kapandı — arşiv
+
+| Kod | Nasıl kapandı |
+|---|---|
+| ~~A-1~~ | **A-M8'e bağlandı (14.09)** — "ekran bütçesi 6" fiilen aşıldı; asıl kısıt ekran sayısı değil, ekrandaki karar sayısı |
+| ~~A-4~~ | **K-033.5** — türetilmiyor, kendi bayrağı var (`parcaBekliyor`); türetilen `fiyatiBekleyen` başka bir şey: *fiyatı gelmemiş* |
+| ~~A-M4~~ | **K-020.3** — ekran görüntüsü gösterdi ki yapışkan başlık bildirimi örtüyordu; yapışkanlık kaldırıldı |
+| ~~A-M13~~ | **Cemil, 07.09:** *"Evet, olabilir."* — satır başına *"kim getirdi"* işareti geri geldi |
+| ~~A-M15~~ | **Cemil, 07.09:** *"İsterse, evet."* — parça beklendiğini müşteriye söylemek ustanın seçimi |
+| ~~A-M17~~ | **K-047.3** — her şablona koşul yazılınca *"Aracınız hazır"* teslim edilmiş araçtan eledi |
+| ~~A-M27~~ | **Cemil, 14.09:** *"a, b ve c'yi sırayla yapalım"* — c = bu madde. Yanlış duyulan plakada *"bunu mu demek istedin"* önerisi **yazılacak** (Tur 5/5.3) |
