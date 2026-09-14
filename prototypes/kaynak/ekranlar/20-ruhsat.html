@@ -401,8 +401,17 @@ function rEylemCiz(plakaTamam, kayitli) {
     : (plakaTamam
         ? '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
             '<svg class="ico"><use href="#i-check"></use></svg> Kaydı aç</button>'
-        : '<p class="plate-hint">Plakayı yaz ya da mikrofona söyle — ' +
-          'kaydı açan düğme burada çıkacak.</p>');
+        /* ⚠️ 14.09 — AÇIKLAMA SATIRI DA KALKTI (Cemil: *"Plakayı yaz ya
+           da mikrofona söyle — kaydı açan düğme burada çıkacak. text
+           kaldır."*).
+
+           08.09'da düğmeyi gizlerken yerine bir cümle koymuştum: *"sıra
+           sende değil"* demenin yolu sanmıştım. Cemil'in itirazı haklı —
+           ekranın tepesinde zaten plaka alanı ve mikrofon duruyor;
+           yapılacak şeyi söyleyen bir şey varken onu ikinci kez
+           yazmak, ustaya yapmadığı bir şeyi hatırlatmak oluyor.
+           BOŞLUK DA BİR CEVAPTIR. */
+        : '');
 }
 
 Ekran.tanim('ruhsat', {

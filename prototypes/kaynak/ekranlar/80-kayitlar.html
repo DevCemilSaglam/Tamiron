@@ -51,17 +51,26 @@
     </button>
   </div>
 
+  <!-- SESTEN GELEN SÜZGEÇ (14.09). Görünür ve KALDIRILABİLİR: usta
+       listenin neden kısa olduğunu bilmeli, yoksa "kayıtlarım nerede"
+       diye sorar. -->
+  <div class="cip-grup" id="kytSuzgec" hidden></div>
+
   <div id="kytListe"></div>
 
 </section>
 
 <script>
+/* Sesli "servistekileri göster" komutunun bıraktığı süzgeç. Ekranın
+   kendi durumu — veriye yazılmaz (K-034: bayrak durum değildir). */
+var kytSuzgec = null;
 
 Ekran.tanim('kayitlar', {
   ciz: function () {
-    /* Sesten gelen arama: "balata ara" ya da "içeridekileri göster". */
+    /* Sesten gelen arama: "balata ara" ya da "servistekileri göster". */
     if (ARAMA_TERIMI && ARAMA_TERIMI.hedef === 'kayitlar') {
       document.getElementById('kytQ').value = ARAMA_TERIMI.terim || '';
+      kytSuzgec = ARAMA_TERIMI.suzgec || null;
       ARAMA_TERIMI = null;
     }
     var q = norm((document.getElementById('kytQ') || {}).value || '');
@@ -70,6 +79,9 @@ Ekran.tanim('kayitlar', {
        GÖSTERDİĞİ için ustanın onları araması beklenir. Gösterilen bir
        şeyin aranamaması, ustaya "yok" dedirtir. */
     var liste = KAYITLAR.filter(function (k) {
+      /* SÜZGEÇ ÖNCE: sesli komut "yalnız servistekiler" dediyse arama
+         kutusu boş olsa da liste daralır. */
+      if (kytSuzgec === 'serviste' && k.teslimTarihi) return false;
       if (!q) return true;
       var a = aracBul(k.plaka) || {};
       return norm(k.plaka + ' ' + (k.sikayet || '') + ' ' + TUR_AD[k.tur] + ' ' +
@@ -90,6 +102,16 @@ Ekran.tanim('kayitlar', {
                    : liste.length + ' kayıt');
     document.getElementById('kytArama').classList.toggle('filled', !!q);
 
+    /* SÜZGEÇ ÇİPİ — basılı ve kapatılabilir. Görünmeyen bir süzgeç,
+       eksik bir listeyi "kayıt yok" diye okutur. */
+    var sz = document.getElementById('kytSuzgec');
+    sz.hidden = !kytSuzgec;
+    sz.innerHTML = kytSuzgec === 'serviste'
+      ? '<button class="cip" id="kytSuzgecKapat" aria-pressed="true">' +
+          'Yalnız servistekiler' +
+          '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>'
+      : '';
+
     document.getElementById('kytListe').innerHTML = liste.length
       ? liste.map(kayitKartiHtml).join('')
       : bosDurumHtml('i-clipboard-list',
@@ -102,6 +124,9 @@ Ekran.tanim('kayitlar', {
 document.addEventListener('click', function (e) {
   if (e.target.closest('#kytQTemiz')) {
     document.getElementById('kytQ').value = ''; Ekran.tazele();
+  }
+  if (e.target.closest('#kytSuzgecKapat')) {
+    kytSuzgec = null; Ekran.tazele();
   }
 });
 document.addEventListener('input', function (e) {

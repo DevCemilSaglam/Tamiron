@@ -1356,6 +1356,60 @@ function stilMetni() {
     showScreen('home');
   }
 
+  /* 45) ORNEK CUMLE CALISMIYOR (14.09.2026)
+     Cemil: "Servis kayitlari listesinde sesli olarak servistekileri
+     goster secenegini sectim ama sonuc bulunamadi cikti."
+
+     YENI HATA SINIFI: EKRANIN KENDI ORNEGI YALAN SOYLUYOR. Ses
+     ekranindaki cipler ustaya "sunu diyebilirsin" diyor; bir terim
+     degisince (07.09'da "iceride" -> "serviste") cozumleyici eski
+     kelimede kaldi ve ornegin KENDISI calismaz oldu. Usta ekranin
+     onerdigi cumleyi soyluyor ve "sonuc bulunamadi" goruyor — bu,
+     sesten tamamen sogutan hata turudur.
+
+     Ornek cipler zaten birer negatif testti; kimse isletmiyordu.
+     Bu test hepsini isletiyor:
+       · cozumlenemeyen ornek  -> bulgu
+       · arama ornegi BOS liste donduruyorsa -> bulgu
+     Olctugu durumu geri birakiyor: arama kutulari temizleniyor,
+     ekran ana menuye donuyor. */
+  if (typeof window.SES_BAGLAMLAR === 'function' && typeof window.SES_COZUMLE === 'function') {
+    var ORNEKLER = window.SES_BAGLAMLAR();
+    var LISTE_YUVA = { araclar: '#arcListe', kayitlar: '#kytListe', musteriler: '#msListe' };
+    var ARAMA_KUTU = { araclar: 'arcQ', kayitlar: 'kytQ', musteriler: 'msQ' };
+    Object.keys(ORNEKLER).forEach(function (baglam) {
+      (ORNEKLER[baglam] || []).forEach(function (cumle) {
+        window.SESLI_NIYET = baglam;
+        window.ACIK_KAYIT = (baglam === 'kayit-icinde' && KAYITLAR.length) ? KAYITLAR[0].id : null;
+        var o;
+        try { o = window.SES_COZUMLE(cumle); }
+        catch (e) { ek('ORNEK-CUMLE', baglam, '"' + cumle + '" — cozumleyici patladi: ' + e.message); return; }
+        if (!o || o.tur === 'plakasiz') {
+          ek('ORNEK-CUMLE', baglam, '"' + cumle + '" — anlasilmadi');
+          return;
+        }
+        /* ARAMA ORNEGI GERCEKTEN SONUC DONDURUYOR MU. Bir ornegin
+           "anlasilmasi" yetmiyor; ustanin gordugu sey LISTE. */
+        if (o.tur === 'ara' && LISTE_YUVA[o.hedef]) {
+          window.ARAMA_TERIMI = { hedef: o.hedef, terim: o.terim, suzgec: o.suzgec || null };
+          showScreen(o.hedef);
+          var yuva = document.querySelector(LISTE_YUVA[o.hedef]);
+          var satirSay = yuva ? yuva.querySelectorAll('.arac-kart, .mus-kart, .tl-item').length : 0;
+          if (!satirSay) {
+            ek('ORNEK-CUMLE', baglam, '"' + cumle + '" — liste BOS dondu (' + o.hedef + ')');
+          }
+          /* Arama kutusunu ve suzgeci temizle: olcum izini birakmasin. */
+          var kutu = document.getElementById(ARAMA_KUTU[o.hedef]);
+          if (kutu) { kutu.value = ''; kutu.dispatchEvent(new Event('input', { bubbles: true })); }
+          var suzgecKapat = document.getElementById('kytSuzgecKapat');
+          if (suzgecKapat) suzgecKapat.click();
+          showScreen(o.hedef);
+        }
+      });
+    });
+    showScreen('home');
+  }
+
   /* 44) YANLIS DUYULAN PLAKA — ONERI (14.09.2026 · A-M27)
      Cemil'in ses kaydinda tanima "34 ABC 123" yerine "34 QBC 123"
      duydu ve akis durdu.

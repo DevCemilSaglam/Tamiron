@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-14 14:05
+  Üretim: 2026-09-14 19:02
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -3501,6 +3501,11 @@ kirpilsin. */
     </button>
   </div>
 
+  <!-- SESTEN GELEN SÜZGEÇ (14.09). Görünür ve KALDIRILABİLİR: usta
+       listenin neden kısa olduğunu bilmeli, yoksa "kayıtlarım nerede"
+       diye sorar. -->
+  <div class="cip-grup" id="kytSuzgec" hidden></div>
+
   <div id="kytListe"></div>
 
 </section>
@@ -6949,39 +6954,50 @@ Ekran.tanim('home', {
    Her giriş noktası kendi örneklerini getirir. Ustanın "ne
    diyebilirim" sorusu, geldiği yere göre farklı. Genel bir örnek
    listesi göstermek, ekranı herkes için biraz yanlış yapıyordu. */
+/* ⚠️ 14.09 — ÖRNEKLER SABİT METİN DEĞİL, VERİDEN DOLUYOR.
+   45. test üç örneğin yalan söylediğini gösterdi: "41 ABC 43 ara"
+   diyen çip, ÖYLE BİR ARAÇ OLMADIĞI için boş liste döndürüyordu.
+   Ekranın kendi örneği "sonuç bulunamadı" veriyorsa usta sesi bir
+   daha denemez.
+
+   Sabit plaka yazmak, veriyi iki yerde tutmaktır: tohum veri değişince
+   örnek bayatlar ve kimse fark etmez. Yer tutucular çizim anında
+   GERÇEK kayıtlardan dolduruluyor — {plaka} kayıtlı bir araç,
+   {serviste} şu an serviste olan bir araç, {sahip} gerçek bir müşteri.
+   Örnek artık bayatlayamaz. */
 var SES_BAGLAM = {
   genel: {
     ad: 'Sesli işlem',
     ipucu: 'Plakayı ve ne yapılacağını söylemen yeter.',
     ornekler: [
-      '34 ABC 123 triger seti değişecek',
-      '06 TMR 07 bakıma geldi kilometre 88 bin',
-      '35 KLM 45 teslim ettim nakit aldım'
+      '{plaka} triger seti değişecek',
+      '{serviste} bakıma geldi kilometre 88 bin',
+      '{serviste} teslim ettim nakit aldım'
     ]
   },
   'servis-ekle': {
     ad: 'Servis kaydı ekle',
     ipucu: 'Plakayı, sahibini, numarasını ve yapılacak işi söyle.',
     ornekler: [
-      '34 ABC 123 triger seti değişecek',
+      '{plaka} triger seti değişecek',
       '41 KV 5588 Ahmet Yılmaz 0532 111 22 33 debriyaj kaçırıyor',
-      '06 TMR 07 bakıma geldi kilometre 88 bin'
+      '{serviste} bakıma geldi kilometre 88 bin'
     ]
   },
   araclar: {
     ad: 'Araçlarda ara',
     ipucu: 'Plaka, marka ya da sahip adı söyleyebilirsin.',
-    ornekler: ['41 ABC 43 ara', 'Mégane ara', 'Mehmet Kaya ara']
+    ornekler: ['{plaka} ara', '{marka} ara', '{sahip} ara']
   },
   kayitlar: {
     ad: 'Servis kayıtlarında ara',
     ipucu: 'Plaka ya da yapılan iş söyleyebilirsin.',
-    ornekler: ['34 ABC 123 ara', 'balata ara', 'servistekileri göster']
+    ornekler: ['{plaka} ara', 'balata ara', 'servistekileri göster']
   },
   musteriler: {
     ad: 'Müşterilerde ara',
     ipucu: 'Plaka, ad ya da telefon söyleyebilirsin.',
-    ornekler: ['41 abc 43 ara', '34 ABC 123 sahibini ara', 'Mehmet Kaya ara']
+    ornekler: ['{plaka} ara', '{plaka} sahibini ara', '{sahip} ara']
   },
   mesaj: {
     ad: 'Müşteriye mesaj',
@@ -6989,8 +7005,8 @@ var SES_BAGLAM = {
     /* 14.09 — örnekler Cemil'in söylediği cümleler oldu: birincisi
        ses kaydında geçen cümlenin aynısı, üçüncüsü toplu gönderim. */
     ornekler: [
-      '34 ABC 123 sahibine WhatsApp üzerinden selam mesajı gönder',
-      '16 XY 8890 sahibine bakım hatırlatması gönder',
+      '{serviste} sahibine WhatsApp üzerinden selam mesajı gönder',
+      '{teslimli} sahibine bakım hatırlatması gönder',
       'tüm müşterilere bayram mesajı gönder'
     ]
   },
@@ -7013,6 +7029,30 @@ var SES_BAGLAM = {
     ]
   }
 };
+
+/* Yer tutucuları GERÇEK veriyle doldurur. Veri boşsa yer tutucu
+   ekranda kalmasın diye son çare olarak ilk araç kullanılıyor. */
+function sesOrnekDoldur(c) {
+  var ilk = ARACLAR[0] || {};
+  var icerdeKayit = icerideki()[0];
+  var servisteki = icerdeKayit ? aracBul(icerdeKayit.plaka) : null;
+  var teslimli = ARACLAR.filter(function (a) {
+    return !aracServiste(a.plaka) && aracKayitlari(a.plaka).length;
+  })[0] || ilk;
+  var sahipli = ARACLAR.filter(function (a) { return a.sahipAd; })[0] || ilk;
+  return String(c)
+    .replace(/\{plaka\}/g, ilk.plaka || '')
+    .replace(/\{serviste\}/g, (servisteki || ilk).plaka || '')
+    .replace(/\{teslimli\}/g, teslimli.plaka || '')
+    .replace(/\{marka\}/g, ilk.marka || '')
+    .replace(/\{sahip\}/g, sahipli.sahipAd || '');
+}
+/* Ekranın gösterdiği liste ile tıklanınca işlenen cümle AYNI yerden
+   çıkar — ikisi ayrılırsa usta gördüğünden başka bir şey söylemiş
+   olur. */
+function sesOrnekleri() {
+  return (sesBaglam().ornekler || []).map(sesOrnekDoldur);
+}
 
 var sesDurumu = 'bos';      /* bos · dinliyor · anlasildi · anlasilmadi */
 var sesCumle = '';
@@ -7193,6 +7233,24 @@ function sesCozumle(c) {
              tip: iscilikMi ? 'iscilik' : 'parca', fiyat: tutarR };
   }
 
+  /* --- TAHSİLAT SORUSU (14.09) ---
+     Ekranın kendi örneği *"bugün ne kadar tahsil ettim"* diyordu ve
+     çözümleyicide karşılığı YOKTU — 45. test yakaladı. Örneği silmek
+     de bir seçenekti; soru tamircinin DÖRDÜNCÜ işinin ta kendisi
+     (*"teslimde ödemeyi nasıl aldığını bilmek"*) ve cevabı zaten
+     kayıtlı veriden çıkıyor. Yeni alan istemeyen bir soru, yeni
+     özellik değil — var olanın sesle sorulması.
+
+     ⚠️ TUTAR VARSA BU BİR SORU DEĞİL, GİDER GİRİŞİDİR: "2400 TL
+     elektrik faturası" cümlesi buraya düşmesin diye tutar kontrolü
+     başta duruyor. */
+  if (!sesTutarBul(d) && (d.indexOf('tahsil') >= 0 || d.indexOf('kasa') >= 0)) {
+    var sorulanDonem = (d.indexOf('bugun') >= 0) ? 'bugun'
+                     : (d.indexOf('yil') >= 0) ? 'yil'
+                     : (d.indexOf('ay') >= 0) ? 'ay' : 'bugun';
+    return { tur: 'tahsilat-sor', donem: sorulanDonem };
+  }
+
   /* --- GİDER EKLE --- */
   if (d.indexOf('gider') >= 0 || d.indexOf('fatura') >= 0 || d.indexOf('kira') >= 0 ||
       (baglam === 'muhasebe' && sesTutarBul(d))) {
@@ -7273,7 +7331,22 @@ function sesCozumle(c) {
       terim = a2 && a2.sahipAd ? a2.sahipAd : p.plaka;
       hedef = 'musteriler';
     }
-    if (d.indexOf('iceridek') >= 0) return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'iceride' };
+    /* ⚠️ 14.09 — "SERVİSTEKİLER" BURADA YOKTU VE ÖRNEK ÇİP ÇALIŞMIYORDU.
+       Cemil: *"Servis kayıtları listesinde sesli olarak servistekileri
+       göster seçeneğini seçtim ama sonuç bulunamadı çıktı."*
+
+       Sebep: 07.09'da *"içeride"* kelimesi **"serviste"** oldu (K-046'nın
+       turu) ve ekranların hepsi güncellendi — ama çözümleyici hâlâ
+       yalnız `iceridek` arıyordu. Örnek çip *"servistekileri göster"*
+       diyordu; cümle süzgece değil DÜZ ARAMAYA düşüyor, arama kutusuna
+       "servistekileri" yazılıyor ve liste boş dönüyordu.
+
+       Bir terimi değiştirmek, o terimi ARAYAN yerleri de değiştirmektir.
+       Örnek çipin kendisi negatif testti ve kimse dokunmamıştı —
+       45. test (ORNEK-CUMLE) artık her örneği işletiyor. */
+    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0) {
+      return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'serviste' };
+    }
     if (terim) return { tur: 'ara', hedef: hedef, terim: terim };
   }
 
@@ -7361,6 +7434,14 @@ function sesOzet(o) {
                ['Ne', o.ad],
                ['Tutar', o.fiyat ? tutar(o.fiyat) + ' ₺' : '— (sonra yazılır)']],
     eylem: 'Satırı ekle' };
+
+  /* SORUNUN CEVABI ONAY EKRANINDA. Muhasebeyi açıp ustayı rakamı
+     aramaya bırakmak, sorduğu şeyi cevaplamamaktır. */
+  if (o.tur === 'tahsilat-sor') return {
+    baslik: donemAdi(o.donem) + ' tahsilat',
+    satirlar: [['Tahsil edilen', tutar(tahsilatToplami(o.donem)) + ' ₺'],
+               ['Alacak (veresiye)', tutar(veresiyeToplami()) + ' ₺']],
+    eylem: 'Muhasebeyi aç' };
 
   if (o.tur === 'gider-ekle') return {
     baslik: 'Gider eklenecek',
@@ -7488,6 +7569,13 @@ function sesUygula(o) {
       marka: '', kod: '', tanim: 'tanimlanamadi' });
     balon('Satır eklendi — fiyatını yaz.', false, 2800);
     Ekran.ac('kayit'); return;
+  }
+  if (o.tur === 'tahsilat-sor') {
+    /* Dönem muhasebe ekranıyla ORTAK (çekirdekteki muhDonemSecili):
+       usta sorduğu pencereyi ekranda da bulsun. */
+    muhDonemSecili = o.donem;
+    Ekran.ac('muhasebe');
+    return;
   }
   if (o.tur === 'gider-ekle') {
     GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
@@ -7746,6 +7834,20 @@ function sesDinlemeyiBaslat() {
    Denetimin showScreen köprüsüyle aynı gerekçe: sınanamayan kod,
    sınanmamış koddur. */
 window.SES_COZUMLE = function (c) { return sesCozumle(c); };
+/* ⚠️ ÖRNEK ÇİPLER DE SINANABİLİR OLMALI (14.09). Bağlam tablosu bu
+   ekranın IIFE'sinde duruyordu ve denetim onu göremiyordu; ekranın
+   ustaya önerdiği cümlelerin çalıştığını kimse ölçmüyordu. Nitekim
+   biri çalışmıyordu ("servistekileri göster"). */
+window.SES_BAGLAMLAR = function () {
+  var c = {};
+  Object.keys(SES_BAGLAM).forEach(function (ad) {
+    /* Denetim ekranda GÖRÜNEN cümleyi sınamalı — yer tutucu hâlini
+       değil. Doldurma bağlamdan bağımsız olduğu için burada tek tek
+       geçiliyor. */
+    c[ad] = (SES_BAGLAM[ad].ornekler || []).map(sesOrnekDoldur);
+  });
+  return c;
+};
 /* Ham metnin düzeltilmiş hâli — hata ararken hangi adımın bozduğunu
    görmek için. */
 window.SES_METIN = function (c) {
@@ -7779,7 +7881,7 @@ Ekran.tanim('ses', {
   },
   ciz: function () {
     var b = sesBaglam();
-    document.getElementById('sesOrnekler').innerHTML = b.ornekler.map(function (c, i) {
+    document.getElementById('sesOrnekler').innerHTML = sesOrnekleri().map(function (c, i) {
       return '<button class="cip" data-ornek="' + i + '">' + c + '</button>';
     }).join('');
     /* ⚠️ MOTOR NOTU ARTIK YAZILMIYOR (Cemil, 07.09): *"Altta
@@ -7800,7 +7902,7 @@ document.addEventListener('click', function (e) {
   if (o !== null) {
     /* Örnek de gerçek cümle gibi işlenir; kısa gecikme "dinliyor"
        hâlinin görülmesi için. */
-    var c = sesBaglam().ornekler[parseInt(o, 10)];
+    var c = sesOrnekleri()[parseInt(o, 10)];
     sesCumle = c; sesDurumu = 'dinliyor'; sesCiz();
     setTimeout(function () { sesCumleIsle(c); }, 700);
     return;
@@ -8029,8 +8131,17 @@ function rEylemCiz(plakaTamam, kayitli) {
     : (plakaTamam
         ? '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
             '<svg class="ico"><use href="#i-check"></use></svg> Kaydı aç</button>'
-        : '<p class="plate-hint">Plakayı yaz ya da mikrofona söyle — ' +
-          'kaydı açan düğme burada çıkacak.</p>');
+        /* ⚠️ 14.09 — AÇIKLAMA SATIRI DA KALKTI (Cemil: *"Plakayı yaz ya
+           da mikrofona söyle — kaydı açan düğme burada çıkacak. text
+           kaldır."*).
+
+           08.09'da düğmeyi gizlerken yerine bir cümle koymuştum: *"sıra
+           sende değil"* demenin yolu sanmıştım. Cemil'in itirazı haklı —
+           ekranın tepesinde zaten plaka alanı ve mikrofon duruyor;
+           yapılacak şeyi söyleyen bir şey varken onu ikinci kez
+           yazmak, ustaya yapmadığı bir şeyi hatırlatmak oluyor.
+           BOŞLUK DA BİR CEVAPTIR. */
+        : '');
 }
 
 Ekran.tanim('ruhsat', {
@@ -9356,11 +9467,16 @@ document.addEventListener('input', function (e) {
 
 /* ===== ekran: 80-kayitlar.html ===== */
 (function () {
+/* Sesli "servistekileri göster" komutunun bıraktığı süzgeç. Ekranın
+   kendi durumu — veriye yazılmaz (K-034: bayrak durum değildir). */
+var kytSuzgec = null;
+
 Ekran.tanim('kayitlar', {
   ciz: function () {
-    /* Sesten gelen arama: "balata ara" ya da "içeridekileri göster". */
+    /* Sesten gelen arama: "balata ara" ya da "servistekileri göster". */
     if (ARAMA_TERIMI && ARAMA_TERIMI.hedef === 'kayitlar') {
       document.getElementById('kytQ').value = ARAMA_TERIMI.terim || '';
+      kytSuzgec = ARAMA_TERIMI.suzgec || null;
       ARAMA_TERIMI = null;
     }
     var q = norm((document.getElementById('kytQ') || {}).value || '');
@@ -9369,6 +9485,9 @@ Ekran.tanim('kayitlar', {
        GÖSTERDİĞİ için ustanın onları araması beklenir. Gösterilen bir
        şeyin aranamaması, ustaya "yok" dedirtir. */
     var liste = KAYITLAR.filter(function (k) {
+      /* SÜZGEÇ ÖNCE: sesli komut "yalnız servistekiler" dediyse arama
+         kutusu boş olsa da liste daralır. */
+      if (kytSuzgec === 'serviste' && k.teslimTarihi) return false;
       if (!q) return true;
       var a = aracBul(k.plaka) || {};
       return norm(k.plaka + ' ' + (k.sikayet || '') + ' ' + TUR_AD[k.tur] + ' ' +
@@ -9389,6 +9508,16 @@ Ekran.tanim('kayitlar', {
                    : liste.length + ' kayıt');
     document.getElementById('kytArama').classList.toggle('filled', !!q);
 
+    /* SÜZGEÇ ÇİPİ — basılı ve kapatılabilir. Görünmeyen bir süzgeç,
+       eksik bir listeyi "kayıt yok" diye okutur. */
+    var sz = document.getElementById('kytSuzgec');
+    sz.hidden = !kytSuzgec;
+    sz.innerHTML = kytSuzgec === 'serviste'
+      ? '<button class="cip" id="kytSuzgecKapat" aria-pressed="true">' +
+          'Yalnız servistekiler' +
+          '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>'
+      : '';
+
     document.getElementById('kytListe').innerHTML = liste.length
       ? liste.map(kayitKartiHtml).join('')
       : bosDurumHtml('i-clipboard-list',
@@ -9401,6 +9530,9 @@ Ekran.tanim('kayitlar', {
 document.addEventListener('click', function (e) {
   if (e.target.closest('#kytQTemiz')) {
     document.getElementById('kytQ').value = ''; Ekran.tazele();
+  }
+  if (e.target.closest('#kytSuzgecKapat')) {
+    kytSuzgec = null; Ekran.tazele();
   }
 });
 document.addEventListener('input', function (e) {
@@ -10484,7 +10616,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>b32b2c21</b><br>' +
+      'Sürüm <b>46ed7e76</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
