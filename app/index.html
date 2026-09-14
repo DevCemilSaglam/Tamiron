@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-14 19:09
+  Üretim: 2026-09-14 19:12
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -3718,6 +3718,22 @@ kirpilsin. */
       <div class="field">
         <textarea id="msjMetin" rows="6" aria-label="Mesaj metni"></textarea>
       </div>
+      <!-- ⚠️ 14.09 — "Yapay zeka düzeltsin" (Cemil: "Mesaj gönderirken,
+           mesajı yapay zeka düzenleyecek.").
+
+           PROTOTİPTE DÜZELTME SAHTE ve bu ekranda YAZILI. Gerçek model
+           backend ister (anahtar tarayıcıda duramaz — YAPAY-ZEKA.md §4);
+           bugün yazılan şey AKIŞ: düzelt → ÖNCE/SONRA karşılaştır →
+           onayla ya da vazgeç.
+
+           Neden akışı şimdi yazıyoruz: model bağlandığında değişecek
+           tek şey düzeltmeyi kimin yaptığı. Onay adımı olmasaydı model
+           ustanın cümlesini sessizce değiştirirdi — K-017'nin kuralı
+           burada da geçerli: onaysız hiçbir şey. -->
+      <button class="btn btn-ghost" id="msjZeka">
+        <svg class="ico"><use href="#i-search-check"></use></svg>
+        Yapay zeka düzeltsin
+      </button>
     </div>
 
     <div id="msjUyari"></div>
@@ -10046,6 +10062,9 @@ document.addEventListener('input', function (e) {
 (function () {
 var msjPlaka = null;
 var msjSablonSecili = 'ozet';
+/* Katmanda gosterilen duzeltme onerisi — onaylanana kadar metne
+   YAZILMAZ (K-017: onaysiz hicbir sey). */
+var msjZekaOneri = null;
 /* Hangi hedefe gidiyor — null ise varsayilan (telefonu olan ilk sira). */
 var msjHedefSecili = null;
 
@@ -10108,6 +10127,33 @@ function msjOzetKaydi(plaka) {
    Ekranda kalan tek şey, ekrana ait olan: hangi hedef seçili. */
 function msjMetinUret(plaka, sablon) {
   return mesajMetniUret(plaka, sablon, msjHedefSecili);
+}
+
+/* ---- SAHTE DÜZELTME (14.09) ----
+   ⚠️ BU BİR YAPAY ZEKA DEĞİL, üç kuralı olan bir temizleyici:
+     · satır içi fazla boşluklar toparlanır
+     · ilk harf büyütülür
+     · imza (dükkân adı + telefon) yoksa eklenir
+   Bilerek küçük. Zeki görünen sahte bir çıktı — "modelin yazdığı güzel
+   cümle" — olmayan bir yeteneği göstermek olurdu.
+
+   ⚠️ TÜRKÇE BÜYÜK HARF `toLocaleUpperCase('tr')` İLE: `toUpperCase()`
+   "istanbul"u "ISTANBUL" yapıyor, "İSTANBUL" değil (K-018'in akrabası —
+   Türkçe, ASCII varsayımlarını sessizce bozar). */
+function msjSahteDuzelt(metin, plaka) {
+  var imza = mesajImzasi().trim();
+  var govde = String(metin).replace(/[ \t]{2,}/g, ' ')
+                           .replace(/\n{3,}/g, '\n\n')
+                           .trim();
+  /* İmzayı ayır, gövdeyi düzelt, sonra geri ekle — imzanın içindeki
+     boşluklarla oynamak dükkân adını bozardı. */
+  if (imza && govde.indexOf(imza) >= 0) {
+    govde = govde.slice(0, govde.indexOf(imza)).trim();
+  }
+  if (govde) {
+    govde = govde.charAt(0).toLocaleUpperCase('tr') + govde.slice(1);
+  }
+  return govde + mesajImzasi();
 }
 
 function msjSecimCiz() {
@@ -10313,6 +10359,48 @@ document.addEventListener('click', function (e) {
   }
 
   if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
+
+  /* ---- YAPAY ZEKA DÜZELTMESİ (14.09) ----
+     ⚠️ PROTOTİPTE SAHTE VE ÖYLE YAZIYOR. Yaptığı iş gerçek bir
+     düzeltme değil, ustanın GÖRECEĞİ AKIŞ: iki metin yan yana, fark
+     görünür, onay ustada.
+
+     Sahte düzeltme bilerek KÜÇÜK: boşlukları toparlıyor, cümle başını
+     büyütüyor, imzayı garantiliyor. Zeki görünen sahte bir çıktı
+     yazsaydım — "modelin yazdığı güzel cümle" — Cemil'e olmayan bir
+     yetenek göstermiş olurdum; bu depoda en pahalı yalan o. */
+  if (t.id === 'msjZeka') {
+    var alan = document.getElementById('msjMetin');
+    var once = alan.value || '';
+    if (!once.trim()) { balon('Önce bir metin olsun.', false, 2400); return; }
+    var sonra = msjSahteDuzelt(once, msjPlaka);
+    if (sonra === once) { balon('Metin zaten düzgün görünüyor.', false, 2600); return; }
+    Katman.ac('Yapay zeka düzeltmesi',
+      '<div class="notice warn">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+        '<span class="n-body">Bu prototipte düzeltmeyi <b>yapay zeka yapmıyor</b>; ' +
+          'akışı görüyorsun. Gerçek düzeltme sunucu tarafında çalışacak ' +
+          '(<b>YAPAY-ZEKA.md</b>).</span></div>' +
+      '<div class="section-label" style="margin-top:14px">Şimdiki</div>' +
+      '<div class="card"><p class="plate-hint">' + once.replace(/\n/g, '<br>') + '</p></div>' +
+      '<div class="section-label" style="margin-top:14px">Önerilen</div>' +
+      '<div class="card"><p class="plate-hint">' + sonra.replace(/\n/g, '<br>') + '</p></div>' +
+      '<button class="btn btn-primary btn-lg" id="ktmZekaUygula" style="margin-top:14px">' +
+        '<svg class="ico"><use href="#i-check"></use></svg> Öneriyi uygula</button>');
+    /* Metin katmanın içinde değil, ekranın alanında duruyor; uygulama
+       anında oradan okunacak diye geçici olarak saklanıyor. */
+    msjZekaOneri = sonra;
+    return;
+  }
+  if (t.id === 'ktmZekaUygula') {
+    if (msjZekaOneri === null) return;
+    var ma = document.getElementById('msjMetin');
+    ma.value = msjZekaOneri;
+    msjZekaOneri = null;
+    Katman.kapa();
+    balon('Metin güncellendi — göndermeden önce bir daha bak.', false, 2800);
+    return;
+  }
 
   /* TÜM MESAJLAR — arşiv sayfası, bu aracın süzgeciyle (Cemil:
      "Tüm mesajlarına link olsun"). Süzgeç ekranda çip olarak
@@ -11240,7 +11328,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>bb4a3cd6</b><br>' +
+      'Sürüm <b>1ebb7239</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

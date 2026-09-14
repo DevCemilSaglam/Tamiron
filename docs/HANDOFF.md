@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 14.09.2026 *(K-047 · ikinci telefon turu)*
+> **Son güncelleme:** 14.09.2026 *(K-048 · üçüncü telefon turu · yapay zeka planı)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -13,14 +13,16 @@ tıklanabilir prototip.
 
 | | |
 |---|---|
-| Ekran | **15** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · **musteri** *(detay, K-046.2)* · muhasebe · **is-basina** + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
+| Ekran | **16** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · musteri · muhasebe · is-basina · **mesajlar** *(gönderilen mesaj arşivi, K-048.2)* + **ozet** *(müşterinin gördüğü sayfa — K-023)*. **Menü hâlâ altı satır** |
 | Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
-| Mesaj | Altı şablon, **her biri koşullu** (K-047.3) · **gönderilen mesaj arşivi** (mesaj ekranında akordiyon; K-045.3: üç yıl saklanır) · **sesli gönderim onay ekranından** · **toplu mesaj** (K-047.4 — K-045.2 ile çelişiyor, Cemil genişletti) |
+| Mesaj | Altı şablon, **her biri kayıt bazlı koşulla** (K-048.4) · **arşiv kendi sayfasında** (arama · kanal süzgeci · sayfalama) · mesaj yazımında **son 5** kapalı akordiyon · **sesli gönderim onay ekranından** · **toplu mesaj** (K-047.4) · **"yapay zeka düzeltsin"** — prototipte sahte, öyle yazılı (K-048.6) |
+| Süreç | Servis kaydının omurgası: açılış → parça bekleme → **mesajlar** → teslim → hatırlatma, ve *"şimdi gönderilebilir"* önerileri. Yeni durum alanı yok, türetiliyor (K-048.4) |
+| Yapay zeka | **Plan yazıldı, kod yok:** `arastirma/YAPAY-ZEKA.md` — dört iş (ses anlama · ruhsat · parça listesi · mesaj düzeltme), tek şart (**anahtar backend'de**), ölçüm yolu (değerlendirme seti) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
-| Sağlık denetimi | **44 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **46 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-047** |
+| Kararlar | **K-001 … K-048** · **açık maddelerin çoğu 14.09'da cevaplandı**; bekleyen dört madde yapay zeka turunun (A-M30…A-M33) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -258,28 +260,28 @@ kullanışlıdır.**
 
 ⚠️ **LİSTE BURADA DEĞİL, `KARARLAR.md`'NİN SONUNDA** (14.09).
 
-Burada **ikinci bir liste** duruyordu ve iki liste ayrışmıştı: `A-14` ile
-`A-M1` yalnız burada vardı, `A-M18`…`A-M24` yalnız orada. Aynı soruyu iki
-yerde tutmak, iki ayrı cevap demektir (K-019.1) — bu deponun en sık
-tekrarlayan hatası. Maddeler `KARARLAR.md`'ye taşındı; burası artık
-**nereye bakılacağını** söylüyor.
+Burada ikinci bir liste duruyordu ve iki liste ayrışmıştı — aynı soruyu
+iki yerde tutmak, iki ayrı cevap demektir (K-019.1).
 
-`KARARLAR.md` → **AÇIK — karara bağlanacak**, üç blok:
+**14.09 akşamı itibarıyla açık maddelerin çoğu cevaplandı** (Cemil:
+*"Karar bekleyen bir şey varsa onu da bitirelim."*). Bekleyen dört madde
+yapay zeka turunun:
 
-| Blok | Ne demek | Kaç madde |
+| Kod | Soru | Öneri |
 |---|---|---|
-| **A · Kapsamı belirleyenler** | Cevap bir işi açar ya da kapatır | 7 *(MUH · A-M8 · A-M25 · A-M21 · A-M20 · A-M22 · A-2)* |
-| **B · Ekranı değiştirenler** | *"Evet"* dersen kod yazılır | 8 *(A-M14 · A-M7 · A-M28 · A-M29 · A-M16 · A-M12 · A-3 · A-14)* |
-| **C · "Böyle kalsın mı"** | *"Hayır"* dersen geri alınır; tamamına tek cümleyle *"hepsi kalsın"* denebilir | 13 |
+| **A-M30** | Hangi model — dükkân başına aylık ~$3 ile ~$13 arası | Ölçmeden seçme |
+| **A-M31** | Backend bu fazda mı açılıyor (yapay zekanın tek yapısal engeli) | Evet ama küçük: tek uç nokta |
+| **A-M32** | Gerçek ruhsat/parça listesi fotoğrafları toplanacak mı | Toplanmalı |
+| **A-M33** | Gizlilik cümlesi nerede yazsın | Ayarlarda tek satır |
 
-Ayrıca **sonraki fazın soruları** (A-5 · A-6 · A-7 · Ç-2 · A-S3) ve
-**kapandı/arşiv** bölümü orada. **En acili: `MUH`** — tek sayfalık karar
-belgesi [`MUHASEBE-KARARI.md`](MUHASEBE-KARARI.md).
+Kapsam kararlarından ikisi **tek cümleyle geri alınabilir**: `MUH`
+(kasa+gider) ve `A-M25` (toplu mesaj kalıyor).
 
-
-**Yapılmamış işler:** ~~müşteri özeti~~ **(K-023'te yazıldı)** · müşteri uygulaması (T-21) · gerçek ruhsat
-okuma (`RUHSAT-OKUMA.md` C yolu) · gerçek WhatsApp gönderimi
-(`WHATSAPP.md` A yolu, kurulum gerektirmiyor) · SMS + İYS kaydı ·
+**Yapılmamış işler:** müşteri uygulaması (T-21) · **gerçek ruhsat ve
+parça listesi okuma** (`YAPAY-ZEKA.md` — backend bekliyor) · **sesli
+komutun modele bağlanması** (aynı yerde) · gerçek WhatsApp gönderimi
+(`WHATSAPP.md` A yolu) · SMS + İYS kaydı · **muhasebe kararının açtığı
+dört iş** (ay bazlı gider toplamı → dışa aktarma → alacak → izin alanı) ·
 backend.
 
 ---

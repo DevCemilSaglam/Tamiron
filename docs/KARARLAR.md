@@ -10,6 +10,186 @@
 
 ---
 
+## K-048 · Üçüncü telefon turu: ölçek, süreç ve yapay zekanın yeri (14.09.2026)
+
+Cemil on bir madde yazdı. Üçü hata, dördü ölçek, biri akış, üçü yapay
+zeka. Hepsinin altında tek bir soru vardı: **prototip, gerçek hacimde ve
+gerçek zekâyla ne olacak?**
+
+### 48.1 · Ekranın kendi örneği yalan söylüyordu
+
+Cemil: *"Servis kayıtlarında sesli olarak servistekileri göster
+seçeneğini seçtim ama sonuç bulunamadı çıktı."*
+
+07.09'da *"içeride"* kelimesi **"serviste"** oldu; ekranların hepsi
+güncellendi, **çözümleyici eski kelimede kaldı.** Örnek çip cümleyi
+öneriyor, cümle düz aramaya düşüyor, liste boş dönüyordu. Üstelik
+çözümleyicinin ürettiği `suzgec` alanını **hiçbir ekran okumuyordu**.
+
+> **Bir terimi değiştirmek, o terimi ARAYAN yerleri de değiştirmektir.**
+> Örnek çipin kendisi negatif testti ve kimse dokunmamıştı.
+
+**45. test (`ORNEK-CUMLE`)** her örneği işletiyor ve arama örneklerinde
+listenin boş dönüp dönmediğine bakıyor. Yazılır yazılmaz **üç gerçek
+hata daha** buldu: iki örnek olmayan bir plakayı arıyordu, biri
+(*"bugün ne kadar tahsil ettim"*) çözümleyicide karşılığı olmayan bir
+şey vaat ediyordu.
+
+**Örnekler artık bayatlayamaz:** sabit plaka yazmak veriyi iki yerde
+tutmaktı. Yer tutucular (`{plaka}`, `{serviste}`, `{teslimli}`,
+`{sahip}`) çizim anında gerçek kayıtlardan doluyor.
+
+**Tahsilat sorusu silinmedi, YAZILDI:** *"bugün ne kadar tahsil ettim"*
+tamircinin dördüncü işinin ta kendisi ve cevabı zaten kayıtlı veriden
+çıkıyor. Yeni alan istemeyen bir soru, yeni özellik değildir.
+
+### 48.2 · Ölçek: üç mesajla güzel, üç yüz mesajla kullanılamaz
+
+Cemil: *"Gönderilen mesajlar binlerce olduğunda nasıl listelenecek?
+Filtrelemek gerekir mi? Yeni bir sayfa daha uygun olabilir."*
+
+Sabah yazdığım arşiv akordiyonu **tohum veriyle** güzel görünüyordu: iki
+mesaj. Günde beş mesaj gönderen bir dükkân bir yılda **1.800 satır**
+eder. **Örnek veriye bakarak tasarlamak, ölçeksiz tasarlamaktır** —
+72 mesajla denedim ve sayfalama, kanal süzgeci ve arama olmadan liste
+kullanılamıyordu.
+
+Üç soru, üç ayrı yer: *"bu müşteriye ne gönderdim"* → mesaj yazımında
+**kapalı** akordiyon, son 5 (Cemil'in sayısı) · *"tümünü gör"* → arşiv
+sayfası, plaka süzgeciyle · *"dün ne gönderdim"* → arşiv sayfası.
+Ekran 15 → 16, **ama menüye satır eklenmedi** (karar bütçesi, A-M8).
+
+**Bir kararımı geri aldım:** sabah *"mesaj satırı tıklanmaz, çünkü
+gönderilmiş mesaj değişmez"* yazmıştım. Cemil *"detayı görülebilsin"*
+dedi ve haklı — **değişmemesi bakılamaması demek değilmiş.**
+
+### 48.3 · İki liste birbirine benzedi
+
+Cemil: *"Araçlar, müşteriler, müşteriye mesaj aynı sayfalar oldu.
+Farkları olmalı."*
+
+08.09'da *"listelemeleri aynı olsun"* demişti ve satırı ortak nesne
+yaptım — doğruydu. Ama ikisi de **aynı şeyi bağırıyordu: büyük plaka.**
+Oysa iki liste iki ayrı soruyu cevaplıyor: araçlar *"hangi araç"*,
+müşteriler *"hangi kişi"*. Müşteri satırında plaka **hiyerarşide indi**
+(aynı bileşen, küçük boy), ad büyüdü. Satır 190 px'den 130 px'e indi —
+**A-M28 de böyle kapandı.**
+
+> *"Aynı olsun"* ile *"aynı görünsün"* aynı şey değilmiş: ortak olması
+> gereken **satırın kendisi ve kuralı**, bağırdığı şey değil.
+
+### 48.4 · Süreç: kaydın omurgası
+
+Cemil: *"Süreç mesaj göndermeyle birlikte süreç şeklinde olsun. Teslim
+edildi, parça bekliyor vb hep arka arkaya olan süreç şeklinde işlesin.
+Bunu iyi kontrol et."*
+
+Ekran bugüne kadar **"şu an"ı** gösteriyordu: bir rozet *"serviste"*,
+bir bayrak *"parça bekliyor"*. Ama iş bir anlık durum değil, arka arkaya
+gelen olaylar — ve **mesajlar o olayların içinde**, yanında değil.
+
+**Yeni durum alanı açılmadı** (K-004 duruyor): süreç türetiliyor. Tek
+eklenen alan `bekliyorTarihi` — bayrağın ne zaman kalktığını hiçbir yer
+tutmuyordu ve **zamansız bir olay sıraya giremez.**
+
+*"Bunu iyi kontrol et"* dedi; kontrol **iki hata** buldu:
+
+1. Teslim edilmiş bir kaydın süreci *"Aracınız hazır gönderilebilir"*
+   diyordu — öneriler **plakaya** bakıyordu ve aynı aracın başka bir
+   açık kaydı vardı. **Araç düzeyinde doğru olan cümle, kayıt düzeyinde
+   yalan.** Şablon koşulları kayıt bazına çevrildi.
+2. *"Teslim edildi"* mesajı teslimin **üstünde** görünüyordu: aynı gün
+   oldukları için sıra tarihten çıkmıyordu. Aynı gün olanlar artık
+   **neden sırasına** göre diziliyor.
+
+**46. test (`SUREC`)** dört değişmezi ölçüyor ve ikinci hatanın sınıfını
+kapatıyor: *olmamış bir şeyi olmuş gibi anlatan sıra.*
+
+### 48.5 · Ses açık kayıtta üç iş yapıyor
+
+Cemil: *"Yeni işlemler için sesli olarak söyleyebilir. Bunlar parça
+olabilir, işçilik olabilir. Fiyat güncellenebilir. Teslime
+edilebilir."*
+
+Sıra **dar olandan geniş**e: teslim → fiyat güncelleme → satır ekleme.
+Ters sırada *"teslim ettim nakit aldım"* cümlesi kayda *"teslim ettim"*
+diye bir satır eklerdi.
+
+Fiyat güncellemede **A-M27'nin kuralı tekrar işliyor:** söylenen ad iki
+satıra birden uyuyorsa güncelleme yok, yeni satır eklenir. *Tahmin
+etmek, ustanın yazdığı rakamı sessizce değiştirmenin yoludur.*
+
+Foto ve mikrofon adım 2'nin içindeydi; **ustanın eli yağlıyken
+söyleyeceği şey adımı beklemiyor.** İkisi de her adımda görünür yere
+taşındı, kopya bırakılmadı.
+
+### 48.6 · Yapay zeka: dört iş, tek boru, bir şart
+
+Cemil: *"Ses, parça listesi okuma, ruhsat okuma, sesi modele çevirip iş
+yapılabilmesi... Bunu nasıl yaparız?"* + *"Mesaj gönderirken, mesajı
+yapay zeka düzenleyecek."*
+
+Cevap `arastirma/YAPAY-ZEKA.md`'de; model adları, fiyatlar ve API
+davranışı **14.09.2026 tarihli Claude API referansından** alındı,
+hafızadan yazılmadı. Dört bulgu:
+
+**① Model sesi duymuyor.** Claude API metin ve görüntü alıyor, ses
+almıyor. *"Sesi modele çevirmek"* iki adım: tanıma tarayıcıda kalıyor
+(bugünkü Web Speech, ücretsiz), model **anlama** işini alıyor. Bugünkü
+desen eşleştirici *"34 ABC 123 triger seti değişecek"*i anlıyor,
+*"şu Mégane'ın trigerini değiştirdik, balatalara da baktık"*ı
+anlamıyor — kazanç orada.
+
+**② Anahtar tarayıcıda duramaz.** Bu belgedeki tek *"olmazsa olmaz"*.
+Tarayıcıya konan API anahtarı herkese konmuştur. Yapay zeka,
+`MIMARI.md`'de zaten öngörülen backend'in **ilk gerçek işi** oluyor —
+dört küçük uç nokta yetiyor.
+
+**③ Sözleşme zaten yazılı.** Model serbest metin değil, ekranın
+beklediği **işlem nesnesini** döndürmeli; o nesneyi prototipin
+çözümleyicisi bugün üretiyor. Yani model **prototipin yerine değil,
+bir fonksiyonun yerine** geçiyor: onay ekranı, `sesUygula`, balonlar,
+geri alma — hepsi kalıyor.
+
+**④ Onay ekranı yapay zekayla birlikte kalkmaz, önemli hâle gelir.**
+K-017 sahte çözümleyici için yazılmıştı; model de yanılır ve
+**kendinden emin** yanılır.
+
+**Ölçüm nasıl yapılacak** (Cemil'in asıl sorusu): elimizde zaten
+`SES_COZUMLE` köprüsü ve 45. test var. Cümle + beklenen çıktı listesi
+eklenince değerlendirme seti olur ve **aynı liste iki motora** verilir.
+Fotoğraf tarafı için elde veri yok — **20–30 gerçek ruhsat ve 10–15
+gerçek parça listesi fotoğrafı** gerekiyor (A-M32); onlar olmadan
+doğruluk hakkında yazılan her cümle tahmindir.
+
+**Mesaj düzeltmenin arayüzü bugün yazıldı** ve düzeltme **sahte olduğu
+ekranda yazılı**. Sahte düzeltme bilerek küçük tutuldu (boşluk, ilk
+harf, imza): zeki görünen sahte bir çıktı, olmayan bir yeteneği
+göstermek olurdu — bu depoda en pahalı yalan o.
+
+### 48.7 · Araç kendi hatasını söylemeye başladı
+
+Bu turda *"geri"* yapmadan ikinci kez *"gom"* çağırdım: denetim **iki
+kez** gömüldü, her fonksiyon iki kez tanımlandı ve 10. test haklı olarak
+*"YINELENEN-FN | stilMetni x2"* dedi. **Bulgu gerçekti ama prototipte
+değil, ARAÇTA** — yarım saat yanlış yerde hata arattırabilirdi.
+`denetim-kos.py` artık üst üste gömmeyi reddediyor; *"geri"* de yedek
+yokken yığın izi basmak yerine *"yapılacak bir şey yok"* diyor.
+
+### 48.8 · Bu turun dersi
+
+**Örnek veriyle tasarlamak, ölçeksiz tasarlamaktır.** İki mesajla güzel
+görünen akordiyon, üç yüz mesajla kullanılamaz; dört müşteriyle güzel
+görünen liste, kırk müşteriyle okunamaz. Bu turda ilk kez **veriyi
+büyütüp baktım** (72 mesaj) ve tasarım oracıkta değişti. Bundan sonraki
+her liste için soru şu: *bunun yüz katı olsa ne olur?*
+
+> **Cemil onayına açık:** **A-M30** (hangi model) · **A-M31** (backend
+> bu fazda mı) · **A-M32** (gerçek fotoğraflar toplanacak mı) ·
+> **A-M33** (gizlilik cümlesi nerede yazsın).
+
+---
+
 ## K-047 · İkinci telefon turu: dört madde, üçü "aynı şeyi iki yerde yapma" (14.09.2026)
 
 Cemil telefondan dört madde yazdı. Görünürde dördü ayrı iş; üçü aynı
@@ -3367,48 +3547,51 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 > **C** *"böyle kalsın mı"* onayıdır (hayır dersen geri alınır).
 > C bloğunun tamamına tek cümleyle *"hepsi kalsın"* denebilir.
 
-### A · Kapsamı belirleyenler
+### A · Kapsamı belirleyenler — **14.09'da CEVAPLANDI**
+
+> Cemil: *"Karar bekleyen bir şey varsa onu da bitirelim."* Bu cümleyi
+> **önerilerin onayı** olarak okudum: her satırın önerisi yazılıydı ve
+> hepsi uygulandı. ⚠️ İkisi kapsam kararı — **ters çevirmek tek
+> cümlelik iş**, söylemen yeter (A-M25 ve MUH).
+
+| Kod | Karar | Sonucu |
+|---|---|---|
+| **MUH** | **B — kasa + gider.** Cari hesap kapsam dışı | Bekleyen dört iş sıraya girdi: ay bazlı gider toplamı → dışa aktarma → alacak takibi → ticari ileti izni alanı |
+| **A-M8** | **Karar bütçesi kısıt:** menü ≤ 8 başlık · ana yolda ekran başına ≤ 3 sabit karar · jargon 0 | Bu turda sınandı: ekran 16 oldu ama **menüye satır eklenmedi** |
+| **A-M25** | **Toplu mesaj kalıyor** — izin altyapısı yazılana kadar gerçek gönderim yok | Onay ekranındaki risk uyarısı kalıcı |
+| **A-M21** | **Ticari ileti izni alanı eklenecek** | Kuyruğa girdi (muhasebe sırasının 4. işi) |
+| **A-M20** | **Sanal POS faz dışı** | Ödeme linki backend fazında yeniden konuşulur |
+| **A-M22** | **PDF = tarayıcı yazdırması**, kütüphane yok | Dışa aktarma işi bu kararla yazılacak |
+| **A-2** | **Müşteri uygulaması sonraya** — özet linki yeterli | T-21 faz dışı kalmaya devam |
+
+### B · Ekranı değiştirenler — **14.09'da CEVAPLANDI**
+
+| Kod | Karar | Durum |
+|---|---|---|
+| **A-M14** | Teslimde *"özet gönder / geç"* **sorulmaya devam** | Değişiklik yok |
+| **A-M7** | İş başına kâr kayıt ekranında **gösterilmeyecek** | Değişiklik yok; `is-basina` sayfası duruyor |
+| **A-M28** | Müşteri satırı **kısaltıldı** (plaka küçüldü, 190 → 130 px) | **Uygulandı** (K-048.3) |
+| **A-M29** | Öteki araca mesaj için *"Tüm araçlar"* yolu **yeterli** | Değişiklik yok |
+| **A-M16** | Ses örnek çipleri **kalıyor** | Ve artık veriden doluyor (K-048.1) |
+| **A-M12** | Kaydırarak silmeye **ipucu eklenmeyecek** | Değişiklik yok |
+| **A-3** | Bakım periyodu **6 ay** (km ile birlikte, hangisi önce gelirse) | Değişiklik yok |
+| **A-14** | Ruhsat **ayrı ekran kalıyor** | Katmana taşımak "geri"yi değiştirirdi |
+
+### C · "Böyle kalsın mı" — **14.09'da HEPSİ KALDI**
+
+A-M1 · A-M2 · A-M3 · A-M5 · A-M6 · A-M9 · A-M10 · A-M11 · A-M18 ·
+A-M19 · A-M23 · A-M24 · A-M26 — on üçü de bugünkü hâliyle onaylandı.
+Gerekçeleri K-047'nin C tablosunda duruyor; biri geri alınacaksa
+oradan bakılır.
+
+### Şimdi cevap bekleyenler — yapay zeka turu (K-048.6)
 
 | Kod | Soru | Öneri |
 |---|---|---|
-| **MUH** | Muhasebe nereye kadar — yalnız kasa / kasa+gider / cari hesap? Tek sayfa: [`MUHASEBE-KARARI.md`](MUHASEBE-KARARI.md) | **B — kasa + gider.** Cari hesap kapsam dışı |
-| **A-M8** | **Karar bütçesi** kısıt olarak kabul mü: menü ≤ 8 başlık · ana yolda bir ekranda ≤ 3 sabit karar · alan adında jargon 0 | Kabul. *(**A-1 buraya bağlandı:** "ekran bütçesi 6" fiilen aşıldı — 15 ekran var ama ana yol hâlâ üç ekran. Asıl kısıt ekran sayısı değil, ekrandaki karar sayısıymış)* |
-| **A-M25** | **Toplu mesaj yazıldı** (K-047.4) — K-045.2'deki *"kampanya bu fazda yazılmaz"* kararının tersine, senin isteğinle. Kabul mü? | Kabul, **ama izin altyapısı yazılana kadar gerçek gönderim yok**: prototipte hiçbir şey gitmiyor |
-| **A-M21** | Kampanya için gereken **"ticari ileti izni"** alanı araç/müşteri kaydına eklensin mi? | Eklensin — tek alan, bugün hiçbir şeyi bozmuyor, izinsiz gönderimin cezası 2.859–14.309 ₺ (toplu gönderimde 10 katına kadar) |
-| **A-M20** | **Sanal POS faz dışı** bırakıldı (K-045.1). Kabul mü? | Kabul. *"Tamiron parayı topluyor"* olsaydı bu ürün kararı değil **şirket kararı** olurdu — ödeme kuruluşu lisansı ister |
-| **A-M22** | Dışa aktarmada PDF için kütüphane yerine **tarayıcının kendi yazdırması** (*"PDF olarak kaydet"*) yeter mi? | Yeter — 0 KB, Türkçe sorunsuz. jsPDF Türkçe için yüz KB'lık yazı tipi gömmek ister (K-045.4) |
-| **A-2** | Müşteri **uygulaması** (T-21) bu fazda mı? *(Özet linki — T-19/T-20 — K-023'te yazıldı)* | Sonraya. Link zaten müşterinin sayfasını açıyor; ayrı uygulama backend ister |
-
-### B · Ekranı değiştirenler
-
-| Kod | Soru | Öneri |
-|---|---|---|
-| **A-M14** | Araç teslim edilince ekran *"müşteriye özet gönder / geç"* diye soruyor ve bu **bir dokunuş** ekliyor. Sorulmasın, doğrudan ana ekrana dönülsün mü? | **Sorulsun** — altıncı iş (müşteriye özet) tam orada doğuyor; "geç" tek dokunuş |
-| **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında da gösterilsin mi? *(Bugün yalnız `is-basina` sayfasında)* | Gösterilmesin — kayıt ekranında dükkân kârıyla karıştırılır (K-014) |
-| **A-M28** | Müşteri satırı senin tarifinle uzadı (ad · plaka · araç+renk · telefon · not). Plaka küçültülüp satır kısaltılsın mı? | **Telefonda bakıp söyle.** Ayrıntı hâlâ detay ekranında; kısaltmak bir satırlık iş |
-| **A-M29** | Mesaj ekranında satır, müşterinin **serviste olan ilk aracını** hedefliyor. Öteki aracına mesaj için *"Tüm araçlar"* → müşteri detayı yolu var. Yeterli mi? | Yeterli — satırda araç seçtirmek her satıra bir karar daha ekler |
-| **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? | Kalsın — mikrofon yalnız güvenli adreste açılıyor; çipler kalkarsa **sesli yol prototipte hiç denenemez** |
-| **A-M12** | Sola kaydırarak silme keşfedilebilir mi? Ekranda söyleyen bir şey yok; artık **iki** tabloda var (servis kaydı · giderler) | İpucu eklenmesin — bir kez öğrenilen bir jest; istersen tek satırlık ipucu eklenir |
-| **A-3** | Bakım periyodu varsayılanı kaç ay? *(Çekmecede 3 · 6 · 12 seçilebiliyor)* | **6 ay** — ve km ile birlikte: hangisi önce gelirse (K-002) |
-| **A-14** | Ruhsat ekranı ayrı ekran değil **katman** (popup) olsun mu? Ölçülmüştü: bir dokunuş ve bir ekran kazandırıyor | Şimdilik kalsın — katman bileşeni artık var (K-043), ama ruhsat ana yolun ilk adımı; katmana taşımak *"geri"* davranışını değiştirir |
-
-### C · "Böyle kalsın mı" onayları — hepsi bugün prototipte böyle çalışıyor
-
-| Kod | Bugün ne yapıyor | Öneri |
-|---|---|---|
-| **A-M1** | Aynı kişinin adı iki araçta **farklı yazılmışsa** listede iki müşteri görünüyor; birleştirme yok (müşterinin kendi tablosu yok — K-012) | Kalsın — tamirci şikâyet edene kadar dokunma. *(HANDOFF §5'te duruyordu, bu tabloda yoktu — 14.09'da buraya alındı)* |
-| **A-M2** | Özet/hatırlatma **ikinci iletişime** gidiyor (ruhsat firmanınsa santrale değil); usta hedefi değiştirebiliyor | Kalsın |
-| **A-M3** | Araç geçmişinde *"parçayı müşteri getirmişti"* uyarısı **yok**; bilgi kaydın kendi ekranında | Kalsın |
-| **A-M5** | Arama mikrofonu **dört listede** (araçlar · kayıtlar · müşteriler · mesaj); sen yalnız araçlar için istemiştin | Kalsın — dördü de aynı iş |
-| **A-M6** | Kayıt ekranındaki düğme *"Onay iste"* değil **"Özet gönder"** ve gerçekten özet gönderiyor | Kalsın — ad yaptığı işi söylüyor (T-19) |
-| **A-M9** | Özet sayfasının linki **tahmin edilebilir** (plaka + kayıt no), kimlik doğrulama yok | Prototipte kabul; backend fazında kapatılacak |
-| **A-M10** | *"Tamirat + Bakım"* **tek kayıt** (üçüncü tür), iki ayrı kayıt değil | Kalsın — iki kayıt, aynı aracı iki kez yazdırıyordu |
-| **A-M11** | Muhasebe → Detaylı'daki beş modül (fatura/KDV · çek · senet · cari) **yalnız yer tutuyor**, hiçbiri yazılmadı | Kalsın — MUH kararına bağlı |
-| **A-M18** | *"Müşteri ne görecek"* katmanı **müşterinin gördüğü sayfayı** gösteriyor, mesaj metnini değil (o zaten üstteki alanda) | Kalsın |
-| **A-M19** | Sola kaydırma **kayıt satırında da doğrudan siliyor** (geri alma şeridiyle); sen yalnız gider için söylemiştin | Kalsın — aynı jest iki anlama gelmesin |
-| **A-M23** | Tutarı **yazılmış** satırda *"müşteri getirdi"* teklifi çıkmıyor; önce tutarı silmek gerekiyor | Kalsın — parayı sen alıyorsan parçayı sen getirmişsindir |
-| **A-M24** | Servis kaydı **üç adım**: İş · Yapılanlar · Teslim. *"Yapılanlar"* kendi içinde parça/işçilik diye ayrılmıyor | Kalsın — ayırmak dördüncü adım demek |
-| **A-M26** | Arşive **kanal açılınca** yazılıyor; usta WhatsApp'ta vazgeçerse kayıt yine *"gönderildi"* der | Prototipte kabul — A yolunda gerçek teyit alınamıyor |
+| **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
+| **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
+| **A-M32** | 20–30 gerçek ruhsat + 10–15 parça listesi fotoğrafı toplanacak mı | Toplanmalı; yoksa doğruluk hakkında konuşulamaz |
+| **A-M33** | Gizlilik cümlesi (*"söyledikleriniz ve fotoğraf işlenmek üzere gönderilir"*) nerede yazsın | Ayarlarda tek satır, ilk kullanımda bir kez |
 
 ### Sonraki fazın soruları — şimdi cevap gerekmiyor
 
