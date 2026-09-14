@@ -196,6 +196,22 @@ fonksiyon.**
 Cemil'in sorusu *"nasıl yaparız"*dı; en zor parçası yazmak değil,
 **çalıştığını bilmek.**
 
+### 7.0 · ⚠️ SET YAZILDI VE İLK KARNE ÇIKTI (14.09 akşamı)
+
+`tools/degerlendirme/` — 40 cümle, ortak cetvel, iki koşucu. Bugünkü
+motorun karnesi **%93** (37 tam · 3 yanlış). İlk koşu **%83** vermişti;
+aradaki fark iki şeyden geldi:
+
+* **setin kendi iki hatası** (serviste olmayan araca *"teslim ettim"*,
+  açık kayıtta olmayan parçanın fiyatı) — *değerlendirme seti de bir
+  programdır ve ilk koşusunda hata verir*;
+* **motorun iki gerçek eksiği** — `sms` kelimesi mesaj komutu
+  sayılmıyordu, *"sahibine"* (yönelme hâli) servis kaydı sanılıyordu.
+
+**Kalan üç cümle modelin sınavı** ve desen eşleştiriciyle çözülemez:
+*"şu Mégane'ın trigerini değiştirdik"* · *"Mehmet Kaya'nın arabası
+geldi"* · *"sahibini ara telefonla"*.
+
 ### 7.1 · Elimizde zaten bir ölçüm aleti var
 
 `window.SES_COZUMLE(cumle)` prototipte açık duruyor ve 45. denetim

@@ -1,0 +1,172 @@
+{
+  "ad": "Sesli komut değerlendirme seti",
+  "surum": 1,
+  "tarih": "14.09.2026",
+  "aciklama": "Cümle -> beklenen işlem nesnesi. Bugünkü desen eşleştirici ile gelecekteki model AYNI setle ölçülür. Beklenen alanlar YALNIZ kritik olanlardır; ekranın doldurduğu yardımcı alanlar (arac nesnesi, govde metni) karşılaştırmaya girmez.",
+  "kurallar": [
+    "tur yanlışsa cümle kaybedilmiştir — kısmi puan yok",
+    "tur doğru, alan yanlışsa YARIM sayılır ve hangi alan olduğu yazılır",
+    "beklenen.tur 'plakasiz' ise doğru cevap ANLAMAMAKTIR: uydurmak, anlamamaktan kötüdür"
+  ],
+  "cumleler": [
+    { "id": 1, "baglam": "genel", "cumle": "34 ABC 123 triger seti değişecek",
+      "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123" },
+      "not": "temel hâl — bugünkü motor da yapıyor" },
+
+    { "id": 2, "baglam": "genel", "cumle": "06 TMR 07 bakıma geldi kilometre 88 bin",
+      "beklenen": { "tur": "servis-ac", "plaka": "06 TMR 07", "isTuru": "bakim", "km": "88.000" },
+      "not": "km kelimeyle söylenmiş" },
+
+    { "id": 3, "baglam": "genel", "cumle": "35 KLM 45 teslim ettim nakit aldım",
+      "beklenen": { "tur": "teslim", "plaka": "35 KLM 45", "odeme": "nakit" },
+      "not": "teslim + ödeme yolu" },
+
+    { "id": 4, "baglam": "genel", "cumle": "35 KLM 45 teslim ettim parayı almadım",
+      "beklenen": { "tur": "teslim", "plaka": "35 KLM 45", "odeme": null },
+      "not": "TUZAK: 'almadım' bir ödeme yoludur ama cümlede nakit/kart/havale yok — uydurma yapılmamalı. ⚠️ SETİN KENDİ HATASIYDI: ilk yazımda serviste OLMAYAN bir araç seçmiştim; motor haklı olarak 'teslim edilecek kayıt yok' dedi. Değerlendirme setinin de sınanması gerekiyormuş" },
+
+    { "id": 5, "baglam": "genel", "cumle": "şu Mégane'ın trigerini değiştirdik",
+      "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123" },
+      "not": "ZOR: plaka YOK, marka var. Bugünkü motor yapamaz — modelin kazanacağı yer. Tek Mégane kayıtlı" },
+
+    { "id": 6, "baglam": "genel", "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi yapılacak",
+      "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123", "isTuru": "bakim" },
+      "not": "ZOR: araç sahibin adından bulunacak; 'yağ' bakım demek" },
+
+    { "id": 7, "baglam": "genel", "cumle": "34 ABC 123 beyaz araba geldi",
+      "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123" },
+      "not": "TUZAK (K-018): 'beyaz' içinde 'yaz' var — mesaj sanılmamalı" },
+
+    { "id": 8, "baglam": "genel", "cumle": "yeni araç kaydı açacağım",
+      "beklenen": { "tur": "plakasiz" },
+      "not": "TUZAK (K-018): 'araç' içinde ' ara' var — arama sanılmamalı. Plaka yok, anlaşılmamalı" },
+
+    { "id": 9, "baglam": "genel", "cumle": "gösterge paneli yanıyor 06 TMR 07",
+      "beklenen": { "tur": "servis-ac", "plaka": "06 TMR 07" },
+      "not": "TUZAK (K-018): 'gösterge' içinde 'göster' var — arama sanılmamalı" },
+
+    { "id": 10, "baglam": "servis-ekle", "cumle": "41 KV 5588 Ahmet Yılmaz 0532 111 22 33 debriyaj kaçırıyor",
+      "beklenen": { "tur": "yeni-arac", "plaka": "41 KV 5588", "tel": "0532 111 22 33" },
+      "not": "kayıtsız araç: ruhsat yoluna gidecek, söylenenler taşınacak" },
+
+    { "id": 11, "baglam": "servis-ekle", "cumle": "34 qbc 123 triger seti değişecek",
+      "beklenen": { "tur": "yeni-arac", "plaka": "34 QBC 123", "oneri": "34 ABC 123" },
+      "not": "A-M27: tanıma A'yı Q duydu. Doğru davranış SORMAK — kendiliğinden düzeltmek DEĞİL" },
+
+    { "id": 12, "baglam": "kayit-icinde", "cumle": "balata da değişecek",
+      "beklenen": { "tur": "satir-ekle", "tip": "parca" },
+      "not": "açık kayda satır" },
+
+    { "id": 13, "baglam": "kayit-icinde", "cumle": "işçilik 750 lira",
+      "beklenen": { "tur": "satir-ekle", "tip": "iscilik", "fiyat": 750 },
+      "not": "ad yok, tür var" },
+
+    { "id": 14, "baglam": "kayit-icinde", "cumle": "yağ filtresi 300 lira",
+      "beklenen": { "tur": "fiyat-guncelle", "fiyat": 300 },
+      "not": "kayıtta 'Yağ filtresi' VAR — yeni satır değil güncelleme" },
+
+    { "id": 15, "baglam": "kayit-icinde", "cumle": "hava filtresi 180 lira",
+      "beklenen": { "tur": "satir-ekle", "tip": "parca", "fiyat": 180 },
+      "not": "kayıtta YOK — yeni satır. 14 ile 15 arasındaki farkı görmek asıl sınav" },
+
+    { "id": 16, "baglam": "kayit-icinde", "cumle": "teslim ettim kartla aldım",
+      "beklenen": { "tur": "teslim", "odeme": "kart" },
+      "not": "açık kayıtta teslim — satır eklenmemeli" },
+
+    { "id": 17, "baglam": "kayit-icinde", "cumle": "balatalara da baktık ön takım sesi var arka fren diski de aşınmış",
+      "beklenen": { "tur": "satir-ekle" },
+      "not": "ZOR: üç iş bir cümlede. Bugünkü motor tek satır ekler; model kaç satır çıkarıyor — ölçülecek" },
+
+    { "id": 18, "baglam": "muhasebe", "cumle": "2400 TL elektrik faturası ekle",
+      "beklenen": { "tur": "gider-ekle", "tutar": 2400 },
+      "not": "temel gider" },
+
+    { "id": 19, "baglam": "muhasebe", "cumle": "850 lira kira gideri ekle",
+      "beklenen": { "tur": "gider-ekle", "tutar": 850 },
+      "not": "temel gider" },
+
+    { "id": 20, "baglam": "muhasebe", "cumle": "bugün ne kadar tahsil ettim",
+      "beklenen": { "tur": "tahsilat-sor", "donem": "bugun" },
+      "not": "soru — 14.09'da yazıldı" },
+
+    { "id": 21, "baglam": "muhasebe", "cumle": "bu ay kasaya ne girdi",
+      "beklenen": { "tur": "tahsilat-sor", "donem": "ay" },
+      "not": "aynı soru başka kelimelerle — bugünkü motor 'kasa' kelimesini tanıyor, 'bu ay'ı dönem olarak alıyor mu" },
+
+    { "id": 22, "baglam": "muhasebe", "cumle": "beş yüz lira çay ocağı gideri",
+      "beklenen": { "tur": "gider-ekle", "tutar": 500 },
+      "not": "TUZAK (K-018): 'beş yüz' rakama çevrilecek; bir kez 'beşyüz' diye birleştirilmişti" },
+
+    { "id": 23, "baglam": "mesaj", "cumle": "34 ABC 123 sahibine WhatsApp üzerinden selam mesajı gönder",
+      "beklenen": { "tur": "mesaj-gonder", "plaka": "34 ABC 123", "sablon": "selam", "kanal": "whatsapp" },
+      "not": "Cemil'in ses kaydındaki cümle" },
+
+    { "id": 24, "baglam": "mesaj", "cumle": "16 XY 8890 sahibine bakım hatırlatması gönder",
+      "beklenen": { "tur": "mesaj-gonder", "plaka": "16 XY 8890", "sablon": "hatirlatma" },
+      "not": "şablon adıyla" },
+
+    { "id": 25, "baglam": "mesaj", "cumle": "tüm müşterilere bayram mesajı gönder",
+      "beklenen": { "tur": "toplu-mesaj", "metinTuru": "bayram" },
+      "not": "toplu gönderim" },
+
+    { "id": 26, "baglam": "mesaj", "cumle": "herkese sms at yarın kapalıyız",
+      "beklenen": { "tur": "toplu-mesaj", "kanal": "sms" },
+      "not": "ZOR: hazır metin değil, ustanın kendi cümlesi + kanal SMS" },
+
+    { "id": 27, "baglam": "mesaj", "cumle": "06 TMR 07 sahibine aracınız hazır yaz",
+      "beklenen": { "tur": "mesaj-gonder", "plaka": "06 TMR 07", "sablon": "hazir" },
+      "not": "'yaz' kelimesi — 'beyaz' tuzağının tersi" },
+
+    { "id": 28, "baglam": "mesaj", "cumle": "35 KLM 45 sahibine parça bekliyoruz de",
+      "beklenen": { "tur": "mesaj-gonder", "plaka": "35 KLM 45", "sablon": "bekliyor" },
+      "not": "ZOR: 'de' fiiliyle; bugünkü motor 'bekliyor' şablonunu cümleden çıkarmıyor" },
+
+    { "id": 29, "baglam": "araclar", "cumle": "34 ABC 123 ara",
+      "beklenen": { "tur": "ara", "hedef": "araclar", "terim": "34 ABC 123" },
+      "not": "plakayla arama" },
+
+    { "id": 30, "baglam": "araclar", "cumle": "Renault ara",
+      "beklenen": { "tur": "ara", "hedef": "araclar", "terim": "Renault" },
+      "not": "markayla arama" },
+
+    { "id": 31, "baglam": "kayitlar", "cumle": "servistekileri göster",
+      "beklenen": { "tur": "ara", "hedef": "kayitlar", "suzgec": "serviste" },
+      "not": "14.09'da Cemil'in bulduğu hata — bu satır regresyon bekçisi" },
+
+    { "id": 32, "baglam": "kayitlar", "cumle": "içeridekileri göster",
+      "beklenen": { "tur": "ara", "hedef": "kayitlar", "suzgec": "serviste" },
+      "not": "eski kelime de çalışmaya devam etmeli — usta alışkanlığını bir günde bırakmaz" },
+
+    { "id": 33, "baglam": "kayitlar", "cumle": "balata ara",
+      "beklenen": { "tur": "ara", "hedef": "kayitlar", "terim": "balata" },
+      "not": "iş adıyla arama" },
+
+    { "id": 34, "baglam": "musteriler", "cumle": "34 ABC 123 sahibini ara",
+      "beklenen": { "tur": "ara", "hedef": "musteriler", "terim": "Mehmet Kaya" },
+      "not": "plakadan sahibe" },
+
+    { "id": 35, "baglam": "musteriler", "cumle": "Ayşe Kaya ara",
+      "beklenen": { "tur": "ara", "hedef": "musteriler", "terim": "Ayşe Kaya" },
+      "not": "adla arama" },
+
+    { "id": 36, "baglam": "genel", "cumle": "hava çok soğuk bugün",
+      "beklenen": { "tur": "plakasiz" },
+      "not": "ALAKASIZ: doğru cevap anlamamaktır. Model burada bir şey uydurursa güvenilmez" },
+
+    { "id": 37, "baglam": "genel", "cumle": "bir de balata değişecek",
+      "beklenen": { "tur": "plakasiz" },
+      "not": "TUZAK: açık kayıt YOKKEN 'bir' sayıya çevrilmemeli, plaka yok — anlaşılmamalı" },
+
+    { "id": 38, "baglam": "genel", "cumle": "34 ABC 123 yarın gelecek",
+      "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123" },
+      "not": "SINIR: randevu kavramı YOK (yedi iş dışı). En doğru davranış kaydı açmak; model randevu uydurmamalı" },
+
+    { "id": 39, "baglam": "mesaj", "cumle": "34 ABC 123 sahibini ara telefonla",
+      "beklenen": { "tur": "mesaj-gonder", "plaka": "34 ABC 123" },
+      "not": "TUZAK: 'ara' burada arama değil TELEFON. Bugünkü motor arama sanabilir" },
+
+    { "id": 40, "baglam": "kayit-icinde", "cumle": "motor yağı dört bin beş yüz lira",
+      "beklenen": { "tur": "fiyat-guncelle", "fiyat": 4500 },
+      "not": "kelimeyle söylenen büyük sayı + var olan satır. ⚠️ SETİN KENDİ HATASIYDI: ilk yazımda AÇIK KAYITTA OLMAYAN bir parça adı yazmıştım (triger seti başka kayıtta). Bağlam cümlenin değil, koşucunun seçtiği kaydın" }
+  ]
+}

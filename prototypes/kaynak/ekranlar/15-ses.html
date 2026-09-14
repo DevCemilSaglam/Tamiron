@@ -411,8 +411,20 @@ function sesCozumle(c) {
   /* --- MESAJ GÖNDER --- */
   /* "yaz" KELİME OLARAK aranıyor: "beyaz" içinde geçiyordu ve
      "34 ABC 123 beyaz araba geldi" mesaj sanılıyordu (K-018). */
+  /* ⚠️ 14.09 — DEĞERLENDİRME SETİ İKİ EKSİK BULDU (ses-seti.json).
+     `sms`  : *"herkese sms at yarın kapalıyız"* hiç anlaşılmıyordu —
+              cümlede mesaj/whatsapp/yaz/gönder yok, ama "sms" tek
+              başına yeterince ayırt edici (başka kelimenin içine
+              düşmüyor).
+     `sahibine`: *"...sahibine parça bekliyoruz de"* servis kaydı
+              sanılıyordu. Türkçe burada işi kolaylaştırıyor —
+              **"sahibine" yönelme hâli (mesaj), "sahibini" belirtme
+              hâli (arama)**; ikisi ayrı kelime, eşitlikle ayrılıyor
+              (K-018: boşluktan böl, eşitlikle karşılaştır). */
   var mesajKomutu = (d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
-                     kelimeVarMi(d, ['yaz', 'yazdir']) || d.indexOf('gonder') >= 0);
+                     d.indexOf('sms') >= 0 ||
+                     kelimeVarMi(d, ['yaz', 'yazdir', 'sahibine']) ||
+                     d.indexOf('gonder') >= 0);
 
   /* ⚠️ TOPLU MESAJ (14.09) — Cemil: *"Mesela tüm müşterilere bayram
      mesajı gönder diyecek sesli olarak. Uygun bir bayram mesajı bulacak
@@ -448,8 +460,11 @@ function sesCozumle(c) {
     /* ŞABLON: önce adı söylenen hazır metin, sonra iş şablonları.
        "selam mesajı" bir şablon adı değil ama ustanın söylediği şey. */
     var hz = hazirMetinBul(metin);
+    /* "parça bekliyoruz" şablonu da adıyla söylenebiliyor — değerlendirme
+       seti 28. cümlede bunu sordu ve motor cevaplayamıyordu. */
     var sablon = hz ? hz.k
                : d.indexOf('hatirlatma') >= 0 ? 'hatirlatma'
+               : d.indexOf('bekliyor') >= 0 ? 'bekliyor'
                : d.indexOf('hazir') >= 0 ? 'hazir'
                : d.indexOf('teslim') >= 0 ? 'teslim' : 'ozet';
     return { tur: 'mesaj-gonder', plaka: p.plaka, arac: ar, sablon: sablon,
