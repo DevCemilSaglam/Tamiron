@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-14 13:35
+  Üretim: 2026-09-14 14:05
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -5764,6 +5764,68 @@ function aracBul(plaka) {
   for (var i = 0; i < ARACLAR.length; i++) if (ARACLAR[i].plaka === plaka) return ARACLAR[i];
   return null;
 }
+/* ---- YANLIŞ DUYULAN PLAKA (14.09 · A-M27) ----
+   Cemil'in ses kaydı *"34 qbc 123 sahibine WhatsApp üzerinden selam
+   mesajı gönder"* oldu: tanıma **A**'yı **Q** duydu ve akış
+   *"bu araç kayıtlı değil"* deyip ruhsat ekranına gitti. Usta doğru
+   söylemişti; program doğru davranmıştı; **iş yine de durdu.**
+
+   KURAL DAR TUTULDU, ÇÜNKÜ YANLIŞIN BEDELİ AĞIR: yanlış araca mesaj
+   gitmesi, hiç gitmemesinden kötüdür.
+     · il kodu ve rakam grubu **birebir aynı** olacak
+     · harf grubu **en fazla bir karakter** farklı olacak
+     · ve **tek bir aday** kalacak — iki aday varsa öneri YOK,
+       bugünkü davranış aynen sürer
+
+   ⚠️ ÖNERİ BİR SORUDUR, DÜZELTME DEĞİL. Bu fonksiyon yalnız adayı
+   söyler; hiçbir şey seçmez, hiçbir şey göndermez. Ekran onu bir
+   düğme olarak gösteriyor ve usta dokunmadıkça hiçbir şey olmuyor.
+
+   ⚠️ TÜRKÇEDE SINIR ARANMAZ (K-018): plaka boşluktan bölünüyor,
+   parçalar eşitlikle karşılaştırılıyor. */
+function plakaParcala(plaka) {
+  var p = String(plaka || '').toLocaleUpperCase('tr').split(/\s+/).filter(Boolean);
+  if (p.length !== 3) return null;
+  return { il: p[0], harf: p[1], rakam: p[2] };
+}
+
+/* Harf grubu kaç karakter farklı: aynı uzunlukta yer yer farklılık,
+   bir eksik/fazla harfte tek ekleme-çıkarma. Tanıma harf yutabiliyor
+   da ("ABC" yerine "AC"), harf uydurabiliyor da. */
+function harfFarki(a, b) {
+  if (a === b) return 0;
+  if (a.length === b.length) {
+    var f = 0;
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) f++;
+    return f;
+  }
+  if (Math.abs(a.length - b.length) !== 1) return 99;
+  var uzun = a.length > b.length ? a : b;
+  var kisa = a.length > b.length ? b : a;
+  for (var j = 0; j < uzun.length; j++) {
+    if (uzun.slice(0, j) + uzun.slice(j + 1) === kisa) return 1;
+  }
+  return 99;
+}
+
+function benzerPlaka(plaka) {
+  var p = plakaParcala(plaka);
+  if (!p) return null;
+  /* Kayıtlı bir plakaya öneri yapılmaz — sorulacak bir şey yok. */
+  if (aracBul(plaka)) return null;
+  var adaylar = [];
+  ARACLAR.forEach(function (a) {
+    var q = plakaParcala(a.plaka);
+    if (!q) return;
+    if (q.il !== p.il || q.rakam !== p.rakam) return;
+    if (harfFarki(p.harf, q.harf) > 1) return;
+    adaylar.push(a.plaka);
+  });
+  /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,
+     ustaya yanlış aracı onaylatmanın yoludur. */
+  return adaylar.length === 1 ? adaylar[0] : null;
+}
+
 function kayitBul(id) {
   for (var i = 0; i < KAYITLAR.length; i++) if (KAYITLAR[i].id === id) return KAYITLAR[i];
   return null;
@@ -6920,6 +6982,9 @@ var SES_BAGLAM = {
 
 var sesDurumu = 'bos';      /* bos · dinliyor · anlasildi · anlasilmadi */
 var sesCumle = '';
+/* Plaka onerisi kabul edildi mi — ekrandaki "Duyulan" etiketi buna
+   gore degisiyor (A-M27). */
+var sesDuzeltildi = false;
 var sesIslem = null;
 var sesTanima = null;       /* Web Speech API nesnesi */
 
@@ -7138,7 +7203,10 @@ function sesCozumle(c) {
 
   if (mesajKomutu && p) {
     var ar = aracBul(p.plaka);
-    if (!ar) return { tur: 'bilinmeyen-arac', plaka: p.plaka };
+    /* Plaka kayıtlı değil: yanlış duyulmuş olabilir (A-M27). Öneri
+       varsa onay ekranı SORAR; yoksa bugünkü davranış aynen sürer. */
+    if (!ar) return { tur: 'bilinmeyen-arac', plaka: p.plaka,
+                      oneri: benzerPlaka(p.plaka) };
     /* ŞABLON: önce adı söylenen hazır metin, sonra iş şablonları.
        "selam mesajı" bir şablon adı değil ama ustanın söylediği şey. */
     var hz = hazirMetinBul(metin);
@@ -7218,8 +7286,10 @@ function sesCozumle(c) {
     .replace(/\s+/g, ' ').trim();
 
   if (!arac) {
+    /* Aynı tuzak burada da var (A-M27): yanlış duyulan bir harf,
+       kayıtlı aracı "yeni araç" yapıp ustayı ruhsat çekmeye gönderir. */
     return { tur: 'yeni-arac', plaka: plaka, sahip: sahip, tel: tel,
-             is: is, isTuru: isTuru, km: km };
+             is: is, isTuru: isTuru, km: km, oneri: benzerPlaka(plaka) };
   }
   return { tur: 'servis-ac', plaka: plaka, arac: arac, isTuru: isTuru, km: km, is: is };
 }
@@ -7327,6 +7397,12 @@ function sesOzet(o) {
   if (o.tur === 'bilinmeyen-arac') return {
     baslik: 'Bu araç kayıtlı değil',
     satirlar: [['Duyulan plaka', o.plaka]], eylem: 'Ruhsatı çek' };
+
+  /* ⚠️ ÖNERİ ÖZETİN İÇİNDE DEĞİL, KENDİ DÜĞMESİNDE (14.09). Satır
+     olarak yazılsaydı ("Benziyor: 34 ABC 123") usta okur ve ne
+     yapacağını bilemezdi. Soru bir düğmedir: dokunursan düzeltilir,
+     dokunmazsan ekran olduğu gibi kalır. sesCiz `o.oneri`yi görünce
+     çiziyor; işlemdeki `oneri` alanı çözümleyiciden geliyor. */
 
   if (o.tur === 'teslim-edilecek-kayit-yok') return {
     baslik: 'Bu araç zaten serviste değil',
@@ -7460,8 +7536,12 @@ function sesCiz() {
      duran bir sey er ya da gec okunur. */
   var duy = document.getElementById('sesDuyulan');
   duy.hidden = !sesCumle;
+  /* ⚠️ DÜZELTİLEN CÜMLE "DUYULAN" DEĞİLDİR (14.09). Plaka önerisi
+     kabul edilince cümle değişiyor; etiketi "Duyulan" bırakmak,
+     ustaya söylemediği bir şeyi söylemiş gibi göstermek olurdu. */
   duy.innerHTML = sesCumle
-    ? '<span class="sd-lbl">Duyulan</span>' + sesCumle
+    ? '<span class="sd-lbl">' + (sesDuzeltildi ? 'Düzeltildi' : 'Duyulan') +
+      '</span>' + sesCumle
     : '';
 
   var durum = document.getElementById('sesDurum');
@@ -7516,6 +7596,15 @@ function sesCiz() {
                '<span class="tv">' + s[1] + '</span></div>';
       }).join('') +
     '</div>' +
+    /* ⚠️ YANLIŞ DUYULAN PLAKA — SORU, DÜZELTME DEĞİL (A-M27).
+       Tanıma "34 ABC 123" yerine "34 QBC 123" duyunca akış duruyordu.
+       Kendiliğinden düzeltmek yanlış araca iş açardı; düzeltmemek
+       ustayı ruhsat çekmeye gönderiyordu. Üçüncü yol: SOR. */
+    (sesIslem.oneri
+      ? '<button class="btn btn-ghost" id="sesOneri" style="margin-top:12px">' +
+          '<svg class="ico"><use href="#i-search-check"></use></svg>' +
+          ' Bunu mu demek istedin: ' + sesIslem.oneri + '</button>'
+      : '') +
     /* KANAL SEÇİMİ ONAY EKRANINDA (Cemil: "SMS yada WhatsApp üzerinden
        mesaj gönderecek"). Söylenmediyse WhatsApp seçili gelir; usta
        tek dokunuşla değiştirir. Çip bir SEÇİM aracıdır — doğru bileşen. */
@@ -7650,6 +7739,9 @@ Ekran.tanim('ses', {
      sesleAc artik goster() cagiriyor: acilis acikca acilis. */
   ac: function () {
     sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+    /* Düzeltme işareti de AÇILIŞA ait: bırakılsa bir sonraki cümle
+       "Düzeltildi" diye etiketlenirdi (K-040'ın kuralı). */
+    sesDuzeltildi = false;
   },
   ciz: function () {
     var b = sesBaglam();
@@ -7682,7 +7774,8 @@ document.addEventListener('click', function (e) {
   if (t.id === 'sesOrb') { sesDinlemeyiBaslat(); return; }
   if (t.id === 'sesVazgec') {
     if (sesTanima) { try { sesTanima.abort(); } catch (x) {} }
-    sesDurumu = 'bos'; sesCumle = ''; sesIslem = null; sesCiz(); return;
+    sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+    sesDuzeltildi = false; sesCiz(); return;
   }
   /* KANAL DEĞİŞİNCE YAZILAN METİN KAYBOLMAZ (14.09). Çizim `sesIslem`
      üzerinden üretiliyor; usta metni elle düzeltmişse önce oraya
@@ -7697,6 +7790,11 @@ document.addEventListener('click', function (e) {
     return;
   }
 
+  if (t.id === 'sesOneri' && sesIslem && sesIslem.oneri) {
+    sesPlakayiDuzelt(sesIslem.oneri);
+    return;
+  }
+
   if (t.id === 'sesEkrandaAc' && sesIslem) {
     sesMetniAl();
     sesIslem.ekranaGit = true;
@@ -7706,6 +7804,26 @@ document.addEventListener('click', function (e) {
 
   if (t.id === 'sesOnayla' && sesIslem) { sesMetniAl(); sesUygula(sesIslem); return; }
 });
+
+/* ⚠️ ÖNERİ KABUL EDİLİNCE CÜMLE DÜZELTİLİR, İŞLEM DEĞİL (A-M27).
+   İşlemi elle düzeltmek ikinci bir çözümleme yolu açardı: plakayı
+   değiştirip şablonu, kanalı ve metni eski hâlinde bırakan bir işlem,
+   ustanın onayladığından başka bir şey gönderirdi. Cümledeki plaka
+   değiştirilip AYNI çözümleyiciye veriliyor — tek yol, tek sonuç.
+
+   Onaysız hiçbir şey olmuyor: bu fonksiyon yalnız ekranı yeniden
+   çiziyor, gönderme sesOnayla'da duruyor. */
+function sesPlakayiDuzelt(yeniPlaka) {
+  var metin = sesSayilariCevir(sesHarfleriBirlestir((sesCumle || '').trim()));
+  var p = sesPlakaBul(metin);
+  if (!p || !yeniPlaka) return;
+  var duzeltilmis = metin.slice(0, p.indeks) + yeniPlaka +
+                    metin.slice(p.indeks + p.uzunluk);
+  sesCumleIsle(duzeltilmis);
+  sesDuzeltildi = true;
+  sesCiz();
+  balon('Plaka ' + yeniPlaka + ' olarak düzeltildi — göndermeden önce bak.', false, 3000);
+}
 
 /* Onay ekranındaki metin alanı varsa içeriğini işleme yaz — gönderilen
    şey ustanın EKRANDA GÖRDÜĞÜ metin olsun. */

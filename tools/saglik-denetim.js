@@ -1356,6 +1356,83 @@ function stilMetni() {
     showScreen('home');
   }
 
+  /* 44) YANLIS DUYULAN PLAKA — ONERI (14.09.2026 · A-M27)
+     Cemil'in ses kaydinda tanima "34 ABC 123" yerine "34 QBC 123"
+     duydu ve akis durdu.
+
+     YENI HATA SINIFI: TAHMIN EDEN EKRAN. Bir oneri iki yonden bozulur
+     ve ikisi de sessizdir:
+       a) HIC ONERMEZ  — usta ruhsat cekmeye gonderilir (eski hal),
+       b) FAZLA ONERIR — iki aday varken birini secer, ya da oneriyi
+          SORMADAN uygular. Ikincisi en pahalisi: ekran dogru gorunur,
+          mesaj YANLIS ARACA gider ve usta bunu musteri sorunca ogrenir.
+
+     Bu yuzden test yalnizca "oneri cikti mi" diye bakmiyor; oneriye
+     dokunulunca HICBIR SEYIN GONDERILMEDIGINI de olcuyor.
+
+     Denetim ARACLAR'a gecici bir arac ekliyor (iki aday durumunu
+     uretmek icin) — yedekten geri yukleniyor (K-024.1). */
+  if (typeof benzerPlaka === 'function' && typeof ARACLAR !== 'undefined' && ARACLAR.length) {
+    var ilkPlaka = ARACLAR[0].plaka;
+    var parca = String(ilkPlaka).split(/\s+/);
+    if (parca.length !== 3 || parca[1].length < 2) {
+      ek('PLAKA-ONERISI', '(veri)', 'ilk plaka uc parcali degil: ' + ilkPlaka);
+    } else {
+      /* Harf grubunun ILK harfini degistir: bir karakter farkli. */
+      var baskaHarf = (parca[1][0] === 'Z' ? 'Y' : 'Z') + parca[1].slice(1);
+      var yanlisPlaka = parca[0] + ' ' + baskaHarf + ' ' + parca[2];
+
+      if (benzerPlaka(yanlisPlaka) !== ilkPlaka) {
+        ek('PLAKA-ONERISI', '(veri)', yanlisPlaka + ' -> beklenen "' + ilkPlaka +
+           '", gelen "' + benzerPlaka(yanlisPlaka) + '"');
+      }
+      /* Kayitli plakaya oneri yapilmaz. */
+      if (benzerPlaka(ilkPlaka) !== null) {
+        ek('PLAKA-ONERISI', '(veri)', 'kayitli plakaya oneri cikti: ' + ilkPlaka);
+      }
+      /* Uzak plaka: il kodu da rakam da farkli. */
+      if (benzerPlaka('81 ZZZ 9999') !== null) {
+        ek('PLAKA-ONERISI', '(veri)', 'alakasiz plakaya oneri cikti');
+      }
+      /* IKI ADAY -> ONERI YOK. Gecici arac ekleniyor. */
+      var ikinciHarf = (parca[1][0] === 'X' ? 'W' : 'X') + parca[1].slice(1);
+      ARACLAR.push({ plaka: parca[0] + ' ' + ikinciHarf + ' ' + parca[2],
+                     marka: 'Denetim', model: 'Gecici', sahipAd: '', sahipTel: '' });
+      var ortaHarf = (parca[1][0] === 'V' ? 'U' : 'V') + parca[1].slice(1);
+      if (benzerPlaka(parca[0] + ' ' + ortaHarf + ' ' + parca[2]) !== null) {
+        ek('PLAKA-ONERISI', '(veri)', 'iki aday varken oneri cikti — tahmin ediliyor');
+      }
+      ARACLAR.pop();
+
+      /* EKRANDA: oneri bir DUGME mi, ve dokununca bir sey GONDERIYOR mu. */
+      if (typeof window.SES_SOYLE === 'function' && typeof MESAJLAR !== 'undefined') {
+        showScreen('ses');
+        window.SESLI_NIYET = 'mesaj';
+        window.ACIK_KAYIT = null;
+        var mesajOnce = MESAJLAR.length;
+        window.SES_SOYLE(yanlisPlaka + ' sahibine whatsapp selam mesaji gonder');
+        var oneriD = document.getElementById('sesOneri');
+        if (!oneriD) {
+          ek('PLAKA-ONERISI', 'ses', 'yanlis duyulan plakada oneri dugmesi cizilmedi');
+        } else {
+          oneriD.click();
+          if (MESAJLAR.length !== mesajOnce) {
+            ek('PLAKA-ONERISI', 'ses', 'oneriye dokununca MESAJ GONDERILDI — soru degil, eylem olmus');
+          }
+          if (Ekran.adi() !== 'ses') {
+            ek('PLAKA-ONERISI', 'ses', 'oneriye dokununca ekran degisti: ' + Ekran.adi());
+          }
+          /* Duzeltme gercekten islemis mi: artik oneri kalmamali ve
+             islem gonderilebilir olmali. */
+          if (document.getElementById('sesOneri')) {
+            ek('PLAKA-ONERISI', 'ses', 'duzeltmeden sonra oneri hala duruyor');
+          }
+        }
+      }
+    }
+    showScreen('home');
+  }
+
   /* 42) AYRISAN LISTE — AYNI LISTE IKI EKRANDA (14.09.2026)
      Cemil: "Müşteriye mesaj ve müşteriler sayfasının listelemeleri
      aynı olacak."

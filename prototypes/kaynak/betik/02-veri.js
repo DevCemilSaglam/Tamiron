@@ -324,6 +324,68 @@ function aracBul(plaka) {
   for (var i = 0; i < ARACLAR.length; i++) if (ARACLAR[i].plaka === plaka) return ARACLAR[i];
   return null;
 }
+/* ---- YANLIŞ DUYULAN PLAKA (14.09 · A-M27) ----
+   Cemil'in ses kaydı *"34 qbc 123 sahibine WhatsApp üzerinden selam
+   mesajı gönder"* oldu: tanıma **A**'yı **Q** duydu ve akış
+   *"bu araç kayıtlı değil"* deyip ruhsat ekranına gitti. Usta doğru
+   söylemişti; program doğru davranmıştı; **iş yine de durdu.**
+
+   KURAL DAR TUTULDU, ÇÜNKÜ YANLIŞIN BEDELİ AĞIR: yanlış araca mesaj
+   gitmesi, hiç gitmemesinden kötüdür.
+     · il kodu ve rakam grubu **birebir aynı** olacak
+     · harf grubu **en fazla bir karakter** farklı olacak
+     · ve **tek bir aday** kalacak — iki aday varsa öneri YOK,
+       bugünkü davranış aynen sürer
+
+   ⚠️ ÖNERİ BİR SORUDUR, DÜZELTME DEĞİL. Bu fonksiyon yalnız adayı
+   söyler; hiçbir şey seçmez, hiçbir şey göndermez. Ekran onu bir
+   düğme olarak gösteriyor ve usta dokunmadıkça hiçbir şey olmuyor.
+
+   ⚠️ TÜRKÇEDE SINIR ARANMAZ (K-018): plaka boşluktan bölünüyor,
+   parçalar eşitlikle karşılaştırılıyor. */
+function plakaParcala(plaka) {
+  var p = String(plaka || '').toLocaleUpperCase('tr').split(/\s+/).filter(Boolean);
+  if (p.length !== 3) return null;
+  return { il: p[0], harf: p[1], rakam: p[2] };
+}
+
+/* Harf grubu kaç karakter farklı: aynı uzunlukta yer yer farklılık,
+   bir eksik/fazla harfte tek ekleme-çıkarma. Tanıma harf yutabiliyor
+   da ("ABC" yerine "AC"), harf uydurabiliyor da. */
+function harfFarki(a, b) {
+  if (a === b) return 0;
+  if (a.length === b.length) {
+    var f = 0;
+    for (var i = 0; i < a.length; i++) if (a[i] !== b[i]) f++;
+    return f;
+  }
+  if (Math.abs(a.length - b.length) !== 1) return 99;
+  var uzun = a.length > b.length ? a : b;
+  var kisa = a.length > b.length ? b : a;
+  for (var j = 0; j < uzun.length; j++) {
+    if (uzun.slice(0, j) + uzun.slice(j + 1) === kisa) return 1;
+  }
+  return 99;
+}
+
+function benzerPlaka(plaka) {
+  var p = plakaParcala(plaka);
+  if (!p) return null;
+  /* Kayıtlı bir plakaya öneri yapılmaz — sorulacak bir şey yok. */
+  if (aracBul(plaka)) return null;
+  var adaylar = [];
+  ARACLAR.forEach(function (a) {
+    var q = plakaParcala(a.plaka);
+    if (!q) return;
+    if (q.il !== p.il || q.rakam !== p.rakam) return;
+    if (harfFarki(p.harf, q.harf) > 1) return;
+    adaylar.push(a.plaka);
+  });
+  /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,
+     ustaya yanlış aracı onaylatmanın yoludur. */
+  return adaylar.length === 1 ? adaylar[0] : null;
+}
+
 function kayitBul(id) {
   for (var i = 0; i < KAYITLAR.length; i++) if (KAYITLAR[i].id === id) return KAYITLAR[i];
   return null;

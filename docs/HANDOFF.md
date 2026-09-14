@@ -18,7 +18,7 @@ tıklanabilir prototip.
 | Mesaj | Altı şablon, **her biri koşullu** (K-047.3) · **gönderilen mesaj arşivi** (mesaj ekranında akordiyon; K-045.3: üç yıl saklanır) · **sesli gönderim onay ekranından** · **toplu mesaj** (K-047.4 — K-045.2 ile çelişiyor, Cemil genişletti) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
-| Sağlık denetimi | **43 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **44 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
 | Kararlar | **K-001 … K-047** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |

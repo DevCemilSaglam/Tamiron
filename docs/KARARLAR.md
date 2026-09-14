@@ -147,6 +147,42 @@ uyarısı duruyor, kimlere gideceği **adlarıyla** görünüyor ve her alıcı
 Gerçek kullanımda sıra değişmiyor: **İYS kaydı → onay toplama →
 WhatsApp Business API → şablon onayı** (A-M25).
 
+### 47.6 · Yanlış duyulan plaka: üçüncü yol — SOR (14.09, A-M27)
+
+Cemil'in ses kaydı *"34 **qbc** 123 sahibine WhatsApp üzerinden selam
+mesajı gönder"* oldu: tanıma **A**'yı **Q** duydu. Usta doğru söylemişti,
+program doğru davranmıştı (*"bu araç kayıtlı değil"*) ve **iş yine de
+durdu.**
+
+İki kolay yol da yanlıştı:
+
+| Yol | Sonucu |
+|---|---|
+| Kendiliğinden düzelt | **Yanlış araca mesaj gider** — ve usta bunu ancak müşteri sorunca öğrenir |
+| Hiç düzeltme | Usta kayıtlı bir araç için ruhsat çekmeye gönderilir |
+
+Üçüncü yol: **sor.** Onay ekranında bir düğme çıkıyor — *"Bunu mu demek
+istedin: 34 ABC 123"* — ve **dokunulmadıkça hiçbir şey olmuyor.**
+
+**Kural dar tutuldu, çünkü yanlışın bedeli ağır:** il kodu ve rakam
+grubu **birebir aynı** olacak · harf grubu **en fazla bir karakter**
+farklı (harf yutulmuş ya da uydurulmuş olabilir) · ve **tek aday**
+kalacak. **İki aday varsa öneri yok** — hangisi olduğunu bilmiyorsak
+tahmin etmek, ustaya yanlış aracı onaylatmanın yoludur.
+
+⚠️ **DÜZELTME İŞLEMİ DEĞİL CÜMLEYİ DEĞİŞTİRİYOR.** İşlemin plakasını
+elle değiştirmek ikinci bir çözümleme yolu açardı: plaka yenisi,
+şablon/kanal/metin eskisi — usta onayladığından başka bir şey
+gönderirdi. Cümledeki plaka değiştirilip **aynı çözümleyiciye** veriliyor.
+Ve etiket *"Duyulan"* değil **"Düzeltildi"** oluyor: söylemediği bir şey
+ustaya söylemiş gibi gösterilmiyor.
+
+**44. test (`PLAKA-ONERISI`)** bu hata sınıfını üç yönden ölçüyor: hiç
+önermemek · fazla önermek (iki aday varken seçmek) · **sormadan
+uygulamak**. Üçü de negatif testle doğrulandı; sonuncusu için kod bilerek
+bozuldu (öneriye dokununca gönderiyordu) ve test *"soru değil, eylem
+olmuş"* dedi.
+
 ### 47.5 · Bu turun dersi
 
 **"İki ekran da doğru" cümlesi bir hata sınıfını gizliyor.** Bu turun üç
@@ -160,6 +196,7 @@ doğruluğunu değil, iki yer arasındaki aynılığı.**
 | 41 | `ANA-TUS` | Duruma göre anlam değiştiren tuş: ikinci dokunuş dönüyor mu, dönüş hedefi fazla yaşıyor mu |
 | 42 | `AYRISAN-LISTE` | Aynı verinin iki ekranda iki görüntüsü |
 | 43 | `MESAJ-ARSIV` | Sonucu başka yerde duran eylem — **iki gönderim yolu da** işletiliyor |
+| 44 | `PLAKA-ONERISI` | Tahmin eden ekran: hiç önermemek · fazla önermek · **sormadan uygulamak** |
 
 Üçü de negatif testle doğrulandı. Denetim artık gezinme yığınını ve
 mesaj arşivini de geri yüklüyor (K-024.1 / K-041.2'nin dersi iki yeni
