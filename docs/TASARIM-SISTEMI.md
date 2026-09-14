@@ -438,7 +438,10 @@ sınıf açıyorsa ya sözlüğe girer ya da yazılmaz.
 | Uyarı kutusu | `.notice` (+ hâl) > `.n-ic` + `.n-body` |
 | Boş durum | `.bos-durum` (yalnız `bosDurumHtml()` üretir) |
 | İpucu satırı | `.plate-hint` |
-| Müşteri kartı | `.ms-kart` > `.ms-bas` (`.ms-ad` + `.ms-say`) + `.tel-link` + `.ms-araclar` > `.ms-arac` (`.plate` + `.ms-arac-ad`). **Plaka çipin içine konmaz** — çip seçim aracıdır, plaka veridir (K-033.8) |
+| **Müşteri satırı** | `.mus-kart` (+`.serviste`) > `.mus-ad` + `.plate-lg` + `.mus-arac` (marka/model + `.renk-kutu`) + `.tel-link` + `.mus-not` + `.mus-cok` > `.mus-link` — yalnız `musteriKartiHtml()` üretir. **Müşteriler listesi ve mesaj ekranının "kime?" listesi AYNI satırı giyer** (K-047.2); hangi satırların, hangi sırada geleceği de tek yerde (`musteriListesi()`). Sol ikon YOK; serviste olan müşteri **çerçeveden** belli (K-019.2'nin dili) |
+| Müşteri künyesi (detay) | `.ms-bas` (`.ms-ad` + `.ms-say`) + `.tel-link` + `.ms-araclar` > `.ms-arac` (`.plate` + `.ms-arac-ad`) + `.mst-grup-bas` — yalnız `musteri` ekranında. **Plaka çipin içine konmaz** — çip seçim aracıdır, plaka veridir (K-033.8) |
+| Gönderilen mesaj satırı | `.tl-item` > `.tl-body` > `.tl-title` (`.tl-tip` + `.plate`) + `.tl-sub` + `.tl-foot` (`.pill` ×2-3 + `.tl-date`) — yalnız `mesajSatiriHtml()` üretir. Tıklanmaz: gönderilmiş mesaj değişmez (K-047.3) |
+| Gezinme tuşu · dönüş hâli | `.botbar-nav .icon-btn[aria-pressed="true"]` — ana tuşu ana menüde "önceki ekrana dön" anlamına geçer (K-047.1). Yeni sınıf değil, bileşenin hâli |
 | Balon | tek `#toast`, `.show` ile görünür (yalnız `balon()` yönetir). `width: max-content` + `max-width` — `left:50%` ile ortalanan bir öğe aksi hâlde kapsayıcının **yarısını** geçemez (K-033.10) |
 | **Katman (popup)** | `.katman-ortu` + `.katman` > `.katman-bas` (`.katman-baslik`) + `.katman-govde` — yalnız `Katman.ac(baslik, govde, kapaninca)` açar. **İkinci bir popup yazılmaz**: ekran yalnız başlık ve gövde verir; odak, Esc, örtü ve arka plan kilidi bileşenin işi (K-043) |
 | Çekmece | `.drawer-overlay` + `.drawer` > `.drawer-head` `.drawer-title` + `.drawer-body` |

@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 08.09.2026 *(K-045 · kuyruk 4 A/C/D bitti)*
+> **Son güncelleme:** 14.09.2026 *(K-047 · ikinci telefon turu)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -13,13 +13,14 @@ tıklanabilir prototip.
 
 | | |
 |---|---|
-| Ekran | **14** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · muhasebe · **is-basina** + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
+| Ekran | **15** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · **musteri** *(detay, K-046.2)* · muhasebe · **is-basina** + **ozet** *(müşterinin gördüğü sayfa, ustanın ekranı değil — K-023)* |
 | Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
+| Mesaj | Altı şablon, **her biri koşullu** (K-047.3) · **gönderilen mesaj arşivi** (mesaj ekranında akordiyon; K-045.3: üç yıl saklanır) · **sesli gönderim onay ekranından** · **toplu mesaj** (K-047.4 — K-045.2 ile çelişiyor, Cemil genişletti) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
-| Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
-| Sağlık denetimi | **40 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — hem veriyi (K-024.1) hem **DOM durumunu** (K-041.2) — ve sekmelere dokunmuyor (K-026.7) |
+| Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
+| Sağlık denetimi | **43 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-045** |
+| Kararlar | **K-001 … K-047** |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
@@ -218,6 +219,20 @@ Ayrıca: `getComputedStyle` zemini `color(srgb 0.88 0.92 0.96 / 0.55)`
 biçiminde verebilir — `rgb()` bekleyen bir ayrıştırıcı bunu 0–255 sanıp
 kontrastı yanlış hesaplar.
 
+### 14.09 turunda öğrenilen iki şey daha
+
+**"İki ekran da doğru" cümlesi bir hata sınıfını gizliyor.** Bu turun
+üç maddesi de ekranların **arasındaki** tutarsızlıktı: iki müşteri
+listesi, iki metin üreteci, iki gönderim yolu. Hiçbiri kendi içinde
+bozuk değildi — ve bu yüzden hiçbir test görmüyordu. Yeni testler
+(41 · 42 · 43) ekranın iç doğruluğunu değil **iki yer arasındaki
+aynılığı** ölçüyor.
+
+**Koşul doğru cümleyle yazılıp yanlış yere bakabilir.** *"Teslim
+edilmiş araca teslim mesajı"* kuralı doğruydu; **son kayda** bakıyordu,
+oysa araç bugün serviste olabilir ve teslim edilmiş bakımı geçmişte
+kalmış olabilir. Ekranı açıp dört araçta denemeden görülmedi.
+
 ### 07–08.09 turunda öğrenilen üç şey daha
 
 **Bir yerde uygulanan kural, ötekine kendiliğinden geçmez.** Bu tur
@@ -243,6 +258,11 @@ kullanışlıdır.**
 
 | Kod | Soru | Öneri |
 |---|---|---|
+| **A-M25** | **Toplu mesaj yazıldı** (K-047.4) — K-045.2'deki *"kampanya bu fazda yazılmaz"* kararının tersine, senin isteğinle | Prototipte hiçbir şey gitmiyor; gerçek kullanımda İYS → onay → WhatsApp Business API |
+| **A-M26** | Arşive **kanal açılınca** yazılıyor; gerçek gönderim teyidi yok (WHATSAPP.md A yolu) | Prototipte kabul |
+| **A-M27** | Ses plakayı yanlış duyunca akış duruyor (*"34 qbc 123"*) | *"Bunu mu demek istedin"* önerisi yazılmadı — istersen yazılır |
+| **A-M28** | Müşteri satırı senin tarifinle uzadı | Ayrıntı hâlâ detayda; plaka küçültülebilir |
+| **A-M29** | Müşterinin **öteki aracına** mesaj: *"Tüm araçlar"* → detay yolu | Yeterli varsayıldı |
 | **A-2** | Müşteri tarafı bu fazda mı | **Özet linki YAZILDI (K-023).** Müşteri uygulaması hâlâ sonraya |
 | **A-3** | Bakım periyodu · şu an 6 ay + 10.000 km | Onay |
 | **A-14** | Ruhsat ekranı tabaka mı olsun | Ölçüldü: bir dokunuş ve bir ekran kazandırır |

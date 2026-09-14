@@ -10,6 +10,169 @@
 
 ---
 
+## K-047 · İkinci telefon turu: dört madde, üçü "aynı şeyi iki yerde yapma" (14.09.2026)
+
+Cemil telefondan dört madde yazdı. Görünürde dördü ayrı iş; üçü aynı
+hataya çıktı — **aynı iş iki yerde yapılıyordu ve ikisi ayrışmıştı.**
+
+### 47.1 · Ana tuşu gidiş-dönüş oldu
+
+Cemil: *"Alttaki menü ikonuna basınca anasayfaya gidiyor. Tekrar basınca
+önceki ekrana dönsün."*
+
+Dönüş yolu **zaten vardı** (geri tuşu) ve çalışıyordu. Ama usta ana
+menüye **hangi tuşla gittiyse aynı tuşla dönmeyi** bekliyor. İki ayrı
+tuş öğretmek yerine aynı tuşa ikinci anlam verildi.
+
+**Bir tuşun iki işi varsa ikincisi görünmeli:** tuş ana menüde "dönüş"
+hâline geçiyor — adı değişiyor, vurgulanıyor; dönülecek yer yoksa
+geri/ileri gibi sönük (K-042'nin kuralı: gidilemeyecek yer gidilebilir
+görünmesin).
+
+**Dönüş hedefi tek kapıda siliniyor** (`goster`): ana tuşu dışında her
+gezinme onu düşürür. Silinmeseydi tuş, ustanın çoktan terk ettiği bir
+ekrana atardı — ve **ekran doğru çizilirdi**, yanlış olan nereye
+gittiği olurdu.
+
+### 47.2 · Aynı liste, iki ekran, iki ayrı çizim
+
+Cemil: *"Müşteriye mesaj ve müşteriler sayfasının listelemeleri aynı
+olacak. Soldaki ikon olmayacak. Servisteki araçlar üstte ve renkli
+olacak. Müşteri adı, altına plaka aynı stilde, altında araç marka model
+ve renk kutucuğu. Altta telefon altta varsa not."*
+
+**İkisi de kendi içinde doğruydu.** Müşteriler ekranı müşteri başına
+satır üretiyordu, mesaj ekranı **araç başına**; ikisi de `.tl-item`
+giyiyordu — oysa o bir **servis kaydı** satırıdır ve soldaki ikon da
+oradan geliyordu. İki aracı olan müşteri bir listede iki kez, ötekinde
+bir kez görünüyordu. Hiçbir test bunu göremezdi, çünkü **her ekran tek
+başına tutarlıydı.**
+
+Üç şey tek yere taşındı: satırın çizimi (`musteriKartiHtml`), hangi
+satırların hangi sırada geleceği (`musteriListesi`), satırın hangi aracı
+gösterdiği (`musteriAraci`). **Satırın işi ekrana göre değişiyor
+(müşteri detayı · mesaj), satırın kendisi değil.**
+
+> Sol ikon kalkınca `.tl-ic`nin kullananı kalmadı ve **OLU-SINIF testi
+> aynı turda söyledi.** Ölü CSS bırakılmaz: duran bir kural "bu da var"
+> diye okunur.
+
+**Satırlar Cemil'in tarifiyle uzadı.** 08.09'da *"çok boşluklu"* denen
+şey ayrıntının **listede** olmasıydı; ayrıntı hâlâ müşteri detayında,
+listede duran şey ustanın tarif ettiği beş satır (A-M28).
+
+### 47.3 · Şablonun koşulu artık "daha önce ne gönderildi"yi de soruyor
+
+Cemil: *"Gönderilen mesajlar listelenebilmeli."* +
+*"Teslim edilmiş ve mesaj gönderilmemiş araca teslim edildi mesajı
+gönderebilir. Yine serviste olan ve işin özeti gönderilmemiş araca işin
+özeti gönderilebilir. Ve gerçekten parça bekliyor durumunda olana parça
+bekleniyor mesajı gidebilir."*
+
+Üç cümlenin ortak yanı: her şablonun bir **koşulu** var ve koşul iki
+şeyi birden soruyor — kaydın durumu ve **daha önce ne gönderildiği**.
+İkincisi bugüne kadar hiç yoktu; "işin özeti" gönderilmiş araca ikinci
+kez teklif ediliyordu.
+
+**Arşiv bir görünüm değil, kuralın kaynağı.** Ve "iyi olur" diye
+yazılmadı: K-045.3'te ölçülmüştü — ticari elektronik iletiye ilişkin
+kayıtlar **üç yıl** saklanır, **ispat yükü gönderende**. Alanlar oradan
+geliyor: kime, hangi kanaldan, ne zaman, hangi metin.
+
+**"Ara" arşive yazılmaz** — telefon bir mesaj değil; yazılsaydı aranan
+müşteriye *"özeti gönderdin"* denirdi.
+
+Altı şablon, altısı da koşullu:
+
+| Şablon | Koşul |
+|---|---|
+| İşin özeti | serviste **ve** özeti gönderilmemiş |
+| Parça bekliyoruz | serviste **ve** gerçekten parça bekliyor |
+| Aracınız hazır | serviste *(A-M17 kapandı: teslim edilmişte artık çıkmıyor)* |
+| Teslim edildi | **açık kaydı yok** ve son kaydı teslim edilmiş ve hiç mesaj gitmemiş |
+| Bakım hatırlatması | serviste değil **ve** bakımı var |
+| Serbest mesaj | her zaman |
+
+> **Bir koşul fazla çıktı ve elle işletince görüldü:** *"Teslim edildi"*,
+> bugün serviste olan ama geçmişte teslim edilmiş bir bakımı olan araca
+> da çıkıyordu. Koşul doğru cümleyle yazılmıştı; yanlış olan **hangi
+> kayda baktığıydı** (son kayıt ≠ açık kayıt).
+
+### 47.4 · Sesli yol artık gönderiyor — ve toplu gönderim yazıldı
+
+Cemil: *"Mesaj gönderde ses kaydettim. '34 qbc 123 sahibine WhatsApp
+üzerinden selam mesajı gönder.' Buradan mesaj sesli olarak
+gönderebilmeliyiz."* + *"Burada da bir onay ekranı gerekli. Mesela tüm
+müşterilere bayram mesajı gönder diyecek sesli olarak. Uygun bir bayram
+mesajı bulacak ve onay ekranı ile SMS yada WhatsApp üzerinden mesaj
+gönderecek."*
+
+Eskiden sesli yol mesaj ekranını **açıyordu**: usta söylüyor, onay
+ekranında onaylıyor, sonra bir kez daha gönder düğmesine basıyordu.
+**Onay ekranı zaten bir onaydı**; ikincisi aynı soruyu iki kez sormaktı.
+
+Onay ekranında artık üç şey var: **gidecek metin** (düzenlenebilir —
+usta neyi gönderdiğini göndermeden önce okuyor), **kanal seçimi**
+(söylenmediyse WhatsApp; SMS paralı ve İYS kaydı istiyor, varsayılan
+olamaz) ve *"Ekranda aç"* (özet linkine bakmak ya da hedefi değiştirmek
+isteyen için — ölü uç yok).
+
+**Metin üretimi ortak nesne oldu.** Ekran betikleri kendi IIFE'sine
+sarıldığı için sesli işlem mesaj ekranındaki fonksiyonu **göremiyordu**.
+İki seçenek vardı: metni ikinci kez yazmak ya da ortak nesne yapmak.
+Birincisi, **onay ekranında görülen metinle gerçekte gidenin
+ayrılması** demekti — ve usta bunu ancak müşteri sorunca öğrenirdi.
+Hitap ve imza da aynı sebeple tek yere taşındı; firmaya *"Ltd. Şti.
+Bey/Hanım"* yazan hata oradan çıkmıştı.
+
+**Hazır metinler:** bayram · selam · teşekkür. Usta metni yazmıyor,
+**türünü** söylüyor. ⚠️ **Bayramın adı yazılmaz** — *"Ramazan
+Bayramınız"* yazsaydık Kurban'da yanlış mesaj giderdi ve hangi bayram
+olduğunu bilen bir takvimimiz yok. **Bilmediğini söylememek, yanlış
+söylemekten iyidir.**
+
+#### ⚠️ Toplu mesaj K-045.2 ile çelişiyor — ve Cemil kazanıyor
+
+K-045.2'de *"kampanya bu fazda yazılmaz"* demiştim. Gerekçe sağlamdı ve
+**hâlâ geçerli**: izin altyapısı yok (araç kaydında telefon var, **izin
+yok**) ve kendi numarasından toplu gönderim Meta'nın şartlarına aykırı;
+numara engellenirse **yalnız kampanya durmaz** — özet, *"aracınız
+hazır"* ve bakım hatırlatması da durur.
+
+**Kapsamı Cemil genişletti** (CLAUDE.md: kapsamı yalnız o genişletir).
+Gerekçe silinmedi, **ustanın gözüne yazıldı**: onay ekranında risk
+uyarısı duruyor, kimlere gideceği **adlarıyla** görünüyor ve her alıcı
+**kendi arşiv kaydını** alıyor (ispat yükü kişi başına).
+
+Gerçek kullanımda sıra değişmiyor: **İYS kaydı → onay toplama →
+WhatsApp Business API → şablon onayı** (A-M25).
+
+### 47.5 · Bu turun dersi
+
+**"İki ekran da doğru" cümlesi bir hata sınıfını gizliyor.** Bu turun üç
+maddesi de aralarındaki tutarsızlıktı: iki liste, iki metin üreteci, iki
+gönderim yolu. Hiçbiri kendi içinde bozuk değildi — ve bu yüzden hiçbir
+test görmüyordu. Üç yeni test de tam bunu ölçüyor: **ekranın iç
+doğruluğunu değil, iki yer arasındaki aynılığı.**
+
+| # | Test | Ne ölçüyor |
+|---|---|---|
+| 41 | `ANA-TUS` | Duruma göre anlam değiştiren tuş: ikinci dokunuş dönüyor mu, dönüş hedefi fazla yaşıyor mu |
+| 42 | `AYRISAN-LISTE` | Aynı verinin iki ekranda iki görüntüsü |
+| 43 | `MESAJ-ARSIV` | Sonucu başka yerde duran eylem — **iki gönderim yolu da** işletiliyor |
+
+Üçü de negatif testle doğrulandı. Denetim artık gezinme yığınını ve
+mesaj arşivini de geri yüklüyor (K-024.1 / K-041.2'nin dersi iki yeni
+yüzeyde), ve yedeklenen tablo listesi **tek yere** bağlandı — iki yere
+yazılıydı, yenisi birine yazılıp ötekinde unutulabilirdi.
+
+> **Cemil onayına açık:** **A-M25** (toplu mesaj yazıldı, K-045.2 ile
+> çelişiyor) · **A-M26** ("gönderildi" sayılma anı) · **A-M27** (ses
+> plakayı yanlış duyunca) · **A-M28** (müşteri satırının boyu) ·
+> **A-M29** (müşterinin öteki aracına mesaj).
+
+---
+
 ## K-046 · Telefon testi: sekiz geri bildirim, biri akışın kendisi (08.09.2026)
 
 Cemil prototipi **ilk kez telefondan** kullandı (Netlify'a deploy edilmiş
@@ -3171,6 +3334,12 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M7** | **İş başına kâr** (`fiyat − alış`) kayıt ekranında gösterilsin mi? Önerildi, yazılmadı | Cemil |
 | **A-M8** | **Karar bütçesi** kısıt olarak kabul mü (menü ≤8 · ekran başına karar ≤3 · jargon 0) | Cemil |
 | ~~A-M15~~ | **CEVAPLANDI (07.09):** *"İsterse, evet."* — söylemek **ustanın seçimi** olacak, zorla değil. Kuyruk 4/A12 | — |
+| **A-M29** | Mesaj ekranında satır, müşterinin **serviste olan ilk aracını** hedefliyor. Başka aracına mesaj yazmak için *"Tüm araçlar"* → müşteri detayı yolu var. Yeterli mi, yoksa satırda araç seçilebilsin mi? (K-047.2) | Cemil |
+| **A-M28** | Müşteri satırı senin tarifinle **uzadı** (ad · plaka · araç+renk · telefon · not). 08.09'da *"çok boşluklu"* demiştin; ayrıntı hâlâ detayda ama satırın boyu büyüdü. Plaka küçültülsün mü? (K-047.2) | Cemil |
+| **A-M27** | Ses plakayı yanlış duyunca (*"34 qbc 123"*) akış **"bu araç kayıtlı değil"** deyip ruhsata götürüyor. *"Bunu mu demek istedin: 34 ABC 123"* önerisi **YAZILMADI** — yanlış araca mesaj gitme riski var. İstersen yazılır (K-047.4) | Cemil |
+| **A-M26** | Arşive **kanal açılınca** yazılıyor; usta WhatsApp'ta göndermekten vazgeçerse kayıt yine "gönderildi" der. WHATSAPP.md A yolunda gerçek teyit **alınamıyor**. Prototipte kabul mü? (K-047.3) | Cemil |
+| **A-M25** | **Toplu mesaj YAZILDI** — K-045.2'deki *"kampanya bu fazda yazılmaz"* kararının tersine, senin isteğinle. Prototipte hiçbir şey gönderilmiyor; gerçek kullanımda sıra: İYS kaydı → onay toplama → WhatsApp Business API → şablon onayı. Kendi numaradan toplu gönderim numarayı engelletebilir (K-047.4) | Cemil |
+| ~~A-M17~~ | **KAPANDI (K-047.3):** *"Aracınız hazır"* artık yalnız serviste olan araçta çıkıyor | — |
 | **A-M24** | Servis kaydı **üç adım** doğru bölünme mi — "Yapılanlar" kendi içinde ikiye mi ayrılmalı (parça / işçilik)? (K-046.6) | Cemil |
 | **A-M23** | Tutarı **yazılmış** satır artık *"müşteri getirdi"* yapılamıyor; önce tutar silinecek. Her satırda düğme göstermemek için bilinçli daraltma — kabul mü? (K-046.3) | Cemil |
 | **A-M22** | Dışa aktarmada PDF için **kütüphane yerine tarayıcı yazdırması** öneriliyor — *"PDF olarak kaydet"* yeter mi? (K-045.4) | Cemil |
@@ -3178,7 +3347,7 @@ Cemil'in istediği **sağ sütun**: *"hangi parçanın satıldığını tespit e
 | **A-M20** | **Sanal POS faz dışı** bırakıldı. Amaç *"Tamiron müşterilerden para toplasın"*sa bu ürün kararı değil **şirket kararıdır** — ödeme kuruluşu lisansı gerektirir (K-045.1) | Cemil |
 | **A-M19** | Kaydırarak silme kayıt satırında da **doğrudan siliyor** — sen yalnız gider için söylemiştin; aynı jest iki anlama gelmesin diye hizaladım (K-044.1) | Cemil |
 | **A-M18** | *"Sadece mesaj gözüksün"* — katmanda **müşterinin gördüğü sayfa** gösteriliyor, mesaj metni değil (o zaten üstteki alanda). Doğru okuma mı? (K-043.2) | Cemil |
-| **A-M17** | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta hâlâ çıkıyor. Cemil yalnız iki şablonu saymıştı (*özet*, *parça bekliyoruz*); üçüncüsü de mantıken yanlış görünüyor — elensin mi? | Cemil |
+| ~~A-M17~~ | *"Aracınız hazır"* şablonu **teslim edilmiş** araçta çıkıyordu. **KAPANDI (K-047.3)** — 14.09'da her şablona koşul yazılınca eledi | — |
 | **A-M16** | Ses ekranındaki **örnek çipleri** tamamen kalksın mı? Kalkarsa prototipte sesli yol denenemez (K-042.4) | Cemil |
 | **A-M14** | *(07.09: Cemil anlamadı — soru sadeleştirildi)* Araç teslim edilince ekran **kapanmıyor**, *"müşteriye özet gönder / geç"* diye soruyor. Bu **bir dokunuş** ekliyor. Sorulmasın, teslim edilir edilmez ana ekrana dönülsün mü? | Cemil |
 | ~~A-M13~~ | **CEVAPLANDI (07.09):** *"Evet, olabilir."* — *"balatayı müşteri getirdi, yağı ben aldım"* gerçek bir durum. Satır başına işaret **geri geliyor** (kuyruk 4/A11). K-033.5'teki gerekçem yanlıştı: Cemil'in *"gerek yok"* dediği şey satır başına **iki çipli soru**ydu, işaretin kendisi değil | — |
