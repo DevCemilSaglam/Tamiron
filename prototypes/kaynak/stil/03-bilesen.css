@@ -1467,16 +1467,23 @@ kirpilsin. */
   box-shadow: inset 3px 0 0 0 var(--accent);
   background: var(--surface);
 }
-/* Ad EN ÜSTTE ve en büyük: listenin cevapladığı soru "kim". */
+/* Ad EN ÜSTTE ve en büyük: listenin cevapladığı soru "kim".
+   ⚠️ 14.09 — ARAÇ KARTIYLA AYRIŞMA BURADA: araç listesinde en büyük
+   öğe PLAKA, müşteri listesinde AD. İki liste iki ayrı soruyu
+   cevaplıyor; ikisinde de aynı şey bağırırsa usta hangi listede
+   olduğunu ayırt edemiyor (Cemil, 14.09). */
 .mus-ad {
   font-family: var(--font-display); font-weight: 700;
   font-size: var(--tip-lg); color: var(--text);
-  margin-bottom: 9px;
+  margin-bottom: 6px;
 }
+/* Plaka · marka/model · renk — HEPSİ TEK SATIR ve ikincil. Plaka
+   kaybolmadı, hiyerarşide indi (plate-sm). */
 .mus-arac {
   display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  margin-top: 8px; font-size: var(--tip-md); font-weight: 600; color: var(--text);
+  margin-top: 6px; font-size: var(--tip-sm); color: var(--muted);
 }
+.mus-arac-ad { font-weight: 600; color: var(--text); }
 /* Not — ustanın müşteriyle konuşmadan önce bilmek istediği tek şey. */
 .mus-not {
   margin-top: 8px; font-size: var(--tip-sm); color: var(--muted);
@@ -1495,6 +1502,61 @@ kirpilsin. */
 }
 .mus-link:hover { text-decoration: underline; }
 .mus-link .ico { flex: none; }
+
+/* ================= SÜREÇ (14.09.2026 — Cemil istedi) =================
+   "Süreç mesaj göndermeyle birlikte süreç şeklinde olsun. Teslim
+    edildi, parça bekliyor vb hep arka arkaya olan süreç şeklinde
+    işlesin."
+
+   OLAN ile OLACAK aynı şeritte: tamamlanan adımlar dolu, bekleyenler
+   kesikli. İki hâl İKİ SINIF değil, tek sınıfın iki hâli — bir adım
+   zamanla "bekliyor"dan "tamam"a geçiyor ve satırın kendisi
+   değişmiyor.
+
+   ⚠️ DİKEY ÇİZGİ ::before İLE, AYRI BİR ÖĞEYLE DEĞİL: her adıma bir
+   çizgi div'i koymak, son adımda sarkan bir kuyruk bırakırdı. */
+.surec { display: flex; flex-direction: column; }
+.surec-adim {
+  position: relative;
+  /* ⚠️ 320 px'te SARAR (14.09, IC-TASMA yakaladı): adım adı, alt satır
+     ve tarih tek satıra sığmıyordu — 62 px'lik kutuya 72 px'lik metin.
+     K-031'in kuralı: kesme de kaydırma da değil, SIĞDIR. Tarih dar
+     ekranda kendi satırına iniyor. */
+  display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap;
+  padding: 8px 0 8px 0;
+  width: 100%; text-align: left; background: transparent; border: 0;
+  font: inherit; color: var(--text);
+}
+/* Adımları birbirine bağlayan çizgi — sonuncuda yok. */
+.surec-adim:not(:last-child)::before {
+  content: ''; position: absolute;
+  left: 13px; top: 32px; bottom: -2px; width: 2px;
+  background: var(--line);
+}
+.surec-adim .sa-ic {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: var(--ok-bg); color: var(--ok);
+  border: 1px solid transparent;
+}
+/* Bekleyen adım: içi boş, kenarı kesikli — "henüz olmadı" görsel
+   olarak da yarım duruyor. */
+.surec-adim.bekliyor .sa-ic {
+  background: var(--surface); color: var(--muted);
+  border: 1px dashed var(--line);
+}
+.surec-adim.bekliyor .sa-ad { color: var(--muted); font-weight: 500; }
+.sa-govde { flex: 1 1 150px; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sa-ad { font-size: var(--tip-sm); font-weight: 600; overflow-wrap: anywhere; }
+.sa-alt { font-size: var(--tip-xs); color: var(--muted); overflow-wrap: anywhere; }
+.sa-tarih {
+  flex: 0 0 auto; margin-left: auto;
+  font-family: var(--font-mono); font-size: var(--tip-xs);
+  color: var(--muted); padding-top: 2px; white-space: nowrap;
+}
+/* Mesaj adımı tıklanabilir — satırın tamamı hedef (44 px'i aşıyor). */
+.surec-adim[data-mesaj] { cursor: pointer; }
+.surec-adim[data-mesaj]:hover .sa-ad { text-decoration: underline; }
 
 /* ---------- ARAÇ RENGİ KUTUCUĞU ----------
    Renk ADI yerine rengin KENDİSİ (Cemil, 04.09). Renk değerleri

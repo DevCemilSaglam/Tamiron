@@ -94,6 +94,42 @@
   <div class="tab-grup" id="kAdimSerit" role="tablist"
        aria-label="Servis kaydı adımları"></div>
 
+  <!-- ⚠️ 14.09 — SES VE FOTOĞRAF HER ADIMDA (Cemil: "Servis kaydı
+       sayfasında foto ve mik buttonları gerekli. Yeni işlemler için
+       sesli olarak söyleyebilir. Bunlar parça olabilir, işçilik
+       olabilir. Fiyat güncellenebilir. Teslime edilebilir.").
+
+       İkisi de ADIM 2'nin içindeydi. Oysa ustanın eli yağlıyken
+       söyleyeceği şey adımı beklemiyor: 1. adımdayken "balata da
+       değişecek" diyebilir, 3. adımdayken "teslim ettim nakit aldım"
+       diyebilir. Adım şeridi bir SUNUM sırası; ses ona tabi değil.
+
+       İKİ DÜĞME, ADIM ŞERİDİNİN ALTINDA VE HEP GÖRÜNÜR. Kopya
+       değiller: adım 2'deki eski düğmeler kalktı, tek yer burası. -->
+  <!-- ⚠️ 14.09 — SÜREÇ ŞERİDİ ADIMLARIN DIŞINDA VE HEP GÖRÜNÜR
+       (Cemil: "Süreç mesaj göndermeyle birlikte süreç şeklinde olsun...
+       Bunu iyi kontrol et.").
+
+       Adım şeridi ustanın NE YAPACAĞINI sıralıyor; süreç NE OLDUĞUNU.
+       İkisi ayrı sorular ve ikisi de her adımda geçerli: 1. adımdayken
+       de "özet gönderildi mi" sorulabilir. Bir adımın içine konsaydı
+       cevap o adıma girildiğinde görünürdü. -->
+  <div class="card" id="kSurecKart">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Süreç
+    </div>
+    <div id="kSurec"></div>
+  </div>
+
+  <div class="btn-row tek-satir" id="kHizli">
+    <button class="btn btn-ghost" id="kSesleEkle">
+      <svg class="ico"><use href="#i-mic"></use></svg> Sesle
+    </button>
+    <button class="btn btn-ghost" id="kFotoParca">
+      <svg class="ico"><use href="#i-camera"></use></svg> Fotoğraftan parça
+    </button>
+  </div>
+
   <!-- ================= ADIM 1 · İŞ ================= -->
   <div class="yigin" id="kAdim1" role="tabpanel" aria-labelledby="kAdimTab1">
 
@@ -183,21 +219,11 @@
       <button class="btn btn-ghost" id="kIscilikEkle">
         <svg class="ico"><use href="#i-plus"></use></svg> İşçilik
       </button>
-      <!-- SERVİS KAYDI AÇIKKEN SESLİ İŞLEM (Cemil, 03.09: "balata
-           örneği gibi"). Eli yağlı ustanın satır eklemek için klavyeye
-           gitmesi gerekmiyor. -->
-      <button class="btn btn-ghost" id="kSesleEkle">
-        <svg class="ico"><use href="#i-mic"></use></svg> Sesle
-      </button>
     </div>
-    <!-- FOTOĞRAFTAN PARÇA LİSTESİ (Cemil, 06.09: "Foto çekip parça
-         listesi alınabilir."). Parçacı çoğu zaman irsaliyeyi ya da el
-         yazısı listeyi WhatsApp'tan yolluyor; on kalemi tek tek yazmak
-         ustanın en sevmediği iş. Prototipte okuma sahte — davranışı
-         gösteriyor: okunanlar satır olur, HEPSİ düzeltilebilir. -->
-    <button class="btn btn-ghost" id="kFotoParca">
-      <svg class="ico"><use href="#i-camera"></use></svg> Fotoğraftan parça listesi
-    </button>
+    <!-- ⚠️ 14.09 — "Sesle" ve "Fotoğraftan parça listesi" düğmeleri
+         BURADAN KALKTI, adım şeridinin altına taşındı: ikisi de her
+         adımda gerekli (Cemil, 14.09). Kopya bırakılmadı — aynı işin
+         iki düğmesi, bir gün birbirinden ayrılır. -->
   </div>
 
   <!-- ⚠️ PARÇA BEKLİYOR — KENDİ ALANI (Cemil, 06.09).
@@ -731,6 +757,9 @@ function kayitCiz() {
     document.getElementById('kAdim' + n).hidden = (adim !== n);
   });
 
+  /* ---- SÜREÇ — her adımda, ortak nesneden ---- */
+  document.getElementById('kSurec').innerHTML = surecHtml(k);
+
   /* ---- ADIM 3 · TESLİM ÖZETİ ---- */
   if (adim === 3) {
     var sat = k.satirlar || [];
@@ -853,6 +882,11 @@ document.addEventListener('click', function (e) {
 
   if (t.id === 'kBekliyor') {
     k.parcaBekliyor = !k.parcaBekliyor;
+    /* ⚠️ ZAMANSIZ BİR OLAY SIRAYA GİREMEZ (14.09). Bayrak kalkıyordu
+       ama NE ZAMAN kalktığı hiçbir yerde yazmıyordu; süreç şeridi onu
+       sıraya koyamazdı. Tek yeni alan bu — yeni bir DURUM değil
+       (K-004 duruyor), var olan bayrağın tarihi. */
+    k.bekliyorTarihi = k.parcaBekliyor ? bugunMetin() : null;
     /* Bayrak kapanınca müşteriye gösterme seçimi de anlamını yitirir. */
     if (!k.parcaBekliyor) k.bekliyorMusteriye = false;
     Ekran.tazele(); return;

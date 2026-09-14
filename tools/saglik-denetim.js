@@ -1356,6 +1356,72 @@ function stilMetni() {
     showScreen('home');
   }
 
+  /* 46) SUREC YANLIS ANLATIYOR (14.09.2026)
+     Cemil: "Surec mesaj gondermeyle birlikte surec seklinde olsun.
+     Teslim edildi, parca bekliyor vb hep arka arkaya olan surec
+     seklinde islesin. BUNU IYI KONTROL ET."
+
+     YENI HATA SINIFI: OLMAMIS BIR SEYI OLMUS GIBI ANLATAN SIRA.
+     Surec seridi bir ANLATIDIR; yanlis sirali ya da eksik bir anlati,
+     yanlis rakamdan daha sinsidir — usta ona bakip "ozeti gondermisim"
+     diye dusunur ve musteri beklemede kalir.
+
+     Ilk yazimda TAM BU oldu ve elle kontrolde cikti: teslim edilmis bir
+     kaydin sureci "Aracınız hazır gonderilebilir" diyordu, cunku
+     oneriler PLAKAYA bakiyordu ve ayni aracin baska bir acik kaydi
+     vardi. Arac duzeyinde dogru olan cumle, KAYIT duzeyinde yalan.
+
+     Test dort degismezi olcuyor:
+       a) her surec acilisla baslar,
+       b) teslim edilmis kayitta "Teslim edildi" VAR, "Teslim bekliyor" YOK
+          (ve tersi),
+       c) o kayda gonderilmis her mesaj sureçte GORUNUR,
+       d) siradaki oneriler kaydin haliyle celismez. */
+  if (typeof surecAdimlari === 'function' && typeof kayitSiradakiMesajlar === 'function') {
+    KAYITLAR.forEach(function (k) {
+      var adimlar = surecAdimlari(k);
+      if (!adimlar.length) { ek('SUREC', 'kayit#' + k.id, 'surec bos'); return; }
+      if (adimlar[0].ad.indexOf('kayıt açıldı') < 0) {
+        ek('SUREC', 'kayit#' + k.id, 'ilk adim acilis degil: ' + adimlar[0].ad);
+      }
+      var adlar = adimlar.map(function (a) { return a.ad; }).join(' | ');
+      if (k.teslimTarihi) {
+        if (adlar.indexOf('Teslim edildi') < 0) {
+          ek('SUREC', 'kayit#' + k.id, 'teslim edilmis ama surecte teslim yok');
+        }
+        if (adlar.indexOf('Teslim bekliyor') >= 0) {
+          ek('SUREC', 'kayit#' + k.id, 'teslim edilmis ama surec "teslim bekliyor" diyor');
+        }
+      } else if (adlar.indexOf('Teslim bekliyor') < 0) {
+        ek('SUREC', 'kayit#' + k.id, 'acik kayit ama surecte "teslim bekliyor" yok');
+      }
+
+      /* (c) Mesaj sayisi tutuyor mu. */
+      var mesajSay = MESAJLAR.filter(function (m) { return m.kayit === k.id; }).length;
+      var surecMesaj = adimlar.filter(function (a) { return a.mesaj; }).length;
+      if (mesajSay !== surecMesaj) {
+        ek('SUREC', 'kayit#' + k.id, 'gonderilen ' + mesajSay + ' mesajin ' +
+           surecMesaj + ' tanesi surecte');
+      }
+
+      /* (d) Oneriler kaydin haliyle celisiyor mu. */
+      var sirada = kayitSiradakiMesajlar(k).map(function (s) { return s.k; });
+      if (k.teslimTarihi) {
+        ['ozet', 'bekliyor', 'hazir'].forEach(function (yanlis) {
+          if (sirada.indexOf(yanlis) >= 0) {
+            ek('SUREC', 'kayit#' + k.id,
+               'teslim edilmis kayitta "' + yanlis + '" oneriliyor');
+          }
+        });
+      } else if (sirada.indexOf('teslim') >= 0 || sirada.indexOf('hatirlatma') >= 0) {
+        ek('SUREC', 'kayit#' + k.id, 'acik kayitta teslim/hatirlatma oneriliyor');
+      }
+      if (!k.parcaBekliyor && sirada.indexOf('bekliyor') >= 0) {
+        ek('SUREC', 'kayit#' + k.id, 'parca beklemiyorken "parca bekliyoruz" oneriliyor');
+      }
+    });
+  }
+
   /* 45) ORNEK CUMLE CALISMIYOR (14.09.2026)
      Cemil: "Servis kayitlari listesinde sesli olarak servistekileri
      goster secenegini sectim ama sonuc bulunamadi cikti."

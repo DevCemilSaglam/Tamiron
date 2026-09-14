@@ -315,6 +315,66 @@ function mesajListesi(secenek) {
   });
 }
 
+/* ---- ŞABLON KURALLARI (14.09'da mesaj ekranından BURAYA taşındı) ----
+   Cemil: *"Teslim edilmiş ve mesaj gönderilmemiş araca teslim edildi
+   mesajı gönderebilir. Yine serviste olan ve işin özeti gönderilmemiş
+   araca işin özeti gönderilebilir. Ve gerçekten parça bekliyor
+   durumunda olana parça bekleniyor mesajı gidebilir."*
+
+   ⚠️ NEDEN VERİ KATMANINDA: aynı kuralı İKİ yer soruyor — mesaj
+   ekranının çip listesi ve servis kaydındaki SÜREÇ şeridi (*"şimdi ne
+   gönderilebilir"*). Ekranda kalsaydı süreç kendi kopyasını yazardı ve
+   ikisi bir gün ayrışırdı: ekran *"özet gönderilebilir"* derken süreç
+   sessiz kalırdı (K-019.1). */
+var MESAJ_SABLONLARI = [
+  /* ⚠️ KOŞULLAR KAYIT BAZLI, ARAÇ BAZLI DEĞİL (14.09, ikinci yazım).
+     İlk yazımda koşullar plakaya bakıyordu ve SÜREÇ ŞERİDİ yanlış
+     öneri gösterdi: teslim edilmiş bir kaydın süreci *"Aracınız hazır
+     gönderilebilir"* diyordu — çünkü AYNI ARACIN başka bir açık kaydı
+     vardı. Araç düzeyinde doğru olan cümle, kayıt düzeyinde yalan.
+
+     Cemil "bunu iyi kontrol et" dedi ve kontrol bunu buldu: aynı
+     aracın iki kaydı olduğunda soru "bu araçta ne var" değil, "BU
+     İŞTE ne var". */
+  { k: 'ozet',
+    uygunKayit: function (k) {
+      return !!k && !k.teslimTarihi && !kayitMesajiVar(k.id, 'ozet');
+    } },
+  { k: 'bekliyor',
+    uygunKayit: function (k) { return !!k && !k.teslimTarihi && !!k.parcaBekliyor; } },
+  { k: 'hazir',
+    /* A-M17: teslim edilmiş kayıtta "hazır" yalandı; yalnız açık işte. */
+    uygunKayit: function (k) { return !!k && !k.teslimTarihi; } },
+  { k: 'teslim',
+    uygunKayit: function (k) { return !!k && !!k.teslimTarihi && !kayitMesajiVar(k.id); } },
+  { k: 'hatirlatma',
+    /* Hatırlatma teslim edilmiş BAKIM kaydının işi; kurulmuş ve henüz
+       gönderilmemişse sırada. */
+    uygunKayit: function (k) {
+      return !!k && !!k.teslimTarihi && bakimIceriyor(k) &&
+             !!k.hatirlatmaTarihi && !k.hatirlatmaGonderildi;
+    } },
+  { k: 'serbest', uygunKayit: function () { return true; } }
+];
+
+/* Aracın "şu anki işi": açık kayıt varsa o, yoksa sonuncusu. Mesaj
+   ekranı araç seçiyor; süreç şeridi kaydı biliyor. İkisi de aynı
+   kural tablosunu kullanıyor — tek kaynak (K-019.1). */
+function aracinIsi(plaka) {
+  return acikKayit(plaka) || sonKayit(plaka);
+}
+function uygunSablonlar(plaka) {
+  var k = aracinIsi(plaka);
+  return MESAJ_SABLONLARI.filter(function (s) { return s.uygunKayit(k); });
+}
+/* Süreç şeridinin sorduğu soru: "bu işte şimdi hangi mesaj sırada".
+   `serbest` elenir — o bir öneri değil, her zaman açık bir kapı. */
+function kayitSiradakiMesajlar(k) {
+  return MESAJ_SABLONLARI.filter(function (s) {
+    return s.k !== 'serbest' && s.uygunKayit(k);
+  });
+}
+
 function mesajBul(id) {
   for (var i = 0; i < MESAJLAR.length; i++) if (MESAJLAR[i].id === id) return MESAJLAR[i];
   return null;

@@ -324,12 +324,55 @@ function sesCozumle(c) {
   /* --- AÇIK KAYDA SATIR (Cemil: "servis kaydı açıkken yine sesli
          işlem yapabilir, balata örneği gibi") --- */
   if (baglam === 'kayit-icinde' && ACIK_KAYIT) {
+    var acikK = kayitBul(ACIK_KAYIT);
     var tutarR = sesTutarBul(d);
     var iscilikMi = d.indexOf('iscilik') >= 0;
     /* kelimeleriAt kullanılıyor, \b DEĞİL: /\bde\b/ "değişecek"i
        "ğişecek" yapıyordu (çekirdekteki uyarıya bak). */
     var ad = kelimeleriAt(metin.replace(/(\d[\d.]*)\s*(tl|lira|₺)/gi, ''),
-                          ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle']);
+                          ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
+                           'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
+                           'güncelle', 'guncelle']);
+
+    /* ⚠️ 14.09 — AÇIK KAYITTA SES ÜÇ İŞ YAPIYOR (Cemil: "Yeni işlemler
+       için sesli olarak söyleyebilir. Bunlar parça olabilir, işçilik
+       olabilir. Fiyat güncellenebilir. Teslime edilebilir.").
+
+       SIRA DAR OLANDAN GENİŞE: teslim → fiyat güncelleme → satır ekleme.
+       Ters sırada olsaydı "teslim ettim nakit aldım" cümlesi kayda
+       "teslim ettim" diye bir satır eklerdi. */
+    if (acikK && d.indexOf('teslim') >= 0 && !acikK.teslimTarihi) {
+      var odemeYolu = d.indexOf('nakit') >= 0 ? 'nakit'
+                    : d.indexOf('kart') >= 0 ? 'kart'
+                    : d.indexOf('havale') >= 0 ? 'havale' : null;
+      return { tur: 'teslim', plaka: acikK.plaka, arac: aracBul(acikK.plaka),
+               kayit: acikK, odeme: odemeYolu };
+    }
+
+    /* FİYAT GÜNCELLEME — söylenen ad VAR OLAN bir satıra uyuyorsa.
+       "yağ filtresi 300 lira" iki şey demek olabilir: yeni satır ya da
+       duran satırın fiyatı. Ayırt eden şey kaydın kendisi.
+
+       ⚠️ TEK ADAY KURALI (A-M27'nin aynısı): iki satır birden uyuyorsa
+       hangisi olduğunu bilmiyoruz demektir — o zaman güncelleme YOK,
+       yeni satır eklenir ve usta görür. Tahmin etmek, ustanın
+       yazdığı rakamı sessizce değiştirmenin yoludur. */
+    if (acikK && tutarR && ad) {
+      var adN = norm(ad);
+      var uyan = [];
+      (acikK.satirlar || []).forEach(function (s, i) {
+        var sN = norm(s.ad || '');
+        if (sN.length < 3 || adN.length < 3) return;
+        if (sN === adN || sN.indexOf(adN) >= 0 || adN.indexOf(sN) >= 0) {
+          uyan.push({ satir: s, indeks: i });
+        }
+      });
+      if (uyan.length === 1) {
+        return { tur: 'fiyat-guncelle', kayit: acikK, indeks: uyan[0].indeks,
+                 satir: uyan[0].satir, fiyat: tutarR };
+      }
+    }
+
     /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
        yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
     return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
@@ -546,6 +589,13 @@ function sesOzet(o) {
                ['Alacak (veresiye)', tutar(veresiyeToplami()) + ' ₺']],
     eylem: 'Muhasebeyi aç' };
 
+  if (o.tur === 'fiyat-guncelle') return {
+    baslik: 'Satırın fiyatı değişecek',
+    satirlar: [['Ne', o.satir.ad || '—'],
+               ['Şimdiki', o.satir.fiyat ? tutar(o.satir.fiyat) + ' ₺' : '— (boş)'],
+               ['Yeni', tutar(o.fiyat) + ' ₺']],
+    eylem: 'Fiyatı güncelle' };
+
   if (o.tur === 'gider-ekle') return {
     baslik: 'Gider eklenecek',
     satirlar: [['Açıklama', o.aciklama], ['Tutar', tutar(o.tutar) + ' ₺'],
@@ -673,6 +723,19 @@ function sesUygula(o) {
     balon('Satır eklendi — fiyatını yaz.', false, 2800);
     Ekran.ac('kayit'); return;
   }
+  if (o.tur === 'fiyat-guncelle') {
+    /* Satır nesnesi kaydın içinde duruyor; indeks de taşınıyor ki
+       aynı adı taşıyan iki satır olsa bile doğru olan değişsin. */
+    var gk = kayitBul(o.kayit.id);
+    var gs = gk && gk.satirlar ? gk.satirlar[o.indeks] : null;
+    if (!gs) { balon('Satır bulunamadı.', false, 2600); return; }
+    gs.fiyat = o.fiyat;
+    ACIK_KAYIT = gk.id;
+    balon((gs.ad || 'Satır') + ' → ' + tutar(o.fiyat) + ' ₺', false, 2800);
+    Ekran.ac('kayit');
+    return;
+  }
+
   if (o.tur === 'tahsilat-sor') {
     /* Dönem muhasebe ekranıyla ORTAK (çekirdekteki muhDonemSecili):
        usta sorduğu pencereyi ekranda da bulsun. */

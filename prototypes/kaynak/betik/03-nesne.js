@@ -140,8 +140,19 @@ function musteriKartiHtml(m, hedef) {
       ' role="button" tabindex="0" aria-label="' + m.ad +
       (a ? ' — ' + a.plaka : '') + '">' +
     '<div class="mus-ad">' + m.ad + '</div>' +
-    (a ? plakaHtml(a.plaka, 'plate-lg') : '') +
-    (a ? '<div class="mus-arac"><span>' + a.marka + ' ' + a.model + '</span>' +
+    /* ⚠️ 14.09 — PLAKA KÜÇÜLDÜ VE ARACIN YANINA GEÇTİ (Cemil: "Araçlar,
+       müşteriler, müşteriye mesaj aynı sayfalar oldu. Farkları olmalı.
+       Müşteri ve müşteriye mesaj sayfaları araçlar sayfasından farklı
+       olsun.").
+
+       Sabah iki liste de aynı şeyi bağırıyordu: büyük plaka. Oysa iki
+       liste iki ayrı soruyu cevaplıyor —
+         ARAÇLAR   : "hangi araç?"  → plaka büyük, en üstte (.arac-kart)
+         MÜŞTERİLER: "hangi kişi?"  → AD büyük, plaka ikinci satırda
+       Plaka kaybolmadı, HİYERARŞİDE indi: aynı bileşen (plakaHtml),
+       küçük boyu. A-M28 de böyle kapandı — satır kısaldı. */
+    (a ? '<div class="mus-arac">' + plakaHtml(a.plaka, 'plate-sm') +
+         '<span class="mus-arac-ad">' + a.marka + ' ' + a.model + '</span>' +
          renkKutuHtml(a.renk) + '</div>' : '') +
     (m.tel ? telLinkHtml(m.tel, m.ad)
            : '<div class="mus-arac"><span class="pill warn">telefon yok</span></div>') +
@@ -357,6 +368,143 @@ function mesajSatiriHtml(m) {
     '</div>' +
   '</div>';
 }
+
+/* ---- SÜREÇ: KAYDIN OMURGASI (14.09) ----
+   Cemil: *"Süreç mesaj göndermeyle birlikte süreç şeklinde olsun.
+   Teslim edildi, parça bekliyor vb hep arka arkaya olan süreç şeklinde
+   işlesin. Bunu iyi kontrol et."*
+
+   BUGÜNE KADAR EKRAN "ŞU AN"I GÖSTERİYORDU: bir rozet *"serviste"*
+   diyor, bir bayrak *"parça bekliyor"* diyordu. Ama iş bir ANLIK DURUM
+   değil, arka arkaya gelen olaylar: araç geldi · parça beklendi ·
+   müşteriye haber verildi · teslim edildi · özet gönderildi. Usta
+   *"nerede kaldık"* diye soruyor ve o sorunun cevabı tek bir rozette
+   yok.
+
+   ⚠️ YENİ DURUM ALANI AÇILMADI (K-004 duruyor). Süreç TÜRETİLİYOR:
+   açılış tarihi, parça bayrağı, mesaj arşivi ve teslim tarihi zaten
+   kayıtlı. Tek eklenen alan `bekliyorTarihi` — bayrağın NE ZAMAN
+   kaldırıldığını hiçbir yer tutmuyordu ve zamansız bir olay sıraya
+   giremez.
+
+   ⚠️ MESAJLAR SÜRECİN İÇİNDE, YANINDA DEĞİL. Cemil'in cümlesindeki
+   asıl istek bu: gönderilen mesaj bir yan defter değil, işin bir
+   adımı. Sıralama tarihe göre; aynı gün olanlar kaydın mantıksal
+   sırasını izliyor. */
+function surecAdimlari(k) {
+  if (!k) return [];
+  var adimlar = [];
+  adimlar.push({ ad: 'Araç geldi, kayıt açıldı', tarih: k.acilis || '',
+                 saat: '', ikon: 'i-plus', hal: 'tamam',
+                 alt: (k.sikayet || '').split('\n')[0] });
+
+  if (k.parcaBekliyor) {
+    adimlar.push({ ad: 'Parça bekleniyor', tarih: k.bekliyorTarihi || k.acilis || '',
+                   saat: '', ikon: 'i-package', sira: 1,
+                   /* Teslim edildiyse bekleme BİTMİŞTİR; açık kayıtta
+                      hâlâ sürüyor. Aynı olay, iki farklı hâl. */
+                   hal: k.teslimTarihi ? 'tamam' : 'bekliyor',
+                   alt: k.bekliyorMusteriye ? 'Müşteriye söylendi' : '' });
+  }
+
+  mesajArsivi(null).filter(function (m) { return m.kayit === k.id; })
+    .slice().reverse()   /* mesajArsivi en yeniyi öne alıyor; süreç eskiden yeniye */
+    .forEach(function (m) {
+      adimlar.push({ ad: (SABLON_AD[m.sablon] || 'Mesaj') + ' gönderildi',
+                     tarih: m.tarih, saat: m.saat, ikon: 'i-message-square',
+                     hal: 'tamam', alt: (KANAL_AD[m.kanal] || m.kanal) + ' · ' + m.ad,
+                     mesaj: m.id,
+                     /* ⚠️ AYNI GÜN OLANLARIN SIRASI NEDENE GÖRE.
+                        "Teslim edildi" mesajı teslimden SONRA gider;
+                        tarihler eşit olduğu için sıra saatten çıkmıyordu
+                        ve mesaj teslimin ÜSTÜNDE görünüyordu — süreç
+                        olmamış bir şeyi olmuş gibi anlatıyordu. */
+                     sira: (m.sablon === 'teslim' || m.sablon === 'hatirlatma') ? 4 : 2 });
+    });
+
+  if (k.teslimTarihi) {
+    adimlar.push({ ad: 'Teslim edildi', tarih: k.teslimTarihi, saat: '',
+                   ikon: 'i-circle-check', hal: 'tamam', sira: 3,
+                   alt: k.odemeYolu
+                     ? (k.odemeYolu === 'almadim' ? 'Ödeme alınmadı'
+                        : 'Ödeme: ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu))
+                     : '' });
+  } else {
+    /* SIRADAKİ ADIM DA SÜRECİN PARÇASI — ve henüz olmadığı için
+       "bekliyor" hâlinde duruyor. Ekran ne olduğunu değil, NE
+       OLACAĞINI da söylüyor. */
+    adimlar.push({ ad: 'Teslim bekliyor', tarih: '', saat: '',
+                   ikon: 'i-clock', hal: 'bekliyor', sira: 9,
+                   alt: 'Ödeme teslimde soruluyor' });
+  }
+
+  if (k.teslimTarihi && k.hatirlatmaTarihi) {
+    adimlar.push({ ad: k.hatirlatmaGonderildi ? 'Bakım hatırlatması gönderildi'
+                                              : 'Bakım hatırlatması kuruldu',
+                   tarih: k.hatirlatmaTarihi, saat: '', ikon: 'i-calendar-clock',
+                   hal: k.hatirlatmaGonderildi ? 'tamam' : 'bekliyor', sira: 5,
+                   alt: k.hatirlatmaGonderildi ? '' : 'Tarihi gelince menüde rozet çıkar' });
+  }
+
+  /* SIRALAMA: önce tarih, sonra NEDEN sırası. Tarihi olmayan adım
+     (henüz olmamış) en sona düşer — gelecek, geçmişin arasına
+     karışmasın. */
+  return adimlar.map(function (a, i) { a.__i = i; return a; }).sort(function (x, y) {
+    var tx = x.tarih ? tariheCevir(x.tarih).getTime() : Infinity;
+    var ty = y.tarih ? tariheCevir(y.tarih).getTime() : Infinity;
+    if (tx !== ty) return tx - ty;
+    if ((x.sira || 0) !== (y.sira || 0)) return (x.sira || 0) - (y.sira || 0);
+    /* Eşitse eklenme sırası korunur — kararlı sıralama. */
+    return x.__i - y.__i;
+  });
+}
+
+function surecHtml(k) {
+  if (!k) return '';
+  var adimlar = surecAdimlari(k);
+  var siradaki = kayitSiradakiMesajlar(k);
+
+  return '<div class="surec">' +
+    adimlar.map(function (a) {
+      return '<div class="surec-adim ' + a.hal + '"' +
+          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') + '>' +
+        '<span class="sa-ic"><svg class="ico ico-sm"><use href="#' + a.ikon + '"></use></svg></span>' +
+        '<span class="sa-govde">' +
+          '<span class="sa-ad">' + a.ad + '</span>' +
+          (a.alt ? '<span class="sa-alt">' + a.alt + '</span>' : '') +
+        '</span>' +
+        '<span class="sa-tarih">' + (a.tarih || '—') +
+          (a.saat ? ' · ' + a.saat : '') + '</span>' +
+      '</div>';
+    }).join('') +
+  '</div>' +
+  /* ⚠️ SÜREÇ MESAJLA BİRLİKTE İŞLER (Cemil'in cümlesi). Sıradaki
+     adımın mesajı BURADAN gönderiliyor — usta mesaj ekranını arayıp
+     müşteriyi yeniden seçmiyor. Koşullar mesaj ekranıyla AYNI tablodan
+     (MESAJ_SABLONLARI), yoksa iki ekran iki şey önerirdi. Fark yalnız
+     SORULAN ŞEY: burada BU KAYIT, mesaj ekranında aracın şu anki işi. */
+  (siradaki.length
+    ? '<div class="section-label" style="margin-top:14px">' +
+        '<svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Şimdi gönderilebilir' +
+      '</div>' +
+      '<div class="cip-grup">' +
+        siradaki.map(function (s) {
+          return '<button class="cip" data-surec-mesaj="' + s.k +
+            '" data-surec-plaka="' + k.plaka + '">' + SABLON_AD[s.k] + '</button>';
+        }).join('') +
+      '</div>'
+    : '');
+}
+
+/* Süreçten mesaja: şablon ve araç birlikte taşınıyor. Davranış ortak
+   nesnede, çünkü süreç iki ekranda görünebilir (kayıt · araç). */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-surec-mesaj]');
+  if (!t) return;
+  MESAJ_HEDEF = { plaka: t.getAttribute('data-surec-plaka'),
+                  sablon: t.getAttribute('data-surec-mesaj') };
+  Ekran.ac('mesaj');
+});
 
 /* ---- TELEFON BAĞLANTISI ----
    Beş yerde elle yazılıydı ve beşi birbirinden ayrışmaya başlamıştı

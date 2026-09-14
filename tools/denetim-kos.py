@@ -47,6 +47,18 @@ if sys.argv[1] == 'gom':
         print('Once derle:  node tools/prototip-derle.js')
         print('(Eski derlemeyi olcmek "0 bulgu" der ama yanlis dosyayi olcer.)')
         sys.exit(1)
+    # UST USTE GOMME (14.09.2026) — bugun tam bu oldu.
+    # "geri" yapmadan ikinci kez "gom" cagirdim: denetim betigi IKI KEZ
+    # gomuldu, her fonksiyon iki kez tanimlandi ve 10. test haklı olarak
+    # "YINELENEN-FN | stilMetni x2" dedi. Bulgu gercekti ama PROTOTIPTE
+    # DEGIL, ARACTA — yarim saat yanlis yerde hata arattiracak cinsten.
+    # Arac kendi hatasini artik kendi soyluyor; yedek de ezilmiyor
+    # (ikinci gom, yedege GOMULMUS dosyayi yazardi ve "geri" temiz hali
+    # bir daha bulamazdi).
+    if 'window.DENETIM_CALISTIR' in io.open(p, encoding='utf-8').read():
+        print('DURDURULDU: denetim ZATEN gomulu.')
+        print('Once geri al:  python tools/denetim-kos.py geri')
+        sys.exit(1)
     shutil.copyfile(p, yedek)
     h = io.open(p, encoding='utf-8').read()
     a = io.open('tools/saglik-denetim.js', encoding='utf-8').read()
@@ -111,6 +123,14 @@ if sys.argv[1] == 'gom':
 
     print('gomuldu (%d KB)' % (len(h) // 1024))
 else:
+    # YEDEK YOKSA YAPILACAK BIR SEY DE YOK (14.09). Eskiden burada
+    # Python yigin izi basiyordu: "geri" komutu, gomulmemis bir dosyada
+    # HATA gibi gorunuyordu. Sira kurali "geri DAIMA derleden once"
+    # oldugu icin bu komut cogu turda bos calisiyor — bos calismak
+    # hata degil, ve arac hata gibi gorunmemeli.
+    if not os.path.exists(yedek):
+        print('gomulu denetim yok — yapilacak bir sey yok.')
+        sys.exit(0)
     shutil.copyfile(yedek, p)
     os.remove(yedek)
     print('geri alindi')

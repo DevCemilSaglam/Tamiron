@@ -192,36 +192,11 @@ var msjHedefSecili = null;
    `serbest` HER ZAMAN VAR: koşulların hepsi elense bile ustanın
    söyleyeceği bir şey olabilir (*"selam mesajı gönder"*). Şablonsuz
    kalan bir ekran, ustayı boş bir kutuyla baş başa bırakır. */
-var MSJ_SABLON = [
-  { k: 'ozet',
-    uygun: function (p) {
-      var k = acikKayit(p);
-      return !!k && !kayitMesajiVar(k.id, 'ozet');
-    } },
-  { k: 'bekliyor',
-    uygun: function (p) {
-      var k = acikKayit(p);
-      return !!k && !!k.parcaBekliyor;
-    } },
-  { k: 'hazir',
-    /* A-M17 KAPANDI: teslim edilmiş araçta "hazır" yalandı; artık
-       yalnız serviste olan araçta çıkıyor. */
-    uygun: function (p) { return !!acikKayit(p); } },
-  { k: 'teslim',
-    /* ⚠️ AÇIK KAYIT VARSA "TESLİM EDİLDİ" YALANDIR. İlk yazımda koşul
-       yalnız SON kayda bakıyordu ve 34 ABC 123'te ikisi birden çıktı:
-       araç bugün serviste ama geçmişte teslim edilmiş bir bakımı da
-       var. Ekranda denemeden görülmezdi — koşul doğru cümleyle
-       yazılmıştı, yanlış olan HANGİ KAYDA baktığıydı. */
-    uygun: function (p) {
-      if (acikKayit(p)) return false;
-      var k = sonKayit(p);
-      return !!k && !!k.teslimTarihi && !kayitMesajiVar(k.id);
-    } },
-  { k: 'hatirlatma',
-    uygun: function (p) { return !acikKayit(p) && !!sonBakim(p); } },
-  { k: 'serbest', uygun: function () { return true; } }
-];
+/* ⚠️ 14.09 — ŞABLON KURALLARI BU EKRANDAN ÇIKTI (MESAJ_SABLONLARI,
+   02-veri.js). Sebep: aynı kuralı SÜREÇ ŞERİDİ de soruyor ("şimdi ne
+   gönderilebilir"). İki yerde iki kural, iki ayrı cevap demektir
+   (K-019.1) — ekran "özet gönderilebilir" derken süreç sessiz kalırdı.
+   Ekranda kalan tek şey çizim. */
 
 /* Balonun ne diyeceği kanala göre değişir — ama HEPSİ "açılıyor" der,
    "gönderildi" DEMEZ. Uygulama mesajı bizim yerimize göndermiyor;
@@ -346,7 +321,7 @@ function msjYazimCiz() {
      alanları olmamalı."* — iki şablon da AÇIK BİR İŞİ anlatıyor.
      14.09: koşullar "daha önce ne gönderildi" sorusunu da soruyor.
      Kural artık şablonun kendi üstünde (MSJ_SABLON[].uygun). */
-  var uygun = MSJ_SABLON.filter(function (s) { return s.uygun(msjPlaka); });
+  var uygun = uygunSablonlar(msjPlaka);
   /* Seçili şablon elenmiş olabilir — o zaman ilk uyguna düşülür,
      yoksa ekran "hiçbiri seçili değil" hâlinde kalır. */
   if (!uygun.filter(function (s) { return s.k === msjSablonSecili; }).length) {
