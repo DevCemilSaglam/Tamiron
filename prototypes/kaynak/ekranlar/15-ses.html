@@ -444,8 +444,10 @@ function sesOzet(o) {
 }
 
 var ODEME_AD_SES = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale' };
-var SABLON_AD = { ozet: 'Yapılan işin özeti', hazir: 'Aracınız hazır',
-                  hatirlatma: 'Bakım hatırlatması' };
+/* ⚠️ 14.09 — ŞABLON ADLARI BURADAN KALKTI, veri katmanına taşındı
+   (SABLON_AD). Burada kendi kopyası vardı ve adlar mesaj ekranındaki
+   çiplerle AYNI DEĞİLDİ: onay ekranı "Yapılan işin özeti" diyor, çip
+   "İşin özeti" diyordu — usta iki ekranda iki ad görüyordu. */
 
 /* ================= UYGULA ================= */
 function sesUygula(o) {

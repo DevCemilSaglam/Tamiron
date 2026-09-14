@@ -55,7 +55,7 @@ var KAYITLAR = [
   { id: 1, plaka: '34 ABC 123', tur: 'tamirat', km: '',
     sikayet: 'Triger seti değişecek',
     acilis: '03.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true, bekliyorMusteriye: true,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true,
     satirlar: [
       { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' }
@@ -64,7 +64,7 @@ var KAYITLAR = [
   { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
     sikayet: 'Periyodik bakım',
     acilis: '02.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1900, alis: 1450, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -82,7 +82,7 @@ var KAYITLAR = [
        sayfasında da görünüyordu — örnek veri, abartının kendisiydi. */
     sikayet: 'Ön balata değişimi',
     acilis: '01.09.2026', teslimTarihi: null,
-    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
@@ -97,7 +97,7 @@ var KAYITLAR = [
   { id: 4, plaka: '34 ABC 123', tur: 'bakim', km: '142.500',
     sikayet: 'Periyodik bakım',
     acilis: '15.03.2026', teslimTarihi: '15.03.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: '15.09.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -112,7 +112,7 @@ var KAYITLAR = [
   { id: 6, plaka: '34 ABC 123', tur: 'bakim', km: '151.200',
     sikayet: 'Ara bakım',
     acilis: '20.06.2026', teslimTarihi: '20.06.2026',
-    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: 'havale', hatirlatmaTarihi: '20.12.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
@@ -126,7 +126,7 @@ var KAYITLAR = [
   { id: 7, plaka: '35 KLM 45', tur: 'tamirat', km: '',
     sikayet: 'Ön cam silecek motoru',
     acilis: '03.09.2026', teslimTarihi: '03.09.2026',
-    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
         marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
@@ -138,7 +138,7 @@ var KAYITLAR = [
   { id: 8, plaka: '06 TMR 07', tur: 'tamirat', km: '',
     sikayet: 'Akü değişimi',
     acilis: '28.08.2026', teslimTarihi: '28.08.2026',
-    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
@@ -150,13 +150,82 @@ var KAYITLAR = [
   { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
     sikayet: 'Periyodik bakım',
     acilis: '20.02.2026', teslimTarihi: '20.02.2026',
-    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false, bekliyorMusteriye: false,
+    odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
       { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
     ] }
 ];
+
+/* ---- GÖNDERİLEN MESAJLAR (14.09) ----
+   Cemil: *"Gönderilen mesajlar listelenebilmeli."*
+
+   ⚠️ BU ARŞİV "İYİ OLUR" DİYE YAZILMADI. K-045.3'te ölçülmüştü:
+   ticari elektronik iletiye ilişkin kayıtlar **üç yıl** saklanır ve
+   **ispat yükü gönderende**. Alanlar da oradan geliyor — kime, hangi
+   kanaldan, ne zaman, hangi metin. Prototipte bellekte duruyor;
+   backend fazında saklanacak yer bu alanları bekliyor.
+
+   İKİNCİ İŞİ: HANGİ MESAJ GÖNDERİLDİ sorusu. Cemil aynı turda
+   *"teslim edilmiş ve mesaj gönderilmemiş araca"*, *"işin özeti
+   gönderilmemiş araca"* dedi — yani şablonun çıkıp çıkmayacağı bu
+   listeden okunuyor. Arşiv olmasaydı o kurallar yazılamazdı.
+
+   Tohumda iki kayıt var: gönderilmiş bir özet ve bir hatırlatma.
+   Boş liste, çalıştığı görülemeyen bir alandır. */
+var MESAJLAR = [
+  { id: 1, tarih: '02.09.2026', saat: '10:20', plaka: '06 TMR 07',
+    ad: 'Hasan Demir', tel: '0542 331 90 07', kanal: 'whatsapp',
+    sablon: 'ozet', kayit: 2, toplu: false,
+    metin: 'Hasan Bey/Hanım, Fiat Egea (06 TMR 07) için 3 kalem işlem yapıldı.' },
+  { id: 2, tarih: '28.08.2026', saat: '17:05', plaka: '06 TMR 07',
+    ad: 'Hasan Demir', tel: '0542 331 90 07', kanal: 'sms',
+    sablon: 'teslim', kayit: 8, toplu: false,
+    metin: 'Hasan Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.' }
+];
+
+/* ŞABLONUN ADI TEK YERDE. Üç yerde yazılıydı: mesaj ekranının çipleri,
+   sesli işlemin onay ekranı ("Yapılan işin özeti") ve şimdi arşiv
+   satırı. Usta onay ekranında bir ad, çipte başka bir ad görüyordu. */
+var SABLON_AD = {
+  ozet: 'İşin özeti', bekliyor: 'Parça bekliyoruz', hazir: 'Aracınız hazır',
+  teslim: 'Teslim edildi', hatirlatma: 'Bakım hatırlatması',
+  serbest: 'Serbest mesaj'
+};
+var KANAL_AD = { whatsapp: 'WhatsApp', sms: 'SMS', ara: 'Telefon' };
+
+/* Mesaj kaydı TEK YERDEN düşer. İki gönderim yolu var (mesaj ekranı ve
+   sesli işlem) ve ikisi ayrı yazsaydı biri arşive yazmayı unuturdu —
+   bu turda tam olarak bunun testi yazıldı (43. denetim). */
+function mesajKaydet(o) {
+  var d = new Date();
+  var k = {
+    id: MESAJLAR.length + 1,
+    tarih: bugunMetin(),
+    saat: ('0' + d.getHours()).slice(-2) + ':' + ('0' + d.getMinutes()).slice(-2),
+    plaka: o.plaka || '', ad: o.ad || '', tel: o.tel || '',
+    kanal: o.kanal || 'whatsapp', sablon: o.sablon || 'serbest',
+    kayit: o.kayit || null, toplu: !!o.toplu, metin: o.metin || ''
+  };
+  MESAJLAR.push(k);
+  return k;
+}
+
+/* En yeni üstte — liste "ne gönderdim" sorusunu cevaplıyor ve o soru
+   hep son gönderilenle başlar. */
+function mesajArsivi(plaka) {
+  return MESAJLAR.filter(function (m) { return !plaka || m.plaka === plaka; })
+                 .slice().reverse();
+}
+
+/* Bir KAYIT için o şablon gönderilmiş mi. Araç değil KAYIT: aynı araç
+   üç kez gelir, her gelişin kendi özeti vardır. */
+function kayitMesajiVar(kayitId, sablon) {
+  return MESAJLAR.some(function (m) {
+    return m.kayit === kayitId && (!sablon || m.sablon === sablon);
+  });
+}
 
 /* ---- Supplier (VERI-MODELI §4) — iki alan ---- */
 var PARCACILAR = [
@@ -247,6 +316,17 @@ function icerideki() {
 }
 function aracKayitlari(plaka) {
   return KAYITLAR.filter(function (k) { return k.plaka === plaka; });
+}
+/* Aracın AÇIK kaydı ve SON kaydı — iki soru, iki cevap, tek yer (14.09).
+   Mesaj ekranı hangi şablonun çıkacağını bunlara soruyor; üç ayrı
+   ekranda üç ayrı süzgeç yazılsaydı biri bir gün başka cevap verirdi
+   (K-019.1). */
+function acikKayit(plaka) {
+  return icerideki().filter(function (k) { return k.plaka === plaka; })[0] || null;
+}
+function sonKayit(plaka) {
+  var l = aracKayitlari(plaka);
+  return l.length ? l[l.length - 1] : null;
 }
 /* MÜŞTERİYE SÖYLENEN RAKAM.
    ⚠️ 06.09 — MÜŞTERİ PARÇASI TOPLAMA GİRMEZ ve bu artık BURADA

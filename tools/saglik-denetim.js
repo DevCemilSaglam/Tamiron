@@ -44,9 +44,15 @@ function stilMetni() {
      Kendi olctugu seyi degistiren bir arac, olcum aleti degildir.
 
      Cozum: bastan derin kopya, sonda geri yukleme. */
+  /* ⚠️ TABLO LISTESI TEK YERDE (14.09). Ayni liste iki yere yazilmisti
+     (yedek alan ve geri yukleyen). Yeni bir tablo — MESAJLAR — gelince
+     birine yazip otekini unutmak, denetimin o tabloyu KIRLETIP geri
+     yuklememesi demekti: 30. test her dugmeye basiyor ve dugmelerden
+     biri artik mesaj gonderiyor. Kurali listeye degil YAPIYA bagla. */
+  var VERI_TABLOLARI = ['KAYITLAR', 'ARACLAR', 'GIDERLER', 'PARCACILAR', 'DUKKAN', 'MESAJLAR'];
   var YEDEK = (function () {
     var y = {};
-    ['KAYITLAR', 'ARACLAR', 'GIDERLER', 'PARCACILAR', 'DUKKAN'].forEach(function (ad) {
+    VERI_TABLOLARI.forEach(function (ad) {
       try { y[ad] = JSON.parse(JSON.stringify(window[ad])); } catch (e) { y[ad] = null; }
     });
     ['ACIK_KAYIT', 'ACIK_PLAKA', 'SESLI_NIYET', 'MESAJ_HEDEF',
@@ -57,7 +63,7 @@ function stilMetni() {
   })();
   function yedegiGeriYukle() {
     Object.keys(YEDEK).forEach(function (ad) {
-      if (YEDEK[ad] === null && ['KAYITLAR','ARACLAR','GIDERLER','PARCACILAR','DUKKAN'].indexOf(ad) >= 0) return;
+      if (YEDEK[ad] === null && VERI_TABLOLARI.indexOf(ad) >= 0) return;
       try { window[ad] = YEDEK[ad]; } catch (e) {}
     });
   }
@@ -1273,6 +1279,56 @@ function stilMetni() {
     }
   }
   showScreen('home');
+
+  /* 43) GONDERIM ARSIVE YAZMIYOR (14.09.2026)
+     Cemil: "Gönderilen mesajlar listelenebilmeli."
+
+     YENI HATA SINIFI: SONUCU BASKA YERDE DURAN EYLEM. Gonderme yolu
+     iki yerde (mesaj ekrani ve sesli islem) ve ikisi de arsive yazmak
+     zorunda. Yazmayan yol SESSIZ bozulur: balon "WhatsApp aciliyor"
+     der, mesaj gercekten gider, ekran dogru gorunur — yalniz liste
+     eksik kalir ve "isin ozeti gonderilmemis araca" kurali yanlis
+     calisir. 30. test (SAHTE-EYLEM) bunu goremez: orada olculen sey
+     "bir sey degisti mi", burada olculen "DOGRU YERDE mi degisti".
+
+     Yol GERCEKTEN isletiliyor: musteri satirina tiklanip gonder
+     dugmesine basiliyor. Denetim MESAJLAR'i yedekliyor (VERI_TABLOLARI)
+     ve sonda geri yukluyor. */
+  if (typeof MESAJLAR !== 'undefined' && typeof mesajHedefi === 'function') {
+    var mesajTanimA = (typeof Ekran !== 'undefined' && Ekran.tanimlar) ? Ekran.tanimlar()['mesaj'] : null;
+    if (mesajTanimA && mesajTanimA.geriAl) { try { mesajTanimA.geriAl(); } catch (e) {} }
+    showScreen('mesaj');
+    var msjSatirlar = document.querySelectorAll('#msjListe .mus-kart[data-mesaj-plaka]');
+    var telliSatir = null;
+    for (var mi = 0; mi < msjSatirlar.length; mi++) {
+      var mpl = msjSatirlar[mi].getAttribute('data-mesaj-plaka');
+      var mhd = mesajHedefi(mpl);
+      if (mhd && mhd.tel) { telliSatir = msjSatirlar[mi]; break; }
+    }
+    /* Olcemeyen test, olcum yapmis gibi rapor etmez. */
+    if (!telliSatir) {
+      ek('MESAJ-ARSIV', 'mesaj', 'telefonu olan musteri yok — yol isletilemedi');
+    } else {
+      var arsivOnce = MESAJLAR.length;
+      telliSatir.click();
+      var msjGonderD = document.getElementById('msjGonder');
+      if (!msjGonderD || msjGonderD.disabled) {
+        ek('MESAJ-ARSIV', 'mesaj', 'musteri secildi ama gonder dugmesi kapali');
+      } else {
+        msjGonderD.click();
+        if (MESAJLAR.length !== arsivOnce + 1) {
+          ek('MESAJ-ARSIV', 'mesaj', 'WhatsApp ile gonderildi ama arsive yazilmadi');
+        } else {
+          var sonMsj = MESAJLAR[MESAJLAR.length - 1];
+          ['plaka', 'tel', 'kanal', 'metin'].forEach(function (alan) {
+            if (!sonMsj[alan]) ek('MESAJ-ARSIV', 'mesaj', 'arsiv kaydinda "' + alan + '" bos');
+          });
+        }
+      }
+    }
+    if (mesajTanimA && mesajTanimA.geriAl) { try { mesajTanimA.geriAl(); } catch (e) {} }
+    showScreen('home');
+  }
 
   /* 42) AYRISAN LISTE — AYNI LISTE IKI EKRANDA (14.09.2026)
      Cemil: "Müşteriye mesaj ve müşteriler sayfasının listelemeleri

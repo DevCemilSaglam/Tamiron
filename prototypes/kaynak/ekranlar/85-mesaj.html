@@ -9,18 +9,25 @@
      Parça sorma ekranı da aynı yolu kullanıyor; iki yerde iki ayrı
      yöntem olsaydı biri mutlaka bozuk kalırdı.
 
-     ÜÇ ŞABLON, ÜÇÜ DE YEDİ İŞTEN BİRİNE BAĞLI:
-       özet        → "müşteriye özet gönder" (altıncı iş)
-       hazır       → teslim öncesi haber
-       hatırlatma  → "bakım hatırlat" (yedinci iş)
-     Serbest mesaj da yazılabilir; şablon başlangıç noktası.
+     ALTI ŞABLON, HER BİRİ BİR KOŞULLA (14.09):
+       özet        → serviste VE özeti gönderilmemiş   (altıncı iş)
+       bekliyor    → serviste VE gerçekten parça bekliyor
+       hazır       → serviste                          (teslim öncesi haber)
+       teslim      → teslim edilmiş VE hiç mesaj gitmemiş
+       hatırlatma  → serviste değil VE bakımı var      (yedinci iş)
+       serbest     → her zaman  (ustanın kendi cümlesi · sesli yol)
 
-     ÜZERİNDE YOK: toplu mesaj · kampanya · gönderim geçmişi ·
-     okundu bilgisi · mesaj şablonu düzenleyici.
+     ⚠️ 14.09 — GÖNDERİM GEÇMİŞİ ARTIK VAR (Cemil: "Gönderilen mesajlar
+     listelenebilmeli"). Bu ekranın "ÜZERİNDE YOK" listesinden çıktı.
+     Geçmiş iki işi birden yapıyor: ustaya ne gönderdiğini gösteriyor ve
+     şablon koşullarını besliyor (K-045.3: kayıtlar üç yıl saklanır).
+
+     ÜZERİNDE YOK: okundu bilgisi · mesaj şablonu düzenleyici.
 
      BİLEŞENLER v1'DEN: .screen-head .eyebrow · .card · .section-label
-     · .search-box · .tl-item · .cip-grup .cip · .field · .notice
-     · .btn · .plate · .tel-link. Yeni bileşen yazılmadı. -->
+     · .search-box · .mus-kart · .tl-item · .cip-grup .cip · .field
+     · .notice · .btn · .plate · .tel-link · .akordiyon.
+     Yeni bileşen yazılmadı. -->
 <section class="screen" id="screen-mesaj">
 
   <div class="screen-head">
@@ -53,6 +60,16 @@
       </button>
     </div>
     <div id="msjListe"></div>
+
+    <!-- GÖNDERİLEN MESAJLAR (14.09) — Cemil: "Gönderilen mesajlar
+         listelenebilmeli."
+
+         AKORDİYON, EKRAN DEĞİL: bu bir BAŞVURU listesi — usta günde bir
+         kez "şunu göndermiş miydim" diye bakar. Kendi ekranı olsaydı
+         menüye yedinci satır eklenirdi (karar bütçesi, A-M8); burada,
+         mesaj işinin yanında duruyor. Başlık kaç mesaj olduğunu
+         açmadan söylüyor. -->
+    <div id="msjArsiv"></div>
   </div>
 
   <div id="msjYazim" class="yigin" hidden>
@@ -146,11 +163,54 @@ var msjHedefSecili = null;
    müşteri aracını bıraktı ve haber bekliyor. Haber gelmeyince
    müşteri arıyor, usta telefonda vakit kaybediyor — tamircinin
    şikâyet ettiği şeylerden biri. */
+/* ⚠️ 14.09 — ŞABLON LİSTESİ DEĞİL, ŞABLON KURALI (Cemil, telefon
+   testi): *"Teslim edilmiş ve mesaj gönderilmemiş araca teslim edildi
+   mesajı gönderebilir. Yine serviste olan ve işin özeti gönderilmemiş
+   araca işin özeti gönderilebilir. Ve gerçekten parça bekliyor
+   durumunda olana parça bekleniyor mesajı gidebilir."*
+
+   Üç cümlenin ortak yanı: her şablonun bir KOŞULU var ve koşul iki
+   şeyden okunuyor — kaydın durumu (serviste · teslim · parça bekliyor)
+   ve **daha önce ne gönderildiği** (mesaj arşivi). İkincisi bugüne
+   kadar hiç yoktu; o yüzden "işin özeti" gönderilmiş araca ikinci kez
+   teklif ediliyordu.
+
+   KOŞUL ŞABLONUN YANINDA DURUR. Süzme kuralını çizim yerine yazsaydım
+   aynı kural iki yere (çip listesi ve metin üretimi) dağılırdı; burada
+   şablon kendi koşulunu taşıyor, ekran yalnız `uygun()` soruyor.
+
+   `serbest` HER ZAMAN VAR: koşulların hepsi elense bile ustanın
+   söyleyeceği bir şey olabilir (*"selam mesajı gönder"*). Şablonsuz
+   kalan bir ekran, ustayı boş bir kutuyla baş başa bırakır. */
 var MSJ_SABLON = [
-  { k: 'ozet', ad: 'İşin özeti' },
-  { k: 'bekliyor', ad: 'Parça bekliyoruz' },
-  { k: 'hazir', ad: 'Aracınız hazır' },
-  { k: 'hatirlatma', ad: 'Bakım hatırlatması' }
+  { k: 'ozet',
+    uygun: function (p) {
+      var k = acikKayit(p);
+      return !!k && !kayitMesajiVar(k.id, 'ozet');
+    } },
+  { k: 'bekliyor',
+    uygun: function (p) {
+      var k = acikKayit(p);
+      return !!k && !!k.parcaBekliyor;
+    } },
+  { k: 'hazir',
+    /* A-M17 KAPANDI: teslim edilmiş araçta "hazır" yalandı; artık
+       yalnız serviste olan araçta çıkıyor. */
+    uygun: function (p) { return !!acikKayit(p); } },
+  { k: 'teslim',
+    /* ⚠️ AÇIK KAYIT VARSA "TESLİM EDİLDİ" YALANDIR. İlk yazımda koşul
+       yalnız SON kayda bakıyordu ve 34 ABC 123'te ikisi birden çıktı:
+       araç bugün serviste ama geçmişte teslim edilmiş bir bakımı da
+       var. Ekranda denemeden görülmezdi — koşul doğru cümleyle
+       yazılmıştı, yanlış olan HANGİ KAYDA baktığıydı. */
+    uygun: function (p) {
+      if (acikKayit(p)) return false;
+      var k = sonKayit(p);
+      return !!k && !!k.teslimTarihi && !kayitMesajiVar(k.id);
+    } },
+  { k: 'hatirlatma',
+    uygun: function (p) { return !acikKayit(p) && !!sonBakim(p); } },
+  { k: 'serbest', uygun: function () { return true; } }
 ];
 
 /* Balonun ne diyeceği kanala göre değişir — ama HEPSİ "açılıyor" der,
@@ -168,8 +228,7 @@ var KANAL_METIN = {
    bir kayıttan üretilseydi usta gönderdiğinden farklı bir şey görürdü
    ve bunu ancak müşteri sorunca anlardı. */
 function msjOzetKaydi(plaka) {
-  return icerideki().filter(function (x) { return x.plaka === plaka; })[0] ||
-         aracKayitlari(plaka).slice(-1)[0] || null;
+  return acikKayit(plaka) || sonKayit(plaka);
 }
 
 function msjMetinUret(plaka, sablon) {
@@ -196,6 +255,25 @@ function msjMetinUret(plaka, sablon) {
   if (sablon === 'hazir') {
     return basi + arac + ' hazır, teslim alabilirsiniz.\n\n' +
            DUKKAN.ad + '\n' + DUKKAN.tel;
+  }
+  /* TESLİM EDİLDİ (14.09) — Cemil: *"Teslim edilmiş ve mesaj
+     gönderilmemiş araca teslim edildi mesajı gönderebilir."*
+     "Hazır"dan farkı ZAMAN: biri teslimden önce, öteki sonra. Aynı
+     şablonun iki kullanımı denenebilirdi ama metin yalan söylerdi —
+     teslim alınmış araca "teslim alabilirsiniz" yazmak gibi. */
+  if (sablon === 'teslim') {
+    var tk = sonKayit(plaka);
+    var tl = (tk && kayitToplami(tk)) ? 'Toplam: ' + tutar(kayitToplami(tk)) + ' ₺\n' : '';
+    return basi + arac + ' teslim edildi.\n' + tl +
+           (tk ? 'Ayrıntılı özet: ' + ozetLinki(tk) + '\n' : '') +
+           '\nBizi tercih ettiğiniz için teşekkür ederiz.\n\n' +
+           DUKKAN.ad + '\n' + DUKKAN.tel;
+  }
+  /* SERBEST — metni usta söyleyecek ya da yazacak. Boş bırakmıyoruz:
+     hitap ve imza zaten biliniyor, ustanın yazacağı yalnız orta kısım.
+     Sesli yol buraya METNİ koyarak geliyor (sesMesajMetni). */
+  if (sablon === 'serbest') {
+    return basi + '\n\n' + DUKKAN.ad + '\n' + DUKKAN.tel;
   }
   if (sablon === 'hatirlatma') {
     var sb = sonBakim(plaka);
@@ -243,6 +321,17 @@ function msjSecimCiz() {
     ? liste.map(function (m) { return musteriKartiHtml(m, 'mesaj'); }).join('')
     : bosDurumHtml('i-users', 'Eşleşen müşteri yok',
         'Adın, telefonun ya da plakanın bir kısmını yazman yeter.');
+
+  /* GÖNDERİLEN MESAJLAR — arama kutusundan bağımsız: usta "kime
+     göndereyim" derken süzdüğü şey müşteriler, gönderdikleri değil. */
+  var arsiv = mesajArsivi();
+  document.getElementById('msjArsiv').innerHTML = akordiyonHtml(
+    'msjArsivGovde', 'i-message-square', 'Gönderilen mesajlar',
+    arsiv.length ? arsiv.length + ' mesaj' : 'yok',
+    arsiv.length
+      ? arsiv.map(mesajSatiriHtml).join('')
+      : bosDurumHtml('i-message-square', 'Henüz mesaj gönderilmedi',
+          'Gönderdiğin her mesaj burada tarihiyle birlikte durur.'));
 }
 
 function msjYazimCiz() {
@@ -275,21 +364,12 @@ function msjYazimCiz() {
       ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
 
-  /* ⚠️ SERVİSTE OLMAYAN ARACA İŞ ŞABLONU ÇIKMAZ (Cemil, 07.09:
-     "Serviste olmayan araca işin özeti, parça bekliyoruz alanları
-     olmamalı.").
-
-     Doğru: iki şablon da AÇIK BİR İŞİ anlatıyor. Araç teslim
-     edilmişse *"parça bekliyoruz"* yalan olur; *"işin özeti"* ise
-     geçmiş bir işin özetini bugünkü işmiş gibi gönderir.
-
-     Bakım hatırlatması tam tersine YALNIZ teslim edilmiş araçta
-     anlamlı — o zaten kendi koşulunu taşıyor. */
-  var acikIs = !!icerideki().filter(function (x) { return x.plaka === msjPlaka; })[0];
-  var uygun = MSJ_SABLON.filter(function (s) {
-    if ((s.k === 'ozet' || s.k === 'bekliyor') && !acikIs) return false;
-    return true;
-  });
+  /* ⚠️ ŞABLONU KOŞULU SÜZER (07.09'dan beri, 14.09'da genişledi).
+     07.09: *"Serviste olmayan araca işin özeti, parça bekliyoruz
+     alanları olmamalı."* — iki şablon da AÇIK BİR İŞİ anlatıyor.
+     14.09: koşullar "daha önce ne gönderildi" sorusunu da soruyor.
+     Kural artık şablonun kendi üstünde (MSJ_SABLON[].uygun). */
+  var uygun = MSJ_SABLON.filter(function (s) { return s.uygun(msjPlaka); });
   /* Seçili şablon elenmiş olabilir — o zaman ilk uyguna düşülür,
      yoksa ekran "hiçbiri seçili değil" hâlinde kalır. */
   if (!uygun.filter(function (s) { return s.k === msjSablonSecili; }).length) {
@@ -299,7 +379,7 @@ function msjYazimCiz() {
   }
   document.getElementById('msjSablon').innerHTML = uygun.map(function (s) {
     return '<button class="cip" data-sablon="' + s.k + '" aria-pressed="' +
-      (msjSablonSecili === s.k) + '">' + s.ad + '</button>';
+      (msjSablonSecili === s.k) + '">' + SABLON_AD[s.k] + '</button>';
   }).join('');
 
   /* TELEFON YOKSA GÖNDERİLEMEZ ve bu ÖNCEDEN söylenir — düğmeye
@@ -360,7 +440,14 @@ Ekran.tanim('mesaj', {
     var yaziyor = !!msjPlaka;
     document.getElementById('msjSecim').hidden = yaziyor;
     document.getElementById('msjYazim').hidden = !yaziyor;
-    if (yaziyor) msjYazimCiz(); else msjSecimCiz();
+    /* ⚠️ SEÇİM ADIMI GİZLİYKEN DE TAZELENİR (14.09). Eskiden yalnız
+       görünen adım çiziliyordu; gizli kalan adımın DOM'u eskiyordu ve
+       bugün arşiv listesi oraya girince tuzak işledi — gönderilmiş
+       mesaj sayısını hidden bir kaptan okuyup yanlış sayıyı gördüm
+       (K-040.5'in aynısı: "duran bir şey er ya da geç okunur").
+       Yazım adımı msjPlaka olmadan çizilemez, o yüzden koşullu. */
+    msjSecimCiz();
+    if (yaziyor) msjYazimCiz();
   }
 });
 
@@ -533,6 +620,18 @@ document.addEventListener('click', function (e) {
       aracKayitlari(msjPlaka).forEach(function (k) {
         if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
       });
+    }
+    /* ⚠️ GÖNDERİLEN MESAJ ARŞİVE DÜŞER (14.09) — ama YALNIZ mesaj.
+       "Ara" bir mesaj değil; arşive yazılsaydı liste "gönderilen
+       mesajlar" olmaktan çıkar, "yaptıklarım" olurdu ve şablon
+       koşulları da yanlış beslenirdi: telefonla aranmış bir müşteriye
+       "özeti gönderdin" denirdi. */
+    if (kanal !== 'ara') {
+      var gk = msjOzetKaydi(msjPlaka);
+      mesajKaydet({ plaka: msjPlaka, ad: hedef.ad, tel: hedef.tel, kanal: kanal,
+                    sablon: msjSablonSecili || 'serbest',
+                    kayit: gk ? gk.id : null,
+                    metin: document.getElementById('msjMetin').value });
     }
     balon(KANAL_METIN[kanal] + ' — ' + hedef.ad + ' · ' + hedef.tel +
           (kanal === 'ara' ? '.' : ', mesaj hazır.'), false, 3200);

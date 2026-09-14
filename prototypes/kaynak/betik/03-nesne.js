@@ -248,6 +248,34 @@ function kayitKartiHtml(k) {
   '</div>';
 }
 
+/* ---- GÖNDERİLEN MESAJ SATIRI (14.09) ----
+   Cemil: *"Gönderilen mesajlar listelenebilmeli."*
+
+   Satır dört soruyu cevaplıyor — kime, hangi araç için, ne, ne zaman.
+   Beşincisi (metin) ilk satırıyla duruyor: usta hangi mesaj olduğunu
+   metnin başından tanıyor, tamamını okumak istemiyor.
+
+   ⚠️ TIKLANMIYOR ve bu bilinçli: satırın açacağı bir şey yok. Gönderilmiş
+   bir mesaj değiştirilemez — dokununca bir şey olmayan satır, ölü uçtur
+   (K-021); dokunulacak gibi DURMAYAN satır değildir. */
+function mesajSatiriHtml(m) {
+  var ilkSatir = (m.metin || '').split('\n')[0];
+  if (ilkSatir.length > 90) ilkSatir = ilkSatir.slice(0, 90) + '…';
+  return '<div class="tl-item">' +
+    '<div class="tl-body">' +
+      '<div class="tl-title"><span class="tl-tip">' + (m.ad || 'kime yazılmamış') +
+        '</span>' + (m.plaka ? plakaHtml(m.plaka) : '') + '</div>' +
+      '<div class="tl-sub">' + ilkSatir + '</div>' +
+      '<div class="tl-foot">' +
+        '<span class="pill info">' + (KANAL_AD[m.kanal] || m.kanal) + '</span>' +
+        '<span class="pill muted">' + (SABLON_AD[m.sablon] || m.sablon) + '</span>' +
+        (m.toplu ? '<span class="pill warn">toplu</span>' : '') +
+        '<span class="tl-date">' + m.tarih + ' · ' + m.saat + '</span>' +
+      '</div>' +
+    '</div>' +
+  '</div>';
+}
+
 /* ---- TELEFON BAĞLANTISI ----
    Beş yerde elle yazılıydı ve beşi birbirinden ayrışmaya başlamıştı
    (birinde data-tel yoktu ve numaraya dokunmak hem arıyor hem kaydı
