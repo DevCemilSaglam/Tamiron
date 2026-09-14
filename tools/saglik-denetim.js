@@ -1274,6 +1274,46 @@ function stilMetni() {
   }
   showScreen('home');
 
+  /* 42) AYRISAN LISTE — AYNI LISTE IKI EKRANDA (14.09.2026)
+     Cemil: "Müşteriye mesaj ve müşteriler sayfasının listelemeleri
+     aynı olacak."
+
+     YENI HATA SINIFI: AYNI VERININ IKI EKRANDA IKI GORUNTUSU.
+     K-019.1 bunun SUZGEC halini yasamisti (ayni hatirlatma cekmecede
+     var, ana ekranda yok). Ikinci hali CIZIM: mesaj ekrani ARAC basina
+     satir uretiyordu, musteriler ekrani MUSTERI basina — iki aracli
+     musteri birinde iki kez, otekinde bir kez goruluyordu. Hicbir test
+     bunu goremezdi, cunku her iki ekran da KENDI icinde dogruydu.
+
+     Bu test ikisini KARSILASTIRIYOR: ayni bilesen mi, ayni satirlar mi,
+     ayni sirada mi. Ekranlarin ic dogrulugu degil, ARALARINDAKI tutarlilik
+     olculuyor — bir nesne bir yerde cizilir kuralinin bekcisi. */
+  if (typeof musteriListesi === 'function' && musteriListesi('').length) {
+    /* Mesaj ekrani "yazim" adiminda kalmis olabilir (30. test dugmelere
+       basiyor); listeyi gorebilmek icin ekranin KENDI geri adimi
+       kullaniliyor — denetim ekranin ic degiskenine elle dokunmuyor. */
+    var mesajTanim = (typeof Ekran !== 'undefined' && Ekran.tanimlar) ? Ekran.tanimlar()['mesaj'] : null;
+    if (mesajTanim && mesajTanim.geriAl) { try { mesajTanim.geriAl(); } catch (e) {} }
+    showScreen('musteriler');
+    var listeSol = Array.prototype.slice.call(document.querySelectorAll('#msListe .mus-kart'));
+    showScreen('mesaj');
+    var listeSag = Array.prototype.slice.call(document.querySelectorAll('#msjListe .mus-kart'));
+    var musAdi = function (el) {
+      var x = el.querySelector('.mus-ad');
+      return x ? (x.textContent || '').trim() : '(adsiz)';
+    };
+    if (!listeSol.length || !listeSag.length) {
+      ek('AYRISAN-LISTE', 'musteriler/mesaj',
+         'ortak musteri satiri kullanilmiyor: musteriler=' + listeSol.length +
+         ' mesaj=' + listeSag.length);
+    } else if (listeSol.map(musAdi).join(' | ') !== listeSag.map(musAdi).join(' | ')) {
+      ek('AYRISAN-LISTE', 'musteriler/mesaj',
+         'ayni liste iki ekranda farkli: [' + listeSol.map(musAdi).join(', ') +
+         '] <-> [' + listeSag.map(musAdi).join(', ') + ']');
+    }
+    showScreen('home');
+  }
+
   /* 41) ANA TUSU GIDIS-DONUS (14.09.2026)
      Cemil: "Alttaki menü ikonuna basınca anasayfaya gidiyor. Tekrar
      basınca önceki ekrana dönsün."

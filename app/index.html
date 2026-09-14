@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-14 13:24
+  Üretim: 2026-09-14 13:27
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -804,33 +804,13 @@ renkler
    doğrudan kaynağından alınıyor: bakım teal,
 tamirat mavi.
    Zemin BOYANMAZ — boyanırsa aynı ailenin rozeti görünmez olur. */
-.tl-item.t-bakim { border-left: 3px solid var(--accent); }.tl-item.t-tamirat { border-left: 3px solid var(--primary); }.tl-item.t-bakim .tl-ic {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
-}.tl-item.t-tamirat .tl-ic {
-  color: var(--primary);
-  border-color: color-mix(in srgb, var(--primary) 35%, var(--line));
-}.tl-ic {
-  width: 38px;
-  height: 38px;
-  flex: none;
-  border-radius: var(--radius-md);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  color: var(--muted);
-}.tl-ic.ok {
-  color: var(--ok);
-  border-color: color-mix(in srgb, var(--ok) 35%, var(--line));
-}.tl-ic.accent {
-  color: var(--accent);
-  border-color: color-mix(in srgb, var(--accent) 35%, var(--line));
-}.tl-ic.warn {
-  color: var(--warn);
-  border-color: color-mix(in srgb, var(--warn) 40%, var(--line));
-}.tl-body {
+.tl-item.t-bakim { border-left: 3px solid var(--accent); }.tl-item.t-tamirat { border-left: 3px solid var(--primary); }
+/* ⚠️ 14.09 — `.tl-ic` SİLİNDİ (ve onu OLU-SINIF testi söyledi).
+   Satırın solundaki 38 px'lik ikon kutusu v1'den geliyordu. Son
+   kullanıcısı müşteri listesiydi; Cemil "Soldaki ikon olmayacak"
+   deyince kullanan kalmadı. Ölü CSS bırakılmaz: duran bir kural
+   "bu da var" diye okunur ve bir gün yanlış yere giydirilir. */
+.tl-body {
   flex: 1;
   min-width: 0;
   display: flex;
@@ -1817,6 +1797,65 @@ kirpilsin. */
 .ak-kisi { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
 .ak-kisi-ad { display: block; font-size: var(--tip-sm); color: var(--muted); }
 .ak-kisi-ad b { color: var(--text); font-weight: 600; }
+
+/* ================= MÜŞTERİ SATIRI (14.09.2026 — Cemil tarif etti) ====
+   "Müşteriye mesaj ve müşteriler sayfasının listelemeleri aynı olacak.
+    Soldaki ikon olmayacak. Servisteki araçlar üstte ve renkli olacak.
+    Müşteri adı, altına plaka aynı stilde, altında araç marka model ve
+    renk kutucuğu. Altta telefon altta varsa not."
+
+   ARAÇ KARTININ KARDEŞİ, KOPYASI DEĞİL: aynı kap (kenarlık, yarıçap,
+   zemin, iç boşluk), farklı okuma sırası — burada ilk soru "kim",
+   araç kartında "hangi araç". `.arac-kart`ı giydirmedim: o kartı yalnız
+   `aracKartiHtml()` üretir (sözlük kuralı) ve iki ayrı nesnenin tek
+   sınıfa binmesi, birini düzeltince ötekini bozmanın yoludur.
+
+   SERVİSTEKİ MÜŞTERİ = ÇERÇEVE FARKI, araç kartındaki dilin aynısı
+   (K-019.2): rozet yok, "serviste" yazısı yok. Sıra da aynı şeyi
+   söylüyor — servistekiler listenin başında. */
+.mus-kart {
+  position: relative;
+  display: block; width: 100%; text-align: left;
+  padding: 14px; cursor: pointer;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-2);
+}
+.mus-kart + .mus-kart { margin-top: 14px; }
+.mus-kart:hover { border-color: color-mix(in srgb, var(--primary) 35%, var(--line)); }
+.mus-kart.serviste {
+  border-color: var(--accent);
+  box-shadow: inset 3px 0 0 0 var(--accent);
+  background: var(--surface);
+}
+/* Ad EN ÜSTTE ve en büyük: listenin cevapladığı soru "kim". */
+.mus-ad {
+  font-family: var(--font-display); font-weight: 700;
+  font-size: var(--tip-lg); color: var(--text);
+  margin-bottom: 9px;
+}
+.mus-arac {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 8px; font-size: var(--tip-md); font-weight: 600; color: var(--text);
+}
+/* Not — ustanın müşteriyle konuşmadan önce bilmek istediği tek şey. */
+.mus-not {
+  margin-top: 8px; font-size: var(--tip-sm); color: var(--muted);
+}
+/* Birden çok araç: sayı solda, çıkış yolu sağda. */
+.mus-cok {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--line);
+  font-size: var(--tip-sm); color: var(--muted);
+}
+.mus-link {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: var(--dokun); padding: 0 4px;
+  background: transparent; border: 0; cursor: pointer;
+  font: inherit; font-weight: 600; color: var(--accent);
+}
+.mus-link:hover { text-decoration: underline; }
+.mus-link .ico { flex: none; }
 
 /* ---------- ARAÇ RENGİ KUTUCUĞU ----------
    Renk ADI yerine rengin KENDİSİ (Cemil, 04.09). Renk değerleri
@@ -3641,9 +3680,14 @@ kirpilsin. */
      mesaj ekranındaki müşteri seçme listesiyle aynı satır), ayrıntı
      91-musteri.html'e taşındı. Hiçbir şey silinmedi; yeri değişti.
 
+     ⚠️ 14.09 — SATIR ARTIK ORTAK NESNE (Cemil: "Müşteriye mesaj ve
+     müşteriler sayfasının listelemeleri aynı olacak."). `.tl-item`
+     giydirmek 08.09'da doğru görünmüştü ama o satır bir SERVİS KAYDI
+     satırı; sol ikonu da oradan geliyordu (Cemil: "Soldaki ikon
+     olmayacak"). Müşterinin kendi satırı yazıldı: `musteriKartiHtml()`.
+
      BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
-     · .tl-item .tl-ic .tl-body .tl-title .tl-tip .tl-sub .tl-foot
-     .tl-date · .tel-inline · .pill · .bos-durum.
+     · .mus-kart (ortak nesne) · .bos-durum.
      Ekrana özel sınıf KALMADI.
 
      ⚠️ YORUMUN İÇİNE ETİKET YAZILMAZ: burada bir kez "(aşağıdaki
@@ -3680,7 +3724,8 @@ kirpilsin. */
 
 <!-- ⚠️ 08.09 — BU EKRANIN KENDİ STİLİ KALMADI.
      .ms-* sınıfları müşteri DETAY ekranına (91-musteri.html) taşındı;
-     liste artık ortak `.tl-item` satırını kullanıyor. Sınıf, kullanan
+     liste artık ortak `.mus-kart` satırını kullanıyor (14.09'a kadar
+     `.tl-item` idi) ve o sınıf da bileşen dosyasında. Sınıf, kullanan
      ekranın yanında durur — iki ekranda tanımlı kalsaydı derleme
      denetiminin "aynı sınıf iki ekranda" testi haklı olarak bağırırdı. -->
 
@@ -5776,6 +5821,48 @@ function musteriBul(anahtar) {
   return musteriler().filter(function (m) { return m.anahtar === anahtar; })[0] || null;
 }
 
+/* ---- MÜŞTERİ LİSTESİ: ARAMA VE SIRA TEK YERDE (14.09) ----
+   Cemil: *"Müşteriye mesaj ve müşteriler sayfasının listelemeleri aynı
+   olacak."*
+
+   Aynı liste iki ekranda çiziliyordu ve süzgeci de sırası da iki ayrı
+   yerde yazılıydı. K-019.1'in dersi tam buydu: **aynı soruyu iki yerde
+   cevaplamak, iki ayrı cevap demektir.** Satırın kendisi ortak nesne
+   (musteriKartiHtml); hangi satırların, hangi sırada geleceği de ortak
+   olmalı — yoksa iki liste bir gün sessizce ayrışır. */
+
+/* Araç ŞU AN serviste mi — tek tanım, K-004'ün tek durumu. */
+function aracServiste(plaka) {
+  return icerideki().some(function (k) { return k.plaka === plaka; });
+}
+
+/* Satırın göstereceği araç: Cemil'in kuralı — *"o an serviste olan ilk
+   araç plakası"*; serviste aracı yoksa ilk aracı. Satır hangi aracı
+   gösteriyorsa mesaj da ona gider; ikisi ayrılırsa usta gördüğünden
+   başka bir araç için mesaj yazar. */
+function musteriAraci(m) {
+  if (!m || !m.araclar.length) return null;
+  return m.araclar.filter(function (a) { return aracServiste(a.plaka); })[0] || m.araclar[0];
+}
+function musteriServiste(m) {
+  return !!m && m.araclar.some(function (a) { return aracServiste(a.plaka); });
+}
+
+function musteriListesi(q) {
+  var n = norm(q || '');
+  return musteriler().filter(function (m) {
+    if (!n) return true;
+    var alan = m.ad + ' ' + m.tel + ' ' +
+               m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
+    return norm(alan).indexOf(n) >= 0;
+  }).sort(function (x, y) {
+    /* SERVİSTEKİLER ÜSTTE (Cemil, 14.09). Araç ve kayıt listelerindeki
+       sıranın aynısı: usta üç listede üç ayrı sıra öğrenmesin. */
+    var f = (musteriServiste(y) ? 1 : 0) - (musteriServiste(x) ? 1 : 0);
+    return f || x.ad.localeCompare(y.ad, 'tr');
+  });
+}
+
 /* ---- MUHASEBENİN HAMMADDESİ ----
    Kapsam Cemil'in kararını bekliyor ("sonra geçeceğiz"). Bu iki sorgu
    HİÇBİR YENİ ALAN İSTEMİYOR: teslimdeki ödeme yolu ve satır fiyatları
@@ -6120,6 +6207,70 @@ function aracKartiHtml(a, icerde) {
           '<span class="ak-kisi-ad">İletişim: <b>' +
             (a.iletisimAd || 'ad yazılmamış') + '</b></span>' +
           (a.iletisimTel ? telLinkHtml(a.iletisimTel, a.iletisimAd) : '') +
+        '</div>'
+      : '') +
+  '</div>';
+}
+
+/* ---- MÜŞTERİ SATIRI (14.09) ----
+   Cemil, telefon testi: *"Müşteriye mesaj ve müşteriler sayfasının
+   listelemeleri aynı olacak. Soldaki ikon olmayacak. Servisteki araçlar
+   üstte ve renkli olacak. Müşteri adı, altına plaka aynı stilde,
+   altında araç marka model ve renk kutucuğu. Altta telefon, altta varsa
+   not. Birden fazla aracı olanlar için o an serviste olan ilk araç
+   plakası ve araç marka. Birden fazla ise kaç araç ve tüm araçlar
+   linki."*
+
+   İKİ EKRAN, TEK SATIR. Müşteri listesi ve mesaj ekranının "kime?"
+   listesi bugüne kadar iki ayrı yerde çiziliyordu: biri `.tl-item`
+   giyip plakaları düz metin yazıyordu, öteki ARAÇ BAŞINA bir satır
+   üretiyordu. Aynı şeyin iki görüntüsü. Ortak nesne kuralı: satır
+   burada çizilir.
+
+   OKUMA SIRASI (Cemil'in tarif ettiği sıra, değiştirilmedi):
+     1) müşteri adı   — listenin sorusu "kim", plaka ikinci
+     2) plaka         — araç kartındaki plakanın aynısı (plakaHtml)
+     3) marka/model + renk kutucuğu
+     4) telefon       — dokununca arar
+     5) varsa not
+     6) birden çok araç varsa: kaç araç + "Tüm araçlar"
+
+   ⚠️ SATIRIN İŞİ EKRANA GÖRE DEĞİŞİR, SATIRIN KENDİSİ DEĞİL.
+   `hedef` yalnız satırın taşıdığı veri anahtarını seçiyor:
+     'musteri' → müşteri detayını açar    (müşteriler listesi)
+     'mesaj'   → o araca mesaj yazdırır   (mesaj ekranı)
+   Çizim tek, davranış iki — ikisi de zaten var olan delegasyonlar. */
+function musteriKartiHtml(m, hedef) {
+  var a = musteriAraci(m);
+  var serviste = musteriServiste(m);
+  var cokArac = m.araclar.length > 1;
+  /* Mesaj ekranında satır ARACA gider: hitap, şablon ve telefon araçtan
+     üretiliyor (mesajHedefi). Araçsız müşteri listede zaten görünmez. */
+  var anahtar = (hedef === 'mesaj')
+    ? ' data-mesaj-plaka="' + (a ? a.plaka : '') + '"'
+    : ' data-musteri="' + m.anahtar + '"';
+
+  return '<div class="mus-kart' + (serviste ? ' serviste' : '') + '"' + anahtar +
+      ' role="button" tabindex="0" aria-label="' + m.ad +
+      (a ? ' — ' + a.plaka : '') + '">' +
+    '<div class="mus-ad">' + m.ad + '</div>' +
+    (a ? plakaHtml(a.plaka, 'plate-lg') : '') +
+    (a ? '<div class="mus-arac"><span>' + a.marka + ' ' + a.model + '</span>' +
+         renkKutuHtml(a.renk) + '</div>' : '') +
+    (m.tel ? telLinkHtml(m.tel, m.ad)
+           : '<div class="mus-arac"><span class="pill warn">telefon yok</span></div>') +
+    /* NOT — varsa. "Arka cam kolu kırık, müşteri biliyor" gibi bir not,
+       ustanın müşteriyle konuşmadan önce bilmek istediği tek şey. */
+    ((a && a.not) ? '<div class="mus-not">' + a.not + '</div>' : '') +
+    /* BİRDEN FAZLA ARAÇ: satır bir aracı gösteriyor, ötekiler
+       kaybolmasın. Link müşteri detayına gider — araçların tamamı
+       zaten orada listeleniyor, ikinci bir liste açılmadı. */
+    (cokArac
+      ? '<div class="mus-cok">' + m.araclar.length + ' araç' +
+          '<button class="mus-link" data-musteri="' + m.anahtar + '">' +
+            'Tüm araçlar' +
+            '<svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>' +
+          '</button>' +
         '</div>'
       : '') +
   '</div>';
@@ -8761,34 +8912,24 @@ function msjMetinUret(plaka, sablon) {
 }
 
 function msjSecimCiz() {
-  var q = norm((document.getElementById('msjQ') || {}).value || '');
-  var liste = musteriler().filter(function (m) {
-    if (!q) return true;
-    var alan = m.ad + ' ' + m.tel + ' ' +
-               m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
-    return norm(alan).indexOf(q) >= 0;
-  });
+  /* ⚠️ 14.09 — LİSTE MÜŞTERİLER EKRANININ AYNISI (Cemil: "Müşteriye
+     mesaj ve müşteriler sayfasının listelemeleri aynı olacak.").
+
+     NE OLMUŞTU: burada ARAÇ BAŞINA bir satır vardı, müşteriler
+     ekranında MÜŞTERİ başına. İki aracı olan müşteri burada iki kez,
+     ötekinde bir kez görünüyordu — aynı veri, iki ayrı dünya. Şimdi
+     ikisi de `musteriListesi()` süzüyor ve `musteriKartiHtml()`
+     çiziyor; servistekiler ikisinde de üstte ve çerçevesi renkli.
+
+     SATIR HANGİ ARACI GÖSTERİYORSA MESAJ ONA GİDER (musteriAraci):
+     serviste olan ilk araç, yoksa ilk araç. Başka bir aracına mesaj
+     yazılacaksa "Tüm araçlar" müşteri detayını açıyor. */
+  var q = (document.getElementById('msjQ') || {}).value || '';
+  var liste = musteriListesi(q);
   document.getElementById('msjArama').classList.toggle('filled', !!q);
 
   document.getElementById('msjListe').innerHTML = liste.length
-    ? liste.map(function (m) {
-        return m.araclar.map(function (a) {
-          return '<div class="tl-item" data-mesaj-plaka="' + a.plaka + '"' +
-              ' role="button" tabindex="0">' +
-            '<span class="tl-ic"><svg class="ico ico-sm">' +
-              '<use href="#i-user"></use></svg></span>' +
-            '<div class="tl-body">' +
-              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span>' +
-                plakaHtml(a.plaka) + '</div>' +
-              '<div class="tl-sub">' + a.marka + ' ' + a.model + '</div>' +
-              '<div class="tl-foot">' +
-                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
-                       : '<span class="pill warn">telefon yok</span>') +
-              '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('');
-      }).join('')
+    ? liste.map(function (m) { return musteriKartiHtml(m, 'mesaj'); }).join('')
     : bosDurumHtml('i-users', 'Eşleşen müşteri yok',
         'Adın, telefonun ya da plakanın bir kısmını yazman yeter.');
 }
@@ -8913,6 +9054,14 @@ Ekran.tanim('mesaj', {
 });
 
 document.addEventListener('click', function (e) {
+  /* ⚠️ SATIRIN İÇİNDEKİ İKİ ÇIKIŞ SATIRIN İŞİ DEĞİL (14.09).
+     Ortak müşteri satırı iki şey taşıyor: telefon bağlantısı (dokunan
+     ARAMAK istiyor) ve "Tüm araçlar" (dokunan MÜŞTERİYİ açmak istiyor).
+     İkisi de satırın kendi işini tetiklememeli — yoksa numaraya
+     dokunan usta hem arar hem mesaj ekranına düşer. Aynı korumanın
+     ilki 03-nesne.js'te yazılıydı; kural kabı değişince taşınmadı. */
+  if (e.target.closest('[data-tel]') || e.target.closest('.mus-link')) return;
+
   var t = e.target.closest('button, [data-mesaj-plaka]');
   if (!t) return;
 
@@ -9097,13 +9246,11 @@ Ekran.tanim('musteriler', {
       document.getElementById('msQ').value = ARAMA_TERIMI.terim || '';
       ARAMA_TERIMI = null;
     }
-    var q = norm((document.getElementById('msQ') || {}).value || '');
-    var liste = musteriler().filter(function (m) {
-      if (!q) return true;
-      var alan = m.ad + ' ' + m.tel + ' ' +
-                 m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
-      return norm(alan).indexOf(q) >= 0;
-    });
+    /* ⚠️ SÜZGEÇ VE SIRA EKRANDA DEĞİL, VERİDE (14.09 — musteriListesi).
+       Aynı liste mesaj ekranında da var; süzgeç iki yerde yazılıysa iki
+       ayrı cevap verir (K-019.1). */
+    var q = (document.getElementById('msQ') || {}).value || '';
+    var liste = musteriListesi(q);
 
     document.getElementById('msSay').textContent =
       liste.length + (q ? ' bulundu' : ' müşteri');
@@ -9125,34 +9272,17 @@ Ekran.tanim('musteriler', {
        bu boşluğu doldurmanın da yolu oldu: taşınan ayrıntı silinmedi,
        yeri değişti.
 
-       BİLEŞEN YENİ DEĞİL: `.tl-item` — mesaj ekranındaki müşteri seçme
-       listesi zaten bu satırı kullanıyor. İki yerde müşteri seçiliyor
-       ve ikisi artık aynı görünüyor. */
+       ⚠️ 14.09 — SATIR ORTAK NESNE OLDU (Cemil: "Müşteriye mesaj ve
+       müşteriler sayfasının listelemeleri aynı olacak. Soldaki ikon
+       olmayacak.").
+
+       `.tl-item` bir SERVİS KAYDI satırıdır ve müşteri listesi ona
+       zorla giydirilmişti; sol ikonu da oradan geliyordu. Artık iki
+       ekran da `musteriKartiHtml()` çağırıyor — bir nesne bir yerde
+       çizilir. Ekranın işi yalnız HANGİ satırlar (musteriListesi) ve
+       satıra dokununca ne olacağı. */
     document.getElementById('msListe').innerHTML = liste.length
-      ? liste.map(function (m) {
-          var kayitSay = m.araclar.reduce(function (t, a) {
-            return t + aracKayitlari(a.plaka).length; }, 0);
-          /* Plakalar SATIRIN İÇİNDE, düz metin olarak: usta plakayla
-             arıyor, gördüğü şey aradığı şeyle aynı yazılmalı. Üçten
-             fazlası satırı sarar — sayıyla söyleniyor. */
-          var plakalar = m.araclar.slice(0, 3).map(function (a) { return a.plaka; }).join(' · ') +
-            (m.araclar.length > 3 ? ' +' + (m.araclar.length - 3) : '');
-          return '<div class="tl-item" data-musteri="' + m.anahtar + '"' +
-              ' role="button" tabindex="0" aria-label="' + m.ad + ' — müşteriyi aç">' +
-            '<span class="tl-ic"><svg class="ico ico-sm">' +
-              '<use href="#i-user"></use></svg></span>' +
-            '<div class="tl-body">' +
-              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
-              '<div class="tl-sub">' + plakalar + '</div>' +
-              '<div class="tl-foot">' +
-                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
-                       : '<span class="pill warn">telefon yok</span>') +
-                '<span class="tl-date">' + m.araclar.length + ' araç · ' +
-                  kayitSay + ' kayıt</span>' +
-              '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('')
+      ? liste.map(function (m) { return musteriKartiHtml(m, 'musteri'); }).join('')
       : bosDurumHtml('i-users',
           q ? 'Eşleşen müşteri yok' : 'Müşteri yok',
           q ? 'Adın, telefonun ya da plakanın bir kısmını yazman yeter.'
@@ -9743,7 +9873,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>a8fc0323</b><br>' +
+      'Sürüm <b>593ae7a1</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

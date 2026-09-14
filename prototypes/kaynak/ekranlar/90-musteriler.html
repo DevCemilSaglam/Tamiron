@@ -38,9 +38,14 @@
      mesaj ekranındaki müşteri seçme listesiyle aynı satır), ayrıntı
      91-musteri.html'e taşındı. Hiçbir şey silinmedi; yeri değişti.
 
+     ⚠️ 14.09 — SATIR ARTIK ORTAK NESNE (Cemil: "Müşteriye mesaj ve
+     müşteriler sayfasının listelemeleri aynı olacak."). `.tl-item`
+     giydirmek 08.09'da doğru görünmüştü ama o satır bir SERVİS KAYDI
+     satırı; sol ikonu da oradan geliyordu (Cemil: "Soldaki ikon
+     olmayacak"). Müşterinin kendi satırı yazıldı: `musteriKartiHtml()`.
+
      BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
-     · .tl-item .tl-ic .tl-body .tl-title .tl-tip .tl-sub .tl-foot
-     .tl-date · .tel-inline · .pill · .bos-durum.
+     · .mus-kart (ortak nesne) · .bos-durum.
      Ekrana özel sınıf KALMADI.
 
      ⚠️ YORUMUN İÇİNE ETİKET YAZILMAZ: burada bir kez "(aşağıdaki
@@ -82,13 +87,11 @@ Ekran.tanim('musteriler', {
       document.getElementById('msQ').value = ARAMA_TERIMI.terim || '';
       ARAMA_TERIMI = null;
     }
-    var q = norm((document.getElementById('msQ') || {}).value || '');
-    var liste = musteriler().filter(function (m) {
-      if (!q) return true;
-      var alan = m.ad + ' ' + m.tel + ' ' +
-                 m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
-      return norm(alan).indexOf(q) >= 0;
-    });
+    /* ⚠️ SÜZGEÇ VE SIRA EKRANDA DEĞİL, VERİDE (14.09 — musteriListesi).
+       Aynı liste mesaj ekranında da var; süzgeç iki yerde yazılıysa iki
+       ayrı cevap verir (K-019.1). */
+    var q = (document.getElementById('msQ') || {}).value || '';
+    var liste = musteriListesi(q);
 
     document.getElementById('msSay').textContent =
       liste.length + (q ? ' bulundu' : ' müşteri');
@@ -110,34 +113,17 @@ Ekran.tanim('musteriler', {
        bu boşluğu doldurmanın da yolu oldu: taşınan ayrıntı silinmedi,
        yeri değişti.
 
-       BİLEŞEN YENİ DEĞİL: `.tl-item` — mesaj ekranındaki müşteri seçme
-       listesi zaten bu satırı kullanıyor. İki yerde müşteri seçiliyor
-       ve ikisi artık aynı görünüyor. */
+       ⚠️ 14.09 — SATIR ORTAK NESNE OLDU (Cemil: "Müşteriye mesaj ve
+       müşteriler sayfasının listelemeleri aynı olacak. Soldaki ikon
+       olmayacak.").
+
+       `.tl-item` bir SERVİS KAYDI satırıdır ve müşteri listesi ona
+       zorla giydirilmişti; sol ikonu da oradan geliyordu. Artık iki
+       ekran da `musteriKartiHtml()` çağırıyor — bir nesne bir yerde
+       çizilir. Ekranın işi yalnız HANGİ satırlar (musteriListesi) ve
+       satıra dokununca ne olacağı. */
     document.getElementById('msListe').innerHTML = liste.length
-      ? liste.map(function (m) {
-          var kayitSay = m.araclar.reduce(function (t, a) {
-            return t + aracKayitlari(a.plaka).length; }, 0);
-          /* Plakalar SATIRIN İÇİNDE, düz metin olarak: usta plakayla
-             arıyor, gördüğü şey aradığı şeyle aynı yazılmalı. Üçten
-             fazlası satırı sarar — sayıyla söyleniyor. */
-          var plakalar = m.araclar.slice(0, 3).map(function (a) { return a.plaka; }).join(' · ') +
-            (m.araclar.length > 3 ? ' +' + (m.araclar.length - 3) : '');
-          return '<div class="tl-item" data-musteri="' + m.anahtar + '"' +
-              ' role="button" tabindex="0" aria-label="' + m.ad + ' — müşteriyi aç">' +
-            '<span class="tl-ic"><svg class="ico ico-sm">' +
-              '<use href="#i-user"></use></svg></span>' +
-            '<div class="tl-body">' +
-              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span></div>' +
-              '<div class="tl-sub">' + plakalar + '</div>' +
-              '<div class="tl-foot">' +
-                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
-                       : '<span class="pill warn">telefon yok</span>') +
-                '<span class="tl-date">' + m.araclar.length + ' araç · ' +
-                  kayitSay + ' kayıt</span>' +
-              '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('')
+      ? liste.map(function (m) { return musteriKartiHtml(m, 'musteri'); }).join('')
       : bosDurumHtml('i-users',
           q ? 'Eşleşen müşteri yok' : 'Müşteri yok',
           q ? 'Adın, telefonun ya da plakanın bir kısmını yazman yeter.'
@@ -167,6 +153,7 @@ document.addEventListener('input', function (e) {
 
 <!-- ⚠️ 08.09 — BU EKRANIN KENDİ STİLİ KALMADI.
      .ms-* sınıfları müşteri DETAY ekranına (91-musteri.html) taşındı;
-     liste artık ortak `.tl-item` satırını kullanıyor. Sınıf, kullanan
+     liste artık ortak `.mus-kart` satırını kullanıyor (14.09'a kadar
+     `.tl-item` idi) ve o sınıf da bileşen dosyasında. Sınıf, kullanan
      ekranın yanında durur — iki ekranda tanımlı kalsaydı derleme
      denetiminin "aynı sınıf iki ekranda" testi haklı olarak bağırırdı. -->

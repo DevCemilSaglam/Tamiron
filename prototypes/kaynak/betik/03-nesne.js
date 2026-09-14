@@ -98,6 +98,70 @@ function aracKartiHtml(a, icerde) {
   '</div>';
 }
 
+/* ---- MÜŞTERİ SATIRI (14.09) ----
+   Cemil, telefon testi: *"Müşteriye mesaj ve müşteriler sayfasının
+   listelemeleri aynı olacak. Soldaki ikon olmayacak. Servisteki araçlar
+   üstte ve renkli olacak. Müşteri adı, altına plaka aynı stilde,
+   altında araç marka model ve renk kutucuğu. Altta telefon, altta varsa
+   not. Birden fazla aracı olanlar için o an serviste olan ilk araç
+   plakası ve araç marka. Birden fazla ise kaç araç ve tüm araçlar
+   linki."*
+
+   İKİ EKRAN, TEK SATIR. Müşteri listesi ve mesaj ekranının "kime?"
+   listesi bugüne kadar iki ayrı yerde çiziliyordu: biri `.tl-item`
+   giyip plakaları düz metin yazıyordu, öteki ARAÇ BAŞINA bir satır
+   üretiyordu. Aynı şeyin iki görüntüsü. Ortak nesne kuralı: satır
+   burada çizilir.
+
+   OKUMA SIRASI (Cemil'in tarif ettiği sıra, değiştirilmedi):
+     1) müşteri adı   — listenin sorusu "kim", plaka ikinci
+     2) plaka         — araç kartındaki plakanın aynısı (plakaHtml)
+     3) marka/model + renk kutucuğu
+     4) telefon       — dokununca arar
+     5) varsa not
+     6) birden çok araç varsa: kaç araç + "Tüm araçlar"
+
+   ⚠️ SATIRIN İŞİ EKRANA GÖRE DEĞİŞİR, SATIRIN KENDİSİ DEĞİL.
+   `hedef` yalnız satırın taşıdığı veri anahtarını seçiyor:
+     'musteri' → müşteri detayını açar    (müşteriler listesi)
+     'mesaj'   → o araca mesaj yazdırır   (mesaj ekranı)
+   Çizim tek, davranış iki — ikisi de zaten var olan delegasyonlar. */
+function musteriKartiHtml(m, hedef) {
+  var a = musteriAraci(m);
+  var serviste = musteriServiste(m);
+  var cokArac = m.araclar.length > 1;
+  /* Mesaj ekranında satır ARACA gider: hitap, şablon ve telefon araçtan
+     üretiliyor (mesajHedefi). Araçsız müşteri listede zaten görünmez. */
+  var anahtar = (hedef === 'mesaj')
+    ? ' data-mesaj-plaka="' + (a ? a.plaka : '') + '"'
+    : ' data-musteri="' + m.anahtar + '"';
+
+  return '<div class="mus-kart' + (serviste ? ' serviste' : '') + '"' + anahtar +
+      ' role="button" tabindex="0" aria-label="' + m.ad +
+      (a ? ' — ' + a.plaka : '') + '">' +
+    '<div class="mus-ad">' + m.ad + '</div>' +
+    (a ? plakaHtml(a.plaka, 'plate-lg') : '') +
+    (a ? '<div class="mus-arac"><span>' + a.marka + ' ' + a.model + '</span>' +
+         renkKutuHtml(a.renk) + '</div>' : '') +
+    (m.tel ? telLinkHtml(m.tel, m.ad)
+           : '<div class="mus-arac"><span class="pill warn">telefon yok</span></div>') +
+    /* NOT — varsa. "Arka cam kolu kırık, müşteri biliyor" gibi bir not,
+       ustanın müşteriyle konuşmadan önce bilmek istediği tek şey. */
+    ((a && a.not) ? '<div class="mus-not">' + a.not + '</div>' : '') +
+    /* BİRDEN FAZLA ARAÇ: satır bir aracı gösteriyor, ötekiler
+       kaybolmasın. Link müşteri detayına gider — araçların tamamı
+       zaten orada listeleniyor, ikinci bir liste açılmadı. */
+    (cokArac
+      ? '<div class="mus-cok">' + m.araclar.length + ' araç' +
+          '<button class="mus-link" data-musteri="' + m.anahtar + '">' +
+            'Tüm araçlar' +
+            '<svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>' +
+          '</button>' +
+        '</div>'
+      : '') +
+  '</div>';
+}
+
 /* ---- SERVİS KAYDI KARTI (05.09) ----
    Cemil: "Servis kayıtları araç listelemesi gibi olsun. Araç bilgileri
    belirgin olacak. Sonra altına Tamirat, Bakım veya Tamirat + Bakım

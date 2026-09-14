@@ -364,6 +364,48 @@ function musteriBul(anahtar) {
   return musteriler().filter(function (m) { return m.anahtar === anahtar; })[0] || null;
 }
 
+/* ---- MÜŞTERİ LİSTESİ: ARAMA VE SIRA TEK YERDE (14.09) ----
+   Cemil: *"Müşteriye mesaj ve müşteriler sayfasının listelemeleri aynı
+   olacak."*
+
+   Aynı liste iki ekranda çiziliyordu ve süzgeci de sırası da iki ayrı
+   yerde yazılıydı. K-019.1'in dersi tam buydu: **aynı soruyu iki yerde
+   cevaplamak, iki ayrı cevap demektir.** Satırın kendisi ortak nesne
+   (musteriKartiHtml); hangi satırların, hangi sırada geleceği de ortak
+   olmalı — yoksa iki liste bir gün sessizce ayrışır. */
+
+/* Araç ŞU AN serviste mi — tek tanım, K-004'ün tek durumu. */
+function aracServiste(plaka) {
+  return icerideki().some(function (k) { return k.plaka === plaka; });
+}
+
+/* Satırın göstereceği araç: Cemil'in kuralı — *"o an serviste olan ilk
+   araç plakası"*; serviste aracı yoksa ilk aracı. Satır hangi aracı
+   gösteriyorsa mesaj da ona gider; ikisi ayrılırsa usta gördüğünden
+   başka bir araç için mesaj yazar. */
+function musteriAraci(m) {
+  if (!m || !m.araclar.length) return null;
+  return m.araclar.filter(function (a) { return aracServiste(a.plaka); })[0] || m.araclar[0];
+}
+function musteriServiste(m) {
+  return !!m && m.araclar.some(function (a) { return aracServiste(a.plaka); });
+}
+
+function musteriListesi(q) {
+  var n = norm(q || '');
+  return musteriler().filter(function (m) {
+    if (!n) return true;
+    var alan = m.ad + ' ' + m.tel + ' ' +
+               m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
+    return norm(alan).indexOf(n) >= 0;
+  }).sort(function (x, y) {
+    /* SERVİSTEKİLER ÜSTTE (Cemil, 14.09). Araç ve kayıt listelerindeki
+       sıranın aynısı: usta üç listede üç ayrı sıra öğrenmesin. */
+    var f = (musteriServiste(y) ? 1 : 0) - (musteriServiste(x) ? 1 : 0);
+    return f || x.ad.localeCompare(y.ad, 'tr');
+  });
+}
+
 /* ---- MUHASEBENİN HAMMADDESİ ----
    Kapsam Cemil'in kararını bekliyor ("sonra geçeceğiz"). Bu iki sorgu
    HİÇBİR YENİ ALAN İSTEMİYOR: teslimdeki ödeme yolu ve satır fiyatları

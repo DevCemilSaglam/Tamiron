@@ -223,34 +223,24 @@ function msjMetinUret(plaka, sablon) {
 }
 
 function msjSecimCiz() {
-  var q = norm((document.getElementById('msjQ') || {}).value || '');
-  var liste = musteriler().filter(function (m) {
-    if (!q) return true;
-    var alan = m.ad + ' ' + m.tel + ' ' +
-               m.araclar.map(function (a) { return a.plaka + ' ' + a.marka; }).join(' ');
-    return norm(alan).indexOf(q) >= 0;
-  });
+  /* ⚠️ 14.09 — LİSTE MÜŞTERİLER EKRANININ AYNISI (Cemil: "Müşteriye
+     mesaj ve müşteriler sayfasının listelemeleri aynı olacak.").
+
+     NE OLMUŞTU: burada ARAÇ BAŞINA bir satır vardı, müşteriler
+     ekranında MÜŞTERİ başına. İki aracı olan müşteri burada iki kez,
+     ötekinde bir kez görünüyordu — aynı veri, iki ayrı dünya. Şimdi
+     ikisi de `musteriListesi()` süzüyor ve `musteriKartiHtml()`
+     çiziyor; servistekiler ikisinde de üstte ve çerçevesi renkli.
+
+     SATIR HANGİ ARACI GÖSTERİYORSA MESAJ ONA GİDER (musteriAraci):
+     serviste olan ilk araç, yoksa ilk araç. Başka bir aracına mesaj
+     yazılacaksa "Tüm araçlar" müşteri detayını açıyor. */
+  var q = (document.getElementById('msjQ') || {}).value || '';
+  var liste = musteriListesi(q);
   document.getElementById('msjArama').classList.toggle('filled', !!q);
 
   document.getElementById('msjListe').innerHTML = liste.length
-    ? liste.map(function (m) {
-        return m.araclar.map(function (a) {
-          return '<div class="tl-item" data-mesaj-plaka="' + a.plaka + '"' +
-              ' role="button" tabindex="0">' +
-            '<span class="tl-ic"><svg class="ico ico-sm">' +
-              '<use href="#i-user"></use></svg></span>' +
-            '<div class="tl-body">' +
-              '<div class="tl-title"><span class="tl-tip">' + m.ad + '</span>' +
-                plakaHtml(a.plaka) + '</div>' +
-              '<div class="tl-sub">' + a.marka + ' ' + a.model + '</div>' +
-              '<div class="tl-foot">' +
-                (m.tel ? '<span class="tel-inline">' + m.tel + '</span>'
-                       : '<span class="pill warn">telefon yok</span>') +
-              '</div>' +
-            '</div>' +
-          '</div>';
-        }).join('');
-      }).join('')
+    ? liste.map(function (m) { return musteriKartiHtml(m, 'mesaj'); }).join('')
     : bosDurumHtml('i-users', 'Eşleşen müşteri yok',
         'Adın, telefonun ya da plakanın bir kısmını yazman yeter.');
 }
@@ -375,6 +365,14 @@ Ekran.tanim('mesaj', {
 });
 
 document.addEventListener('click', function (e) {
+  /* ⚠️ SATIRIN İÇİNDEKİ İKİ ÇIKIŞ SATIRIN İŞİ DEĞİL (14.09).
+     Ortak müşteri satırı iki şey taşıyor: telefon bağlantısı (dokunan
+     ARAMAK istiyor) ve "Tüm araçlar" (dokunan MÜŞTERİYİ açmak istiyor).
+     İkisi de satırın kendi işini tetiklememeli — yoksa numaraya
+     dokunan usta hem arar hem mesaj ekranına düşer. Aynı korumanın
+     ilki 03-nesne.js'te yazılıydı; kural kabı değişince taşınmadı. */
+  if (e.target.closest('[data-tel]') || e.target.closest('.mus-link')) return;
+
   var t = e.target.closest('button, [data-mesaj-plaka]');
   if (!t) return;
 
