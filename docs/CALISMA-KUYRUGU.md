@@ -19,6 +19,24 @@
 
 ---
 
+## Tur 5 · 14.09.2026 · son commit `cbb3302`
+
+Cemil sırayı kendisi verdi: **(a) MUH kararı · (b) bekleyen açık
+maddeler · (c) A-M27.** Üçü aynı cinsten değil — ilk ikisi **karar
+hazırlığı** (kod yok), üçüncüsü kod.
+
+> ⚠️ **İlk ikisi Cemil'in cevabını gerektiriyor.** Lider onları
+> *cevaplanabilir* hâle getirir, cevaplamaz. Kuyruk buna rağmen
+> durmaz: hazırlık biter, sıradaki işe geçilir.
+
+| # | İş | Durum |
+|---|---|---|
+| 5.1 | **MUH kararı karara hazır** — `MUHASEBE-KARARI.md`: tek sayfa, üç seçenek, bedeli, açtığı işler, öneri | **BİTTİ** — B (kasa+gider) önerildi; üç seçenek "usta ne girer" diliyle yazıldı, onay sonrası sıra belirlendi |
+| 5.2 | **Açık maddeler tazelensin** — kaynak KARARLAR.md'nin AÇIK tablosu; ikinci liste açılmaz (K-019.1). Kapananlar prototipte **doğrulanarak** işaretlenir | AÇIK |
+| 5.3 | **A-M27** — ses plakayı yanlış duyunca *"bunu mu demek istedin"*; tek aday varsa öner, birden fazlaysa önerme. Yeni denetim testi + negatif test | AÇIK |
+
+---
+
 ## Tur 4 · 07.09.2026 · son commit `66c7870`
 
 Cemil bir mesaj dizisinde **otuz beş madde** yazdı ve üç açık maddeyi
