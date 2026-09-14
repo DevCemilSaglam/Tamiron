@@ -75,6 +75,21 @@ var Ekran = (function () {
   var ileriYigin = [];
   var acik = null;
 
+  /* ⚠️ ANA TUŞU GİDİŞ-DÖNÜŞTÜR (14.09 — Cemil: "Alttaki menü ikonuna
+     basınca anasayfaya gidiyor. Tekrar basınca önceki ekrana dönsün.")
+
+     Ustanın yaptığı şey BAKMAK: kayıt yazarken ana menüye bakıp geri
+     dönmek istiyor. Eski hâlde dönüş yolu "geri" tuşuydu ve o da
+     çalışıyordu — ama usta ana menüye HANGİ tuşla gittiyse aynı tuşla
+     döneceğini bekliyor. Aynı tuş, aynı yer: gidiş-dönüş.
+
+     `anaDonus` yalnız ana tuşuyla gelindiğinde yazılır; başka bir yolla
+     ekran değişirse (bir düğme, bir satır, geri tuşu) SİLİNİR — yoksa
+     tuş, ustanın çoktan terk ettiği bir ekrana geri atardı.
+     Silme yeri goster(): ekranı değiştiren tek kapı orası. */
+  var anaDonus = null;
+  var anaKoruma = false;
+
   /* Ekran iki kanca tanımlayabilir:
        ac(el)  — ekran AÇILDIĞINDA bir kez. Açılışa ait sıfırlamalar
                  buraya yazılır (seçim temizleme, alan boşaltma).
@@ -89,6 +104,8 @@ var Ekran = (function () {
   function goster(ad) {
     var el = document.getElementById('screen-' + ad);
     if (!el) { console.warn('Ekran yok: ' + ad); return false; }
+    /* Ana tuşunun dönüş hedefi, ana tuşu dışında her gezinmede düşer. */
+    if (!anaKoruma) anaDonus = null;
     var hepsi = document.querySelectorAll('.screen');
     /* v1 sozlesmesi: gorunur ekran .active — bilesen CSS'i ve denetim
        bu ada gore yazilmis, degistirilmez. */
@@ -195,6 +212,28 @@ var Ekran = (function () {
     goster(ileriYigin.pop());
   }
 
+  /* ANA TUŞU — gidiş ve dönüş aynı tuşta (14.09).
+     Ana menüde DEĞİLSEK: menüye git, nereden geldiğimizi yaz.
+     Ana menüdeysek ve yazılı bir dönüş varsa: oraya dön.
+
+     `ac()` kullanılıyor, `goster()` değil: gidiş de dönüş de geçmişe
+     yazılır, yani "geri" tuşu ikisini de geri alabilir. İki tuş aynı
+     dünyayı anlatmalı — biri geçmişe yazıp öteki yazmasaydı, geri
+     tuşu ustanın gerçekten gittiği yerleri atlardı. */
+  function ana() {
+    if (acik !== 'home') {
+      var nereden = acik;
+      anaKoruma = true; ac('home'); anaKoruma = false;
+      anaDonus = nereden;
+    } else {
+      if (!anaDonus) return;
+      var hedef = anaDonus;
+      anaKoruma = true; ac(hedef); anaKoruma = false;
+      anaDonus = null;
+    }
+    geriTazele();
+  }
+
   /* ⚠️ TEK DURUM, KAÇ GÖVDE OLURSA OLSUN (07.09). Geri/ileri tuşları
      artık hem üstte hem altta; `data-nav` ile işaretli HEPSİ aynı anda
      soluklaşıyor. id ile arasaydık ikinci gövde sessizce hep açık
@@ -206,7 +245,19 @@ var Ekran = (function () {
                 ileri: ileriYigin.length === 0 };
     document.querySelectorAll('[data-nav]').forEach(function (b) {
       var y = b.getAttribute('data-nav');
-      if (y === 'geri' || y === 'ileri') b.disabled = yok[y];
+      if (y === 'geri' || y === 'ileri') { b.disabled = yok[y]; return; }
+      if (y !== 'ana') return;
+      /* ⚠️ TUŞ NE YAPACAĞINI SÖYLER (14.09). Aynı tuş iki iş yapıyor;
+         hangisini yapacağı yalnız ustanın aklında durursa, ikinci
+         dokunuş bir kumar olur. Ana menüdeyken tuş "dönüş" hâline
+         geçiyor: adı değişiyor ve vurgulanıyor. Dönülecek yer yoksa
+         geri/ileri gibi SÖNÜK — gidilemeyecek yer gidilebilir
+         görünmesin (K-042'nin kuralı). */
+      var donus = (acik === 'home') && !!anaDonus;
+      b.disabled = (acik === 'home') && !anaDonus;
+      b.setAttribute('aria-pressed', String(donus));
+      b.setAttribute('aria-label', donus ? 'Önceki ekrana dön' : 'Ana menü');
+      b.setAttribute('title', donus ? 'Önceki ekrana dön' : 'Ana menü');
     });
   }
 
@@ -234,8 +285,20 @@ var Ekran = (function () {
     yuva.textContent = yazi;
   }
 
-  return { tanim: tanim, ac: ac, geri: geri, ileri: ileri,
-           goster: goster, tazele: tazele,
+  /* GEZİNME DURUMUNU SIFIRLA — ölçüm aracı için (14.09).
+     Sağlık denetimi ana tuşunu gerçekten işletiyor; işletmek geçmiş
+     yığınına yazmak demek ve ölçüm aleti ölçtüğü şeyi değiştirmemeli
+     (K-024.1). `showScreen` geçmişe yazmadığı için bugüne kadar
+     gerekmemişti; ana tuşu davranışı ancak `ac()` üzerinden sınanıyor.
+     Ekranlar bunu ÇAĞIRMAZ — çağıran ekran, ustanın geri tuşunu
+     sessizce boşaltır. */
+  function sifirla() {
+    gecmis.length = 0; ileriYigin.length = 0; anaDonus = null;
+    goster('home');
+  }
+
+  return { tanim: tanim, ac: ac, geri: geri, ileri: ileri, ana: ana,
+           goster: goster, tazele: tazele, sifirla: sifirla,
            /* Denetimin 38. testi ekranların `ciz` kaynağını okuyor —
               kayıt defterine erişimi olmadan bakamaz. */
            tanimlar: function () { return kayit; },
@@ -1126,7 +1189,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var y = t.getAttribute('data-nav');
     if (y === 'geri') Ekran.geri();
     else if (y === 'ileri') Ekran.ileri();
-    else if (y === 'ana') Ekran.ac('home');
+    /* ⚠️ Ekran.ac('home') DEĞİL Ekran.ana(): tuş iki iş yapıyor
+       (git · dön) ve hangisi olduğuna çekirdek karar veriyor. */
+    else if (y === 'ana') Ekran.ana();
   });
   bagla('menuBtn', function () { Cekmece.ac(); });
   bagla('drawerClose', function () { Cekmece.kapa(); });

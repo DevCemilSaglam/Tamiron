@@ -1274,6 +1274,53 @@ function stilMetni() {
   }
   showScreen('home');
 
+  /* 41) ANA TUSU GIDIS-DONUS (14.09.2026)
+     Cemil: "Alttaki menü ikonuna basınca anasayfaya gidiyor. Tekrar
+     basınca önceki ekrana dönsün."
+
+     YENI HATA SINIFI: BIR TUS IKI IS YAPIYOR. Bugune kadar her tusun
+     tek anlami vardi; bu tusun anlami DURUMA bagli. Boyle bir tus iki
+     yerden bozulur:
+       a) ikinci dokunus donmez (donus hedefi hic yazilmamistir ya da
+          bir yerde silinmistir) — usta ayni ekrana iki kez bakar,
+       b) donus hedefi FAZLA yasar: usta ana menuden baska bir ekrana
+          gecer, tus onu COKTAN TERK ETTIGI ekrana atar.
+     (b) daha sinsi, cunku ekran dogru CIZILIR — yanlis olan NEREYE
+     gittigidir. Ikisi de burada olculuyor.
+
+     Denetim gezinme yigini kirletiyor (Ekran.ac cagiriyor); olctugu
+     durumu geri birakiyor: Ekran.sifirla(). */
+  if (typeof Ekran !== 'undefined' && Ekran.sifirla && Ekran.ana) {
+    var anaTus = document.querySelector('.botbar [data-nav="ana"]');
+    if (!anaTus) ek('ANA-TUS', '(kabuk)', 'alt seritte ana tusu yok');
+    else {
+      Ekran.sifirla();
+      Ekran.ac('araclar');
+      anaTus.click();
+      if (Ekran.adi() !== 'home') {
+        ek('ANA-TUS', '(kabuk)', 'ilk dokunus ana menuye gitmedi -> ' + Ekran.adi());
+      }
+      if (anaTus.disabled) {
+        ek('ANA-TUS', '(kabuk)', 'ana menude tus sonuk — oysa donulecek ekran var');
+      }
+      anaTus.click();
+      if (Ekran.adi() !== 'araclar') {
+        ek('ANA-TUS', '(kabuk)', 'ikinci dokunus onceki ekrana donmedi -> ' + Ekran.adi());
+      }
+
+      /* Donus hedefi, ana tusu disinda her gezinmede DUSMELI. */
+      Ekran.sifirla();
+      Ekran.ac('araclar');
+      anaTus.click();                 /* home; donus hedefi = araclar */
+      Ekran.ac('musteriler');         /* usta baska bir yoldan gezindi */
+      Ekran.ac('home');
+      if (!anaTus.disabled) {
+        ek('ANA-TUS', '(kabuk)', 'baska yolla gezinildi ama donus hedefi silinmedi');
+      }
+      Ekran.sifirla();
+    }
+  }
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 
@@ -1309,7 +1356,12 @@ function stilMetni() {
     if (g) g.hidden = true;
   });
   yedegiGeriYukle();
-  showScreen('home');
+  /* GEZINME YIGINI DA GERI YUKLENIR (14.09). 30. test her dugmeye
+     basiyor ve artik dugmelerden biri gezinme durumunu DEGISTIRIYOR
+     (ana tusu, donus hedefi). showScreen yigina dokunmuyor; yigini
+     ancak sifirla temizler. K-041.2'nin dersi yeni bir yuzeyde. */
+  if (typeof Ekran !== 'undefined' && Ekran.sifirla) Ekran.sifirla();
+  else showScreen('home');
 
   console.log('SAGLIK DENETIMI — '+ekranlar.length+' ekran, '+b.length+' bulgu');
   b.forEach(function(x){

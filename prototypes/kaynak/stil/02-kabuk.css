@@ -52,3 +52,16 @@
   font-size: var(--tip-xs); color: var(--muted);
 }
 .botbar-nav { display: flex; align-items: center; gap: 10px; flex: none; }
+
+/* ANA TUŞU "DÖNÜŞ" HÂLİNDE VURGULANIR (14.09 — Cemil: "Tekrar basınca
+   önceki ekrana dönsün.").
+
+   Aynı tuş iki iş yapıyor. İkinci işi yalnız ustanın hatırlamasına
+   bırakmak, her dokunuşu bir kumara çevirirdi: vurgu "buradan
+   dönebilirsin" diyor. Yeni sınıf açılmadı — `.icon-btn` bileşeninin
+   `aria-pressed` hâli; ekran okuyucu da aynı şeyi duyuyor. */
+.botbar-nav .icon-btn[aria-pressed="true"] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+}
