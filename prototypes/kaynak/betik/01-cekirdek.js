@@ -42,6 +42,10 @@ var MESAJ_HEDEF = null;      /* {plaka, sablon} */
    önizliyorsa o. */
 var OZET_KAYIT = null;      /* kayit id */
 var ARAMA_TERIMI = null;     /* {hedef, terim, suzgec} */
+/* Mesajlar ekranina hangi suzgecle gidildigi. Bir musterinin tum
+   mesajlarina bakan usta, listenin neden kisa oldugunu ekranda
+   gormeli — ekran bunu cipiyle soyluyor. */
+var MESAJ_SUZGEC = null;     /* {plaka} */
 /* Muhasebe ve "iş başına" ekranı AYNI dönemi kullanır. İki ekranda iki
    ayrı dönem tutulsaydı usta muhasebede "Eylül" seçip iş başına
    sayfasına gelince "Bugün" bulurdu ve rakamların neden tutmadığını

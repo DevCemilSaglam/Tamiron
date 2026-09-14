@@ -1,0 +1,147 @@
+<!-- ekran: mesajlar · GÖNDERİLEN MESAJLAR
+     ⚠️ 14.09 — CEMİL İSTEDİ: *"Gönderilen mesajlar binlerce olduğunda
+     nasıl listelenecek? Filtrelemek gerekir mi? Yeni bir sayfa daha
+     uygun olabilir."*
+
+     Haklı ve sayı onu doğruluyor: günde beş mesaj gönderen bir dükkân
+     bir yılda 1.800 satır eder. 14.09 sabahı arşiv mesaj ekranının
+     dibinde bir akordiyondu — üç mesajla güzel görünüyordu, üç yüzle
+     kullanılamaz olurdu.
+
+     BU EKRAN NE İŞE YARAR: iki soru var ve ikisi de arşivde cevaplanır.
+       "Bu müşteriye ne göndermiştim?"  → plaka süzgeciyle açılır
+       "Dün ne gönderdim?"              → en yeni üstte, ilk sayfa
+
+     EKRAN SAYISI 15 -> 16, ANA YOL BÜYÜMEDİ (A-2 / A-M8): bu ekran
+     akışın üstünde değil, mesaj işinin YANINDA. Menüye satır
+     EKLENMEDİ — karar bütçesi menüyü ≤ 8 başlıkta tutuyor ve buraya
+     iki yoldan geliniyor: mesaj ekranındaki düğme ve müşteri
+     detayındaki "Tüm mesajları".
+
+     ÜZERİNDE YOK: okundu bilgisi · mesaj silme · yeniden gönderme.
+     Gönderilmiş bir mesaj değişmez; arşiv bir KAYITTIR (K-045.3: üç
+     yıl saklanır, ispat yükü gönderende).
+
+     BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
+     · .cip-grup .cip · .tl-item (ortak mesajSatiriHtml) · .btn
+     · .bos-durum. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-mesajlar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Gönderilen mesajlar
+      <span class="eb-say" id="msjlSay"></span>
+    </span>
+  </div>
+
+  <div class="search-box" id="msjlArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="msjlQ" placeholder="Ad, plaka ya da mesaj metni…"
+           autocomplete="off" aria-label="Mesajlarda ara" />
+    <button class="clear" id="msjlQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <!-- KANAL SÜZGECİ — üç çip. Kanal, ustanın gerçekten sorduğu tek
+       ayrım: "WhatsApp'tan mı yazmıştım, SMS mi attım". -->
+  <div class="cip-grup" id="msjlKanal" role="group" aria-label="Kanal süzgeci"></div>
+
+  <div id="msjlListe"></div>
+
+  <!-- SAYFALAMA: ilk 30, sonra "daha göster". Binlerce satırı tek
+       seferde çizmek telefonu dondurur; "hepsini göster" düğmesi de
+       aynı şeyi bir dokunuş arkasına saklamak olurdu. -->
+  <div id="msjlDaha"></div>
+
+</section>
+
+<script>
+var MSJL_SAYFA = 30;
+var msjlGosterilen = MSJL_SAYFA;
+var msjlKanalSecili = null;
+/* Hangi aracin mesajlari — ekranin kendi durumu. Cekirdekteki
+   MESAJ_SUZGEC bir KUYRUK: okunur ve TEMIZLENIR, yoksa bir sonraki
+   acilisa sizar (MESAJ_HEDEF ile ayni kalip). */
+var msjlPlaka = null;
+
+Ekran.tanim('mesajlar', {
+  /* ⚠️ SAYFA SAYACI AÇILIŞTA SIFIRLANIR (K-040). `ciz`e yazılsaydı
+     her tazeleme — arama kutusuna basılan her tuş — listeyi başa
+     sarardı ve usta "daha göster"e bastığı yeri kaybederdi. */
+  ac: function () {
+    msjlGosterilen = MSJL_SAYFA;
+    msjlKanalSecili = null;
+    msjlPlaka = null;
+    var k = document.getElementById('msjlQ');
+    if (k) k.value = '';
+  },
+  ciz: function () {
+    if (MESAJ_SUZGEC) { msjlPlaka = MESAJ_SUZGEC.plaka; MESAJ_SUZGEC = null; }
+    var q = (document.getElementById('msjlQ') || {}).value || '';
+    var plaka = msjlPlaka;
+    var liste = mesajListesi({ q: q, kanal: msjlKanalSecili, plaka: plaka });
+
+    document.getElementById('msjlSay').textContent =
+      liste.length + (q || msjlKanalSecili || plaka ? ' bulundu' : ' mesaj');
+    document.getElementById('msjlArama').classList.toggle('filled', !!q);
+
+    /* KANAL ÇİPLERİ + PLAKA ÇİPİ AYNI ŞERİTTE: ikisi de "liste neden
+       kısa" sorusunun cevabı. Plaka çipi kapatılabilir — süzgeçle
+       gelen usta listenin tamamına da bakabilmeli. */
+    document.getElementById('msjlKanal').innerHTML =
+      (plaka
+        ? '<button class="cip" id="msjlPlakaKapat" aria-pressed="true">' +
+            plaka + '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>'
+        : '') +
+      [['', 'Hepsi'], ['whatsapp', 'WhatsApp'], ['sms', 'SMS']].map(function (x) {
+        return '<button class="cip" data-msjl-kanal="' + x[0] + '" aria-pressed="' +
+          ((msjlKanalSecili || '') === x[0]) + '">' + x[1] + '</button>';
+      }).join('');
+
+    var gosterilecek = liste.slice(0, msjlGosterilen);
+    document.getElementById('msjlListe').innerHTML = gosterilecek.length
+      ? gosterilecek.map(mesajSatiriHtml).join('')
+      : bosDurumHtml('i-message-square',
+          (q || msjlKanalSecili || plaka) ? 'Eşleşen mesaj yok' : 'Henüz mesaj gönderilmedi',
+          (q || msjlKanalSecili || plaka)
+            ? 'Adın, plakanın ya da mesaj metninin bir kısmını yazman yeter.'
+            : 'Gönderdiğin her mesaj burada tarihiyle birlikte durur.');
+
+    /* Kaç tanesinin gizlendiği YAZILIR: "daha göster" düğmesi kaç
+       satır getireceğini söylemezse usta listenin bittiğini sanar. */
+    var kalan = liste.length - gosterilecek.length;
+    document.getElementById('msjlDaha').innerHTML = kalan > 0
+      ? '<button class="btn btn-ghost" id="msjlDahaBtn">' +
+          '<svg class="ico"><use href="#i-chevron-down"></use></svg> ' +
+          kalan + ' mesaj daha</button>'
+      : '';
+  }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.id === 'msjlQTemiz') {
+    document.getElementById('msjlQ').value = ''; Ekran.tazele(); return;
+  }
+  if (t.id === 'msjlDahaBtn') { msjlGosterilen += MSJL_SAYFA; Ekran.tazele(); return; }
+  if (t.id === 'msjlPlakaKapat') { msjlPlaka = null; Ekran.tazele(); return; }
+
+  var kn = t.getAttribute('data-msjl-kanal');
+  if (kn !== null && Ekran.adi() === 'mesajlar') {
+    msjlKanalSecili = kn || null;
+    msjlGosterilen = MSJL_SAYFA;
+    Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'msjlQ') {
+    /* Arama daraltıyor; sayfalama başa döner ki usta aradığını ilk
+       sayfada bulsun. */
+    msjlGosterilen = MSJL_SAYFA;
+    Ekran.tazele();
+  }
+});
+</script>

@@ -88,6 +88,16 @@
     </div>
     <div class="card" id="msjKunye"></div>
 
+    <!-- ⚠️ 14.09 — BU MÜŞTERİYE DAHA ÖNCE NE GİTTİ (Cemil: "Müşteriye
+         mesaj göndermek istediğimizde son 5 mesajı kapalı olarak
+         listelensin, açılabilsin ve detayı görülebilsin.").
+
+         KAPALI AÇILIYOR ve bu bilinçli: usta mesaj yazmaya geldi,
+         geçmiş okumaya değil. Ama "bunu zaten yazmış mıydım" sorusu
+         gönderMEDEN önce sorulur — gönderdikten sonra öğrenmek geç.
+         Başlık kaç mesaj olduğunu açmadan söylüyor. -->
+    <div id="msjGecmis"></div>
+
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne yazılsın?
     </div>
@@ -264,16 +274,20 @@ function msjSecimCiz() {
     : bosDurumHtml('i-users', 'Eşleşen müşteri yok',
         'Adın, telefonun ya da plakanın bir kısmını yazman yeter.');
 
-  /* GÖNDERİLEN MESAJLAR — arama kutusundan bağımsız: usta "kime
-     göndereyim" derken süzdüğü şey müşteriler, gönderdikleri değil. */
+  /* ⚠️ 14.09 — ARŞİV BURADAN KENDİ SAYFASINA TAŞINDI (Cemil:
+     *"Gönderilen mesajlar binlerce olduğunda nasıl listelenecek?
+     Yeni bir sayfa daha uygun olabilir."*).
+
+     Sabah yazdığım akordiyon üç mesajla güzel görünüyordu; üç yüzle
+     kullanılamaz olurdu. Burada kalan tek şey KAPI: sayıyı söyleyen
+     bir düğme. */
   var arsiv = mesajArsivi();
-  document.getElementById('msjArsiv').innerHTML = akordiyonHtml(
-    'msjArsivGovde', 'i-message-square', 'Gönderilen mesajlar',
-    arsiv.length ? arsiv.length + ' mesaj' : 'yok',
-    arsiv.length
-      ? arsiv.map(mesajSatiriHtml).join('')
-      : bosDurumHtml('i-message-square', 'Henüz mesaj gönderilmedi',
-          'Gönderdiğin her mesaj burada tarihiyle birlikte durur.'));
+  document.getElementById('msjArsiv').innerHTML =
+    '<button class="btn btn-ghost" data-git="mesajlar">' +
+      '<svg class="ico"><use href="#i-message-square"></use></svg> ' +
+      (arsiv.length ? 'Gönderilen mesajlar · ' + arsiv.length
+                    : 'Gönderilen mesajlar') +
+    '</button>';
 }
 
 function msjYazimCiz() {
@@ -305,6 +319,27 @@ function msjYazimCiz() {
     (hedef && hedef.tel
       ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
+
+  /* SON BEŞ MESAJ — kapalı akordiyon, altında tümüne giden link.
+     Beş sayısı Cemil'in: ekranda kalabalık yapmayan, "son ne oldu"
+     sorusuna yeten sayı. Tamamı kendi sayfasında. */
+  var gecmis = mesajArsivi(msjPlaka);
+  document.getElementById('msjGecmis').innerHTML = akordiyonHtml(
+    'msjGecmisGovde', 'i-clock', 'Bu müşteriye gidenler',
+    gecmis.length ? gecmis.length + ' mesaj' : 'yok',
+    (gecmis.length
+      ? gecmis.slice(0, 5).map(mesajSatiriHtml).join('')
+      : bosDurumHtml('i-message-square', 'Bu araca mesaj gitmemiş',
+          'Gönderdiğin ilk mesaj burada görünecek.')) +
+    (gecmis.length > 5
+      ? '<button class="btn btn-ghost" id="msjTumMesajlar" style="margin-top:10px">' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+          ' Tüm mesajları (' + gecmis.length + ')</button>'
+      : (gecmis.length
+          ? '<button class="btn btn-ghost" id="msjTumMesajlar" style="margin-top:10px">' +
+              '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+              ' Tüm mesajları</button>'
+          : '')));
 
   /* ⚠️ ŞABLONU KOŞULU SÜZER (07.09'dan beri, 14.09'da genişledi).
      07.09: *"Serviste olmayan araca işin özeti, parça bekliyoruz
@@ -420,6 +455,15 @@ document.addEventListener('click', function (e) {
   }
 
   if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
+
+  /* TÜM MESAJLAR — arşiv sayfası, bu aracın süzgeciyle (Cemil:
+     "Tüm mesajlarına link olsun"). Süzgeç ekranda çip olarak
+     görünüyor ve kaldırılabiliyor. */
+  if (t.id === 'msjTumMesajlar') {
+    MESAJ_SUZGEC = { plaka: msjPlaka };
+    Ekran.ac('mesajlar');
+    return;
+  }
 
   /* Özet sayfasını AÇAR — usta linkin ucundakini görsün. Geri düğmesi
      mesaja döndürüyor, mesaj yazımı bozulmuyor (msjPlaka duruyor). */

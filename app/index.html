@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-14 19:02
+  Üretim: 2026-09-14 19:04
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -3600,6 +3600,16 @@ kirpilsin. */
     </div>
     <div class="card" id="msjKunye"></div>
 
+    <!-- ⚠️ 14.09 — BU MÜŞTERİYE DAHA ÖNCE NE GİTTİ (Cemil: "Müşteriye
+         mesaj göndermek istediğimizde son 5 mesajı kapalı olarak
+         listelensin, açılabilsin ve detayı görülebilsin.").
+
+         KAPALI AÇILIYOR ve bu bilinçli: usta mesaj yazmaya geldi,
+         geçmiş okumaya değil. Ama "bunu zaten yazmış mıydım" sorusu
+         gönderMEDEN önce sorulur — gönderdikten sonra öğrenmek geç.
+         Başlık kaç mesaj olduğunu açmadan söylüyor. -->
+    <div id="msjGecmis"></div>
+
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne yazılsın?
     </div>
@@ -3988,6 +3998,64 @@ kirpilsin. */
 
 </section>
 
+<!-- ekran: mesajlar · GÖNDERİLEN MESAJLAR
+     ⚠️ 14.09 — CEMİL İSTEDİ: *"Gönderilen mesajlar binlerce olduğunda
+     nasıl listelenecek? Filtrelemek gerekir mi? Yeni bir sayfa daha
+     uygun olabilir."*
+
+     Haklı ve sayı onu doğruluyor: günde beş mesaj gönderen bir dükkân
+     bir yılda 1.800 satır eder. 14.09 sabahı arşiv mesaj ekranının
+     dibinde bir akordiyondu — üç mesajla güzel görünüyordu, üç yüzle
+     kullanılamaz olurdu.
+
+     BU EKRAN NE İŞE YARAR: iki soru var ve ikisi de arşivde cevaplanır.
+       "Bu müşteriye ne göndermiştim?"  → plaka süzgeciyle açılır
+       "Dün ne gönderdim?"              → en yeni üstte, ilk sayfa
+
+     EKRAN SAYISI 15 -> 16, ANA YOL BÜYÜMEDİ (A-2 / A-M8): bu ekran
+     akışın üstünde değil, mesaj işinin YANINDA. Menüye satır
+     EKLENMEDİ — karar bütçesi menüyü ≤ 8 başlıkta tutuyor ve buraya
+     iki yoldan geliniyor: mesaj ekranındaki düğme ve müşteri
+     detayındaki "Tüm mesajları".
+
+     ÜZERİNDE YOK: okundu bilgisi · mesaj silme · yeniden gönderme.
+     Gönderilmiş bir mesaj değişmez; arşiv bir KAYITTIR (K-045.3: üç
+     yıl saklanır, ispat yükü gönderende).
+
+     BİLEŞENLER: .screen-head .eyebrow .eb-say · .search-box
+     · .cip-grup .cip · .tl-item (ortak mesajSatiriHtml) · .btn
+     · .bos-durum. Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-mesajlar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Gönderilen mesajlar
+      <span class="eb-say" id="msjlSay"></span>
+    </span>
+  </div>
+
+  <div class="search-box" id="msjlArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="msjlQ" placeholder="Ad, plaka ya da mesaj metni…"
+           autocomplete="off" aria-label="Mesajlarda ara" />
+    <button class="clear" id="msjlQTemiz" aria-label="Aramayı temizle">
+      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+    </button>
+  </div>
+
+  <!-- KANAL SÜZGECİ — üç çip. Kanal, ustanın gerçekten sorduğu tek
+       ayrım: "WhatsApp'tan mı yazmıştım, SMS mi attım". -->
+  <div class="cip-grup" id="msjlKanal" role="group" aria-label="Kanal süzgeci"></div>
+
+  <div id="msjlListe"></div>
+
+  <!-- SAYFALAMA: ilk 30, sonra "daha göster". Binlerce satırı tek
+       seferde çizmek telefonu dondurur; "hepsini göster" düğmesi de
+       aynı şeyi bir dokunuş arkasına saklamak olurdu. -->
+  <div id="msjlDaha"></div>
+
+</section>
+
 <!-- ekran: ozet · MÜŞTERİNİN GÖRDÜĞÜ ÖZET (04.09.2026)
      Yedi işten ALTINCISI: "Müşteriye özet göndermek." (T-19, T-20, T-21)
 
@@ -4263,6 +4331,10 @@ var MESAJ_HEDEF = null;      /* {plaka, sablon} */
    önizliyorsa o. */
 var OZET_KAYIT = null;      /* kayit id */
 var ARAMA_TERIMI = null;     /* {hedef, terim, suzgec} */
+/* Mesajlar ekranina hangi suzgecle gidildigi. Bir musterinin tum
+   mesajlarina bakan usta, listenin neden kisa oldugunu ekranda
+   gormeli — ekran bunu cipiyle soyluyor. */
+var MESAJ_SUZGEC = null;     /* {plaka} */
 /* Muhasebe ve "iş başına" ekranı AYNI dönemi kullanır. İki ekranda iki
    ayrı dönem tutulsaydı usta muhasebede "Eylül" seçip iş başına
    sayfasına gelince "Bugün" bulurdu ve rakamların neden tutmadığını
@@ -5772,6 +5844,33 @@ function mesajArsivi(plaka) {
                  .slice().reverse();
 }
 
+/* ---- MESAJ SÜZGECİ (14.09) ----
+   Cemil: *"Gönderilen mesajlar binlerce olduğunda nasıl listelenecek?
+   Filtrelemek gerekir mi? Yeni bir sayfa daha uygun olabilir."*
+
+   Haklı ve sayı onu doğruluyor: günde beş mesaj gönderen bir dükkân
+   bir yılda 1.800 satır eder. Akordiyonun içine sığmaz, mesaj yazma
+   ekranının dibinde durması da doğru olmaz.
+
+   SÜZGEÇ TEK YERDE: liste iki ekranda görünüyor (mesaj ekranındaki
+   "son mesajlar" ve kendi sayfası). İki süzgeç iki ayrı cevap
+   demektir (K-019.1). */
+function mesajListesi(secenek) {
+  var s = secenek || {};
+  var q = norm(s.q || '');
+  return mesajArsivi(s.plaka).filter(function (m) {
+    if (s.kanal && m.kanal !== s.kanal) return false;
+    if (!q) return true;
+    return norm(m.ad + ' ' + m.plaka + ' ' + m.tel + ' ' + m.metin + ' ' +
+                (SABLON_AD[m.sablon] || '')).indexOf(q) >= 0;
+  });
+}
+
+function mesajBul(id) {
+  for (var i = 0; i < MESAJLAR.length; i++) if (MESAJLAR[i].id === id) return MESAJLAR[i];
+  return null;
+}
+
 /* Bir KAYIT için o şablon gönderilmiş mi. Araç değil KAYIT: aynı araç
    üç kez gelir, her gelişin kendi özeti vardır. */
 function kayitMesajiVar(kayitId, sablon) {
@@ -6685,13 +6784,17 @@ function mesajMetniUret(plaka, sablon, hedefAnahtar) {
    Beşincisi (metin) ilk satırıyla duruyor: usta hangi mesaj olduğunu
    metnin başından tanıyor, tamamını okumak istemiyor.
 
-   ⚠️ TIKLANMIYOR ve bu bilinçli: satırın açacağı bir şey yok. Gönderilmiş
-   bir mesaj değiştirilemez — dokununca bir şey olmayan satır, ölü uçtur
-   (K-021); dokunulacak gibi DURMAYAN satır değildir. */
+   ⚠️ 14.09 — SATIR ARTIK AÇILIYOR (Cemil: *"son 5 mesajı ... açılabilsin
+   ve detayı görülebilsin"*). Sabah *"tıklanmıyor, çünkü gönderilmiş
+   mesaj değişmez"* diye yazmıştım; **değişmemesi bakılamaması demek
+   değilmiş.** Satırda metnin ilk satırı var, tamamı katmanda —
+   değiştirme yok, yalnız okuma. */
 function mesajSatiriHtml(m) {
   var ilkSatir = (m.metin || '').split('\n')[0];
   if (ilkSatir.length > 90) ilkSatir = ilkSatir.slice(0, 90) + '…';
-  return '<div class="tl-item">' +
+  return '<div class="tl-item" data-mesaj="' + m.id + '"' +
+      ' role="button" tabindex="0" aria-label="' +
+      (m.ad || 'mesaj') + ' — mesajın tamamını gör">' +
     '<div class="tl-body">' +
       '<div class="tl-title"><span class="tl-tip">' + (m.ad || 'kime yazılmamış') +
         '</span>' + (m.plaka ? plakaHtml(m.plaka) : '') + '</div>' +
@@ -6902,6 +7005,38 @@ document.addEventListener('click', function (e) {
   if (!t) return;
   ACIK_MUSTERI = t.getAttribute('data-musteri');
   Ekran.ac('musteri');
+});
+
+/* GONDERILEN MESAJIN TAMAMI — satirin davranisi da ortak nesnede
+   (14.09). Satir uc ekranda var (mesaj yazimi, arsiv sayfasi, ileride
+   surec); tiklamayi her ekrana ayri yazmak nesneyi uce bolerdi.
+
+   ⚠️ KATMAN, EKRAN DEGIL: usta mesaj yazarken bakiyor; ekran degisse
+   yazdigini kaybederdi (K-043'un gerekcesi). */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-mesaj]');
+  if (!t) return;
+  var m = mesajBul(parseInt(t.getAttribute('data-mesaj'), 10));
+  if (!m) return;
+  Katman.ac('Gönderilen mesaj',
+    '<div class="tutar-serit">' +
+      '<div class="tutar-sat"><span>Kime</span><span class="tv">' +
+        (m.ad || '—') + '</span></div>' +
+      '<div class="tutar-sat"><span>Numara</span><span class="tv">' +
+        (m.tel || '—') + '</span></div>' +
+      '<div class="tutar-sat"><span>Kanal</span><span class="tv">' +
+        (KANAL_AD[m.kanal] || m.kanal) + '</span></div>' +
+      '<div class="tutar-sat"><span>Ne</span><span class="tv">' +
+        (SABLON_AD[m.sablon] || m.sablon) + '</span></div>' +
+      '<div class="tutar-sat"><span>Ne zaman</span><span class="tv">' +
+        m.tarih + ' · ' + m.saat + '</span></div>' +
+    '</div>' +
+    /* ⚠️ SATIR SONLARI KORUNUYOR (K-038.1): mesaj cok satirli ve
+       HTML satir sonunu bosluga cevirir — usta gonderdiginden baska
+       bir sey gorurdu. */
+    '<div class="card" style="margin-top:14px"><p class="plate-hint">' +
+      String(m.metin || '').replace(/\n/g, '<br>') +
+    '</p></div>');
 });
 
 /* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
@@ -9655,16 +9790,20 @@ function msjSecimCiz() {
     : bosDurumHtml('i-users', 'Eşleşen müşteri yok',
         'Adın, telefonun ya da plakanın bir kısmını yazman yeter.');
 
-  /* GÖNDERİLEN MESAJLAR — arama kutusundan bağımsız: usta "kime
-     göndereyim" derken süzdüğü şey müşteriler, gönderdikleri değil. */
+  /* ⚠️ 14.09 — ARŞİV BURADAN KENDİ SAYFASINA TAŞINDI (Cemil:
+     *"Gönderilen mesajlar binlerce olduğunda nasıl listelenecek?
+     Yeni bir sayfa daha uygun olabilir."*).
+
+     Sabah yazdığım akordiyon üç mesajla güzel görünüyordu; üç yüzle
+     kullanılamaz olurdu. Burada kalan tek şey KAPI: sayıyı söyleyen
+     bir düğme. */
   var arsiv = mesajArsivi();
-  document.getElementById('msjArsiv').innerHTML = akordiyonHtml(
-    'msjArsivGovde', 'i-message-square', 'Gönderilen mesajlar',
-    arsiv.length ? arsiv.length + ' mesaj' : 'yok',
-    arsiv.length
-      ? arsiv.map(mesajSatiriHtml).join('')
-      : bosDurumHtml('i-message-square', 'Henüz mesaj gönderilmedi',
-          'Gönderdiğin her mesaj burada tarihiyle birlikte durur.'));
+  document.getElementById('msjArsiv').innerHTML =
+    '<button class="btn btn-ghost" data-git="mesajlar">' +
+      '<svg class="ico"><use href="#i-message-square"></use></svg> ' +
+      (arsiv.length ? 'Gönderilen mesajlar · ' + arsiv.length
+                    : 'Gönderilen mesajlar') +
+    '</button>';
 }
 
 function msjYazimCiz() {
@@ -9696,6 +9835,27 @@ function msjYazimCiz() {
     (hedef && hedef.tel
       ? telLinkHtml(hedef.tel, hedef.ad)
       : '');
+
+  /* SON BEŞ MESAJ — kapalı akordiyon, altında tümüne giden link.
+     Beş sayısı Cemil'in: ekranda kalabalık yapmayan, "son ne oldu"
+     sorusuna yeten sayı. Tamamı kendi sayfasında. */
+  var gecmis = mesajArsivi(msjPlaka);
+  document.getElementById('msjGecmis').innerHTML = akordiyonHtml(
+    'msjGecmisGovde', 'i-clock', 'Bu müşteriye gidenler',
+    gecmis.length ? gecmis.length + ' mesaj' : 'yok',
+    (gecmis.length
+      ? gecmis.slice(0, 5).map(mesajSatiriHtml).join('')
+      : bosDurumHtml('i-message-square', 'Bu araca mesaj gitmemiş',
+          'Gönderdiğin ilk mesaj burada görünecek.')) +
+    (gecmis.length > 5
+      ? '<button class="btn btn-ghost" id="msjTumMesajlar" style="margin-top:10px">' +
+          '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+          ' Tüm mesajları (' + gecmis.length + ')</button>'
+      : (gecmis.length
+          ? '<button class="btn btn-ghost" id="msjTumMesajlar" style="margin-top:10px">' +
+              '<svg class="ico"><use href="#i-message-square"></use></svg>' +
+              ' Tüm mesajları</button>'
+          : '')));
 
   /* ⚠️ ŞABLONU KOŞULU SÜZER (07.09'dan beri, 14.09'da genişledi).
      07.09: *"Serviste olmayan araca işin özeti, parça bekliyoruz
@@ -9811,6 +9971,15 @@ document.addEventListener('click', function (e) {
   }
 
   if (t.id === 'msjBaskasi') { msjPlaka = null; Ekran.tazele(); return; }
+
+  /* TÜM MESAJLAR — arşiv sayfası, bu aracın süzgeciyle (Cemil:
+     "Tüm mesajlarına link olsun"). Süzgeç ekranda çip olarak
+     görünüyor ve kaldırılabiliyor. */
+  if (t.id === 'msjTumMesajlar') {
+    MESAJ_SUZGEC = { plaka: msjPlaka };
+    Ekran.ac('mesajlar');
+    return;
+  }
 
   /* Özet sayfasını AÇAR — usta linkin ucundakini görsün. Geri düğmesi
      mesaja döndürüyor, mesaj yazımı bozulmuyor (msjPlaka duruyor). */
@@ -10046,6 +10215,16 @@ document.addEventListener('click', function (e) {
     e.stopPropagation();
     MESAJ_HEDEF = { plaka: mp.getAttribute('data-mesajla'), sablon: 'ozet' };
     Ekran.ac('mesaj');
+    return;
+  }
+  /* Müşteri detayındaki "Tüm mesajları" — arşiv sayfası, plaka
+     süzgeciyle. Dinleyici burada duruyor çünkü [data-mesajla] da
+     burada: aynı satırın iki çıkışı, aynı yerde. */
+  var mm = e.target.closest('[data-mst-mesajlar]');
+  if (mm) {
+    e.stopPropagation();
+    MESAJ_SUZGEC = { plaka: mm.getAttribute('data-mst-mesajlar') };
+    Ekran.ac('mesajlar');
   }
 });
 document.addEventListener('input', function (e) {
@@ -10147,11 +10326,23 @@ Ekran.tanim('musteri', {
       var h = mesajHedefi(a.plaka);
       return h && h.tel;
     })[0];
-    document.getElementById('mstEylem').innerHTML = mesajlik
+    /* TÜM MESAJLARI — Cemil, 14.09: *"Tüm mesajlarına link olsun."*
+       Müşterinin araçlarına gitmiş mesajların hepsi arşiv sayfasında;
+       buradaki link o sayfayı bu aracın süzgeciyle açıyor. Sayı
+       yazılıyor: dolu mu boş mu, açmadan belli olsun. */
+    var mesajSay = m.araclar.reduce(function (t, a) {
+      return t + mesajArsivi(a.plaka).length; }, 0);
+    document.getElementById('mstEylem').innerHTML = (mesajlik
       ? '<button class="btn btn-primary btn-lg" data-mesajla="' + mesajlik.plaka + '">' +
           '<svg class="ico"><use href="#i-message-square"></use></svg>' +
           ' Mesaj gönder</button>'
-      : '';
+      : '') +
+      (mesajSay
+        ? '<button class="btn btn-ghost" data-mst-mesajlar="' +
+            (mesajlik ? mesajlik.plaka : m.araclar[0].plaka) + '" style="margin-top:10px">' +
+            '<svg class="ico"><use href="#i-clock"></use></svg>' +
+            ' Tüm mesajları (' + mesajSay + ')</button>'
+        : '');
   }
 });
 
@@ -10509,6 +10700,97 @@ Ekran.tanim('is-basina', {
    ortak nesne kuralı gereği burada yeniden yazılmıyor. */
 })();
 
+/* ===== ekran: 97-mesajlar.html ===== */
+(function () {
+var MSJL_SAYFA = 30;
+var msjlGosterilen = MSJL_SAYFA;
+var msjlKanalSecili = null;
+/* Hangi aracin mesajlari — ekranin kendi durumu. Cekirdekteki
+   MESAJ_SUZGEC bir KUYRUK: okunur ve TEMIZLENIR, yoksa bir sonraki
+   acilisa sizar (MESAJ_HEDEF ile ayni kalip). */
+var msjlPlaka = null;
+
+Ekran.tanim('mesajlar', {
+  /* ⚠️ SAYFA SAYACI AÇILIŞTA SIFIRLANIR (K-040). `ciz`e yazılsaydı
+     her tazeleme — arama kutusuna basılan her tuş — listeyi başa
+     sarardı ve usta "daha göster"e bastığı yeri kaybederdi. */
+  ac: function () {
+    msjlGosterilen = MSJL_SAYFA;
+    msjlKanalSecili = null;
+    msjlPlaka = null;
+    var k = document.getElementById('msjlQ');
+    if (k) k.value = '';
+  },
+  ciz: function () {
+    if (MESAJ_SUZGEC) { msjlPlaka = MESAJ_SUZGEC.plaka; MESAJ_SUZGEC = null; }
+    var q = (document.getElementById('msjlQ') || {}).value || '';
+    var plaka = msjlPlaka;
+    var liste = mesajListesi({ q: q, kanal: msjlKanalSecili, plaka: plaka });
+
+    document.getElementById('msjlSay').textContent =
+      liste.length + (q || msjlKanalSecili || plaka ? ' bulundu' : ' mesaj');
+    document.getElementById('msjlArama').classList.toggle('filled', !!q);
+
+    /* KANAL ÇİPLERİ + PLAKA ÇİPİ AYNI ŞERİTTE: ikisi de "liste neden
+       kısa" sorusunun cevabı. Plaka çipi kapatılabilir — süzgeçle
+       gelen usta listenin tamamına da bakabilmeli. */
+    document.getElementById('msjlKanal').innerHTML =
+      (plaka
+        ? '<button class="cip" id="msjlPlakaKapat" aria-pressed="true">' +
+            plaka + '<svg class="ico ico-sm"><use href="#i-x"></use></svg></button>'
+        : '') +
+      [['', 'Hepsi'], ['whatsapp', 'WhatsApp'], ['sms', 'SMS']].map(function (x) {
+        return '<button class="cip" data-msjl-kanal="' + x[0] + '" aria-pressed="' +
+          ((msjlKanalSecili || '') === x[0]) + '">' + x[1] + '</button>';
+      }).join('');
+
+    var gosterilecek = liste.slice(0, msjlGosterilen);
+    document.getElementById('msjlListe').innerHTML = gosterilecek.length
+      ? gosterilecek.map(mesajSatiriHtml).join('')
+      : bosDurumHtml('i-message-square',
+          (q || msjlKanalSecili || plaka) ? 'Eşleşen mesaj yok' : 'Henüz mesaj gönderilmedi',
+          (q || msjlKanalSecili || plaka)
+            ? 'Adın, plakanın ya da mesaj metninin bir kısmını yazman yeter.'
+            : 'Gönderdiğin her mesaj burada tarihiyle birlikte durur.');
+
+    /* Kaç tanesinin gizlendiği YAZILIR: "daha göster" düğmesi kaç
+       satır getireceğini söylemezse usta listenin bittiğini sanar. */
+    var kalan = liste.length - gosterilecek.length;
+    document.getElementById('msjlDaha').innerHTML = kalan > 0
+      ? '<button class="btn btn-ghost" id="msjlDahaBtn">' +
+          '<svg class="ico"><use href="#i-chevron-down"></use></svg> ' +
+          kalan + ' mesaj daha</button>'
+      : '';
+  }
+});
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  if (t.id === 'msjlQTemiz') {
+    document.getElementById('msjlQ').value = ''; Ekran.tazele(); return;
+  }
+  if (t.id === 'msjlDahaBtn') { msjlGosterilen += MSJL_SAYFA; Ekran.tazele(); return; }
+  if (t.id === 'msjlPlakaKapat') { msjlPlaka = null; Ekran.tazele(); return; }
+
+  var kn = t.getAttribute('data-msjl-kanal');
+  if (kn !== null && Ekran.adi() === 'mesajlar') {
+    msjlKanalSecili = kn || null;
+    msjlGosterilen = MSJL_SAYFA;
+    Ekran.tazele();
+  }
+});
+document.addEventListener('input', function (e) {
+  if (e.target && e.target.id === 'msjlQ') {
+    /* Arama daraltıyor; sayfalama başa döner ki usta aradığını ilk
+       sayfada bulsun. */
+    msjlGosterilen = MSJL_SAYFA;
+    Ekran.tazele();
+  }
+});
+})();
+
 /* ===== ekran: 98-ozet.html ===== */
 (function () {
 /* OZET_KAYIT ve ozetLinki() ÇEKİRDEKTE (01-cekirdek.js) — ekran
@@ -10616,7 +10898,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>46ed7e76</b><br>' +
+      'Sürüm <b>354934ba</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

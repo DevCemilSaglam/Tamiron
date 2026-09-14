@@ -293,6 +293,33 @@ function mesajArsivi(plaka) {
                  .slice().reverse();
 }
 
+/* ---- MESAJ SÜZGECİ (14.09) ----
+   Cemil: *"Gönderilen mesajlar binlerce olduğunda nasıl listelenecek?
+   Filtrelemek gerekir mi? Yeni bir sayfa daha uygun olabilir."*
+
+   Haklı ve sayı onu doğruluyor: günde beş mesaj gönderen bir dükkân
+   bir yılda 1.800 satır eder. Akordiyonun içine sığmaz, mesaj yazma
+   ekranının dibinde durması da doğru olmaz.
+
+   SÜZGEÇ TEK YERDE: liste iki ekranda görünüyor (mesaj ekranındaki
+   "son mesajlar" ve kendi sayfası). İki süzgeç iki ayrı cevap
+   demektir (K-019.1). */
+function mesajListesi(secenek) {
+  var s = secenek || {};
+  var q = norm(s.q || '');
+  return mesajArsivi(s.plaka).filter(function (m) {
+    if (s.kanal && m.kanal !== s.kanal) return false;
+    if (!q) return true;
+    return norm(m.ad + ' ' + m.plaka + ' ' + m.tel + ' ' + m.metin + ' ' +
+                (SABLON_AD[m.sablon] || '')).indexOf(q) >= 0;
+  });
+}
+
+function mesajBul(id) {
+  for (var i = 0; i < MESAJLAR.length; i++) if (MESAJLAR[i].id === id) return MESAJLAR[i];
+  return null;
+}
+
 /* Bir KAYIT için o şablon gönderilmiş mi. Araç değil KAYIT: aynı araç
    üç kez gelir, her gelişin kendi özeti vardır. */
 function kayitMesajiVar(kayitId, sablon) {

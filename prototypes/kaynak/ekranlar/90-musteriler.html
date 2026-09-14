@@ -144,6 +144,16 @@ document.addEventListener('click', function (e) {
     e.stopPropagation();
     MESAJ_HEDEF = { plaka: mp.getAttribute('data-mesajla'), sablon: 'ozet' };
     Ekran.ac('mesaj');
+    return;
+  }
+  /* Müşteri detayındaki "Tüm mesajları" — arşiv sayfası, plaka
+     süzgeciyle. Dinleyici burada duruyor çünkü [data-mesajla] da
+     burada: aynı satırın iki çıkışı, aynı yerde. */
+  var mm = e.target.closest('[data-mst-mesajlar]');
+  if (mm) {
+    e.stopPropagation();
+    MESAJ_SUZGEC = { plaka: mm.getAttribute('data-mst-mesajlar') };
+    Ekran.ac('mesajlar');
   }
 });
 document.addEventListener('input', function (e) {

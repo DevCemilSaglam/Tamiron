@@ -157,11 +157,23 @@ Ekran.tanim('musteri', {
       var h = mesajHedefi(a.plaka);
       return h && h.tel;
     })[0];
-    document.getElementById('mstEylem').innerHTML = mesajlik
+    /* TÜM MESAJLARI — Cemil, 14.09: *"Tüm mesajlarına link olsun."*
+       Müşterinin araçlarına gitmiş mesajların hepsi arşiv sayfasında;
+       buradaki link o sayfayı bu aracın süzgeciyle açıyor. Sayı
+       yazılıyor: dolu mu boş mu, açmadan belli olsun. */
+    var mesajSay = m.araclar.reduce(function (t, a) {
+      return t + mesajArsivi(a.plaka).length; }, 0);
+    document.getElementById('mstEylem').innerHTML = (mesajlik
       ? '<button class="btn btn-primary btn-lg" data-mesajla="' + mesajlik.plaka + '">' +
           '<svg class="ico"><use href="#i-message-square"></use></svg>' +
           ' Mesaj gönder</button>'
-      : '';
+      : '') +
+      (mesajSay
+        ? '<button class="btn btn-ghost" data-mst-mesajlar="' +
+            (mesajlik ? mesajlik.plaka : m.araclar[0].plaka) + '" style="margin-top:10px">' +
+            '<svg class="ico"><use href="#i-clock"></use></svg>' +
+            ' Tüm mesajları (' + mesajSay + ')</button>'
+        : '');
   }
 });
 

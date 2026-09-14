@@ -333,13 +333,17 @@ function mesajMetniUret(plaka, sablon, hedefAnahtar) {
    Beşincisi (metin) ilk satırıyla duruyor: usta hangi mesaj olduğunu
    metnin başından tanıyor, tamamını okumak istemiyor.
 
-   ⚠️ TIKLANMIYOR ve bu bilinçli: satırın açacağı bir şey yok. Gönderilmiş
-   bir mesaj değiştirilemez — dokununca bir şey olmayan satır, ölü uçtur
-   (K-021); dokunulacak gibi DURMAYAN satır değildir. */
+   ⚠️ 14.09 — SATIR ARTIK AÇILIYOR (Cemil: *"son 5 mesajı ... açılabilsin
+   ve detayı görülebilsin"*). Sabah *"tıklanmıyor, çünkü gönderilmiş
+   mesaj değişmez"* diye yazmıştım; **değişmemesi bakılamaması demek
+   değilmiş.** Satırda metnin ilk satırı var, tamamı katmanda —
+   değiştirme yok, yalnız okuma. */
 function mesajSatiriHtml(m) {
   var ilkSatir = (m.metin || '').split('\n')[0];
   if (ilkSatir.length > 90) ilkSatir = ilkSatir.slice(0, 90) + '…';
-  return '<div class="tl-item">' +
+  return '<div class="tl-item" data-mesaj="' + m.id + '"' +
+      ' role="button" tabindex="0" aria-label="' +
+      (m.ad || 'mesaj') + ' — mesajın tamamını gör">' +
     '<div class="tl-body">' +
       '<div class="tl-title"><span class="tl-tip">' + (m.ad || 'kime yazılmamış') +
         '</span>' + (m.plaka ? plakaHtml(m.plaka) : '') + '</div>' +
@@ -550,6 +554,38 @@ document.addEventListener('click', function (e) {
   if (!t) return;
   ACIK_MUSTERI = t.getAttribute('data-musteri');
   Ekran.ac('musteri');
+});
+
+/* GONDERILEN MESAJIN TAMAMI — satirin davranisi da ortak nesnede
+   (14.09). Satir uc ekranda var (mesaj yazimi, arsiv sayfasi, ileride
+   surec); tiklamayi her ekrana ayri yazmak nesneyi uce bolerdi.
+
+   ⚠️ KATMAN, EKRAN DEGIL: usta mesaj yazarken bakiyor; ekran degisse
+   yazdigini kaybederdi (K-043'un gerekcesi). */
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-mesaj]');
+  if (!t) return;
+  var m = mesajBul(parseInt(t.getAttribute('data-mesaj'), 10));
+  if (!m) return;
+  Katman.ac('Gönderilen mesaj',
+    '<div class="tutar-serit">' +
+      '<div class="tutar-sat"><span>Kime</span><span class="tv">' +
+        (m.ad || '—') + '</span></div>' +
+      '<div class="tutar-sat"><span>Numara</span><span class="tv">' +
+        (m.tel || '—') + '</span></div>' +
+      '<div class="tutar-sat"><span>Kanal</span><span class="tv">' +
+        (KANAL_AD[m.kanal] || m.kanal) + '</span></div>' +
+      '<div class="tutar-sat"><span>Ne</span><span class="tv">' +
+        (SABLON_AD[m.sablon] || m.sablon) + '</span></div>' +
+      '<div class="tutar-sat"><span>Ne zaman</span><span class="tv">' +
+        m.tarih + ' · ' + m.saat + '</span></div>' +
+    '</div>' +
+    /* ⚠️ SATIR SONLARI KORUNUYOR (K-038.1): mesaj cok satirli ve
+       HTML satir sonunu bosluga cevirir — usta gonderdiginden baska
+       bir sey gorurdu. */
+    '<div class="card" style="margin-top:14px"><p class="plate-hint">' +
+      String(m.metin || '').replace(/\n/g, '<br>') +
+    '</p></div>');
 });
 
 /* Plakaya dokunmak ARACI ACAR — araclar listesinde de musteri
