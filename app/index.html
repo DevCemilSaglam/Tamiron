@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-14 20:11
+  Üretim: 2026-09-15 18:54
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2950,13 +2950,39 @@ kirpilsin. */
             <label for="rIlkTescil">İlk tescil</label>
             <input id="rIlkTescil" class="mono" data-giris="tarih" inputmode="numeric" placeholder="14.06.2018" autocomplete="off" />
           </div>
-          <!-- ⚠️ TC KİMLİK NO ve ADRES BURAYA DA GİRMEDİ. Ruhsatta
-               varlar; RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en
-               güvenli veridir. Tamircinin yedi işinden hiçbiri
-               bunları istemiyor. -->
+          <!-- ⚠️ 15.09 — TC/VERGİ NO ve ADRES GERİ GELDİ (Cemil:
+               *"Bu alanlar da gerekli. Çünkü bu alanlara fatura
+               kesilecek vb."*).
+
+               BU BİR KARARIN GERİ ALINMASIDIR. RUHSAT-OKUMA.md Bulgu
+               2 *"tutmadığın veri en güvenli veridir"* diyordu ve
+               gerekçesi doğruydu — ama TEK BİR İŞİ (araç kaydı)
+               düşünerek verilmişti. Faturanın kesileceği yer tam
+               olarak burası: fatura TC/vergi numarasına ve adrese
+               kesilir. Cemil ikinci işi söyledi, kural değişti
+               (K-050).
+
+               ⚠️ VERGİ DAİRESİ RUHSATTA YOK. Fatura için gerekiyor
+               ama belgede yazmıyor — okunamaz, ustaya sorulur. Alan
+               boş duruyor ve bunu ekran söylüyor. -->
+          <div class="field">
+            <label for="rTcVergi">TC kimlik no / Vergi no</label>
+            <input id="rTcVergi" class="mono" data-giris="km" inputmode="numeric"
+                   placeholder="11 hane (TC) ya da 10 hane (vergi)" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="rAdres">Adres</label>
+            <textarea id="rAdres" rows="2" aria-label="Adres"
+                      placeholder="Ruhsattan okunur"></textarea>
+          </div>
+          <div class="field">
+            <label for="rVergiDairesi">Vergi dairesi</label>
+            <input id="rVergiDairesi" placeholder="Ruhsatta yazmaz — fatura kesilecekse sor"
+                   autocomplete="off" />
+          </div>
           <p class="plate-hint">
-            TC kimlik no ve adres ruhsatta yazar ama burada tutulmaz —
-            işine yaramıyor, saklanması risk.
+            Bu üç alan <b>fatura için</b> tutuluyor. Vergi dairesi ruhsatta
+            yazmaz; fatura kesecekseniz müşteriye sorulur.
           </p>
         </div>
       </div>
@@ -3447,6 +3473,11 @@ kirpilsin. */
   <div id="arOdeme"></div>
 
   <div id="arRuhsatBolum"></div>
+
+  <!-- FATURA BİLGİLERİ (15.09 · K-050) — ruhsat bilgilerinin hemen
+       altında, çünkü ikisi de aynı fotoğraftan doluyor; ama AYRI
+       akordiyon, çünkü ayrı soruya cevap veriyorlar. -->
+  <div id="arFaturaBolum"></div>
 
   <div id="arKmBolum"></div>
 
@@ -5658,8 +5689,13 @@ document.addEventListener('DOMContentLoaded', function () {
    alan buraya da girmez. Modelde olmayan bir alana ihtiyaç duyulursa
    önce VERI-MODELI.md açılır.
 
-   ⚠️ Ruhsatta TC kimlik no ve adres VAR ama burada YOK
-   (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir). */
+   ⚠️ 15.09 — TC/VERGİ NO ve ADRES ARTIK TUTULUYOR (K-050). Cemil:
+   *"Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb."*
+   RUHSAT-OKUMA Bulgu 2 bunları *"tutmadığın veri en güvenli veridir"*
+   diye elemişti; gerekçe doğruydu ama TEK BİR İŞE (araç kaydı)
+   bakıyordu. Fatura tam olarak bu alanlara kesilir.
+
+   ⚠️ VERGİ DAİRESİ RUHSATTA YOK: alan var, okuma yok — usta yazar. */
 
 var BUGUN = new Date(2026, 8, 3);   /* prototipin "bugün"ü — TEK KAYNAK */
 
@@ -5674,7 +5710,9 @@ var ARACLAR = [
     renk: 'Gri Metalik', yakit: 'Dizel', motorNo: 'K9K872C123456',
     silindir: '1461', guc: '110', koltuk: '5', ilkTescil: '14.06.2018',
     depo: '50',
-    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: 'Arka cam kolu kırık — müşteri biliyor.' },
+    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00',
+    tcVergiNo: '12345678901', adres: 'Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli',
+    vergiDairesi: '', not: 'Arka cam kolu kırık — müşteri biliyor.' },
   { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
     motor: '1.4 Fire', vin: 'NM4358004ZT129041',
     renk: 'Beyaz', yakit: 'Benzin', motorNo: '843A1000098765',
@@ -5685,19 +5723,28 @@ var ARACLAR = [
        ve aranacak kişi başkasıdır. İkinci iletişim olmadan usta
        santrali arayıp "hangi araç" diye anlatmak zorunda kalıyordu. */
     sahipAd: 'Demir Nakliyat Ltd. Şti.', sahipTel: '0312 395 12 00',
-    iletisimAd: 'Hasan Demir', iletisimTel: '0542 331 90 07', not: '' },
+    iletisimAd: 'Hasan Demir', iletisimTel: '0542 331 90 07',
+    /* FİRMA: TC yerine VERGİ NO (10 hane) ve vergi dairesi var —
+       faturanın kesileceği yer burası. */
+    tcVergiNo: '2960412771', adres: 'Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara',
+    vergiDairesi: 'Ostim', not: '' },
   { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
     motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
     renk: 'Lacivert', yakit: 'Dizel', motorNo: 'DV6FD10JBCE4455',
     silindir: '1560', guc: '100', koltuk: '5', ilkTescil: '21.11.2019',
     depo: '50',
-    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' },
+    sahipAd: 'Ayşe Kaya', sahipTel: '',
+    /* Fatura alanları BOŞ — her araçta dolu olmayacak; ruhsat
+       okunmadıysa ya da okunamadıysa usta sonra yazar. */
+    tcVergiNo: '', adres: '', vergiDairesi: '', not: '' },
   { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
     motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
     renk: 'Siyah', yakit: 'Dizel', motorNo: 'CLH1234567',
     silindir: '1598', guc: '110', koltuk: '5', ilkTescil: '08.08.2016',
     depo: '50',
-    sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41', not: '' }
+    sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41',
+    tcVergiNo: '45678901234', adres: 'Cedit Mah. Hisar Geçidi Sk. No:1/9 İzmit / Kocaeli',
+    vergiDairesi: '', not: '' }
 ];
 
 /* ---- ServiceRecord (VERI-MODELI §2) ----
@@ -8734,16 +8781,22 @@ Ekran.tanim('ruhsat', {
    koltuk, ilk tescil. Yarım örnek, "bu alanlar zaten dolmaz" diye
    yanlış bir izlenim bırakıyordu. */
 var RUHSAT_ORNEK = [
+  /* ⚠️ 15.09 — ÖRNEKLERE FATURA ALANLARI EKLENDİ. Gerçek ruhsatta
+     bunlar var ve artık okunuyorlar (K-050); örnek veride olmasalardı
+     alanlar prototipte hep boş kalır ve "çalışmıyor" sanılırdı —
+     çalıştığı görülemeyen alan, çalışmıyor sayılır. */
   { plaka: '41 P 3873', marka: 'Hyundai', model: 'i20', yil: '2020',
     motor: '1.4 MPI', renk: 'Beyaz', yakit: 'Benzin',
     vin: 'NLHB351CALZ123456', motorNo: 'G4LAJH123456',
     silindir: '1368', guc: '74', koltuk: '5', depo: '50',
-    ilkTescil: '09.07.2020' },
+    ilkTescil: '09.07.2020',
+    tcVergiNo: '12345678901', adres: 'Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli' },
   { plaka: '06 BFT 41', marka: 'Ford', model: 'Focus', yil: '2017',
     motor: '1.5 TDCi', renk: 'Gri Metalik', yakit: 'Dizel',
     vin: 'WF0PXXGCHPHR12345', motorNo: 'XWDA1234567',
     silindir: '1499', guc: '88', koltuk: '5', depo: '52',
-    ilkTescil: '28.02.2017' }
+    ilkTescil: '28.02.2017',
+    tcVergiNo: '9876543210', adres: 'Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara' }
 ];
 var ruhsatSira = 0;
 
@@ -8753,10 +8806,13 @@ var ruhsatSira = 0;
 function ruhsatOku(kaynak) {
   var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
   ruhsatSira++;
+  /* ⚠️ VERGİ DAİRESİ BU HARİTADA YOK ve olmayacak: ruhsatta yazmıyor.
+     Okunamayan bir alanı doldurmak, uydurmaktır (K-050). */
   var esle = { rPlaka: 'plaka', rMarka: 'marka', rModel: 'model', rYil: 'yil',
     rMotor: 'motor', rRenk: 'renk', rYakit: 'yakit', rVin: 'vin',
     rMotorNo: 'motorNo', rSilindir: 'silindir', rGuc: 'guc',
-    rKoltuk: 'koltuk', rDepo: 'depo', rIlkTescil: 'ilkTescil' };
+    rKoltuk: 'koltuk', rDepo: 'depo', rIlkTescil: 'ilkTescil',
+    rTcVergi: 'tcVergiNo', rAdres: 'adres' };
   Object.keys(esle).forEach(function (id) {
     var e = document.getElementById(id);
     if (e) e.value = r[esle[id]] || '';
@@ -8820,6 +8876,11 @@ document.addEventListener('click', function (e) {
         koltuk: rDeger('rKoltuk'), depo: rDeger('rDepo'),
         ilkTescil: rDeger('rIlkTescil'),
         sahipAd: rDeger('rSahip'), sahipTel: rDeger('rTel'),
+        /* FATURA ALANLARI (15.09 · K-050) — fatura TC/vergi numarasına
+           ve adrese kesilir. Vergi dairesi ruhsatta yok; usta yazarsa
+           kaydediliyor, yoksa boş kalıyor. */
+        tcVergiNo: rDeger('rTcVergi'), adres: rDeger('rAdres'),
+        vergiDairesi: rDeger('rVergiDairesi'),
         not: ''
       });
     }
@@ -9795,8 +9856,6 @@ Ekran.tanim('arac', {
       : '';
 
     /* ---- RUHSAT BİLGİLERİ (akordiyon) ----
-       ⚠️ TC kimlik no ve adres ruhsatta VAR ama BURADA YOK
-       (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir).
        Yakıt deposu ruhsatta yazmaz; araç bilgisi olarak tutuluyor. */
     var alanlar = [
       ['Şasi no (VIN)', a.vin], ['Motor no', a.motorNo],
@@ -9807,6 +9866,26 @@ Ekran.tanim('arac', {
       ['Yakıt deposu', a.depo ? a.depo + ' litre' : '']
     ].filter(function (x) { return x[1]; });
 
+    /* ---- FATURA BİLGİLERİ (akordiyon · 15.09 · K-050) ----
+       Cemil: *"Bu alanlar da gerekli. Çünkü bu alanlara fatura
+       kesilecek vb."*
+
+       ⚠️ RUHSAT BİLGİLERİNDEN AYRI DURUYOR ve bu bilinçli: ikisi ayrı
+       soruya cevap veriyor. Ruhsat bilgileri *"bu araç ne"*, fatura
+       bilgileri *"bu fatura kime kesilecek"*. Tek akordiyona
+       doldurulsaydı usta fatura keserken dokuz alanın içinden üçünü
+       aramak zorunda kalırdı.
+
+       ⚠️ VERGİ DAİRESİ RUHSATTA YOK: boşsa "—" değil, NE YAPILACAĞI
+       yazıyor. Boş bir alan ustaya bir şey söylemez; eksik olduğunu
+       söyleyen alan söyler (K-033.3'ün kuralı). */
+    var faturaAlan = [
+      ['TC / Vergi no', a.tcVergiNo || ''],
+      ['Adres', a.adres || ''],
+      ['Vergi dairesi', a.vergiDairesi || '']
+    ].filter(function (x) { return x[1]; });
+    var faturaEksik = !a.tcVergiNo || !a.adres;
+
     document.getElementById('arRuhsatBolum').innerHTML = akordiyonHtml(
       'arRuhsat', 'i-file-text', 'Ruhsat bilgileri',
       alanlar.length ? alanlar.length + ' alan' : 'boş',
@@ -9816,6 +9895,24 @@ Ekran.tanim('arac', {
                    '<span class="tv">' + x[1] + '</span></div>';
           }).join('') + '</div>'
         : '<p class="plate-hint">Ruhsat okunmamış — bilgiler boş.</p>');
+
+    document.getElementById('arFaturaBolum').innerHTML = akordiyonHtml(
+      'arFatura', 'i-receipt', 'Fatura bilgileri',
+      faturaAlan.length ? faturaAlan.length + ' alan' : 'boş',
+      (faturaAlan.length
+        ? '<div class="tutar-serit">' + faturaAlan.map(function (x) {
+            return '<div class="tutar-sat"><span>' + x[0] + '</span>' +
+                   '<span class="tv">' + x[1] + '</span></div>';
+          }).join('') + '</div>'
+        : '') +
+      (faturaEksik
+        ? '<p class="plate-hint">' +
+            (!a.tcVergiNo && !a.adres
+              ? 'Fatura kesmek için TC/vergi no ve adres gerekiyor — ruhsat okununca dolar.'
+              : (!a.tcVergiNo ? 'TC/vergi no eksik.' : 'Adres eksik.')) +
+            ' Vergi dairesi ruhsatta yazmaz; gerekiyorsa müşteriye sorulur.' +
+          '</p>'
+        : ''));
 
     /* ---- KİLOMETRE GEÇMİŞİ (akordiyon) ----
        ⚠️ 04.09, Cemil: "Km geçmişinde tahmin için alanı olmasın.
@@ -11343,7 +11440,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>ad399b38</b><br>' +
+      'Sürüm <b>59b4d909</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

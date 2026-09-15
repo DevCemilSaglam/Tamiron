@@ -27,6 +27,8 @@ Akıştaki yeri: **Adım 1** · Ekran 2, 6
 | `Vin` | Ruhsatta var, alınır. Zorunlu değil |
 | `OwnerName` · `OwnerPhone` | **Telefon hatırlatmanın ön koşulu.** Ad özette geçer. **Ruhsat sahibi FİRMA da olabilir** (04.09) — ayrı bir "tüzel kişi" işareti tutulmaz, ad neyse o yazılır |
 | `ContactName` · `ContactPhone` | **İkinci iletişim** (04.09, Cemil: *"Eğer ikinci bir iletişim varsa adı ve Telefonu"*). Ruhsat firmanınsa aranacak kişi başkasıdır; firmanın numarası santraldir. **Adsız telefon işe yaramaz** — usta kimi aradığını bilmeden aramaz. İkisi de boş olabilir |
+| `TaxOrNationalId` · `Address` | **⚠️ 15.09'da EKLENDİ (K-050).** Cemil: *"Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb."* Ruhsatta ikisi de var (Y.4 · C.1.3) ve **fatura tam olarak bunlara kesilir** — kişide 11 haneli TC, firmada 10 haneli vergi no. `RUHSAT-OKUMA.md` Bulgu 2 bunları *"bize gerekmiyor"* diye elemişti; **gerekçe doğruydu ama tek bir işe (araç kaydı) bakıyordu** |
+| `TaxOffice` | **Vergi dairesi — RUHSATTA YOK.** Fatura için gerekiyor, belgede yazmıyor: okunamaz, **usta yazar**. Alan var, okuma yok. Bir alanı ruhsattan doldurulabilir sanmak, uydurmanın davetidir |
 | `Note` | Serbest — *"arka cam kolu kırık"* |
 
 > **İkinci iletişim iki alandır, tablo değil.** v1'de müşteri dünyası

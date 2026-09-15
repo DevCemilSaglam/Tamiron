@@ -58,10 +58,12 @@ KURALLAR:
    pahalıdır — usta onu bir daha kontrol etmez.
 3. BELGEDE OLMAYAN ALANI BOŞ BIRAK. Eski tip ruhsatlarda yakıt cinsi,
    motor gücü, silindir hacmi ve koltuk sayısı YOKTUR.
-4. TC KİMLİK NO, VERGİ NO, ADRES ve SAHİP ADINI OKUMA, DÖNDÜRME.
-   Bu bilgiler bize gerekmiyor; tutmadığımız veri en güvenli veridir.
-5. Plakayı boşluklu yaz: "33VAH34" değil "33 VAH 34".
-6. Belge yan ya da ters çekilmiş olabilir; döndürüp oku.`
+4. TC KİMLİK NO / VERGİ NO, SOYADI-ÜNVAN, ADI ve ADRESİ DE OKU.
+   Bunlar faturanın kesileceği bilgiler (K-050). Kişide 11 haneli TC,
+   firmada 10 haneli vergi numarası olur.
+5. VERGİ DAİRESİ ruhsatta YAZMAZ — böyle bir alan döndürme.
+6. Plakayı boşluklu yaz: "33VAH34" değil "33 VAH 34".
+7. Belge yan ya da ters çekilmiş olabilir; döndürüp oku.`
   },
   parca: {
     set: 'parca-seti.json', klasor: 'parcalar', kayitAlani: 'listeler',
@@ -93,6 +95,30 @@ KURALLAR:
 if (!AYAR) { console.error('--tur ruhsat ya da parca olmalı'); process.exit(1); }
 
 const set = JSON.parse(fs.readFileSync(path.join(KOK, AYAR.set), 'utf8'));
+
+/* ---- KİŞİSEL ÖLÇÜT (15.09 · K-050) ----
+   TC/vergi no, ad ve adres artık ÖLÇÜLÜYOR — fatura bunlara kesiliyor.
+   Ama değerleri depoda durmuyor: gerçek insanların kimlik numarası bir
+   GitHub deposunda kalıcı olarak kalmaz. Yerel dosya varsa ölçüte
+   karışıyor; yoksa bu alanlar ÖLÇÜME GİRMİYOR ve koşucu bunu SÖYLÜYOR —
+   ölçemediğini ölçmüş gibi raporlayan araç, ölçüm aleti değildir. */
+const KISISEL_YOL = path.join(KOK, AYAR.set.replace('.json', '-kisisel.json'));
+let kisiselVar = false;
+if (fs.existsSync(KISISEL_YOL)) {
+  const kisisel = JSON.parse(fs.readFileSync(KISISEL_YOL, 'utf8'));
+  const tablo = kisisel.belgeler || kisisel.listeler || {};
+  set[AYAR.kayitAlani].forEach(k => {
+    const ek = tablo[k.id];
+    /* Dosyada adı geçmeyen belgede doğru cevap BOŞTUR — o yüzden
+       alanlar yine ekleniyor, null değerle. Eklenmezse "uydurma"
+       sınavı hiç koşmaz. */
+    (kisisel.alanlar ? Object.keys(kisisel.alanlar) : []).forEach(alan => {
+      k.beklenen[alan] = ek ? (ek[alan] === undefined ? null : ek[alan]) : null;
+    });
+  });
+  kisiselVar = true;
+}
+
 const kayitlar = set[AYAR.kayitAlani]
   .filter(k => !SADECE || SADECE.split(',').indexOf(k.id) >= 0);
 
@@ -204,6 +230,10 @@ const PARCA_SEMA = {
 
   console.log('\nMOTOR: ' + MODEL + ' · TÜR: ' + TUR);
   if (atlanan) console.log('⚠️ ' + atlanan + ' fotoğraf bulunamadı — ölçüm EKSİK.');
+  if (TUR === 'ruhsat' && !kisiselVar) {
+    console.log('⚠️ ' + path.basename(KISISEL_YOL) + ' yok — TC/vergi no, ad ve ' +
+                'adres ÖLÇÜLMEDİ. Fatura alanları bu koşuda sınanmadı.');
+  }
   console.log(sonuc.ozet);
   console.log('jeton: ' + girdi + ' girdi · ' + cikti + ' çıktı');
   sonuc.satirlar.filter(s => s.sonuc !== 'TAM').forEach(s => {

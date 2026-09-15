@@ -205,13 +205,39 @@
             <label for="rIlkTescil">İlk tescil</label>
             <input id="rIlkTescil" class="mono" data-giris="tarih" inputmode="numeric" placeholder="14.06.2018" autocomplete="off" />
           </div>
-          <!-- ⚠️ TC KİMLİK NO ve ADRES BURAYA DA GİRMEDİ. Ruhsatta
-               varlar; RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en
-               güvenli veridir. Tamircinin yedi işinden hiçbiri
-               bunları istemiyor. -->
+          <!-- ⚠️ 15.09 — TC/VERGİ NO ve ADRES GERİ GELDİ (Cemil:
+               *"Bu alanlar da gerekli. Çünkü bu alanlara fatura
+               kesilecek vb."*).
+
+               BU BİR KARARIN GERİ ALINMASIDIR. RUHSAT-OKUMA.md Bulgu
+               2 *"tutmadığın veri en güvenli veridir"* diyordu ve
+               gerekçesi doğruydu — ama TEK BİR İŞİ (araç kaydı)
+               düşünerek verilmişti. Faturanın kesileceği yer tam
+               olarak burası: fatura TC/vergi numarasına ve adrese
+               kesilir. Cemil ikinci işi söyledi, kural değişti
+               (K-050).
+
+               ⚠️ VERGİ DAİRESİ RUHSATTA YOK. Fatura için gerekiyor
+               ama belgede yazmıyor — okunamaz, ustaya sorulur. Alan
+               boş duruyor ve bunu ekran söylüyor. -->
+          <div class="field">
+            <label for="rTcVergi">TC kimlik no / Vergi no</label>
+            <input id="rTcVergi" class="mono" data-giris="km" inputmode="numeric"
+                   placeholder="11 hane (TC) ya da 10 hane (vergi)" autocomplete="off" />
+          </div>
+          <div class="field">
+            <label for="rAdres">Adres</label>
+            <textarea id="rAdres" rows="2" aria-label="Adres"
+                      placeholder="Ruhsattan okunur"></textarea>
+          </div>
+          <div class="field">
+            <label for="rVergiDairesi">Vergi dairesi</label>
+            <input id="rVergiDairesi" placeholder="Ruhsatta yazmaz — fatura kesilecekse sor"
+                   autocomplete="off" />
+          </div>
           <p class="plate-hint">
-            TC kimlik no ve adres ruhsatta yazar ama burada tutulmaz —
-            işine yaramıyor, saklanması risk.
+            Bu üç alan <b>fatura için</b> tutuluyor. Vergi dairesi ruhsatta
+            yazmaz; fatura kesecekseniz müşteriye sorulur.
           </p>
         </div>
       </div>
@@ -479,16 +505,22 @@ Ekran.tanim('ruhsat', {
    koltuk, ilk tescil. Yarım örnek, "bu alanlar zaten dolmaz" diye
    yanlış bir izlenim bırakıyordu. */
 var RUHSAT_ORNEK = [
+  /* ⚠️ 15.09 — ÖRNEKLERE FATURA ALANLARI EKLENDİ. Gerçek ruhsatta
+     bunlar var ve artık okunuyorlar (K-050); örnek veride olmasalardı
+     alanlar prototipte hep boş kalır ve "çalışmıyor" sanılırdı —
+     çalıştığı görülemeyen alan, çalışmıyor sayılır. */
   { plaka: '41 P 3873', marka: 'Hyundai', model: 'i20', yil: '2020',
     motor: '1.4 MPI', renk: 'Beyaz', yakit: 'Benzin',
     vin: 'NLHB351CALZ123456', motorNo: 'G4LAJH123456',
     silindir: '1368', guc: '74', koltuk: '5', depo: '50',
-    ilkTescil: '09.07.2020' },
+    ilkTescil: '09.07.2020',
+    tcVergiNo: '12345678901', adres: 'Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli' },
   { plaka: '06 BFT 41', marka: 'Ford', model: 'Focus', yil: '2017',
     motor: '1.5 TDCi', renk: 'Gri Metalik', yakit: 'Dizel',
     vin: 'WF0PXXGCHPHR12345', motorNo: 'XWDA1234567',
     silindir: '1499', guc: '88', koltuk: '5', depo: '52',
-    ilkTescil: '28.02.2017' }
+    ilkTescil: '28.02.2017',
+    tcVergiNo: '9876543210', adres: 'Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara' }
 ];
 var ruhsatSira = 0;
 
@@ -498,10 +530,13 @@ var ruhsatSira = 0;
 function ruhsatOku(kaynak) {
   var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
   ruhsatSira++;
+  /* ⚠️ VERGİ DAİRESİ BU HARİTADA YOK ve olmayacak: ruhsatta yazmıyor.
+     Okunamayan bir alanı doldurmak, uydurmaktır (K-050). */
   var esle = { rPlaka: 'plaka', rMarka: 'marka', rModel: 'model', rYil: 'yil',
     rMotor: 'motor', rRenk: 'renk', rYakit: 'yakit', rVin: 'vin',
     rMotorNo: 'motorNo', rSilindir: 'silindir', rGuc: 'guc',
-    rKoltuk: 'koltuk', rDepo: 'depo', rIlkTescil: 'ilkTescil' };
+    rKoltuk: 'koltuk', rDepo: 'depo', rIlkTescil: 'ilkTescil',
+    rTcVergi: 'tcVergiNo', rAdres: 'adres' };
   Object.keys(esle).forEach(function (id) {
     var e = document.getElementById(id);
     if (e) e.value = r[esle[id]] || '';
@@ -565,6 +600,11 @@ document.addEventListener('click', function (e) {
         koltuk: rDeger('rKoltuk'), depo: rDeger('rDepo'),
         ilkTescil: rDeger('rIlkTescil'),
         sahipAd: rDeger('rSahip'), sahipTel: rDeger('rTel'),
+        /* FATURA ALANLARI (15.09 · K-050) — fatura TC/vergi numarasına
+           ve adrese kesilir. Vergi dairesi ruhsatta yok; usta yazarsa
+           kaydediliyor, yoksa boş kalıyor. */
+        tcVergiNo: rDeger('rTcVergi'), adres: rDeger('rAdres'),
+        vergiDairesi: rDeger('rVergiDairesi'),
         not: ''
       });
     }

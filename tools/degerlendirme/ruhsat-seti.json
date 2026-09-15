@@ -6,11 +6,13 @@
 
   "⚠️ TASLAK": "Bu dosyadaki alanları FOTOĞRAFLARDAN OKUYAN ben oldum (Claude, görüntü). Yani burası henüz 'ölçüt' değil, ÖLÇÜT ADAYI. Bir modelin kendi okumasını kendi ölçütü yapması, sınavı kendi yazıp kendi puanlaması olurdu. Cemil doğrulayıp 'dogrulandi: true' yazana kadar bu dosya bir TASLAKTIR. Şüphelendiğim her alanın yanında 'guven' notu var — doğrulama oradan başlasın.",
 
-  "gizlilik": {
-    "kural": "RUHSAT-OKUMA.md Bulgu 2 · A-31: TC kimlik no ve adres TUTULMAZ.",
-    "uygulama": "Bu dosyada TC no, adres ve SAHİP ADI YOK. Ruhsatta görünüyorlar; okunmadılar. Sahip alanı yalnız 'belgede var mı' diye işaretlendi.",
-    "yasakAlanlar": ["tcNo", "vergiNo", "adres", "sahipAd", "soyad"],
-    "not": "yasakAlanlar bir SINAV maddesidir: model bu alanlardan birini döndürürse, değeri doğru olsa bile o okuma BAŞARISIZ sayılır. Tutmadığın veri en güvenli veridir."
+  "kisiselAlanlar": {
+    "⚠️ 15.09 KURAL DEĞİŞTİ": "Cemil: 'Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb.' — RUHSAT-OKUMA Bulgu 2 bunları elemişti, gerekçesi doğruydu ama TEK BİR İŞE (araç kaydı) bakıyordu. Fatura TC/vergi numarasına ve adrese kesilir. Kural geri alındı (K-050).",
+    "okunacak": ["tcVergiNo", "unvanSoyad", "ad", "adres"],
+    "yasakAlanlar": [],
+    "degerleriNerede": "ruhsat-seti-kisisel.json — .gitignore'da, depoya girmez.",
+    "neden": "Alanlar ölçülüyor ama 46 gerçek insanın TC numarası ve adresi bir GitHub deposunda kalıcı olarak durmaz. Fotoğrafların kendisi zaten depoya girmiyor; içindekini yazıya dökünce girmesi tutarsız olurdu. Koşucu yerel dosya varsa birleştiriyor, yoksa bu alanları ATLIYOR ve atladığını söylüyor.",
+    "vergiDairesi": "⚠️ RUHSATTA YOK. Fatura için gerekiyor ama belgede yazmıyor — okunamaz, ustaya sorulur. Ölçütte de yok; olmayan alanı ölçmek, modeli uydurmaya davet etmek olurdu."
   },
 
   "fotograflar": {
@@ -33,12 +35,17 @@
     "silindir": "(P.1) SİLİNDİR HACMİ",
     "guc": "(P.2) MOTOR GÜCÜ (kW)",
     "yakit": "(P.3) YAKIT CİNSİ",
-    "koltuk": "(S.1) KOLTUK SAYISI"
+    "koltuk": "(S.1) KOLTUK SAYISI",
+    "tcVergiNo": "(Y.4) TC KİMLİK NO / VERGİ NO — kişisel, değeri ayrı dosyada",
+    "unvanSoyad": "(C.1.1) SOYADI / TİCARİ ÜNVANI — kişisel",
+    "ad": "(C.1.2) ADI — kişisel",
+    "adres": "(C.1.3) ADRESİ — kişisel"
   },
 
   "puanlama": {
     "kritik": ["plaka", "marka", "ticariAd", "modelYili", "sase"],
     "not": "Kritik alan yanlışsa okuma başarısızdır — plaka yanlışsa yanlış araca kayıt açılır, şase yanlışsa parçacı yanlış parça gönderir. Öteki alanlar tek tek sayılır.",
+    "kisiselAlanNotu": "tcVergiNo · unvanSoyad · ad · adres KRİTİK DEĞİL ama ölçülüyor: fatura bunlara kesiliyor. Değerleri yerel dosyadan geliyor; dosya yoksa bu dört alan puanlamaya girmiyor ve koşucu bunu söylüyor.",
     "bosBirakmaKurali": "Belgede OLMAYAN ya da OKUNMAYAN alan boş bırakılmalı. Uydurulan alan, boş bırakılandan AĞIR hata sayılır (guven: 'okunamadi' olanlar bunun sınavıdır)."
   },
 

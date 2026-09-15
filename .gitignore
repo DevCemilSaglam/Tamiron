@@ -14,3 +14,10 @@ tools/degerlendirme/parcalar/
 
 # Model koşularının ham çıktıları (içinde okunan alanlar var)
 tools/degerlendirme/sonuc-*.json
+
+# ⚠️ KİŞİSEL ÖLÇÜT: TC/vergi no, ad ve adres değerleri (K-050).
+# Alanlar ARTIK ÖLÇÜLÜYOR — fatura bunlara kesiliyor — ama 46 gerçek
+# insanın kimlik numarası bir GitHub deposunda kalıcı olarak durmaz.
+# Fotoğrafların kendisi zaten girmiyor; içindekini yazıya dökünce
+# girmesi tutarsız olurdu.
+tools/degerlendirme/*-kisisel.json

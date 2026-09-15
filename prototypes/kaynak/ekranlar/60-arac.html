@@ -63,6 +63,11 @@
 
   <div id="arRuhsatBolum"></div>
 
+  <!-- FATURA BİLGİLERİ (15.09 · K-050) — ruhsat bilgilerinin hemen
+       altında, çünkü ikisi de aynı fotoğraftan doluyor; ama AYRI
+       akordiyon, çünkü ayrı soruya cevap veriyorlar. -->
+  <div id="arFaturaBolum"></div>
+
   <div id="arKmBolum"></div>
 
   <div id="arBakim"></div>
@@ -199,8 +204,6 @@ Ekran.tanim('arac', {
       : '';
 
     /* ---- RUHSAT BİLGİLERİ (akordiyon) ----
-       ⚠️ TC kimlik no ve adres ruhsatta VAR ama BURADA YOK
-       (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir).
        Yakıt deposu ruhsatta yazmaz; araç bilgisi olarak tutuluyor. */
     var alanlar = [
       ['Şasi no (VIN)', a.vin], ['Motor no', a.motorNo],
@@ -211,6 +214,26 @@ Ekran.tanim('arac', {
       ['Yakıt deposu', a.depo ? a.depo + ' litre' : '']
     ].filter(function (x) { return x[1]; });
 
+    /* ---- FATURA BİLGİLERİ (akordiyon · 15.09 · K-050) ----
+       Cemil: *"Bu alanlar da gerekli. Çünkü bu alanlara fatura
+       kesilecek vb."*
+
+       ⚠️ RUHSAT BİLGİLERİNDEN AYRI DURUYOR ve bu bilinçli: ikisi ayrı
+       soruya cevap veriyor. Ruhsat bilgileri *"bu araç ne"*, fatura
+       bilgileri *"bu fatura kime kesilecek"*. Tek akordiyona
+       doldurulsaydı usta fatura keserken dokuz alanın içinden üçünü
+       aramak zorunda kalırdı.
+
+       ⚠️ VERGİ DAİRESİ RUHSATTA YOK: boşsa "—" değil, NE YAPILACAĞI
+       yazıyor. Boş bir alan ustaya bir şey söylemez; eksik olduğunu
+       söyleyen alan söyler (K-033.3'ün kuralı). */
+    var faturaAlan = [
+      ['TC / Vergi no', a.tcVergiNo || ''],
+      ['Adres', a.adres || ''],
+      ['Vergi dairesi', a.vergiDairesi || '']
+    ].filter(function (x) { return x[1]; });
+    var faturaEksik = !a.tcVergiNo || !a.adres;
+
     document.getElementById('arRuhsatBolum').innerHTML = akordiyonHtml(
       'arRuhsat', 'i-file-text', 'Ruhsat bilgileri',
       alanlar.length ? alanlar.length + ' alan' : 'boş',
@@ -220,6 +243,24 @@ Ekran.tanim('arac', {
                    '<span class="tv">' + x[1] + '</span></div>';
           }).join('') + '</div>'
         : '<p class="plate-hint">Ruhsat okunmamış — bilgiler boş.</p>');
+
+    document.getElementById('arFaturaBolum').innerHTML = akordiyonHtml(
+      'arFatura', 'i-receipt', 'Fatura bilgileri',
+      faturaAlan.length ? faturaAlan.length + ' alan' : 'boş',
+      (faturaAlan.length
+        ? '<div class="tutar-serit">' + faturaAlan.map(function (x) {
+            return '<div class="tutar-sat"><span>' + x[0] + '</span>' +
+                   '<span class="tv">' + x[1] + '</span></div>';
+          }).join('') + '</div>'
+        : '') +
+      (faturaEksik
+        ? '<p class="plate-hint">' +
+            (!a.tcVergiNo && !a.adres
+              ? 'Fatura kesmek için TC/vergi no ve adres gerekiyor — ruhsat okununca dolar.'
+              : (!a.tcVergiNo ? 'TC/vergi no eksik.' : 'Adres eksik.')) +
+            ' Vergi dairesi ruhsatta yazmaz; gerekiyorsa müşteriye sorulur.' +
+          '</p>'
+        : ''));
 
     /* ---- KİLOMETRE GEÇMİŞİ (akordiyon) ----
        ⚠️ 04.09, Cemil: "Km geçmişinde tahmin için alanı olmasın.

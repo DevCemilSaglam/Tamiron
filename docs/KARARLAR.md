@@ -10,6 +10,91 @@
 
 ---
 
+## K-050 · TC/vergi no ve adres tutuluyor — "gerekmiyor" dediğim şey gerekiyormuş (15.09.2026)
+
+> **Cemil:** *"`yasakAlanlar` alanları da gerekli. Çünkü bu alanlara
+> fatura kesilecek vb."*
+
+**Bir gün önce yazdığım kuralı geri alıyorum ve gerekçesi benimkinden
+güçlü.**
+
+### 50.1 · Neden yanılmışım — "gerekmiyor" demek, her işi bilmeyi gerektirir
+
+`RUHSAT-OKUMA.md` Bulgu 2 şöyle diyordu: *"Ruhsatta TC kimlik no ve
+adres var, yedi işten hiçbiri bunları istemiyor; tutmadığın veri en
+güvenli veridir."* K-049 bu kuralı bir **sınav maddesine** çevirmişti:
+model bu alanları döndürürse, değeri doğru olsa bile okuma başarısız.
+
+Cümle yanlış değildi, **eksikti**. Baktığım tek iş **araç kaydı
+açmaktı**. Fatura kesmek ikinci bir iş ve **fatura tam olarak bu
+alanlara kesilir**: kişide 11 haneli TC, firmada 10 haneli vergi no,
+ikisinde de adres.
+
+> **Ders:** *"Bu veri bize gerekmiyor"* demek için tamircinin yaptığı
+> **her işi** bilmek gerekiyor. Gizlilik kaygısıyla verilen bir karar
+> bile, kapsamı eksik biliniyorsa yanlış olur. Kuralı yazan ben,
+> kapsamı bilen Cemil.
+
+### 50.2 · Ne değişti
+
+| | Önce | Sonra |
+|---|---|---|
+| TC / vergi no · adres | okunmaz, tutulmaz | **okunur, tutulur** (`Vehicle.TaxOrNationalId` · `Address`) |
+| Değerlendirme setinde | `yasakAlanlar` — dönerse başarısız | **ölçülen alan** — dönmezse eksik |
+| Ruhsat ekranı | *"burada tutulmaz"* açıklaması | **üç alan** (TC/vergi · adres · vergi dairesi) |
+| Araç ekranı | yok | **"Fatura bilgileri" akordiyonu** |
+
+**Fatura bilgileri ruhsat bilgilerinden AYRI akordiyonda** ve bu
+bilinçli: ikisi ayrı soruya cevap veriyor — *"bu araç ne"* ve *"bu
+fatura kime kesilecek"*. Tek akordiyona doldurulsaydı usta fatura
+keserken dokuz alanın içinden üçünü aramak zorunda kalırdı.
+
+### 50.3 · Vergi dairesi ruhsatta YOK — ve bu ekranda yazıyor
+
+Fatura için gerekiyor, belgede yazmıyor. Üç yerde birden ele alındı:
+alan **var**, okuma haritasında **yok**, ekran da *"ruhsatta yazmaz,
+gerekiyorsa müşteriye sorulur"* diyor. Model istemine de yazıldı:
+*"vergi dairesi ruhsatta yazmaz — böyle bir alan döndürme."*
+
+> **Olmayan bir alanı doldurulabilir sanmak, modeli uydurmaya davet
+> etmektir.** Boş alan ustaya *"sen yaz"* der; uydurulmuş vergi
+> dairesiyle kesilen fatura **yanlış faturadır**.
+
+### 50.4 · Değer depoya girmiyor — alan giriyor
+
+Alanlar artık ölçülüyor, ama **46 gerçek insanın TC numarası ve adresi
+bir GitHub deposunda kalıcı olarak durmaz.** Ayrım şu:
+
+* **Alan** (şema, kural, ölçüt) → depoda.
+* **Değer** (gerçek TC, gerçek adres) → `*-kisisel.json`, **.gitignore**'da.
+
+Fotoğrafların kendisi zaten depoya girmiyordu; içindekini yazıya dökünce
+girmesi **tutarsız** olurdu. Koşucu yerel dosyayı varsa ölçüte karıştırıyor,
+yoksa bu dört alanı **ölçmüyor ve ölçmediğini söylüyor** — ölçemediğini
+ölçmüş gibi raporlayan araç, ölçüm aleti değildir (K-024.1).
+
+Negatif testle doğrulandı: kişisel alanı olmayan belgeye TC yazan model
+**UYDURMA** alıyor; alanları hiç okumayan model belge tamlığında
+**%100 → %48**'e düşüyor.
+
+### 50.5 · İki sonucu var ve ikisi de yazıldı
+
+**① Aydınlatma metni artık gerekli.** A-M33 *"iyi olur"* diye
+duruyordu; TC ve adres tutuluyorsa KVKK aydınlatması ve **saklama
+süresi** gerekiyor (**A-M36** açıldı).
+
+**② Fatura, muhasebe kapsamının dışındaydı.** `MUHASEBE-KARARI.md`
+B seçeneğinin sınırını *"fatura yok · KDV yok · e-belge yok"* diye
+çizmişti. *"Bu alanlara fatura kesilecek"* cümlesi o sınıra
+dokunuyor — **fatura alanlarını tutmak** ile **fatura kesmek** ayrı
+işler; bu turda yalnız birincisi yapıldı (**A-M37**).
+
+> **Cemil onayına açık:** **A-M36** (saklama süresi + aydınlatma
+> metni) · **A-M37** (fatura kesmek MUH kapsamına giriyor mu —
+> giriyorsa K-022'nin sınırı değişir).
+
+---
+
 ## K-049 · Fotoğraflar geldi: ölçüt yazıldı, ama ölçütü MODEL yazdı (15.09.2026)
 
 Cemil **46 ruhsat + 27 parça listesi** gönderdi (A-M32 kapandı). İkisinin
@@ -3683,6 +3768,8 @@ oradan bakılır.
 |---|---|---|
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
+| **A-M37** | **Fatura kesmek** MUH kapsamına giriyor mu? Bu turda yalnız fatura ALANLARI tutuldu; fatura kesmek K-022'nin "fatura yok · KDV yok · e-belge yok" sınırını değiştirir (K-050.5) | Alanlar evet, kesmek **ayrı karar** — MUH cevabıyla birlikte |
+| **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma metni ve saklama süresi** gerekiyor (K-050.5) | Aydınlatma: ayarlarda tek satır (A-M33 ile birleşti). Saklama: fatura kayıtlarıyla aynı süre — konuşulmalı |
 | **A-M35** | Fotoğraflar diske konup model koşusu yapılsın mı? 46 ruhsat + 27 liste — Opus 5 ~$0,60 · Sonnet 5 ~$0,25 (K-049) | Koşulsun, ama **A-M34'ten sonra** |
 | **A-M34** | **Ölçütü model yazdı** (fotoğrafları okuyan bendim). Doğrulanmadan çıkacak rakam karne değil tahmin. Kim doğrulayacak? (K-049.1) | Cemil — yalnız `guven` notlu 14 belge ve 42 ditto satırı; hepsi değil |
 | ~~A-M32~~ | **KAPANDI (15.09):** Cemil 46 ruhsat + 27 parça listesi gönderdi; ikisinin de ölçütü yazıldı (K-049) | — |

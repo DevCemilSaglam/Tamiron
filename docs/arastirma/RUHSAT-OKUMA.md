@@ -21,11 +21,35 @@ Ruhsat araç ve sahip bilgisi taşıyor — **iletişim bilgisi taşımıyor.** 
 
 > Öneri: telefon **zorunlu değil.** Boş bırakılabilsin — usta acele ediyorsa iş durmasın. Telefon yoksa hatırlatma ve özet sessizce atlanır (zaten öyle kurgulandı). Sonradan araç kartından eklenir.
 
-### ⚠️ Bulgu 2 · **Ruhsatta TC kimlik no ve adres var — bize gerekmiyor**
+### ⚠️ Bulgu 2 · ~~Ruhsatta TC kimlik no ve adres var — bize gerekmiyor~~ · **15.09'da GERİ ALINDI**
 
-Ruhsat, sahibin **TC kimlik numarasını ve adresini** taşıyor. Yedi işten hiçbiri bunları istemiyor.
+> **Cemil, 15.09:** *"Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb."*
+> **Kural değişti (K-050): TC/vergi no ve adres OKUNUYOR ve TUTULUYOR.**
 
-> **Kural: okuduğumuzun tamamını saklamıyoruz.** Fotoğraftan çıkan alanlardan yalnız `VERI-MODELI.md`'de karşılığı olanlar kaydedilir. TC kimlik no ve adres **hiç yazılmaz** — KVKK açısından tutmadığın veri en güvenli veridir.
+Eski gerekçe silinmedi, çünkü **yanlış değildi — eksikti**:
+
+> *"Yedi işten hiçbiri bunları istemiyor. Okuduğumuzun tamamını
+> saklamıyoruz; tutmadığın veri en güvenli veridir."*
+
+Bu cümle **tek bir işe** bakıyordu: araç kaydı açmak. Fatura kesmek
+ikinci bir iştir ve **fatura tam olarak bu alanlara kesilir** — kişide
+TC kimlik no, firmada vergi no, ikisinde de adres. *"Bize gerekmiyor"*
+demek için tamircinin yaptığı her işi bilmek gerekiyordu; bilmiyorduk.
+
+**Değişmeyen üç şey:**
+
+* **Fotoğraf yine saklanmıyor** (A-31). Okunur, alanlar alınır, fotoğraf
+  atılır. Alanı tutmakla görüntüyü tutmak ayrı kararlar.
+* **Vergi dairesi ruhsatta YOK.** Fatura için gerekiyor ama belgede
+  yazmıyor — **usta yazar**. Okuma istemine *"böyle bir alan
+  döndürme"* diye yazıldı; olmayan alanı istemek, modeli uydurmaya
+  davet etmektir.
+* **Okuduğumuzun tamamını saklamıyoruz** kuralı duruyor; genişleyen şey
+  listenin kendisi, kuralın kendisi değil.
+
+**Yeni yükümlülük:** bu alanlar tutuluyorsa aydınlatma metni (A-M33)
+*"iyi olur"* olmaktan çıkıp **gerekli** hâle geliyor, ve saklama süresi
+konuşulmalı (A-M36).
 
 ---
 

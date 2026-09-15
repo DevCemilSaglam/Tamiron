@@ -3,8 +3,13 @@
    alan buraya da girmez. Modelde olmayan bir alana ihtiyaç duyulursa
    önce VERI-MODELI.md açılır.
 
-   ⚠️ Ruhsatta TC kimlik no ve adres VAR ama burada YOK
-   (RUHSAT-OKUMA.md Bulgu 2: tutmadığın veri en güvenli veridir). */
+   ⚠️ 15.09 — TC/VERGİ NO ve ADRES ARTIK TUTULUYOR (K-050). Cemil:
+   *"Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb."*
+   RUHSAT-OKUMA Bulgu 2 bunları *"tutmadığın veri en güvenli veridir"*
+   diye elemişti; gerekçe doğruydu ama TEK BİR İŞE (araç kaydı)
+   bakıyordu. Fatura tam olarak bu alanlara kesilir.
+
+   ⚠️ VERGİ DAİRESİ RUHSATTA YOK: alan var, okuma yok — usta yazar. */
 
 var BUGUN = new Date(2026, 8, 3);   /* prototipin "bugün"ü — TEK KAYNAK */
 
@@ -19,7 +24,9 @@ var ARACLAR = [
     renk: 'Gri Metalik', yakit: 'Dizel', motorNo: 'K9K872C123456',
     silindir: '1461', guc: '110', koltuk: '5', ilkTescil: '14.06.2018',
     depo: '50',
-    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00', not: 'Arka cam kolu kırık — müşteri biliyor.' },
+    sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00',
+    tcVergiNo: '12345678901', adres: 'Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli',
+    vergiDairesi: '', not: 'Arka cam kolu kırık — müşteri biliyor.' },
   { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
     motor: '1.4 Fire', vin: 'NM4358004ZT129041',
     renk: 'Beyaz', yakit: 'Benzin', motorNo: '843A1000098765',
@@ -30,19 +37,28 @@ var ARACLAR = [
        ve aranacak kişi başkasıdır. İkinci iletişim olmadan usta
        santrali arayıp "hangi araç" diye anlatmak zorunda kalıyordu. */
     sahipAd: 'Demir Nakliyat Ltd. Şti.', sahipTel: '0312 395 12 00',
-    iletisimAd: 'Hasan Demir', iletisimTel: '0542 331 90 07', not: '' },
+    iletisimAd: 'Hasan Demir', iletisimTel: '0542 331 90 07',
+    /* FİRMA: TC yerine VERGİ NO (10 hane) ve vergi dairesi var —
+       faturanın kesileceği yer burası. */
+    tcVergiNo: '2960412771', adres: 'Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara',
+    vergiDairesi: 'Ostim', not: '' },
   { plaka: '35 KLM 45', marka: 'Peugeot', model: '301', yil: '2019',
     motor: '1.6 BlueHDi', vin: 'VF3DDBHYAKS012345',
     renk: 'Lacivert', yakit: 'Dizel', motorNo: 'DV6FD10JBCE4455',
     silindir: '1560', guc: '100', koltuk: '5', ilkTescil: '21.11.2019',
     depo: '50',
-    sahipAd: 'Ayşe Kaya', sahipTel: '', not: '' },
+    sahipAd: 'Ayşe Kaya', sahipTel: '',
+    /* Fatura alanları BOŞ — her araçta dolu olmayacak; ruhsat
+       okunmadıysa ya da okunamadıysa usta sonra yazar. */
+    tcVergiNo: '', adres: '', vergiDairesi: '', not: '' },
   { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
     motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
     renk: 'Siyah', yakit: 'Dizel', motorNo: 'CLH1234567',
     silindir: '1598', guc: '110', koltuk: '5', ilkTescil: '08.08.2016',
     depo: '50',
-    sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41', not: '' }
+    sahipAd: 'Selim Aydın', sahipTel: '0537 662 08 41',
+    tcVergiNo: '45678901234', adres: 'Cedit Mah. Hisar Geçidi Sk. No:1/9 İzmit / Kocaeli',
+    vergiDairesi: '', not: '' }
 ];
 
 /* ---- ServiceRecord (VERI-MODELI §2) ----
