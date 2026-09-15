@@ -22,7 +22,8 @@ tıklanabilir prototip.
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
 | Sağlık denetimi | **46 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-048** · **açık maddelerin çoğu 14.09'da cevaplandı**; bekleyen dört madde yapay zeka turunun (A-M30…A-M33) |
+| Kararlar | **K-001 … K-049** · bekleyen maddeler yapay zeka turunun (A-M30…A-M35) |
+| Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 alan)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---

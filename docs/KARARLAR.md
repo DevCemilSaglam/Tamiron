@@ -10,6 +10,99 @@
 
 ---
 
+## K-049 · Fotoğraflar geldi: ölçüt yazıldı, ama ölçütü MODEL yazdı (15.09.2026)
+
+Cemil **46 ruhsat + 27 parça listesi** gönderdi (A-M32 kapandı). İkisinin
+de değerlendirme seti yazıldı: `ruhsat-seti.json` (14 alan × 46 belge) ve
+`parca-seti.json` (**258 satır** × 27 liste).
+
+### 49.1 · ⚠️ Bu ölçüt kendi kendini sınayamaz
+
+**Fotoğrafları okuyup alanları yazan modelin kendisiydi.** Yani elimizdeki
+şey bir ölçüt değil, **ölçüt adayı**. Bir modelin kendi okumasını kendi
+ölçütü yapması, sınavı kendi yazıp kendi puanlaması olur — ve çıkan rakam
+ne kadar yüksek olursa olsun hiçbir şey söylemez.
+
+Bu yüzden iki dosyanın başına da büyük harfle **TASLAK** yazıldı ve
+şüphelenilen her alanın yanına `guven` notu düşüldü (46 belgenin
+**14'ünde** var). Doğrulama oradan başlar.
+
+> **Kural:** Cemil doğrulayıp onaylamadan bu setten çıkacak rakam
+> **karne değil, tahmindir.** (A-M34)
+
+### 49.2 · Ölçülen şey doğruluk değil, ÜÇ DAVRANIŞ
+
+Cetvel (`puanla.js` · `alanPuanla`) üç şeyi ayrı sayıyor, çünkü üçünün
+ustaya maliyeti farklı:
+
+| Ne | Neden ayrı sayılıyor |
+|---|---|
+| **Kritik alan** (plaka · marka · ticari ad · model yılı · şase) | Plaka yanlışsa **yanlış araca kayıt açılır**; şase yanlışsa parçacı **yanlış parça gönderir**. Öteki on alanın doğruluğu bunu telafi etmez |
+| **Uydurma** | Okunamayan alanı boş bırakan model ustaya *"sen yaz"* der; **uyduran model yanlış bilgiyi doğruymuş gibi verir** ve usta onu bir daha kontrol etmez |
+| **Yasak alan** | TC no · adres · sahip adı döndürülürse, **değeri doğru olsa bile** okuma başarısız (RUHSAT-OKUMA Bulgu 2 · A-31). Bu bir doğruluk değil **davranış** sınavı |
+
+**İki rakam birden veriliyor ve ikincisi asıl olan:** alan başına
+doğruluk %97 olsa bile *belge başına tamlık* %83 ise, usta her altı
+ruhsattan birinde bir şey düzeltiyor demektir — ve **üç düzeltmeden
+sonra "bu çalışmıyor" der.**
+
+### 49.3 · Fotoğraflar depoya girmiyor
+
+`.gitignore`: `tools/degerlendirme/ruhsatlar/` · `parcalar/` ·
+`sonuc-*.json`. Ruhsatlarda **TC kimlik no ve adres** var, parça
+listelerinde müşteri ve parçacı adı geçiyor. Ölçüm için gerekliler,
+**saklanmaları için bir sebep yok.**
+
+Aynı kural ölçüte de işledi: `ruhsat-seti.json`'da sahip adı **yok**,
+yalnız *"belgede sahip bilgisi var mı"* işareti var.
+
+### 49.4 · Gerçek dünya, uydurulmuş örnekten daha zengin çıktı
+
+Prototipin tohum verisinde olmayan, **ancak gerçek belgede görülen**
+hâller:
+
+* **Eski tip ruhsat** (3 belge) — yakıt, motor gücü, silindir hacmi ve
+  koltuk sayısı **alanları yok**. Bunları dolduran model uyduruyor
+  demektir; setin en sessiz tuzağı bu.
+* **Okunamayan plaka** (`r31` · VW Passat) ve **parmağın kapattığı
+  tarih** (`r45` · Peugeot 308) — doğru cevabın **boş bırakmak** olduğu
+  iki kayıt.
+* **Gelecek tarihli tescil** (`r23` — 25/06/2026). Belgede öyle yazıyor;
+  model **düzeltmemeli**.
+* **Ditto işareti** — parça listelerinde **42 satır**. Bir satırın anlamı
+  ÜSTÜNDEKİ satırda: *"Sağ ön çamurluk sinyali / `" " "` çıtası"*.
+  Çözülmezse o satır parçacıya sorulamaz.
+* **Üstü çizili satır** (`p15` · Devirdaim, `p25` · tamamen karalanmış) —
+  listeden atılmaz, **iptal işaretlenir**. Neden çizdiğini usta bilir.
+* **Bir satırda iki fiyat** (`p09`): `1500 YN / 2500 ORJ` — yan sanayi ve
+  orijinal. Tek fiyat alanına sıkıştıran model **yanlış rakam** verir.
+* **Fiyat yerine durum**: *Gelmez · Yok · Geliniyor · Klimacıya
+  bakılacak.* Bunlar sayı değil **cevap**.
+* **Çarpım satırı** (`p23`): `4 buji = 230 ORJ x4  920` — toplamı birim
+  fiyat sanan model ustaya dört kat pahalı gösterir.
+* **Parça değil İŞ olan satırlar**: rektifiye (9000 ₺), yağ bakımı, rot
+  ayarı, disk taşlama. Tamiron'da satır tipi parça/işçilik ayrımı var;
+  hepsini "parça" diye kaydeden liste yanlış kayıt üretir.
+* **Araç bilgisi gezici**: kimi listede üstte, kimisinde **en altta**
+  (`p20` · *98 model Golf*), kimisinde yok; biri **motor koduyla**
+  (`p11` · X16XEL), biri **şase ile** (`p02`), biri **plakayla** (`p06`).
+
+### 49.5 · Tutarlılık çiftleri — tek kâğıt, tek cevap
+
+Cemil farkında olmadan en değerli malzemeyi de gönderdi: **aynı belgenin
+farklı çekimleri** (`r04·r15·r43`, `r10·r18`, `r33·r42`) ve **aynı
+listenin fiyatsız/fiyatlı hâli** (`p24`→`p23`, `p26`→`p02`→`p08`).
+
+İkincisi T-12/T-13'ün tarif ettiği akışın **fotoğrafı**: ustanın yazdığı
+liste gidiyor, parçacı üstüne fiyat yazıp geri gönderiyor. Aynı kâğıdın
+gidişi ve dönüşü elimizde.
+
+> **Cemil onayına açık:** **A-M34** (ölçüt doğrulaması — modelin kendi
+> okumasını ölçüt yapmasının önüne geçen tek adım) · **A-M35**
+> (fotoğraflar diske konup koşulacak mı, maliyeti Opus 5 ile ~$0,60).
+
+---
+
 ## K-048 · Üçüncü telefon turu: ölçek, süreç ve yapay zekanın yeri (14.09.2026)
 
 Cemil on bir madde yazdı. Üçü hata, dördü ölçek, biri akış, üçü yapay
@@ -3590,7 +3683,9 @@ oradan bakılır.
 |---|---|---|
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
-| **A-M32** | 20–30 gerçek ruhsat + 10–15 parça listesi fotoğrafı toplanacak mı | Toplanmalı; yoksa doğruluk hakkında konuşulamaz |
+| **A-M35** | Fotoğraflar diske konup model koşusu yapılsın mı? 46 ruhsat + 27 liste — Opus 5 ~$0,60 · Sonnet 5 ~$0,25 (K-049) | Koşulsun, ama **A-M34'ten sonra** |
+| **A-M34** | **Ölçütü model yazdı** (fotoğrafları okuyan bendim). Doğrulanmadan çıkacak rakam karne değil tahmin. Kim doğrulayacak? (K-049.1) | Cemil — yalnız `guven` notlu 14 belge ve 42 ditto satırı; hepsi değil |
+| ~~A-M32~~ | **KAPANDI (15.09):** Cemil 46 ruhsat + 27 parça listesi gönderdi; ikisinin de ölçütü yazıldı (K-049) | — |
 | **A-M33** | Gizlilik cümlesi (*"söyledikleriniz ve fotoğraf işlenmek üzere gönderilir"*) nerede yazsın | Ayarlarda tek satır, ilk kullanımda bir kez |
 
 ### Sonraki fazın soruları — şimdi cevap gerekmiyor

@@ -1,0 +1,397 @@
+{
+  "ad": "Parça listesi okuma değerlendirme seti",
+  "surum": 1,
+  "tarih": "15.09.2026",
+  "kaynak": "Cemil'in 15.09'da gönderdiği 27 gerçek parça listesi fotoğrafı",
+
+  "⚠️ TASLAK": "Satırları FOTOĞRAFLARDAN OKUYAN ben oldum (Claude, görüntü). Ölçüt değil, ÖLÇÜT ADAYI — Cemil doğrulayana kadar. El yazısı okumada kendi okumamı kendi ölçütüm yapmak, sınavı kendim yazıp kendim puanlamak olurdu. Şüphelendiğim satırların yanında 'guven' notu var.",
+
+  "nicin_ruhsattan_zor": [
+    "Ruhsatta alanlar SABİT ve etiketli; burada her liste kendi düzenini uyduruyor.",
+    "El yazısı — bazıları okunaksız, bazıları teknik kısaltma ('SKC', 'Sibop gayd').",
+    "DITTO işareti: bir satırın anlamı ÜSTÜNDEKİ satırda ('  \"  \"  \" çıtası').",
+    "Üstü çizili satır: iptal mi, alındı mı?",
+    "Bir satırda İKİ fiyat: yan sanayi / orijinal.",
+    "Fiyat yerine DURUM: 'Gelmez', 'Yok', 'Geliniyor', 'Klimacıya bakılacak'.",
+    "Araç bilgisi gezici: kimi listede üstte, kimisinde altta, kimisinde hiç yok."
+  ],
+
+  "alanlar": {
+    "arac": "Listenin hangi araca ait olduğu — yoksa null. Plaka/şase varsa ayrı alan.",
+    "satirlar": "[{ ad, adet, fiyat, paraBirimiNotu, durum, iptal }]",
+    "ad": "Parçanın adı — DITTO çözülmüş hâliyle. '\" \" \" çıtası' -> 'Sağ ön çamurluk çıtası'",
+    "adet": "Yazılıysa sayı, yoksa null. '6 Litre' gibi birimli ifadeler adet alanına metin olarak.",
+    "fiyat": "Rakam. Yoksa null. İKİ fiyat varsa fiyat + fiyatIkinci.",
+    "durum": "Fiyat yerine yazılmış cevap: 'yok' | 'gelmez' | 'geliniyor' | serbest metin.",
+    "iptal": "Üstü çizili satır için true."
+  },
+
+  "puanlama": {
+    "satirSayisi": "Önce kaç satır çıkardığı sayılır — eksik satır, yanlış satırdan ağırdır: usta eksik parçayı ancak araç dağılmışken fark eder.",
+    "kritik": ["ad", "fiyat"],
+    "dittoKurali": "Ditto çözülmemişse o satır YANLIŞ sayılır — '\" \" \" çıtası' diye kaydedilen bir satır parçacıya sorulamaz.",
+    "uydurmaKurali": "Okunamayan satır 'okunamadi' işaretlenmeli. Uydurulan parça adı, eksik satırdan ağır: yanlış parça sipariş edilir."
+  },
+
+  "listeler": [
+    { "id": "p01", "kagit": "Şahiner Otomotiv antetli kareli", "zorluk": ["kisaltma"],
+      "arac": null, "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "SKC" }, { "ad": "Eksantrik mili" }, { "ad": "İticiler" }, { "ad": "Kapler" }
+      ],
+      "guven": { "SKC": "kısaltma — silindir kapak contası olabilir, açılımı ustaya sorulmalı; model AÇMAMALI, yazıldığı gibi almalı" } },
+
+    { "id": "p02", "kagit": "fotokopi (gri, kontrastsız)", "zorluk": ["fotokopi", "ditto", "uzun-liste", "sase-var"],
+      "arac": "PEUGEOT PARTNER 2001 model", "sase": "VFJSCWJZE1K514308", "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Sağ ön çamurluk sinyali (ufak yer kısmında)", "fiyat": 220 },
+        { "ad": "Sağ ön çamurluk çıtası", "fiyat": 60, "ditto": true },
+        { "ad": "Sağ ön kapı çıtası", "fiyat": 200 },
+        { "ad": "Sağ sürgülü kapı çıtası", "fiyat": 170 },
+        { "ad": "Sağ sürgülü kapı alt makarası", "fiyat": 200, "ditto": true },
+        { "ad": "Sağ sürgülü kapı üst makarası", "fiyat": null, "durum": "yok", "ditto": true },
+        { "ad": "Sağ sürgülü kapı orta makarası", "fiyat": 300, "ditto": true },
+        { "ad": "Sağ arka çamurluk çıtası", "fiyat": null, "durum": "yok" },
+        { "ad": "Sol far alt çıtası", "fiyat": 50 },
+        { "ad": "Sağ far sinyali", "fiyat": 150 },
+        { "ad": "Sol far sinyali", "fiyat": 150 },
+        { "ad": "Sol ön çamurluk", "fiyat": 1450 },
+        { "ad": "Sol ön çamurluk sinyali", "fiyat": null, "ditto": true },
+        { "ad": "Sol ön çamurluk çıtası", "fiyat": 60, "ditto": true },
+        { "ad": "Sol ön kapı", "fiyat": null, "durum": "yok" },
+        { "ad": "Sol ön kapı menteşesi alt-üst", "fiyat": 1950, "fiyatNotu": "üst=1950, alt=yok", "ditto": true },
+        { "ad": "Sol ön kapı çıtası", "fiyat": 200, "ditto": true },
+        { "ad": "Sol ön kapı cam mekanizması (manuel)", "fiyat": null, "durum": "yok", "ditto": true },
+        { "ad": "Sol arka çamurluk çıtası", "fiyat": null, "durum": "yok" },
+        { "ad": "Sağ bagaj dış açma kolu", "fiyat": 80 }
+      ],
+      "not": "20 satır, 9 ditto. p08 ve p26 aynı listenin başka hâlleri — üçü aynı satırları vermeli." },
+
+    { "id": "p03", "kagit": "BRAX pembe blok", "zorluk": ["durum-metni"],
+      "arac": null, "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Baskı balata", "fiyat": 1000 },
+        { "ad": "Devirdaim", "fiyat": 400 },
+        { "ad": "Triger", "fiyat": 1850 },
+        { "ad": "V kayış", "fiyat": null, "durum": "yok" },
+        { "ad": "Volant", "fiyat": 1650 }
+      ],
+      "not": "'V kayış = Yok' — fiyat alanına 'Yok' yazan model hata yapar; bu bir DURUM." },
+
+    { "id": "p04", "kagit": "beyaz kağıt, kalın kalem", "zorluk": ["okunaksiz-baslik"],
+      "arac": null, "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Triger set" }, { "ad": "Devirdaim" }, { "ad": "Takım buji" },
+        { "ad": "V kayış" }, { "ad": "Arka balata" }, { "ad": "Buji" }
+      ],
+      "guven": { "baslik": "okunamadi — üstteki kelime ('ŞB.YYAL'?) çözülemedi", "Takım buji": "dusuk" } },
+
+    { "id": "p05", "kagit": "kare not kağıdı", "zorluk": ["adet", "kenar-notu"],
+      "arac": "2.0 Insignia A", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Piston kol yatağı" },
+        { "ad": "Yağ pompası" },
+        { "ad": "Arka gren keçe" },
+        { "ad": "Şanzıman yağı", "adet": "6 Litre" },
+        { "ad": "Triger set" },
+        { "ad": "Devirdaim" },
+        { "ad": "Antifiriz" },
+        { "ad": "Bakım set" },
+        { "ad": "Balata spreyi", "adet": "10 Adet" }
+      ],
+      "not": "'Triger Set - Devirdaim' TEK satıra yazılmış, İKİ parça. 'Antifiriz' araya sıkıştırılmış kenar notu." },
+
+    { "id": "p06", "kagit": "Avea defteri, çizgili", "zorluk": ["ditto", "plaka-var", "adet"],
+      "arac": "PEUGEOT 306", "plaka": "34 TS 5206", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Sol ön kapı" },
+        { "ad": "Sol ön kapı cam mekanizması", "ditto": true },
+        { "ad": "Sol ön kapı dış açma kolu", "ditto": true },
+        { "ad": "Sol ön kapı dış temas bandı", "ditto": true },
+        { "ad": "Sol arka kapı" },
+        { "ad": "Sol arka kapı cam mekanizması", "ditto": true },
+        { "ad": "Sol arka kapı temas bandı", "ditto": true },
+        { "ad": "Kapı döşeme klipsi", "adet": 20 },
+        { "ad": "Perçin", "adet": 10 },
+        { "ad": "Ön ve arka kapı iç izolatörü" }
+      ],
+      "not": "p10 aynı sayfanın ikinci çekimi." },
+
+    { "id": "p07", "kagit": "beyaz kağıt", "zorluk": ["imla-hatasi"],
+      "arac": "99 Opel Vectra", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Piston sekman" }, { "ad": "Kol yatak" }, { "ad": "Triger set" },
+        { "ad": "Sibop kayıt" }, { "ad": "Takım conta" }
+      ],
+      "guven": { "Sibop kayıt": "dusuk — 'sibop gayd' (supap gaydı) olabilir; model DÜZELTMEMELİ, yazıldığı gibi almalı" } },
+
+    { "id": "p08", "kagit": "kareli blok (p02'nin el yazısı aslı)", "zorluk": ["ditto"], "ayniListe": "p02",
+      "arac": null, "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Sağ ön çamurluk sinyali", "fiyat": 220 },
+        { "ad": "Sağ ön çamurluk çıtası", "fiyat": 60, "ditto": true },
+        { "ad": "Sağ ön kapı çıtası", "fiyat": 200 },
+        { "ad": "Sağ sürgülü kapı çıtası", "fiyat": 170 },
+        { "ad": "Sağ sürgülü kapı alt makarası", "fiyat": 200, "ditto": true },
+        { "ad": "Sağ sürgülü kapı orta makarası", "fiyat": 300, "ditto": true },
+        { "ad": "Sol far alt çıtası", "fiyat": 50 },
+        { "ad": "Sağ far sinyali", "fiyat": 150 },
+        { "ad": "Sol far sinyali", "fiyat": 150 },
+        { "ad": "Sol ön çamurluk", "fiyat": 1450 },
+        { "ad": "Sol ön çamurluk sinyali", "fiyat": null },
+        { "ad": "Sol ön çamurluk çıtası", "fiyat": 60, "ditto": true },
+        { "ad": "Sol ön kapı çıtası", "fiyat": 200 },
+        { "ad": "Sağ bagaj açma kolu dış", "fiyat": 80 }
+      ] },
+
+    { "id": "p09", "kagit": "Öznur Otomotiv antetli kareli", "zorluk": ["iki-fiyat", "durum-metni", "ditto"],
+      "arac": null, "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Ön tampon", "fiyat": 10000, "fiyatNotu": "ORJ" },
+        { "ad": "Ön tampon demiri", "fiyat": 420, "fiyatNotu": "YN", "ditto": true },
+        { "ad": "Sağ far", "fiyat": 1500, "fiyatIkinci": 2500, "fiyatNotu": "1500 YN / 2500 ORJ" },
+        { "ad": "Sol far", "fiyat": 1500, "fiyatIkinci": 2500, "ditto": true },
+        { "ad": "Sağ sis", "fiyat": 550, "fiyatNotu": "ORJ" },
+        { "ad": "Sol sis", "fiyat": 550, "ditto": true },
+        { "ad": "Sağ davlumbaz", "fiyat": 220, "fiyatNotu": "YN" },
+        { "ad": "Sol davlumbaz", "fiyat": 220, "fiyatNotu": "YN" },
+        { "ad": "Radyatör alt demiri", "fiyat": null, "durum": "gelmez" },
+        { "ad": "Sağ çamurluk", "fiyat": 1900, "fiyatIkinci": 3000, "fiyatNotu": "1900 YN, 3000 ORJ" },
+        { "ad": "Sağ şase kol", "fiyat": 7300, "fiyatNotu": "ORJ" },
+        { "ad": "Hava yastıkları", "fiyat": null, "durum": "gelmez" },
+        { "ad": "Emniyet kemeri", "fiyat": null, "durum": "gelmez", "ditto": true },
+        { "ad": "ABS ünitesi", "fiyat": null, "durum": "gelmez", "ditto": true },
+        { "ad": "Darbe sensörü", "fiyat": null, "durum": "geliniyor" },
+        { "ad": "Klima hortumları", "fiyat": null, "durum": "Klimacıya bakılacak" },
+        { "ad": "Cam su deposu", "fiyat": 680, "fiyatNotu": "ORJ" },
+        { "ad": "Direksiyon hortumları", "fiyat": null, "durum": "cevap yok" }
+      ],
+      "not": "⚠️ SETİN EN ZOR LİSTESİ. Üç ayrı tuzak bir arada: iki fiyat (YN/ORJ), durum metinleri, ditto. 'YN' yan sanayi, 'ORJ' orijinal — bu ayrım T-13'ün (ürün adı·marka·OEM) ta kendisi ve fiyatın anlamını değiştiriyor." },
+
+    { "id": "p10", "kagit": "Avea defteri (ikinci çekim)", "zorluk": ["ditto", "tutarlilik"], "ayniListe": "p06",
+      "arac": "PEUGEOT 306", "plaka": "34 TS 5206", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Sol ön kapı" },
+        { "ad": "Sol ön kapı cam mekanizması", "ditto": true },
+        { "ad": "Sol ön kapı dış açma kolu", "ditto": true },
+        { "ad": "Sol ön kapı dış temas bandı", "ditto": true },
+        { "ad": "Sol arka kapı" },
+        { "ad": "Sol arka kapı cam mekanizması", "ditto": true },
+        { "ad": "Sol arka kapı temas bandı", "ditto": true },
+        { "ad": "Kapı döşeme klipsi", "adet": 20 },
+        { "ad": "Perçin", "adet": 10 },
+        { "ad": "Ön ve arka kapı iç izolatörü" }
+      ] },
+
+    { "id": "p11", "kagit": "Akyol Otomotiv kare blok", "zorluk": ["motor-kodu", "ditto", "karanlik"],
+      "arac": "X16XEL Vectra B", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Üst takım conta" },
+        { "ad": "Alt takım conta", "ditto": true },
+        { "ad": "Motor yağı" },
+        { "ad": "Yağ filtre" },
+        { "ad": "Hava filtre" }
+      ],
+      "not": "Araç MOTOR KODUYLA yazılmış (X16XEL) — plaka ya da marka/model değil. Usta böyle de tarif ediyor." },
+
+    { "id": "p12", "kagit": "kareli, kırmızı kalem", "zorluk": ["90-derece-yan", "kirmizi-kalem", "adet"],
+      "arac": "Veka marka", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Ön amortisör", "adet": 2, "notu": "sağ-sol" },
+        { "ad": "Amortisör takozu", "adet": 2 },
+        { "ad": "Amortisör rulmanı", "adet": 2 },
+        { "ad": "Arka amortisör", "adet": 2 },
+        { "ad": "Ön tekerlek rulmanı", "adet": 2 },
+        { "ad": "Dizel araç için kızdırma bujisi", "adet": 4 }
+      ],
+      "guven": { "arac": "dusuk — 'Veka Marka' okunabildi ama ne olduğu belirsiz" } },
+
+    { "id": "p13", "kagit": "KONİ antetli kareli", "zorluk": [],
+      "arac": null, "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Sağ sol salıncak" }, { "ad": "Sol rot başı" },
+        { "ad": "Sağ sol amortisör takozu" }, { "ad": "Sağ sol Z rot" }, { "ad": "Ön balata" }
+      ] },
+
+    { "id": "p14", "kagit": "TİA Otomotiv spiralli defter", "zorluk": ["iscilik-satiri", "kisi-adi"],
+      "arac": "Skoda", "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Piston sekman" }, { "ad": "Gömlek" }, { "ad": "Kol yatak" },
+        { "ad": "Üst takım conta" }, { "ad": "Termostat" }, { "ad": "Motor yağı" },
+        { "ad": "Antifiriz" }, { "ad": "Yağ filtresi" }, { "ad": "Subop takımı" },
+        { "ad": "Rektefiye", "fiyat": 9000, "tip": "iscilik" },
+        { "ad": "İşçilik", "fiyat": null, "tip": "iscilik" }
+      ],
+      "not": "⚠️ İŞÇİLİK SATIRI VAR (Rektefiye 9000₺ · İşçilik). Parça listesi sanılıp hepsi 'parça' diye kaydedilirse kayıt yanlış olur — Tamiron'da satır tipi parça/işçilik ayrımı var. Üstte kişi adı yazılı; gizlilik gereği buraya alınmadı." },
+
+    { "id": "p15", "kagit": "Gürşah Yedek Parça sipariş formu (matbu)", "zorluk": ["ustu-cizili", "matbu-form"],
+      "arac": null, "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Triger" },
+        { "ad": "Devirdaim", "iptal": true },
+        { "ad": "V kayışı" }, { "ad": "Şanzıman yağı" }, { "ad": "Hava filtresi" },
+        { "ad": "Yağ filtresi" }, { "ad": "Polen filtresi" }, { "ad": "5/30 Yağ Castrol" },
+        { "ad": "Arka teker rulman" }, { "ad": "Buji" }, { "ad": "Arka disk" },
+        { "ad": "Arka balata" }, { "ad": "Ön balata" }, { "ad": "Ön taşlama", "fiyat": 400 }
+      ],
+      "not": "⚠️ ÜSTÜ ÇİZİLİ SATIR: 'Devirdaim'. Çizilen satır listeden ATILMAZ, 'iptal' işaretlenir — usta neden çizdiğini bilir, program bilmez. Matbu formun ADET/MALZEME CİNSİ/FİYAT/TUTAR sütunları var ama usta sütunlara uymamış." },
+
+    { "id": "p16", "kagit": "Performance spiralli blok", "zorluk": [],
+      "arac": "Peugeot 307 1.4 dizel", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Triger seti" }, { "ad": "Krank kasnağı" }, { "ad": "V kayış" },
+        { "ad": "Krank sensörü" }, { "ad": "Triger kapakları" }
+      ] },
+
+    { "id": "p17", "kagit": "Local Otomotiv antetli kareli", "zorluk": ["arac-ustte"],
+      "arac": "2000 model Polo", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Sol rot kolu" }, { "ad": "Sol rot başı" }, { "ad": "Sağ rot başı" },
+        { "ad": "Ön fren balata" }, { "ad": "Disk taşlama" }, { "ad": "Vites armut" },
+        { "ad": "Vites keçesi" }, { "ad": "Kalorifer peteği" }, { "ad": "Triger set" },
+        { "ad": "Devirdaim" }
+      ] },
+
+    { "id": "p18", "kagit": "Precision/NTK spiralli blok", "zorluk": ["adet", "kisaltma"],
+      "arac": "307", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Arka disk" }, { "ad": "Arka balata" },
+        { "ad": "Z rot", "adet": 2 }, { "ad": "Rotil", "adet": 2 }, { "ad": "Rot başı", "adet": 2 },
+        { "ad": "Yağ filtresi" }, { "ad": "Hava filtresi" }, { "ad": "Mazot filtresi" },
+        { "ad": "Polen filtresi" }, { "ad": "5/30 Yağ" }, { "ad": "Ön disk" }, { "ad": "Ön balata" }
+      ],
+      "not": "Filtreler 'Yağ f. · Hava f. · Mazot f. · Polen f.' diye KISALTILMIŞ. Model kısaltmayı açabilir ama açtığını uydurmamalı." },
+
+    { "id": "p19", "kagit": "EMR Otomotiv filigranlı kareli", "zorluk": ["ditto", "adet", "okunaksiz-son"],
+      "arac": null, "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Salıncak", "adet": 2, "notu": "sağ-sol" },
+        { "ad": "Z rot", "adet": 2, "ditto": true },
+        { "ad": "Rot mili (kolu)", "adet": 2, "ditto": true },
+        { "ad": "Dış aks kafası", "adet": 2, "ditto": true },
+        { "ad": "Rot başı", "adet": 2, "ditto": true },
+        { "ad": "Buji", "adet": null },
+        { "ad": "Buji kablo", "adet": null }
+      ],
+      "guven": { "Buji": "dusuk — yanındaki işaret '6m' mi başka mı, çözülemedi" } },
+
+    { "id": "p20", "kagit": "Local Otomotiv kartı", "zorluk": ["arac-altta", "birlesik-satir"],
+      "arac": "98 model Golf 1.8 Benzin LPG", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Sağ amortisör ve üst takoz" },
+        { "ad": "Sol amortisör ve üst takoz" },
+        { "ad": "Rot kolu ve rot başı sağ" },
+        { "ad": "Rot kolu ve rot başı sol" },
+        { "ad": "Ön fren balataları" },
+        { "ad": "Sağ ve sol rotil" },
+        { "ad": "V kayışı" },
+        { "ad": "Sağ ve sol viraj demiri ve lastiği" },
+        { "ad": "Karter contası" },
+        { "ad": "Yağ bakımı" },
+        { "ad": "Hız müşürü" },
+        { "ad": "El fren ayarı", "tip": "iscilik" },
+        { "ad": "Arka balata" }
+      ],
+      "not": "⚠️ ARAÇ BİLGİSİ EN ALTTA. Üstten okuyup 'araç yok' diyen model bu listeyi sahipsiz bırakır. Ayrıca 'yağ bakımı' ve 'el fren ayarı' parça değil İŞ." },
+
+    { "id": "p21", "kagit": "beyaz kağıt, yan çekilmiş", "zorluk": ["90-derece-yan", "tekrar-eden-satir"],
+      "arac": null, "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Antifiriz" },
+        { "ad": "Balata spreyi" },
+        { "ad": "Devirdaim" },
+        { "ad": "Balata spreyi", "adet": 3 }
+      ],
+      "not": "'Balata spreyi' İKİ KEZ geçiyor (biri adetli). Model tekrarı birleştirmemeli — usta iki kez yazdıysa sebebi vardır; birleştirme ustanın işi." },
+
+    { "id": "p22", "kagit": "MARTAŞ spiralli defter", "zorluk": ["olcu-notu", "iki-fiyat"],
+      "arac": null, "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Piston sekman", "fiyat": 1450, "notu": "80.00 mm (1.2 x 1.5 x 2.5)" },
+        { "ad": "Kol yatak", "fiyat": 160 },
+        { "ad": "Triger set", "fiyat": 1200 },
+        { "ad": "Sibop gayd", "fiyat": null, "durum": "yok" },
+        { "ad": "Takım conta üst", "fiyat": 480 },
+        { "ad": "Takım conta alt", "fiyat": 230 },
+        { "ad": "Oto conta", "fiyat": null }
+      ],
+      "not": "Piston sekman satırında ÖLÇÜ var: 80.00mm (1.2x1.5x2.5). Bu fiyat değil, parçanın kimliği — T-13'teki 'kod' alanının el yazısı hâli. 'Takım conta = üst=480 Alt=230' TEK satıra yazılmış İKİ satır." },
+
+    { "id": "p23", "kagit": "Tokyo Otomotiv (fotokopi, gri)", "zorluk": ["fotokopi", "carpim-hesabi"],
+      "arac": "PARTNER", "fiyatliMi": true,
+      "satirlar": [
+        { "ad": "Debriyaj teli", "fiyat": null, "durum": "yok" },
+        { "ad": "Kilometre kaptonu", "fiyat": 140 },
+        { "ad": "Sol aks keçe", "fiyat": 120 },
+        { "ad": "Triger set", "fiyat": 930 },
+        { "ad": "Devirdaim", "fiyat": 600 },
+        { "ad": "V kayışı", "fiyat": 120 },
+        { "ad": "Buji", "adet": 4, "fiyat": 230, "fiyatNotu": "230 ORJ x4 = 920", "toplam": 920 },
+        { "ad": "Debriyaj set", "fiyat": 1350 },
+        { "ad": "Takım conta", "fiyat": 1400 },
+        { "ad": "Sıvı conta", "fiyat": 80 },
+        { "ad": "Yağ pompa", "fiyat": 1000 }
+      ],
+      "not": "⚠️ ÇARPIM SATIRI: '4-buji = 230 ORJ x4  920'. Birim fiyat 230, adet 4, toplam 920. Tek sayı alan bir model 920'yi birim fiyat sanabilir — ustaya 4 kat pahalı görünür. p24 aynı listenin FİYATSIZ hâli." },
+
+    { "id": "p24", "kagit": "Tokyo Otomotiv (renkli asıl, fiyatsız)", "zorluk": ["tutarlilik"], "ayniListe": "p23",
+      "arac": "PARTNER", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Debriyaj teli" }, { "ad": "Kilometre kaptonu" }, { "ad": "Sol aks keçe" },
+        { "ad": "Triger set" }, { "ad": "Devirdaim" }, { "ad": "V kayışı" }, { "ad": "4 buji" },
+        { "ad": "Debriyaj set" }, { "ad": "Takım conta" }, { "ad": "Sıvı conta" }, { "ad": "Yağ pompa" }
+      ],
+      "not": "⚠️ ALTIN DEĞERİNDE ÇİFT: p24 ustanın yazdığı liste, p23 parçacının üstüne fiyat yazdığı hâli. T-12/T-13'ün tam olarak tarif ettiği akış — aynı kâğıdın gidişi ve dönüşü." },
+
+    { "id": "p25", "kagit": "buruşuk küçük not", "zorluk": ["ustu-cizili", "burusuk"],
+      "arac": null, "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Termostat" }, { "ad": "Rot başları" }, { "ad": "Rot kolları" },
+        { "ad": "Salıncaklar" }, { "ad": "Z rotlar" },
+        { "ad": null, "iptal": true, "okunamadi": true }
+      ],
+      "not": "Son satır KALIN KALEMLE tamamen karalanmış — okunamıyor. Doğru davranış: 'iptal edilmiş, okunamadı' demek. Karalamanın altını okumaya çalışıp bir şey uyduran model başarısız." },
+
+    { "id": "p26", "kagit": "clipboard, beyaz A4 (p02'nin renkli aslı)", "zorluk": ["ditto", "uzun-liste", "sase-var", "tutarlilik"], "ayniListe": "p02",
+      "arac": "PEUGEOT PARTNER 2001 model", "sase": "VFJSCWJZE1K514308", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Sağ ön çamurluk sinyali (ufak yer kısmında)" },
+        { "ad": "Sağ ön çamurluk çıtası", "ditto": true },
+        { "ad": "Sağ ön kapı çıtası" },
+        { "ad": "Sağ sürgülü kapı çıtası" },
+        { "ad": "Sağ sürgülü kapı alt makarası", "ditto": true },
+        { "ad": "Sağ sürgülü kapı üst makarası", "ditto": true },
+        { "ad": "Sağ sürgülü kapı orta makarası", "ditto": true },
+        { "ad": "Sağ arka çamurluk çıtası" },
+        { "ad": "Sol far alt çıtası" },
+        { "ad": "Sağ far sinyali" },
+        { "ad": "Sol far sinyali" },
+        { "ad": "Sol ön çamurluk" },
+        { "ad": "Sol ön çamurluk sinyali", "ditto": true },
+        { "ad": "Sol ön çamurluk çıtası", "ditto": true },
+        { "ad": "Sol ön kapı" },
+        { "ad": "Sol ön kapı menteşesi alt-üst", "ditto": true },
+        { "ad": "Sol ön kapı çıtası", "ditto": true },
+        { "ad": "Sol ön kapı cam mekanizması (manuel)", "ditto": true },
+        { "ad": "Sol arka çamurluk çıtası" },
+        { "ad": "Sağ bagaj dış açma kolu" }
+      ] },
+
+    { "id": "p27", "kagit": "19 Mayıs ajanda sayfası", "zorluk": ["ajanda-cizgileri", "kenar-isareti", "okunaksiz"],
+      "arac": "Vectra", "fiyatliMi": false,
+      "satirlar": [
+        { "ad": "Ön amortisörler", "isaret": "+" },
+        { "ad": "Ön amortisör takozları", "isaret": "+" },
+        { "ad": "Rot başları sağ-sol", "isaret": "+" },
+        { "ad": "Salıncak sağ-sol", "isaret": "+" },
+        { "ad": "2 Rot", "adet": 2, "isaret": "+" },
+        { "ad": "Sol ön teker fren ana merkez" },
+        { "ad": "Kapı cam açma tuşları" },
+        { "ad": "Sağ dikiz aynası plastik" },
+        { "ad": "Ön çamurluk sinyalleri", "isaret": "+" },
+        { "ad": "Rot ayarı", "tip": "iscilik" }
+      ],
+      "guven": { "Sağ dikiz aynası plastik": "dusuk", "Rot ayarı": "dusuk" },
+      "not": "⚠️ KENAR İŞARETİ: bazı satırların solunda '+' var, bazılarında yok. Anlamı belli değil (alındı mı, onaylandı mı?) — model bunu OKUMALI ama ANLAMINI UYDURMAMALI. Ajandanın kendi saat çizgileri (08, 09, 10…) satır sanılmamalı." }
+  ]
+}

@@ -70,8 +70,127 @@
     return sonuc;
   }
 
+  /* ============ ALAN PUANLAMASI — FOTOĞRAF OKUMA (15.09) ============
+     Sesli komutta ölçülen şey TEK bir karardı (tur). Fotoğrafta ölçülen
+     şey ON DÖRT ALAN ve her biri ayrı ayrı yanlış olabilir. Bu yüzden
+     ikinci bir cetvel gerekti — ama AYNI DOSYADA, çünkü ikisi de aynı
+     soruyu soruyor: *"model ne kadarını doğru yaptı?"*
+
+     ÜÇ KURAL, ÜÇÜ DE GERÇEK BİR ZARARDAN GELİYOR:
+
+     1. KRİTİK ALAN yanlışsa okuma BAŞARISIZ. Plaka yanlışsa yanlış
+        araca kayıt açılır; şase yanlışsa parçacı yanlış parça gönderir.
+        Öteki on alanın doğru olması bunu telafi etmez.
+
+     2. UYDURMA, BOŞ BIRAKMAKTAN AĞIR. Okunamayan alanı boş bırakan
+        model ustaya *"şunu sen yaz"* der; uyduran model ustaya YANLIŞ
+        BİLGİYİ DOĞRUYMUŞ GİBİ verir ve usta bunu bir daha kontrol
+        etmez. Bu yüzden `beklenen[alan] === null` iken dolu cevap
+        **iki kat** ceza alıyor.
+
+     3. YASAK ALAN dönerse okuma BAŞARISIZ — değeri doğru olsa bile.
+        TC kimlik no ve adres bize gerekmiyor (RUHSAT-OKUMA Bulgu 2);
+        tutmadığın veri en güvenli veridir. Bu, doğruluk değil
+        DAVRANIŞ sınavı: model istenmeyeni getirmemeyi de bilmeli. */
+  function alanPuanla(set, cevaplar, secenek) {
+    var s = secenek || {};
+    var kritik = (set.puanlama && set.puanlama.kritik) || s.kritik || [];
+    var yasak = (set.gizlilik && set.gizlilik.yasakAlanlar) || s.yasak || [];
+    var kayitlar = set.belgeler || set.listeler || [];
+
+    var sonuc = { belge: 0, belgeTam: 0, alanToplam: 0, alanDogru: 0,
+                  uydurma: 0, yasakIhlali: 0, satirlar: [] };
+
+    kayitlar.forEach(function (k) {
+      var gelen = cevaplar[k.id] || {};
+      var beklenen = k.beklenen || {};
+      var hata = gelen.hata || null;
+
+      /* Yasak alan denetimi ÖNCE: ihlal varsa okuma zaten başarısız. */
+      var ihlal = yasak.filter(function (a) {
+        return gelen[a] !== undefined && gelen[a] !== null && gelen[a] !== '';
+      });
+
+      var yanlisAlanlar = [], uydurmaAlanlar = [], kritikYanlis = [];
+      var alanSayisi = 0, dogruSayisi = 0;
+
+      Object.keys(beklenen).forEach(function (alan) {
+        alanSayisi++;
+        var b = beklenen[alan];
+        var g = gelen[alan];
+        var bosG = (g === undefined || g === null || String(g).trim() === '');
+        var bosB = (b === undefined || b === null || String(b).trim() === '');
+
+        if (bosB) {
+          /* Beklenen BOŞ: doğru cevap boş bırakmaktır. */
+          if (bosG) { dogruSayisi++; }
+          else { uydurmaAlanlar.push(alan + '="' + g + '"'); }
+          return;
+        }
+        if (bosG) { yanlisAlanlar.push(alan + '=(bos)'); }
+        else if (sadeMetin(g) === sadeMetin(b)) { dogruSayisi++; }
+        else { yanlisAlanlar.push(alan + '="' + g + '"'); }
+
+        if (kritik.indexOf(alan) >= 0 && sadeMetin(g) !== sadeMetin(b)) {
+          kritikYanlis.push(alan);
+        }
+      });
+
+      var basarili = !hata && !ihlal.length && !kritikYanlis.length &&
+                     !uydurmaAlanlar.length && !yanlisAlanlar.length;
+
+      sonuc.belge++;
+      if (basarili) sonuc.belgeTam++;
+      sonuc.alanToplam += alanSayisi;
+      sonuc.alanDogru += dogruSayisi;
+      sonuc.uydurma += uydurmaAlanlar.length;
+      sonuc.yasakIhlali += ihlal.length;
+
+      sonuc.satirlar.push({
+        id: k.id,
+        sonuc: hata ? 'HATA' : (ihlal.length ? 'YASAK-ALAN'
+              : (kritikYanlis.length ? 'KRITIK-YANLIS'
+              : (uydurmaAlanlar.length ? 'UYDURMA'
+              : (yanlisAlanlar.length ? 'EKSIK' : 'TAM')))),
+        alan: dogruSayisi + '/' + alanSayisi,
+        kritikYanlis: kritikYanlis.join(', '),
+        uydurma: uydurmaAlanlar.join(' · '),
+        yanlis: yanlisAlanlar.join(' · '),
+        ihlal: ihlal.join(', '),
+        zorluk: (k.zorluk || []).join(' ')
+      });
+    });
+
+    sonuc.alanPuan = sonuc.alanToplam
+      ? Math.round((sonuc.alanDogru / sonuc.alanToplam) * 100) : 0;
+    sonuc.belgePuan = sonuc.belge
+      ? Math.round((sonuc.belgeTam / sonuc.belge) * 100) : 0;
+    /* ⚠️ İKİ RAKAM BİRDEN SÖYLENİYOR ve ikincisi asıl olan:
+       alan başına doğruluk %95 olsa bile, BELGE başına tamlık %50 ise
+       usta her iki ruhsattan birinde bir şey düzeltiyor demektir — ve
+       üç düzeltmeden sonra "bu çalışmıyor" der (RUHSAT-OKUMA §6). */
+    sonuc.ozet = 'belge: ' + sonuc.belgeTam + '/' + sonuc.belge +
+                 ' tam (%' + sonuc.belgePuan + ') · alan: %' + sonuc.alanPuan +
+                 ' · uydurma: ' + sonuc.uydurma +
+                 ' · yasak alan: ' + sonuc.yasakIhlali;
+    return sonuc;
+  }
+
+  /* Karşılaştırma öncesi sadeleştirme: Türkçe küçük harf, tek boşluk,
+     noktalama at. "BENZİNLİ - LPG" ile "Benzinli-LPG" aynı cevaptır;
+     model biçim yüzünden ceza almamalı. */
+  function sadeMetin(x) {
+    return String(x === undefined || x === null ? '' : x)
+      .toLocaleLowerCase('tr')
+      .replace(/[.,;:()/-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
   kok.DEGERLENDIRME_PUANLA = puanla;
+  kok.DEGERLENDIRME_ALAN_PUANLA = alanPuanla;
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { puanla: puanla, alanKarsilastir: alanKarsilastir };
+    module.exports = { puanla: puanla, alanPuanla: alanPuanla,
+                       alanKarsilastir: alanKarsilastir, sadeMetin: sadeMetin };
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this);

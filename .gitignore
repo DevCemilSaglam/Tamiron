@@ -4,3 +4,13 @@ prototypes/.omurga.denetim-yedek
 
 # Local Netlify folder
 .netlify
+
+# ⚠️ GERÇEK RUHSAT VE PARÇA LİSTESİ FOTOĞRAFLARI — DEPOYA GİRMEZ.
+# Ruhsatta TC kimlik no ve adres var (RUHSAT-OKUMA.md Bulgu 2 · A-31);
+# parça listelerinde müşteri/parçacı adı geçiyor. Ölçüm için gerekliler,
+# saklanmaları için bir sebep yok. Tutmadığın veri en güvenli veridir.
+tools/degerlendirme/ruhsatlar/
+tools/degerlendirme/parcalar/
+
+# Model koşularının ham çıktıları (içinde okunan alanlar var)
+tools/degerlendirme/sonuc-*.json

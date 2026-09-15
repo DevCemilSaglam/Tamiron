@@ -104,17 +104,66 @@ geçiyor (`YAPAY-ZEKA.md` §6).
 
 ---
 
-## Fotoğraf tarafı — henüz yok
+## Fotoğraf tarafı — ölçüt yazıldı (15.09)
 
-Ruhsat ve parça listesi okuma için **gerçek fotoğraf** gerekiyor
-(A-M32): 20–30 ruhsat, 10–15 parça listesi — atölye ışığında, buruşuk,
-el yazısı olanlar dahil. Ölçülecek iki rakam: **alan başına doğruluk**
-ve **ustanın kaç alan düzelttiği.** İkincisi asıl olan; %95 doğruluk
-her ruhsatta bir düzeltme demektir ve usta bunu üç ruhsattan sonra
-*"çalışmıyor"* diye okur.
+Cemil **46 ruhsat + 27 parça listesi** gönderdi. İkisinin de ölçütü
+yazıldı; koşucusu hazır, üç şey bekliyor (aşağıda).
 
-Fotoğraflar gelince koşucusu bu klasöre `ruhsat-kos.js` olarak yazılır;
-cetvel yine ortak olur.
+| Dosya | Ne |
+|---|---|
+| `ruhsat-seti.json` | 46 belge · 14 alan · zorluk etiketleri · **yasak alanlar** |
+| `parca-seti.json` | 27 liste · **258 satır** · 42 ditto · iptal/durum/çarpım kuralları |
+| `foto-kos.js` | Koşucu — `--tur ruhsat` \| `--tur parca` |
+
+### ⚠️ Bu ölçüt henüz TASLAK
+
+Fotoğrafları okuyup alanları yazan **modelin kendisiydi** (Claude,
+görüntü). Bir modelin kendi okumasını kendi ölçütü yapması, sınavı
+kendi yazıp kendi puanlaması olur. Şüphelenilen her alanın yanında
+`guven` notu var; doğrulama oradan başlar. **Cemil doğrulayana kadar
+buradan çıkacak rakam bir karne değil, bir tahmindir.**
+
+### Koşmak için üç şey
+
+1. **Fotoğraflar diske** — `ruhsatlar/r01.jpg … r46.jpg` ve
+   `parcalar/p01.jpg … p27.jpg`. Sıra Cemil'in gönderdiği sıradır;
+   her kaydın plakası/kâğıdı ölçütte yazılı, eşleştirme gözle
+   doğrulanabilir. **Klasörler `.gitignore`'da** — ruhsatta TC no ve
+   adres var.
+2. **API anahtarı** — ortam değişkeninde, depoda değil.
+3. **Ölçütün doğrulanması** — yukarıdaki `guven` notları.
+
+### Ne ölçülüyor — ve neden iki rakam birden
+
+```
+belge: 38/46 tam (%83) · alan: %97 · uydurma: 2 · yasak alan: 0
+```
+
+**Alan başına doğruluk (%97) yanıltıcıdır.** Asıl rakam **belge başına
+tamlık**: %83, her altı ruhsattan birinde ustanın bir şey düzelttiği
+anlamına gelir — ve usta üç düzeltmeden sonra *"bu çalışmıyor"* der.
+
+Ayrı sayılan iki davranış var, ikisi de doğruluktan önemli:
+
+* **uydurma** — okunamayan alanı boş bırakmak yerine doldurmak. Boş
+  alan ustaya *"sen yaz"* der; uydurulan alan **yanlış bilgiyi doğru
+  gibi** verir ve usta onu bir daha kontrol etmez.
+* **yasak alan** — TC kimlik no, adres, sahip adı. Model bunları
+  döndürürse **değeri doğru olsa bile** o okuma başarısızdır
+  (RUHSAT-OKUMA Bulgu 2 · A-31).
+
+### Setin en sert dört kaydı
+
+| # | Ne | Doğru davranış |
+|---|---|---|
+| `r31` | VW Passat — **plaka okunamıyor** (sol sütun soluk) | Plakayı boş bırak. Plaka döndüren her cevap başarısız |
+| `r45` | Peugeot 308 — **parmak tescil tarihini kapatıyor** | Tarihi boş bırak |
+| `r03·r07·r12` | **Eski tip ruhsat** — yakıt, güç, silindir, koltuk **alanları yok** | Doldurma |
+| `p09` | Öznur listesi — **iki fiyat (YN/ORJ) + durum metinleri + ditto** bir arada | Üçünü de ayır |
+
+Ve üç **tutarlılık** çifti: aynı belgenin farklı çekimleri
+(`r04·r15·r43`, `r10·r18`, `r33·r42`) ile aynı listenin fiyatsız/fiyatlı
+hâli (`p24`→`p23`, `p26`→`p02`→`p08`). Aynı kâğıt, aynı cevabı vermeli.
 
 ---
 
