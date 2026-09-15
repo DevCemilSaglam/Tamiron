@@ -111,9 +111,10 @@ yazıldı; koşucusu hazır, üç şey bekliyor (aşağıda).
 
 | Dosya | Ne |
 |---|---|
-| `ruhsat-seti.json` | 46 belge · 14 alan · zorluk etiketleri · **yasak alanlar** |
+| `ruhsat-seti.json` | 46 belge · **18 alan** (dördü kişisel — fatura için, K-050) · zorluk etiketleri |
 | `parca-seti.json` | 27 liste · **258 satır** · 42 ditto · iptal/durum/çarpım kuralları |
 | `foto-kos.js` | Koşucu — `--tur ruhsat` \| `--tur parca` |
+| `foto-esle.js` | Kaydı fotoğrafıyla eşleştirir — **ada göre değil, MD5'e göre** |
 
 ### ⚠️ Bu ölçüt henüz TASLAK
 
@@ -123,12 +124,61 @@ kendi yazıp kendi puanlaması olur. Şüphelenilen her alanın yanında
 `guven` notu var; doğrulama oradan başlar. **Cemil doğrulayana kadar
 buradan çıkacak rakam bir karne değil, bir tahmindir.**
 
+### Kontrol sayfası — ölçütü doğrulamanın yolu
+
+`kontrol-sablon.html` + `kontrol-uret.js` → **tek sayfa**: 73 kayıt
+(46 ruhsat + 27 liste), her birinin **fotoğrafı kaydın yanında**,
+**Doğru / Düzelt / Fotoğrafı bulamadım** diye işaretleniyor.
+
+```
+node tools/degerlendirme/foto-esle.js <sohbet.jsonl> C:\...\Desktop\Tamiron
+node tools/degerlendirme/kontrol-uret.js
+```
+
+Sayfa **fotoğrafların yanına** yazılıyor (`…\Desktop\Tamiron\kontrol.html`)
+ve resimlere göreli yoldan bakıyor; çift tıkla da, yerel sunucudan da
+açılır.
+
+* Süzgeç varsayılanı **Bakılmadı** — kaldığın yerden devam edersin.
+* **Şüpheli alan var** süzgeci şüpheli 21 kaydı ayırıyor (`guven` notu
+  olan 14 belge + okunamayan satırı olan listeler); doğrulama oradan
+  başlarsa iş yarıya iner.
+* Fotoğraf **yan çekilmişse** `Döndür ⟳`; tam boy için `Büyüt`.
+* Kişisel alanlar (TC/ad/adres) **maskeli açılıyor**; göstermek bir
+  dokunuş. Omuz üstünden bakan biri numaraları görmesin diye.
+* **Üretilmiş sayfa depoya girmez** (`.gitignore`): kişisel dosya
+  birleştiğinde içinde gerçek TC ve adres olur. Şablon ve üreteç depoda,
+  çıktısı değil.
+
+### Fotoğrafı kayda bağlamak — ada göre DEĞİL
+
+`foto-esle.js`, sohbet kaydındaki (`.jsonl`) görsellerin **MD5**'ini
+diskteki dosyalarınkiyle karşılaştırıyor. 15.09 koşusunda **73/73
+birebir** tuttu.
+
+Dosya adından sıralamak iki kez denendi, ikisi de yanlış çıktı ve
+**gözle yakalandı**: indirme sırasının 1.si `p16`, 13.ü `p21`. WhatsApp
+indirme sırası gönderme sırası değil; üstelik klasörde gönderilmemiş
+7 eski fotoğraf da duruyordu (80 dosya, 73 görsel). *Kayan bir eşleme
+ölçütü sessizce çöpe çevirir:* kontrol eden kişi başka belgeye bakıp
+**"yanlış okumuşsun"** der, ölçüt bozulur. Doğrulama üç kayıtta gözle
+de tekrarlandı (p16 · p21 · r45).
+
+### Düzeltmeler bana nasıl ulaşıyor
+
+* **Artifact'te açılırsa** → doğrudan veritabanına yazılır, oradan
+  okurum.
+* **Diskten açılırsa** (fotoğraflı olan bu) → `claude` nesnesi yoktur;
+  düzeltmeler tarayıcıda durur ve **“Düzeltmeleri indir”** tek dosya
+  çıkarır. Sayfa bunu şerit olarak söylüyor — eskiden sessizce
+  `ReferenceError` atıp hiçbir şey demiyordu.
+
+
 ### Koşmak için üç şey
 
-1. **Fotoğraflar diske** — `ruhsatlar/r01.jpg … r46.jpg` ve
-   `parcalar/p01.jpg … p27.jpg`. Sıra Cemil'in gönderdiği sıradır;
-   her kaydın plakası/kâğıdı ölçütte yazılı, eşleştirme gözle
-   doğrulanabilir. **Klasörler `.gitignore`'da** — ruhsatta TC no ve
+1. **Fotoğraflar diske** — `foto-harita.json` hangi kaydın hangi
+   dosya olduğunu söylüyor (yukarıdaki MD5 eşleştirmesi).
+   **Fotoğraflar da harita da `.gitignore`'da** — ruhsatta TC no ve
    adres var.
 2. **API anahtarı** — ortam değişkeninde, depoda değil.
 3. **Ölçütün doğrulanması** — yukarıdaki `guven` notları.
@@ -148,9 +198,11 @@ Ayrı sayılan iki davranış var, ikisi de doğruluktan önemli:
 * **uydurma** — okunamayan alanı boş bırakmak yerine doldurmak. Boş
   alan ustaya *"sen yaz"* der; uydurulan alan **yanlış bilgiyi doğru
   gibi** verir ve usta onu bir daha kontrol etmez.
-* **yasak alan** — TC kimlik no, adres, sahip adı. Model bunları
-  döndürürse **değeri doğru olsa bile** o okuma başarısızdır
-  (RUHSAT-OKUMA Bulgu 2 · A-31).
+* **kişisel alanlar** — TC/vergi no, soyad-ünvan, ad, adres. 15.09'a
+  kadar bunlar *yasaktı*; Cemil **fatura bunlara kesiliyor** deyince
+  kural geri alındı (K-050). Artık okunmamaları eksiklik. Değerleri
+  `ruhsat-seti-kisisel.json`'da — depoya girmez; dosya yoksa bu dört
+  alan ölçülmez ve koşucu bunu söyler.
 
 ### Setin en sert dört kaydı
 

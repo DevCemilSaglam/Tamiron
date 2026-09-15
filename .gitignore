@@ -21,3 +21,12 @@ tools/degerlendirme/sonuc-*.json
 # Fotoğrafların kendisi zaten girmiyor; içindekini yazıya dökünce
 # girmesi tutarsız olurdu.
 tools/degerlendirme/*-kisisel.json
+
+# Fotograf haritasi: r01..p27 -> diskteki dosya yolu. Makineye ozel
+# (yollar Cemil'in masaustunu gosteriyor) ve fotograflar zaten depo disi.
+# `foto-esle.js` her makinede yeniden uretir.
+tools/degerlendirme/foto-harita.json
+
+# Kontrol sayfasinin URETILMIS hali — icinde kisisel alanlar birlesmis olur.
+# Sablon ve ureteci depoda; ciktisi degil.
+tools/degerlendirme/kontrol.html
