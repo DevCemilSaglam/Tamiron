@@ -116,6 +116,24 @@ yazıldı; koşucusu hazır, üç şey bekliyor (aşağıda).
 | `foto-kos.js` | Koşucu — `--tur ruhsat` \| `--tur parca` |
 | `foto-esle.js` | Kaydı fotoğrafıyla eşleştirir — **ada göre değil, MD5'e göre** |
 
+### ⚠️ Kişisel alanların çoğu fotoğrafta YOK (K-051)
+
+46 ruhsat fotoğrafı sahip bölümü için tek tek tarandı:
+
+| Sahip bölümü (TC/vergi no · soyad · ad · adres) | Kaç fotoğraf |
+|---|---|
+| **Okunuyor** | **17** (%37) |
+| Değer sağ kenarda **kesik** — etiket var, değer yok | 18 |
+| Sahip sayfası **hiç çekilmemiş** | 10 |
+| Parlamada kaybolmuş | 1 |
+
+Sebep belgenin geometrisi: sahip bilgileri **sağ sayfada**, usta araç
+alanlarına odaklanıp çekiyor, sağ kenar kadraja girmiyor. Bu 29 kaydın
+her kişisel alanına **neden boş olduğu** yazıldı (`guven` notu).
+**Boş alan ile okunamayan alan aynı şey değil** — ilki ölçüt eksiği,
+ikincisi ölçütün kendisi; ayırt edilmezse sonraki turda model haksız
+yere suçlanır.
+
 ### ⚠️ Bu ölçüt henüz TASLAK
 
 Fotoğrafları okuyup alanları yazan **modelin kendisiydi** (Claude,
@@ -126,9 +144,16 @@ buradan çıkacak rakam bir karne değil, bir tahmindir.**
 
 ### Kontrol sayfası — ölçütü doğrulamanın yolu
 
-`kontrol-sablon.html` + `kontrol-uret.js` → **tek sayfa**: 73 kayıt
-(46 ruhsat + 27 liste), her birinin **fotoğrafı kaydın yanında**,
-**Doğru / Düzelt / Fotoğrafı bulamadım** diye işaretleniyor.
+`kontrol-sablon.html` + `kontrol-uret.js` → **iki sayfa**:
+`kontrol-ruhsat.html` (46 belge) ve `kontrol-parca.html` (27 liste).
+Her kaydın **fotoğrafı yanında**, **Doğru / Düzelt / Fotoğrafı
+bulamadım** diye işaretleniyor; işaretler ortak yerde durduğu için
+sayfalar arası geçiş bir şey kaybettirmiyor.
+
+Ayrı sayfa Cemil'in isteği (15.09): ruhsat **alan** doğruluyor, parça
+listesi **satır** — 73 kart tek listede alt alta gelince ikisi
+birbirine karışıyor ve ilerleme çubuğu *"ne kadar kaldı"*yı söylemez
+oluyordu.
 
 ```
 node tools/degerlendirme/foto-esle.js <sohbet.jsonl> C:\...\Desktop\Tamiron
@@ -144,8 +169,11 @@ açılır.
   olan 14 belge + okunamayan satırı olan listeler); doğrulama oradan
   başlarsa iş yarıya iner.
 * Fotoğraf **yan çekilmişse** `Döndür ⟳`; tam boy için `Büyüt`.
-* Kişisel alanlar (TC/ad/adres) **maskeli açılıyor**; göstermek bir
-  dokunuş. Omuz üstünden bakan biri numaraları görmesin diye.
+* Kişisel alanlar (TC/ad/adres) **açık geliyor**. Maskeli
+  başlatmıştım; Cemil *"TC / Vergi no alanlarını göremiyorum"* dedi.
+  Sayfanın tek işi bu alanları doğrulatmak — doğrulanacak şeyi
+  varsayılan gizlemek, aracı kendi işine engel yapar. Gizleme düğmesi
+  duruyor.
 * **Üretilmiş sayfa depoya girmez** (`.gitignore`): kişisel dosya
   birleştiğinde içinde gerçek TC ve adres olur. Şablon ve üreteç depoda,
   çıktısı değil.

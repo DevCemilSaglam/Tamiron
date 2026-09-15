@@ -48,7 +48,9 @@ body { background: var(--bg); color: var(--text); font-family: var(--font-body);
        padding: 14px 0 10px; border-bottom: 1px solid var(--line); }
 h1 { font-family: var(--font-display); font-size: 21px; font-weight: 700;
      margin: 0 0 2px; text-wrap: balance; }
-.alt { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+.alt { color: var(--muted); font-size: 13px; margin: 0 0 6px; }
+.gecis { margin: 0 0 12px; font-size: 13px; }
+.gecis a { color: var(--primary); font-weight: 600; }
 .ilerleme { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .cubuk { flex: 1; height: 7px; border-radius: 99px; background: var(--surface-2);
          overflow: hidden; }
@@ -180,8 +182,9 @@ button.tus.atla[aria-pressed="true"] { background: var(--warn); border-color: va
 
 <div class="sar">
   <header class="ust">
-    <h1>Ruhsat ve Parça Kontrolü</h1>
+    <h1 id="baslik">Kontrol</h1>
     <p class="alt">Fotoğrafı aç, yazdıklarımı karşılaştır. Doğruysa tek dokunuş; yanlışsa üstüne yaz.</p>
+    <p class="gecis"><a id="otekiSayfa" href="#"></a></p>
     <div class="ilerleme">
       <div class="cubuk"><i id="cubuk"></i></div>
       <span class="sayac" id="sayac">0 / 0</span>
@@ -201,7 +204,12 @@ button.tus.atla[aria-pressed="true"] { background: var(--warn); border-color: va
   var liste = document.getElementById('liste');
   var suzgecEl = document.getElementById('suzgec');
   var durumSerit = document.getElementById('durumSerit');
-  var db = null, kisiselAcik = false, suzgec = 'bekleyen';
+  /* Kişisel alanlar AÇIK açılıyor. Maskeli başlatmıştım; Cemil
+     "TC/Vergi no alanlarını göremiyorum" dedi. Bu sayfanın tek işi bu
+     alanları DOĞRULATMAK — doğrulanacak şeyi varsayılan olarak gizlemek,
+     aracı kendi işine engel yapar. Gizleme düğmesi duruyor: omuz
+     üstünden bakan biri varsa tek dokunuşla kapanır. */
+  var db = null, kisiselAcik = true, suzgec = 'bekleyen';
   var durum = {};   /* id -> {durum, duzeltme, not} */
 
   var SUZGECLER = [
@@ -445,7 +453,7 @@ button.tus.atla[aria-pressed="true"] { background: var(--warn); border-color: va
              '">' + f[1] + ' · ' + n + '</button>';
     }).join('') +
     '<button class="cip" data-kisisel aria-pressed="' + kisiselAcik + '">' +
-      (kisiselAcik ? 'Kişisel alanlar açık' : 'Kişisel alanları göster') + '</button>' +
+      (kisiselAcik ? 'Kişisel alanları gizle' : 'Kişisel alanları göster') + '</button>' +
     (bakilan ? '<button class="cip" data-indir>Düzeltmeleri indir · ' + bakilan + '</button>' : '');
 
     document.getElementById('bitti').textContent = bakilan === VERI.kayitlar.length
@@ -513,6 +521,12 @@ button.tus.atla[aria-pressed="true"] { background: var(--warn); border-color: va
       return;
     }
   });
+
+  document.getElementById('baslik').textContent = VERI.baslik;
+  document.title = VERI.baslik;
+  var oteki = document.getElementById('otekiSayfa');
+  if (VERI.oteki) { oteki.textContent = VERI.oteki.ad; oteki.href = VERI.oteki.dosya; }
+  else { oteki.parentNode.hidden = true; }
 
   durum = yerelOku();
   try { donme = JSON.parse(localStorage.getItem('tamiron-kontrol-donme') || '{}'); }

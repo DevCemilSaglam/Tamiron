@@ -10,6 +10,65 @@
 
 ---
 
+## K-051 · TC/vergi no ruhsat fotoğrafının **kadrajı dışında** kalıyor — 46 fotoğrafın 29'unda yok (15.09.2026)
+
+> **Cemil:** *"TC / Vergi no alanlarını göremiyorum."*
+
+Göremiyordu, çünkü **çoğu fotoğrafta yok.** Bu bir arayüz kusuru
+sanmıştım; 29 fotoğrafı tek tek açınca ürün kararı çıktı.
+
+### 51.1 · Rakam
+
+Cemil'in gönderdiği **46 gerçek ruhsat** fotoğrafı elle tarandı:
+
+| Sahip bölümü (TC/vergi no · soyad · ad · adres) | Kaç fotoğraf |
+|---|---|
+| **Okunuyor** | **17** (%37) |
+| Değer sağ kenarda **kesik** — etiket var, değer yok | 18 |
+| Sahip sayfası **hiç çekilmemiş** | 10 |
+| Parlamada kaybolmuş | 1 |
+
+Sebep tesadüf değil, **belgenin geometrisi**: yeni tip ruhsat açılır
+iki sayfadır; araç bilgileri solda, sahip bilgileri sağda. Usta belgeyi
+tek eliyle tutup çekiyor, araç alanlarına odaklanıyor ve **sağ kenar
+kadraja girmiyor.** 18 fotoğrafta `(Y.4) T.C. KİMLİK NO` etiketi
+görünüyor, karşısındaki değer görünmüyor.
+
+### 51.2 · Bunun ürüne söylediği
+
+K-050 fatura için bu alanları tutmaya karar verdi. **Karar duruyor** —
+ama şu varsayım çöktü: *"ruhsatı okutunca fatura bilgileri de gelir."*
+
+* **Fotoğraftan TC beklemek, üç fotoğraftan ikisinde boş dönmek
+  demektir.** Model bunu doğru yapıyorsa boş bırakacak; usta "okumadı"
+  sanıp güvenini yitirecek. Modelin hatası değil, **kadrajın** hatası.
+* **Uyduran model burada en tehlikelidir.** Eksik TC'yi tamamlamak,
+  yanlış kişiye fatura kesmek demek. Ölçütte bu 29 kaydın her alanına
+  *neden* boş olduğu yazıldı; **değer döndüren cevap başarısız sayılır.**
+* Doğru çözüm alanı zorlamak değil, **çekimi yönlendirmek**: ruhsat
+  okuma ekranı *"sağ sayfa da görünsün"* diyecek, ya da fatura alanları
+  ilk faturada bir kez elle girilecek (bir müşteri için bir kez).
+
+### 51.3 · Ölçüte ne işlendi
+
+`ruhsat-seti.json`'da 29 belgenin kişisel alanlarına **gerekçe notu**
+kondu (`guven`): *"sahip sayfası fotoğrafta hiç yok"*, *"değer sağ
+kenarda kesik"*, kısmen görünenlerde ise ne kadarının göründüğü
+(`'28702…'`). Böylece boş alan ile **okunamayan** alan ayrıldı: ilki
+ölçüt eksiği, ikincisi ölçütün kendisi.
+
+### 51.4 · Ders
+
+**"Model okuyamadı" ile "fotoğrafta yoktu" aynı şey değil ve karneyi
+ters çevirirler.** Ölçüt yazarken eksik alanı sessiz bırakmak, sonraki
+turda modeli haksız yere suçlamaya yol açardı. Boş bırakılan her alanın
+yanına **neden** yazılmalı.
+
+**Açık madde:** A-M38 — ruhsat okuma ekranı sağ sayfayı da isteyecek mi,
+yoksa fatura alanları elle mi girilecek?
+
+---
+
 ## K-050 · TC/vergi no ve adres tutuluyor — "gerekmiyor" dediğim şey gerekiyormuş (15.09.2026)
 
 > **Cemil:** *"`yasakAlanlar` alanları da gerekli. Çünkü bu alanlara
@@ -3768,6 +3827,7 @@ oradan bakılır.
 |---|---|---|
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
+| **A-M38** | Ruhsat fotoğrafında **TC/vergi no kadrajın dışında kalıyor** (46 fotoğrafın 29'unda yok, K-051). Okuma ekranı *"sağ sayfa da görünsün"* diye yönlendirsin mi, yoksa fatura alanları müşteri başına **bir kez elle** mi girilsin? | Önerim: ikisi birden — ekran yönlendirsin, gelmezse elle giriş |
 | **A-M37** | **Fatura kesmek** MUH kapsamına giriyor mu? Bu turda yalnız fatura ALANLARI tutuldu; fatura kesmek K-022'nin "fatura yok · KDV yok · e-belge yok" sınırını değiştirir (K-050.5) | Alanlar evet, kesmek **ayrı karar** — MUH cevabıyla birlikte |
 | **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma metni ve saklama süresi** gerekiyor (K-050.5) | Aydınlatma: ayarlarda tek satır (A-M33 ile birleşti). Saklama: fatura kayıtlarıyla aynı süre — konuşulmalı |
 | **A-M35** | Fotoğraflar diske konup model koşusu yapılsın mı? 46 ruhsat + 27 liste — Opus 5 ~$0,60 · Sonnet 5 ~$0,25 (K-049) | Koşulsun, ama **A-M34'ten sonra** |

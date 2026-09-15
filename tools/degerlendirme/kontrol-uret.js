@@ -10,7 +10,10 @@
    numarası ve adres olur. Varsayılan çıktı yeri depo dışı; `--cikti`
    ile değiştirilir.
 
-     node tools/degerlendirme/kontrol-uret.js --cikti C:\yol\kontrol.html
+   İKİ sayfa üretir: kontrol-ruhsat.html ve kontrol-parca.html.
+   `--cikti` yalnız KLASÖRÜ belirlemek için kullanılır.
+
+     node tools/degerlendirme/kontrol-uret.js
 
    Şablon `kontrol-sablon.html`; bu betik yalnız VERİYİ enjekte ediyor.
    Tasarım şablonda, veri burada — ikisi karışırsa biri ötekini bozar. */
@@ -95,29 +98,45 @@ parca.listeler.forEach(l => {
   });
 });
 
-const veri = {
-  uretim: new Date().toISOString().slice(0, 16).replace('T', ' '),
-  kisiselVar: !!kisisel,
-  alanAdi: ALAN_ADI,
-  ruhsatAlanSira: RUHSAT_SIRA,
-  kayitlar
-};
+/* İKİ AYRI SAYFA (Cemil, 15.09: "Ayrı bir sayfa olsun").
+   Ruhsat ile parça listesi iki ayrı iş: biri alan doğruluyor, öteki
+   satır. Tek listede 73 kart alt alta gelince ikisi birbirine karışıyor
+   ve ilerleme çubuğu "ne kadar kaldı"yı söylemez oluyordu. İşaretler
+   ortak yerde durduğu için sayfalar arasında geçiş kaybettirmiyor. */
+const SAYFALAR = [
+  { dosya: 'kontrol-ruhsat.html', baslik: 'Ruhsat Kontrolü',
+    kayitlar: kayitlar.filter(k => k.tur === 'ruhsat') },
+  { dosya: 'kontrol-parca.html', baslik: 'Parça Listesi Kontrolü',
+    kayitlar: kayitlar.filter(k => k.tur === 'parca') }
+];
 
 const sablon = fs.readFileSync(path.join(KOK, 'kontrol-sablon.html'), 'utf8');
-/* </script> dizisi JSON'un içinde geçerse sayfayı erkenden kapatır —
-   kaçırılmazsa sessiz bir bozulma olur. */
-const govde = JSON.stringify(veri).replace(/<\//g, '<\\/');
-/* ⚠️ CHARSET SATIRI ŞART. Artifact yayınında kabuk kendi charset'ini
-   ekliyor, ama bu dosya DOĞRUDAN da açılıyor (yerel sunucu, çift tık) ve
-   o zaman tarayıcı latin-1 varsayıyor: "Parça" -> "ParÃ§a". Türkçe bir
-   sayfada sessiz bozulma. */
-const govdeHtml = '<meta charset="utf-8" />\n' +
-  sablon.replace('/* @@VERI@@ */', 'var VERI = ' + govde + ';');
-fs.writeFileSync(CIKTI, govdeHtml, 'utf8');
+const cikisDizini = path.dirname(CIKTI);
 
-console.log('kontrol sayfası: ' + CIKTI);
-console.log('  ruhsat: ' + ruhsat.belgeler.length + ' · parça: ' + parca.listeler.length +
-            ' · toplam ' + kayitlar.length + ' kayıt');
+SAYFALAR.forEach((sayfa, i) => {
+  const oteki = SAYFALAR[(i + 1) % SAYFALAR.length];
+  const veri = {
+    uretim: new Date().toISOString().slice(0, 16).replace('T', ' '),
+    baslik: sayfa.baslik,
+    oteki: { ad: oteki.baslik + ' →', dosya: oteki.dosya },
+    kisiselVar: !!kisisel,
+    alanAdi: ALAN_ADI,
+    ruhsatAlanSira: RUHSAT_SIRA,
+    kayitlar: sayfa.kayitlar
+  };
+  /* </script> dizisi JSON'un içinde geçerse sayfayı erkenden kapatır —
+     kaçırılmazsa sessiz bir bozulma olur. */
+  const govde = JSON.stringify(veri).replace(/<\//g, '<\\/');
+  /* ⚠️ CHARSET SATIRI ŞART. Bu dosya doğrudan açılıyor (çift tık, yerel
+     sunucu) ve charset'siz tarayıcı latin-1 varsayıyor: "Parça" ->
+     "ParÃ§a". Türkçe bir sayfada sessiz bozulma. */
+  const html = '<meta charset="utf-8" />\n' +
+    sablon.replace('/* @@VERI@@ */', 'var VERI = ' + govde + ';');
+  const yol = path.join(cikisDizini, sayfa.dosya);
+  fs.writeFileSync(yol, html, 'utf8');
+  console.log(sayfa.baslik + ': ' + yol + '  (' + sayfa.kayitlar.length + ' kayıt)');
+});
+
 const fotolu = kayitlar.filter(k => k.foto).length;
 console.log(fotolu === kayitlar.length
   ? '  fotoğraflar bağlandı: ' + fotolu + '/' + kayitlar.length

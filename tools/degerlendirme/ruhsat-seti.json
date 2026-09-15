@@ -1,263 +1,1378 @@
 {
-  "ad": "Ruhsat okuma değerlendirme seti",
-  "surum": 1,
-  "tarih": "15.09.2026",
-  "kaynak": "Cemil'in 14–15.09'da gönderdiği 46 gerçek ruhsat fotoğrafı",
-
-  "⚠️ TASLAK": "Bu dosyadaki alanları FOTOĞRAFLARDAN OKUYAN ben oldum (Claude, görüntü). Yani burası henüz 'ölçüt' değil, ÖLÇÜT ADAYI. Bir modelin kendi okumasını kendi ölçütü yapması, sınavı kendi yazıp kendi puanlaması olurdu. Cemil doğrulayıp 'dogrulandi: true' yazana kadar bu dosya bir TASLAKTIR. Şüphelendiğim her alanın yanında 'guven' notu var — doğrulama oradan başlasın.",
-
-  "kisiselAlanlar": {
-    "⚠️ 15.09 KURAL DEĞİŞTİ": "Cemil: 'Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb.' — RUHSAT-OKUMA Bulgu 2 bunları elemişti, gerekçesi doğruydu ama TEK BİR İŞE (araç kaydı) bakıyordu. Fatura TC/vergi numarasına ve adrese kesilir. Kural geri alındı (K-050).",
-    "okunacak": ["tcVergiNo", "unvanSoyad", "ad", "adres"],
-    "yasakAlanlar": [],
-    "degerleriNerede": "ruhsat-seti-kisisel.json — .gitignore'da, depoya girmez.",
-    "neden": "Alanlar ölçülüyor ama 46 gerçek insanın TC numarası ve adresi bir GitHub deposunda kalıcı olarak durmaz. Fotoğrafların kendisi zaten depoya girmiyor; içindekini yazıya dökünce girmesi tutarsız olurdu. Koşucu yerel dosya varsa birleştiriyor, yoksa bu alanları ATLIYOR ve atladığını söylüyor.",
-    "vergiDairesi": "⚠️ RUHSATTA YOK. Fatura için gerekiyor ama belgede yazmıyor — okunamaz, ustaya sorulur. Ölçütte de yok; olmayan alanı ölçmek, modeli uydurmaya davet etmek olurdu."
+ "ad": "Ruhsat okuma değerlendirme seti",
+ "surum": 1,
+ "tarih": "15.09.2026",
+ "kaynak": "Cemil'in 14–15.09'da gönderdiği 46 gerçek ruhsat fotoğrafı",
+ "⚠️ TASLAK": "Bu dosyadaki alanları FOTOĞRAFLARDAN OKUYAN ben oldum (Claude, görüntü). Yani burası henüz 'ölçüt' değil, ÖLÇÜT ADAYI. Bir modelin kendi okumasını kendi ölçütü yapması, sınavı kendi yazıp kendi puanlaması olurdu. Cemil doğrulayıp 'dogrulandi: true' yazana kadar bu dosya bir TASLAKTIR. Şüphelendiğim her alanın yanında 'guven' notu var — doğrulama oradan başlasın.",
+ "kisiselAlanlar": {
+  "⚠️ 15.09 KURAL DEĞİŞTİ": "Cemil: 'Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb.' — RUHSAT-OKUMA Bulgu 2 bunları elemişti, gerekçesi doğruydu ama TEK BİR İŞE (araç kaydı) bakıyordu. Fatura TC/vergi numarasına ve adrese kesilir. Kural geri alındı (K-050).",
+  "okunacak": [
+   "tcVergiNo",
+   "unvanSoyad",
+   "ad",
+   "adres"
+  ],
+  "yasakAlanlar": [],
+  "degerleriNerede": "ruhsat-seti-kisisel.json — .gitignore'da, depoya girmez.",
+  "neden": "Alanlar ölçülüyor ama 46 gerçek insanın TC numarası ve adresi bir GitHub deposunda kalıcı olarak durmaz. Fotoğrafların kendisi zaten depoya girmiyor; içindekini yazıya dökünce girmesi tutarsız olurdu. Koşucu yerel dosya varsa birleştiriyor, yoksa bu alanları ATLIYOR ve atladığını söylüyor.",
+  "vergiDairesi": "⚠️ RUHSATTA YOK. Fatura için gerekiyor ama belgede yazmıyor — okunamaz, ustaya sorulur. Ölçütte de yok; olmayan alanı ölçmek, modeli uydurmaya davet etmek olurdu."
+ },
+ "fotograflar": {
+  "nerede": "tools/degerlendirme/ruhsatlar/  (git'e girmez — .gitignore)",
+  "adlandirma": "r01.jpg … r46.jpg, aşağıdaki sırayla. Sıra Cemil'in gönderdiği sıradır; her kaydın plakası yazılı olduğu için eşleştirme gözle doğrulanabilir.",
+  "neden": "Fotoğraflar sohbetten geldi, diske yazılamadı. Depoya da konmuyor: içlerinde TC no ve adres var."
+ },
+ "alanlar": {
+  "plaka": "(A) PLAKA — boşluklu normal hâle getirilir: '33VAH34' -> '33 VAH 34'",
+  "ilkTescil": "(B) İLK TESCİL TARİHİ",
+  "marka": "(D.1) MARKASI",
+  "tip": "(D.2) TİPİ",
+  "ticariAd": "(D.3) TİCARİ ADI",
+  "modelYili": "(D.4) MODEL YILI",
+  "cinsi": "(D.5) CİNSİ",
+  "renk": "(R) RENGİ — parantezli ton dahil, belgede nasılsa öyle",
+  "motorNo": "(P.5) MOTOR NO",
+  "sase": "(E) ŞASE NO",
+  "silindir": "(P.1) SİLİNDİR HACMİ",
+  "guc": "(P.2) MOTOR GÜCÜ (kW)",
+  "yakit": "(P.3) YAKIT CİNSİ",
+  "koltuk": "(S.1) KOLTUK SAYISI",
+  "tcVergiNo": "(Y.4) TC KİMLİK NO / VERGİ NO — kişisel, değeri ayrı dosyada",
+  "unvanSoyad": "(C.1.1) SOYADI / TİCARİ ÜNVANI — kişisel",
+  "ad": "(C.1.2) ADI — kişisel",
+  "adres": "(C.1.3) ADRESİ — kişisel"
+ },
+ "puanlama": {
+  "kritik": [
+   "plaka",
+   "marka",
+   "ticariAd",
+   "modelYili",
+   "sase"
+  ],
+  "not": "Kritik alan yanlışsa okuma başarısızdır — plaka yanlışsa yanlış araca kayıt açılır, şase yanlışsa parçacı yanlış parça gönderir. Öteki alanlar tek tek sayılır.",
+  "kisiselAlanNotu": "tcVergiNo · unvanSoyad · ad · adres KRİTİK DEĞİL ama ölçülüyor: fatura bunlara kesiliyor. Değerleri yerel dosyadan geliyor; dosya yoksa bu dört alan puanlamaya girmiyor ve koşucu bunu söylüyor.",
+  "bosBirakmaKurali": "Belgede OLMAYAN ya da OKUNMAYAN alan boş bırakılmalı. Uydurulan alan, boş bırakılandan AĞIR hata sayılır (guven: 'okunamadi' olanlar bunun sınavıdır)."
+ },
+ "belgeler": [
+  {
+   "id": "r01",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "parlama"
+   ],
+   "beklenen": {
+    "plaka": "33 VAH 34",
+    "ilkTescil": "08/09/2015",
+    "marka": "VOLKSWAGEN",
+    "tip": "16",
+    "ticariAd": "JETTA",
+    "modelYili": "2015",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "BEYAZ (SAF)",
+    "motorNo": "CZC051790",
+    "sase": "WVWZZZ16ZGM001794",
+    "silindir": "1395",
+    "guc": "92",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
   },
-
-  "fotograflar": {
-    "nerede": "tools/degerlendirme/ruhsatlar/  (git'e girmez — .gitignore)",
-    "adlandirma": "r01.jpg … r46.jpg, aşağıdaki sırayla. Sıra Cemil'in gönderdiği sıradır; her kaydın plakası yazılı olduğu için eşleştirme gözle doğrulanabilir.",
-    "neden": "Fotoğraflar sohbetten geldi, diske yazılamadı. Depoya da konmuyor: içlerinde TC no ve adres var."
+  {
+   "id": "r02",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "06 JT 115",
+    "ilkTescil": "22-11-2007",
+    "marka": "CİTROEN",
+    "tip": "C3 SX 1.6",
+    "ticariAd": "C3 SX",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL (AB Heçbek)",
+    "renk": "GRİ (Gümüş)",
+    "motorNo": "NFU10FX6FPSA3172783",
+    "sase": "VF7FCNFUF28854790",
+    "silindir": "1587",
+    "guc": "80.8",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
   },
-
-  "alanlar": {
-    "plaka": "(A) PLAKA — boşluklu normal hâle getirilir: '33VAH34' -> '33 VAH 34'",
-    "ilkTescil": "(B) İLK TESCİL TARİHİ",
-    "marka": "(D.1) MARKASI",
-    "tip": "(D.2) TİPİ",
-    "ticariAd": "(D.3) TİCARİ ADI",
-    "modelYili": "(D.4) MODEL YILI",
-    "cinsi": "(D.5) CİNSİ",
-    "renk": "(R) RENGİ — parantezli ton dahil, belgede nasılsa öyle",
-    "motorNo": "(P.5) MOTOR NO",
-    "sase": "(E) ŞASE NO",
-    "silindir": "(P.1) SİLİNDİR HACMİ",
-    "guc": "(P.2) MOTOR GÜCÜ (kW)",
-    "yakit": "(P.3) YAKIT CİNSİ",
-    "koltuk": "(S.1) KOLTUK SAYISI",
-    "tcVergiNo": "(Y.4) TC KİMLİK NO / VERGİ NO — kişisel, değeri ayrı dosyada",
-    "unvanSoyad": "(C.1.1) SOYADI / TİCARİ ÜNVANI — kişisel",
-    "ad": "(C.1.2) ADI — kişisel",
-    "adres": "(C.1.3) ADRESİ — kişisel"
+  {
+   "id": "r03",
+   "belgeTipi": "eski",
+   "zorluk": [
+    "eski-belge",
+    "alan-yok"
+   ],
+   "beklenen": {
+    "plaka": "34 SC 5940",
+    "ilkTescil": "14-02-2017",
+    "marka": "VOLKSWAGEN",
+    "tip": "7J0",
+    "ticariAd": null,
+    "modelYili": "2016",
+    "cinsi": "KAMYONET (BB Van)",
+    "renk": "BEYAZ",
+    "motorNo": "CAA963512",
+    "sase": "WV1ZZZ7HZHH076563",
+    "silindir": null,
+    "guc": null,
+    "yakit": null,
+    "koltuk": null
+   },
+   "sahipBilgisiVar": false,
+   "not": "ESKİ TİP BELGE: silindir, güç, yakıt, koltuk ve ticari ad ALANLARI YOK. Bunları dolduran model UYDURUYOR demektir — bu kayıt o sınavın kendisi. 'İlk tescil' yerine 'TRAFİĞE ÇIKIŞ TARİHİ' yazıyor.",
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
   },
-
-  "puanlama": {
-    "kritik": ["plaka", "marka", "ticariAd", "modelYili", "sase"],
-    "not": "Kritik alan yanlışsa okuma başarısızdır — plaka yanlışsa yanlış araca kayıt açılır, şase yanlışsa parçacı yanlış parça gönderir. Öteki alanlar tek tek sayılır.",
-    "kisiselAlanNotu": "tcVergiNo · unvanSoyad · ad · adres KRİTİK DEĞİL ama ölçülüyor: fatura bunlara kesiliyor. Değerleri yerel dosyadan geliyor; dosya yoksa bu dört alan puanlamaya girmiyor ve koşucu bunu söylüyor.",
-    "bosBirakmaKurali": "Belgede OLMAYAN ya da OKUNMAYAN alan boş bırakılmalı. Uydurulan alan, boş bırakılandan AĞIR hata sayılır (guven: 'okunamadi' olanlar bunun sınavıdır)."
+  {
+   "id": "r04",
+   "belgeTipi": "yeni",
+   "zorluk": [],
+   "beklenen": {
+    "plaka": "34 DLA 23",
+    "ilkTescil": null,
+    "marka": "AUDI",
+    "tip": "A3 SPORTBACK 1,6 102 NP",
+    "ticariAd": "A3 SPORTBACK 1,6 102 NP",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL",
+    "renk": "BEYAZ",
+    "motorNo": "BSE596180",
+    "sase": "WAUZZZ8P98A151795",
+    "silindir": "1395",
+    "guc": "75",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "not": "İlk tescil tarihi alanı BOŞ (belgede yazmıyor). r15 ve r43 aynı belgenin başka çekimleri — üçü aynı sonucu vermeli (tutarlılık sınavı).",
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
   },
-
-  "belgeler": [
-    { "id": "r01", "belgeTipi": "yeni", "zorluk": ["parlama"],
-      "beklenen": { "plaka": "33 VAH 34", "ilkTescil": "08/09/2015", "marka": "VOLKSWAGEN", "tip": "16", "ticariAd": "JETTA", "modelYili": "2015", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "BEYAZ (SAF)", "motorNo": "CZC051790", "sase": "WVWZZZ16ZGM001794", "silindir": "1395", "guc": "92", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r02", "belgeTipi": "yeni", "zorluk": ["silik-yazi", "tc-gorunur"],
-      "beklenen": { "plaka": "06 JT 115", "ilkTescil": "22-11-2007", "marka": "CİTROEN", "tip": "C3 SX 1.6", "ticariAd": "C3 SX", "modelYili": "2008", "cinsi": "OTOMOBİL (AB Heçbek)", "renk": "GRİ (Gümüş)", "motorNo": "NFU10FX6FPSA3172783", "sase": "VF7FCNFUF28854790", "silindir": "1587", "guc": "80.8", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r03", "belgeTipi": "eski", "zorluk": ["eski-belge", "alan-yok"],
-      "beklenen": { "plaka": "34 SC 5940", "ilkTescil": "14-02-2017", "marka": "VOLKSWAGEN", "tip": "7J0", "ticariAd": null, "modelYili": "2016", "cinsi": "KAMYONET (BB Van)", "renk": "BEYAZ", "motorNo": "CAA963512", "sase": "WV1ZZZ7HZHH076563", "silindir": null, "guc": null, "yakit": null, "koltuk": null },
-      "sahipBilgisiVar": false,
-      "not": "ESKİ TİP BELGE: silindir, güç, yakıt, koltuk ve ticari ad ALANLARI YOK. Bunları dolduran model UYDURUYOR demektir — bu kayıt o sınavın kendisi. 'İlk tescil' yerine 'TRAFİĞE ÇIKIŞ TARİHİ' yazıyor." },
-
-    { "id": "r04", "belgeTipi": "yeni", "zorluk": [],
-      "beklenen": { "plaka": "34 DLA 23", "ilkTescil": null, "marka": "AUDI", "tip": "A3 SPORTBACK 1,6 102 NP", "ticariAd": "A3 SPORTBACK 1,6 102 NP", "modelYili": "2008", "cinsi": "OTOMOBİL", "renk": "BEYAZ", "motorNo": "BSE596180", "sase": "WAUZZZ8P98A151795", "silindir": "1395", "guc": "75", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "not": "İlk tescil tarihi alanı BOŞ (belgede yazmıyor). r15 ve r43 aynı belgenin başka çekimleri — üçü aynı sonucu vermeli (tutarlılık sınavı)." },
-
-    { "id": "r05", "belgeTipi": "yeni", "zorluk": ["kirpik-kenar"],
-      "beklenen": { "plaka": "41 HR 878", "ilkTescil": null, "marka": "SEAT", "tip": "CORDOBA 1.4", "ticariAd": "CORDOBA 1.4", "modelYili": "2008", "cinsi": "OTOMOBİL", "renk": "GRİ (ZEYTİN)", "motorNo": "BXW073705", "sase": "VSSZZZ6LZ7R187368", "silindir": "1390", "guc": null, "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "guven": { "guc": "dusuk — sayfa kenarında kalıyor, okunamadı" } },
-
-    { "id": "r06", "belgeTipi": "yeni", "zorluk": ["cok-silik"],
-      "beklenen": { "plaka": "41 ATC 704", "ilkTescil": "20/03/2013", "marka": "SEAT", "tip": "6J", "ticariAd": "IBIZA 1.2 DSG STYLE", "modelYili": "2013", "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)", "renk": "BEYAZ", "motorNo": "CBZD13096", "sase": "VSSZZZ6JZDR154805", "silindir": "1197", "guc": "77", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "guven": { "hepsi": "dusuk — belge çok soluk, yazı neredeyse kaybolmuş; bu kayıt doğrulamada ilk bakılacaklardan" } },
-
-    { "id": "r07", "belgeTipi": "eski", "zorluk": ["eski-belge", "alan-yok", "kirli-kagit"],
-      "beklenen": { "plaka": "34 KZ 0582", "ilkTescil": "09-10-2014", "marka": "SKODA", "tip": "5E", "ticariAd": null, "modelYili": "2014", "cinsi": "OTOMOBİL (AA Sedan)", "renk": "BEYAZ", "motorNo": "CLHC22039", "sase": "TMBAG6NE1F0062507", "silindir": null, "guc": null, "yakit": null, "koltuk": null },
-      "sahipBilgisiVar": false },
-
-    { "id": "r08", "belgeTipi": "yeni", "zorluk": ["silik-yazi", "tc-gorunur"],
-      "beklenen": { "plaka": "41 AFK 652", "ilkTescil": null, "marka": "OPEL", "tip": "VECTRA 1.6 NB COMF.", "ticariAd": "VECTRA", "modelYili": "2004", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "MAVİ (SATÜRN)", "motorNo": "Z16XE20CD8435", "sase": "WOLOZCF6941027918", "silindir": "1598", "guc": "73.5", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "guven": { "ilkTescil": "dusuk — üstü silinmiş/soluk", "renk": "dusuk" } },
-
-    { "id": "r09", "belgeTipi": "yeni", "zorluk": ["90-derece-yan", "tc-gorunur"],
-      "beklenen": { "plaka": "06 AH 3860", "ilkTescil": "20/04/2004", "marka": "PEUGEOT", "tip": "206", "ticariAd": "206", "modelYili": "2004", "cinsi": "OTOMOBİL", "renk": "MAVİ", "motorNo": "10FSM74704591", "sase": "VF32AKFWF43809098", "silindir": "1360", "guc": null, "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "not": "Belge 90° yan çekilmiş. Döndürmeden okuyabilmeli." },
-
-    { "id": "r10", "belgeTipi": "yeni", "zorluk": ["parlama", "golge"],
-      "beklenen": { "plaka": "55 SC 311", "ilkTescil": null, "marka": "VOLKSWAGEN", "tip": "POLO CLS 1,6", "ticariAd": "POLO", "modelYili": "2000", "cinsi": "OTOMOBİL", "renk": "KIRMIZI", "motorNo": "ALM071567", "sase": "WVWZZZ6KZYR527065", "silindir": "1598", "guc": "55", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "not": "r18 aynı belgenin ikinci çekimi." },
-
-    { "id": "r11", "belgeTipi": "yeni", "zorluk": ["cok-silik", "parlama"],
-      "beklenen": { "plaka": "34 DFY 477", "ilkTescil": null, "marka": "OPEL", "tip": "0G-A", "ticariAd": null, "modelYili": null, "cinsi": "OTOMOBİL - AF ÇOK AMAÇLI", "renk": "BEYAZ", "motorNo": "A16LET20SW2407", "sase": "W0LGT5GB5D1074071", "silindir": "1598", "guc": "132", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "guven": { "plaka": "dusuk — parlama altında", "modelYili": "okunamadi", "ticariAd": "okunamadi" },
-      "not": "Sol sütun parlamadan neredeyse kayıp. Modelin 'okunamadı' demesi beklenen alanlar var." },
-
-    { "id": "r12", "belgeTipi": "eski", "zorluk": ["eski-belge", "alan-yok"],
-      "beklenen": { "plaka": "34 RJ 4916", "ilkTescil": "12-07-2016", "marka": "VOLKSWAGEN", "tip": "6R", "ticariAd": null, "modelYili": "2016", "cinsi": "OTOMOBİL (AB Heçbek)", "renk": "MAVİ", "motorNo": "CUS232776", "sase": "WVWZZZ6RZGY264738", "silindir": null, "guc": null, "yakit": null, "koltuk": null },
-      "sahipBilgisiVar": false },
-
-    { "id": "r13", "belgeTipi": "yeni", "zorluk": ["parlama"],
-      "beklenen": { "plaka": "41 NT 210", "ilkTescil": "25/05/2000", "marka": "SEAT", "tip": "IBIZA 1.6 STELLA", "ticariAd": "IBIZA", "modelYili": "2000", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "KIRMIZI (METALİK)", "motorNo": "ALM073199", "sase": "VSSZZZ6KZYR160837", "silindir": "1598", "guc": "55.1", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r14", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 EY 184", "ilkTescil": "03/12/2013", "marka": "OPEL", "tip": "P-J", "ticariAd": "ASTRA", "modelYili": "2013", "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)", "renk": "SİYAH", "motorNo": "A14NET19CU8166", "sase": "W0LPF6EC7DG085675", "silindir": "1362", "guc": "103", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r15", "belgeTipi": "yeni", "zorluk": ["tutarlilik"], "ayniBelge": "r04",
-      "beklenen": { "plaka": "34 DLA 23", "ilkTescil": null, "marka": "AUDI", "tip": "A3 SPORTBACK 1,6 102 NP", "ticariAd": "A3 SPORTBACK 1,6 102 NP", "modelYili": "2008", "cinsi": "OTOMOBİL", "renk": "BEYAZ", "motorNo": "BSE596180", "sase": "WAUZZZ8P98A151795", "silindir": "1395", "guc": "75", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r16", "belgeTipi": "yeni", "zorluk": [],
-      "beklenen": { "plaka": "34 RU 3208", "ilkTescil": "05/09/2016", "marka": "OPEL", "tip": "P-J", "ticariAd": "ASTRA NOTCHBACK", "modelYili": "2016", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "BEYAZ", "motorNo": "A1161745GU7X0051LVL", "sase": "W0LPD5E3XGG151690", "silindir": "1598", "guc": "100", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r17", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 BY 510", "ilkTescil": "30/05/2015", "marka": "VOLKSWAGEN", "tip": "6R", "ticariAd": "POLO", "modelYili": "2015", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "GRİ", "motorNo": "CJZ490094", "sase": "WVWZZZ6RZFY323737", "silindir": "1197", "guc": "66", "yakit": "BENZİNLİ", "koltuk": null },
-      "sahipBilgisiVar": true,
-      "guven": { "koltuk": "dusuk — satır silik" } },
-
-    { "id": "r18", "belgeTipi": "yeni", "zorluk": ["karanlik", "tutarlilik"], "ayniBelge": "r10",
-      "beklenen": { "plaka": "55 SC 311", "ilkTescil": null, "marka": "VOLKSWAGEN", "tip": "POLO CLS 1,6", "ticariAd": "POLO", "modelYili": "2000", "cinsi": "OTOMOBİL", "renk": "KIRMIZI", "motorNo": "ALM071567", "sase": "WVWZZZ6KZYR527065", "silindir": "1598", "guc": "55", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r19", "belgeTipi": "yeni", "zorluk": ["kirpik-kenar"],
-      "beklenen": { "plaka": "41 NS 280", "ilkTescil": "11/01/2008", "marka": "PEUGEOT", "tip": "207 TRENDY 1.4HDİ", "ticariAd": "207 TRENDY 1.4 HDİ", "modelYili": "2008", "cinsi": "OTOMOBİL", "renk": "SİYAH (OBSİDİEN)", "motorNo": "10FD881995706", "sase": "VF3WC8HZC34102250", "silindir": "1398", "guc": "68", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r20", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "34 LB 926", "ilkTescil": "11/06/1997", "marka": "VOLKSWAGEN", "tip": "POLO 1.6 5 KAPI", "ticariAd": "POLO 1.6 5 KAPI", "modelYili": "1997", "cinsi": "OTOMOBİL", "renk": "KIRMIZI", "motorNo": "AEE162330", "sase": "WVWZZZ6NZVY228351", "silindir": "1598", "guc": "55.1", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r21", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "34 FES 033", "ilkTescil": "22/04/2022", "marka": "VOLKSWAGEN", "tip": "A1", "ticariAd": "T-ROC", "modelYili": "2022", "cinsi": "OTOMOBİL (AC STEYŞIN)", "renk": "BEYAZ", "motorNo": "DPCH81839", "sase": "WVGZZZA1ZNV109057", "silindir": "1498", "guc": "110", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r22", "belgeTipi": "yeni", "zorluk": ["kirpik-kenar"],
-      "beklenen": { "plaka": "41 EM 673", "ilkTescil": "21-01-2011", "marka": "PEUGEOT", "tip": "M59", "ticariAd": "PARTNER", "modelYili": "2011", "cinsi": "KAMYONET (Kapalı Kasa)", "renk": "GRİ (Alüminyum)", "motorNo": "10JBBV0093193", "sase": "VF3GC9HXCBX501644", "silindir": "1560", "guc": "66.2", "yakit": "Dizel", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "not": "Araç sınıfı N1 (ticari). Sağ sütun kırpılmış." },
-
-    { "id": "r23", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 BFM 863", "ilkTescil": "05/12/2001", "marka": "SKODA", "tip": "FABIA COMF.1.4", "ticariAd": "FABIA COMFORT 1.4", "modelYili": "2002", "cinsi": "OTOMOBİL-AB HEÇBEK", "renk": "MAVİ", "motorNo": "AME026571", "sase": "TMBNB46Y913174962", "silindir": "1397", "guc": "68", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "not": "Tescil tarihi 25/06/2026 — GELECEK tarih. Belgede öyle yazıyor; model düzeltmemeli." },
-
-    { "id": "r24", "belgeTipi": "yeni", "zorluk": ["90-derece-yan", "tc-gorunur"],
-      "beklenen": { "plaka": "41 AJP 287", "ilkTescil": "25/03/2022", "marka": "OPEL", "tip": "P?", "ticariAd": "CROSSLAND", "modelYili": "2022", "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)", "renk": "MAVİ SİYAH", "motorNo": "10XVDU1885550", "sase": "W0V7H9EL3N4136756", "silindir": "1199", "guc": "96.0", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "guven": { "tip": "dusuk — tek harf, yan çekimde net değil" } },
-
-    { "id": "r25", "belgeTipi": "yeni", "zorluk": ["silik-yazi"],
-      "beklenen": { "plaka": "41 EP 417", "ilkTescil": "29-05-2013", "marka": "SEAT", "tip": "LEON 1.6 TDI CRI 105 HP", "ticariAd": "LEON", "modelYili": "2013", "cinsi": "OTOMOBİL (AC Steyşın)", "renk": "BEYAZ (Opak)", "motorNo": "CLH239831", "sase": "VSSZZZ5FZDR038668", "silindir": "1598", "guc": "77", "yakit": "Dizel", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r26", "belgeTipi": "yeni", "zorluk": ["cok-silik", "parmak-kapatiyor"],
-      "beklenen": { "plaka": "16 LEC 87", "ilkTescil": "28/06/2011", "marka": "OPEL", "tip": "S-D", "ticariAd": "CORSA", "modelYili": "2011", "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)", "renk": "SİYAH", "motorNo": "A14XER19XA3291", "sase": "W0L0SDL68B4288667", "silindir": null, "guc": "74", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "guven": { "silindir": "okunamadi — parmak ve solukluk", "koltuk": "dusuk" } },
-
-    { "id": "r27", "belgeTipi": "yeni", "zorluk": [],
-      "beklenen": { "plaka": "34 BJV 625", "ilkTescil": "02/07/2018", "marka": "VOLKSWAGEN", "tip": "2KN", "ticariAd": "CADDY", "modelYili": "2018", "cinsi": "KAMYONET (BB VAN)", "renk": "SARI", "motorNo": "DFS537025", "sase": "WV1ZZZ2KZJX113804", "silindir": "1968", "guc": "75", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "not": "En temiz çekim — bu kayıt 'kolay' ucu temsil ediyor." },
-
-    { "id": "r28", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "34 DSH 25", "ilkTescil": "25/09/2000", "marka": "SEAT", "tip": "IBIZA 1.6 SİGNO", "ticariAd": "IBIZA 1.6 SİGNO", "modelYili": "2001", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "GRİ (METALİK GÜMÜŞ)", "motorNo": "AKL955018", "sase": "VSSZZZ6KZ1R094233", "silindir": "1589", "guc": "101", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "guven": { "guc": "dusuk — 101 kW bu araç için yüksek görünüyor ama belgede öyle yazıyor; model belgeyi okumalı, dünyayı değil" } },
-
-    { "id": "r29", "belgeTipi": "yeni", "zorluk": ["silik-yazi", "parmak-kapatiyor"],
-      "beklenen": { "plaka": "16 NCF 91", "ilkTescil": "18/11/1999", "marka": "OPEL", "tip": "ASTRA 1.6 NB CD", "ticariAd": "ASTRA 1.6 NB CD", "modelYili": "2000", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "BEYAZ", "motorNo": "X16XEL02KY1359", "sase": "W0L0TGF69Y5065572", "silindir": "1598", "guc": "73", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r30", "belgeTipi": "yeni", "zorluk": ["kirpik-kenar"],
-      "beklenen": { "plaka": "16 BEH 029", "ilkTescil": "10/02/1994", "marka": "OPEL", "tip": "VECTRA", "ticariAd": "VECTRA GL", "modelYili": "1994", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "MAVİ (LACİVERT)", "motorNo": "18SV14278300", "sase": "W0L000087RZ006598", "silindir": "1791", "guc": "66", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r31", "belgeTipi": "yeni", "zorluk": ["cok-silik", "plaka-okunamiyor"],
-      "beklenen": { "plaka": null, "ilkTescil": null, "marka": "VOLKSWAGEN", "tip": "3C", "ticariAd": "PASSAT", "modelYili": "2015", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "GRİ", "motorNo": "DCX031215", "sase": "WVWZZZ3CZFE504408", "silindir": "1598", "guc": "88", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "guven": { "plaka": "okunamadi — sol sütun tamamen soluk" },
-      "not": "⚠️ EN ÖNEMLİ KAYIT. Plaka okunamıyor. Doğru davranış plakayı BOŞ bırakıp ustaya sormaktır; plaka uyduran model, yanlış araca kayıt açar. Bu kayıtta plaka döndüren her cevap BAŞARISIZ sayılır." },
-
-    { "id": "r32", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 LE 352", "ilkTescil": "15-12-2010", "marka": "VOLKSWAGEN", "tip": "2KN", "ticariAd": "CADDY COMBI 1.6 TDI", "modelYili": "2011", "cinsi": "KAMYONET (Kapalı Kasa)", "renk": "SİYAH (Sedefli)", "motorNo": "CAY488772", "sase": "WV1ZZZ2KZBX230252", "silindir": "1598", "guc": "75", "yakit": "Dizel", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r33", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 AK 097", "ilkTescil": "23/03/2021", "marka": "OPEL", "tip": "Z", "ticariAd": "GRANDLAND X", "modelYili": "2020", "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)", "renk": "GRİ", "motorNo": "10XVDV1718766", "sase": "W0VZRHNS2LS271369", "silindir": "1199", "guc": "96", "yakit": "BENZİNLİ", "koltuk": null },
-      "sahipBilgisiVar": true,
-      "guven": { "silindir": "dusuk — '1199' soluk", "koltuk": "okunamadi" },
-      "not": "r42 aynı belgenin yan çekilmiş hâli." },
-
-    { "id": "r34", "belgeTipi": "yeni", "zorluk": ["silik-yazi"],
-      "beklenen": { "plaka": "06 AAL 281", "ilkTescil": "01/03/2016", "marka": "VOLKSWAGEN", "tip": "6R", "ticariAd": "POLO", "modelYili": "2016", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "BEYAZ", "motorNo": "CJZA37880", "sase": "WVWZZZ6RZGY203568", "silindir": "1197", "guc": "66", "yakit": "BENZİNLİ", "koltuk": null },
-      "sahipBilgisiVar": false,
-      "guven": { "koltuk": "okunamadi — satır üstü çizilmiş gibi soluk" } },
-
-    { "id": "r35", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 FA 101", "ilkTescil": "25/04/2008", "marka": "SKODA", "tip": "5J", "ticariAd": "FABIA CLS PLUS", "modelYili": "2008", "cinsi": "OTOMOBİL", "renk": "KIRMIZI (KARMEN)", "motorNo": "BZG077753", "sase": "TMBAH45J083157396", "silindir": "1198", "guc": "51", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r36", "belgeTipi": "yeni", "zorluk": ["tc-gorunur"],
-      "beklenen": { "plaka": "41 FB 508", "ilkTescil": "29/09/2011", "marka": "VOLKSWAGEN", "tip": "JETTA 1.2 105 HP", "ticariAd": "JETTA", "modelYili": "2012", "cinsi": "OTOMOBİL", "renk": "BEYAZ (ŞEKER)", "motorNo": "CBZ446632", "sase": "WVWZZZ16ZCM011796", "silindir": "1197", "guc": "77", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r37", "belgeTipi": "yeni", "zorluk": ["kirpik-kenar", "egik"],
-      "beklenen": { "plaka": "41 AGE 473", "ilkTescil": "24/09/2010", "marka": "VOLKSWAGEN", "tip": "JETTA 1.6 TDI 105 HP", "ticariAd": "JETTA 1.6 TDI 105", "modelYili": "2011", "cinsi": "OTOMOBİL (AA SEDAN)", "renk": "SİYAH (DERİN)", "motorNo": "CAY766126", "sase": "WVWZZZ1KZBM004355", "silindir": "1598", "guc": "77", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r38", "belgeTipi": "yeni", "zorluk": [],
-      "beklenen": { "plaka": "41 AFV 254", "ilkTescil": "19/09/2013", "marka": "VOLKSWAGEN", "tip": "6R", "ticariAd": "POLO", "modelYili": "2013", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "BEYAZ", "motorNo": "CGG991612", "sase": "WVWZZZ6RZEY063840", "silindir": "1390", "guc": "63", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": false },
-
-    { "id": "r39", "belgeTipi": "yeni", "zorluk": ["silik-yazi", "tc-gorunur"],
-      "beklenen": { "plaka": "41 ER 309", "ilkTescil": "19-11-2013", "marka": "VOLKSWAGEN", "tip": "2KN", "ticariAd": "CADDY", "modelYili": "2013", "cinsi": "KAMYONET (Panelvan)", "renk": "GRİ", "motorNo": "CAYX77649", "sase": "WV1ZZZ2KZEX056833", "silindir": "1598", "guc": "75", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r40", "belgeTipi": "yeni", "zorluk": ["silik-yazi", "tc-gorunur"],
-      "beklenen": { "plaka": "16 BKF 23", "ilkTescil": "27/09/2004", "marka": "CHEVROLET", "tip": "KALOS HB 1.2 SE", "ticariAd": "KALOS HB 1.2 SE", "modelYili": "2005", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "SİYAH (İNCİ)", "motorNo": "B12S1100414KA2", "sase": "KLASF48T15B257861", "silindir": "1150", "guc": "55.1", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r41", "belgeTipi": "yeni", "zorluk": ["90-derece-yan", "tc-gorunur"],
-      "beklenen": { "plaka": "41 BBH 883", "ilkTescil": "14/04/2021", "marka": "VOLKSWAGEN", "tip": "5N", "ticariAd": "TIGUAN", "modelYili": "2021", "cinsi": "OTOMOBİL-AC (STEYŞIN)", "renk": "GRİ", "motorNo": "DPC170971", "sase": "WVGZZZ5NZMW530134", "silindir": "1498", "guc": "110", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r42", "belgeTipi": "yeni", "zorluk": ["90-derece-yan", "tutarlilik"], "ayniBelge": "r33",
-      "beklenen": { "plaka": "41 AK 097", "ilkTescil": "23/03/2021", "marka": "OPEL", "tip": "Z", "ticariAd": "GRANDLAND X", "modelYili": "2020", "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)", "renk": "GRİ", "motorNo": "10XVDV1718766", "sase": "W0VZRHNS2LS271369", "silindir": "1199", "guc": "96", "yakit": "BENZİNLİ", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r43", "belgeTipi": "yeni", "zorluk": ["tutarlilik"], "ayniBelge": "r04",
-      "beklenen": { "plaka": "34 DLA 23", "ilkTescil": null, "marka": "AUDI", "tip": "A3 SPORTBACK 1,6 102 NP", "ticariAd": "A3 SPORTBACK 1,6 102 NP", "modelYili": "2008", "cinsi": "OTOMOBİL", "renk": "BEYAZ", "motorNo": "BSE596180", "sase": "WAUZZZ8P98A151795", "silindir": "1395", "guc": "75", "yakit": "BENZİNLİ - LPG", "koltuk": "5" },
-      "sahipBilgisiVar": true },
-
-    { "id": "r44", "belgeTipi": "yeni", "zorluk": ["karanlik"],
-      "beklenen": { "plaka": "41 H 0036", "ilkTescil": "17/08/2015", "marka": "AUDI", "tip": "8V", "ticariAd": "A3 SPORTBACK", "modelYili": "2015", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "MAVİ", "motorNo": "CXX401960", "sase": "WAUZZZ8V5GA001342", "silindir": "1598", "guc": "81", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "guven": { "plaka": "dusuk — '41H0036' bitişik yazılmış, boşluk ayrımı belirsiz" } },
-
-    { "id": "r45", "belgeTipi": "yeni", "zorluk": ["parmak-kapatiyor"],
-      "beklenen": { "plaka": "23 ADT 632", "ilkTescil": null, "marka": "PEUGEOT", "tip": "308 COMFORT 1.6 HDİ", "ticariAd": "308 COMFORT 1.6 HDİ", "modelYili": "2008", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "SİYAH (İNCİ)", "motorNo": "10JBAJ3055860", "sase": "VF34C9HZC55139917", "silindir": "1560", "guc": "80", "yakit": "DİZEL", "koltuk": "5" },
-      "sahipBilgisiVar": false,
-      "guven": { "ilkTescil": "okunamadi — USTANIN PARMAĞI TAM O ALANIN ÜSTÜNDE" },
-      "not": "⚠️ İKİNCİ ÖNEMLİ KAYIT. Parmak 'İlk tescil tarihi'ni kapatıyor; yalnız '.../2008' görünüyor. Tarih uyduran model başarısız sayılır." },
-
-    { "id": "r46", "belgeTipi": "yeni", "zorluk": ["silik-yazi", "tc-gorunur", "ustte-baska-belge"],
-      "beklenen": { "plaka": "34 HGZ 710", "ilkTescil": null, "marka": "OPEL", "tip": "CORSA 1.7 VAN", "ticariAd": "CORSA 1.7 VAN", "modelYili": "2003", "cinsi": "OTOMOBİL (AB HEÇBEK)", "renk": "BEYAZ", "motorNo": "Y17DT00589461", "sase": "W0L0XCF0834116250", "silindir": null, "guc": "55", "yakit": "Dizel", "koltuk": "5" },
-      "sahipBilgisiVar": true,
-      "guven": { "silindir": "dusuk", "koltuk": "dusuk" },
-      "not": "Fotoğrafın üst yarısında BAŞKA bir belge var (trafikten men tutanağı). Model ruhsat alanlarını ondan değil, alttaki ruhsattan okumalı." }
-  ]
+  {
+   "id": "r05",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "kirpik-kenar"
+   ],
+   "beklenen": {
+    "plaka": "41 HR 878",
+    "ilkTescil": null,
+    "marka": "SEAT",
+    "tip": "CORDOBA 1.4",
+    "ticariAd": "CORDOBA 1.4",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL",
+    "renk": "GRİ (ZEYTİN)",
+    "motorNo": "BXW073705",
+    "sase": "VSSZZZ6LZ7R187368",
+    "silindir": "1390",
+    "guc": null,
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "guc": "dusuk — sayfa kenarında kalıyor, okunamadı",
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r06",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "cok-silik"
+   ],
+   "beklenen": {
+    "plaka": "41 ATC 704",
+    "ilkTescil": "20/03/2013",
+    "marka": "SEAT",
+    "tip": "6J",
+    "ticariAd": "IBIZA 1.2 DSG STYLE",
+    "modelYili": "2013",
+    "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)",
+    "renk": "BEYAZ",
+    "motorNo": "CBZD13096",
+    "sase": "VSSZZZ6JZDR154805",
+    "silindir": "1197",
+    "guc": "77",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "hepsi": "dusuk — belge çok soluk, yazı neredeyse kaybolmuş; bu kayıt doğrulamada ilk bakılacaklardan",
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r07",
+   "belgeTipi": "eski",
+   "zorluk": [
+    "eski-belge",
+    "alan-yok",
+    "kirli-kagit"
+   ],
+   "beklenen": {
+    "plaka": "34 KZ 0582",
+    "ilkTescil": "09-10-2014",
+    "marka": "SKODA",
+    "tip": "5E",
+    "ticariAd": null,
+    "modelYili": "2014",
+    "cinsi": "OTOMOBİL (AA Sedan)",
+    "renk": "BEYAZ",
+    "motorNo": "CLHC22039",
+    "sase": "TMBAG6NE1F0062507",
+    "silindir": null,
+    "guc": null,
+    "yakit": null,
+    "koltuk": null
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r08",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 AFK 652",
+    "ilkTescil": null,
+    "marka": "OPEL",
+    "tip": "VECTRA 1.6 NB COMF.",
+    "ticariAd": "VECTRA",
+    "modelYili": "2004",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "MAVİ (SATÜRN)",
+    "motorNo": "Z16XE20CD8435",
+    "sase": "WOLOZCF6941027918",
+    "silindir": "1598",
+    "guc": "73.5",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "ilkTescil": "dusuk — üstü silinmiş/soluk",
+    "renk": "dusuk",
+    "tcVergiNo": "sağ kenarda kesik — yalnız '6101201…' görünüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r09",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "90-derece-yan",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "06 AH 3860",
+    "ilkTescil": "20/04/2004",
+    "marka": "PEUGEOT",
+    "tip": "206",
+    "ticariAd": "206",
+    "modelYili": "2004",
+    "cinsi": "OTOMOBİL",
+    "renk": "MAVİ",
+    "motorNo": "10FSM74704591",
+    "sase": "VF32AKFWF43809098",
+    "silindir": "1360",
+    "guc": null,
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "not": "Belge 90° yan çekilmiş. Döndürmeden okuyabilmeli."
+  },
+  {
+   "id": "r10",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "parlama",
+    "golge"
+   ],
+   "beklenen": {
+    "plaka": "55 SC 311",
+    "ilkTescil": null,
+    "marka": "VOLKSWAGEN",
+    "tip": "POLO CLS 1,6",
+    "ticariAd": "POLO",
+    "modelYili": "2000",
+    "cinsi": "OTOMOBİL",
+    "renk": "KIRMIZI",
+    "motorNo": "ALM071567",
+    "sase": "WVWZZZ6KZYR527065",
+    "silindir": "1598",
+    "guc": "55",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "not": "r18 aynı belgenin ikinci çekimi.",
+   "guven": {
+    "tcVergiNo": "sahip bölümü parlamada kaybolmuş — okunmuyor",
+    "unvanSoyad": "sahip bölümü parlamada kaybolmuş — okunmuyor",
+    "ad": "sahip bölümü parlamada kaybolmuş — okunmuyor",
+    "adres": "parlama var ama adres okunabiliyor — kontrol et"
+   }
+  },
+  {
+   "id": "r11",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "cok-silik",
+    "parlama"
+   ],
+   "beklenen": {
+    "plaka": "34 DFY 477",
+    "ilkTescil": null,
+    "marka": "OPEL",
+    "tip": "0G-A",
+    "ticariAd": null,
+    "modelYili": null,
+    "cinsi": "OTOMOBİL - AF ÇOK AMAÇLI",
+    "renk": "BEYAZ",
+    "motorNo": "A16LET20SW2407",
+    "sase": "W0LGT5GB5D1074071",
+    "silindir": "1598",
+    "guc": "132",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "plaka": "dusuk — parlama altında",
+    "modelYili": "okunamadi",
+    "ticariAd": "okunamadi",
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   },
+   "not": "Sol sütun parlamadan neredeyse kayıp. Modelin 'okunamadı' demesi beklenen alanlar var."
+  },
+  {
+   "id": "r12",
+   "belgeTipi": "eski",
+   "zorluk": [
+    "eski-belge",
+    "alan-yok"
+   ],
+   "beklenen": {
+    "plaka": "34 RJ 4916",
+    "ilkTescil": "12-07-2016",
+    "marka": "VOLKSWAGEN",
+    "tip": "6R",
+    "ticariAd": null,
+    "modelYili": "2016",
+    "cinsi": "OTOMOBİL (AB Heçbek)",
+    "renk": "MAVİ",
+    "motorNo": "CUS232776",
+    "sase": "WVWZZZ6RZGY264738",
+    "silindir": null,
+    "guc": null,
+    "yakit": null,
+    "koltuk": null
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r13",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "parlama"
+   ],
+   "beklenen": {
+    "plaka": "41 NT 210",
+    "ilkTescil": "25/05/2000",
+    "marka": "SEAT",
+    "tip": "IBIZA 1.6 STELLA",
+    "ticariAd": "IBIZA",
+    "modelYili": "2000",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "KIRMIZI (METALİK)",
+    "motorNo": "ALM073199",
+    "sase": "VSSZZZ6KZYR160837",
+    "silindir": "1598",
+    "guc": "55.1",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r14",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 EY 184",
+    "ilkTescil": "03/12/2013",
+    "marka": "OPEL",
+    "tip": "P-J",
+    "ticariAd": "ASTRA",
+    "modelYili": "2013",
+    "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)",
+    "renk": "SİYAH",
+    "motorNo": "A14NET19CU8166",
+    "sase": "W0LPF6EC7DG085675",
+    "silindir": "1362",
+    "guc": "103",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r15",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tutarlilik"
+   ],
+   "ayniBelge": "r04",
+   "beklenen": {
+    "plaka": "34 DLA 23",
+    "ilkTescil": null,
+    "marka": "AUDI",
+    "tip": "A3 SPORTBACK 1,6 102 NP",
+    "ticariAd": "A3 SPORTBACK 1,6 102 NP",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL",
+    "renk": "BEYAZ",
+    "motorNo": "BSE596180",
+    "sase": "WAUZZZ8P98A151795",
+    "silindir": "1395",
+    "guc": "75",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "tcVergiNo": "sağ kenarda kesik — yalnız '28702…' görünüyor"
+   }
+  },
+  {
+   "id": "r16",
+   "belgeTipi": "yeni",
+   "zorluk": [],
+   "beklenen": {
+    "plaka": "34 RU 3208",
+    "ilkTescil": "05/09/2016",
+    "marka": "OPEL",
+    "tip": "P-J",
+    "ticariAd": "ASTRA NOTCHBACK",
+    "modelYili": "2016",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "BEYAZ",
+    "motorNo": "A1161745GU7X0051LVL",
+    "sase": "W0LPD5E3XGG151690",
+    "silindir": "1598",
+    "guc": "100",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r17",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 BY 510",
+    "ilkTescil": "30/05/2015",
+    "marka": "VOLKSWAGEN",
+    "tip": "6R",
+    "ticariAd": "POLO",
+    "modelYili": "2015",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "GRİ",
+    "motorNo": "CJZ490094",
+    "sase": "WVWZZZ6RZFY323737",
+    "silindir": "1197",
+    "guc": "66",
+    "yakit": "BENZİNLİ",
+    "koltuk": null
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "koltuk": "dusuk — satır silik"
+   }
+  },
+  {
+   "id": "r18",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "karanlik",
+    "tutarlilik"
+   ],
+   "ayniBelge": "r10",
+   "beklenen": {
+    "plaka": "55 SC 311",
+    "ilkTescil": null,
+    "marka": "VOLKSWAGEN",
+    "tip": "POLO CLS 1,6",
+    "ticariAd": "POLO",
+    "modelYili": "2000",
+    "cinsi": "OTOMOBİL",
+    "renk": "KIRMIZI",
+    "motorNo": "ALM071567",
+    "sase": "WVWZZZ6KZYR527065",
+    "silindir": "1598",
+    "guc": "55",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r19",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "kirpik-kenar"
+   ],
+   "beklenen": {
+    "plaka": "41 NS 280",
+    "ilkTescil": "11/01/2008",
+    "marka": "PEUGEOT",
+    "tip": "207 TRENDY 1.4HDİ",
+    "ticariAd": "207 TRENDY 1.4 HDİ",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL",
+    "renk": "SİYAH (OBSİDİEN)",
+    "motorNo": "10FD881995706",
+    "sase": "VF3WC8HZC34102250",
+    "silindir": "1398",
+    "guc": "68",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r20",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "34 LB 926",
+    "ilkTescil": "11/06/1997",
+    "marka": "VOLKSWAGEN",
+    "tip": "POLO 1.6 5 KAPI",
+    "ticariAd": "POLO 1.6 5 KAPI",
+    "modelYili": "1997",
+    "cinsi": "OTOMOBİL",
+    "renk": "KIRMIZI",
+    "motorNo": "AEE162330",
+    "sase": "WVWZZZ6NZVY228351",
+    "silindir": "1598",
+    "guc": "55.1",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r21",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "34 FES 033",
+    "ilkTescil": "22/04/2022",
+    "marka": "VOLKSWAGEN",
+    "tip": "A1",
+    "ticariAd": "T-ROC",
+    "modelYili": "2022",
+    "cinsi": "OTOMOBİL (AC STEYŞIN)",
+    "renk": "BEYAZ",
+    "motorNo": "DPCH81839",
+    "sase": "WVGZZZA1ZNV109057",
+    "silindir": "1498",
+    "guc": "110",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r22",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "kirpik-kenar"
+   ],
+   "beklenen": {
+    "plaka": "41 EM 673",
+    "ilkTescil": "21-01-2011",
+    "marka": "PEUGEOT",
+    "tip": "M59",
+    "ticariAd": "PARTNER",
+    "modelYili": "2011",
+    "cinsi": "KAMYONET (Kapalı Kasa)",
+    "renk": "GRİ (Alüminyum)",
+    "motorNo": "10JBBV0093193",
+    "sase": "VF3GC9HXCBX501644",
+    "silindir": "1560",
+    "guc": "66.2",
+    "yakit": "Dizel",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "not": "Araç sınıfı N1 (ticari). Sağ sütun kırpılmış.",
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r23",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 BFM 863",
+    "ilkTescil": "05/12/2001",
+    "marka": "SKODA",
+    "tip": "FABIA COMF.1.4",
+    "ticariAd": "FABIA COMFORT 1.4",
+    "modelYili": "2002",
+    "cinsi": "OTOMOBİL-AB HEÇBEK",
+    "renk": "MAVİ",
+    "motorNo": "AME026571",
+    "sase": "TMBNB46Y913174962",
+    "silindir": "1397",
+    "guc": "68",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "not": "Tescil tarihi 25/06/2026 — GELECEK tarih. Belgede öyle yazıyor; model düzeltmemeli."
+  },
+  {
+   "id": "r24",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "90-derece-yan",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 AJP 287",
+    "ilkTescil": "25/03/2022",
+    "marka": "OPEL",
+    "tip": "P?",
+    "ticariAd": "CROSSLAND",
+    "modelYili": "2022",
+    "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)",
+    "renk": "MAVİ SİYAH",
+    "motorNo": "10XVDU1885550",
+    "sase": "W0V7H9EL3N4136756",
+    "silindir": "1199",
+    "guc": "96.0",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "tip": "dusuk — tek harf, yan çekimde net değil"
+   }
+  },
+  {
+   "id": "r25",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi"
+   ],
+   "beklenen": {
+    "plaka": "41 EP 417",
+    "ilkTescil": "29-05-2013",
+    "marka": "SEAT",
+    "tip": "LEON 1.6 TDI CRI 105 HP",
+    "ticariAd": "LEON",
+    "modelYili": "2013",
+    "cinsi": "OTOMOBİL (AC Steyşın)",
+    "renk": "BEYAZ (Opak)",
+    "motorNo": "CLH239831",
+    "sase": "VSSZZZ5FZDR038668",
+    "silindir": "1598",
+    "guc": "77",
+    "yakit": "Dizel",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "tcVergiNo": "sağ kenarda kesik — yalnız '329…' görünüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r26",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "cok-silik",
+    "parmak-kapatiyor"
+   ],
+   "beklenen": {
+    "plaka": "16 LEC 87",
+    "ilkTescil": "28/06/2011",
+    "marka": "OPEL",
+    "tip": "S-D",
+    "ticariAd": "CORSA",
+    "modelYili": "2011",
+    "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)",
+    "renk": "SİYAH",
+    "motorNo": "A14XER19XA3291",
+    "sase": "W0L0SDL68B4288667",
+    "silindir": null,
+    "guc": "74",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "silindir": "okunamadi — parmak ve solukluk",
+    "koltuk": "dusuk",
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r27",
+   "belgeTipi": "yeni",
+   "zorluk": [],
+   "beklenen": {
+    "plaka": "34 BJV 625",
+    "ilkTescil": "02/07/2018",
+    "marka": "VOLKSWAGEN",
+    "tip": "2KN",
+    "ticariAd": "CADDY",
+    "modelYili": "2018",
+    "cinsi": "KAMYONET (BB VAN)",
+    "renk": "SARI",
+    "motorNo": "DFS537025",
+    "sase": "WV1ZZZ2KZJX113804",
+    "silindir": "1968",
+    "guc": "75",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "not": "En temiz çekim — bu kayıt 'kolay' ucu temsil ediyor.",
+   "guven": {
+    "tcVergiNo": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "unvanSoyad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "ad": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı",
+    "adres": "sahip sayfası fotoğrafta hiç yok — bu alan okunamaz, boş kalmalı"
+   }
+  },
+  {
+   "id": "r28",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "34 DSH 25",
+    "ilkTescil": "25/09/2000",
+    "marka": "SEAT",
+    "tip": "IBIZA 1.6 SİGNO",
+    "ticariAd": "IBIZA 1.6 SİGNO",
+    "modelYili": "2001",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "GRİ (METALİK GÜMÜŞ)",
+    "motorNo": "AKL955018",
+    "sase": "VSSZZZ6KZ1R094233",
+    "silindir": "1589",
+    "guc": "101",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "guc": "dusuk — 101 kW bu araç için yüksek görünüyor ama belgede öyle yazıyor; model belgeyi okumalı, dünyayı değil",
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r29",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi",
+    "parmak-kapatiyor"
+   ],
+   "beklenen": {
+    "plaka": "16 NCF 91",
+    "ilkTescil": "18/11/1999",
+    "marka": "OPEL",
+    "tip": "ASTRA 1.6 NB CD",
+    "ticariAd": "ASTRA 1.6 NB CD",
+    "modelYili": "2000",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "BEYAZ",
+    "motorNo": "X16XEL02KY1359",
+    "sase": "W0L0TGF69Y5065572",
+    "silindir": "1598",
+    "guc": "73",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r30",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "kirpik-kenar"
+   ],
+   "beklenen": {
+    "plaka": "16 BEH 029",
+    "ilkTescil": "10/02/1994",
+    "marka": "OPEL",
+    "tip": "VECTRA",
+    "ticariAd": "VECTRA GL",
+    "modelYili": "1994",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "MAVİ (LACİVERT)",
+    "motorNo": "18SV14278300",
+    "sase": "W0L000087RZ006598",
+    "silindir": "1791",
+    "guc": "66",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r31",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "cok-silik",
+    "plaka-okunamiyor"
+   ],
+   "beklenen": {
+    "plaka": null,
+    "ilkTescil": null,
+    "marka": "VOLKSWAGEN",
+    "tip": "3C",
+    "ticariAd": "PASSAT",
+    "modelYili": "2015",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "GRİ",
+    "motorNo": "DCX031215",
+    "sase": "WVWZZZ3CZFE504408",
+    "silindir": "1598",
+    "guc": "88",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "plaka": "okunamadi — sol sütun tamamen soluk",
+    "tcVergiNo": "sağ kenarda kesik — yalnız '1780068…' görünüyor (TÜZEL KİŞİ: vergi no)",
+    "ad": "araç bir şirkete ait — tüzel kişide ADI alanı zaten boştur"
+   },
+   "not": "⚠️ EN ÖNEMLİ KAYIT. Plaka okunamıyor. Doğru davranış plakayı BOŞ bırakıp ustaya sormaktır; plaka uyduran model, yanlış araca kayıt açar. Bu kayıtta plaka döndüren her cevap BAŞARISIZ sayılır."
+  },
+  {
+   "id": "r32",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 LE 352",
+    "ilkTescil": "15-12-2010",
+    "marka": "VOLKSWAGEN",
+    "tip": "2KN",
+    "ticariAd": "CADDY COMBI 1.6 TDI",
+    "modelYili": "2011",
+    "cinsi": "KAMYONET (Kapalı Kasa)",
+    "renk": "SİYAH (Sedefli)",
+    "motorNo": "CAY488772",
+    "sase": "WV1ZZZ2KZBX230252",
+    "silindir": "1598",
+    "guc": "75",
+    "yakit": "Dizel",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r33",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 AK 097",
+    "ilkTescil": "23/03/2021",
+    "marka": "OPEL",
+    "tip": "Z",
+    "ticariAd": "GRANDLAND X",
+    "modelYili": "2020",
+    "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)",
+    "renk": "GRİ",
+    "motorNo": "10XVDV1718766",
+    "sase": "W0VZRHNS2LS271369",
+    "silindir": "1199",
+    "guc": "96",
+    "yakit": "BENZİNLİ",
+    "koltuk": null
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "silindir": "dusuk — '1199' soluk",
+    "koltuk": "okunamadi"
+   },
+   "not": "r42 aynı belgenin yan çekilmiş hâli."
+  },
+  {
+   "id": "r34",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi"
+   ],
+   "beklenen": {
+    "plaka": "06 AAL 281",
+    "ilkTescil": "01/03/2016",
+    "marka": "VOLKSWAGEN",
+    "tip": "6R",
+    "ticariAd": "POLO",
+    "modelYili": "2016",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "BEYAZ",
+    "motorNo": "CJZA37880",
+    "sase": "WVWZZZ6RZGY203568",
+    "silindir": "1197",
+    "guc": "66",
+    "yakit": "BENZİNLİ",
+    "koltuk": null
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "koltuk": "okunamadi — satır üstü çizilmiş gibi soluk",
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r35",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 FA 101",
+    "ilkTescil": "25/04/2008",
+    "marka": "SKODA",
+    "tip": "5J",
+    "ticariAd": "FABIA CLS PLUS",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL",
+    "renk": "KIRMIZI (KARMEN)",
+    "motorNo": "BZG077753",
+    "sase": "TMBAH45J083157396",
+    "silindir": "1198",
+    "guc": "51",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r36",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 FB 508",
+    "ilkTescil": "29/09/2011",
+    "marka": "VOLKSWAGEN",
+    "tip": "JETTA 1.2 105 HP",
+    "ticariAd": "JETTA",
+    "modelYili": "2012",
+    "cinsi": "OTOMOBİL",
+    "renk": "BEYAZ (ŞEKER)",
+    "motorNo": "CBZ446632",
+    "sase": "WVWZZZ16ZCM011796",
+    "silindir": "1197",
+    "guc": "77",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r37",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "kirpik-kenar",
+    "egik"
+   ],
+   "beklenen": {
+    "plaka": "41 AGE 473",
+    "ilkTescil": "24/09/2010",
+    "marka": "VOLKSWAGEN",
+    "tip": "JETTA 1.6 TDI 105 HP",
+    "ticariAd": "JETTA 1.6 TDI 105",
+    "modelYili": "2011",
+    "cinsi": "OTOMOBİL (AA SEDAN)",
+    "renk": "SİYAH (DERİN)",
+    "motorNo": "CAY766126",
+    "sase": "WVWZZZ1KZBM004355",
+    "silindir": "1598",
+    "guc": "77",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r38",
+   "belgeTipi": "yeni",
+   "zorluk": [],
+   "beklenen": {
+    "plaka": "41 AFV 254",
+    "ilkTescil": "19/09/2013",
+    "marka": "VOLKSWAGEN",
+    "tip": "6R",
+    "ticariAd": "POLO",
+    "modelYili": "2013",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "BEYAZ",
+    "motorNo": "CGG991612",
+    "sase": "WVWZZZ6RZEY063840",
+    "silindir": "1390",
+    "guc": "63",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "adres": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r39",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 ER 309",
+    "ilkTescil": "19-11-2013",
+    "marka": "VOLKSWAGEN",
+    "tip": "2KN",
+    "ticariAd": "CADDY",
+    "modelYili": "2013",
+    "cinsi": "KAMYONET (Panelvan)",
+    "renk": "GRİ",
+    "motorNo": "CAYX77649",
+    "sase": "WV1ZZZ2KZEX056833",
+    "silindir": "1598",
+    "guc": "75",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r40",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "16 BKF 23",
+    "ilkTescil": "27/09/2004",
+    "marka": "CHEVROLET",
+    "tip": "KALOS HB 1.2 SE",
+    "ticariAd": "KALOS HB 1.2 SE",
+    "modelYili": "2005",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "SİYAH (İNCİ)",
+    "motorNo": "B12S1100414KA2",
+    "sase": "KLASF48T15B257861",
+    "silindir": "1150",
+    "guc": "55.1",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r41",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "90-derece-yan",
+    "tc-gorunur"
+   ],
+   "beklenen": {
+    "plaka": "41 BBH 883",
+    "ilkTescil": "14/04/2021",
+    "marka": "VOLKSWAGEN",
+    "tip": "5N",
+    "ticariAd": "TIGUAN",
+    "modelYili": "2021",
+    "cinsi": "OTOMOBİL-AC (STEYŞIN)",
+    "renk": "GRİ",
+    "motorNo": "DPC170971",
+    "sase": "WVGZZZ5NZMW530134",
+    "silindir": "1498",
+    "guc": "110",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r42",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "90-derece-yan",
+    "tutarlilik"
+   ],
+   "ayniBelge": "r33",
+   "beklenen": {
+    "plaka": "41 AK 097",
+    "ilkTescil": "23/03/2021",
+    "marka": "OPEL",
+    "tip": "Z",
+    "ticariAd": "GRANDLAND X",
+    "modelYili": "2020",
+    "cinsi": "OTOMOBİL (AF ÇOK AMAÇLI)",
+    "renk": "GRİ",
+    "motorNo": "10XVDV1718766",
+    "sase": "W0VZRHNS2LS271369",
+    "silindir": "1199",
+    "guc": "96",
+    "yakit": "BENZİNLİ",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true
+  },
+  {
+   "id": "r43",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "tutarlilik"
+   ],
+   "ayniBelge": "r04",
+   "beklenen": {
+    "plaka": "34 DLA 23",
+    "ilkTescil": null,
+    "marka": "AUDI",
+    "tip": "A3 SPORTBACK 1,6 102 NP",
+    "ticariAd": "A3 SPORTBACK 1,6 102 NP",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL",
+    "renk": "BEYAZ",
+    "motorNo": "BSE596180",
+    "sase": "WAUZZZ8P98A151795",
+    "silindir": "1395",
+    "guc": "75",
+    "yakit": "BENZİNLİ - LPG",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "tcVergiNo": "sağ kenarda kesik — yalnız '2870227…' görünüyor"
+   }
+  },
+  {
+   "id": "r44",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "karanlik"
+   ],
+   "beklenen": {
+    "plaka": "41 H 0036",
+    "ilkTescil": "17/08/2015",
+    "marka": "AUDI",
+    "tip": "8V",
+    "ticariAd": "A3 SPORTBACK",
+    "modelYili": "2015",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "MAVİ",
+    "motorNo": "CXX401960",
+    "sase": "WAUZZZ8V5GA001342",
+    "silindir": "1598",
+    "guc": "81",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "plaka": "dusuk — '41H0036' bitişik yazılmış, boşluk ayrımı belirsiz",
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   }
+  },
+  {
+   "id": "r45",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "parmak-kapatiyor"
+   ],
+   "beklenen": {
+    "plaka": "23 ADT 632",
+    "ilkTescil": null,
+    "marka": "PEUGEOT",
+    "tip": "308 COMFORT 1.6 HDİ",
+    "ticariAd": "308 COMFORT 1.6 HDİ",
+    "modelYili": "2008",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "SİYAH (İNCİ)",
+    "motorNo": "10JBAJ3055860",
+    "sase": "VF34C9HZC55139917",
+    "silindir": "1560",
+    "guc": "80",
+    "yakit": "DİZEL",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": false,
+   "guven": {
+    "ilkTescil": "okunamadi — USTANIN PARMAĞI TAM O ALANIN ÜSTÜNDE",
+    "tcVergiNo": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "unvanSoyad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor",
+    "ad": "değer fotoğrafın sağ kenarında kesik — etiket görünüyor, değer görünmüyor"
+   },
+   "not": "⚠️ İKİNCİ ÖNEMLİ KAYIT. Parmak 'İlk tescil tarihi'ni kapatıyor; yalnız '.../2008' görünüyor. Tarih uyduran model başarısız sayılır."
+  },
+  {
+   "id": "r46",
+   "belgeTipi": "yeni",
+   "zorluk": [
+    "silik-yazi",
+    "tc-gorunur",
+    "ustte-baska-belge"
+   ],
+   "beklenen": {
+    "plaka": "34 HGZ 710",
+    "ilkTescil": null,
+    "marka": "OPEL",
+    "tip": "CORSA 1.7 VAN",
+    "ticariAd": "CORSA 1.7 VAN",
+    "modelYili": "2003",
+    "cinsi": "OTOMOBİL (AB HEÇBEK)",
+    "renk": "BEYAZ",
+    "motorNo": "Y17DT00589461",
+    "sase": "W0L0XCF0834116250",
+    "silindir": null,
+    "guc": "55",
+    "yakit": "Dizel",
+    "koltuk": "5"
+   },
+   "sahipBilgisiVar": true,
+   "guven": {
+    "silindir": "dusuk",
+    "koltuk": "dusuk"
+   },
+   "not": "Fotoğrafın üst yarısında BAŞKA bir belge var (trafikten men tutanağı). Model ruhsat alanlarını ondan değil, alttaki ruhsattan okumalı."
+  }
+ ]
 }
