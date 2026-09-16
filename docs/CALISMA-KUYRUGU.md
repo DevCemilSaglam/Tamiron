@@ -35,8 +35,8 @@
 | # | İş | Durum |
 |---|---|---|
 | 7.1 | **Servis kaydında satır düzenleme** | **BİTTİ** — asıl kusur çıktı: *ekle düğmesi adımların üstünde, satır tablosu 2. adımın içinde* → 1. adımda basınca satır **görünmeden** ekleniyordu. Artık satırın durduğu adıma geçiliyor + odak yeni satıra. Tip rozeti **düğme** oldu (parça↔işçilik, ad ve tutar korunuyor). 49. denetim testi koruyor |
-| 7.2 | **Ses → işlem nesnesi → onay**, her ekranda aynı biçimde ve **görünür** | SIRADA |
-| 7.3 | **"Bunu mu demek istediniz"** — yalnız plakada değil, **yanlış ekran/yanlış işlem** için de | SIRADA |
+| 7.2 | **Ses → işlem nesnesi → onay** | **BİTTİ** — nesne ve onay zaten vardı; eksik olan **bağlam dışı işin tanınmasıydı**. Çözümleyici ikiye ayrıldı (`sesCozumle` / `sesGenel`), kayıt içindeki dal artık genel yola da soruyor |
+| 7.3 | **"Bunu mu demek istediniz"** — yanlış ekran/işlem için | **BİTTİ** — plaka önerisinin kardeşi: tanınan iş asıl olur, bağlamın kendi işi ÖNERİ olur. Dokunuş işlemi değiştirir, YAPMAZ; geri dönülebilir. 50. denetim testi koruyor |
 | 7.4 | **Servis detayında sesle işlem** — aynı yaklaşım kayıt içinde de | SIRADA |
 | 7.5 | **Sunum kaynağı** — özellikler + baştan sona kullanım | SIRADA |
 

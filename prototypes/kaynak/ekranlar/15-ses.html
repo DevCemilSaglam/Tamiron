@@ -375,10 +375,48 @@ function sesCozumle(c) {
 
     /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
        yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
-    return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
+    var satirIslemi = { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
              tip: iscilikMi ? 'iscilik' : 'parca', fiyat: tutarR };
+
+    /* ⚠️ BU DAL BİR ÇÖPLÜKTÜ (16.09 — Cemil: "Kullanıcı farklı ekranda
+       farklı bir işlem yapmak isteyebilir. Google aramada olduğu gibi
+       'bunu mu demek istediniz' diye yönlendirebilelim.").
+
+       Önce kayıt açıkken SÖYLENEN HER CÜMLE satır oluyordu:
+         "servistekileri göster"        -> adı bu olan bir PARÇA
+         "34 ABC 123 sahibine selam at" -> adı bu olan bir PARÇA
+         "bugün ne kadar tahsilat"      -> adı bu olan bir PARÇA
+       Usta onaylarsa kayda saçma bir satır giriyor; onaylamazsa
+       istediği iş hiç yapılmıyor. İkisi de sessiz.
+
+       Artık cümle GENEL yola da veriliyor. Orada tanınmış bir iş
+       çıkarsa o asıl olur ve satır ekleme ÖNERİ olarak sunulur —
+       kendiliğinden bağlam değiştirmiyoruz, SORUYORUZ. */
+    var genelIslem = sesGenel(metin, d, p, 'genel');
+    if (genelIslem && SES_GUCLU_TUR.indexOf(genelIslem.tur) >= 0) {
+      genelIslem.baskaIslem = satirIslemi;
+      return genelIslem;
+    }
+    return satirIslemi;
   }
 
+  return sesGenel(metin, d, p, baglam);
+}
+
+/* Bağlamdan BAĞIMSIZ çözümleme. Ayrı bir fonksiyon oldu ki kayıt
+   içindeki dal da ona sorabilsin: aynı cümle iki yerde iki ayrı
+   şekilde anlaşılmasın (tek yol, tek sonuç — A-M27'nin kuralı). */
+var SES_GUCLU_TUR = ['mesaj-gonder', 'toplu-mesaj', 'ara', 'tahsilat-sor',
+  'gider-ekle', 'teslim', 'servis-ac', 'yeni-arac', 'bilinmeyen-arac'];
+
+function sesGenel(metin, d, p, baglam) {
+  /* ⚠️ `baglam` PARAMETRE OLARAK GEÇİYOR. Ayırma sırasında bunu
+     unutmuştum: genel yol `baglam`ı sesCozumle'nin yerel değişkeni
+     olarak kullanıyordu, ayrılınca ReferenceError atıyor ve hata
+     sessizce yutuluyordu — öneri hiç çıkmıyordu, sebebi de görünmüyordu.
+     Kayıt içinden çağrılırken 'genel' veriliyor: orada bağlam zaten
+     "bu ekran değil" demek. */
+  baglam = baglam || 'genel';
   /* --- TAHSİLAT SORUSU (14.09) ---
      Ekranın kendi örneği *"bugün ne kadar tahsil ettim"* diyordu ve
      çözümleyicide karşılığı YOKTU — 45. test yakaladı. Örneği silmek
@@ -908,6 +946,16 @@ function sesCiz() {
           '<svg class="ico"><use href="#i-search-check"></use></svg>' +
           ' Bunu mu demek istedin: ' + sesIslem.oneri + '</button>'
       : '') +
+    /* ⚠️ BAŞKA İŞ ÖNERİSİ (16.09) — plaka önerisinin kardeşi.
+       Orada "başka bir ARAÇ mı demek istedin", burada "başka bir İŞ
+       mi". İkisi de SORU: dokunmazsan hiçbir şey değişmiyor. Kendi
+       kendine bağlam değiştirmek, ustanın onayladığından başka bir
+       işi yapmak olurdu. */
+    (sesIslem.baskaIslem
+      ? '<button class="btn btn-ghost" id="sesBaskaIs" style="margin-top:12px">' +
+          '<svg class="ico"><use href="#i-search-check"></use></svg>' +
+          ' Bunu mu demek istedin: ' + sesOzet(sesIslem.baskaIslem).baslik + '</button>'
+      : '') +
     /* KANAL SEÇİMİ ONAY EKRANINDA (Cemil: "SMS yada WhatsApp üzerinden
        mesaj gönderecek"). Söylenmediyse WhatsApp seçili gelir; usta
        tek dokunuşla değiştirir. Çip bir SEÇİM aracıdır — doğru bileşen. */
@@ -1109,6 +1157,21 @@ document.addEventListener('click', function (e) {
 
   if (t.id === 'sesOneri' && sesIslem && sesIslem.oneri) {
     sesPlakayiDuzelt(sesIslem.oneri);
+    return;
+  }
+
+  /* Öneriye dokunmak işlemi DEĞİŞTİRİR, yapmaz: ekranda yine onay
+     bekliyor. Eski işlem yeni öneri oluyor — usta fikir değiştirirse
+     tek dokunuşla geri dönüyor, yoksa cümleyi tekrar söylemesi
+     gerekirdi. */
+  if (t.id === 'sesBaskaIs' && sesIslem && sesIslem.baskaIslem) {
+    var eski = sesIslem, yeni = sesIslem.baskaIslem;
+    eski.baskaIslem = null;
+    yeni.baskaIslem = eski;
+    sesIslem = yeni;
+    sesDurumu = 'anlasildi';
+    Iz.supheli('ses-baglam-disi-is', { kabul: true });
+    sesCiz();
     return;
   }
 

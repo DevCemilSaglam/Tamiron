@@ -257,6 +257,28 @@ kullanışlıdır.**
 
 ---
 
+### Bayat sayfa — ölçülen şey yüklenen şey değil (16.09.2026)
+
+Yerel sunucudan açılan prototipte tarayıcı **eski kopyayı** tuttu:
+sunucuda yeni derleme duruyordu, sayfada eski kod çalışıyordu.
+`location.reload()` ve sekmeyi kapatıp açmak yetmedi; sorgu dizesi
+(`?v=2`) da işe yaramadı çünkü önizleme adresi kökene sadeleştiriyor.
+
+**Belirtisi yanıltıcı:** yeni yazılan kod "çalışmıyor" görünüyor ve
+insan koda bakmaya başlıyor. Yarım saat kodda hata aradım; hata
+koddaydı değil, **yüklenmemişti**.
+
+**Kural:** yeni koda dayanan her ölçümden önce sayfanın TAZE olduğu
+doğrulanır —
+
+```js
+document.documentElement.outerHTML.indexOf('<yeni eklenen bir dize>') >= 0
+```
+
+ve bayatsa **yeni bir port** açılır (yeni köken = yeni önbellek).
+K-024.1'in kardeşi: ölçüm aleti ölçtüğü şeyi bozmamalı — ve
+**ölçtüğünü sandığı şeyi ölçmeli.**
+
 ## 5 · Cemil'in kararını bekleyenler
 
 ⚠️ **LİSTE BURADA DEĞİL, `KARARLAR.md`'NİN SONUNDA** (14.09).

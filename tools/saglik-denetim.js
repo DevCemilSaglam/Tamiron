@@ -1922,6 +1922,91 @@ function stilMetni() {
     Ekran.sifirla();
   })();
 
+    /* 50) BAGLAM DISI IS — "BUNU MU DEMEK ISTEDIN" (16.09.2026)
+     Cemil: "Kullanici farkli ekranda farkli bir islem yapmak
+     isteyebilir. Google aramada oldugu gibi bunu mu demek istediniz
+     diye yonlendirebilelim."
+
+     YENI HATA SINIFI: BAGLAM DALI COPLUK OLUYOR. Bir ekranin kendi
+     sesli dali "geri kalan her sey" dalina donusunce, o ekranda
+     soylenen HER cumle o ekranin isine cevriliyor. Yasanan hali:
+     kayit acikken
+
+       "servistekileri goster"        -> adi bu olan bir PARCA
+       "bugun ne kadar tahsilat"      -> adi bu olan bir PARCA
+       "2400 lira elektrik faturasi"  -> adi bu olan bir PARCA
+
+     Usta onaylarsa kayda sacma bir satir giriyor; onaylamazsa
+     istedigi is HIC yapilmiyor. Ikisi de sessiz -- ekran duzgun
+     cizilir, hata verilmez.
+
+     Olculen uc sey:
+       a) taninan bir is, baglam icindeyken de TANINIYOR mu,
+       b) baglamin kendi isi ONERI olarak duruyor mu (soru, eylem degil),
+       c) baglama AIT bir cumle bosuna yonlendirilmiyor mu.
+
+     (c) onemli: her cumleye oneri koymak, oneriyi gurultuye cevirir. */
+  if (typeof window.SES_SOYLE === 'function' && typeof KAYITLAR !== 'undefined') {
+    var acikK = null;
+    KAYITLAR.forEach(function (k) { if (!acikK && !k.teslim) acikK = k; });
+    if (acikK) {
+      var oncekiNiyet = window.SESLI_NIYET, oncekiKayit = window.ACIK_KAYIT;
+
+      var sesDene = function (cumle) {
+        Ekran.sifirla();
+        window.ACIK_KAYIT = acikK.id;
+        showScreen('ses');
+        window.SESLI_NIYET = 'kayit-icinde';
+        window.SES_SOYLE(cumle);
+        return {
+          durum: (document.getElementById('sesDurum') || {}).textContent || '',
+          oneri: document.getElementById('sesBaskaIs')
+        };
+      };
+
+      /* (a) + (b) — baglam disi bir is */
+      var disi = sesDene('bugun ne kadar tahsilat yaptim');
+      if (disi.durum.indexOf('tahsilat') < 0) {
+        ek('SES-BAGLAM', 'ses',
+           'kayit acikken "tahsilat" komutu taninmadi -> "' + disi.durum + '"');
+      }
+      if (!disi.oneri) {
+        ek('SES-BAGLAM', 'ses',
+           'baglam disi is taninip baglamin kendi isi ONERI olarak sunulmadi');
+      } else {
+        /* Oneri bir SORU olmali: dokunmadan once islem degismemeli,
+           dokununca da EKRAN DEGISMEMELI (A-M27'nin kurali). */
+        var satirOnce = acikK.satirlar.length;
+        disi.oneri.click();
+        var sonra = (document.getElementById('sesDurum') || {}).textContent || '';
+        if (sonra.indexOf('satir') < 0 && sonra.indexOf('satır') < 0) {
+          ek('SES-BAGLAM', 'ses', 'oneriye dokununca islem degismedi -> "' + sonra + '"');
+        }
+        if (acikK.satirlar.length !== satirOnce) {
+          ek('SES-BAGLAM', 'ses', 'oneriye dokununca SATIR EKLENDI — soru degil, eylem olmus');
+        }
+        if (Ekran.adi() !== 'ses') {
+          ek('SES-BAGLAM', 'ses', 'oneriye dokununca ekran degisti: ' + Ekran.adi());
+        }
+        /* Geri donulebilmeli: yeni oneri eski isi gostermeli. */
+        if (!document.getElementById('sesBaskaIs')) {
+          ek('SES-BAGLAM', 'ses', 'oneriden geri donus yok — usta cumleyi tekrar soyler');
+        }
+      }
+
+      /* (c) baglamin KENDI isi bosuna yonlendirilmemeli */
+      var ici = sesDene('balata 450 lira');
+      if (ici.oneri) {
+        ek('SES-BAGLAM', 'ses',
+           'baglama ait cumleye de oneri cikti — oneri gurultuye doner');
+      }
+
+      window.SESLI_NIYET = oncekiNiyet;
+      window.ACIK_KAYIT = oncekiKayit;
+      Ekran.sifirla();
+    }
+  }
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 
