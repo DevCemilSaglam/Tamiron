@@ -16,6 +16,65 @@ const KOK = path.join(__dirname, '..');
 const KAYNAK = path.join(KOK, 'prototypes', 'omurga.html');
 const APP = path.join(KOK, 'app');
 
+/* ---------- 0) RENK DENETIMI ----------
+ * Yasanan hata: uygulama acilirken logonun altinda KUTU goruluyordu.
+ * Sebep dort ayri yerde duran ve birbirini tutmayan renklerdi:
+ *   manifest background_color  #0A0F17   (hicbir token'a karsilik gelmiyor)
+ *   ikon plakasi (icon.svg)    #0F1E30
+ *   tokens.css koyu --bg       #0A1220
+ *   meta theme-color (acik)    #F2F5F8   (token: #EDF2F9)
+ * Acilis zemini ile ikon plakasi ayri tonda olunca plaka KUTU olarak
+ * goruluyor. Renkler CSS disinda (manifest, meta) tekrarlandigi icin
+ * token'lardan sessizce ayrisabiliyorlar; bu denetim ayrismayi
+ * derlemede yakalar.
+ *
+ * Kural:
+ *   manifest.background_color == icon.svg plaka rengi   (acilista kutu yok)
+ *   manifest.theme_color      == tokens koyu --bg       (durum cubugu uygulamayla ayni)
+ *   meta theme-color light    == tokens acik --bg
+ *   meta theme-color dark     == tokens koyu --bg
+ */
+function renkDenetimi(pwaBaslikMetni) {
+  const tokens = fs.readFileSync(path.join(KOK, 'docs', 'tokens.css'), 'utf8');
+  /* tokens.css'te --bg iki kez taniminiyor: once acik tema, sonra koyu. */
+  const bgler = [...tokens.matchAll(/--bg:\s*(#[0-9A-Fa-f]{6})/g)].map((m) => m[1].toUpperCase());
+  if (bgler.length < 2) {
+    console.error('HATA: tokens.css icinde acik/koyu --bg bulunamadi.');
+    process.exit(1);
+  }
+  const acikBg = bgler[0], koyuBg = bgler[1];
+
+  const svg = fs.readFileSync(path.join(KOK, 'prototypes', 'pwa', 'icon.svg'), 'utf8');
+  const plaka = (svg.match(/<rect[^>]*fill="(#[0-9A-Fa-f]{6})"/) || [])[1];
+  if (!plaka) {
+    console.error('HATA: icon.svg icinde plaka (zemin dikdortgeni) bulunamadi.');
+    process.exit(1);
+  }
+
+  const man = JSON.parse(fs.readFileSync(path.join(KOK, 'prototypes', 'pwa', 'manifest.json'), 'utf8'));
+  const metaAcik = (pwaBaslikMetni.match(/prefers-color-scheme: light\)" content="(#[0-9A-Fa-f]{6})"/) || [])[1];
+  const metaKoyu = (pwaBaslikMetni.match(/prefers-color-scheme: dark\)" content="(#[0-9A-Fa-f]{6})"/) || [])[1];
+
+  const kontroller = [
+    ['manifest.background_color', (man.background_color || '').toUpperCase(), plaka.toUpperCase(),
+     'acilis zemini ikon plakasindan farkli -> logonun altinda KUTU gorunur'],
+    ['manifest.theme_color', (man.theme_color || '').toUpperCase(), koyuBg,
+     'durum cubugu uygulamanin koyu zemininden farkli -> ustte serit'],
+    ['meta theme-color (light)', (metaAcik || '').toUpperCase(), acikBg, 'token disi renk'],
+    ['meta theme-color (dark)', (metaKoyu || '').toUpperCase(), koyuBg, 'token disi renk']
+  ];
+
+  const sapan = kontroller.filter(([, olan, olmasi]) => olan !== olmasi);
+  if (sapan.length) {
+    console.error('HATA: renk sapmasi (' + sapan.length + ')');
+    sapan.forEach(([ad, olan, olmasi, neden]) => {
+      console.error('  ' + ad.padEnd(26) + olan + '  olmali: ' + olmasi + '   — ' + neden);
+    });
+    process.exit(1);
+  }
+  console.log('renk denetimi     TAMAM  · plaka ' + plaka + ' · --bg ' + acikBg + ' / ' + koyuBg);
+}
+
 /* ---------- 1) prototipi oku ---------- */
 let html = fs.readFileSync(KAYNAK, 'utf8');
 const oncekiUzunluk = html.length;
@@ -38,13 +97,14 @@ html = html.replace(fontLink, '<link rel="stylesheet" href="fonts.css" />\n');
 const pwaBaslik = `<link rel="manifest" href="manifest.json" />
 <link rel="apple-touch-icon" href="apple-touch-icon.png" />
 <link rel="icon" type="image/svg+xml" href="icon.svg" />
-<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F2F5F8" />
-<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A0F17" />
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#EDF2F9" />
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0A1220" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="Tamiron" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 `;
+renkDenetimi(pwaBaslik);
 html = html.replace('<link rel="stylesheet" href="fonts.css" />\n',
                     '<link rel="stylesheet" href="fonts.css" />\n' + pwaBaslik);
 

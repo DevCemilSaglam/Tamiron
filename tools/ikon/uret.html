@@ -1,0 +1,63 @@
+<meta charset="utf-8" />
+<title>İkon üretimi</title>
+<style>body{background:#8a8a8a;font:13px system-ui;margin:12px}
+canvas{margin:8px;vertical-align:top;outline:1px dashed #fff4}</style>
+<div id="cikti">yükleniyor…</div>
+<script>
+/* Uygulama ikonlarını MARKANIN KENDİ SVG'sinden üretir.
+   Eski üreteç (tools/ikon-png.js) markayı taklit eden bir altıgen
+   çiziyordu: telefonun ana ekranında duran şekil logo DEĞİLDİ.
+   Cemil, 14.09: "Uygulama açılırken logonun arka planı var. Svg olmalı."
+
+   Çizim tarayıcıda yapılıyor; depoya harici bir raster kütüphanesi
+   girmiyor. */
+window.HAZIR = null;
+
+fetch('icon.svg').then(function (r) { return r.text(); }).then(function (metin) {
+  /* Plaka rengi TEK KAYNAK: SVG'nin kendi zemin dikdörtgeninden
+     okunuyor. İkinci bir yere yazılsa ikisi zamanla ayrışır ve
+     açılışta yine kutu görünür — bu hatanın kendisi buydu. */
+  var plaka = (metin.match(/<rect[^>]*fill="(#[0-9A-Fa-f]{6})"/) || [])[1] || '#0F1E30';
+
+  var img = new Image();
+  img.onload = function () {
+    var isler = [
+      /* iOS saydamlık kabul etmiyor: köşeleri kendi yuvarlıyor, bizim
+         şeffaf köşelerimizi SİYAH dolduruyor. Plaka full-bleed. */
+      ['apple-touch-icon.png', 180, plaka, 1.0],
+      /* "any" ikonlar SVG'nin kendi yuvarlak plakasıyla, köşeler şeffaf */
+      ['icon-192.png',         192, null,  1.0],
+      ['icon-512.png',         512, null,  1.0],
+      /* maskable: platform kırpıyor. Full-bleed zemin + marka %80
+         güvenli alanda. SVG'nin kendi plakası aynı renk olduğu için
+         kaynaşıyor, kırpma sonrası köşede boşluk kalmıyor. */
+      ['icon-maskable-512.png', 512, plaka, 0.80]
+    ];
+    var sonuc = {}, kutu = document.getElementById('cikti');
+    kutu.textContent = '';
+    isler.forEach(function (is) {
+      var ad = is[0], boyut = is[1], zemin = is[2], doluluk = is[3];
+      var c = document.createElement('canvas');
+      c.width = c.height = boyut;
+      var g = c.getContext('2d');
+      if (zemin) { g.fillStyle = zemin; g.fillRect(0, 0, boyut, boyut); }
+      var k = boyut * doluluk, p = (boyut - k) / 2;
+      g.drawImage(img, p, p, k, k);
+      sonuc[ad] = c.toDataURL('image/png').split(',')[1];
+      kutu.appendChild(c);
+    });
+    window.HAZIR = { png: sonuc, plaka: plaka };
+    /* Diske yazdırma sunucuya devrediliyor: base64 sohbetten geçmiyor. */
+    fetch('/yaz', { method: 'POST', body: JSON.stringify(sonuc) })
+      .then(function (r) { return r.text(); })
+      .then(function (t) { window.YAZILDI = t; });
+  };
+  /* ⚠️ Blob'a giden SVG'de xmlns ŞART: xmlns'siz SVG <img> olarak hiç
+     çizilmiyor ama onload yine de tetikleniyor — kanvas sessizce boş
+     kalıyor, hata da alınmıyor. */
+  if (metin.indexOf('xmlns=') < 0) {
+    metin = metin.replace('<svg', '<svg xmlns="http://www.w3.org/2000/svg"');
+  }
+  img.src = URL.createObjectURL(new Blob([metin], { type: 'image/svg+xml' }));
+});
+</script>

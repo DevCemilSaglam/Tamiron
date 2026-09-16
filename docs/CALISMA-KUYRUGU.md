@@ -19,6 +19,34 @@
 
 ---
 
+## Tur 6 · 16.09.2026 · son commit `bef7f2e`
+
+Cemil sekiz not iletti (14–16.09, WhatsApp). Sekizi **beş iş**:
+ikisi ikişer notun aynı konusu.
+
+| # | İş | Hangi notlar | Durum |
+|---|---|---|---|
+| 6.1 | **Açılış logosunun arka planı** — uygulama açılırken logonun altında kutu görünüyor | *"Uygulama açılırken logonun arka planı var. Svg olmalı."* | **BİTTİ** — iki ayrı kusur çıktı: (1) açılış zemini ikon plakasından farklı tondaydı → kutu; (2) PNG ikonlar markanın TAKLİDİYDİ, artık `icon.svg`'den üretiliyor. Renk sapması derlemede yakalanıyor (negatif testle doğrulandı) |
+| 6.2 | **Ses ölçümü: kendi test verimiz + kötü kaydı bulmak** | *"Kötü ses kayıtlarını nasıl bulabiliriz?"* · *"Test verisi kendimiz oluşturabilir miyiz ses için."* | SIRADA |
+| 6.3 | **İz kaydı (log) — uzaktan görmek** | *"Log kaydı, nereye tıklanmış, ne yapılmış adım adım, hatalar, başarısızlıklar… mantığa aykırı işlemleri de görebilmeliyiz."* | SIRADA |
+| 6.4 | **Fatura → serviste kullanılan parça (kâr/zarar için)** | *"Fatura girişi olunca serviste kullanılan parçalara ekleyebilmeli… müşteri için değil kâr zarar muhasebe için."* · *"Faturasız çalışıyor da olabilirler."* | SIRADA |
+| 6.5 | **Taklit edilemezlik — alanı zapt etmek ve savunmak** | *"Kopyalanamaz bir özellik eklemek"* · *"Taklit edilemez olması için ne yapılabilir?… hızlı ilerlemeli ve alanı zapt etmeli ve savunmalıyız."* | SIRADA |
+
+**Sıra neden böyle:** 6.1 küçük ve somut, önden çıkar. 6.2 bir gün
+önce açılan **A-M39**'u kapatır — ses tarafı bugün ölçülemiyor, ölçüm
+aleti yarım. 6.3 mimariye dokunur ve 6.2 ile kesişir (kötü kaydı
+bulmanın yolu izden geçiyor). 6.4 **bekleyen MUH kararına girdi**;
+Cemil'in cevabını beklemeden hazırlanır. 6.5 strateji — ötekilerden
+beslendiği için sona kondu.
+
+⚠️ **6.4 ve 6.5 karar üretmez, karar HAZIRLAR.** MUH kapsamını lider
+tek başına genişletmez (K-022); 6.4'ün çıktısı `MUHASEBE-KARARI.md`'ye
+girdi olur. 6.5 bir ürün kararı değil, seçeneklerin bedeliyle birlikte
+serilmesidir.
+
+
+---
+
 ## Tur 5 · 14.09.2026 · son commit `cbb3302`
 
 Cemil sırayı kendisi verdi: **(a) MUH kararı · (b) bekleyen açık

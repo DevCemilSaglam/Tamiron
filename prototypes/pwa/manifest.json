@@ -9,8 +9,8 @@
   "id": "tamiron-omurga",
   "display": "fullscreen",
   "orientation": "portrait",
-  "background_color": "#0A0F17",
-  "theme_color": "#0A0F17",
+  "background_color": "#0F1E30",
+  "theme_color": "#0A1220",
   "categories": [
     "business",
     "productivity"
