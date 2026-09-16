@@ -10,6 +10,70 @@
 
 ---
 
+## K-052 · İz kaydı: değer yazılmaz, şekil yazılır (16.09.2026)
+
+> **Cemil:** *"Log kaydı, nereye tıklanmış, ne yapılmış adım adım,
+> hatalar, başarısızlıklar… Mantığa aykırı işlemleri de
+> görebilmeliyiz."*
+
+**Giriyor.** Gerekçesi bu deponun 1 numaralı belgesinde yazılı: tamirci
+*"çok fazla özellik var"* dedi ve bunu **sorduğumuz için** öğrendik.
+Usta destek aramaz, sessizce bırakır. İz kaydı o sessizliği ölçüye
+çevirir.
+
+### 52.1 · Ustanın işi değil, bizim işimiz
+
+Yedi işten hiçbirine hizmet etmiyor. O yüzden **görünmez**: ekran yok,
+ayar yok, soru yok, ustaya maliyeti sıfır. Ekran bütçesine (A-2)
+dokunmuyor.
+
+### 52.2 · Asıl tehlike ölçenin sızdırması
+
+Bir iz kaydı az yazarsa işe yaramaz; **çok yazarsa müşteri verisinin
+ikinci kopyası olur** ve bu fark edilmez — çünkü ayrıntılı iz *daha
+iyi* çalışır. K-050/K-051 ile TC ve adres zaten tutuluyor; iznin
+onları da taşıması, veriyi koruduğumuz yeri ikiye çıkarırdı.
+
+> **Kural:** *değer yazılmaz, şekil yazılır.*
+> `"34 ABC 123 → 34 QBC 123"` değil, `"plaka alanı 3 kez düzeltildi"`.
+
+Temenni değil **mekanik**: `Iz.guvenli()` yalnız sayı, doğru/yanlış ve
+küçük harfli kısa kod geçirir. Plaka, ad, telefon biçimce elenir —
+*unutmakla değil, geçememekle.* 47. denetim iki yönden ölçüyor: tohum
+verinin her plakası/adı/telefonu izde aranır (**bugün sızmıyor**) ve
+eleğe bilerek plaka verilir (**yarın da sızamaz**). Negatif doğrulama
+yapıldı.
+
+### 52.3 · İki katman
+
+| | nerede | ne var | ne zaman çıkar |
+|---|---|---|---|
+| **Ayrıntılı** | dükkânda, cihazda | değerler dahil | yalnız usta *"sorun bildir"* derse |
+| **Kısır** | bizde | ekran · dokunuş · hata sınıfı · süre · şüphe kodu | varsayılan |
+
+Hata ayıklamak için bazen değer gerekiyor (*"hangi plakayı yanlış
+duydu"*); o bilgi **dükkânda** kalır.
+
+### 52.4 · "Mantığa aykırı" hatadan ayrı bir şey
+
+Program çalışıyor, kimse hata almıyor, ama olan iş yanlış: teslimden
+sonra işlem · aynı araca ikinci açık kayıt · kilometrenin geri gitmesi
+· parça beklerken teslim · fiyatsız teslim. Ayrıca **zorlanma
+işaretleri**: aynı ekrana üç kez dönmek, aynı hatanın tekrarı, kaydı
+açıp 10 saniyede silmek. Tam liste `arastirma/IZ-KAYDI.md §4`'te; ikisi
+prototipe girdi.
+
+### 52.5 · Ders
+
+**Ölçüm aleti de ürünün parçasıdır ve onun da bir gizlilik yüzeyi
+vardır.** İz kaydını yazarken sorulacak ilk soru *"ne görmek
+istiyorum"* değil, *"bu ne taşıyor"*.
+
+**Açık maddeler:** A-M40 (iz ne zaman gönderilir) · A-M41 (saklama
+süresi — A-M36'daki KVKK cümlesiyle birlikte).
+
+---
+
 ## K-051 · TC/vergi no ruhsat fotoğrafının **kadrajı dışında** kalıyor — 46 fotoğrafın 29'unda yok (15.09.2026)
 
 > **Cemil:** *"TC / Vergi no alanlarını göremiyorum."*
@@ -3827,6 +3891,8 @@ oradan bakılır.
 |---|---|---|
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
+| **A-M40** | **İz kaydı bize ne zaman gelsin?** (a) yalnız usta *"sorun bildir"* derse, (b) günde bir kez kısır özet, (c) ikisi birden (K-052, IZ-KAYDI §6) | Önerim **(c)**: kısır özet zorlanmayı gösterir, ayrıntı yalnız istendiğinde gider |
+| **A-M41** | **İz saklama süresi.** Önerim: cihazda 7 gün, bizde 90 gün — A-M36'daki KVKK aydınlatmasıyla aynı cümlede söylenmeli | Cemil onayına açık |
 | **A-M39** | **Ses kaydı alınacak mı?** Kayıt sayfası hazır (`ses-kaydet.html`): telefonla, dükkânda, 40 cümle + 20 sn dükkân sesi; kalite anında ölçülüyor, hepsi tek zip çıkıyor. Kaydedilmezse ses tarafı ÖLÇÜLEMEZ ve *"Web Speech yetiyor"* bir tahmin olarak kalır (YAPAY-ZEKA §2.1–2.2) | Önerim: bir öğleden sonra — alet yazıldı, geriye konuşmak kaldı |
 | **A-M38** | Ruhsat fotoğrafında **TC/vergi no kadrajın dışında kalıyor** (46 fotoğrafın 29'unda yok, K-051). Okuma ekranı *"sağ sayfa da görünsün"* diye yönlendirsin mi, yoksa fatura alanları müşteri başına **bir kez elle** mi girilsin? | Önerim: ikisi birden — ekran yönlendirsin, gelmezse elle giriş |
 | **A-M37** | **Fatura kesmek** MUH kapsamına giriyor mu? Bu turda yalnız fatura ALANLARI tutuldu; fatura kesmek K-022'nin "fatura yok · KDV yok · e-belge yok" sınırını değiştirir (K-050.5) | Alanlar evet, kesmek **ayrı karar** — MUH cevabıyla birlikte |

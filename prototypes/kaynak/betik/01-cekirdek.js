@@ -116,6 +116,9 @@ var Ekran = (function () {
     for (var i = 0; i < hepsi.length; i++) hepsi[i].classList.remove('active');
     el.classList.add('active');
     acik = ad;
+    /* İz kaydı buraya bağlı: goster() tek geçiş noktası. Ekran ekran
+       çağrı serpiştirilseydi biri unutulur ve iz sessizce eksilirdi. */
+    Iz.ekran(ad);
     var k = kayit[ad];
     /* ⚠️ AÇILIŞ, ÇİZİMDEN AYRI (06.09 — K-040).
        `ciz` hem ekran açılınca hem her tazelemede koşuyordu ve ekran
@@ -126,10 +129,10 @@ var Ekran = (function () {
 
        `ac` yalnız goster()'den çağrılır; tazele() ona hiç dokunmaz. */
     if (k && typeof k.ac === 'function') {
-      try { k.ac(el); } catch (e) { console.error('ac(' + ad + '):', e); }
+      try { k.ac(el); } catch (e) { console.error('ac(' + ad + '):', e); Iz.hata(ad, e); }
     }
     if (k && typeof k.ciz === 'function') {
-      try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); }
+      try { k.ciz(el); } catch (e) { console.error('ciz(' + ad + '):', e); Iz.hata(ad, e); }
     }
     el.scrollTop = 0;
     window.scrollTo(0, 0);
