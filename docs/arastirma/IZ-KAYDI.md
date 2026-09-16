@@ -103,6 +103,7 @@ Cemil'in istediği asıl şey bu ve **hatadan ayrı bir şey**: program
 | `parca-beklerken-teslim` | Parça bekleniyorken teslim edildi | Ya parça geldi ve işaretlenmedi ya araç eksik gitti |
 | `fiyatsiz-teslim` | Fiyat girilmeden teslim | Para konuşulmadan araç çıkıyor |
 | `ayni-musteriye-tekrar-mesaj` | 1 dakikada ikinci mesaj | Gönderdiğini görmedi — buton geri bildirimi zayıf |
+| `zararina-satis` | Fatura maliyeti, müşteriye söylenen fiyattan yüksek | Ya fiyat düşük yazıldı ya yanlış parça eşleşti (MALIYET-VE-KAR §5) |
 
 ### 4.2 · Zorlanma işareti (usta kayboldu)
 

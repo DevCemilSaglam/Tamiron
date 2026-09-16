@@ -1725,6 +1725,86 @@ function stilMetni() {
     if (typeof Ekran !== 'undefined' && Ekran.sifirla) Ekran.sifirla();
   }
 
+    /* 48) ALIS FIYATI MUSTERI YUZEYINE SIZIYOR MU (16.09.2026)
+     Cemil: "Bunu musteri icin degil kar zarar muhasebe icin
+     yapmaliyiz."
+
+     YENI HATA SINIFI: IC RAKAM DIS YUZEYE DUSUYOR. `alis` BIZIM
+     parcaciya odedigimiz; `fiyat` musteriye soyledigimiz. Ikisi ayni
+     satirda, yan yana duruyor -- bir sablon yanlis alani okursa
+     musteri dukkanin maliyetini gorur. Bu:
+       * pazarlik gucunu bitirir ("demek 1450'ye alip 1900'e satiyorsun"),
+       * ve HATA VERMEZ, ekran duzgun cizilir.
+
+     Kural bugune kadar YORUMDA yaziliydi (98-ozet.html, VERI-MODELI
+     §3). Tur 4'un dersi: belgede duran bir ders, uygulanmamissa
+     ogrenilmemistir. Burada uygulaniyor.
+
+     Olcum yontemi: tohum verideki alis rakamlarinin HICBIRI musteri
+     yuzeylerinin metninde gecmemeli. Rakamlar satis fiyatlariyla
+     karismasin diye yalniz alis-a OZGU olanlar araniyor. */
+  (function () {
+    if (typeof KAYITLAR === 'undefined' || typeof Ekran === 'undefined') return;
+
+    /* Yalniz alis'a ozgu rakamlar: ayni sayi bir yerde satis fiyati
+       olarak da geciyorsa eslesme tesaduf olur, bulgu da yanlis. */
+    var alislar = {}, satislar = {};
+    KAYITLAR.forEach(function (k) {
+      (k.satirlar || []).forEach(function (s) {
+        if (s.alis) alislar[s.alis] = true;
+        if (s.fiyat) satislar[s.fiyat] = true;
+      });
+    });
+    var aranacak = Object.keys(alislar).filter(function (a) {
+      return !satislar[a] && Number(a) >= 100;   /* kucuk sayi her yerde gecer */
+    });
+    if (!aranacak.length) return;
+
+    /* ⚠️ BAGLAM KURULMADAN OLCULMEZ (16.09).
+       Ilk yazilisinda bu test ekranlari OYLECE aciyordu: ozet ekrani
+       "Ozet secilmedi" diyor, teslim ekrani bos geliyor ve testte
+       aranacak metin HIC OLUSMUYORDU. Sonuc: bulgu yok -- ama olcum
+       de yok. Yalanci gecen bir test, olmayan testten KOTUDUR: korur
+       sanilir. Alis rakami TASIYAN bir kayit secilip oyle aciliyor. */
+    var hedef = null;
+    KAYITLAR.forEach(function (k) {
+      if (!hedef && (k.satirlar || []).some(function (s) { return s.alis >= 100; })) hedef = k;
+    });
+    if (!hedef) return;
+
+    var yuzeyler = ['teslim', 'ozet', 'mesaj'];
+    Ekran.sifirla();
+    yuzeyler.forEach(function (ad) {
+      var el = document.getElementById('screen-' + ad);
+      if (!el) return;
+      if (typeof ACIK_KAYIT !== 'undefined') ACIK_KAYIT = hedef.id;
+      if (typeof OZET_KAYIT !== 'undefined') OZET_KAYIT = hedef.id;
+      if (typeof ACIK_PLAKA !== 'undefined') ACIK_PLAKA = hedef.plaka;
+      Ekran.ac(ad);
+      var metin = el.textContent || '';
+      /* Baglam gercekten kuruldu mu? Kurulmadiysa test yine yalanci
+         gecer; o yuzden BOS YUZEY DE BULGUDUR. */
+      if (metin.replace(/\s+/g, ' ').trim().length < 40) {
+        ek('ALIS-SIZINTI', '(' + ad + ')',
+           'yuzey bos acildi — test olcmeden geciyor, baglam kurulamadi');
+        return;
+      }
+      aranacak.forEach(function (a) {
+        /* Rakamin BASINA ve SONUNA rakam gelmemeli: 1450, 11450'nin
+           icinde de gecer ve yanlis bulgu verir. */
+        var kalip = new RegExp('(^|[^0-9])' + a + '([^0-9]|$)');
+        if (kalip.test(metin.replace(/[.,\s]/g, ''))
+            || kalip.test(metin)) {
+          ek('ALIS-SIZINTI', '(' + ad + ')',
+             'alis rakami ' + a + ' musteri yuzeyinde gorunuyor');
+        }
+      });
+    });
+    if (typeof ACIK_KAYIT !== 'undefined') ACIK_KAYIT = null;
+    if (typeof OZET_KAYIT !== 'undefined') OZET_KAYIT = null;
+    Ekran.sifirla();
+  })();
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

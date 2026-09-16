@@ -137,6 +137,28 @@ dört iş beklemede kalır. Hiçbiri yarım bırakılmış değil — **başlanm
 
 ---
 
+## 5.5 · 16.09'da gelen not: **maliyet tarafı eksik** (A-M43…A-M45)
+
+> **Cemil:** *"Fatura girişi olunca serviste kullanılan parçalara
+> ekleyebilmeli sistem. Fakat bunu müşteri için değil kâr zarar
+> muhasebe için yapmalıyız."* · *"Faturasız çalışıyor da olabilirler."*
+
+**K-022 açılmıyor.** *Fatura kesmek* (e-belge, KDV — kapsam dışı) ile
+*fatura girmek* (parçacıdan gelen belgeyle maliyeti bilmek) ayrı
+şeyler. Bu not ikincisi.
+
+**Bulunan kusur:** `alis` alanı ve `is-basina` kâr ekranı **var**, ama
+`alis`'i dolduran akış **yok**. Parçacının verdiği rakam bugün `fiyat`e
+(müşteri fiyatı) yazılıyor; kâr `fiyat − 0` çıkıyor ve **şişik**
+görünüyor. Tohum veride `alis` elle doldurulduğu için bu bugüne kadar
+görünmedi.
+
+**Önerim sırası:** önce **A-M43** (alış rakamı parça sorma akışında
+girilsin), sonra **A-M44** (fatura girişi ikinci turda, düzeltici
+olarak). Ayrıntı: `arastirma/MALIYET-VE-KAR.md`.
+
+---
+
 ## 6 · Aynı turda cevaplanması iyi olur (muhasebeye komşu)
 
 | Kod | Soru | Öneri |
