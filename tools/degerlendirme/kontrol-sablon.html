@@ -1,4 +1,4 @@
-<title>Ruhsat ve Parça Kontrolü</title>
+<title>@@BASLIK@@</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
@@ -454,7 +454,7 @@ button.tus.atla[aria-pressed="true"] { background: var(--warn); border-color: va
     }).join('') +
     '<button class="cip" data-kisisel aria-pressed="' + kisiselAcik + '">' +
       (kisiselAcik ? 'Kişisel alanları gizle' : 'Kişisel alanları göster') + '</button>' +
-    (bakilan ? '<button class="cip" data-indir>Düzeltmeleri indir · ' + bakilan + '</button>' : '');
+    (bakilan && !db ? '<button class="cip" data-indir>Düzeltmeleri indir · ' + bakilan + '</button>' : '');
 
     document.getElementById('bitti').textContent = bakilan === VERI.kayitlar.length
       ? 'Hepsi kontrol edildi. Claude bu sayfadan okuyacak.' : '';
@@ -550,6 +550,7 @@ button.tus.atla[aria-pressed="true"] { background: var(--warn); border-color: va
         'dosyayı bana ver — ölçütü ondan güncelleyeceğim.</div>';
       return;
     }
+    ciz();   /* db geldi: "Düzeltmeleri indir" düğmesi artık gereksiz */
     db.collection('kontrol').onSnapshot(function (snap) {
       var geldi = false;
       snap.docs.forEach(function (d) {

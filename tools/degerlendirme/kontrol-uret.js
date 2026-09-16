@@ -38,10 +38,21 @@ const VARSAYILAN_CIKTI = harita && harita.kok
   : path.join(KOK, 'kontrol.html');
 const CIKTI = arg('--cikti', VARSAYILAN_CIKTI);
 
-/* Göreli yol + URL kodlaması: dosya adlarında boşluk, parantez ve
-   Türkçe harf var ("Parça listesi"); ham hâlde src'ye konursa kırılır. */
+/* YAYIN KİPİ (--yayin <klasör>): sayfalar artifact olarak yayınlanmak
+   üzere üretilir. Cemil, 16.09: *"Ruhsat ve parça listesi görseller
+   bilgisayarda. Telefondan göremiyorum."*
+   Fark iki yerde:
+     · fotoğraf yolu diskteki dosya değil, yayına giden `foto/<id>.jpg`
+     · öteki sayfaya geçiş dosya adı değil, artifact ADRESİ olur
+   Yerel kipte hiçbir şey değişmiyor — iki kip tek şablonu paylaşıyor. */
+const YAYIN = arg('--yayin', null);
+const BAGLANTI = { ruhsat: arg('--url-ruhsat', null), parca: arg('--url-parca', null) };
+
 function fotoYolu(id) {
   if (!harita || !harita.yollar || !harita.yollar[id]) return null;
+  if (YAYIN) return 'foto/' + id + '.jpg';
+  /* Göreli yol + URL kodlaması: dosya adlarında boşluk, parantez ve
+     Türkçe harf var ("Parça listesi"); ham hâlde src'ye konursa kırılır. */
   const goreli = path.relative(path.dirname(CIKTI), harita.yollar[id]);
   return goreli.split(path.sep).map(encodeURIComponent).join('/');
 }
@@ -104,21 +115,26 @@ parca.listeler.forEach(l => {
    ve ilerleme çubuğu "ne kadar kaldı"yı söylemez oluyordu. İşaretler
    ortak yerde durduğu için sayfalar arasında geçiş kaybettirmiyor. */
 const SAYFALAR = [
-  { dosya: 'kontrol-ruhsat.html', baslik: 'Ruhsat Kontrolü',
+  { dosya: 'kontrol-ruhsat.html', tur: 'ruhsat', baslik: 'Ruhsat Kontrolü',
     kayitlar: kayitlar.filter(k => k.tur === 'ruhsat') },
-  { dosya: 'kontrol-parca.html', baslik: 'Parça Listesi Kontrolü',
+  { dosya: 'kontrol-parca.html', tur: 'parca', baslik: 'Parça Listesi Kontrolü',
     kayitlar: kayitlar.filter(k => k.tur === 'parca') }
 ];
 
 const sablon = fs.readFileSync(path.join(KOK, 'kontrol-sablon.html'), 'utf8');
-const cikisDizini = path.dirname(CIKTI);
+const cikisDizini = YAYIN || path.dirname(CIKTI);
+if (YAYIN && !fs.existsSync(YAYIN)) fs.mkdirSync(YAYIN, { recursive: true });
 
 SAYFALAR.forEach((sayfa, i) => {
   const oteki = SAYFALAR[(i + 1) % SAYFALAR.length];
+  /* Yayında geçiş bağlantısı öteki artifact'in adresi olmalı; dosya adı
+     orada bir yere gitmez. Adres henüz yoksa bağlantı hiç çizilmiyor —
+     tıklanıp hiçbir şey yapmayan bir bağlantıdan iyidir. */
+  const otekiHedef = YAYIN ? BAGLANTI[oteki.tur] : oteki.dosya;
   const veri = {
     uretim: new Date().toISOString().slice(0, 16).replace('T', ' '),
     baslik: sayfa.baslik,
-    oteki: { ad: oteki.baslik + ' →', dosya: oteki.dosya },
+    oteki: otekiHedef ? { ad: oteki.baslik + ' →', dosya: otekiHedef } : null,
     kisiselVar: !!kisisel,
     alanAdi: ALAN_ADI,
     ruhsatAlanSira: RUHSAT_SIRA,
@@ -131,7 +147,8 @@ SAYFALAR.forEach((sayfa, i) => {
      sunucu) ve charset'siz tarayıcı latin-1 varsayıyor: "Parça" ->
      "ParÃ§a". Türkçe bir sayfada sessiz bozulma. */
   const html = '<meta charset="utf-8" />\n' +
-    sablon.replace('/* @@VERI@@ */', 'var VERI = ' + govde + ';');
+    sablon.replace('/* @@VERI@@ */', 'var VERI = ' + govde + ';')
+          .replace('@@BASLIK@@', sayfa.baslik);
   const yol = path.join(cikisDizini, sayfa.dosya);
   fs.writeFileSync(yol, html, 'utf8');
   console.log(sayfa.baslik + ': ' + yol + '  (' + sayfa.kayitlar.length + ' kayıt)');
