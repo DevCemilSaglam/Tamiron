@@ -19,6 +19,38 @@
 
 ---
 
+## Tur 7 · 16.09.2026 · son commit `0a3b205`
+
+> **Cemil:** *"Servis kayıt ekranı istediğim gibi değil. Orada parça
+> ekle, işçilik ekle düzenle vb daha kolay olmalı. Sesle işlem yapılan
+> ekranlarda sesten gelen veri yapılabilecek işler için json dosyası
+> doldursun ve kullanıcı onayı ile işlemi yapsın. Kullanıcı farklı
+> ekranda farklı bir işlem yapmak isteyebilir. Google aramada olduğu
+> gibi 'bunu mu demek istediniz' diye yönlendirebilelim. Servis detayda
+> yine sesle işlem yapmak istediğinde bu yaklaşımı ele almak lazım…
+> Bittikten sonra bir kaynak hazırlaman gerek. Bu haliyle sunum yapmak
+> istiyorum ve özelliklerimiz, baştan sona nasıl kullanılır göstermek
+> istiyorum."*
+
+| # | İş | Durum |
+|---|---|---|
+| 7.1 | **Servis kaydında satır düzenleme** | **BİTTİ** — asıl kusur çıktı: *ekle düğmesi adımların üstünde, satır tablosu 2. adımın içinde* → 1. adımda basınca satır **görünmeden** ekleniyordu. Artık satırın durduğu adıma geçiliyor + odak yeni satıra. Tip rozeti **düğme** oldu (parça↔işçilik, ad ve tutar korunuyor). 49. denetim testi koruyor |
+| 7.2 | **Ses → işlem nesnesi → onay**, her ekranda aynı biçimde ve **görünür** | SIRADA |
+| 7.3 | **"Bunu mu demek istediniz"** — yalnız plakada değil, **yanlış ekran/yanlış işlem** için de | SIRADA |
+| 7.4 | **Servis detayında sesle işlem** — aynı yaklaşım kayıt içinde de | SIRADA |
+| 7.5 | **Sunum kaynağı** — özellikler + baştan sona kullanım | SIRADA |
+
+**Zemin (bugün ne var):** `sesCozumle()` zaten bir **işlem nesnesi**
+üretiyor (`{tur, plaka, is, km, oneri…}`) ve onay ekranı var — yani
+7.2'nin yarısı yazılı. *"Bunu mu demek istediniz"* yalnız **plaka**
+için çalışıyor (A-M27, 44. test). `kayit-icinde` bağlamı var ama
+kapsamı dar. Yani tur, sıfırdan yazmak değil, **var olanı bütünlemek.**
+
+⚠️ **7.5 ötekiler bitmeden yazılamaz:** sunum, olmayan bir şeyi
+anlatırsa ilk soruda çöker.
+
+---
+
 ## Tur 6 · 16.09.2026 · son commit `bef7f2e`
 
 Cemil sekiz not iletti (14–16.09, WhatsApp). Sekizi **beş iş**:

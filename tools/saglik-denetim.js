@@ -1822,6 +1822,106 @@ function stilMetni() {
     Ekran.sifirla();
   })();
 
+    /* 49) SATIR DUZENLEME — EKLE, TIP CEVIR, YAZILANI KORU (16.09.2026)
+     Cemil: "Servis kayit ekrani istedigim gibi degil. Orada parca
+     ekle, iscilik ekle duzenle vb daha kolay olmali."
+
+     YENI HATA SINIFI: KOLAYLASTIRMA VERI SILIYOR. Duzenlemeyi
+     kolaylastiran her dokunus, ustanin YAZDIGI seyin uzerinden gecme
+     riski tasir. Uc yerden bozulur:
+
+       a) ekleme sonucu GORUNMEZ -- satir tablonun altinda belirir,
+          odak gitmez, usta bastigi dugmenin sonucunu ARAR (K-032),
+       b) tip cevirme AD ve TUTARI silerse, "kolaylastirma" ustaya
+          yazdigini yeniden yazdirir -- eskisinden kotudur,
+       c) parcadan iscilige cevrilen satirda parcaya OZEL alanlar
+          (parcaci fiyati, kim getirdi) kalirsa, iscilik satirinda
+          "parcaci 1450 TL" yazar ve toplam yanlis anlasilir.
+
+     (b) ozellikle sinsi: ekranda dogru gorunur, kayip ancak usta
+     tutari tekrar yazarken anlasilir. */
+  (function () {
+    if (typeof KAYITLAR === 'undefined' || typeof Ekran === 'undefined') return;
+    var k = KAYITLAR[0];
+    if (!k) return;
+    var yedek = JSON.parse(JSON.stringify(k.satirlar || []));
+
+    Ekran.sifirla();
+    if (typeof ACIK_KAYIT !== 'undefined') ACIK_KAYIT = k.id;
+    Ekran.ac('kayit');
+
+    /* ⚠️ EKRAN 1. ADIMDA ACILIYOR — BILEREK.
+       Kusur tam burada yasandi: "Parca ekle" dugmesi adimlarin
+       ustunde her adimda gorunuyor, satir tablosu ise 2. adimin
+       icinde. 1. adimdayken basilinca satir ekleniyor ama EKRANDA
+       HICBIR SEY OLMUYOR. Elle denerken gorulmedi cunku ekran onceki
+       denemeden 2. adimda kalmisti; test ekrani TEMIZ actigi icin
+       yakaladi. */
+    if (k.adim !== 1) { k.adim = 1; Ekran.tazele(); }
+
+    var ekleTus = document.getElementById('kParcaEkle');
+    if (!ekleTus) {
+      ek('SATIR-DUZEN', '(kayit)', 'parca ekle dugmesi yok');
+    } else {
+      var once = k.satirlar.length;
+      ekleTus.click();
+      if (k.satirlar.length !== once + 1) {
+        ek('SATIR-DUZEN', '(kayit)', 'parca ekle satir eklemedi');
+      } else {
+        /* (a) sonuc gorunuyor mu */
+        var giris = document.querySelector('#kSatirlar [data-satir-ad="' + once + '"]');
+        if (!giris || !giris.offsetParent) {
+          ek('SATIR-DUZEN', '(kayit)',
+             'eklenen satir GORUNMUYOR — dugme adimlarin ustunde, tablo 2. adimda');
+        }
+        var odak = document.activeElement;
+        if (!odak || odak.getAttribute('data-satir-ad') !== String(once)) {
+          ek('SATIR-DUZEN', '(kayit)',
+             'eklenen satira odak gitmiyor — usta bastigi dugmenin sonucunu arar');
+        }
+
+        /* (b) tip cevrilince yazilan korunuyor mu */
+        var yeni = k.satirlar[once];
+        yeni.ad = 'deneme parca'; yeni.fiyat = 777; yeni.alis = 555;
+        yeni.kimGetirdi = 'tamirci';
+        Ekran.tazele();
+        var tipTus = document.querySelector('[data-satir-tip="' + once + '"]');
+        if (!tipTus) {
+          ek('SATIR-DUZEN', '(kayit)',
+             'satir tipi degistirilemiyor — yanlis tip secen usta satiri SILIP yeniden ekler');
+        } else {
+          tipTus.click();
+          var sonra = k.satirlar[once];
+          if (sonra.tip !== 'iscilik') {
+            ek('SATIR-DUZEN', '(kayit)', 'tip dugmesi tipi cevirmedi');
+          }
+          if (sonra.ad !== 'deneme parca' || sonra.fiyat !== 777) {
+            ek('SATIR-DUZEN', '(kayit)',
+               'tip cevrilince ad/tutar kayboldu — usta yazdigini tekrar yazar');
+          }
+          /* (c) parcaya ozel alanlar temizlendi mi */
+          if (sonra.alis || sonra.kimGetirdi) {
+            ek('SATIR-DUZEN', '(kayit)',
+               'iscilige cevrildi ama parcaci alanlari duruyor (alis/kimGetirdi)');
+          }
+          /* Geri cevrilince parca alani yeniden calisiyor mu */
+          var tipTus2 = document.querySelector('[data-satir-tip="' + once + '"]');
+          if (tipTus2) {
+            tipTus2.click();
+            if (k.satirlar[once].tip !== 'parca') {
+              ek('SATIR-DUZEN', '(kayit)', 'tip geri cevrilemiyor');
+            }
+          }
+        }
+      }
+    }
+
+    /* Denetim veriyi kirletti; geri birakiyor (K-024.1). */
+    k.satirlar = yedek;
+    if (typeof ACIK_KAYIT !== 'undefined') ACIK_KAYIT = null;
+    Ekran.sifirla();
+  })();
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

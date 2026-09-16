@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-16 13:03
+  Üretim: 2026-09-16 13:24
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2292,6 +2292,12 @@ kirpilsin. */
   display: flex; align-items: center; gap: 8px;
 }
 #screen-kayit .k-satir .pill { flex: none; }
+/* Rozet bir düğme oldu: dokunulabilir göründüğü kadar dursun, ama
+   satırın içinde gürültü yapmasın — çerçeve yok, yalnız imleç. */
+/* Odak halkası GENEL kuralda (stil/01-taban.css :focus-visible);
+   burada tekrarlanmıyor — iki yerde durursa biri eskir. */
+#screen-kayit .k-satir .k-tip { cursor: pointer; border: 0; font: inherit;
+  font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
 #screen-kayit .tablo input {
   width: 100%; background: transparent; border: 0;
   border-bottom: 1px dashed var(--line);
@@ -9142,6 +9148,26 @@ var FOTO_PARCA_ORNEK = [
   ['Triger seti', 0], ['Devirdaim', 0], ['Antifriz 4 lt', 0]
 ];
 
+/* ⚠️ EKLENEN SATIR GÖRÜNMÜYORDU (16.09 — bu turda çıkan asıl kusur).
+   "Parça ekle" düğmesi ADIMLARIN ÜSTÜNDE, her adımda görünüyor; ama
+   satır tablosu **2. adımın içinde**. Usta 1. adımdayken düğmeye
+   basınca satır ekleniyor ve ekranda HİÇBİR ŞEY OLMUYOR. Üç kez
+   basarsa üç görünmez boş satır birikiyor — sonra 2. adıma geçince
+   nereden geldiği belli olmayan boş satırlar buluyor.
+
+   Bunu elle denerken görmedim: ekran bir önceki denemeden 2. adımda
+   kalmıştı. 49. denetim testi yakaladı — çünkü o, ekranı TEMİZ açıyor.
+
+   Çözüm iki parçalı: önce satırın DURDUĞU adıma geç, sonra odaklan.
+   Odak ÇİZİMDEN SONRA veriliyor; önce verilseydi yeni DOM onu silerdi. */
+function kSatiraOdaklan(k, i) {
+  if (k && k.adim !== 2) kAdimGit(k, 2);
+  var e = document.querySelector('#kSatirlar [data-satir-ad="' + i + '"]');
+  if (!e) return;
+  try { e.focus({ preventScroll: true }); } catch (h) { e.focus(); }
+  if (e.scrollIntoView) e.scrollIntoView({ block: 'center' });
+}
+
 function kayitToplamCiz(k) {
   var el = document.getElementById('kToplam');
   if (el) el.textContent = tutar(kayitToplami(k)) + ' ₺';
@@ -9324,8 +9350,17 @@ function kayitCiz() {
               ' aria-label="' + (s.ad || 'satır') + ' — silmek için sola kaydır">' +
             '<td>' +
               '<span class="k-satir">' +
-                '<span class="pill ' + (s.tip === 'parca' ? 'info' : 'muted') + '">' +
-                  (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</span>' +
+                /* ⚠️ ROZET ARTIK DÜĞME (16.09 — Cemil: "parça ekle,
+                   işçilik ekle düzenle vb daha kolay olmalı").
+                   Önce yalnız bir etiketti: usta yanlış tipi seçtiyse
+                   satırı SİLİP yeniden ekliyordu — yazdığı ad ve tutar
+                   da onunla gidiyordu. Tek dokunuşla dönüyor. */
+                '<button class="pill ' + (s.tip === 'parca' ? 'info' : 'muted') +
+                  ' k-tip" data-satir-tip="' + i + '"' +
+                  ' title="Dokun — ' + (s.tip === 'parca' ? 'işçiliğe' : 'parçaya') + ' çevir"' +
+                  ' aria-label="Satır tipi: ' + (s.tip === 'parca' ? 'parça' : 'işçilik') +
+                  ' — değiştirmek için dokun">' +
+                  (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</button>' +
                 '<input value="' + (s.ad || '').replace(/"/g, '&quot;') +
                   '" data-satir-ad="' + i + '" placeholder="' +
                   (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') +
@@ -9527,11 +9562,27 @@ document.addEventListener('click', function (e) {
   if (t.id === 'kParcaEkle') {
     k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
                       kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
-    Ekran.tazele(); return;
+    Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
   }
   if (t.id === 'kIscilikEkle') {
     k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
-    Ekran.tazele(); return;
+    Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
+  }
+
+  /* Tip çevirme — ad ve tutar KORUNUR. */
+  var tipNo = t.getAttribute('data-satir-tip');
+  if (tipNo !== null) {
+    var st = k.satirlar[parseInt(tipNo, 10)];
+    if (st) {
+      st.tip = (st.tip === 'parca') ? 'iscilik' : 'parca';
+      /* İşçiliğin parçacısı olmaz: parçaya özel alanlar temizlenir,
+         geri çevrilirse boş başlar. Kalsaydı işçilik satırında
+         "parçacı 1450 ₺" yazardı. */
+      if (st.tip === 'iscilik') { st.kimGetirdi = ''; st.alis = 0; st.sorulan = null; }
+      else { st.kimGetirdi = 'tamirci'; }
+      Ekran.tazele(); kSatiraOdaklan(k, parseInt(tipNo, 10));
+    }
+    return;
   }
 
   /* FOTOĞRAFTAN PARÇA LİSTESİ — okunanlar satır olur, fiyatları BOŞ. */
@@ -9541,7 +9592,10 @@ document.addEventListener('click', function (e) {
         kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     });
     balon(FOTO_PARCA_ORNEK.length + ' parça okundu — fiyatlarını yaz.', false, 3000);
-    Ekran.tazele(); return;
+    /* Aynı tuzak burada da vardı: balon "fiyatlarını yaz" diyor ama
+       1. adımdayken yazılacak satırlar görünmüyordu. */
+    Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - FOTO_PARCA_ORNEK.length);
+    return;
   }
 
   /* ADIM ŞERİDİ ve "devam" düğmeleri AYNI YOLU kullanıyor (kAdimGit):
