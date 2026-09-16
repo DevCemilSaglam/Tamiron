@@ -487,10 +487,16 @@ function balon(metin, dinliyor, sure) {
    kayboluyor VE ekranda ne olduğunu söyleyen, geri almayı teklif eden
    bir şerit çıkıyor. */
 var geriAlFn = null;
-function balonGeriAl(metin, fn, sure) {
+/* Balonun içindeki EYLEM tek mekanizma: "Geri al" da, "Kayda dön" de
+   buradan çıkıyor. İkinci bir balon-eylem yazılsaydı biri ötekinin
+   düğmesini temizlemez ve iki balon üst üste binerdi. */
+function balonEylem(metin, etiket, fn, sure) {
   geriAlFn = fn || null;
-  balon(metin + ' <button class="balon-eylem" data-geri-al="1">Geri al</button>',
+  balon(metin + ' <button class="balon-eylem" data-geri-al="1">' + etiket + '</button>',
         false, sure || 4500);
+}
+function balonGeriAl(metin, fn, sure) {
+  balonEylem(metin, 'Geri al', fn, sure);
 }
 document.addEventListener('click', function (e) {
   if (!e.target.closest('[data-geri-al]')) return;

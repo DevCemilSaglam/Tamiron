@@ -740,7 +740,45 @@ var ODEME_AD_SES = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale' };
    "İşin özeti" diyordu — usta iki ekranda iki ad görüyordu. */
 
 /* ================= UYGULA ================= */
+/* ⚠️ BAĞLAM DIŞI İŞ BİTİNCE KAYDA DÖNÜŞ (16.09 — 7.4).
+   Usta servis kaydının içindeyken başka bir iş söyleyebiliyor artık
+   (7.3). Ama iş bitince başka bir ekranda kalıyordu: kaydı bulmak için
+   listeye gidip aramak gerekiyordu. Kayıt hâlâ AÇIK (`ACIK_KAYIT`
+   duruyor) — eksik olan yalnız kapıydı.
+
+   ⚠️ İLK YAZIŞIM ZAMANLAYICIYLA İDİ VE DENETİM YAKALADI: balonu 400 ms
+   sonra gösteriyordum ki işin kendi balonu ("Gider eklendi") önce
+   okunsun. Zamanlayıcı denetimin işi bittikten SONRA ateşleniyor,
+   bıraktığı düğme bir sonraki koşuda "çekmece odak sızıntısı" olarak
+   çıkıyordu — yani ekranda kimsenin beklemediği bir anda beliren bir
+   düğme. Gerçek kullanımda da aynısı olurdu: usta çoktan başka bir
+   şeye bakarken balon açılır.
+
+   Artık TEK BALON: işin kendi mesajının üstüne dönüş düğmesi
+   ekleniyor. İki bilgi bir yerde, zamanlayıcı yok. */
+function sesDonusHedefi(o) {
+  if (SESLI_NIYET !== 'kayit-icinde' || !ACIK_KAYIT) return null;
+  /* Kaydın kendi işleri zaten kayıtta kalıyor; teklif yalnız BAŞKA
+     bir ekrana götüren işler için. */
+  if (['satir-ekle', 'fiyat-guncelle', 'teslim'].indexOf(o.tur) >= 0) return null;
+  return kayitBul(ACIK_KAYIT) || null;
+}
+
+function sesKaydaDonusEkle(k) {
+  var t = document.getElementById('toast');
+  var mevcut = t ? (t.textContent || '').trim() : '';
+  var don = function () { Ekran.ac('kayit'); };
+  window.SES_DONUS = { kayit: k.id, plaka: k.plaka, ac: don };
+  balonEylem((mevcut || k.plaka + ' kaydı açık.'), 'Kayda dön', don, 6000);
+}
+
 function sesUygula(o) {
+  var donus = sesDonusHedefi(o);
+  sesUygulaIs(o);
+  if (donus) sesKaydaDonusEkle(donus);
+}
+
+function sesUygulaIs(o) {
   if (o.tur === 'servis-ac') {
     var yeni = { id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
       km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',

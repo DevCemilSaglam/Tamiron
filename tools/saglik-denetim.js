@@ -233,7 +233,21 @@ function stilMetni() {
     var dis = Array.prototype.slice.call(document.querySelectorAll(kapsa('body'))).filter(function (el) {
       return el.offsetParent !== null && !el.disabled && !dr.contains(el) && !el.closest('[inert]');
     });
-    if (dis.length) ek('DRAWER-ODAK-SIZINTISI', 'drawer', dis.length + ' oge');
+    /* ⚠️ SAYI YETMIYOR, KIMLIK GEREKIYOR (16.09).
+       Mesaj yillardir "1 oge" diyordu ve bulgu cikinca hangi ogenin
+       sizdigini bulmak icin elle arama gerekiyordu -- bir kez de
+       tekrar uretilemedi (yalniz tam kosuda cikiyor). Olcum sonucu,
+       duzeltmeye YETECEK kadar konusmali. */
+    if (dis.length) {
+      ek('DRAWER-ODAK-SIZINTISI', 'drawer', dis.length + ' oge: ' +
+        dis.slice(0, 3).map(function (el) {
+          return el.tagName.toLowerCase() +
+            (el.id ? '#' + el.id : '') +
+            (el.className && typeof el.className === 'string'
+              ? '.' + el.className.split(/\s+/)[0] : '') +
+            ' [' + (el.textContent || '').trim().slice(0, 20) + ']';
+        }).join(' · '));
+    }
     if (!document.querySelector('.topbar').inert) ek('DRAWER-ARKA-PLAN', 'drawer', 'topbar inert degil');
     closeDrawer();
     if (document.querySelector('.topbar').inert) ek('DRAWER-ARKA-PLAN', 'drawer', 'kapaninca inert kalkmiyor');
@@ -1994,12 +2008,43 @@ function stilMetni() {
         }
       }
 
+      /* (d) BAGLAM DISI IS BITINCE KAYDA DONUS (7.4)
+         Usta kaydin icindeyken baska bir is yapabiliyor; is bitince
+         BASKA BIR EKRANDA kaliyor ve kaydi bulmak icin listeye gidip
+         aramasi gerekiyordu. Kayit hala ACIK -- eksik olan kapiydi. */
+      window.SES_DONUS = null;
+      var disi2 = sesDene('2400 lira elektrik faturasi');
+      var onayD = document.getElementById('sesOnayla');
+      if (!onayD) {
+        ek('SES-BAGLAM', 'ses', 'baglam disi iste onay dugmesi yok');
+      } else {
+        onayD.click();
+        if (!window.SES_DONUS || window.SES_DONUS.kayit !== acikK.id) {
+          ek('SES-BAGLAM', 'ses',
+             'baglam disi is bitti ama KAYDA DONUS teklif edilmiyor — usta ortada kalir');
+        } else {
+          window.SES_DONUS.ac();
+          if (Ekran.adi() !== 'kayit' || window.ACIK_KAYIT !== acikK.id) {
+            ek('SES-BAGLAM', 'ses', 'donus teklifi kayda goturmuyor -> ' + Ekran.adi());
+          }
+        }
+      }
+
       /* (c) baglamin KENDI isi bosuna yonlendirilmemeli */
       var ici = sesDene('balata 450 lira');
       if (ici.oneri) {
         ek('SES-BAGLAM', 'ses',
            'baglama ait cumleye de oneri cikti — oneri gurultuye doner');
       }
+
+      /* ⚠️ BALONU DA GERI BIRAK (K-024.1).
+         (d) gercek bir isi ONAYLIYOR ve o isin kendi balonu icinde bir
+         "Geri al" DUGMESI var. Balon acik kalinca cekmece testi onu
+         "odak sizintisi" sayip bulgu veriyordu -- yani benim testim,
+         baska bir testi yalanci kirmiziya dusuruyordu. Veriyi geri
+         yuklemek yetmiyor; DOM da geri birakilir. */
+      var toast = document.getElementById('toast');
+      if (toast) { toast.classList.remove('show'); toast.innerHTML = ''; }
 
       window.SESLI_NIYET = oncekiNiyet;
       window.ACIK_KAYIT = oncekiKayit;
