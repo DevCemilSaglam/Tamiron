@@ -10,7 +10,93 @@
 
 ---
 
-## K-052 · İz kaydı: değer yazılmaz, şekil yazılır (16.09.2026)
+## K-053 · İzde DEĞERLER yazılır — bir gün önceki kuralımı geri alıyorum (16.09.2026)
+
+> **Cemil:** *"Bu zaten müşteri verisi saklıyor olacağız mecburen. Bu
+> yüzden müşteri verisini dert etmeni istemiyorum. Burada amaç kullanıcı
+> hangi veriyi girmiş ve ne sorun yaşamış. Kullanıcı problem
+> yaşadığında arayacağı kişi olacağım ve ona neyi yanlış yaptığını
+> direkt söyleyebilmeliyim."*
+
+**K-052.2'yi geri alıyorum.** Orada *"değer yazılmaz, şekil yazılır"*
+demiş ve bunu bir elekle mekanik hâle getirmiştim.
+
+### 53.1 · Neden yanılmışım — koruduğunu sandığım şey zaten korunmuyordu
+
+Eleğin gerekçesi *"iz, müşteri verisinin ikinci kopyası olmasın"*dı.
+Ama **birinci kopya zaten var**: plaka, ad, adres, TC veritabanında
+duruyor (K-050). İz bunları yazmayınca veri korunmuyor — yalnızca
+**destek körleşiyor.**
+
+Telefondaki ustaya *"şurada plakayı yanlış yazmışsın"* diyebilmek için
+o plakayı görmek gerekiyor. Elek tam olarak bunu engelliyordu.
+
+> **Ders — K-050'nin dersinin ikizi:** *"Bu veri bize gerekmiyor"*
+> demek için tamircinin yaptığı her işi bilmek gerekiyordu. Bu kez
+> eksik bildiğim iş **destek**ti: ürünü kullananla telefonda konuşan
+> kişi Cemil olacak ve elinde ekranın o anki hâli olmalı.
+>
+> İki kez aynı yerden düştüm: gizlilik kaygısıyla verilen bir karar,
+> **kapsamı eksik biliniyorsa yanlış olur.**
+
+### 53.2 · Yeni kural
+
+| | K-052 (dün) | K-053 (bugün) |
+|---|---|---|
+| Girilen değer | elenir | **yazılır** |
+| Dokunulan düğmenin yazısı | yazılmaz | **yazılır** |
+| Kalan tek sınır | — | **boy**: değer 80 harfte kırpılır |
+
+Boy sınırının sebebi gizlilik değil **ölçü**: tek bir uzun not halka
+tamponu doldurup önceki adımları siler; iz yine kör kalır, bu kez
+fazlalıktan.
+
+### 53.3 · İzin işi üç tane
+
+1. **Destek** — usta arayınca ne girdiğini ve nerede takıldığını görmek.
+2. **Vazgeçme** — *"neden kullanmaktan vazgeçti"*: hangi adımdan sonra
+   bir daha dönmedi.
+3. **Zorlanma** — nerede yavaşlıyor, nerede geri gidip geliyor,
+   hangi alanı üç kez düzeltiyor.
+
+İkincisi ve üçüncüsü tek bir kullanıcıya bakarak görülmez; **zaman
+içinde** görünür. Bu yüzden saklama iki aşamalı.
+
+### 53.4 · Saklama (A-M41 KAPANDI)
+
+> **Cemil:** *"Gün sayısı bir yerden sonra istatistiğe dönebilir, süre
+> senin dediğin gibi olur."*
+
+| aşama | süre | ne durur |
+|---|---|---|
+| **Ayrıntı** | cihazda 7 gün · bizde 90 gün | olay olay, değerler dahil |
+| **İstatistik** | süresiz | ekran başına süre, tamamlanma oranı, şüphe sayıları, vazgeçme noktası |
+
+Ayrıntı desteğin işine yarar ve eskiyince değerini yitirir; istatistik
+**eskidikçe değer kazanır** — *"bu adımı altı ay önce %70 tamamlıyordu,
+şimdi %40"* ancak böyle görülür.
+
+### 53.5 · İzden çıkarım
+
+> **Cemil:** *"İzden çıkarım yapabilmeliyiz."*
+
+İz bir dosya yığını değil, **cevap veren bir şey** olmalı. Sorulacak
+sorular şunlar ve hepsi aynı olay akışından çıkar:
+
+* Hangi ekranda **en çok** vakit geçiyor? (yavaşlık)
+* Hangi adımdan sonra kullanıcı bir daha **dönmedi**? (vazgeçme)
+* Hangi alan **en çok** düzeltiliyor? (form yanlış soruyor)
+* Hangi hata **en çok kişide** var? (yaygın kusur)
+* Aynı şüphe kodu **hangi dükkânlarda** tekrar ediyor? (tasarım hatası,
+  kullanıcı hatası değil)
+
+**Açık madde A-M42:** bu soruların cevabı nerede görünecek? Öneri: ayrı
+bir ekran değil, **tek sayfalık bir özet** — dükkân listesi, yanında
+"zorlanma" işareti. Ürüne değil, bizim tarafa ait.
+
+---
+
+## K-052 · İz kaydı: giriyor, ustaya görünmez (16.09.2026) · ⚠️ 52.2 **K-053 ile geri alındı**
 
 > **Cemil:** *"Log kaydı, nereye tıklanmış, ne yapılmış adım adım,
 > hatalar, başarısızlıklar… Mantığa aykırı işlemleri de
@@ -3892,7 +3978,7 @@ oradan bakılır.
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
 | **A-M40** | **İz kaydı bize ne zaman gelsin?** (a) yalnız usta *"sorun bildir"* derse, (b) günde bir kez kısır özet, (c) ikisi birden (K-052, IZ-KAYDI §6) | Önerim **(c)**: kısır özet zorlanmayı gösterir, ayrıntı yalnız istendiğinde gider |
-| **A-M41** | **İz saklama süresi.** Önerim: cihazda 7 gün, bizde 90 gün — A-M36'daki KVKK aydınlatmasıyla aynı cümlede söylenmeli | Cemil onayına açık |
+| **A-M42** | İzden çıkarım nerede görünecek? Öneri: ayrı ekran değil, **tek sayfalık özet** — dükkân listesi + "zorlanma" işareti; ürüne değil bizim tarafa ait (K-053.5) | Cemil onayına açık |
 | **A-M39** | **Ses kaydı alınacak mı?** Kayıt sayfası hazır (`ses-kaydet.html`): telefonla, dükkânda, 40 cümle + 20 sn dükkân sesi; kalite anında ölçülüyor, hepsi tek zip çıkıyor. Kaydedilmezse ses tarafı ÖLÇÜLEMEZ ve *"Web Speech yetiyor"* bir tahmin olarak kalır (YAPAY-ZEKA §2.1–2.2) | Önerim: bir öğleden sonra — alet yazıldı, geriye konuşmak kaldı |
 | **A-M38** | Ruhsat fotoğrafında **TC/vergi no kadrajın dışında kalıyor** (46 fotoğrafın 29'unda yok, K-051). Okuma ekranı *"sağ sayfa da görünsün"* diye yönlendirsin mi, yoksa fatura alanları müşteri başına **bir kez elle** mi girilsin? | Önerim: ikisi birden — ekran yönlendirsin, gelmezse elle giriş |
 | **A-M37** | **Fatura kesmek** MUH kapsamına giriyor mu? Bu turda yalnız fatura ALANLARI tutuldu; fatura kesmek K-022'nin "fatura yok · KDV yok · e-belge yok" sınırını değiştirir (K-050.5) | Alanlar evet, kesmek **ayrı karar** — MUH cevabıyla birlikte |

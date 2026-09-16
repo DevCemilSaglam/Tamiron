@@ -1640,47 +1640,43 @@ function stilMetni() {
     }
   }
 
-    /* 47) IZ KAYDI — YAZIYOR MU, VE ICINDE MUSTERI VERISI VAR MI (16.09.2026)
-     Cemil: "Log kaydi, nereye tiklanmis, ne yapilmis adim adim,
-     hatalar, basarisizliklar... Mantiga aykiri islemleri de
-     gorebilmeliyiz."
+    /* 47) IZ KAYDI — YAZIYOR MU, VE GIRILEN DEGER ICINDE MI (16.09.2026)
+     Cemil: "Kullanici problem yasadiginda arayacagi kisi olacagim ve
+     ona neyi yanlis yaptigini direkt soyleyebilmeliyim."
 
-     YENI HATA SINIFI: OLCEN SEYIN KENDISI SIZDIRIYOR. Iz kaydinin
-     isi ustayi uzaktan gormek; bedeli MUSTERI VERISINI IKINCI BIR
-     YERE KOPYALAMAK olamaz. Bu iki yonden bozulur:
+     YENI HATA SINIFI: IZ VAR AMA KOR. Iki turlu kor olur ve ikisi de
+     ayni sonucu verir -- telefondaki ustaya yardim edilemez:
 
-       a) iz HIC yazmaz  -> uzaktan hicbir sey gorunmez, sessiz koruk
-       b) iz FAZLA yazar -> plaka, ad, telefon ize dusser ve her
-          yedek, her gonderim, her hata raporu onlari tasir
+       a) BOSLUKTAN: girilen deger ize dusmez. Ekran gecisleri gorunur,
+          dokunuslar gorunur, ama "su alana sunu yazmissin" denemez.
+          Ilk surumde tam boyleydi: bir elek degerleri bicimce
+          eliyordu. Cemil kurali bozdu (K-053) -- musteri verisi zaten
+          tutuluyor, elek yalnizca DESTEGI kor ediyordu.
+       b) FAZLALIKTAN: tek bir uzun not halka tamponu doldurur ve
+          onceki adimlari siler. Usta "bir seye bastim, bozuldu" der;
+          izde yalnizca o notun kendisi vardir.
 
-     (b) sinsi olan: calisiyor gibi gorunur, hatta DAHA iyi calisir --
-     ayrintili iz hata ayiklamayi kolaylastirir. Yanlisligi ancak
-     kimse bakmazken anlasilir. O yuzden burada TOHUM VERININ KENDISI
-     ize karsi aranir: prototipte gercek plakalar ve musteri adlari
-     var; birisi ize dustuyse test kirmizi yanar.
-
-     Iz.guvenli() zaten bicimce eliyor (sayi, dogru/yanlis, kucuk
-     harfli kisa kod). Bu test o elegin DELINMEDIGINI olcuyor. */
+     Bu test ikisini de olcuyor: deger DUSUYOR mu, ve KIRPILIYOR mu. */
   if (typeof Iz === 'undefined') {
     ek('IZ-KAYDI', '(kabuk)', 'Iz modulu yok — uzaktan hicbir sey gorunmez');
   } else {
     Iz.sil();
+    var izTus = null;
     if (typeof Ekran !== 'undefined' && Ekran.ac) {
       Ekran.sifirla();
       Ekran.ac('araclar');
       Ekran.ac('musteriler');
-      var tus = document.querySelector('.botbar [data-nav="ana"]');
-      if (tus) tus.click();
+      izTus = document.querySelector('.botbar [data-nav="ana"]');
+      if (izTus) izTus.click();
     }
     var o = Iz.ozet();
     if (!o.ekran) ek('IZ-KAYDI', '(kabuk)', 'ekran gecisleri ize dusmuyor');
-    if (tus && !o.dokunus) ek('IZ-KAYDI', '(kabuk)', 'dokunuslar ize dusmuyor');
+    if (izTus && !o.dokunus) ek('IZ-KAYDI', '(kabuk)', 'dokunuslar ize dusmuyor');
 
-    /* Hata yolu: yakalanan hata ize dusuyor mu? */
     Iz.hata('deneme', { name: 'TypeError' });
     if (!Iz.ozet().hata) ek('IZ-KAYDI', '(kabuk)', 'hatalar ize dusmuyor');
 
-    /* Sunhe kurali: ayni ekrana kisa surede uc kez donmek */
+    /* Suphe: ayni ekrana kisa surede uc kez donmek */
     Iz.sil();
     if (typeof Ekran !== 'undefined' && Ekran.ac) {
       Ekran.ac('araclar'); Ekran.ac('home');
@@ -1691,39 +1687,40 @@ function stilMetni() {
       }
     }
 
-    /* ---- ASIL OLCUM: ize musteri verisi sizmis mi ---- */
-    var metin = JSON.stringify(Iz.dok());
-    var gizliler = [];
-    if (typeof ARACLAR !== 'undefined') {
-      ARACLAR.forEach(function (a) {
-        if (a.plaka) gizliler.push(['plaka', a.plaka]);
-        if (a.sahip) gizliler.push(['sahip', a.sahip]);
-        if (a.telefon) gizliler.push(['telefon', a.telefon]);
-        if (a.tcVergiNo) gizliler.push(['tc', a.tcVergiNo]);
-        if (a.adres) gizliler.push(['adres', a.adres]);
-      });
-    }
-    if (typeof kisileriTuret === 'function') {
-      kisileriTuret().forEach(function (k) { if (k.ad) gizliler.push(['musteri', k.ad]); });
-    }
-    gizliler.forEach(function (g) {
-      var tur = g[0], deger = String(g[1]);
-      if (deger.length < 4) return;              /* cok kisa deger tesadufen eslesir */
-      if (metin.indexOf(deger) >= 0) {
-        ek('IZ-SIZINTI', '(gizlilik)', tur + ' ize dusmus: "' + deger + '"');
+    /* ---- ASIL OLCUM 1: girilen deger ize dusuyor mu ---- */
+    Iz.sil();
+    var alanDeneme = document.querySelector('.screen input[type="text"], .screen input:not([type])');
+    if (alanDeneme) {
+      var eski = alanDeneme.value;
+      alanDeneme.value = '34 ABC 123';
+      alanDeneme.dispatchEvent(new Event('change', { bubbles: true }));
+      alanDeneme.value = eski;
+      var d = JSON.stringify(Iz.dok());
+      if (d.indexOf('34 ABC 123') < 0) {
+        ek('IZ-KAYDI', '(kabuk)',
+           'girilen deger ize DUSMUYOR — destek "ne yazdin" diye sormak zorunda kalir');
       }
-    });
+      if (!Iz.ozet().alan) ek('IZ-KAYDI', '(kabuk)', 'alan degisikligi sayilmiyor');
+    }
 
-    /* Elek dogrudan da sinaniyor: bir plaka Iz'e VERILSE bile gecmemeli.
-       Ustteki arama yalnizca "bugun sizmiyor" der; bu satir "yarin da
-       sizamaz" der. */
-    if (typeof ARACLAR !== 'undefined' && ARACLAR.length && ARACLAR[0].plaka) {
-      Iz.sil();
-      Iz.yaz('deneme', 'sizinti-denemesi', { plaka: ARACLAR[0].plaka, sahip: 'Ali Yilmaz' });
-      if (JSON.stringify(Iz.dok()).indexOf(ARACLAR[0].plaka) >= 0) {
-        ek('IZ-SIZINTI', '(gizlilik)', 'Iz.guvenli() plakayi geciriyor — elek delik');
-      }
+    /* ---- ASIL OLCUM 2: uzun deger kirpiliyor mu ---- */
+    Iz.sil();
+    var uzun = new Array(600).join('x');
+    Iz.alan('denemeAlani', uzun);
+    var yazilan = (Iz.dok()[0] || {}).ek || {};
+    if (String(yazilan.deger || '').length > Iz.KIRP + 1) {
+      ek('IZ-KAYDI', '(kabuk)',
+         'uzun deger kirpilmiyor (' + String(yazilan.deger).length +
+         ' harf) — tek not halka tamponu doldurup onceki adimlari siler');
     }
+
+    /* ---- ASIL OLCUM 3: halka tampon tavani tutuyor mu ---- */
+    Iz.sil();
+    for (var iz_i = 0; iz_i < 400; iz_i++) Iz.yaz('deneme', 'd' + iz_i);
+    if (Iz.dok().length > 300) {
+      ek('IZ-KAYDI', '(kabuk)', 'halka tampon tavani asiliyor: ' + Iz.dok().length);
+    }
+
     Iz.sil();
     if (typeof Ekran !== 'undefined' && Ekran.sifirla) Ekran.sifirla();
   }

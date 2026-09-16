@@ -1,4 +1,4 @@
-# İZ KAYDI — uzaktan görmek, veriyi taşımadan
+# İZ KAYDI — uzaktan görmek, telefonda yardım edebilmek
 
 > **Cemil, 16.09:** *"Log kaydı, nereye tıklanmış, ne yapılmış adım
 > adım, hatalar, başarısızlıklar. Kullanıcı bir hata aldığında, yanlış
@@ -24,77 +24,67 @@ budur; geri kalan her şey bunun nasıl yapılacağı.
 
 ---
 
-## 1 · Asıl tehlike: ölçen şeyin kendisi sızdırması
+## 1 · Ne yazılıyor — DEĞERLER DAHİL (K-053)
 
-Bir iz kaydı iki yönden bozulur:
+> **Cemil, 16.09:** *"Bu zaten müşteri verisi saklıyor olacağız
+> mecburen… Amaç kullanıcı hangi veriyi girmiş ve ne sorun yaşamış.
+> Kullanıcı problem yaşadığında arayacağı kişi olacağım ve ona neyi
+> yanlış yaptığını direkt söyleyebilmeliyim."*
 
-| | Ne olur | Nasıl anlaşılır |
+İlk sürümde değerleri biçimce eleyen bir kural yazmıştım (K-052.2).
+**Geri alındı.** Eleğin koruduğunu sandığı şey zaten korunmuyordu —
+plaka, ad, adres veritabanında duruyor. Elek yalnızca **desteği kör**
+ediyordu: telefondaki ustaya *"şurada plakayı yanlış yazmışsın"*
+diyebilmek için o plakayı görmek gerekiyor.
+
+Kalan tek sınır **boy**: değer 80 harfte kırpılıyor. Sebebi gizlilik
+değil ölçü — tek bir uzun not halka tamponu doldurup önceki adımları
+siler ve iz yine kör kalır, bu kez fazlalıktan.
+
+### İzin üç işi
+
+| iş | ne cevaplar | ne gerekir |
 |---|---|---|
-| **Az yazar** | Uzaktan hiçbir şey görünmez | Kolay: hiç veri gelmez |
-| **Çok yazar** | Plaka, ad, telefon, TC ize düşer | **Zor: hiç fark edilmez** |
+| **Destek** | *"Ne yaptın da bozuldu?"* | son adımlar, girilen değerler |
+| **Vazgeçme** | *"Neden bıraktı?"* | hangi adımdan sonra dönmedi |
+| **Zorlanma** | *"Nerede takılıyor?"* | süre, geri-ileri, tekrar düzeltilen alan |
 
-İkincisi sinsi, çünkü *daha iyi çalışır* — ayrıntılı iz hata ayıklamayı
-kolaylaştırır. Yanlışlığı ancak kimse bakmazken anlaşılır: her yedek,
-her hata raporu, her destek gönderimi o veriyi taşır. K-050 ve K-051
-ile TC/adres zaten **tutuluyor**; iz kaydı onların ikinci bir kopyasını
-üretmemeli.
-
-### Kural: **değer yazılmaz, şekil yazılır**
-
-```
-  YANLIŞ   plaka "34 ABC 123" -> "34 QBC 123" olarak düzeltildi
-  DOĞRU    plaka alanı 3 kez düzeltildi
-```
-
-Ve bu bir temenni değil, **mekanik**: `Iz.guvenli()` yalnız sayı,
-doğru/yanlış ve küçük harfli kısa kod geçirir. Plaka ("34 ABC 123"),
-ad ("Ali Yılmaz"), telefon ("0532…") biçimce elenir — *unutmakla
-değil, geçememekle.*
-
-47. sağlık denetimi bunu iki yönden ölçüyor:
-* tohum verideki **her plaka, sahip, telefon, TC, adres** izde aranır
-  → bugün sızmıyor;
-* eleğe **bilerek bir plaka verilir** → yarın da sızamaz.
-
-Negatif doğrulama yapıldı: elek delindiğinde denetim
-*"Iz.guvenli() plakayı geçiriyor — elek delik"* diyor.
+Birincisi tek kullanıcıya bakarak görülür; öteki ikisi **zaman
+içinde** görünür. Saklama bu yüzden iki aşamalı (§2).
 
 ---
 
-## 2 · İki katman — dükkânda ayrıntılı, bizde kısır
+## 2 · Saklama — ayrıntı eskir, istatistik olgunlaşır
 
-```
-   ┌── DÜKKÂNDA (cihazda) ──────────────┐   ┌── BİZDE ─────────────┐
-   │ son N olay, AYRINTILI              │   │ yalnız ŞEKİL         │
-   │ ustanın kendi verisi               │──▶│ ekran · dokunuş      │
-   │ dükkândan çıkmaz                   │   │ hata sınıfı · süre   │
-   │                                    │   │ şüphe kodu           │
-   │ "sorun bildir" derse EK OLARAK     │   │ değer YOK            │
-   │ gönderilir — onayıyla              │   └──────────────────────┘
-   └────────────────────────────────────┘
-```
+| aşama | süre | ne durur |
+|---|---|---|
+| **Ayrıntı** | cihazda 7 gün · bizde 90 gün | olay olay, değerler dahil |
+| **İstatistik** | süresiz | ekran süresi, tamamlanma oranı, şüphe sayısı, vazgeçme noktası |
 
-Ayrımın sebebi: hata ayıklamak için bazen değere ihtiyaç var (*"hangi
-plakayı yanlış duydu"*). O bilgi **dükkânda** durur ve ancak usta
-*"sorun bildir"* derse, gördüğü bir özetle birlikte gelir. Varsayılan
-akışta bize giden izde müşteri verisi yoktur.
+Ayrıntı desteğin işine yarar ve eskiyince değerini yitirir. İstatistik
+tersine, **eskidikçe değer kazanır**: *"bu adımı altı ay önce %70
+tamamlıyordu, şimdi %40"* ancak böyle görülür.
 
 ---
 
-## 3 · Ne yazılıyor
+## 3 · Olay türleri
 
 | tür | ne demek | örnek |
 |---|---|---|
 | `ekran` | ekran açıldı | `ekran: kayit` |
 | `sure` | ekranda geçen süre | `sure: kayit, sn: 48.3` |
-| `dokunus` | neye dokunuldu (**cinsi**, kimliği değil) | `dokunus: nav-ana` |
+| `dokunus` | neye dokunuldu — cinsi **ve yazısı** | `dokunus: tus, yazi: "Teslim et"` |
+| `alan` | **hangi alana ne girildi**, kaçıncı kez | `alan: plaka, deger: "34 QBC 123", kez: 2` |
 | `hata` | yakalanan ya da yakalanmayan hata | `hata: ruhsat, sinif: typeerror` |
 | `suphe` | mantığa aykırı ya da zorlanma işareti | `suphe: kararsiz-gezinme` |
 
-**Dokunuşta metin yazılmıyor.** Düğmenin metninde plaka olabilir
-(*"34 ABC 123 · Ali Yılmaz"* kartı), id'sinde de olabilir. Yazılan şey
-**sınıf adı** — sınıf sözlüğünden (K-008) gelir, yapıyı anlatır,
-içeriği anlatmaz.
+`alan` olayı **tek bir dinleyiciden** çıkıyor (`change`, yakalama
+evresinde). Ekran ekran çağrı serpiştirilseydi biri unutulurdu — ve
+unutulan, tam da aranan alan olurdu.
+
+`kez` sayacı kendi başına bir işaret: aynı alan üçüncü kez
+değiştirilince `alan-tekrar-duzeltildi` şüphesi yazılıyor. *"Formu üç
+kez düzeltmek"*, form yanlış soruyor demektir.
 
 ---
 
@@ -132,23 +122,35 @@ kuralı *çağıran yerde* tanımlanır, `Iz.supheli(kod)` ile kaydedilir.
 
 ## 5 · Bugün prototipte ne var
 
-* `betik/00-iz.js` — halka tampon (son 300 olay), elek, şüphe kuralları
+* `betik/00-iz.js` — halka tampon (son 300 olay), 80 harflik kırpma,
+  şüphe kuralları
 * `goster()` tek geçiş noktasına bağlı — ekran ekran çağrı
   serpiştirilseydi biri unutulur ve iz **sessizce eksilirdi**
+* girilen değerler tek `change` dinleyicisinden düşüyor
 * `ac`/`ciz` hataları artık yalnız konsola değil ize de düşüyor
   *(konsolu kimse görmüyordu)*
 * yakalanmamış hatalar ve sözler (`unhandledrejection`) de ize düşüyor
-* 47. sağlık denetimi: yazıyor mu · sızdırıyor mu
+* **47. sağlık denetimi** üç şeyi ölçüyor ve üçü de *"iz var ama kör"*
+  hata sınıfının yüzleri:
+  1. girilen değer ize düşüyor mu *(boşluktan körlük)*
+  2. uzun değer kırpılıyor mu *(fazlalıktan körlük — tek not tamponu
+     doldurup önceki adımları siler)*
+  3. halka tampon tavanı tutuyor mu
+
+  Negatif doğrulama: değer yazımı kesildiğinde denetim *"girilen değer
+  ize DÜŞMÜYOR — destek 'ne yazdın' diye sormak zorunda kalır"* deyip
+  bulgu verdi; geri alınınca 0'a döndü.
 
 ---
 
 ## 6 · Cemil'in kararına açık
 
 **A-M40 — İzin gönderilmesi.** Cihazdaki iz bize *ne zaman* gelir?
-Seçenekler: (a) yalnız usta *"sorun bildir"* derse, (b) günde bir kez
-kısır özet kendiliğinden, (c) ikisi birden. Önerim **(c)**: kısır özet
-sessiz kalır ve zorlanmayı gösterir; ayrıntı yalnız istendiğinde gider.
+(a) yalnız usta *"sorun bildir"* derse, (b) günde bir kez özet
+kendiliğinden, (c) ikisi birden. Önerim **(c)**.
 
-**A-M41 — Saklama süresi.** İz ne kadar durur? Önerim: cihazda **son 7
-gün**, bizde **90 gün**. A-M36'daki KVKK aydınlatmasıyla aynı cümlede
-söylenmeli.
+**A-M42 — Çıkarım nerede görünecek?** *"İzden çıkarım yapabilmeliyiz"*
+dedin. Önerim ayrı bir ekran değil, **tek sayfalık özet**: dükkân
+listesi, yanında zorlanma işareti; ürüne değil bizim tarafa ait.
+
+*A-M41 (saklama süresi) kapandı — §2.*

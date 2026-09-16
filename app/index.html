@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-16 11:33
+  Üretim: 2026-09-16 11:52
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -4433,16 +4433,23 @@ kirpilsin. */
    destek aramaz; sessizce bırakır. İz kaydı, o sessizliği ölçüye
    çevirir.
 
-   ⚠️ İZ KAYDI USTANIN İŞİ DEĞİL, BİZİM İŞİMİZ. Yedi işten hiçbirine
-   hizmet etmiyor (geri bildirim §7). O yüzden ustaya **görünmez** ve
-   ona **hiçbir şeye mal olmaz**: ekran yok, ayar yok, soru yok.
+   ⚠️ DEĞERLER YAZILIR (K-053 — 16.09'da kuralı GERİ ALDIM).
+   İlk sürüm değerleri biçimce eliyordu: plaka, ad, girilen metin ize
+   düşmesin diye. Cemil kuralı bozdu ve gerekçesi benimkinden güçlü:
 
-   ⚠️ DEĞER YAZILMAZ — ŞEKİL YAZILIR. İz kaydı, müşteri verisinin
-   ikinci bir kopyası olamaz. "34 ABC 123 → 34 QBC 123" yazmak yerine
-   "plaka alanı 3 kez düzeltildi" yazılır. Bu bir temenni değil,
-   MEKANİK: `guvenli()` sayı, doğru/yanlış ve küçük harfli kısa kodlar
-   dışında hiçbir şeyi geçirmez. Plaka, ad, telefon biçimce elenir —
-   unutmakla değil, geçememekle. */
+     *"Bu zaten müşteri verisi saklıyor olacağız mecburen… Burada amaç
+     kullanıcı hangi veriyi girmiş ve ne sorun yaşamış. Kullanıcı
+     problem yaşadığında arayacağı kişi olacağım ve ona neyi yanlış
+     yaptığını direkt söyleyebilmeliyim."*
+
+   Eleğin koruduğu şey zaten korunmuyordu — müşteri verisi veritabanında
+   duruyor. Elek yalnız **desteği kör** ediyordu: telefondaki ustaya
+   "şurada plakayı yanlış yazmışsın" diyebilmek için o plakayı görmek
+   gerekiyor.
+
+   Kalan tek kural ÖLÇÜ: değer kırpılır (KIRP), çünkü uzun bir not
+   halka tamponu tek başına doldurup ötekileri siler — o zaman iz
+   yine kör olur, bu kez fazladan. */
 
 var Iz = (function () {
   'use strict';
@@ -4454,12 +4461,17 @@ var Iz = (function () {
   var ekranSayaci = {};         /* şüphe kuralı: aynı ekrana kaç kez */
   var hataSayaci = {};
 
-  /* Yalnız ŞEKİL geçer. Değer taşıyan her şey burada ölür. */
+  var KIRP = 80;                /* bir değerden yazılacak en fazla harf */
+
+  /* Değer geçer; yalnız BOYU kırpılır. Uzun bir not halka tamponu tek
+     başına doldurursa iz yine kör kalır — bu kez fazlalıktan. */
   function guvenli(d) {
+    if (d === null || d === undefined) return null;
     if (typeof d === 'number' && isFinite(d)) return Math.round(d * 100) / 100;
     if (typeof d === 'boolean') return d;
-    if (typeof d === 'string' && /^[a-z][a-z0-9-]{0,23}$/.test(d)) return d;
-    return null;
+    var m = String(d);
+    if (!m.length) return null;
+    return m.length > KIRP ? m.slice(0, KIRP) + '…' : m;
   }
 
   function temizle(ek) {
@@ -4509,6 +4521,16 @@ var Iz = (function () {
 
   function dokunus(kod) { yaz('dokunus', kod); }
 
+  /* Girilen değer. Destek çağrısının cevabı burada: "şu alana şunu
+     yazmışsın". Aynı alan arka arkaya değişirse sayılıyor — "plaka
+     alanını üç kez düzeltti" tek başına bir işaret. */
+  var alanSayaci = {};
+  function alan(ad, deger) {
+    var n = alanSayaci[ad] = (alanSayaci[ad] || 0) + 1;
+    yaz('alan', ad, { deger: deger, kez: n });
+    if (n === 3) yaz('suphe', 'alan-tekrar-duzeltildi', { alan: ad });
+  }
+
   function hata(yer, e) {
     var sinif = (e && e.name ? String(e.name) : 'hata').toLowerCase()
       .replace(/[^a-z0-9-]/g, '-').slice(0, 24);
@@ -4524,25 +4546,29 @@ var Iz = (function () {
 
   /* ---- dışarı ---- */
   function dok() { return olaylar.slice(); }
-  function sil() { olaylar = []; ekranSayaci = {}; hataSayaci = {}; sonEkran = null; }
+  function sil() {
+    olaylar = []; ekranSayaci = {}; hataSayaci = {}; alanSayaci = {}; sonEkran = null;
+  }
   function ozet() {
-    var s = { olay: olaylar.length, ekran: 0, dokunus: 0, hata: 0, suphe: 0 };
+    var s = { olay: olaylar.length, ekran: 0, dokunus: 0, alan: 0, hata: 0, suphe: 0 };
     for (var i = 0; i < olaylar.length; i++) {
       if (s[olaylar[i].tur] !== undefined) s[olaylar[i].tur]++;
     }
     return s;
   }
 
-  /* Dokunulan şeyin KİMLİĞİ değil, CİNSİ yazılır.
-     Düğmenin metnini yazmak cazip ama metinde plaka olabilir ("34 ABC
-     123 · Ali Yılmaz" kartı); id'de de olabilir. Sınıf adı ise sınıf
-     sözlüğünden (K-008) gelir — yapıyı anlatır, içeriği anlatmaz. */
+  /* Dokunulan şeyin hem CİNSİ hem YAZISI. Yazı, telefondaki ustaya
+     "hangi düğmeye bastın" diye sormayı gereksiz kılıyor. */
   function dokunusKodu(el) {
     var nav = el.getAttribute && el.getAttribute('data-nav');
-    if (nav) return guvenli('nav-' + String(nav).toLowerCase()) || 'nav';
     var sinif = el.className && typeof el.className === 'string'
       ? el.className.split(/\s+/)[0] : '';
-    return guvenli(String(sinif || el.tagName || '').toLowerCase()) || 'bilinmeyen';
+    return nav ? 'nav-' + String(nav).toLowerCase()
+               : (String(sinif || el.tagName || '').toLowerCase() || 'bilinmeyen');
+  }
+  function dokunusYazisi(el) {
+    var y = (el.textContent || '').trim().replace(/\s+/g, ' ');
+    return y ? guvenli(y) : null;
   }
 
   /* Yakalanmamış hatalar da ize düşsün: bunlar bugün hiçbir yere
@@ -4551,7 +4577,24 @@ var Iz = (function () {
     document.addEventListener('click', function (o) {
       var t = o.target && o.target.closest
         ? o.target.closest('button, a, [data-nav], [role="button"]') : null;
-      if (t) dokunus(dokunusKodu(t));
+      if (t) yaz('dokunus', dokunusKodu(t), { yazi: dokunusYazisi(t) });
+    }, true);
+
+    /* GİRİLEN DEĞER — Cemil'in asıl istediği. "Kullanıcı hangi veriyi
+       girmiş": alan adı + yazdığı. Tek dinleyici, her ekran için:
+       ekran ekran çağrı serpiştirilseydi biri unutulur ve tam da
+       aranan alan izde eksik olurdu. */
+    document.addEventListener('change', function (o) {
+      var t = o.target;
+      if (!t || !t.tagName) return;
+      var tur = String(t.tagName).toLowerCase();
+      if (tur !== 'input' && tur !== 'select' && tur !== 'textarea') return;
+      var alanAdi = t.id || t.name || t.getAttribute('data-alan') || tur;
+      if (t.type === 'checkbox' || t.type === 'radio') {
+        alan(alanAdi, t.checked);
+      } else {
+        alan(alanAdi, t.value);
+      }
     }, true);
 
     window.addEventListener('error', function (o) {
@@ -4563,8 +4606,8 @@ var Iz = (function () {
   }
 
   return {
-    yaz: yaz, ekran: ekran, dokunus: dokunus, hata: hata, supheli: supheli,
-    dok: dok, sil: sil, ozet: ozet, guvenli: guvenli
+    yaz: yaz, ekran: ekran, dokunus: dokunus, alan: alan, hata: hata,
+    supheli: supheli, dok: dok, sil: sil, ozet: ozet, guvenli: guvenli, KIRP: KIRP
   };
 })();
 
@@ -11591,7 +11634,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>ca6bcd90</b><br>' +
+      'Sürüm <b>074cee96</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
