@@ -1,0 +1,503 @@
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ses Kaydı — Tamiron</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+/* Renk ve tipografi projenin kendi sisteminden (docs/tokens.css).
+   Bu bir ölçüm aleti ama Tamiron'un yüzüyle görünüyor: usta dükkânda
+   yabancı bir ekran görmesin. */
+:root {
+  --bg: #EDF2F9; --surface: #FFFFFF; --surface-2: #E2EBF5;
+  --line: #D3DEEB; --text: #0F1E30; --muted: #44556F; --faint: #6B7C95;
+  --primary: #1C4E86; --on-primary: #FFFFFF;
+  --warn: #9C6B12; --warn-bg: #F6EDD9;
+  --ok: #1F8A5B; --ok-bg: #E3F2EA;
+  --crit: #C4432E; --crit-bg: #FBE7E2;
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-body: "Instrument Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A1220; --surface: #14202F; --surface-2: #172436;
+    --line: #2A3B51; --text: #E7EEF6; --muted: #A9B8CB; --faint: #8296AE;
+    --primary: #4D8FD6; --on-primary: #06121F;
+    --warn: #E0A64B; --warn-bg: #2E2413;
+    --ok: #4FC98A; --ok-bg: #10281D;
+    --crit: #F0785F; --crit-bg: #2E1712;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text);
+       font-family: var(--font-body); font-size: 16px; line-height: 1.5; }
+.sar { max-width: 620px; margin: 0 auto;
+       padding: 0 16px calc(24px + env(safe-area-inset-bottom)); }
+
+.ust { position: sticky; top: 0; z-index: 5; background: var(--bg);
+       padding: 14px 0 10px; border-bottom: 1px solid var(--line); }
+h1 { font-family: var(--font-display); font-size: 19px; margin: 0 0 8px; }
+.ilerleme { display: flex; align-items: center; gap: 10px; }
+.cubuk { flex: 1; height: 8px; border-radius: 99px; background: var(--surface-2); overflow: hidden; }
+.cubuk i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .25s; }
+.sayac { font-family: var(--font-mono); font-size: 13px; color: var(--muted);
+         font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ozet { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+.rozet { font-size: 12px; padding: 3px 9px; border-radius: 99px;
+         border: 1px solid var(--line); color: var(--muted); }
+.rozet.iyi { background: var(--ok-bg); color: var(--ok); border-color: transparent; }
+.rozet.zayif { background: var(--warn-bg); color: var(--warn); border-color: transparent; }
+.rozet.kotu { background: var(--crit-bg); color: var(--crit); border-color: transparent; }
+
+.kart { background: var(--surface); border: 1px solid var(--line);
+        border-radius: 14px; padding: 18px; margin-top: 16px; }
+.no { font-family: var(--font-mono); font-size: 13px; color: var(--primary); font-weight: 600; }
+.baglam { font-size: 12px; color: var(--muted); }
+/* Cümle BÜYÜK: usta telefonu tezgâha koyup okuyacak, eline almayacak. */
+.cumle { font-family: var(--font-display); font-size: 26px; line-height: 1.32;
+         font-weight: 600; margin: 10px 0 4px; text-wrap: balance; }
+.ipucu { font-size: 13px; color: var(--muted); margin: 0; }
+
+.eylem { display: grid; gap: 10px; margin-top: 18px; }
+button { font: inherit; font-weight: 600; border-radius: 12px; cursor: pointer;
+         border: 1px solid var(--line); background: var(--surface-2); color: var(--text);
+         /* Eldivenli parmak: 56 px'in altı dükkânda ıskalanıyor. */
+         min-height: 56px; padding: 0 18px; }
+button:disabled { opacity: .45; cursor: default; }
+button.ana { background: var(--primary); border-color: var(--primary); color: var(--on-primary);
+             font-size: 18px; min-height: 64px; }
+button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff; }
+.ikili { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.uclu { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.uclu button { padding: 0 8px; font-size: 15px; }
+
+.sonuc { margin-top: 14px; border-radius: 12px; padding: 12px 14px; font-size: 14px; }
+.sonuc.iyi { background: var(--ok-bg); color: var(--ok); }
+.sonuc.zayif { background: var(--warn-bg); color: var(--warn); }
+.sonuc.kotu { background: var(--crit-bg); color: var(--crit); }
+.sonuc b { display: block; font-size: 15px; margin-bottom: 2px; }
+.olcum { font-family: var(--font-mono); font-size: 12px; opacity: .8; margin-top: 6px; }
+
+.seviye { height: 10px; border-radius: 99px; background: var(--surface-2);
+          overflow: hidden; margin-top: 12px; }
+.seviye i { display: block; height: 100%; width: 0; background: var(--ok); }
+.seviye.yuksek i { background: var(--crit); }
+
+.uyari { background: var(--warn-bg); color: var(--warn); border-radius: 12px;
+         padding: 12px 14px; font-size: 14px; margin-top: 14px; }
+.alt { margin-top: 22px; display: grid; gap: 10px; }
+.kucuk { font-size: 13px; color: var(--muted); }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="sar">
+  <header class="ust">
+    <h1>Ses Kaydı</h1>
+    <div class="ilerleme">
+      <div class="cubuk"><i id="cubuk"></i></div>
+      <span class="sayac" id="sayac">0 / 0</span>
+    </div>
+    <div class="ozet" id="ozet"></div>
+  </header>
+
+  <div id="govde"></div>
+
+  <div class="alt">
+    <button id="indir">Hepsini indir</button>
+    <p class="kucuk" id="notu">
+      Kayıtlar yalnız bu telefonda duruyor. Bitince “Hepsini indir”e bas
+      ve çıkan dosyayı bana ver.
+    </p>
+  </div>
+</div>
+
+<script src="ses-olcu.js"></script>
+<script>
+/* ============ SES KAYIT SAYFASI ============
+   Cemil, 16.09: *"Test verisi kendimiz oluşturabilir miyiz ses için."*
+
+   Evet — ve tek eksik buydu. `ses-seti.json`'daki 40 cümlenin METNİ
+   var, SESİ yok; ses tarafı bu yüzden ölçülemiyordu (A-M39).
+
+   Bu sayfa cümleleri tek tek gösterir, kaydeder, kaydın kalitesini
+   ANINDA söyler ve hepsini tek dosya hâlinde çıkarır. Dükkânda, gerçek
+   gürültünün altında kaydedilmesi ölçümün ta kendisidir: sessiz bir
+   odada kaydedilen 40 cümle, dükkânda çalışmayan bir motoru "çalışıyor"
+   gösterir.
+
+   ⚠️ MİKROFON TEMİZLİĞİ KAPALI (echoCancellation/noiseSuppression/
+   autoGainControl = false). Açık bırakılsaydı tarayıcının kendi
+   gürültü temizliğini ölçmüş olurduk, dükkânı değil. Temizlenmiş sesi
+   sonradan kirletmek mümkün; kirli sesi geri getirmek değil. */
+(function () {
+  'use strict';
+
+  var HEDEF_HIZ = 16000;            /* konuşma tanıma servislerinin istediği */
+  var CUMLELER = [];
+  var sira = 0;
+  var kayitlar = {};                /* id -> {wav: Blob, sonuc, olcum} */
+  var akim = null, ctx = null, isleyici = null, kaynak = null;
+  var toplayici = null, kaydediyor = false, calan = null;
+
+  var govde = document.getElementById('govde');
+
+  /* ---------- yardımcılar ---------- */
+  function el(id) { return document.getElementById(id); }
+  function html(x) {
+    return String(x == null ? '' : x).replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  /* ---------- kayıt ---------- */
+  function mikrofonAc() {
+    return navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: 1,
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl: false
+      }
+    });
+  }
+
+  function baslat() {
+    return mikrofonAc().then(function (s) {
+      akim = s;
+      ctx = new (window.AudioContext || window.webkitAudioContext)();
+      kaynak = ctx.createMediaStreamSource(akim);
+      /* ScriptProcessor eski sayılıyor ama her telefonda var ve burada
+         gereken tek şey ham örnekler. AudioWorklet ayrı dosya ister;
+         bu sayfanın çevrimdışı da açılması gerekiyor. */
+      isleyici = ctx.createScriptProcessor(4096, 1, 1);
+      isleyici.onaudioprocess = function (o) {
+        var g = o.inputBuffer.getChannelData(0);
+        if (kaydediyor && toplayici) toplayici.push(new Float32Array(g));
+        seviyeCiz(g);
+      };
+      kaynak.connect(isleyici);
+      isleyici.connect(ctx.destination);
+    });
+  }
+
+  function seviyeCiz(g) {
+    var t = 0, tepe = 0;
+    for (var i = 0; i < g.length; i++) { var m = Math.abs(g[i]); t += m; if (m > tepe) tepe = m; }
+    var c = el('seviye');
+    if (!c) return;
+    c.firstElementChild.style.width = Math.min(100, (t / g.length) * 400) + '%';
+    c.classList.toggle('yuksek', tepe > 0.95);
+  }
+
+  /* Tarayıcının örnekleme hızı 44.1/48 kHz; hedef 16 kHz.
+     Basit ortalamalı indirgeme: her hedef örnek, kaynaktaki karşılık
+     gelen aralığın ortalaması. Örnek ATLAMAK (en yakını seçmek) takma
+     ad gürültüsü üretir ve tanıma oranını sessizce düşürür. */
+  function indirge(parcalar, kaynakHiz) {
+    var toplamUzunluk = 0, i;
+    for (i = 0; i < parcalar.length; i++) toplamUzunluk += parcalar[i].length;
+    var ham = new Float32Array(toplamUzunluk), y = 0;
+    for (i = 0; i < parcalar.length; i++) { ham.set(parcalar[i], y); y += parcalar[i].length; }
+
+    if (Math.abs(kaynakHiz - HEDEF_HIZ) < 1) return ham;
+    var oran = kaynakHiz / HEDEF_HIZ;
+    var n = Math.floor(ham.length / oran);
+    var cikti = new Float32Array(n);
+    for (var k = 0; k < n; k++) {
+      var bas = Math.floor(k * oran), son = Math.min(ham.length, Math.floor((k + 1) * oran));
+      var t = 0;
+      for (var j = bas; j < son; j++) t += ham[j];
+      cikti[k] = son > bas ? t / (son - bas) : 0;
+    }
+    return cikti;
+  }
+
+  function wavYap(ornekler, hiz) {
+    var n = ornekler.length;
+    var tampon = new ArrayBuffer(44 + n * 2);
+    var g = new DataView(tampon);
+    function yaziyaz(o, m) { for (var i = 0; i < m.length; i++) g.setUint8(o + i, m.charCodeAt(i)); }
+    yaziyaz(0, 'RIFF'); g.setUint32(4, 36 + n * 2, true); yaziyaz(8, 'WAVE');
+    yaziyaz(12, 'fmt '); g.setUint32(16, 16, true); g.setUint16(20, 1, true);
+    g.setUint16(22, 1, true); g.setUint32(24, hiz, true);
+    g.setUint32(28, hiz * 2, true); g.setUint16(32, 2, true); g.setUint16(34, 16, true);
+    yaziyaz(36, 'data'); g.setUint32(40, n * 2, true);
+    for (var i = 0; i < n; i++) {
+      var v = Math.max(-1, Math.min(1, ornekler[i]));
+      g.setInt16(44 + i * 2, v < 0 ? v * 0x8000 : v * 0x7fff, true);
+    }
+    return tampon;
+  }
+
+  /* Puanlama TEK YERDE. Önce hem gerçek kayıt yolunda hem deneme
+     yolunda ayrı ayrı duruyordu; deneme yolu ortam kuralını hiç
+     çalıştırmadığı için sınav 4 saniyelik ortam kaydına "iyi" dedi —
+     yani sınav, sınadığını sanmadığı şeyi sınıyordu. */
+  function puanla(ornekler, cumle) {
+    var sonuc = window.SesOlcu.degerlendir(ornekler, HEDEF_HIZ);
+    if (!cumle || !cumle.ortam) return sonuc;
+    /* Ortam kaydında konuşma ARANMIYOR: "konuşma duyulmuyor" uyarısı
+       burada doğru davranışı hatalı gösterirdi. Aranan: ses gelmiş mi
+       ve yeterince uzun mu. */
+    sonuc.kusurlar = sonuc.kusurlar.filter(function (x) {
+      return x.kod !== 'konusma-yok' && x.kod !== 'gurultulu' && x.kod !== 'bos';
+    });
+    if (sonuc.olcum.sure < 10) {
+      sonuc.kusurlar.push({ kod: 'kisa-ortam', agir: true,
+        mesaj: 'Ortam kaydı en az 10 saniye olmalı (' +
+               sonuc.olcum.sure.toFixed(0) + ' sn kaydedildi)' });
+    }
+    sonuc.durum = sonuc.kusurlar.some(function (x) { return x.agir; }) ? 'kotu'
+                : (sonuc.kusurlar.length ? 'zayif' : 'iyi');
+    return sonuc;
+  }
+
+  function kayitBaslat() {
+    if (kaydediyor) return;
+    toplayici = [];
+    kaydediyor = true;
+    ciz();
+  }
+
+  function kayitBitir() {
+    if (!kaydediyor) return;
+    kaydediyor = false;
+    var ornekler = indirge(toplayici, ctx.sampleRate);
+    toplayici = null;
+    var sonuc = puanla(ornekler, CUMLELER[sira]);
+    var tampon = wavYap(ornekler, HEDEF_HIZ);
+    kayitlar[CUMLELER[sira].id] = {
+      wav: tampon,
+      blob: new Blob([tampon], { type: 'audio/wav' }),
+      sonuc: sonuc
+    };
+    ciz();
+  }
+
+  /* ---------- ZIP (yalnız saklama, sıkıştırma yok) ----------
+     Kütüphane yok: 40 dosyayı tek tek indirmek telefonda işkence,
+     sıkıştırma ise WAV'da zaten az kazandırır. */
+  var CRC = (function () {
+    var t = new Int32Array(256);
+    for (var n = 0; n < 256; n++) {
+      var c = n;
+      for (var k = 0; k < 8; k++) c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+      t[n] = c;
+    }
+    return t;
+  })();
+  function crc32(u8) {
+    var c = 0xffffffff;
+    for (var i = 0; i < u8.length; i++) c = CRC[(c ^ u8[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+  function zipYap(dosyalar) {
+    var parcalar = [], merkez = [], konum = 0;
+    dosyalar.forEach(function (d) {
+      var ad = new TextEncoder().encode(d.ad);
+      var veri = d.veri;
+      var c = crc32(veri);
+      var yerel = new DataView(new ArrayBuffer(30));
+      yerel.setUint32(0, 0x04034b50, true); yerel.setUint16(4, 20, true);
+      yerel.setUint16(6, 0x0800, true);   /* ad UTF-8 */
+      yerel.setUint16(8, 0, true);        /* saklama */
+      yerel.setUint32(14, c, true);
+      yerel.setUint32(18, veri.length, true); yerel.setUint32(22, veri.length, true);
+      yerel.setUint16(26, ad.length, true);
+      parcalar.push(new Uint8Array(yerel.buffer), ad, veri);
+
+      var m = new DataView(new ArrayBuffer(46));
+      m.setUint32(0, 0x02014b50, true); m.setUint16(4, 20, true); m.setUint16(6, 20, true);
+      m.setUint16(8, 0x0800, true); m.setUint16(10, 0, true);
+      m.setUint32(16, c, true);
+      m.setUint32(20, veri.length, true); m.setUint32(24, veri.length, true);
+      m.setUint16(28, ad.length, true);
+      m.setUint32(42, konum, true);
+      merkez.push(new Uint8Array(m.buffer), ad);
+      konum += 30 + ad.length + veri.length;
+    });
+    var merkezBoy = merkez.reduce(function (t, p) { return t + p.length; }, 0);
+    var son = new DataView(new ArrayBuffer(22));
+    son.setUint32(0, 0x06054b50, true);
+    son.setUint16(8, dosyalar.length, true); son.setUint16(10, dosyalar.length, true);
+    son.setUint32(12, merkezBoy, true); son.setUint32(16, konum, true);
+    return new Blob(parcalar.concat(merkez, [new Uint8Array(son.buffer)]),
+                    { type: 'application/zip' });
+  }
+
+  function hepsiniIndir() {
+    var dosyalar = [], dizin = [];
+    CUMLELER.forEach(function (c) {
+      var k = kayitlar[c.id];
+      if (!k) return;
+      var ad = (c.ortam ? 'ortam' : 's' + String(c.id).padStart(2, '0')) + '.wav';
+      dosyalar.push({ ad: ad, veri: new Uint8Array(k.wav) });
+      dizin.push({ id: c.id, dosya: ad, cumle: c.cumle,
+                   durum: k.sonuc.durum,
+                   kusurlar: k.sonuc.kusurlar.map(function (x) { return x.kod; }),
+                   olcum: k.sonuc.olcum });
+    });
+    if (!dosyalar.length) { alert('Henüz kayıt yok.'); return; }
+    dosyalar.push({ ad: 'dizin.json',
+      veri: new TextEncoder().encode(JSON.stringify({ hiz: HEDEF_HIZ, kayitlar: dizin }, null, 1)) });
+
+    var url = URL.createObjectURL(zipYap(dosyalar));
+    var a = document.createElement('a');
+    a.href = url; a.download = 'tamiron-ses-kayitlari.zip';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
+  }
+
+  /* ---------- çizim ---------- */
+  function ciz() {
+    var c = CUMLELER[sira];
+    if (!c) {
+      govde.innerHTML = '<div class="kart"><p class="cumle">Bitti.</p>' +
+        '<p class="ipucu">Aşağıdan “Hepsini indir”e bas ve dosyayı bana ver.</p></div>';
+      ozetCiz();
+      return;
+    }
+    var k = kayitlar[c.id];
+    var s = '<div class="kart">' +
+      '<div><span class="no">' + c.id + '</span> ' +
+      '<span class="baglam">· ' + html(c.baglam || '') + '</span></div>' +
+      '<p class="cumle">' + html(c.cumle) + '</p>' +
+      '<p class="ipucu">' + (c.ortam
+        ? 'Telefonu tezgâha koy, yaklaşık 20 saniye bekle. Konuşma; '
+          + 'kompresör, radyo, ne varsa çalışsın.'
+        : 'Normal konuş; dükkân sesi kapanmasın.') + '</p>' +
+      '<div class="seviye" id="seviye"><i></i></div>';
+
+    s += '<div class="eylem">' +
+      '<button class="ana' + (kaydediyor ? ' kayitta' : '') + '" id="kayit">' +
+        (kaydediyor ? '■ Durdur' : (k ? '● Yeniden kaydet' : '● Kaydet')) + '</button>';
+
+    /* "Önceki" HER ZAMAN duruyor. Önce yalnız kayıt yokken çiziliyordu:
+       usta 12'yi kaydedip 13'e geçince 12'ye dönemiyordu — oysa geri
+       dönüp tekrar etmek bu işin yarısı. */
+    if (!kaydediyor) {
+      s += '<div class="' + (k ? 'uclu' : 'ikili') + '">' +
+        '<button id="geri"' + (sira === 0 ? ' disabled' : '') + '>← Önceki</button>' +
+        (k ? '<button id="dinle">Dinle</button>' : '') +
+        '<button id="ileri">' +
+          (sira === CUMLELER.length - 1 ? 'Bitir' : (k ? 'Sonraki →' : 'Atla →')) +
+        '</button>' +
+      '</div>';
+    }
+    s += '</div>';
+
+    if (k && !kaydediyor) {
+      var o = k.sonuc.olcum;
+      s += '<div class="sonuc ' + k.sonuc.durum + '">' +
+        '<b>' + (k.sonuc.durum === 'iyi' ? 'Kayıt iyi' :
+                 k.sonuc.durum === 'zayif' ? 'Kayıt zayıf' : 'Kayıt kötü — tekrar et') + '</b>' +
+        k.sonuc.kusurlar.map(function (x) { return html(x.mesaj); }).join('<br />') +
+        '<div class="olcum">' + o.sure.toFixed(1) + ' sn · tepe ' + o.tepeDb.toFixed(0) +
+        ' dB · SNR ' + o.snrDb.toFixed(0) + ' dB</div>' +
+      '</div>';
+    }
+    s += '</div>';
+    govde.innerHTML = s;
+    ozetCiz();
+  }
+
+  function ozetCiz() {
+    var say = { iyi: 0, zayif: 0, kotu: 0 };
+    Object.keys(kayitlar).forEach(function (id) { say[kayitlar[id].sonuc.durum]++; });
+    var toplam = Object.keys(kayitlar).length;
+    el('sayac').textContent = toplam + ' / ' + CUMLELER.length;
+    el('cubuk').style.width = (CUMLELER.length ? toplam / CUMLELER.length * 100 : 0) + '%';
+    el('ozet').innerHTML =
+      '<span class="rozet iyi">iyi · ' + say.iyi + '</span>' +
+      '<span class="rozet zayif">zayıf · ' + say.zayif + '</span>' +
+      '<span class="rozet kotu">kötü · ' + say.kotu + '</span>' +
+      '<span class="rozet">kalan · ' + (CUMLELER.length - toplam) + '</span>';
+  }
+
+  /* ---------- olaylar ---------- */
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('button');
+    if (!t) return;
+    if (t.id === 'kayit') {
+      if (kaydediyor) { kayitBitir(); return; }
+      (ctx ? Promise.resolve() : baslat()).then(kayitBaslat).catch(function (hata) {
+        govde.insertAdjacentHTML('beforeend',
+          '<div class="uyari">Mikrofon açılamadı: ' + html(hata && hata.message) +
+          '<br />Tarayıcı ayarlarından bu sayfaya mikrofon izni ver.</div>');
+      });
+      return;
+    }
+    if (t.id === 'dinle') {
+      var k = kayitlar[CUMLELER[sira].id];
+      if (!k) return;
+      if (calan) { calan.pause(); }
+      calan = new Audio(URL.createObjectURL(k.blob));
+      calan.play();
+      return;
+    }
+    if (t.id === 'ileri') { sira++; ciz(); window.scrollTo(0, 0); return; }
+    if (t.id === 'geri') { sira--; ciz(); window.scrollTo(0, 0); return; }
+    if (t.id === 'indir') { hepsiniIndir(); return; }
+  });
+
+  /* DENEME KAPISI (?deneme): mikrofonsuz, sahte bir kayıt üretip
+     WAV → ölçü → ZIP yolunun tamamını çalıştırır.
+     Neden var: indirme yolu ancak 40 kayıttan SONRA denenirse, bozuk
+     çıktığında 40 kayıt birden gider. Usta seansa başlamadan bir kez
+     buna basıp dosyanın indiğini görsün. */
+  if (location.search.indexOf('deneme') >= 0) {
+    window.SES_DENEME = {
+      ekle: function (id, sn) {
+        var n = Math.round(HEDEF_HIZ * (sn || 2));
+        var a = new Float32Array(n);
+        for (var i = 0; i < n; i++) {
+          var zarf = (i > n * 0.2 && i < n * 0.8) ? 1 : 0;
+          a[i] = Math.sin(i / HEDEF_HIZ * 2 * Math.PI * 200) * 0.3 * zarf
+               + (Math.random() * 2 - 1) * 0.002;
+        }
+        var tampon = wavYap(a, HEDEF_HIZ);
+        var c = CUMLELER.filter(function (x) { return x.id === id; })[0];
+        kayitlar[id] = { wav: tampon, blob: new Blob([tampon], { type: 'audio/wav' }),
+                         sonuc: puanla(a, c) };
+        ciz();
+        return kayitlar[id].sonuc.durum;
+      },
+      zipBoyu: function () {
+        var d = [];
+        Object.keys(kayitlar).forEach(function (id) {
+          d.push({ ad: 's' + id + '.wav', veri: new Uint8Array(kayitlar[id].wav) });
+        });
+        return zipYap(d);
+      }
+    };
+  }
+
+  /* Cümleler ÖLÇÜT DOSYASINDAN okunuyor, sayfaya gömülmüyor: set
+     büyüdüğünde ya da bir cümle düzeldiğinde sayfayı yeniden üretmek
+     gerekmesin. İkisi ayrışırsa ustanın okuduğu cümle ile ölçütteki
+     cümle farklı olur — ve fark sessizdir. */
+  fetch('ses-seti.json').then(function (r) {
+    if (!r.ok) throw new Error('ses-seti.json okunamadı (' + r.status + ')');
+    return r.json();
+  }).then(function (set) {
+    /* ⚠️ İLK KAYIT CÜMLE DEĞİL: dükkânın kendi sesi.
+       Gürültüyü UYDURMAK yerine gerçeğini almak gerekiyor — beyaz
+       gürültü kompresörü, çekiç sesini, radyoyu taklit etmiyor.
+       Bu 20 saniye elimizde olursa, temiz kaydedilmiş her cümleyi
+       istediğimiz gürültü seviyesinde kirletebiliriz (ses-bozucu.js)
+       ve 40 kayıttan yüzlerce zor örnek çıkar. */
+    CUMLELER = [{
+      id: 0,
+      baglam: 'ortam',
+      cumle: 'Hiçbir şey söyleme — dükkânın sesini kaydet',
+      ortam: true
+    }].concat(set.cumleler || []);
+    ciz();
+  }).catch(function (hata) {
+    govde.innerHTML = '<div class="uyari"><b>Cümleler yüklenemedi.</b><br />' +
+      html(hata.message) + '<br />Bu sayfa <code>ses-seti.json</code> ve ' +
+      '<code>ses-olcu.js</code> ile <b>aynı klasörde</b> durmalı ve bir ' +
+      'sunucudan açılmalı (dosyaya çift tıklayınca tarayıcı okumayı engeller).</div>';
+  });
+})();
+</script>

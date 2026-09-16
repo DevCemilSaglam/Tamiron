@@ -143,6 +143,110 @@ cümlesi bir tahmin olarak durur.
 
 ---
 
+### 2.2 · Ses test verisi ve kötü kayıt (16.09)
+
+> **Cemil:** *"Test verisi kendimiz oluşturabilir miyiz ses için."*
+> *"Kötü ses kayıtlarını nasıl bulabiliriz?"*
+
+**Evet, oluşturabiliriz — ve ölçümü durduran tek şey buydu.**
+`ses-seti.json`'daki 40 cümlenin **metni** vardı, **sesi** yoktu.
+
+#### "Kötü kayıt" iki ayrı soru
+
+| Soru | Ne demek | Cevap |
+|---|---|---|
+| **Bulmak** | Elimizdeki kaydın kötü olduğunu anlamak | `ses-olcu.js` |
+| **Üretmek** | Kötü kaydı bilerek yapmak | `ses-bozucu.js` |
+
+İkisi de gerekli: birincisi olmadan çöp kayıt ölçüte sızar ve suç
+modele kalır; ikincisi olmadan ölçüt yalnız **kolay** ucu ölçer.
+
+#### Bulmak — tek cetvel, üç yer
+
+Bir kaydın kötü olduğu üç yerde anlaşılmalı ve **üçü de aynı cetveli**
+kullanmalı, yoksa telefonun *"iyi"* dediğine bilgisayar *"kötü"* der:
+
+```
+   kayıt sırasında        set taranırken           ileride üründe
+   (usta hemen tekrar     (çöp kayıt ölçüte        ("tekrar söyler
+    etsin)                 girmesin)                misin")
+          \                     |                      /
+           \____________  ses-olcu.js  _______________/
+```
+
+Ölçtükleri: süre · tepe seviyesi · kırpma oranı · **SNR** · sessizlik
+oranı. Kararlar: `sessiz` · `kisa` · `bos` · `kirpik` · `gurultulu` ·
+`konusma-yok`.
+
+**Son ikisi bilerek ayrı.** Konuşma VAR ama gürültü yüksekse model yine
+de deneyebilir (*zayıf*); hiç konuşma yoksa denemeye değmez (*kötü*).
+Ayıran şey **dinamik**: konuşmanın yüksek ve alçak çerçeveleri vardır,
+düz gürültünün yoktur. Tek eşikle bakılsaydı boş kayıt *"biraz
+gürültülü"* diye ölçüte girerdi.
+
+`ses-olcu-test.js` sekiz bilinen sinyalle (sessiz · kısa · kırpık ·
+gürültülü · düz gürültü …) eşikleri koruyor — **8/8**.
+
+> ⚠️ **Eşikler ilk tahmin.** Gerçek dükkân kaydı gelmeden bu sayılar bir
+> varsayım; ilk 40 kayıttan sonra kalibre edilecek. Kalibre etmeden
+> *"kaydın kötü"* demek ustayı boşuna tekrar konuşturur — ve boşuna
+> tekrarlatan bir program bir daha açılmaz.
+
+#### Üretmek — 40 kayıttan yüzlerce zor örnek
+
+Ustayı kırk cümleyi bir de kompresörün yanında, bir de bağırarak
+söylemeye zorlayamayız. Ama temiz kaydı **kontrollü** kirletmek kolay:
+
+```
+  s01.wav ──┬── s01.snr18.wav   hafif dükkân
+            ├── s01.snr12.wav   normal dükkân
+            ├── s01.snr6.wav    kompresör çalışıyor
+            ├── s01.uzak.wav    telefon tezgâhta, usta iki adım ötede
+            └── s01.kirpik.wav  mikrofona çok yakın / bağırarak
+```
+
+**Kontrollü olması şart:** *"12 dB gürültüde tanıma %70'e düşüyor, 6
+dB'de %30'a"* eğrisi ancak gürültü miktarını biz seçersek çıkar.
+Dükkânda kaydedilmiş rastgele gürültü bunu vermez — ne kadar olduğunu
+bilmiyoruz ki.
+
+> ⚠️ **Gürültü uydurulmaz.** Karıştırılan ses, kayıt sayfasının **ilk
+> adımında** alınan *dükkânın kendi 20 saniyesidir*. Beyaz gürültü ne
+> kompresörü taklit eder ne radyoyu; onunla ölçülen dayanıklılık
+> gerçekte tutmaz. `ortam.wav` yoksa bozucu gürültü varyantı
+> **üretmiyor** ve sebebini söylüyor.
+
+#### Kayıt sayfası — `ses-kaydet.html`
+
+Telefonla, **dükkânda**. Cümleyi büyük gösterir, kaydeder, kalitesini
+**anında** söyler, geri dönüp tekrar ettirir, hepsini tek `.zip`
+çıkarır (40 WAV + `dizin.json`).
+
+* **Mikrofon temizliği KAPALI** (`echoCancellation`, `noiseSuppression`,
+  `autoGainControl` = false). Açık kalsaydı tarayıcının gürültü
+  temizliğini ölçmüş olurduk, dükkânı değil. *Temiz sesi sonradan
+  kirletmek mümkün; kirli sesi geri getirmek değil.*
+* **16 kHz mono WAV** — konuşma tanıma servislerinin istediği biçim.
+  İndirgeme örnek atlayarak değil **ortalayarak** yapılıyor; atlamak
+  takma ad gürültüsü üretip tanıma oranını sessizce düşürür.
+* **İlk kayıt cümle değil, dükkânın sesi** (≥10 sn). Bozucunun
+  hammaddesi bu.
+* `?deneme=1` ile mikrofonsuz sahte bir kayıt üretip **indirme yolunu
+  sınar**. Neden: indirme ancak 40 kayıttan sonra denenirse, bozuk
+  çıktığında 40 kayıt birden gider.
+
+#### Sıra
+
+1. Cemil 40 cümleyi + dükkân sesini kaydeder *(bir öğleden sonra)*.
+2. `ses-bozucu.js` zor ucu üretir.
+3. Adaylar (Web Speech · Chirp 2 · Azure · Whisper …) aynı kayıtlarla
+   koşar, çıkan metin `puanla.js`'e girer.
+4. Karne: **hangi servis kaç plakayı doğru duydu** — ve gürültü
+   arttıkça nasıl düşüyor.
+
+
+---
+
 ## 3 · Ruhsat ve parça listesi: fotoğraf doğrudan modele
 
 `RUHSAT-OKUMA.md` üç yolu karşılaştırmış ve **C yolunu** önermişti:

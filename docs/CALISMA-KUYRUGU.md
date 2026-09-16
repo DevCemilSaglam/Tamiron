@@ -27,7 +27,7 @@ ikisi ikişer notun aynı konusu.
 | # | İş | Hangi notlar | Durum |
 |---|---|---|---|
 | 6.1 | **Açılış logosunun arka planı** — uygulama açılırken logonun altında kutu görünüyor | *"Uygulama açılırken logonun arka planı var. Svg olmalı."* | **BİTTİ** — iki ayrı kusur çıktı: (1) açılış zemini ikon plakasından farklı tondaydı → kutu; (2) PNG ikonlar markanın TAKLİDİYDİ, artık `icon.svg`'den üretiliyor. Renk sapması derlemede yakalanıyor (negatif testle doğrulandı) |
-| 6.2 | **Ses ölçümü: kendi test verimiz + kötü kaydı bulmak** | *"Kötü ses kayıtlarını nasıl bulabiliriz?"* · *"Test verisi kendimiz oluşturabilir miyiz ses için."* | SIRADA |
+| 6.2 | **Ses ölçümü: kendi test verimiz + kötü kaydı bulmak** | *"Kötü ses kayıtlarını nasıl bulabiliriz?"* · *"Test verisi kendimiz oluşturabilir miyiz ses için."* | **BİTTİ** — üç alet: `ses-olcu.js` (kötüyü bulur, tek cetvel, 8/8 sınav), `ses-kaydet.html` (telefonla dükkânda 40 cümle + ortam sesi, zip çıkarır), `ses-bozucu.js` (40 kayıttan kontrollü zor örnek). Kayıt Cemil'de: **A-M39** |
 | 6.3 | **İz kaydı (log) — uzaktan görmek** | *"Log kaydı, nereye tıklanmış, ne yapılmış adım adım, hatalar, başarısızlıklar… mantığa aykırı işlemleri de görebilmeliyiz."* | SIRADA |
 | 6.4 | **Fatura → serviste kullanılan parça (kâr/zarar için)** | *"Fatura girişi olunca serviste kullanılan parçalara ekleyebilmeli… müşteri için değil kâr zarar muhasebe için."* · *"Faturasız çalışıyor da olabilirler."* | SIRADA |
 | 6.5 | **Taklit edilemezlik — alanı zapt etmek ve savunmak** | *"Kopyalanamaz bir özellik eklemek"* · *"Taklit edilemez olması için ne yapılabilir?… hızlı ilerlemeli ve alanı zapt etmeli ve savunmalıyız."* | SIRADA |
