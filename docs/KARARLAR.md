@@ -10,6 +10,72 @@
 
 ---
 
+## K-054 · Savunma özellikte değil, birikimde (16.09.2026)
+
+> **Cemil:** *"Kopyalanamaz bir özellik eklemek."* · *"Taklit edilemez
+> olması için ne yapılabilir? Bu alanda hızlı ilerlemeli ve alanı zapt
+> etmeli ve savunmalıyız."*
+
+**Soruyu olduğu gibi cevaplarsam yanlış cevap veririm: kopyalanamaz
+özellik diye bir şey yok.** Sesle işlem, ruhsat okuma, parça listesi
+okuma — hepsi API çağrısı, hepsi günler içinde kopyalanır. **Yapay zeka
+özellikleri en kolay kopyalananlardır**, çünkü zekâ bizde değil API'de.
+
+Dahası: bu deponun kurucu dersi *"çok fazla özellik var, karmaşık
+geldi"*. Özellik ekleyerek savunma kurmak, ürünü bir kez öldüren şeyi
+tekrarlamaktır.
+
+### 54.1 · Kopyalanamayan dört şey
+
+Ortak özellikleri: **zamanla birikir ve satın alınamaz.**
+
+| # | ne | durum |
+|---|---|---|
+| ① | **Düzeltme birikimi** — model okur, usta düzeltir | **bugün başladı** |
+| ② | **Parça sözlüğü** — usta dili ↔ katalog | biriktiriliyor |
+| ③ | **Parçacı ağı** — çift taraflı, en güçlüsü | **bugün kurulmuyor** (A-M46) |
+| ④ | **Destek ilişkisi** — arayıp cevap alabildiği kişi | iz kaydı bunun aleti |
+
+**①'in mekanizması bugün kondu.** Bugüne kadar usta yanlışı
+düzeltiyor, düzeltme ekranda kalıyor, **biz asla öğrenmiyorduk** —
+birikim hiç başlamamıştı. Artık `Iz.okuma()` modelin yazdığını
+bildiriyor, ustanın değiştirdiği her alan `duzeltme` olarak düşüyor:
+*model dedi / usta yazdı*. Okumayı API veriyor, **düzeltmeyi dükkân**.
+
+**③ bir çelişki değil, bir seçim:** parça fiyatı cevabı bugün ustanın
+kendi WhatsApp'ına geliyor (sade, kurulumsuz, alışkanlığı bozmuyor).
+Bedeli, fiyat akışının bizden geçmemesi ve ağın birikmemesi. Seçim
+bilinçli olmalı — **A-M46**.
+
+### 54.2 · Savunma OLMAYANLAR
+
+İlk olmak · daha çok özellik · daha ucuz olmak · kodun gizliliği ·
+patent · modelin kendisi. Bunları savunma sanmak en pahalı hatadır,
+çünkü güvenip yavaşlatır.
+
+### 54.3 · Hız neyi satın alır
+
+Hız tek başına savunma değil; **birikimin başlangıç tarihini öne
+çeker.** Bundan bir ölçüt çıkıyor:
+
+> Bir iş ① ② ③ ④'ten birini büyütmüyorsa, onu hızlı yapmanın
+> **stratejik** değeri yoktur.
+
+Bu, *"yeni özellik varsayılan HAYIR"* kuralıyla çelişmiyor; onu
+güçlendiriyor: **az iş yap, ama yaptığın iş biriksin.**
+
+### 54.4 · Sonuç
+
+**Kopyalanamaz özellik aramak yerine kopyalanamaz BİRİKİM kurmalıyız.**
+Ürün rakibe açık kitap gibi görünsün; kitabı okuyup aynısını yazan,
+üç yıllık düzeltme yığınımızı, parça sözlüğümüzü ve parçacı ağımızı
+yazamaz.
+
+Ayrıntı: `arastirma/SAVUNMA.md`. **Açık:** A-M46 (parçacı ağı) ·
+A-M47 (düzeltmeler dükkândan çıkacak mı).
+
+---
+
 ## K-053 · İzde DEĞERLER yazılır — bir gün önceki kuralımı geri alıyorum (16.09.2026)
 
 > **Cemil:** *"Bu zaten müşteri verisi saklıyor olacağız mecburen. Bu
@@ -3978,6 +4044,8 @@ oradan bakılır.
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
 | **A-M40** | **İz kaydı bize ne zaman gelsin?** (a) yalnız usta *"sorun bildir"* derse, (b) günde bir kez kısır özet, (c) ikisi birden (K-052, IZ-KAYDI §6) | Önerim **(c)**: kısır özet zorlanmayı gösterir, ayrıntı yalnız istendiğinde gider |
+| **A-M46** | **Parçacı ağı.** Fiyat cevabı bugün ustanın kendi WhatsApp'ına geliyor; akış bizden geçmiyor, en güçlü savunma (çift taraflı ağ) birikmiyor. Ne zaman, hangi biçimde? (K-054, SAVUNMA §1③) | Önerim: **bu fazda değil** — ama kararı bilinçli verelim, kazara ertelenmiş olmasın |
+| **A-M47** | **Düzeltmeler dükkândan çıkacak mı?** Birikim ancak ulaşırsa olur. A-M40'ın içinde çözülebilir ama ayrı soru: iz *destek* için, düzeltme *birikim* için | Önerim: ayrı ve baştan gelsin — hacmi küçük, değeri büyük |
 | **A-M43** | **Alış rakamı nerede girilecek?** Bugün parçacının fiyatı `fiyat`e yazılıyor, `alis` 0 kalıyor ve kâr ŞİŞİK çıkıyor. Önerim: parça sorma akışında iki alan — *"parçacı ne dedi"* + *"müşteriye kaç yazıyorsun"* (MALIYET-VE-KAR §2) | İkinci rakam boş bırakılabilir: alışına satmıştır, o da doğru bilgidir |
 | **A-M44** | **Fatura girişi bu faza girsin mi?** | Önerim **hayır** — A-M43 çözülmeden fatura eşleştirmek, olmayan alanı doldurmak olur |
 | **A-M45** | Eşleşmeyen fatura satırı ne olur? | Önerim: gider listesine düşer (MUH-B), kayda zorlanmaz |

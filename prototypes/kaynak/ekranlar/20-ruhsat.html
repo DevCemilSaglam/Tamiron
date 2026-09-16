@@ -537,10 +537,16 @@ function ruhsatOku(kaynak) {
     rMotorNo: 'motorNo', rSilindir: 'silindir', rGuc: 'guc',
     rKoltuk: 'koltuk', rDepo: 'depo', rIlkTescil: 'ilkTescil',
     rTcVergi: 'tcVergiNo', rAdres: 'adres' };
+  var modelYazdi = {};
   Object.keys(esle).forEach(function (id) {
     var e = document.getElementById(id);
     if (e) e.value = r[esle[id]] || '';
+    modelYazdi[id] = r[esle[id]] || '';
   });
+  /* Modelin yazdığı ize bildiriliyor: bundan sonra ustanın değiştirdiği
+     her alan "düzeltme" olarak düşecek. Ürünün savunması bu satırların
+     birikmesinde (SAVUNMA.md) — okumayı API veriyor, DÜZELTMEYİ dükkân. */
+  Iz.okuma('ruhsat', modelYazdi);
   rOkundu = true;
 
   /* ⚠️ SEKME DEĞİŞMİYOR (Cemil'in bildirdiği hata). Okunan plaka

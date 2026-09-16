@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-16 11:58
+  Üretim: 2026-09-16 13:03
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -4529,6 +4529,42 @@ var Iz = (function () {
     var n = alanSayaci[ad] = (alanSayaci[ad] || 0) + 1;
     yaz('alan', ad, { deger: deger, kez: n });
     if (n === 3) yaz('suphe', 'alan-tekrar-duzeltildi', { alan: ad });
+    duzeltmeBak(ad, deger);
+  }
+
+  /* ---- MODELİN OKUDUĞU vs USTANIN YAZDIĞI ----
+     Ürünün savunmasının maddesi burada (SAVUNMA.md). Bir modeli
+     API'den çağırmak kopyalanabilir; **ustanın düzelttiği okuma**
+     kopyalanamaz — o, bu dükkânlarda bu kâğıtlarla geçirilmiş zamandır.
+     Her düzeltme hem ölçüte hem eğitime giden bir satırdır ve bugüne
+     kadar HİÇBİR YERE yazılmıyordu: usta yanlışı düzeltiyor, düzeltme
+     ekranda kalıyor, biz asla öğrenmiyorduk. */
+  var modelDegerleri = {}, okumaKaynagi = null, okunanAlan = 0, duzeltilen = 0;
+
+  function okuma(kaynak, degerler) {
+    modelDegerleri = {}; okunanAlan = 0; duzeltilen = 0;
+    okumaKaynagi = kaynak;
+    for (var k in degerler) {
+      if (!Object.prototype.hasOwnProperty.call(degerler, k)) continue;
+      modelDegerleri[k] = (degerler[k] === null || degerler[k] === undefined)
+        ? '' : String(degerler[k]);
+      okunanAlan++;
+    }
+    yaz('okuma', kaynak, { alan: okunanAlan });
+  }
+
+  function duzeltmeBak(ad, deger) {
+    if (!Object.prototype.hasOwnProperty.call(modelDegerleri, ad)) return;
+    var m = modelDegerleri[ad];
+    if (String(deger) === m) return;
+    duzeltilen++;
+    yaz('duzeltme', ad, { model: m, usta: deger, kaynak: okumaKaynagi });
+    /* ŞÜPHE: okunan alanların yarısından çoğu düzeltildiyse sorun
+       ustada değil OKUMADA. Tek tek bakınca görünmez; oran görünür. */
+    if (okunanAlan && duzeltilen === Math.ceil(okunanAlan / 2)) {
+      yaz('suphe', 'okuma-cogu-duzeltildi',
+          { kaynak: okumaKaynagi, okunan: okunanAlan, duzeltilen: duzeltilen });
+    }
   }
 
   function hata(yer, e) {
@@ -4548,9 +4584,11 @@ var Iz = (function () {
   function dok() { return olaylar.slice(); }
   function sil() {
     olaylar = []; ekranSayaci = {}; hataSayaci = {}; alanSayaci = {}; sonEkran = null;
+    modelDegerleri = {}; okumaKaynagi = null; okunanAlan = 0; duzeltilen = 0;
   }
   function ozet() {
-    var s = { olay: olaylar.length, ekran: 0, dokunus: 0, alan: 0, hata: 0, suphe: 0 };
+    var s = { olay: olaylar.length, ekran: 0, dokunus: 0, alan: 0,
+              okuma: 0, duzeltme: 0, hata: 0, suphe: 0 };
     for (var i = 0; i < olaylar.length; i++) {
       if (s[olaylar[i].tur] !== undefined) s[olaylar[i].tur]++;
     }
@@ -4606,8 +4644,9 @@ var Iz = (function () {
   }
 
   return {
-    yaz: yaz, ekran: ekran, dokunus: dokunus, alan: alan, hata: hata,
-    supheli: supheli, dok: dok, sil: sil, ozet: ozet, guvenli: guvenli, KIRP: KIRP
+    yaz: yaz, ekran: ekran, dokunus: dokunus, alan: alan, okuma: okuma,
+    hata: hata, supheli: supheli, dok: dok, sil: sil, ozet: ozet,
+    guvenli: guvenli, KIRP: KIRP
   };
 })();
 
@@ -9007,10 +9046,16 @@ function ruhsatOku(kaynak) {
     rMotorNo: 'motorNo', rSilindir: 'silindir', rGuc: 'guc',
     rKoltuk: 'koltuk', rDepo: 'depo', rIlkTescil: 'ilkTescil',
     rTcVergi: 'tcVergiNo', rAdres: 'adres' };
+  var modelYazdi = {};
   Object.keys(esle).forEach(function (id) {
     var e = document.getElementById(id);
     if (e) e.value = r[esle[id]] || '';
+    modelYazdi[id] = r[esle[id]] || '';
   });
+  /* Modelin yazdığı ize bildiriliyor: bundan sonra ustanın değiştirdiği
+     her alan "düzeltme" olarak düşecek. Ürünün savunması bu satırların
+     birikmesinde (SAVUNMA.md) — okumayı API veriyor, DÜZELTMEYİ dükkân. */
+  Iz.okuma('ruhsat', modelYazdi);
   rOkundu = true;
 
   /* ⚠️ SEKME DEĞİŞMİYOR (Cemil'in bildirdiği hata). Okunan plaka
@@ -11634,7 +11679,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>6ebba9f6</b><br>' +
+      'Sürüm <b>c51610af</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

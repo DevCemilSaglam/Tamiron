@@ -1703,6 +1703,23 @@ function stilMetni() {
       if (!Iz.ozet().alan) ek('IZ-KAYDI', '(kabuk)', 'alan degisikligi sayilmiyor');
     }
 
+    /* ---- ASIL OLCUM 1b: MODELIN OKUDUGU DUZELTILINCE YAZILIYOR MU ----
+       Urunun savunmasinin maddesi bu (SAVUNMA.md): okumayi API veriyor,
+       DUZELTMEYI dukkan. Duzeltme yazilmazsa usta yanlisi duzeltir,
+       duzeltme ekranda kalir ve biz asla ogrenmeyiz -- yani birikim
+       OLMAZ. Kaybi sessiz: her sey calisiyor gorunur. */
+    Iz.sil();
+    Iz.okuma('deneme', { denemeAlani: 'model boyle okudu' });
+    Iz.alan('denemeAlani', 'usta boyle duzeltti');
+    var duz = Iz.dok().filter(function (x) { return x.tur === 'duzeltme'; })[0];
+    if (!duz) {
+      ek('IZ-KAYDI', '(kabuk)',
+         'modelin okudugu duzeltildi ama "duzeltme" yazilmadi — birikim olmuyor');
+    } else if (!duz.ek || duz.ek.model !== 'model boyle okudu') {
+      ek('IZ-KAYDI', '(kabuk)',
+         'duzeltmede modelin dedigi yok — neyi yanlis okudugu ogrenilemez');
+    }
+
     /* ---- ASIL OLCUM 2: uzun deger kirpiliyor mu ---- */
     Iz.sil();
     var uzun = new Array(600).join('x');
