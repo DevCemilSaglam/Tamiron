@@ -65,6 +65,84 @@ gerekli.
 
 ---
 
+### 2.1 · Konuşma tanıma — hangi servis? (16.09)
+
+> **Cemil:** *"Ses ve görüntü için hangi AI API'yi tavsiye edersin?"*
+
+**Görüntü tarafı kapalı: Claude API.** Ses tarafı bu belgede *"ya da
+paralı bir konuşma tanıma servisi"* diye açık bırakılmıştı; boşluk
+burada kapanıyor.
+
+**Claude API ses ALMIYOR** — metin ve görüntü alıyor. Bu yüzden ses
+işi iki ayrı sağlayıcı demek; tek API arayan biri için kötü haber,
+ama ikinci adım (metin → işlem) zaten Claude'da.
+
+#### Adaylar
+
+| Servis | Kaba maliyet | Ayırt edici |
+|---|---|---|
+| **Tarayıcının Web Speech API'si** | **bedava** | Bugün kullanılan. Anahtar yok, sunucu yok, kurulum yok |
+| Google Cloud STT (Chirp 2) | ~$0,016/dk | **Söz öbeği yanlılığı** (phrase hints) |
+| Azure AI Speech | ~$0,017/dk | **Söz öbeği listesi** + özel model |
+| OpenAI `gpt-4o-transcribe` | ~$0,006/dk | En düşük genel WER'lerden; `prompt` var ama gerçek yanlılık değil |
+| Deepgram Nova-3 | ~$0,0043/dk | En ucuzu, akışta ~300 ms; **keyterm** desteği |
+| ElevenLabs Scribe | ~$0,004–0,008/dk | Çok dilli doğrulukta iddialı |
+
+*(Fiyatlar Eylül 2026 karşılaştırmalarından, kaba. Karar vermeden
+sağlayıcının kendi sayfasından teyit edilir.)*
+
+#### Karar maliyet vermiyor — yine doğruluk veriyor
+
+Ustanın günde 20 komut söylediğini varsayalım, her biri 5 saniye:
+**günde ~2 dakika.** En pahalı seçenekte bile **ayda bir doların
+altı.** Fiyat tablosu karar vermiyor; şu iki şey veriyor:
+
+**1 · Plaka, konuşma tanımanın en zor girdisidir.** *"34 ABC 123"*
+bir kelime değil, harf harf okunan bir dizi; hiçbir genel modelin
+buna dair önseli yok. Genel WER rakamları bunu ölçmez. Ölçen şey
+**söz öbeği yanlılığı**: servise *"plaka harfleri şunlardır,
+dükkânın müşteri plakaları bunlardır"* diyebilmek. Bu yüzden tabloda
+öne çıkan özellik hız ya da fiyat değil, **Google ve Azure'un phrase
+hint desteği**.
+
+**2 · Türkçe + dükkân gürültüsü için yayınlanmış ölçüm YOK.**
+Karşılaştırmaların hiçbiri Türkçeyi ayrı vermiyor; kompresör sesinin
+altında hiç vermiyor. **Bu yüzden tavsiyem bir servis değil, bir
+ölçüm:**
+
+```
+  ses-seti.json'daki 40 cümle DÜKKÂNDA okunup kaydedilir
+        |
+        v
+  her aday servise aynı 40 kayıt verilir
+        |
+        v
+  cikan metin -> puanla.js (ZATEN YAZILI)
+        |
+        v
+  karne: hangi servis kaç plakayı doğru duydu
+```
+
+Elimizdeki cetvel metin girdisiyle çalışıyor; ses kaydı eklenince
+**aynı cetvel** ses servislerini de puanlar. Yeni alet gerekmiyor,
+**40 ses kaydı gerekiyor.**
+
+#### Bugünkü tavsiye
+
+1. **Web Speech'te kal.** Bedava, çalışıyor, anahtar istemiyor. Parayı
+   ancak ölçüm gerektirdiğini gösterirse harcarız.
+2. **Plaka hatasını serviste değil, ekranda çöz.** A-M27 (*"bunu mu
+   demek istedin"* önerisi) tanıma ne kadar iyi olursa olsun gerekli —
+   çünkü %95 doğru tanıma bile 20 komutta bir yanlış plaka demek.
+3. **Ölçüm gerekirse önce Google Chirp 2 ya da Azure** — sırf phrase
+   hint için. Ucuzluk (Deepgram) plakada işe yaramaz.
+
+**Açık madde: A-M39** — 40 cümlelik ses kaydı dükkânda alınacak mı?
+Alınmazsa ses tarafı ölçülmeden kalır ve *"Web Speech yetiyor"*
+cümlesi bir tahmin olarak durur.
+
+---
+
 ## 3 · Ruhsat ve parça listesi: fotoğraf doğrudan modele
 
 `RUHSAT-OKUMA.md` üç yolu karşılaştırmış ve **C yolunu** önermişti:
@@ -85,10 +163,14 @@ girdi; görüntü anlayan model burada açık ara önde.
 okunmaz), ayda 150–300 ruhsat. Maliyet kararı vermiyor — **doğruluk
 veriyor.**
 
-> ⚠️ **RUHSAT FOTOĞRAFI SAKLANMAZ** (`RUHSAT-OKUMA.md` Bulgu 2, A-31):
-> ruhsatta **TC kimlik no ve adres** var, bize gerekmiyor. Okunur,
-> alanlar alınır, fotoğraf atılır. Modele giden fotoğraf da bu kuralın
+> ⚠️ **RUHSAT FOTOĞRAFI SAKLANMAZ** (A-31). Gerekçesi 15.09'da
+> **değişti**: TC/vergi no ve adres artık *tutuluyor* — faturaya
+> gerekiyor (K-050). Saklanmayan **fotoğrafın kendisi**: okunur,
+> alanlar alınır, görüntü atılır. Modele giden fotoğraf da bu kuralın
 > dışında değil — API'ye gönderilen görüntü, gönderdiğimiz veridir.
+>
+> ⚠️ Ayrıca **fotoğraftan TC beklemeyin**: 46 gerçek ruhsatın
+> 29'unda sahip bölümü kadrajın dışında kaldı (K-051).
 
 ---
 

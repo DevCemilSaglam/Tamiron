@@ -3827,6 +3827,7 @@ oradan bakılır.
 |---|---|---|
 | **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
 | **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
+| **A-M39** | Ses tarafı ölçülecek mi? `ses-seti.json`'daki **40 cümle dükkânda kaydedilirse** aynı cetvel (`puanla.js`) konuşma tanıma servislerini de puanlar. Kaydedilmezse *"Web Speech yetiyor"* bir tahmin olarak kalır (YAPAY-ZEKA §2.1) | Önerim: 40 kaydı bir öğleden sonra al — alet zaten yazılı |
 | **A-M38** | Ruhsat fotoğrafında **TC/vergi no kadrajın dışında kalıyor** (46 fotoğrafın 29'unda yok, K-051). Okuma ekranı *"sağ sayfa da görünsün"* diye yönlendirsin mi, yoksa fatura alanları müşteri başına **bir kez elle** mi girilsin? | Önerim: ikisi birden — ekran yönlendirsin, gelmezse elle giriş |
 | **A-M37** | **Fatura kesmek** MUH kapsamına giriyor mu? Bu turda yalnız fatura ALANLARI tutuldu; fatura kesmek K-022'nin "fatura yok · KDV yok · e-belge yok" sınırını değiştirir (K-050.5) | Alanlar evet, kesmek **ayrı karar** — MUH cevabıyla birlikte |
 | **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma metni ve saklama süresi** gerekiyor (K-050.5) | Aydınlatma: ayarlarda tek satır (A-M33 ile birleşti). Saklama: fatura kayıtlarıyla aynı süre — konuşulmalı |
