@@ -38,8 +38,12 @@
 | 7.2 | **Ses → işlem nesnesi → onay** | **BİTTİ** — nesne ve onay zaten vardı; eksik olan **bağlam dışı işin tanınmasıydı**. Çözümleyici ikiye ayrıldı (`sesCozumle` / `sesGenel`), kayıt içindeki dal artık genel yola da soruyor |
 | 7.3 | **"Bunu mu demek istediniz"** — yanlış ekran/işlem için | **BİTTİ** — plaka önerisinin kardeşi: tanınan iş asıl olur, bağlamın kendi işi ÖNERİ olur. Dokunuş işlemi değiştirir, YAPMAZ; geri dönülebilir. 50. denetim testi koruyor |
 | 7.4 | **Servis detayında sesle işlem** | **BİTTİ** — 7.3'ün altyapısı kayıt ekranında baştan sona çalışıyor; eklenen: bağlam dışı iş bitince **"Kayda dön"**. Usta işini yapıp ortada kalmıyor. 50. denetim testi koruyor |
-| 7.5 | **Sunum kaynağı** — özellikler + baştan sona kullanım | SIRADA |
+| 7.5 | **Sunum kaynağı** — özellikler + baştan sona kullanım | **BİTTİ** — sekiz bölümlük belge: ürünün tanımı · yedi iş · baştan sona akış · bugün çalışan özellikler · yapay zekânın yeri · ölçüm · **henüz hazır olmayanlar** · savunma. Belge bağlacında, Cemil düzenleyebilir |
 
+
+**Tur 7 bitti — 16.09.2026.** Beş iş de kapandı. Turun en pahalı dersi ölçüm aracıyla ilgiliydi (yine): tarayıcı prototipin **eski kopyasını** tuttu ve yeni yazılan kod "çalışmıyor" göründü; bir süre kodda hata arandı, oysa kod yüklenmemişti. İkinci ders: 48. test **yalancı geçiyordu** — müşteri ekranlarını boş açıp hiçbir şey ölçmeden yeşil yanıyordu. Üçüncüsü: 50. testin kendisi ekranda balon bırakıp başka bir testi haksız yere kırmızıya düşürdü.
+
+**Cemil'i bekleyen yeni açık maddeler:** A-M43 (alış rakamı nerede girilecek) · A-M46 (parçacı ağı) · A-M47 (düzeltmeler dükkândan çıkacak mı).
 **Zemin (bugün ne var):** `sesCozumle()` zaten bir **işlem nesnesi**
 üretiyor (`{tur, plaka, is, km, oneri…}`) ve onay ekranı var — yani
 7.2'nin yarısı yazılı. *"Bunu mu demek istediniz"* yalnız **plaka**
