@@ -222,12 +222,20 @@ const baslik = `<!--
 -->
 `;
 
+/* ⚠️ YERLEŞTİRME FONKSİYONLA YAPILIR, DİZGEYLE DEĞİL (12.10).
+   `metin.replace(yer, js)` ikinci argüman DİZGE olunca içindeki `$'`,
+   `$&`, `` $` ``, `$$` kalıplarını YORUMLAR: `$'` "eşleşmeden sonraki
+   her şey" demek. 04-islem.js'te bir düzenli ifade dizgesi
+   (`'…\\d{2,4}$'`) tam bu kalıbı taşıyordu; çıktıya şablonun geri kalanı
+   (ikon tanımları, kapanış etiketleri) yapıştı ve BÜTÜN betik
+   ayrışmaz oldu. Kaynak doğruydu, derleyici bozdu.
+   Bugüne kadar tutması tesadüftü: kaynakta o dört kalıp hiç geçmemişti. */
 let cikti = oku(path.join(KAYNAK, 'kabuk.html'))
-  .replace('<!doctype html>', '<!doctype html>\n' + baslik)
-  .replace('/* @@STIL@@ */', css)
-  .replace('<!-- @@EKRANLAR@@ -->', ekranMarkup)
-  .replace('<!-- @@IKONLAR@@ -->', ikonlar)
-  .replace('/* @@BETIK@@ */', js);
+  .replace('<!doctype html>', () => '<!doctype html>\n' + baslik)
+  .replace('/* @@STIL@@ */', () => css)
+  .replace('<!-- @@EKRANLAR@@ -->', () => ekranMarkup)
+  .replace('<!-- @@IKONLAR@@ -->', () => ikonlar)
+  .replace('/* @@BETIK@@ */', () => js);
 
 /* ---- derleme denetimi 7: ÜRETİLEN BETİK ÇALIŞIYOR MU (06.09) ----
    ⚠️ BU DENETİM OLMADAN DERLEYİCİ YALAN SÖYLÜYORDU. Bir ekran
@@ -241,13 +249,26 @@ let cikti = oku(path.join(KAYNAK, 'kabuk.html'))
    En temel soru en sona kalmıştı: bu JavaScript geçerli mi?
 
    new Function ÇALIŞTIRMAZ, yalnız AYRIŞTIRIR — derleme sırasında
-   hiçbir yan etki doğmaz. */
-try {
-  new Function(js);
-} catch (e) {
-  uyarilar.push('ÜRETİLEN BETİK AYRIŞMIYOR — ' + e.message +
-    ' (prototip tarayıcıda ölü açılır)');
-}
+   hiçbir yan etki doğmaz.
+
+   ⚠️ 12.10 — DENETİM YANLIŞ ŞEYE BAKIYORDU. `js` değişkenini, yani
+   şablona YERLEŞTİRİLMEDEN ÖNCEKİ betiği ayrıştırıyordu. Yerleştirme
+   betiği bozdu (yukarıdaki `$'` notu) ve denetim "temiz" dedi: ölçtüğü
+   şey doğruydu, tarayıcının aldığı şey bozuktu. Artık ÜRETİLEN
+   DOSYADAN çıkarılan her <script> ayrıştırılıyor — tarayıcının
+   gördüğü metin. (K-024.1'in kardeşi: ölçtüğünü sandığını ölç.)
+   NEGATİF DOĞRULAMA: yerleştirme dizgeye geri çevrildi → bu denetim
+   bulgu verdi; fonksiyona dönülünce temiz. */
+const betikler = [...cikti.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
+if (!betikler.length) uyarilar.push('ÜRETİLEN DOSYADA HİÇ <script> YOK');
+betikler.forEach((b, i) => {
+  try {
+    new Function(b);
+  } catch (e) {
+    uyarilar.push(`ÜRETİLEN DOSYADAKİ ${i + 1}. BETİK AYRIŞMIYOR — ${e.message}` +
+      ' (prototip tarayıcıda ölü açılır)');
+  }
+});
 
 fs.writeFileSync(CIKTI, cikti, 'utf8');
 
