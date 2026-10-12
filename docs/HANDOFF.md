@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 14.09.2026 *(K-048 · üçüncü telefon turu · yapay zeka planı)*
+> **Son güncelleme:** 12.10.2026 *(K-055 · on beş açık madde kapandı · Tur 8 açıldı)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -20,9 +20,11 @@ tıklanabilir prototip.
 | Yapay zeka | **Plan yazıldı, kod yok:** `arastirma/YAPAY-ZEKA.md` — dört iş (ses anlama · ruhsat · parça listesi · mesaj düzeltme), tek şart (**anahtar backend'de**), ölçüm yolu (değerlendirme seti) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
-| Sağlık denetimi | **46 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **50 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-049** · bekleyen maddeler yapay zeka turunun (A-M30…A-M35) |
+| Kararlar | **K-001 … K-055** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
+| Ses | Cümle → **işlem nesnesi** → onay. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
+| Sıradaki | **Tur 8** — servis detayı yeniden kurgu · ayarlar sayfası + alış alanı · ses şema sistemi · A-M48 (bkz. `CALISMA-KUYRUGU.md`) |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 alan)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
@@ -286,16 +288,24 @@ K-024.1'in kardeşi: ölçüm aleti ölçtüğü şeyi bozmamalı — ve
 Burada ikinci bir liste duruyordu ve iki liste ayrışmıştı — aynı soruyu
 iki yerde tutmak, iki ayrı cevap demektir (K-019.1).
 
-**14.09 akşamı itibarıyla açık maddelerin çoğu cevaplandı** (Cemil:
-*"Karar bekleyen bir şey varsa onu da bitirelim."*). Bekleyen dört madde
-yapay zeka turunun:
+**12.10 itibarıyla on beş maddenin hepsi cevaplandı** (K-055). Açık
+kalan iki madde:
 
-| Kod | Soru | Öneri |
+| Kod | Soru | Durum |
 |---|---|---|
-| **A-M30** | Hangi model — dükkân başına aylık ~$3 ile ~$13 arası | Ölçmeden seçme |
-| **A-M31** | Backend bu fazda mı açılıyor (yapay zekanın tek yapısal engeli) | Evet ama küçük: tek uç nokta |
-| **A-M32** | Gerçek ruhsat/parça listesi fotoğrafları toplanacak mı | Toplanmalı |
-| **A-M33** | Gizlilik cümlesi nerede yazsın | Ayarlarda tek satır |
+| **A-M48** | Dükkân sesine erişmeden ses tarafı nasıl ölçülür? | **AÇIK** — Tur 8.4'ün araştırma işi |
+| **A-M36** | KVKK saklama süresi | **ERTELENDİ** — gerçek veri tutulmadan önce kapanmalı |
+
+**12.10'un üç kalıcı kararı:**
+
+- **Backend bu fazda yok** (A-M31) → iz, çıkarım sayfası, parçacı ağı,
+  düzeltmelerin dışarı çıkması: hepsi backend turunda. **Bedeli:**
+  birikim mekanizması çalışıyor ama **sayaç sıfır** — düzeltmeler
+  dükkânda kalıyor (K-055.1).
+- **Alış fiyatı zorunlu değil** (A-M43) → `alis: null` ≠ `alis: 0`;
+  bilinmeyen alış kâra **girmez**. Bugünkü kâr şişmesi burada (K-055.2).
+- **Ayarlar sayfası kapsama girdi** → alış sorulsun mu · gizlilik
+  cümlesi · tema. 17. ekran olacak.
 
 Kapsam kararlarından ikisi **tek cümleyle geri alınabilir**: `MUH`
 (kasa+gider) ve `A-M25` (toplu mesaj kalıyor).
@@ -305,7 +315,14 @@ parça listesi okuma** (`YAPAY-ZEKA.md` — backend bekliyor) · **sesli
 komutun modele bağlanması** (aynı yerde) · gerçek WhatsApp gönderimi
 (`WHATSAPP.md` A yolu) · SMS + İYS kaydı · **muhasebe kararının açtığı
 dört iş** (ay bazlı gider toplamı → dışa aktarma → alacak → izin alanı) ·
-backend.
+fatura girişi (A-M44, muhasebeyle) · backend.
+
+**Sunum kaynağı:** *"Tamiron — Özellikler ve Baştan Sona Kullanım"*
+(belge bağlacında, 9 bölüm). 12.10'da dört yeri tazelendi: maliyet
+kararı · ses ölçümü · fatura girişi · birikim sayacının sıfır olduğu.
+⚠️ **Cevapsız soru:** sunum **tamirciye mi yatırımcıya mı**? *"Neden
+kopyalanamaz"* bölümü yatırımcı sorusuna hazırlıktı; tamirciye
+yapılacaksa o bölüm çıkar, *"baştan sona"* büyür.
 
 ---
 
