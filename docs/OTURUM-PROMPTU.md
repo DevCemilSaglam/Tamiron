@@ -16,8 +16,9 @@ Depo: D:\GitRepos\Tamiron
 ## Önce oku, sonra konuş
 1. docs/HANDOFF.md              — nerede durduğumuz (durum belgesi)
 2. docs/arastirma/TAMIRCI-GERIBILDIRIM.md — bu deponun 1 numaralı belgesi
-3. docs/KARARLAR.md             — K-001…K-018 ve açık maddeler
-4. CLAUDE.md                    — faz kuralları
+3. docs/KARARLAR.md             — K-001…K-055; en üstteki K-055 en taze
+4. docs/CALISMA-KUYRUGU.md      — sıradaki iş (en üstte Tur 8)
+5. CLAUDE.md                    — faz kuralları
 
 Bunları okumadan iş yapma. Okuduktan sonra bana durumu ÜÇ CÜMLEYLE
 özetle ve ne üzerinde çalışacağımızı sor.
@@ -79,11 +80,22 @@ dokunulabilir.
   temanın nereye gideceği sorulmamıştı.
 - Kuralı yazmak yetmiyor; aynı tuzağa kararı yazdıktan sonra bir kez
   daha düşüldü.
+- ÖNCE ARACINA BAK: "bulgu" sanılan şeylerin çoğu ölçüm hatası çıktı.
+  En pahalısı: tarayıcı prototipin ESKİ kopyasını tuttu, yeni kod
+  "çalışmıyor" göründü ve yarım saat kodda hata arandı. Yeni koda
+  dayanan her ölçümden önce sayfanın TAZE olduğunu doğrula.
+- Yalancı geçen test, olmayan testten kötüdür: bir test müşteri
+  ekranlarını boş açıp hiçbir şey ölçmeden yeşil yanıyordu.
 
 ## Şu an bekleyen kararlarım
-HANDOFF.md §5'te duruyor. En acili MUHASEBE KAPSAMI: günlük kasa mı,
-kasa+gider mi, cari hesap mı? Referans için
-docs/arastirma/PARASUT-HARITA.md ve LUCANET-ONE-HARITA.md var.
+Neredeyse yok — 12.10'da on beşi birden kapattım (K-055). Açık kalan
+tek iş maddesi A-M48: dükkân sesine erişimim yok, ses tarafını nasıl
+ölçeceğimizi bulmalıyız. A-M36 (KVKK saklama süresi) bilerek ertelendi.
+
+## Sıradaki iş
+Tur 8, docs/CALISMA-KUYRUGU.md'nin en üstünde. Dördü de açık:
+servis detayının yeniden kurgusu (bana birkaç yaklaşım sunacaksın,
+seçeceğim) · ayarlar sayfası + alış alanı · ses şema sistemi · A-M48.
 ```
 
 ---
