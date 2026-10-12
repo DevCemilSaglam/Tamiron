@@ -23,6 +23,7 @@ Ustanın söylediği cümlenin **doğru işleme** çevrilip çevrilmediğini.
 | `puanla.js` | **Cetvel — tek yerde.** İki koşucu da bunu kullanır; iki cetvel olsa karneler karşılaştırılamazdı |
 | `tarayicida-kos.js` | Koşucu 1 — bugünkü motor (tarayıcıda, **anahtarsız**) |
 | `model-kos.js` | Koşucu 2 — Claude (Node, **anahtar ister**) |
+| `ses-dosya-kos.html` | Koşucu 3 — **ses dosyası** → tarayıcının tanıyıcısı → aynı çözümleyici → aynı cetvel. Bozma türü başına karne + kelime hatası. Mikrofon gerekmez (`start(track)`, Chrome 152'de denendi). ⚠️ Gerçek Chrome'da baştan sona **henüz doğrulanmadı** — `docs/arastirma/SES-OLCUM.md` (A-M48) |
 
 **Puanlama:** tür yanlışsa **kısmi puan yok** (yanlış tür, ustayı yanlış
 ekrana götürür). Tür doğru ama alan yanlışsa **yarım**. `plakasiz`

@@ -24,7 +24,7 @@ tıklanabilir prototip.
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **7. kontrol artık ÜRETİLEN dosyadaki betiği ayrıştırıyor** — yerleştirmeden önceki betiğe bakıyordu ve `$'` bozulmasını görmedi (K-056.4). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
 | Kararlar | **K-001 … K-057** · açık **A-M49** (servis detayı kurgusu — Cemil seçecek) · **A-M48** (ses ölçümü) · **A-M36** (saklama süresi, ertelendi) |
 | Ses | Cümle → **işlem nesnesi** → onay. **İşi ses tanımaz: sahibi olan ekran şemasını bildirir** (`Islem.tanim`, `betik/04-islem.js`; 12 şema · 7 ekran — K-056). Onay ekranı ve uygulama şemadan. `ISLEM_SEMALARI()` = modele araç tanımı. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
-| Sıradaki | **Tur 8** — **8.1 sunuldu, Cemil'in seçimini bekliyor (A-M49)**: dört kurgu `prototypes/yaklasimlar/servis-detay.html` (yayın: claude.ai/artifact/4boFRu36EEpniK5n9MEVHY) · 8.4 A-M48. **8.2 ve 8.3 bitti** |
+| Sıradaki | **Tur 8'de lider işi kalmadı — dördü de Cemil'de.** 8.1 sunuldu, **seçim bekliyor (A-M49)**: `prototypes/yaklasimlar/servis-detay.html` (yayın: claude.ai/artifact/4boFRu36EEpniK5n9MEVHY) · 8.4 araştırıldı, **üç onay bekliyor (A-M48)**: `arastirma/SES-OLCUM.md` · 8.5 BEKLİYOR (A-M34) · **8.2 ve 8.3 bitti** |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 

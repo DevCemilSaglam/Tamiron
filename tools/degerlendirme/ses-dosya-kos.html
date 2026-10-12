@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ses dosyası koşucusu</title>
+<link rel="stylesheet" href="../../docs/tokens.css">
+<!-- ============ SES DOSYASI KOŞUCUSU (12.10.2026 · A-M48 · Tur 8.4) ============
+     Ayrıntı ve gerekçe: docs/arastirma/SES-OLCUM.md
+
+     NE YAPAR: kayıtlı ses dosyalarını tarayıcının KENDİ tanıyıcısına
+     (Web Speech) verir — mikrofon, hoparlör, kablo yok:
+       dosya → AudioContext → MediaStreamDestination → start(track)
+     Çıkan yazı prototipin çözümleyicisine (SES_COZUMLE, gizli çerçevede
+     omurga.html) ve AYNI cetvele (puanla.js) gider. Bozma türü başına
+     ayrı karne: temiz · snr18 · snr12 · snr6 · uzak · kirpik.
+
+     DOSYA ADI SÖZLEŞMESİ — ses-kaydet.html ve ses-bozucu.js'in ürettiği:
+       s07.wav        → 7. cümle, temiz
+       s07.snr12.wav  → 7. cümle, 12 dB dükkân gürültüsü
+
+     ⚠️ DOĞRULANMADI (12.10): uygulama bölmesindeki tarayıcı Google'ın
+     tanıma sunucusuna ulaşamıyor (`error:network`). Yol API düzeyinde
+     denendi — iz verilince tanıyıcı dinlemeye başlıyor — ama bir dosyanın
+     baştan sona yazıya döndüğü GERÇEK Chrome'da henüz görülmedi. İlk
+     koşu tek dosyayla yapılır (SES-OLCUM.md §5, adım 1).
+
+     NASIL: depo kökünden yerel sunucu (`.claude/launch.json`), sonra
+     masaüstü Chrome'da  http://localhost:8123/tools/degerlendirme/ses-dosya-kos.html
+
+     ÖLÇÜM ALETİ ÖLÇTÜĞÜ ŞEYİ DEĞİŞTİRMEZ (K-024.1): çözümleyici yalnız
+     çağrılıyor, hiçbir şey uygulanmıyor; ses hoparlöre verilmiyor. -->
+<style>
+  body { margin: 0; background: var(--bg); color: var(--text); font-family: var(--font-body); }
+  main { max-width: 960px; margin: 0 auto; padding-inline: 16px; padding-block: 24px 48px; display: flex; flex-direction: column; gap: 16px; }
+  h1 { font-family: var(--font-display); font-size: var(--tip-xl); margin: 0; }
+  p { margin: 0; color: var(--muted); }
+  .kutu { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  button, input[type=file] { min-height: var(--dokun); font: inherit; }
+  button { background: var(--primary); color: var(--on-primary); border: 0; border-radius: var(--radius-sm); padding: 0 16px; cursor: pointer; }
+  button[disabled] { opacity: .5; }
+  label { display: flex; gap: 8px; align-items: center; }
+  .tablo-kap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: var(--tip-sm); }
+  th, td { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-size: var(--tip-xs); text-transform: uppercase; letter-spacing: .05em; }
+  td.s { font-family: var(--font-mono); text-align: right; white-space: nowrap; }
+  .hata { color: var(--crit); }
+  pre { white-space: pre-wrap; font-family: var(--font-mono); font-size: var(--tip-xs); margin: 0; max-height: 240px; overflow: auto; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ses dosyası koşucusu</h1>
+  <p>Kayıtları seç (<code>s01.wav</code>, <code>s01.snr12.wav</code> …). Her dosya gerçek zamanlı çalınır — 40 cümle bir bozma türü için yaklaşık 4 dakika.</p>
+
+  <div class="kutu">
+    <input type="file" id="dosyalar" accept=".wav,audio/*" multiple aria-label="Ses dosyaları">
+    <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code> — karşılaştırma için ayrı koşu)</label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+      <button id="kos" disabled>Koş</button>
+      <span id="durum" aria-live="polite"></span>
+    </div>
+  </div>
+
+  <div class="kutu">
+    <strong>Karne — bozma türüne göre</strong>
+    <div class="tablo-kap"><table id="karne"></table></div>
+  </div>
+
+  <div class="kutu">
+    <strong>Dosya dosya</strong>
+    <div class="tablo-kap"><table id="ayrinti"></table></div>
+  </div>
+
+  <div class="kutu">
+    <strong>Ham sonuç (JSON)</strong>
+    <pre id="ham"></pre>
+  </div>
+</main>
+
+<iframe id="prototip" src="../../prototypes/omurga.html" style="position:fixed;left:-10000px;width:375px;height:700px" title="Prototip (çözümleyici)"></iframe>
+
+<script>
+var KOK = './';
+var SET = null, PUANLA = null;
+var S = window.SpeechRecognition || window.webkitSpeechRecognition;
+/* Tamiron'un en sık yanlış duyulacak kelimeleri (SES-OLCUM.md §6). Ölçmeden
+   ürüne girmez; burada yalnız açık/kapalı farkı ölçülsün diye. */
+var BEKLENEN = ['triger', 'balata', 'devirdaim', 'işçilik', 'teslim', 'tahsilat', 'kilometre', 'WhatsApp'];
+
+function $(id) { return document.getElementById(id); }
+function durum(m) { $('durum').textContent = m; }
+
+(async function hazirla() {
+  if (!S) { durum('Bu tarayıcıda Web Speech yok — masaüstü Chrome gerekli.'); return; }
+  SET = await (await fetch(KOK + 'ses-seti.json')).json();
+  eval(await (await fetch(KOK + 'puanla.js')).text());
+  PUANLA = window.DEGERLENDIRME_PUANLA;
+  $('dosyalar').addEventListener('change', function () { $('kos').disabled = !this.files.length; });
+  durum('Hazır — ' + SET.cumleler.length + ' cümlelik set yüklendi.');
+})();
+
+/* s07.snr12.wav → { id: 7, tur: 'snr12' } */
+function adCoz(ad) {
+  var m = ad.match(/^s(\d+)(?:\.([a-z0-9]+))?\.wav$/i);
+  return m ? { id: parseInt(m[1], 10), tur: m[2] || 'temiz' } : null;
+}
+
+/* Tek dosya → yazı. Ses hoparlöre GİTMEZ: yalnız MediaStreamDestination'a. */
+function tani(dosya, ifadeAcik) {
+  return new Promise(async function (bitti) {
+    var ctx = new AudioContext();
+    var tampon;
+    try { tampon = await ctx.decodeAudioData(await dosya.arrayBuffer()); }
+    catch (e) { ctx.close(); return bitti({ hata: 'çözülemedi: ' + e.message }); }
+    var hedef = ctx.createMediaStreamDestination();
+    var kaynak = ctx.createBufferSource();
+    kaynak.buffer = tampon; kaynak.connect(hedef);
+    var t = new S();
+    t.lang = 'tr-TR'; t.interimResults = false; t.maxAlternatives = 1; t.continuous = false;
+    if (ifadeAcik && window.SpeechRecognitionPhrase && 'phrases' in t) {
+      t.phrases = BEKLENEN.map(function (k) { return new SpeechRecognitionPhrase(k, 5.0); });
+    }
+    var yazi = '', hata = null, kapandi = false;
+    var kapat = function () {
+      if (kapandi) return; kapandi = true;
+      try { kaynak.stop(); } catch (e) {}
+      ctx.close();
+      bitti(hata ? { hata: hata, yazi: yazi } : { yazi: yazi });
+    };
+    t.onresult = function (e) {
+      for (var i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) yazi += e.results[i][0].transcript;
+    };
+    t.onerror = function (e) { if (e.error !== 'no-speech' && e.error !== 'aborted') hata = e.error; };
+    t.onend = kapat;
+    kaynak.onended = function () { setTimeout(function () { try { t.stop(); } catch (e) {} }, 1200); };
+    setTimeout(function () { try { t.abort(); } catch (e) {} kapat(); }, (tampon.duration + 12) * 1000);
+    try { t.start(hedef.stream.getAudioTracks()[0]); }
+    catch (e) { hata = 'start(track) desteklenmiyor: ' + e.message; return kapat(); }
+    kaynak.start();
+  });
+}
+
+/* Kelime hata oranı — beklenen cümleye göre, normalize edilmiş. Türkçede
+   sınır aranmaz, boşluktan bölünür (K-018). */
+function kelimeler(s) {
+  return (s || '').toLocaleLowerCase('tr').replace(/[.,!?;:"]/g, ' ').split(/\s+/).filter(Boolean);
+}
+function kho(beklenen, duyulan) {
+  var a = kelimeler(beklenen), b = kelimeler(duyulan);
+  var d = [];
+  for (var i = 0; i <= a.length; i++) { d[i] = [i]; for (var j = 1; j <= b.length; j++) d[i][j] = i ? 0 : j; }
+  for (i = 1; i <= a.length; i++) for (j = 1; j <= b.length; j++) {
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  }
+  return a.length ? d[a.length][b.length] / a.length : 0;
+}
+
+$('kos').addEventListener('click', async function () {
+  var P = $('prototip').contentWindow;
+  if (!P || typeof P.SES_COZUMLE !== 'function') { durum('Prototip yüklenmedi — sayfayı yenile.'); return; }
+  var ifadeAcik = $('ifadeler').checked;
+  var dosyalar = Array.prototype.slice.call($('dosyalar').files)
+    .map(function (f) { return { f: f, ad: adCoz(f.name) }; })
+    .filter(function (x) { return x.ad && SET.cumleler.some(function (c) { return c.id === x.ad.id; }); });
+  if (!dosyalar.length) { durum('Adı sözleşmeye uyan dosya yok (s01.wav …).'); return; }
+  this.disabled = true;
+
+  var sonuc = [];
+  var kayitId = P.eval("(icerideki().filter(function(k){return (k.satirlar||[]).length>1;})[0]||{}).id");
+  for (var n = 0; n < dosyalar.length; n++) {
+    var x = dosyalar[n];
+    durum((n + 1) + ' / ' + dosyalar.length + ' — ' + x.f.name);
+    var r = await tani(x.f, ifadeAcik);
+    var c = SET.cumleler.filter(function (k) { return k.id === x.ad.id; })[0];
+    var yed = { niyet: P.SESLI_NIYET, kayit: P.ACIK_KAYIT };
+    P.SESLI_NIYET = c.baglam;
+    P.ACIK_KAYIT = c.baglam === 'kayit-icinde' ? kayitId : null;
+    var islem = null;
+    try { islem = r.yazi ? P.SES_COZUMLE(r.yazi) : { tur: 'plakasiz', metin: '' }; } catch (e) { islem = { hata: e.message }; }
+    P.SESLI_NIYET = yed.niyet; P.ACIK_KAYIT = yed.kayit;
+    sonuc.push({ dosya: x.f.name, id: c.id, tur: x.ad.tur, beklenen: c.cumle, duyulan: r.yazi || '',
+                 hata: r.hata || null, kho: kho(c.cumle, r.yazi), islem: islem });
+  }
+
+  /* Bozma türü başına karne — AYNI cetvel (puanla.js). */
+  var turler = {};
+  sonuc.forEach(function (s) { (turler[s.tur] = turler[s.tur] || []).push(s); });
+  var karne = Object.keys(turler).sort().map(function (tur) {
+    var cevap = {};
+    turler[tur].forEach(function (s) { cevap[s.id] = s.islem; });
+    var altSet = { cumleler: SET.cumleler.filter(function (c) { return cevap[c.id]; }), kurallar: SET.kurallar };
+    var p = PUANLA(altSet, cevap);
+    var ort = turler[tur].reduce(function (t, s) { return t + s.kho; }, 0) / turler[tur].length;
+    var agHata = turler[tur].filter(function (s) { return s.hata; }).length;
+    return { tur: tur, dosya: turler[tur].length, puan: p.ozet, kho: Math.round(ort * 100), hata: agHata };
+  });
+
+  $('karne').innerHTML = '<thead><tr><th>Bozma</th><th>Dosya</th><th>Çözümleme (aynı cetvel)</th><th>Kelime hatası</th><th>Tanıma hatası</th></tr></thead><tbody>' +
+    karne.map(function (k) {
+      return '<tr><td>' + k.tur + '</td><td class="s">' + k.dosya + '</td><td>' + k.puan + '</td><td class="s">%' + k.kho +
+        '</td><td class="s' + (k.hata ? ' hata' : '') + '">' + k.hata + '</td></tr>';
+    }).join('') + '</tbody>';
+  $('ayrinti').innerHTML = '<thead><tr><th>Dosya</th><th>Beklenen</th><th>Duyulan</th><th>İşlem</th></tr></thead><tbody>' +
+    sonuc.map(function (s) {
+      return '<tr><td>' + s.dosya + '</td><td>' + s.beklenen + '</td><td>' + (s.hata ? '<span class="hata">' + s.hata + '</span> ' : '') +
+        (s.duyulan || '—') + '</td><td>' + ((s.islem && s.islem.tur) || '—') + '</td></tr>';
+    }).join('') + '</tbody>';
+  $('ham').textContent = JSON.stringify({ tarih: new Date().toISOString(), ifadeler: ifadeAcik,
+    tarayici: navigator.userAgent, karne: karne, sonuc: sonuc }, null, 1);
+  durum('Bitti — ' + sonuc.length + ' dosya.' + (karne.some(function (k) { return k.hata; }) ? ' Tanıma hataları var: ağ bağlantısını kontrol et.' : ''));
+  this.disabled = false;
+});
+</script>
+</body>
+</html>

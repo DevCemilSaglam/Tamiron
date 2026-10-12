@@ -1,0 +1,144 @@
+# SES ÖLÇÜMÜ — dükkân sesine erişmeden (A-M48 · Tur 8.4 · 12.10.2026)
+
+> **Soru (Cemil, 12.10):** *"Bu sesi alabilecek imkânım henüz yok. Buna
+> çözüm bulmalıyız."* Alet hazır (`ses-kaydet.html`), erişim yok. Ölçülmezse
+> *"Web Speech yetiyor"* bir **tahmin** olarak kalır.
+>
+> **Kısa cevap:** dükkân **kaydı** şart değil. Asıl engel başkaydı: tarayıcının
+> tanıyıcısı yalnız mikrofonu dinliyordu, kayıtlı dosyayı dinleyemiyordu. Bu
+> tarayıcının bugünkü sürümü (Chrome 152) **dosyadan beslenebiliyor** — bu
+> oturumda denendi. Böylece konuşma evden, gürültü açık arşivden gelebilir ve
+> ölçüm **kontrollü** yapılabilir. Kalan tek ölçülemeyen şey dükkânın kendi
+> akustiği; o risk olarak yazılır.
+
+---
+
+## 1 · Önce ayrım: sesin İKİ katmanı var, biri zaten ölçülüyor
+
+| Katman | Ne yapar | Bugün ölçülüyor mu |
+|---|---|---|
+| **Tanıma** | ses → yazı (Web Speech, ileride belki başka motor) | **HAYIR** — hiç ölçülmedi |
+| **Çözümleme** | yazı → işlem nesnesi (K-056 şemaları) | **EVET** — 40 cümle, **%93** (`ses-seti.json`) |
+
+Çözümleme ölçümü **temiz yazıyla** yapılıyor. Asıl bilinmeyen: dükkânda
+söylenen cümle tanıyıcıdan **ne kadar bozulmuş** çıkıyor ve bozulmuş
+yazıda çözümleyici %93'ü tutabiliyor mu. A-M48 bu iki sorunun ilki.
+
+## 2 · Bulgu: tanıyıcı dosyadan beslenebiliyor (bu oturumda denendi)
+
+Web Speech API'nin taslağında `start(audioTrack)` diye bir imza var;
+belgeler onu *"deneysel"* diye anıyor ve Chrome'da ne zaman geldiği
+yazılı değil ([MDN](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition/start),
+[2025 Google/Mozilla sunumu](https://docs.google.com/presentation/d/1zRSgSCJ32FtvwtxbVaStyxt6ZERlKL8obApqwBHRWGU/htmlpresent)).
+Tahmin yerine bakıldı (uygulama bölmesindeki tarayıcı, **Chrome 152**):
+
+| Deneme | Sonuç | Anlamı |
+|---|---|---|
+| `start({})` — yanlış tipte argüman | `TypeError: parameter 1 is not of type 'MediaStreamTrack'` | İmza **gerçekten var**; yok sayılan bir argüman değil |
+| `start(ses_izi)` — mikrofon izni **engelliyken** | `start → audiostart → … → error:network` | Tanıyıcı izi **dinlemeye başladı**; mikrofona hiç dokunmadı |
+| `available({langs:['tr-TR'], processLocally:false})` | `available` | Türkçe **bulutta** var |
+| `available({langs:['tr-TR'], processLocally:true})` | `unavailable` | Türkçe **cihaz üstünde yok** — ses dışarı gidiyor (gizlilik cümlesi doğru, K-057) |
+| `SpeechRecognitionPhrase`, `phrases` | var | Beklenen kelimeler önceden bildirilebilir (§6) |
+
+⚠️ **Doğrulanmayan son adım:** `error:network` — bu bölme Google'ın tanıma
+sunucusuna ulaşamıyor. **Gerçek masaüstü Chrome'da** bir dosyanın baştan
+sona yazıya döndüğü **görülmedi.** İlk iş bu (§5, adım 1); tutmazsa plan
+§4'teki B yoluna düşer.
+
+Ses izi şöyle üretiliyor — dosya → `AudioContext` → `MediaStreamDestination`
+→ `getAudioTracks()[0]` → `recognition.start(track)`. Mikrofon, hoparlör,
+kablo yok.
+
+## 3 · Konuşma nereden gelir — hazır Türkçe derlemler
+
+| Derlem | Büyüklük | Lisans | Ne işe yarar | Eksiği |
+|---|---|---|---|---|
+| **Common Voice — Türkçe 25.0** ([Mozilla](https://datacollective.mozillafoundation.org/datasets/cmn2e7kbl01k2mm07gm5n1bc9)) | 135 saat · 1.816 konuşmacı | CC0 — ama yeniden dağıtmak ve konuşmacıyı tanımaya çalışmak **yasak** | Çok sesli, telefon kalitesine yakın; genel taban | Okunan cümleler; dükkân kelimesi yok |
+| **MediaSpeech TR** ([OpenSLR 108](https://www.openslr.org/108)) | 10 saat · ~618 MB | CC BY 4.0 | Küçük ve elle yazılmış; hızlı taban | Haber/medya dili |
+| **ISSAI TSC** ([Hugging Face](https://huggingface.co/datasets/issai/Turkish_Speech_Corpus)) | ~218 saat | ISSAI: CC BY 4.0 · HF kopyası: MIT — **çelişkili**, kaynağından bakılmalı | En büyük açık Türkçe derlem | Aynı |
+| **FLEURS TR** ([Hugging Face](https://www.huggingface.co/datasets/google/fleurs/blame/main/fleurs.py)) | 2.000 cümle | kart üzerinde bakılmalı | Modeller arası karşılaştırma ölçütü | Aynı |
+
+**Hiçbirinde "triger", "balata", "devirdaim" ya da plaka okunuşu yok.** Bu
+derlemler tanıyıcının **genel** Türkçe başarısını verir; bizim cümlemizdeki
+başarıyı vermez. Taban olarak değerli, cevap olarak yetersiz.
+
+## 4 · Dört aday + bulunan beşinci yol
+
+| Yol | Ne ölçer | Bedel | Güvenilirlik | Karar |
+|---|---|---|---|---|
+| **A · Hazır derlem** | genel Türkçe tanıma (kelime hata oranı) | indirme + koşucu | yüksek, ama **bizim cümlemiz değil** | taban olarak **evet** (MediaSpeech TR, küçük) |
+| **B · Sentetik ses (TTS) + bozucu** | boru hattı çalışıyor mu | düşük | makine sesi insan sesi değil — **sayıya güvenilmez** | yalnız **duman testi** |
+| **C · Tanıdık dükkânda tek seferlik kayıt** | gerçeğin kendisi | erişim yok | en yüksek | **sonraki faz**, ilk saha denemesinde |
+| **D · Ertele, riski yaz** | hiçbir şey | sıfır | — | §7'de **her durumda** yazılıyor |
+| **E · Konuşma evden, gürültü açık arşivden** *(yeni)* | **bizim 40 cümlemiz**, kontrollü gürültüde | ~20 dk okuma + koşucu | yüksek; akustik hariç | **ÖNERİ** |
+
+### E yolu — nasıl
+
+1. **Konuşma:** Cemil (ve isterse 2–4 tanıdık) `ses-kaydet.html` ile
+   değerlendirme setinin **40 cümlesini** sessiz bir odada okur. Dükkân
+   gerekmiyor; alet zaten telefonda çalışıyor ve zip çıkarıyor (6.2).
+2. **Gürültü:** açık lisanslı **gerçek atölye kayıtları** — Freesound'da
+   yalnız *"impact wrench"* için **41 CC0 kayıt** var
+   ([arama](https://freesound.org/search/?q=impact+wrench&f=license%3A%22Creative+Commons+0%22));
+   kompresör ve el aletleri de aranır. Her dosyanın lisansı kendi
+   sayfasında doğrulanır, lisans ve kaynak dosyanın yanına yazılır.
+3. **Bozma:** `ses-bozucu.js` aynen — SNR 18 / 12 / 6 + uzak + kırpık.
+4. **Tanıma:** yeni bir koşucu (`ses-dosya-kos.html`, yazılacak): her
+   dosyayı §2'deki yolla tanıyıcıya verir, yazıyı alır.
+5. **Çözümleme + puan:** yazı `SES_COZUMLE`'ye, sonuç `puanla.js`'ye —
+   **aynı cetvel** (K-049). Çıktı bir eğri: *"temizde %x, 12 dB'de %y,
+   6 dB'de %z"*.
+
+⚠️ **E yolu `ses-bozucu.js`'in bir kuralını esnetiyor:** *"GÜRÜLTÜ
+UYDURULMAZ — karıştırılan ses dükkânın kendi 20 saniyesidir."* E'de
+gürültü **uydurma değil, gerçek atölye sesi** — ama **bizim** dükkânın
+değil. Beyaz gürültüden çok daha iyi, dükkânın kendisinden kötü.
+**Cemil onayına açık.**
+
+## 5 · Önerilen sıra
+
+| # | İş | Kim | Çıktı |
+|---|---|---|---|
+| 1 | Dosyadan tanıma koşucusu + **gerçek Chrome'da tek dosyayla** baştan sona doğrulama | lider | §2'nin son adımı kapanır — ya da B yoluna düşülür |
+| 2 | MediaSpeech TR'den 100 kısa kayıtla **genel taban** | lider (indirme izni Cemil'den) | *"Web Speech genel Türkçede %…"* |
+| 3 | 40 cümleyi evde okumak | **Cemil** (~20 dk) | `kayitlar/*.wav` |
+| 4 | CC0 atölye gürültüsü + `ses-bozucu.js` + koşucu + `puanla.js` | lider | SNR eğrisi — **ses tarafının ilk gerçek rakamı** |
+| 5 | Kalan riski sunuma yazmak | lider | §7 |
+
+1 numara tek başına değerli: tutarsa ses ölçümü **artık dükkâna bağlı değil.**
+
+## 6 · Ölçümün açtığı bir fırsat — ölçülmeden açılmaz
+
+Tanıyıcı `phrases` ile **beklenen kelimeleri** önceden alabiliyor (bağlama
+göre yönlendirme). *"triger, balata, devirdaim"* ve plaka okunuşu buraya
+verilebilir; Tamiron'un en sık yanlış duyulacak kelimeleri tam bunlar
+(A-M27'deki *"34 QBC 123"* örneği gibi). Bu **yeni bir özellik değil**,
+var olan tanımanın ayarı — ama **ölçmeden açılmaz:** E yolundaki eğri
+`phrases` açık ve kapalı iki kez koşulur, fark rakamla görülür.
+K-056'nın şemaları ekran başına beklenen kelimeleri zaten taşıyor; liste
+oradan türetilebilir.
+
+## 7 · Ne olursa olsun yazılacak risk
+
+E yolu üç şeyi **ölçemez**:
+
+- **Dükkânın akustiği:** yankılı kapalı alan, usta telefondan iki adım ötede.
+  (`ses-bozucu.js`'in *"uzak"* hâli bunu taklit ediyor, ölçmüyor.)
+- **Ustanın kendi ağzı:** şive, hız, yarım bırakılan cümle. Cemil'in okuduğu
+  cümle, ustanın söylediği cümle değil.
+- **Gerçek telefon mikrofonu ve çevrimiçi bağlantı:** dükkânda internet
+  yavaşsa tanıma gecikir ya da düşer (`error:network`).
+
+Sunumun *"henüz hazır olmayanlar"* bölümüne şu cümle girer:
+*"Sesli işlem temiz yazıda %93 doğru. Gürültülü sesle [E yolu sonucu]. Gerçek
+bir dükkânda henüz denenmedi."* — ölçülmemiş bir şey *"çalışıyor"* diye
+anlatılmaz (K-055.5).
+
+## 8 · Cemil onayına açık
+
+1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
+   sesi ama bizim dükkânın değil.
+2. **Kendi sesin** (40 cümle, ~20 dk) — ve istersen 2–4 tanıdığın.
+3. **İndirme:** MediaSpeech TR (~618 MB, CC BY 4.0) ve seçilen CC0 gürültü
+   dosyaları. Ses dosyaları depoya **girmez** (`.gitignore`, ruhsat
+   fotoğraflarıyla aynı kural); yalnız kaynak + lisans listesi girer.

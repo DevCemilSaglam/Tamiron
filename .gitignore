@@ -33,3 +33,8 @@ tools/degerlendirme/kontrol.html
 
 # Ses eşdeğerlik ölçümünün taban kopyası (tools/ses-esdeger.js) — geçici
 prototypes/_taban.html
+
+# Ses kayıtları ve indirilen derlem/gürültü dosyaları (SES-OLCUM.md §8) —
+# depoya yalnız kaynak + lisans listesi girer.
+tools/degerlendirme/sesler/
+*.wav
