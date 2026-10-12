@@ -79,50 +79,12 @@ function wavYaz(yol, ornekler, hiz) {
   return b.length;
 }
 
-/* ---------- bozmalar ---------- */
-function rms(a, bas, son) {
-  let t = 0;
-  for (let i = bas; i < son; i++) t += a[i] * a[i];
-  return Math.sqrt(t / Math.max(1, son - bas));
-}
-
-function gurultuKat(ornekler, ortam, hedefSnrDb, hiz) {
-  /* ⚠️ Seviyeler ses-olcu.js'ten geliyor — kendi tahmincimizi yazmıyoruz.
-     Yazdığımızda "6 dB" etiketli dosya 8,4 dB ölçülüyordu: etiket ile
-     cetvel ayrı tanım kullanınca eğri kayıyor ve kimse fark etmiyor. */
-  const konusma = olcu.seviyeler(ornekler, hiz).konusma;
-  const ortamSev = olcu.seviyeler(ortam, hiz).taban || rms(ortam, 0, ortam.length) || 1e-6;
-  const hedefGurultu = konusma / Math.pow(10, hedefSnrDb / 20);
-  const k = hedefGurultu / ortamSev;
-  const c = new Float32Array(ornekler.length);
-  /* Ortam kaydı kısaysa başa sarılır — dükkân sesi zaten döngüsel. */
-  for (let i = 0; i < ornekler.length; i++) {
-    c[i] = ornekler[i] + ortam[i % ortam.length] * k;
-  }
-  return c;
-}
-
-/* Uzaklık: seviye düşer ve tizler söner (yüksek frekanslar havada
-   daha çabuk yutulur). Tek kutuplu alçak geçiren yeterli — amaç
-   gerçekçi bir akustik model değil, tanımayı zorlamak. */
-function uzaklastir(a, dbDusus, hiz) {
-  const kazanc = Math.pow(10, -Math.abs(dbDusus) / 20);
-  const kesim = 2200;
-  const alfa = 1 / (1 + hiz / (2 * Math.PI * kesim));
-  const c = new Float32Array(a.length);
-  let onceki = 0;
-  for (let i = 0; i < a.length; i++) {
-    onceki = onceki + alfa * (a[i] - onceki);
-    c[i] = onceki * kazanc;
-  }
-  return c;
-}
-
-function kirp(a, kazanc) {
-  const c = new Float32Array(a.length);
-  for (let i = 0; i < a.length; i++) c[i] = Math.max(-1, Math.min(1, a[i] * kazanc));
-  return c;
-}
+/* ---------- bozmalar ----------
+   12.10 — ORTAK MODÜLE TAŞINDI (ses-bozma.js). Dosyadan tanıma koşucusu
+   (ses-dosya-kos.html) aynı bozmaları tarayıcıda yapıyor; hesap iki yerde
+   yazılsaydı ayrışırdı. Taşımadan önce ve sonra yapay girdiyle üretilen
+   10 varyant BAYT BAYT karşılaştırıldı: aynı. */
+const { varyantlar } = require('./ses-bozma.js');
 
 /* ---------- koşucu ---------- */
 const arg = (ad, v) => { const i = process.argv.indexOf(ad); return i > 0 ? process.argv[i + 1] : v; };
@@ -159,17 +121,8 @@ dosyalar.forEach((f) => {
   const { ornekler, hiz } = wavOku(path.join(KAYNAK, f));
   const taban = f.replace(/\.wav$/i, '');
 
-  const varyantlar = [
-    ['uzak', uzaklastir(ornekler, 12, hiz)],
-    ['kirpik', kirp(ornekler, 6)]
-  ];
-  if (ortam) {
-    [18, 12, 6].forEach((snr) => {
-      varyantlar.push(['snr' + snr, gurultuKat(ornekler, ortam, snr, hiz)]);
-    });
-  }
-
-  varyantlar.forEach(([etiket, sinyal]) => {
+  /* Varyant listesi ve adları ortak modülde — koşucu da aynısını üretir. */
+  varyantlar(ornekler, ortam, hiz).forEach(([etiket, sinyal]) => {
     const ad = taban + '.' + etiket + '.wav';
     wavYaz(path.join(CIKTI, ad), sinyal, hiz);
     karne[olcu.degerlendir(sinyal, hiz).durum]++;

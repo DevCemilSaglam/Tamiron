@@ -19,6 +19,19 @@
        s07.wav        → 7. cümle, temiz
        s07.snr12.wav  → 7. cümle, 12 dB dükkân gürültüsü
 
+     GÜRÜLTÜ (12.10): bir gürültü dosyası da seçilirse (MP3 olabilir —
+     Freesound önizlemeleri), her temiz kayıttan uzak · kırpık · snr18/12/6
+     varyantları BURADA üretilir — ses-bozucu.js'in AYNI fonksiyonuyla
+     (ses-bozma.js). Dosyaya yazmaya, ffmpeg'e gerek yok. Cemil 12.10'da
+     "gürültü uydurulmaz" kuralının açık arşivden gerçek atölye sesiyle
+     esnetilmesini onayladı (SES-OLCUM.md §8).
+
+     DERLEM KİPİ (12.10): ses dosyasıyla AYNI ADLI bir .txt de seçilmişse
+     (MediaSpeech TR: <uuid>.flac + <uuid>.txt) doğru metin odur; yalnız
+     KELİME HATASI ölçülür — dükkân cümlesi olmadığı için çözümleme yok.
+     Bu, tanıyıcının GENEL Türkçe tabanı (SES-OLCUM.md §5, adım 2).
+     Sabit 100'lük alt küme: tools/degerlendirme/sesler/derlem-100/
+
      ⚠️ DOĞRULANMADI (12.10): uygulama bölmesindeki tarayıcı Google'ın
      tanıma sunucusuna ulaşamıyor (`error:network`). Yol API düzeyinde
      denendi — iz verilince tanıyıcı dinlemeye başlıyor — ama bir dosyanın
@@ -55,7 +68,10 @@
   <p>Kayıtları seç (<code>s01.wav</code>, <code>s01.snr12.wav</code> …). Her dosya gerçek zamanlı çalınır — 40 cümle bir bozma türü için yaklaşık 4 dakika.</p>
 
   <div class="kutu">
-    <input type="file" id="dosyalar" accept=".wav,audio/*" multiple aria-label="Ses dosyaları">
+    <label for="dosyalar">Konuşma kayıtları</label>
+    <input type="file" id="dosyalar" accept=".wav,.flac,.txt,audio/*" multiple aria-label="Ses dosyaları">
+    <label for="gurultu">Gürültü (isteğe bağlı — tek dosya; seçilirse bozulmuş varyantlar da koşar)</label>
+    <input type="file" id="gurultu" accept="audio/*,.mp3,.wav" aria-label="Gürültü dosyası">
     <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code> — karşılaştırma için ayrı koşu)</label>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <button id="kos" disabled>Koş</button>
@@ -66,6 +82,11 @@
   <div class="kutu">
     <strong>Karne — bozma türüne göre</strong>
     <div class="tablo-kap"><table id="karne"></table></div>
+  </div>
+
+  <div class="kutu" id="derlemKutu" hidden>
+    <strong>Derlem — genel Türkçe tabanı (yalnız kelime hatası)</strong>
+    <div class="tablo-kap"><table id="derlem"></table></div>
   </div>
 
   <div class="kutu">
@@ -81,6 +102,8 @@
 
 <iframe id="prototip" src="../../prototypes/omurga.html" style="position:fixed;left:-10000px;width:375px;height:700px" title="Prototip (çözümleyici)"></iframe>
 
+<script src="ses-olcu.js"></script>
+<script src="ses-bozma.js"></script>
 <script>
 var KOK = './';
 var SET = null, PUANLA = null;
@@ -107,16 +130,39 @@ function adCoz(ad) {
   return m ? { id: parseInt(m[1], 10), tur: m[2] || 'temiz' } : null;
 }
 
-/* Tek dosya → yazı. Ses hoparlöre GİTMEZ: yalnız MediaStreamDestination'a. */
-function tani(dosya, ifadeAcik) {
+/* Dosya → tek kanal örnekler (ortak çözücü; tanıyıcıyla aynı hız). */
+var COZUCU = null;
+async function ornekleriAl(dosya) {
+  COZUCU = COZUCU || new AudioContext();
+  var t = await COZUCU.decodeAudioData(await dosya.arrayBuffer());
+  var a = new Float32Array(t.length);
+  for (var c = 0; c < t.numberOfChannels; c++) {
+    var k = t.getChannelData(c);
+    for (var i = 0; i < a.length; i++) a[i] += k[i] / t.numberOfChannels;
+  }
+  return { ornekler: a, hiz: t.sampleRate };
+}
+
+/* Tek kayıt → yazı. Kaynak bir DOSYA ya da hazır örnekler {ornekler, hiz}
+   (bozulmuş varyant). Ses hoparlöre GİTMEZ: yalnız MediaStreamDestination'a. */
+function tani(kaynak, ifadeAcik) {
   return new Promise(async function (bitti) {
     var ctx = new AudioContext();
     var tampon;
-    try { tampon = await ctx.decodeAudioData(await dosya.arrayBuffer()); }
+    try {
+      if (kaynak instanceof Blob) tampon = await ctx.decodeAudioData(await kaynak.arrayBuffer());
+      else {
+        tampon = ctx.createBuffer(1, kaynak.ornekler.length, kaynak.hiz);
+        tampon.copyToChannel(kaynak.ornekler, 0);
+      }
+    }
     catch (e) { ctx.close(); return bitti({ hata: 'çözülemedi: ' + e.message }); }
     var hedef = ctx.createMediaStreamDestination();
-    var kaynak = ctx.createBufferSource();
-    kaynak.buffer = tampon; kaynak.connect(hedef);
+    /* ⚠️ ADI "oynatici" — "kaynak" DEĞİL. İlk yazışta `var kaynak` idi ve
+       `var` fonksiyonun başına taşındığı için PARAMETREYİ gölgeledi: her
+       kayıt "çözülemedi" döndü. v1'in sekiz kez yaşadığı hata sınıfı. */
+    var oynatici = ctx.createBufferSource();
+    oynatici.buffer = tampon; oynatici.connect(hedef);
     var t = new S();
     t.lang = 'tr-TR'; t.interimResults = false; t.maxAlternatives = 1; t.continuous = false;
     if (ifadeAcik && window.SpeechRecognitionPhrase && 'phrases' in t) {
@@ -125,7 +171,7 @@ function tani(dosya, ifadeAcik) {
     var yazi = '', hata = null, kapandi = false;
     var kapat = function () {
       if (kapandi) return; kapandi = true;
-      try { kaynak.stop(); } catch (e) {}
+      try { oynatici.stop(); } catch (e) {}
       ctx.close();
       bitti(hata ? { hata: hata, yazi: yazi } : { yazi: yazi });
     };
@@ -134,11 +180,11 @@ function tani(dosya, ifadeAcik) {
     };
     t.onerror = function (e) { if (e.error !== 'no-speech' && e.error !== 'aborted') hata = e.error; };
     t.onend = kapat;
-    kaynak.onended = function () { setTimeout(function () { try { t.stop(); } catch (e) {} }, 1200); };
+    oynatici.onended = function () { setTimeout(function () { try { t.stop(); } catch (e) {} }, 1200); };
     setTimeout(function () { try { t.abort(); } catch (e) {} kapat(); }, (tampon.duration + 12) * 1000);
     try { t.start(hedef.stream.getAudioTracks()[0]); }
     catch (e) { hata = 'start(track) desteklenmiyor: ' + e.message; return kapat(); }
-    kaynak.start();
+    oynatici.start();
   });
 }
 
@@ -161,18 +207,66 @@ $('kos').addEventListener('click', async function () {
   var P = $('prototip').contentWindow;
   if (!P || typeof P.SES_COZUMLE !== 'function') { durum('Prototip yüklenmedi — sayfayı yenile.'); return; }
   var ifadeAcik = $('ifadeler').checked;
-  var dosyalar = Array.prototype.slice.call($('dosyalar').files)
+  var tum = Array.prototype.slice.call($('dosyalar').files);
+
+  /* DERLEM KİPİ — ses + aynı adlı .txt */
+  var metinler = {};
+  tum.forEach(function (f) { if (/\.txt$/i.test(f.name)) metinler[f.name.replace(/\.txt$/i, '')] = f; });
+  var derlem = tum.filter(function (f) { return !/\.txt$/i.test(f.name) && metinler[f.name.replace(/\.[^.]+$/, '')]; });
+  if (derlem.length) {
+    this.disabled = true;
+    var ds = [];
+    for (var d = 0; d < derlem.length; d++) {
+      durum('Derlem ' + (d + 1) + ' / ' + derlem.length + ' — ' + derlem[d].name);
+      var dogru = (await metinler[derlem[d].name.replace(/\.[^.]+$/, '')].text()).trim();
+      var rr = await tani(derlem[d], ifadeAcik);
+      ds.push({ dosya: derlem[d].name, beklenen: dogru, duyulan: rr.yazi || '', hata: rr.hata || null,
+                kho: kho(dogru, rr.yazi) });
+    }
+    var basarili = ds.filter(function (x) { return !x.hata; });
+    var ort = basarili.length ? basarili.reduce(function (t, x) { return t + x.kho; }, 0) / basarili.length : null;
+    $('derlemKutu').hidden = false;
+    $('derlem').innerHTML = '<thead><tr><th>Dosya</th><th>Tanınan</th><th>Ortalama kelime hatası</th><th>Tanıma hatası</th></tr></thead><tbody>' +
+      '<tr><td class="s">' + ds.length + '</td><td class="s">' + basarili.length + '</td><td class="s">' +
+      (ort === null ? '—' : '%' + Math.round(ort * 100)) + '</td><td class="s' + (ds.length - basarili.length ? ' hata' : '') + '">' +
+      (ds.length - basarili.length) + '</td></tr></tbody>';
+    $('ham').textContent = JSON.stringify({ tarih: new Date().toISOString(), kip: 'derlem', ifadeler: ifadeAcik,
+      tarayici: navigator.userAgent, ortalamaKho: ort, sonuc: ds }, null, 1);
+    durum('Derlem bitti — ' + ds.length + ' dosya.');
+    this.disabled = false;
+    return;
+  }
+
+  var dosyalar = tum
     .map(function (f) { return { f: f, ad: adCoz(f.name) }; })
     .filter(function (x) { return x.ad && SET.cumleler.some(function (c) { return c.id === x.ad.id; }); });
   if (!dosyalar.length) { durum('Adı sözleşmeye uyan dosya yok (s01.wav …).'); return; }
   this.disabled = true;
 
+  /* GÜRÜLTÜ SEÇİLDİYSE: her TEMİZ kayıttan varyantlar — ortak modülden. */
+  var gf = $('gurultu').files[0];
+  var is = dosyalar.map(function (x) { return { ad: x.f.name, id: x.ad.id, tur: x.ad.tur, kaynak: x.f }; });
+  if (gf) {
+    durum('Gürültü çözülüyor — ' + gf.name);
+    var ortam = (await ornekleriAl(gf)).ornekler;
+    var gAd = gf.name.replace(/\.[^.]+$/, '');
+    for (var v = 0; v < dosyalar.length; v++) {
+      if (dosyalar[v].ad.tur !== 'temiz') continue;
+      var o = await ornekleriAl(dosyalar[v].f);
+      SesBozma.varyantlar(o.ornekler, ortam, o.hiz).forEach(function (vr) {
+        is.push({ ad: dosyalar[v].f.name.replace(/\.wav$/i, '') + '.' + vr[0] + (/^snr/.test(vr[0]) ? '·' + gAd : '') + '.wav',
+                  id: dosyalar[v].ad.id, tur: vr[0] + (/^snr/.test(vr[0]) ? '·' + gAd : ''),
+                  kaynak: { ornekler: vr[1], hiz: o.hiz } });
+      });
+    }
+  }
+
   var sonuc = [];
   var kayitId = P.eval("(icerideki().filter(function(k){return (k.satirlar||[]).length>1;})[0]||{}).id");
-  for (var n = 0; n < dosyalar.length; n++) {
-    var x = dosyalar[n];
-    durum((n + 1) + ' / ' + dosyalar.length + ' — ' + x.f.name);
-    var r = await tani(x.f, ifadeAcik);
+  for (var n = 0; n < is.length; n++) {
+    var x = { f: { name: is[n].ad }, ad: { id: is[n].id, tur: is[n].tur } };
+    durum((n + 1) + ' / ' + is.length + ' — ' + x.f.name);
+    var r = await tani(is[n].kaynak, ifadeAcik);
     var c = SET.cumleler.filter(function (k) { return k.id === x.ad.id; })[0];
     var yed = { niyet: P.SESLI_NIYET, kayit: P.ACIK_KAYIT };
     P.SESLI_NIYET = c.baglam;
@@ -187,19 +281,25 @@ $('kos').addEventListener('click', async function () {
   /* Bozma türü başına karne — AYNI cetvel (puanla.js). */
   var turler = {};
   sonuc.forEach(function (s) { (turler[s.tur] = turler[s.tur] || []).push(s); });
+  /* ⚠️ TANINAMAYAN KAYIT PUANA GİRMEZ (12.10). İlk yazışta girdi: ağ
+     hatası veren her kayıt "yanlış" sayıldı ve karne "%0 · kelime hatası
+     %100" yazdı — tanıyıcıya HİÇ ULAŞILMADIĞI hâlde. "Her şeyi yanlış
+     duydu" ile "duyamadı" aynı şey değil; ikincisi ayrı sayılır. */
   var karne = Object.keys(turler).sort().map(function (tur) {
+    var tamam = turler[tur].filter(function (s) { return !s.hata; });
+    var agHata = turler[tur].length - tamam.length;
+    if (!tamam.length) return { tur: tur, dosya: turler[tur].length, puan: '— (tanınan yok)', kho: null, hata: agHata };
     var cevap = {};
-    turler[tur].forEach(function (s) { cevap[s.id] = s.islem; });
+    tamam.forEach(function (s) { cevap[s.id] = s.islem; });
     var altSet = { cumleler: SET.cumleler.filter(function (c) { return cevap[c.id]; }), kurallar: SET.kurallar };
     var p = PUANLA(altSet, cevap);
-    var ort = turler[tur].reduce(function (t, s) { return t + s.kho; }, 0) / turler[tur].length;
-    var agHata = turler[tur].filter(function (s) { return s.hata; }).length;
+    var ort = tamam.reduce(function (t, s) { return t + s.kho; }, 0) / tamam.length;
     return { tur: tur, dosya: turler[tur].length, puan: p.ozet, kho: Math.round(ort * 100), hata: agHata };
   });
 
   $('karne').innerHTML = '<thead><tr><th>Bozma</th><th>Dosya</th><th>Çözümleme (aynı cetvel)</th><th>Kelime hatası</th><th>Tanıma hatası</th></tr></thead><tbody>' +
     karne.map(function (k) {
-      return '<tr><td>' + k.tur + '</td><td class="s">' + k.dosya + '</td><td>' + k.puan + '</td><td class="s">%' + k.kho +
+      return '<tr><td>' + k.tur + '</td><td class="s">' + k.dosya + '</td><td>' + k.puan + '</td><td class="s">' + (k.kho === null ? '—' : '%' + k.kho) +
         '</td><td class="s' + (k.hata ? ' hata' : '') + '">' + k.hata + '</td></tr>';
     }).join('') + '</tbody>';
   $('ayrinti').innerHTML = '<thead><tr><th>Dosya</th><th>Beklenen</th><th>Duyulan</th><th>İşlem</th></tr></thead><tbody>' +

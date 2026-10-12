@@ -134,7 +134,46 @@ Sunumun *"henüz hazır olmayanlar"* bölümüne şu cümle girer:
 bir dükkânda henüz denenmedi."* — ölçülmemiş bir şey *"çalışıyor"* diye
 anlatılmaz (K-055.5).
 
-## 8 · Cemil onayına açık
+## 8 · Cemil'in onayları — **12.10'da verildi**
+
+> *"Onaylıyorum."* (gürültü kuralı) · *"Okuyabilirim, fakat yarın sabah."*
+> (40 cümle) · *"İzin veririm."* (indirme)
+
+**Hazırlık yapıldı (12.10 akşamı):**
+- MediaSpeech TR indi; sabit 100'lük alt küme ayrıldı (`sesler/derlem-100/`).
+- Altı CC0 atölye gürültüsü indi, lisansları tek tek doğrulandı
+  (`tools/degerlendirme/ses-kaynaklari.md`).
+- Koşucu iki kip kazandı: **derlem kipi** (ses + aynı adlı `.txt` → yalnız
+  kelime hatası) ve **gürültü** (MP3 seçilir, varyantlar tarayıcıda üretilir).
+- Bozma hesabı **ortak modüle** çıktı (`ses-bozma.js`): Node'daki bozucu ve
+  tarayıcıdaki koşucu aynı fonksiyonu çağırıyor; taşıma öncesi/sonrası 10
+  varyant **bayt bayt aynı** (negatif test: kırpma kazancı değişti → 2 fark).
+- Bu bölmede sınandı: FLAC ve MP3 çözülüyor, 1 temiz + 5 varyant üretiliyor,
+  tanıma `network` verince karne **"— (tanınan yok)"** yazıyor — sahte %0
+  yazmıyor (ilk yazışta yazıyordu, düzeltildi).
+
+## 9 · 13.10 sabahı — sırayla
+
+1. **Tanıyıcı gerçekten dosyadan yazıya döndürüyor mu** (§2'nin son adımı):
+   bilgisayarda depo kökünde
+   `python -m http.server 8123` → masaüstü Chrome'da
+   `http://localhost:8123/tools/degerlendirme/ses-dosya-kos.html` →
+   `sesler/derlem-100/`'den **bir** `.flac` ve aynı adlı `.txt` seç → Koş.
+   Yazı çıkarsa yol açık; `network` çıkarsa Chrome'un tanıma sunucusuna
+   ulaşılamıyor demektir ve plan §4'ün B yoluna düşer.
+2. **Genel taban:** aynı sayfada `derlem-100`'ün tamamı (200 dosya) — ~25 dk.
+3. **40 cümle (Cemil):** `ses-kaydet.html`. İki yol:
+   - **Bilgisayarda** — hemen: `http://localhost:8123/tools/degerlendirme/ses-kaydet.html`
+     (localhost güvenli sayılır, mikrofon açılır). Bilgisayar mikrofonu
+     telefonunkinden farklıdır — not düşülür.
+   - **Telefonda** — ürünün gerçek ortamı, ama https ister: kayıt aletinin
+     Netlify'a **ayrı bir taslak** olarak yayınlanması gerekir. **Yayın
+     onayı Cemil'in.**
+4. **Eğri:** 40 kayıt + bir atölye gürültüsü seçilir → koşucu temiz · uzak ·
+   kırpık · 18/12/6 dB karnesini verir. Her gürültü ayrı koşu (~20 dk).
+5. Sonuç `SES-OLCUM.md`'ye ve sunumun *"henüz hazır olmayanlar"* bölümüne.
+
+## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
    sesi ama bizim dükkânın değil.
