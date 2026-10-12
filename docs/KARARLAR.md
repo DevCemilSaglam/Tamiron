@@ -10,6 +10,130 @@
 
 ---
 
+## K-055 · Bekleyen on beş madde kapandı; bir ayar sayfası ve iki yeni iş açıldı (12.10.2026)
+
+> **Cemil, 12.10:** *"Öncelikle kararlar. Ardından sunumu tekrar gözden
+> geçirelim… Backend'e yolumuz var henüz."*
+
+3,5 haftalık aradan sonra açık maddelerin tamamı cevaplandı. İki yerde
+Cemil önerimden saptı; **ikisi de önerimden iyiydi** ve ikisi de aynı
+sebepten: *benim önerim ustaya iş yüklüyordu.*
+
+### 55.1 · Backend bu fazda açılmıyor (A-M31) — ve bedeli
+
+Karar: **hayır.** Bu, veriyi bize **ulaştıran** her şeyi backend turuna
+taşır: A-M40 (iz), A-M42 (çıkarım sayfası), A-M46 (parçacı ağı),
+A-M47 (düzeltmeler).
+
+**Bedeli açık yazılıyor, kazara ertelenmiş sayılmasın:** K-054 *"①
+düzeltme birikimi bugün başladı"* diyor. Bugün tam doğru değil —
+`Iz.okuma()` ustanın düzeltmesini yakalıyor ama dükkânda kalıyor.
+**Sayaç kuruldu, saymaya başlamadı.** Birikimin başlangıç tarihi,
+backend turunun tarihidir.
+
+### 55.2 · Alış fiyatı ZORUNLU DEĞİL — ve ayarlar sayfası açıldı (A-M43)
+
+> **Cemil:** *"Alış fiyatı girilmeyebilir. Zorunlu ya da beklenen alan
+> olmamalı. Hatta bunun için bir ayar alanı olabilir. Hatta müşteri
+> kullanım için ayar sayfamız olsun. Tercihleri / ayarları burada
+> saklayalım."*
+
+Önerim *"parçacı ne dedi"* + *"müşteriye kaç yazıyorsun"* iki alandı ve
+**T-18'i çiğniyordu**: teknolojiden uzak ustaya her satırda iki rakam
+yazdırmak. Cemil üçüncü yolu gösterdi: **alan dursun, beklenmesin.**
+
+| | karar |
+|---|---|
+| Alış alanı | **var**, ama zorunlu değil — boş geçilir, hiçbir şey uyarmaz |
+| Boş alışın anlamı | *"bilinmiyor"* — **sıfır kâr değil.** Kâr ekranı o satırı hesaba katmaz, kâr **şişmez** |
+| Görünürlüğü | **ayara bağlı** — alış soran dükkân açar, sormayan hiç görmez |
+
+⚠️ **`alis: 0` ile `alis: null` aynı şey değildir.** Bugünkü kusur
+(kâr şişik) tam burada: 0, *"bedava aldım"* demek. Bilinmeyen alış
+toplamdan **elenir**, sıfır sayılmaz. Bu ayrım kodda ve denetimde
+karşılığını bulmalı.
+
+**Ayarlar sayfası (17. ekran) kapsama girdi.** Kapsamı yalnız Cemil
+genişletir; genişletti. İlk üç sakini:
+
+1. *"Parça alış fiyatı sorulsun mu"* (A-M43)
+2. Gizlilik cümlesi — ilk kullanımda bir kez (A-M33)
+3. Tema (bugün çekmecede duruyor)
+
+**Menü bütçesi (A-M8: ≤ 8 başlık) sınanacak** — ayarlar menüye satır
+ekliyorsa çekmecede kalmalı.
+
+### 55.3 · Muhasebe ve fatura sonraki faza (A-M44 · A-M45 · A-M37)
+
+Üçü de **sonraki faz.** Cemil: *"Fatura girişi bu fazda değil.
+Muhasebede ele alacağız."* `MALIYET-VE-KAR.md §4` ve `A-M45` oraya
+girdi sayılır. K-022'nin *"fatura kesmek yok"* sınırı **duruyor**.
+
+### 55.4 · Ölçüm: doğrulama Cemil'de, koşu yapılacak (A-M34 · A-M35 · A-M30)
+
+A-M34 **Cemil** — `guven` notlu 14 belge + 42 ditto satırı.
+A-M35 **evet**, A-M34'ten sonra. A-M30: *"Ölçüp seçelim"* — üç model
+aynı sette koşar, karar rakamla verilir. Ürüne koyma backend turunda.
+
+### 55.5 · Ses kaydı alınamıyor — yeni açık madde (A-M39 → **A-M48**)
+
+> **Cemil:** *"Bu sesi alabilecek imkânım henüz yok. Buna çözüm
+> bulmalıyız."*
+
+Alet hazır (`ses-kaydet.html`), **erişim yok.** Bu, ses tarafını
+ölçülemez bırakıyor: *"Web Speech yetiyor"* bir tahmin olarak kalır.
+A-M39 kapanmadı, **biçim değiştirdi** → **A-M48: dükkân sesine
+erişmeden ses tarafı nasıl ölçülür?** Seçenekler araştırılacak (hazır
+Türkçe konuşma derlemleri · sentetik üretim + `ses-bozucu.js` ·
+tanıdık bir dükkânda tek seferlik kayıt · ölçümü erteleyip riski
+yazmak). Çözümsüzse **riskin kendisi yazılır** — ölçülmemiş bir şey
+"çalışıyor" diye anlatılmaz.
+
+### 55.6 · İzin AMACI netleşti (A-M40 · A-M42 · A-M47 · A-M46)
+
+> **Cemil:** *"Kullanımı tespit etmek, yani kullanmayanları ya da az
+> kullananları tespit etmek, sorun / hata yakalamak amaç."*
+
+Bu cevap *"ne zaman gelsin"* sorusunu **"ne için geliyor"** diye
+yeniden yazdı ve özetin içeriğini belirledi. İz iki soruyu
+cevaplayacak: **kim kullanmıyor** · **nerede takılıyor**. Günlük kısır
+özetin omurgası budur; ayrıntı yalnız istendiğinde.
+
+A-M42 ve A-M47 önerildiği gibi onaylandı. A-M46 **sonraki faz.**
+
+### 55.7 · Gizlilik: tek satır; TC/vergi no zorlamaz (A-M33 · A-M38 · A-M36)
+
+A-M33 **evet** — ayarlarda tek satır (55.2'nin sayfası).
+
+A-M38'de yine hafifletti: *"İhtiyaç olursa elle, zaten ihtiyaç olursa
+foto çekim de ona göre olacaktır. Belki çekim esnasında okunmuyorsa
+bilgi ya da uyarı verilebilir."* → **Ekran kimseyi ikinci fotoğrafa
+zorlamaz.** Alan ihtiyaç anında elle doldurulur; çekimde okunamadıysa
+yalnızca **bilgi** verilir. (46 fotoğrafın 29'unda kadraj dışıydı —
+K-051.)
+
+A-M36 **ertelendi:** *"Uygulama kullanıma başladığında buna karar
+verebiliriz."* Saklama süresi gerçek veri tutulmadan önce kapanmalı;
+hatırlatıcı burada durur.
+
+### 55.8 · İki yeni iş açıldı (Tur 8)
+
+> **Cemil:** *"Servis detay sayfası kullanışlı olmadı gibi görüyorum.
+> Burası için iş mekanizmasına uygun birkaç farklı yaklaşımda sayfa
+> oluştur."* · *"İşlemleri için bir yol / sistem oluşturmak istiyorduk.
+> Kaydedilen ses bir json dolduracak. Bu ikisi eşleşmeli. Hangi sayfada
+> olduğuna göre bu json'u dolduracak ve işlem yapacak."*
+
+İkisi de **yeni özellik değil**: biri var olan ekranın yeniden
+kurulması, öteki Tur 7'de dal dal yazılmış bir davranışın **sisteme**
+dönüştürülmesi. Ayrıntı `CALISMA-KUYRUGU.md` Tur 8'de.
+
+⚠️ Servis detayı **ikinci kez** şikâyet konusu (7.1'de de *"istediğim
+gibi değil"* denmişti). 7.1 bir kusuru düzeltti (görünmeyen satır),
+**sayfanın kurgusunu** değiştirmedi. Bu kez istenen o.
+
+---
+
 ## K-054 · Savunma özellikte değil, birikimde (16.09.2026)
 
 > **Cemil:** *"Kopyalanamaz bir özellik eklemek."* · *"Taklit edilemez
@@ -4037,27 +4161,16 @@ A-M19 · A-M23 · A-M24 · A-M26 — on üçü de bugünkü hâliyle onaylandı.
 Gerekçeleri K-047'nin C tablosunda duruyor; biri geri alınacaksa
 oradan bakılır.
 
-### Şimdi cevap bekleyenler — yapay zeka turu (K-048.6)
+### Şimdi cevap bekleyenler
 
-| Kod | Soru | Öneri |
+> **12.10.2026 · on beş maddenin hepsi kapandı** (K-055). Kapananlar
+> arşiv bölümünde, her birinin yanında *neyle* kapandığı yazılı.
+> Aşağıda yalnız **yeni açılan** ve **bilinçli ertelenen** duruyor.
+
+| Kod | Soru | Durum |
 |---|---|---|
-| **A-M30** | Hangi model? Dükkân başına aylık ~$3 (Haiku+Sonnet) ile ~$13 (hepsi Opus 5) arası | **Ölçmeden seçme** — değerlendirme seti kurulunca üçü de aynı sette koşar |
-| **A-M31** | Backend bu fazda mı açılıyor? Yapay zekanın önündeki **tek yapısal engel** bu | Evet ama küçük: tek uç noktayla başla |
-| **A-M40** | **İz kaydı bize ne zaman gelsin?** (a) yalnız usta *"sorun bildir"* derse, (b) günde bir kez kısır özet, (c) ikisi birden (K-052, IZ-KAYDI §6) | Önerim **(c)**: kısır özet zorlanmayı gösterir, ayrıntı yalnız istendiğinde gider |
-| **A-M46** | **Parçacı ağı.** Fiyat cevabı bugün ustanın kendi WhatsApp'ına geliyor; akış bizden geçmiyor, en güçlü savunma (çift taraflı ağ) birikmiyor. Ne zaman, hangi biçimde? (K-054, SAVUNMA §1③) | Önerim: **bu fazda değil** — ama kararı bilinçli verelim, kazara ertelenmiş olmasın |
-| **A-M47** | **Düzeltmeler dükkândan çıkacak mı?** Birikim ancak ulaşırsa olur. A-M40'ın içinde çözülebilir ama ayrı soru: iz *destek* için, düzeltme *birikim* için | Önerim: ayrı ve baştan gelsin — hacmi küçük, değeri büyük |
-| **A-M43** | **Alış rakamı nerede girilecek?** Bugün parçacının fiyatı `fiyat`e yazılıyor, `alis` 0 kalıyor ve kâr ŞİŞİK çıkıyor. Önerim: parça sorma akışında iki alan — *"parçacı ne dedi"* + *"müşteriye kaç yazıyorsun"* (MALIYET-VE-KAR §2) | İkinci rakam boş bırakılabilir: alışına satmıştır, o da doğru bilgidir |
-| **A-M44** | **Fatura girişi bu faza girsin mi?** | Önerim **hayır** — A-M43 çözülmeden fatura eşleştirmek, olmayan alanı doldurmak olur |
-| **A-M45** | Eşleşmeyen fatura satırı ne olur? | Önerim: gider listesine düşer (MUH-B), kayda zorlanmaz |
-| **A-M42** | İzden çıkarım nerede görünecek? Öneri: ayrı ekran değil, **tek sayfalık özet** — dükkân listesi + "zorlanma" işareti; ürüne değil bizim tarafa ait (K-053.5) | Cemil onayına açık |
-| **A-M39** | **Ses kaydı alınacak mı?** Kayıt sayfası hazır (`ses-kaydet.html`): telefonla, dükkânda, 40 cümle + 20 sn dükkân sesi; kalite anında ölçülüyor, hepsi tek zip çıkıyor. Kaydedilmezse ses tarafı ÖLÇÜLEMEZ ve *"Web Speech yetiyor"* bir tahmin olarak kalır (YAPAY-ZEKA §2.1–2.2) | Önerim: bir öğleden sonra — alet yazıldı, geriye konuşmak kaldı |
-| **A-M38** | Ruhsat fotoğrafında **TC/vergi no kadrajın dışında kalıyor** (46 fotoğrafın 29'unda yok, K-051). Okuma ekranı *"sağ sayfa da görünsün"* diye yönlendirsin mi, yoksa fatura alanları müşteri başına **bir kez elle** mi girilsin? | Önerim: ikisi birden — ekran yönlendirsin, gelmezse elle giriş |
-| **A-M37** | **Fatura kesmek** MUH kapsamına giriyor mu? Bu turda yalnız fatura ALANLARI tutuldu; fatura kesmek K-022'nin "fatura yok · KDV yok · e-belge yok" sınırını değiştirir (K-050.5) | Alanlar evet, kesmek **ayrı karar** — MUH cevabıyla birlikte |
-| **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma metni ve saklama süresi** gerekiyor (K-050.5) | Aydınlatma: ayarlarda tek satır (A-M33 ile birleşti). Saklama: fatura kayıtlarıyla aynı süre — konuşulmalı |
-| **A-M35** | Fotoğraflar diske konup model koşusu yapılsın mı? 46 ruhsat + 27 liste — Opus 5 ~$0,60 · Sonnet 5 ~$0,25 (K-049) | Koşulsun, ama **A-M34'ten sonra** |
-| **A-M34** | **Ölçütü model yazdı** (fotoğrafları okuyan bendim). Doğrulanmadan çıkacak rakam karne değil tahmin. Kim doğrulayacak? (K-049.1) | Cemil — yalnız `guven` notlu 14 belge ve 42 ditto satırı; hepsi değil |
-| ~~A-M32~~ | **KAPANDI (15.09):** Cemil 46 ruhsat + 27 parça listesi gönderdi; ikisinin de ölçütü yazıldı (K-049) | — |
-| **A-M33** | Gizlilik cümlesi (*"söyledikleriniz ve fotoğraf işlenmek üzere gönderilir"*) nerede yazsın | Ayarlarda tek satır, ilk kullanımda bir kez |
+| **A-M48** | **Dükkân sesine erişmeden ses tarafı nasıl ölçülür?** A-M39 kapanmadı, biçim değiştirdi: alet hazır (`ses-kaydet.html`) ama Cemil'in erişimi yok. Ölçülmezse *"Web Speech yetiyor"* **tahmin** olarak kalır | **AÇIK** — seçenekler araştırılacak: hazır Türkçe derlem · sentetik üretim + `ses-bozucu.js` · tanıdık dükkânda tek seferlik kayıt · ölçümü erteleyip **riski yazmak** |
+| **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma + saklama süresi** (K-050.5) | **ERTELENDİ** — Cemil: *"Uygulama kullanıma başladığında karar veririz."* Aydınlatma A-M33 ile çözüldü; **saklama süresi gerçek veri tutulmadan önce kapanmalı** |
 
 ### Sonraki fazın soruları — şimdi cevap gerekmiyor
 
@@ -4073,6 +4186,21 @@ oradan bakılır.
 
 | Kod | Nasıl kapandı |
 |---|---|
+| ~~A-M31~~ | **Cemil, 12.10:** *"Backend'e yolumuz var henüz."* → bu fazda **açılmıyor** (K-055.1) |
+| ~~A-M43~~ | **Cemil, 12.10:** *"Alış fiyatı girilmeyebilir… ayar sayfamız olsun."* → alan **zorunlu değil**, görünürlüğü ayara bağlı; `alis: null` ≠ `alis: 0` (K-055.2) |
+| ~~A-M44~~ | **Cemil, 12.10:** *"Fatura girişi bu fazda değil. Muhasebede ele alacağız."* |
+| ~~A-M45~~ | **Cemil, 12.10:** *"Sonraki faz, genel değerlendirme."* |
+| ~~A-M37~~ | **Cemil, 12.10:** *"Hayır, sonraki faz."* → K-022'nin sınırı duruyor |
+| ~~A-M34~~ | **Cemil, 12.10:** *"Ben"* → ölçütü Cemil doğrulayacak (14 belge + 42 ditto satırı) |
+| ~~A-M35~~ | **Cemil, 12.10:** *"Evet"* → A-M34'ten sonra koşulacak |
+| ~~A-M30~~ | **Cemil, 12.10:** *"Ölçüp seçelim."* → karar rakamla; ürüne koyma backend turunda |
+| ~~A-M39~~ | **Biçim değiştirdi (12.10):** erişim yok → **A-M48** olarak yeniden açıldı (K-055.5) |
+| ~~A-M40~~ | **Cemil, 12.10:** amacı yazdı — *"kullanmayanları/az kullananları tespit, sorun-hata yakalamak"* → özetin içeriği bu iki soru (K-055.6) |
+| ~~A-M42~~ | **Cemil, 12.10:** önerildiği gibi — tek sayfalık özet, bizim tarafta |
+| ~~A-M47~~ | **Cemil, 12.10:** önerildiği gibi — ayrı ve baştan |
+| ~~A-M46~~ | **Cemil, 12.10:** *"Sonraki faz."* → parçacı ağı bilinçli ertelendi (K-055.1) |
+| ~~A-M33~~ | **Cemil, 12.10:** *"Evet"* → ayarlarda tek satır; ayar sayfası A-M43 ile açıldı |
+| ~~A-M38~~ | **Cemil, 12.10:** *"İhtiyaç olursa elle…"* → ekran **zorlamaz**, çekimde yalnız bilgi (K-055.7) |
 | ~~A-1~~ | **A-M8'e bağlandı (14.09)** — "ekran bütçesi 6" fiilen aşıldı; asıl kısıt ekran sayısı değil, ekrandaki karar sayısı |
 | ~~A-4~~ | **K-033.5** — türetilmiyor, kendi bayrağı var (`parcaBekliyor`); türetilen `fiyatiBekleyen` başka bir şey: *fiyatı gelmemiş* |
 | ~~A-M4~~ | **K-020.3** — ekran görüntüsü gösterdi ki yapışkan başlık bildirimi örtüyordu; yapışkanlık kaldırıldı |
