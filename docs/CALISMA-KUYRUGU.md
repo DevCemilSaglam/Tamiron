@@ -30,7 +30,7 @@
 
 | # | İş | Durum |
 |---|---|---|
-| 8.1 | **Servis detayı — birkaç yaklaşım** üretilip Cemil'e sunulur | AÇIK |
+| 8.1 | **Servis detayı — birkaç yaklaşım** üretilip Cemil'e sunulur | **SUNULDU — seçim bekliyor (A-M49)**. Dört kurgu çalışır hâlde, aynı kayıtla, tek sayfada: `prototypes/yaklasimlar/servis-detay.html` (yayın: claude.ai/artifact/4boFRu36EEpniK5n9MEVHY). Ölçüm sayfanın içinde koşuyor ve sonucu doğruluyor; bugünkü ekran gerçek prototipte aynı görevlerle ölçüldü. **Bulgu:** bugün 320 px'te kayıt açılınca satırlar da teslim de ilk karede yok. Önerim **B** |
 | 8.2 | **Ayarlar sayfası + alış alanı** (A-M43 · A-M33 · tema) | **BİTTİ** — 17. ekran (K-057). Bilinmeyen alış **satışıyla birlikte** kâr dışı ve ekran bunu söylüyor: bu yıl **7.410 → 5.310 ₺** (elle doğrulandı). Alış alanı ayara bağlı, boş = `null`. Bakım periyodu ve tema çekmeceden **taşındı**. Gizlilik: ayarlarda satır + ilk kullanımda bir kez. **52. test**, üç negatif testle |
 | 8.3 | **Ses → şema sistemi** — dal değil, bildirilen şema | **BİTTİ** — 12 şema, 7 ekranda, sahibinin dosyasında (K-056). Ses ekranında işe özgü dal **39 → 0**. Davranış değişmedi: eski/yeni yan yana 568 + 392 + 16 durum, **0 fark**, karne %93 → %93. Yolda iki hata sınıfı: derleyici `$'` ile betiği bozuyordu (7. denetim yanlış şeye bakıyordu), tanıyan/yapan yol ayrışabiliyordu (**51. test**). Kalıcı araç: `tools/ses-esdeger.js` |
 | 8.4 | **A-M48** — dükkân sesine erişmeden ölçüm: seçenekler | AÇIK |

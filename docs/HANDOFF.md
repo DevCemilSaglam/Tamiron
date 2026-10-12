@@ -22,9 +22,9 @@ tıklanabilir prototip.
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
 | Sağlık denetimi | **52 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **7. kontrol artık ÜRETİLEN dosyadaki betiği ayrıştırıyor** — yerleştirmeden önceki betiğe bakıyordu ve `$'` bozulmasını görmedi (K-056.4). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-057** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
+| Kararlar | **K-001 … K-057** · açık **A-M49** (servis detayı kurgusu — Cemil seçecek) · **A-M48** (ses ölçümü) · **A-M36** (saklama süresi, ertelendi) |
 | Ses | Cümle → **işlem nesnesi** → onay. **İşi ses tanımaz: sahibi olan ekran şemasını bildirir** (`Islem.tanim`, `betik/04-islem.js`; 12 şema · 7 ekran — K-056). Onay ekranı ve uygulama şemadan. `ISLEM_SEMALARI()` = modele araç tanımı. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
-| Sıradaki | **Tur 8** — servis detayı yeniden kurgu · A-M48 (bkz. `CALISMA-KUYRUGU.md`). **8.2 ve 8.3 bitti** |
+| Sıradaki | **Tur 8** — **8.1 sunuldu, Cemil'in seçimini bekliyor (A-M49)**: dört kurgu `prototypes/yaklasimlar/servis-detay.html` (yayın: claude.ai/artifact/4boFRu36EEpniK5n9MEVHY) · 8.4 A-M48. **8.2 ve 8.3 bitti** |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 

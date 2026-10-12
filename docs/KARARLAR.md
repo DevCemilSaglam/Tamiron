@@ -4330,6 +4330,7 @@ oradan bakılır.
 | Kod | Soru | Durum |
 |---|---|---|
 | **A-M48** | **Dükkân sesine erişmeden ses tarafı nasıl ölçülür?** A-M39 kapanmadı, biçim değiştirdi: alet hazır (`ses-kaydet.html`) ama Cemil'in erişimi yok. Ölçülmezse *"Web Speech yetiyor"* **tahmin** olarak kalır | **AÇIK** — seçenekler araştırılacak: hazır Türkçe derlem · sentetik üretim + `ses-bozucu.js` · tanıdık dükkânda tek seferlik kayıt · ölçümü erteleyip **riski yazmak** |
+| **A-M49** | **Servis detayının kurgusu (Tur 8.1):** A tek sayfa · **B kayıt kartı + yerinde düzenleme** · C eylem merkezli · D zaman çizelgesi — ya da birleşimi. Dört kurgu çalışır hâlde, aynı kayıtla yan yana; ölçüm sayfanın içinde koşuyor (`prototypes/yaklasimlar/servis-detay.html`, yayın: claude.ai/artifact/4boFRu36EEpniK5n9MEVHY). Dokunuş G1/G2/G3: bugün 2/1/4 · A 2/1/3 · B 2/1/3 · C 3/2/3 · D 3/2/3. 320 px ilk karede satırlar+teslim: bugün **ikisi de yok** · A satır · **B ikisi** · C ikisi · D teslim | **CEMİL'İN SEÇİMİ** — önerim **B** (en az dokunuş + ilk karede ikisi + en düşük karar yükü 3). Seçilince kayıt ekranının yerine kurulur; ses eşdeğerlik aracı ve denetim koşar |
 | **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma + saklama süresi** (K-050.5) | **ERTELENDİ** — Cemil: *"Uygulama kullanıma başladığında karar veririz."* Aydınlatma A-M33 ile çözüldü; **saklama süresi gerçek veri tutulmadan önce kapanmalı** |
 
 ### Sonraki fazın soruları — şimdi cevap gerekmiyor

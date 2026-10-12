@@ -1,0 +1,777 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Servis Detayı Kurguları</title>
+<!-- ============ SERVİS DETAYI — DÖRT KURGU (Tur 8.1 · 12.10.2026) ============
+     Cemil, 12.10: *"Servis detay sayfası kullanışlı olmadı gibi görüyorum.
+     Burası için iş mekanizmasına uygun birkaç farklı yaklaşımda sayfa
+     oluştur. Buna göre değerlendirelim."*
+
+     KAYNAK BU DOSYA; `node tools/yaklasim-derle.js` stil ve ikonları gömüp
+     servis-detay.html'i ÜRETİR. Üretilen dosya elle düzenlenmez.
+
+     DÖRT KURGU, AYNI KAYIT, ÜÇ GÖREV. Her kurgu GERÇEKTEN çalışıyor: satır
+     eklenir, tutar yazılır, teslim edilir. Ölçüm sayfanın içinde koşar —
+     her görev görünmeyen bir kopyada baştan sona yürütülür, dokunuşlar
+     sayılır ve SONUÇ VERİSİ doğrulanır. Doğrulanmayan bir dokunuş sayısı
+     yazılmaz; yerine "yapılamadı" yazar.
+
+     DOKUNUŞ KURALI: bir öğeye dokunmak 1. Bir alana yazmak için o alana
+     dokunmak 1 — alan zaten odaktaysa (ekran imleci oraya koyduysa) 0.
+     Klavyede yazmak sayılmaz; dört kurguda da aynı metin yazılıyor.
+
+     "BUGÜN" SATIRI bu sayfada çizilmiyor: gerçek prototipte (omurga.html)
+     aynı görevler yürütülerek ölçüldü, rakamları aşağıda sabit.
+
+     Renk ve ölçü YALNIZ token'dan (docs/tokens.css). Bileşenler prototipin
+     sınıf sözlüğünden; bu sayfaya özgü olanlar `yk-` önekli ve yalnız bu
+     sayfada. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Instrument+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+/* @@STIL@@ */
+
+/* ================= SAYFA (yalnız bu sayfa) =================
+   Düzen: üstte soru ve rakam tablosu, altta dört telefon yan yana;
+   dar ekranda alt alta. Telefonlar karşılaştırmanın kendisi — süs yok. */
+:root { color-scheme: light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { color-scheme: dark; } }
+:root[data-theme="dark"] { color-scheme: dark; }
+
+body { background: var(--bg); color: var(--text); }
+.yk-sayfa {
+  max-width: 1520px; margin: 0 auto;
+  padding-inline: 16px; padding-block: 24px 48px;
+  display: flex; flex-direction: column; gap: 28px;
+}
+.yk-bas { display: flex; flex-direction: column; gap: 10px; max-width: 70ch; }
+.yk-ust {
+  font-family: var(--font-mono); font-size: var(--tip-xs); letter-spacing: .08em;
+  text-transform: uppercase; color: var(--accent); font-weight: 600;
+}
+.yk-bas h1 { font-size: clamp(26px, 4vw, 38px); }
+.yk-bas p { margin: 0; color: var(--muted); }
+.yk-alinti { border-left: 3px solid var(--accent); padding-left: 12px; color: var(--text); font-style: italic; }
+
+.yk-gorev { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+.yk-gorev > div {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+}
+.yk-gorev b { font-family: var(--font-mono); color: var(--accent); }
+.yk-gorev span { color: var(--muted); font-size: var(--tip-sm); }
+
+.yk-tablo-kap { overflow-x: auto; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); }
+.yk-tablo { width: 100%; border-collapse: collapse; font-size: var(--tip-sm); min-width: 720px; }
+.yk-tablo th, .yk-tablo td { padding: 11px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+.yk-tablo th { font-size: var(--tip-xs); text-transform: uppercase; letter-spacing: .06em; color: var(--muted); background: var(--surface-2); }
+.yk-tablo td.s { font-family: var(--font-mono); font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+.yk-tablo th.s { text-align: right; }
+.yk-tablo tr:last-child td { border-bottom: 0; }
+.yk-tablo tr.bugun td { color: var(--muted); }
+.yk-tablo .en { color: var(--ok); font-weight: 700; }
+.yk-tablo .kotu { color: var(--crit); font-weight: 700; }
+.yk-tablo td small { display: block; color: var(--muted); font-size: var(--tip-xs); margin-top: 2px; }
+
+.yk-arac { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.yk-arac .yk-not { color: var(--muted); font-size: var(--tip-sm); }
+
+.yk-izgara { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; align-items: start; }
+.yk-kolon { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.yk-kolon h2 { font-size: var(--tip-lg); display: flex; gap: 8px; align-items: baseline; }
+.yk-kolon h2 .k { font-family: var(--font-mono); color: var(--accent); }
+.yk-iddia { margin: 0; color: var(--muted); font-size: var(--tip-sm); min-height: 3.2em; }
+
+/* TELEFON — genişlik seçilebilir (320 / 375); içi prototipin ekranı. */
+.yk-telefon {
+  --gen: 375px;
+  width: min(100%, calc(var(--gen) + 2px)); height: 660px;
+  border: 1px solid var(--line); border-radius: 22px; overflow: hidden;
+  background: var(--bg); box-shadow: var(--shadow);
+  position: relative; display: flex; flex-direction: column;
+  align-self: center;
+}
+.yk-telefon[data-gen="320"] { --gen: 320px; }
+.yk-tepe {
+  flex: none; display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px; border-bottom: 1px solid var(--line); background: var(--surface);
+  font-family: var(--font-display); font-weight: 700; font-size: var(--tip-sm);
+}
+.yk-tepe .ico { color: var(--muted); }
+.yk-ekran { flex: 1 1 auto; min-height: 0; overflow-y: auto; position: relative; }
+.yk-ekran > .screen { display: flex; padding-bottom: 96px; }
+.yk-telefon.yk-sabitli .yk-ekran > .screen { padding-bottom: 120px; }
+
+.yk-oynat { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+.yk-sayac { font-family: var(--font-mono); font-size: var(--tip-sm); color: var(--muted); min-width: 9ch; text-align: center; }
+
+/* Oynatılan dokunuş görünür olsun. */
+.yk-vurgu { outline: 3px solid var(--accent) !important; outline-offset: 2px; transition: outline-color .2s; }
+@media (prefers-reduced-motion: reduce) { .yk-vurgu { transition: none; } }
+
+/* ---- kurguların kendi parçaları (prototip sözlüğünde karşılığı yok) ---- */
+.yk-satir-in {
+  width: 100%; min-height: var(--dokun); padding: 0 8px;
+  border: 1px solid transparent; border-radius: var(--radius-sm);
+  background: transparent; font-size: var(--tip-sm);
+}
+.yk-satir-in:focus { border-color: var(--primary); background: var(--field-bg); outline: none; }
+.yk-satir-in.sayi { text-align: right; font-family: var(--font-mono); }
+.yk-satir-in::placeholder { color: var(--faint); }
+.yk-tip { font-size: var(--tip-xs); color: var(--muted); font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .04em; }
+.yk-bos-fiyat { color: var(--accent); font-weight: 600; }
+
+/* B · satır listesi */
+.yk-liste { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+.yk-liste > * + * { border-top: 1px solid var(--line); }
+.yk-sat {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 56px; padding: 8px 14px; width: 100%;
+  background: var(--surface); border: 0; text-align: left;
+}
+.yk-sat .yk-ad { display: flex; flex-direction: column; min-width: 0; }
+.yk-sat .yk-tutar { font-family: var(--font-mono); white-space: nowrap; }
+.yk-duzen { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; background: var(--surface-2); }
+.yk-iki { display: grid; grid-template-columns: 1fr 112px; gap: 8px; }
+.yk-alan {
+  width: 100%; min-height: var(--dokun); padding: 0 10px;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--field-bg); font-size: var(--tip-md);
+}
+.yk-alan.sayi { text-align: right; font-family: var(--font-mono); }
+.yk-alan:focus { border-color: var(--primary); outline: none; }
+.yk-ekle-sat { color: var(--primary); font-weight: 600; justify-content: flex-start; gap: 8px; }
+.yk-buyuk { font-family: var(--font-mono); font-size: var(--tip-2xl); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+/* C · sabit eylem çubuğu ve panel */
+.yk-cubuk {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 5;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
+  padding: 8px; background: var(--surface); border-top: 1px solid var(--line);
+}
+.yk-cubuk button {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px;
+  min-height: 64px; padding: 4px; border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--surface); font-size: var(--tip-xs); font-weight: 600;
+}
+.yk-cubuk button.ana { background: var(--primary); color: var(--on-primary); border-color: var(--primary); }
+.yk-ortu { position: absolute; inset: 0; background: var(--scrim); z-index: 8; }
+.yk-panel {
+  position: absolute; left: 0; right: 0; bottom: 0; z-index: 9;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 16px; background: var(--surface);
+  border-top: 1px solid var(--line); border-radius: 18px 18px 0 0; box-shadow: var(--shadow);
+}
+.yk-panel h3 { font-size: var(--tip-lg); }
+.yk-oku-sat { width: 100%; }
+
+/* D · akış */
+.yk-akis { display: flex; flex-direction: column; gap: 0; position: relative; }
+.yk-olay { display: grid; grid-template-columns: 22px 1fr; gap: 10px; padding-bottom: 14px; position: relative; }
+.yk-olay::before {
+  content: ""; position: absolute; left: 10px; top: 20px; bottom: 0; width: 2px; background: var(--line);
+}
+.yk-olay:last-child::before { display: none; }
+.yk-nokta { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); margin-top: 1px; }
+.yk-olay.dolu .yk-nokta { border-color: var(--accent); background: var(--accent-soft); }
+.yk-olay .yk-ne { font-weight: 600; }
+.yk-olay .yk-ne small { display: block; font-weight: 400; color: var(--muted); font-size: var(--tip-xs); font-family: var(--font-mono); margin-top: 2px; }
+.yk-simdi { border: 2px solid var(--accent); }
+.yk-yaz { display: grid; grid-template-columns: 1fr 96px; gap: 8px; }
+
+.yk-sonuc-not { color: var(--muted); font-size: var(--tip-sm); max-width: 80ch; }
+.yk-oneri { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 18px; display: flex; flex-direction: column; gap: 10px; max-width: 80ch; }
+.yk-oneri h2 { font-size: var(--tip-xl); }
+.yk-oneri p { margin: 0; }
+</style>
+
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+<!-- @@IKONLAR@@ -->
+</svg>
+
+<main class="yk-sayfa">
+
+  <header class="yk-bas">
+    <span class="yk-ust">Tur 8.1 · Cemil'in seçimi için</span>
+    <h1>Servis detayı: dört kurgu</h1>
+    <p class="yk-alinti">"Servis detay sayfası kullanışlı olmadı gibi görüyorum. Burası için iş mekanizmasına uygun birkaç farklı yaklaşımda sayfa oluştur."</p>
+    <p>Bugünkü ekran üç adımlı bir sihirbaz: <b>İş · Yapılanlar · Teslim</b>. Sihirbaz bir oturuşta biten işe uyar; servis kaydı ise günlerce açık kalır. Araç gelir, parça beklenir, ertesi gün satır eklenir, sonra teslim edilir. Aşağıdaki dört kurgu aynı kaydı aynı veriyle gösteriyor ve hepsi çalışıyor: satır ekleyebilir, tutar yazabilir, teslim edebilirsin.</p>
+  </header>
+
+  <section class="yk-gorev" aria-label="Ölçülen görevler">
+    <div><b>G1 · Satır ekle</b><span>"Balata" parçası, 450 ₺</span></div>
+    <div><b>G2 · Tutar yaz</b><span>Triger setinin fiyatı geldi: 3.800 ₺</span></div>
+    <div><b>G3 · Teslim et</b><span>Ödeme nakit, araç teslim</span></div>
+  </section>
+
+  <section style="display:flex;flex-direction:column;gap:10px">
+    <div class="yk-tablo-kap">
+      <table class="yk-tablo" id="ykSonuc" aria-label="Ölçüm sonuçları"></table>
+    </div>
+    <p class="yk-sonuc-not">Dokunuşlar, her görev görünmeyen bir kopyada baştan sona yürütülerek sayıldı; görevin sonunda kayıt verisi doğrulandı. Bir alana yazmak için o alana dokunmak 1 dokunuş sayılır; ekran imleci oraya kendisi koyduysa 0. Klavyeyle yazmak sayılmaz. <b>İlk karede</b>: kayıt açıldığında kaydırmadan görünenler (320 × 610 px). <b>Karar yükü</b>: ilk karedeki dokunulabilir öğe sayısı (A-M8: ekran başına az karar). "Bugün" satırı gerçek prototipte aynı görevler yürütülerek ölçüldü.</p>
+  </section>
+
+  <div class="yk-arac">
+    <div class="cip-grup" role="group" aria-label="Telefon genişliği" id="ykGen">
+      <button class="cip" data-gen="320" aria-pressed="true">320 px</button>
+      <button class="cip" data-gen="375" aria-pressed="false">375 px</button>
+    </div>
+    <span class="yk-not">Her telefonun altındaki düğmeler görevi o telefonda adım adım oynatır.</span>
+  </div>
+
+  <section class="yk-izgara" id="ykIzgara" aria-label="Dört kurgu"></section>
+
+  <section class="yk-oneri" id="ykOneri"></section>
+
+</main>
+
+<script>
+/* ================= ORTAK VERİ — dört kurguda AYNI kayıt =================
+   Prototipin 1 no'lu kaydı: triger seti (fiyatı gelmedi, parça bekleniyor)
+   + işçiliği. Kayıt yarım: usta ikinci kez dönüyor. Sihirbazın sorunu
+   tam burada görünüyor. */
+var ARAC = { plaka: '34 ABC 123', marka: 'Renault', model: 'Mégane', motor: '1.5 dCi',
+             sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00' };
+function tohum() {
+  return {
+    acilis: '03.09.2026', sikayet: 'Triger seti değişecek. Devirdaim de bakılsın.',
+    parcaBekliyor: true, ozetGitti: false, teslim: null, odeme: null,
+    satirlar: [
+      { tip: 'parca', ad: 'Triger seti', fiyat: 0 },
+      { tip: 'iscilik', ad: 'Triger işçiliği', fiyat: 1500 }
+    ]
+  };
+}
+var ODEME = [['nakit', 'Nakit'], ['kart', 'Kart'], ['havale', 'Havale'], ['almadim', 'Almadım']];
+function tl(n) { return (n || 0).toLocaleString('tr-TR'); }
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+function toplam(k) { return k.satirlar.reduce(function (t, s) { return t + (s.fiyat || 0); }, 0); }
+function rakam(v) { var r = String(v || '').replace(/[^0-9]/g, ''); return r === '' ? 0 : parseInt(r, 10); }
+function ikon(ad, kucuk) { return '<svg class="ico' + (kucuk ? ' ico-sm' : '') + '"><use href="#' + ad + '"></use></svg>'; }
+
+/* Prototipin ortak nesneleri — aynı biçim (03-nesne.js'teki plakaHtml). */
+function plakaHtml(p, boyut) {
+  return '<span class="plate ' + (boyut || 'plate-sm') + '"><span class="plate-tr">TR</span>' +
+         '<span class="plate-no">' + p + '</span></span>';
+}
+function kunyeHtml() {
+  return plakaHtml(ARAC.plaka, 'plate-lg') +
+    '<div style="display:flex;flex-direction:column;gap:2px">' +
+      '<b>' + ARAC.marka + ' ' + ARAC.model + '</b>' +
+      '<span style="color:var(--muted);font-size:var(--tip-sm)">' + ARAC.motor + ' · ' + ARAC.sahipAd + '</span>' +
+      '<span style="font-family:var(--font-mono);font-size:var(--tip-sm)">' + ikon('i-phone', 1) + ' ' + ARAC.sahipTel + '</span>' +
+    '</div>';
+}
+function odemeCipleri(k) {
+  return '<div class="cip-grup" role="group" aria-label="Ödeme">' + ODEME.map(function (o) {
+    return '<button class="cip" data-e="odeme" data-v="' + o[0] + '" aria-pressed="' + (k.odeme === o[0]) + '">' + o[1] + '</button>';
+  }).join('') + '</div>';
+}
+/* ⚠️ ADİL KARŞILAŞTIRMA: bugünkü ekranda olan her parça kurgularda da
+   olmalı — yoksa kurgunun ilk karesi haksız yere boş görünür. İlk
+   ölçümde ses/fotoğraf düğmeleri ve süreç YOKTU; bugünkü ekranın ilk
+   karesini dolduran tam bu ikisiydi. Her kurgu ikisini KENDİ doğal
+   yerine koyuyor; nereye koyduğu kurgunun bir parçası. */
+function sesFotoHtml() {
+  return '<div class="btn-row tek-satir">' +
+    '<button class="btn btn-ghost" data-e="ses">' + ikon('i-mic') + ' Sesle</button>' +
+    '<button class="btn btn-ghost" data-e="foto">' + ikon('i-camera') + ' Fotoğraftan parça</button></div>';
+}
+function surecMaddeleri(k) {
+  return [
+    ['Kayıt açıldı', k.acilis, true],
+    ['Parça bekleniyor', 'müşteriye haber verildi', k.parcaBekliyor],
+    ['Özet gönderildi', k.ozetGitti ? 'gönderildi' : 'henüz değil', k.ozetGitti],
+    ['Teslim', k.teslim ? k.teslim : 'henüz değil', !!k.teslim]
+  ];
+}
+function teslimBitti(k) {
+  return '<div class="notice"><span class="n-ic">' + ikon('i-circle-check', 1) + '</span>' +
+    '<span class="n-body"><b>Teslim edildi</b> · ' + (ODEME.filter(function (o) { return o[0] === k.odeme; })[0] || ['', ''])[1] +
+    ' · ' + tl(toplam(k)) + ' ₺</span></div>';
+}
+
+/* ================= KURGULAR =================
+   Her kurgu üç şey verir: html(k, ui) · eylem(ad, el, k, ui) · senaryo.
+   Yazılan alanlar ORTAK sözleşmeyle bağlanır (data-ad / data-fiyat /
+   data-yeni-*): giriş dinleyicisi tek yerde, dört kurguda aynı. */
+var KURGULAR = [
+
+/* ---------- A · TEK SAYFA, BÖLÜMLER ---------- */
+{ kod: 'A', ad: 'Tek sayfa, bölümler',
+  iddia: 'Adım yok. Her şey görünür, ikincil bölümler katlanır. Usta nereye isterse dokunur.',
+  html: function (k, ui) {
+    return '' +
+      '<div class="card">' + kunyeHtml() + '</div>' +
+      sesFotoHtml() +
+      '<div class="card">' +
+        '<div class="section-label"><span class="lbl-txt">' + ikon('i-clipboard-list', 1) + ' Yapılanlar</span></div>' +
+        '<table class="tablo"><thead><tr><th>İş</th><th class="sayi">Tutar</th></tr></thead><tbody>' +
+          k.satirlar.map(function (s, i) {
+            return '<tr' + (i === 0 ? ' data-olc="satir"' : '') + '><td><span class="yk-tip">' + (s.tip === 'parca' ? 'Parça' : 'İşçilik') + '</span>' +
+              '<input class="yk-satir-in" data-ad="' + i + '" value="' + esc(s.ad) + '" placeholder="ne yapıldı" aria-label="Satır adı"></td>' +
+              '<td class="sayi"><input class="yk-satir-in sayi" data-fiyat="' + i + '" inputmode="numeric" value="' + (s.fiyat ? tl(s.fiyat) : '') + '" placeholder="—" aria-label="Tutar"></td></tr>';
+          }).join('') +
+          '<tr class="genel"><td>Toplam</td><td class="sayi" data-toplam>' + tl(toplam(k)) + ' ₺</td></tr>' +
+        '</tbody></table>' +
+        '<div class="btn-row">' +
+          '<button class="btn btn-ghost" data-e="ekle" data-v="parca">' + ikon('i-plus') + ' Parça</button>' +
+          '<button class="btn btn-ghost" data-e="ekle" data-v="iscilik">' + ikon('i-plus') + ' İşçilik</button>' +
+        '</div>' +
+      '</div>' +
+      (k.teslim ? teslimBitti(k) :
+        ui.teslim
+          ? '<div class="card"><div class="section-label"><span class="lbl-txt">' + ikon('i-wallet', 1) + ' Ödemeyi nasıl aldın?</span></div>' +
+              odemeCipleri(k) +
+              '<button class="btn btn-primary btn-lg" data-e="teslimOnay">' + ikon('i-check') + ' Teslimi onayla</button></div>'
+          : '<div class="btn-row"><button class="btn btn-ghost" data-e="ozet">' + ikon('i-message-square') + ' Özet gönder</button>' +
+              '<button class="btn btn-primary" data-e="teslim" data-olc="teslim">' + ikon('i-wallet') + ' Teslim et</button></div>') +
+      '<div class="card"><div class="section-label"><span class="lbl-txt">' + ikon('i-package', 1) + ' Parça bekliyor</span>' +
+        '<span class="lbl-eylem"><button class="cip" data-e="bekliyor" aria-pressed="' + k.parcaBekliyor + '">Bekliyor</button></span></div></div>' +
+      '<div class="akordiyon"><button class="akd-bas" data-e="aciklama" aria-expanded="' + !!ui.aciklama + '">' + ikon('i-message-square', 1) +
+        ' Açıklama<span class="akd-say"></span>' + ikon('i-chevron-down', 1) + '</button>' +
+        '<div class="akd-govde"' + (ui.aciklama ? '' : ' hidden') + '><div class="field"><textarea rows="3" aria-label="Açıklama" data-sikayet>' + esc(k.sikayet) + '</textarea></div></div></div>' +
+      '<div class="akordiyon"><button class="akd-bas" data-e="surec" aria-expanded="' + !!ui.surec + '">' + ikon('i-clock', 1) +
+        ' Süreç<span class="akd-say"></span>' + ikon('i-chevron-down', 1) + '</button>' +
+        '<div class="akd-govde"' + (ui.surec ? '' : ' hidden') + '><div class="tutar-serit">' + surecMaddeleri(k).map(function (m) {
+          return '<div class="tutar-sat"><span>' + m[0] + '</span><span class="tv">' + m[1] + '</span></div>'; }).join('') + '</div></div></div>';
+  },
+  eylem: function (ad, el, k, ui) {
+    if (ad === 'ekle') { k.satirlar.push({ tip: el.getAttribute('data-v'), ad: '', fiyat: 0 }); ui.odak = '[data-ad="' + (k.satirlar.length - 1) + '"]'; }
+    if (ad === 'teslim') ui.teslim = true;
+    if (ad === 'aciklama') ui.aciklama = !ui.aciklama;
+    if (ad === 'surec') ui.surec = !ui.surec;
+  },
+  senaryo: {
+    G1: [['tik', '[data-e="ekle"][data-v="parca"]'], ['yaz', '[data-ad="2"]', 'Balata'], ['yaz', '[data-fiyat="2"]', '450']],
+    G2: [['yaz', '[data-fiyat="0"]', '3800']],
+    G3: [['tik', '[data-e="teslim"]'], ['tik', '[data-e="odeme"][data-v="nakit"]'], ['tik', '[data-e="teslimOnay"]']]
+  }
+},
+
+/* ---------- B · KAYIT KARTI + YERİNDE DÜZENLEME ---------- */
+{ kod: 'B', ad: 'Kayıt kartı + yerinde düzenleme',
+  iddia: 'Üstte kaydın özeti, altta satırlar. Satıra dokunursan orada açılır ve düzenlenir; düzenleme alanları yalnız gerektiğinde görünür.',
+  html: function (k, ui) {
+    return '' +
+      '<div class="card">' +
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">' + plakaHtml(ARAC.plaka, 'plate-lg') +
+          (k.parcaBekliyor && !k.teslim ? '<span class="pill">' + ikon('i-package', 1) + ' Parça bekliyor</span>' : '') + '</div>' +
+        '<div><b>' + ARAC.marka + ' ' + ARAC.model + '</b> · <span style="color:var(--muted)">' + ARAC.sahipAd + ' · ' + ARAC.sahipTel + '</span></div>' +
+        '<div style="color:var(--muted);font-size:var(--tip-sm)">' + esc(k.sikayet) + '</div>' +
+        /* Süreç kartta TEK SATIR: neyin olduğu, neyin olmadığı. */
+        '<div style="font-size:var(--tip-xs);color:var(--muted);font-family:var(--font-mono)">' + surecMaddeleri(k).map(function (m) {
+          return (m[2] ? '✓ ' : '○ ') + m[0].toLocaleLowerCase('tr'); }).join(' · ') + '</div>' +
+        '<div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px"><span style="color:var(--muted)">Toplam</span>' +
+          '<span class="yk-buyuk" data-toplam>' + tl(toplam(k)) + ' ₺</span></div>' +
+        (k.teslim ? teslimBitti(k) :
+          '<div class="btn-row"><button class="btn btn-ghost" data-e="ozet">' + ikon('i-message-square') + ' Özet</button>' +
+          '<button class="btn btn-primary" data-e="teslim" data-olc="teslim">' + ikon('i-wallet') + ' Teslim et</button></div>') +
+      '</div>' +
+      '<div class="yk-liste">' +
+        k.satirlar.map(function (s, i) {
+          if (ui.acik === i) {
+            return '<div class="yk-duzen"' + (i === 0 ? ' data-olc="satir"' : '') + '>' +
+              '<div class="cip-grup" role="group" aria-label="Tür">' +
+                '<button class="cip" data-e="tip" data-i="' + i + '" data-v="parca" aria-pressed="' + (s.tip === 'parca') + '">Parça</button>' +
+                '<button class="cip" data-e="tip" data-i="' + i + '" data-v="iscilik" aria-pressed="' + (s.tip === 'iscilik') + '">İşçilik</button></div>' +
+              '<div class="yk-iki"><input class="yk-alan" data-ad="' + i + '" value="' + esc(s.ad) + '" placeholder="ne yapıldı" aria-label="Satır adı">' +
+                '<input class="yk-alan sayi" data-fiyat="' + i + '" inputmode="numeric" value="' + (s.fiyat ? tl(s.fiyat) : '') + '" placeholder="tutar" aria-label="Tutar"></div>' +
+              '<button class="btn btn-ghost" data-e="kapat">' + ikon('i-check') + ' Tamam</button></div>';
+          }
+          return '<button class="yk-sat" data-e="ac" data-i="' + i + '"' + (i === 0 ? ' data-olc="satir"' : '') + '>' +
+            '<span class="yk-ad"><span class="yk-tip">' + (s.tip === 'parca' ? 'Parça' : 'İşçilik') + '</span>' + esc(s.ad || '—') + '</span>' +
+            '<span class="yk-tutar">' + (s.fiyat ? tl(s.fiyat) + ' ₺' : '<span class="yk-bos-fiyat">fiyat yaz</span>') + '</span></button>';
+        }).join('') +
+        (k.teslim ? '' : '<button class="yk-sat yk-ekle-sat" data-e="ekle">' + ikon('i-plus') + ' Satır ekle</button>') +
+      '</div>' +
+      (k.teslim ? '' : sesFotoHtml()) +
+      (ui.panel === 'teslim'
+        ? '<div class="yk-ortu" data-e="panelKapat"></div><div class="yk-panel"><h3>Ödemeyi nasıl aldın?</h3>' + odemeCipleri(k) +
+            '<button class="btn btn-primary btn-lg" data-e="teslimOnay">' + ikon('i-check') + ' Teslimi onayla</button></div>'
+        : '');
+  },
+  eylem: function (ad, el, k, ui) {
+    var i = parseInt(el.getAttribute('data-i'), 10);
+    if (ad === 'ac') { ui.acik = i; ui.odak = k.satirlar[i].fiyat ? '[data-ad="' + i + '"]' : '[data-fiyat="' + i + '"]'; }
+    if (ad === 'kapat') ui.acik = null;
+    if (ad === 'tip') k.satirlar[i].tip = el.getAttribute('data-v');
+    if (ad === 'ekle') { k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0 }); ui.acik = k.satirlar.length - 1; ui.odak = '[data-ad="' + ui.acik + '"]'; }
+    if (ad === 'teslim') ui.panel = 'teslim';
+    if (ad === 'panelKapat') ui.panel = null;
+  },
+  senaryo: {
+    G1: [['tik', '[data-e="ekle"]'], ['yaz', '[data-ad="2"]', 'Balata'], ['yaz', '[data-fiyat="2"]', '450']],
+    G2: [['tik', '[data-e="ac"][data-i="0"]'], ['yaz', '[data-fiyat="0"]', '3800']],
+    G3: [['tik', '[data-e="teslim"]'], ['tik', '[data-e="odeme"][data-v="nakit"]'], ['tik', '[data-e="teslimOnay"]']]
+  }
+},
+
+/* ---------- C · EYLEM MERKEZLİ ---------- */
+{ kod: 'C', ad: 'Eylem merkezli',
+  iddia: 'Sayfa okumak için; iş alttaki büyük çubuktan seçilir (Ekle · Parça sor · Mesaj · Teslim). Seçilen iş kendi panelinde, tek başına açılır.',
+  sabitli: true,
+  html: function (k, ui) {
+    var p = ui.panel;
+    return '' +
+      '<div class="card">' + kunyeHtml() +
+        '<div style="color:var(--muted);font-size:var(--tip-sm)">' + esc(k.sikayet) + '</div>' +
+        '<div style="font-size:var(--tip-xs);color:var(--muted);font-family:var(--font-mono)">' + surecMaddeleri(k).map(function (m) {
+          return (m[2] ? '✓ ' : '○ ') + m[0].toLocaleLowerCase('tr'); }).join(' · ') + '</div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="section-label"><span class="lbl-txt">' + ikon('i-clipboard-list', 1) + ' Yapılanlar</span></div>' +
+        '<div class="yk-liste">' + k.satirlar.map(function (s, i) {
+          return '<button class="yk-sat" data-e="duzenle" data-i="' + i + '"' + (i === 0 ? ' data-olc="satir"' : '') + '>' +
+            '<span class="yk-ad"><span class="yk-tip">' + (s.tip === 'parca' ? 'Parça' : 'İşçilik') + '</span>' + esc(s.ad) + '</span>' +
+            '<span class="yk-tutar">' + (s.fiyat ? tl(s.fiyat) + ' ₺' : '<span class="yk-bos-fiyat">fiyat yaz</span>') + '</span></button>';
+        }).join('') + '</div>' +
+        '<div style="display:flex;justify-content:space-between"><b>Toplam</b><b class="yk-tutar" style="font-family:var(--font-mono)" data-toplam>' + tl(toplam(k)) + ' ₺</b></div>' +
+      '</div>' +
+      (k.teslim ? teslimBitti(k) : '') +
+      (k.teslim ? '' :
+        '<div class="yk-cubuk" role="toolbar" aria-label="İşler">' +
+          '<button data-e="panel" data-v="ekle">' + ikon('i-plus') + 'Ekle</button>' +
+          '<button data-e="panel" data-v="sor">' + ikon('i-package') + 'Parça sor</button>' +
+          '<button data-e="panel" data-v="mesaj">' + ikon('i-message-square') + 'Mesaj</button>' +
+          '<button class="ana" data-e="panel" data-v="teslim" data-olc="teslim">' + ikon('i-wallet') + 'Teslim</button>' +
+        '</div>') +
+      (p ? '<div class="yk-ortu" data-e="panelKapat"></div><div class="yk-panel">' + (
+        p === 'ekle'
+          ? '<h3>Ne yapıldı?</h3>' + sesFotoHtml() + '<div class="cip-grup" role="group" aria-label="Tür">' +
+              '<button class="cip" data-e="yeniTip" data-v="parca" aria-pressed="' + (ui.yeniTip !== 'iscilik') + '">Parça</button>' +
+              '<button class="cip" data-e="yeniTip" data-v="iscilik" aria-pressed="' + (ui.yeniTip === 'iscilik') + '">İşçilik</button></div>' +
+            '<div class="yk-iki"><input class="yk-alan" data-yeni-ad placeholder="ne yapıldı" aria-label="Satır adı">' +
+              '<input class="yk-alan sayi" data-yeni-fiyat inputmode="numeric" placeholder="tutar" aria-label="Tutar"></div>' +
+            '<button class="btn btn-primary btn-lg" data-e="yeniEkle">' + ikon('i-plus') + ' Ekle</button>'
+        : p === 'duzenle'
+          ? '<h3>' + esc(k.satirlar[ui.satir].ad) + '</h3>' +
+            '<div class="yk-iki"><input class="yk-alan" data-ad="' + ui.satir + '" value="' + esc(k.satirlar[ui.satir].ad) + '" aria-label="Satır adı">' +
+              '<input class="yk-alan sayi" data-fiyat="' + ui.satir + '" inputmode="numeric" value="' + (k.satirlar[ui.satir].fiyat ? tl(k.satirlar[ui.satir].fiyat) : '') + '" placeholder="tutar" aria-label="Tutar"></div>' +
+            '<button class="btn btn-primary btn-lg" data-e="panelKapat">' + ikon('i-check') + ' Kaydet</button>'
+        : p === 'teslim'
+          ? '<h3>Ödemeyi nasıl aldın?</h3>' + odemeCipleri(k) +
+            '<button class="btn btn-primary btn-lg" data-e="teslimOnay">' + ikon('i-check') + ' Teslimi onayla</button>'
+          : '<h3>' + (p === 'sor' ? 'Parça fiyatı sor' : 'Müşteriye mesaj') + '</h3><p style="margin:0;color:var(--muted)">Bu panel prototipte kendi ekranına gider; karşılaştırmada ölçülmüyor.</p>' +
+            '<button class="btn btn-ghost" data-e="panelKapat">Kapat</button>'
+      ) + '</div>' : '');
+  },
+  eylem: function (ad, el, k, ui) {
+    if (ad === 'panel') { ui.panel = el.getAttribute('data-v'); if (ui.panel === 'ekle') ui.odak = '[data-yeni-ad]'; }
+    if (ad === 'duzenle') { ui.satir = parseInt(el.getAttribute('data-i'), 10); ui.panel = 'duzenle';
+      ui.odak = k.satirlar[ui.satir].fiyat ? '[data-ad="' + ui.satir + '"]' : '[data-fiyat="' + ui.satir + '"]'; }
+    if (ad === 'panelKapat') ui.panel = null;
+    if (ad === 'yeniTip') ui.yeniTip = el.getAttribute('data-v');
+    if (ad === 'yeniEkle') {
+      var kap = el.closest('.yk-panel');
+      var a = kap.querySelector('[data-yeni-ad]').value.trim();
+      if (!a) return;
+      k.satirlar.push({ tip: ui.yeniTip || 'parca', ad: a, fiyat: rakam(kap.querySelector('[data-yeni-fiyat]').value) });
+      ui.panel = null;
+    }
+  },
+  senaryo: {
+    G1: [['tik', '[data-e="panel"][data-v="ekle"]'], ['yaz', '[data-yeni-ad]', 'Balata'], ['yaz', '[data-yeni-fiyat]', '450'], ['tik', '[data-e="yeniEkle"]']],
+    G2: [['tik', '[data-e="duzenle"][data-i="0"]'], ['yaz', '[data-fiyat="0"]', '3800'], ['tik', '.yk-panel [data-e="panelKapat"]']],
+    G3: [['tik', '[data-e="panel"][data-v="teslim"]'], ['tik', '[data-e="odeme"][data-v="nakit"]'], ['tik', '[data-e="teslimOnay"]']]
+  }
+},
+
+/* ---------- D · ZAMAN ÇİZELGESİ ---------- */
+{ kod: 'D', ad: 'Zaman çizelgesi',
+  iddia: 'Kayıt bir akış: açıldı → satırlar → parça → teslim. Yukarıdan aşağı okunur; en üstte "şimdi ne yapsam" kartı, en altta yeni satır yazma yeri.',
+  html: function (k, ui) {
+    var eksik = -1;
+    k.satirlar.forEach(function (s, i) { if (eksik < 0 && s.tip === 'parca' && !s.fiyat) eksik = i; });
+    var simdi;
+    if (k.teslim) simdi = teslimBitti(k);
+    else if (eksik >= 0 && !ui.teslim) {
+      simdi = '<div class="card yk-simdi" data-olc="teslim"><div class="section-label"><span class="lbl-txt">' + ikon('i-arrow-right', 1) + ' Şimdi</span></div>' +
+        '<div><b>' + esc(k.satirlar[eksik].ad) + '</b> fiyatı yazılmadı.</div>' +
+        '<div class="yk-yaz"><span style="align-self:center;color:var(--muted)">Fiyatı</span><input class="yk-alan sayi" data-fiyat="' + eksik + '" inputmode="numeric" placeholder="tutar" aria-label="Tutar"></div>' +
+        '<div class="btn-row"><button class="btn btn-primary" data-e="kaydet">' + ikon('i-check') + ' Kaydet</button>' +
+        '<button class="btn btn-ghost" data-e="teslim">' + ikon('i-wallet') + ' Yine de teslim et</button></div></div>';
+    } else {
+      simdi = '<div class="card yk-simdi" data-olc="teslim"><div class="section-label"><span class="lbl-txt">' + ikon('i-arrow-right', 1) + ' Şimdi: teslim</span></div>' +
+        '<div style="display:flex;justify-content:space-between"><span>Toplam</span><b style="font-family:var(--font-mono)" data-toplam>' + tl(toplam(k)) + ' ₺</b></div>' +
+        odemeCipleri(k) + '<button class="btn btn-primary btn-lg" data-e="teslimOnay">' + ikon('i-check') + ' Teslim et</button></div>';
+    }
+    var olaylar = ['<div class="yk-olay dolu"><span class="yk-nokta"></span><div class="yk-ne">Kayıt açıldı<small>' + k.acilis + ' · ' + esc(k.sikayet) + '</small></div></div>']
+      .concat(k.satirlar.map(function (s, i) {
+        return '<div class="yk-olay dolu"' + (i === 0 ? ' data-olc="satir"' : '') + '><span class="yk-nokta"></span><div class="yk-ne">' + esc(s.ad) +
+          '<small>' + (s.tip === 'parca' ? 'parça' : 'işçilik') + ' · ' + (s.fiyat ? tl(s.fiyat) + ' ₺' : 'fiyat yok') + '</small></div></div>';
+      }))
+      .concat(k.parcaBekliyor && !k.teslim ? ['<div class="yk-olay"><span class="yk-nokta"></span><div class="yk-ne">Parça bekleniyor<small>müşteriye haber verildi</small></div></div>'] : []);
+    return '' +
+      '<div class="card" style="flex-direction:row;align-items:center;gap:12px;flex-wrap:wrap">' + plakaHtml(ARAC.plaka, 'plate-lg') +
+        '<span><b>' + ARAC.marka + ' ' + ARAC.model + '</b><br><span style="color:var(--muted);font-size:var(--tip-sm)">' + ARAC.sahipAd + ' · ' + ARAC.sahipTel + '</span></span></div>' +
+      simdi +
+      '<div class="card"><div class="section-label"><span class="lbl-txt">' + ikon('i-clock', 1) + ' Ne oldu</span></div><div class="yk-akis">' + olaylar.join('') + '</div></div>' +
+      (k.teslim ? '' :
+        '<div class="card"><div class="section-label"><span class="lbl-txt">' + ikon('i-plus', 1) + ' Ne yapıldı?</span></div>' +
+          '<div class="yk-yaz"><input class="yk-alan" data-yeni-ad placeholder="ör. balata" aria-label="Satır adı">' +
+          '<input class="yk-alan sayi" data-yeni-fiyat inputmode="numeric" placeholder="tutar" aria-label="Tutar"></div>' +
+          '<div class="btn-row"><button class="btn btn-ghost" data-e="yeniEkle" data-v="parca">' + ikon('i-plus') + ' Parça</button>' +
+          '<button class="btn btn-ghost" data-e="yeniEkle" data-v="iscilik">' + ikon('i-plus') + ' İşçilik</button></div>' +
+          sesFotoHtml() + '</div>');
+  },
+  eylem: function (ad, el, k, ui) {
+    if (ad === 'teslim') ui.teslim = true;
+    if (ad === 'yeniEkle') {
+      var kap = el.closest('.card');
+      var a = kap.querySelector('[data-yeni-ad]').value.trim();
+      if (!a) return;
+      k.satirlar.push({ tip: el.getAttribute('data-v'), ad: a, fiyat: rakam(kap.querySelector('[data-yeni-fiyat]').value) });
+    }
+  },
+  senaryo: {
+    G1: [['yaz', '[data-yeni-ad]', 'Balata'], ['yaz', '[data-yeni-fiyat]', '450'], ['tik', '[data-e="yeniEkle"][data-v="parca"]']],
+    G2: [['yaz', '.yk-simdi [data-fiyat="0"]', '3800'], ['tik', '[data-e="kaydet"]']],
+    G3: [['tik', '[data-e="teslim"]'], ['tik', '[data-e="odeme"][data-v="nakit"]'], ['tik', '[data-e="teslimOnay"]']]
+  }
+}
+];
+
+/* ================= ÇALIŞTIRICI — dört kurguda ORTAK =================
+   Ortak eylemler (ödeme seç · teslimi onayla · bekliyor · özet) ve ortak
+   giriş sözleşmesi burada; kurgu yalnız kendine özgü olanı söyler. */
+function Uygulama(kurgu, kap) {
+  this.kurgu = kurgu; this.kap = kap; this.k = tohum(); this.ui = {};
+  var self = this;
+  kap.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-e]');
+    if (!t || !kap.contains(t)) return;
+    self.eylem(t.getAttribute('data-e'), t);
+  });
+  kap.addEventListener('input', function (e) {
+    var el = e.target, k = self.k;
+    if (el.hasAttribute('data-ad')) { k.satirlar[+el.getAttribute('data-ad')].ad = el.value; return; }
+    if (el.hasAttribute('data-fiyat')) {
+      k.satirlar[+el.getAttribute('data-fiyat')].fiyat = rakam(el.value);
+      var t = kap.querySelector('[data-toplam]');
+      if (t) t.textContent = tl(toplam(k)) + ' ₺';
+      return;
+    }
+    if (el.hasAttribute('data-sikayet')) k.sikayet = el.value;
+  });
+  this.ciz();
+}
+Uygulama.prototype.eylem = function (ad, el) {
+  var k = this.k, ui = this.ui;
+  if (ad === 'odeme') k.odeme = el.getAttribute('data-v');
+  else if (ad === 'teslimOnay') { if (!k.odeme) return; k.teslim = '12.10.2026'; ui.panel = null; ui.teslim = false; }
+  else if (ad === 'bekliyor') k.parcaBekliyor = !k.parcaBekliyor;
+  else if (ad === 'ozet') k.ozetGitti = true;
+  else if (ad === 'kaydet') { /* yazılan zaten kayıtta; çizim tazelenir */ }
+  else this.kurgu.eylem(ad, el, k, ui);
+  this.ciz();
+};
+Uygulama.prototype.ciz = function () {
+  var ekran = this.kap.querySelector('.screen');
+  var kay = this.kap.scrollTop;
+  ekran.innerHTML = this.kurgu.html(this.k, this.ui);
+  if (this.ui.odak) {
+    var o = this.kap.querySelector(this.ui.odak);
+    if (o) o.focus({ preventScroll: false });
+    this.ui.odak = null;
+  } else { this.kap.scrollTop = kay; }
+};
+
+/* Görev yürütücü. Sayım kuralı burada TEK YERDE (sayfanın başındaki not). */
+function adimYurut(uyg, adim) {
+  var el = uyg.kap.querySelector(adim[1]);
+  if (!el) return { hata: 'bulunamadı: ' + adim[1] };
+  if (adim[0] === 'tik') { el.click(); return { dokunus: 1, el: el }; }
+  var odakta = (document.activeElement === el);
+  if (!odakta) el.focus();
+  el.value = adim[2];
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  return { dokunus: odakta ? 0 : 1, el: el };
+}
+var DOGRULA = {
+  G1: function (k) { return k.satirlar.some(function (s) { return s.ad === 'Balata' && s.fiyat === 450 && s.tip === 'parca'; }); },
+  G2: function (k) { return k.satirlar[0].fiyat === 3800; },
+  G3: function (k) { return !!k.teslim && k.odeme === 'nakit'; }
+};
+
+/* Görünmeyen kopyada ölç. Telefon gerçek boyutunda (320 × 610 ekran). */
+function olc(kurgu) {
+  var sonuc = { gorev: {} };
+  ['G1', 'G2', 'G3'].forEach(function (g) {
+    var kap = gizliKap(320);
+    var uyg = new Uygulama(kurgu, kap.ekran);
+    var n = 0, hata = null;
+    kurgu.senaryo[g].forEach(function (a) {
+      if (hata) return;
+      var r = adimYurut(uyg, a);
+      if (r.hata) hata = r.hata; else n += r.dokunus;
+    });
+    sonuc.gorev[g] = (!hata && DOGRULA[g](uyg.k)) ? n : null;
+    kap.kok.remove();
+  });
+  /* İlk kare + karar yükü + 320 px taşma — tohum hâlinde, kaydırmadan. */
+  var kap = gizliKap(320);
+  new Uygulama(kurgu, kap.ekran);
+  var ust = kap.ekran.getBoundingClientRect();
+  var gorunur = function (el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.height > 0 && r.top < ust.bottom - 8 && r.bottom > ust.top; };
+  sonuc.satirIlkKare = gorunur(kap.ekran.querySelector('[data-olc="satir"]'));
+  sonuc.teslimIlkKare = gorunur(kap.ekran.querySelector('[data-olc="teslim"]'));
+  sonuc.karar = Array.prototype.filter.call(
+    kap.kok.querySelectorAll('button, input, textarea'), gorunur).length;
+  var tasma = 0, kirpma = 0;
+  kap.kok.querySelectorAll('.screen *').forEach(function (el) {
+    var r = el.getBoundingClientRect();
+    if (r.width && r.right > ust.right + 1) tasma++;
+    if ((el.tagName === 'INPUT') && el.value && el.scrollWidth > el.clientWidth + 1) kirpma++;
+  });
+  sonuc.tasma = tasma; sonuc.kirpma = kirpma;
+  kap.kok.remove();
+  return sonuc;
+}
+function gizliKap(gen) {
+  var kok = document.createElement('div');
+  kok.className = 'yk-telefon';
+  kok.setAttribute('data-gen', String(gen));
+  /* ⚠️ GİZLEMEZ, EKRAN DIŞINA TAŞIR. İlk yazışta visibility:hidden idi:
+     görünmez öğeye ODAK VERİLEMİYOR, o yüzden ekranın imleci kendisi
+     koyduğu alanlar da "dokunuş" sayılıyordu (A'nın G1'i 2 yerine 3).
+     Ölçüm aleti, ölçtüğü şeyi değiştirmemeli (K-024.1). */
+  kok.style.cssText = 'position:fixed;left:-10000px;top:0';
+  kok.innerHTML = '<div class="yk-tepe">Servis kaydı</div><div class="yk-ekran"><div class="screen active"></div></div>';
+  document.body.appendChild(kok);
+  return { kok: kok, ekran: kok.querySelector('.yk-ekran') };
+}
+
+/* "BUGÜN" — gerçek prototipte (omurga.html, 12.10) aynı kayıtla ölçüldü.
+   Ölçen betik: tools/servis-detay-olc.js. */
+var BUGUN = {
+  /* 12.10, 320 × 760 px, kayıt 1 — triger seti (fiyatsız) + triger işçiliği.
+     Kayıt "2 · Yapılanlar" adımında açıldı.
+     G1: Parça (1) → ad alanı odakta (0) → tutar (1)                    = 2
+     G2: triger tutarı (1)                                              = 1
+     G3: "3 · Teslim" sekmesi (1) → Teslim et (1) → Nakit (1) → onay (1) = 4
+     İlk 610 px'te künye, adım şeridi, süreç kartı ve ses/foto düğmeleri
+     var — satırlar ve teslim düğmesi YOK. */
+  gorev: { G1: 2, G2: 1, G3: 4 }, satirIlkKare: false, teslimIlkKare: false,
+  karar: 3, tasma: 0, kirpma: 0
+};
+
+/* ================= SAYFA ================= */
+var SONUCLAR = KURGULAR.map(olc);
+
+function hucre(v, en) {
+  if (v === null || v === undefined) return '<td class="s kotu">yapılamadı</td>';
+  return '<td class="s' + (v === en ? ' en' : '') + '">' + v + '</td>';
+}
+function sonucTablosu() {
+  var gorevler = ['G1', 'G2', 'G3'];
+  var tum = SONUCLAR.concat(BUGUN ? [BUGUN] : []);
+  var en = {};
+  gorevler.forEach(function (g) { en[g] = Math.min.apply(null, tum.map(function (s) { return s.gorev[g] == null ? 99 : s.gorev[g]; })); });
+  var top = function (s) { var t = 0; gorevler.forEach(function (g) { t += s.gorev[g] == null ? 0 : s.gorev[g]; }); return t; };
+  en.top = Math.min.apply(null, tum.map(top));
+  var enKarar = Math.min.apply(null, tum.map(function (s) { return s.karar; }));
+  var evet = function (b) { return b ? '<td>evet</td>' : '<td class="kotu">hayır</td>'; };
+  var satir = function (ad, s, sinif) {
+    return '<tr' + (sinif ? ' class="' + sinif + '"' : '') + '><td>' + ad + '</td>' +
+      gorevler.map(function (g) { return hucre(s.gorev[g], en[g]); }).join('') +
+      hucre(top(s), en.top) + evet(s.satirIlkKare) + evet(s.teslimIlkKare) +
+      hucre(s.karar, enKarar) +
+      '<td class="s' + (s.tasma || s.kirpma ? ' kotu' : '') + '">' + (s.tasma + s.kirpma) + '</td></tr>';
+  };
+  document.getElementById('ykSonuc').innerHTML =
+    '<thead><tr><th>Kurgu</th><th class="s">G1 satır</th><th class="s">G2 tutar</th><th class="s">G3 teslim</th>' +
+      '<th class="s">Toplam</th><th>Satırlar ilk karede</th><th>Teslim ilk karede</th><th class="s">Karar yükü</th><th class="s">320 px taşma</th></tr></thead><tbody>' +
+    (BUGUN ? satir('Bugün · üç adım <small>gerçek prototipte ölçüldü</small>', BUGUN, 'bugun') : '') +
+    KURGULAR.map(function (k, i) { return satir('<b>' + k.kod + '</b> · ' + k.ad, SONUCLAR[i]); }).join('') +
+    '</tbody>';
+}
+
+var UYGULAMALAR = [];
+/* Her yeni uygulama TAZE bir ekran öğesi alır. Aynı öğeye ikinci bir
+   Uygulama bağlansaydı dinleyiciler birikir ve bir dokunuş iki kez
+   işlenirdi — sayım yalan söylerdi. */
+function tazeUygulama(i) {
+  var eski = document.getElementById('ykEkran' + i);
+  var yeni = eski.cloneNode(false);
+  yeni.innerHTML = '<div class="screen active"></div>';
+  eski.parentNode.replaceChild(yeni, eski);
+  return (UYGULAMALAR[i] = new Uygulama(KURGULAR[i], yeni));
+}
+function izgara() {
+  document.getElementById('ykIzgara').innerHTML = KURGULAR.map(function (k, i) {
+    return '<div class="yk-kolon">' +
+      '<h2><span class="k">' + k.kod + '</span> ' + k.ad + '</h2>' +
+      '<p class="yk-iddia">' + k.iddia + '</p>' +
+      '<div class="yk-telefon' + (k.sabitli ? ' yk-sabitli' : '') + '" data-gen="320" id="ykTel' + i + '">' +
+        '<div class="yk-tepe">' + ikon('i-wrench', 1) + ' Servis kaydı</div>' +
+        '<div class="yk-ekran" id="ykEkran' + i + '"><div class="screen active"></div></div>' +
+      '</div>' +
+      '<div class="yk-oynat">' +
+        ['G1', 'G2', 'G3'].map(function (g) {
+          return '<button class="btn btn-ghost" data-oynat="' + i + '" data-g="' + g + '">' + g + ' oynat</button>';
+        }).join('') +
+        '<button class="btn btn-ghost" data-sifirla="' + i + '">' + ikon('i-x', 1) + ' Sıfırla</button>' +
+        '<span class="yk-sayac" id="ykSay' + i + '" aria-live="polite"></span>' +
+      '</div></div>';
+  }).join('');
+  KURGULAR.forEach(function (k, i) { tazeUygulama(i); });
+}
+
+/* Oynatıcı: görevi GÖRÜNEN telefonda adım adım yürütür; her dokunuşu
+   vurgular ve sayar. Hareket istemeyen için beklemesiz. */
+var AZ_HAREKET = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function oynat(i, g) {
+  var uyg = tazeUygulama(i);
+  var adimlar = KURGULAR[i].senaryo[g].slice(), n = 0;
+  var say = document.getElementById('ykSay' + i);
+  say.textContent = g + ': 0 dokunuş';
+  (function sonraki() {
+    var a = adimlar.shift();
+    if (!a) { say.textContent = g + ': ' + n + ' dokunuş' + (DOGRULA[g](uyg.k) ? ' ✓' : ' — olmadı'); return; }
+    var el = uyg.kap.querySelector(a[1]);
+    if (el) { el.scrollIntoView({ block: 'nearest' }); el.classList.add('yk-vurgu'); }
+    setTimeout(function () {
+      var r = adimYurut(uyg, a);
+      if (r.hata) { say.textContent = g + ': ' + r.hata; return; }
+      n += r.dokunus;
+      if (r.el) r.el.classList.remove('yk-vurgu');
+      say.textContent = g + ': ' + n + ' dokunuş';
+      setTimeout(sonraki, AZ_HAREKET ? 0 : 450);
+    }, AZ_HAREKET ? 0 : 600);
+  })();
+}
+
+document.addEventListener('click', function (e) {
+  var t = e.target.closest('[data-oynat], [data-sifirla], [data-gen]');
+  if (!t) return;
+  if (t.hasAttribute('data-oynat')) oynat(+t.getAttribute('data-oynat'), t.getAttribute('data-g'));
+  else if (t.hasAttribute('data-sifirla')) {
+    var i = +t.getAttribute('data-sifirla');
+    tazeUygulama(i);
+    document.getElementById('ykSay' + i).textContent = '';
+  } else if (t.closest('#ykGen')) {
+    var g = t.getAttribute('data-gen');
+    document.querySelectorAll('#ykGen .cip').forEach(function (c) { c.setAttribute('aria-pressed', String(c === t)); });
+    document.querySelectorAll('.yk-izgara .yk-telefon').forEach(function (tel) { tel.setAttribute('data-gen', g); });
+  }
+});
+
+sonucTablosu();
+izgara();
+document.getElementById('ykOneri').innerHTML =
+  '<span class="yk-ust">Önerim · seçim senin</span>' +
+  '<h2>B · Kayıt kartı + yerinde düzenleme</h2>' +
+  '<p><b>Neden:</b> satır eklemek ve tutar yazmak bugünkü kadar kısa (2 ve 1 dokunuş), teslim bir dokunuş kısa (3, bugün 4), çünkü adım şeridi yok. ' +
+  'Kayıt açılınca satırlar da teslim düğmesi de ilk karede; bugün ikisi de kaydırmadan görünmüyor. ' +
+  'İlk karedeki karar yükü en düşük (3). Düzenleme alanları yalnız satıra dokununca açılıyor, gerisi okunacak yazı.</p>' +
+  '<p><b>Ötekilerin bedeli:</b> ' +
+  '<b>A</b> aynı dokunuşla bitiyor ama ilk karede 8 dokunulabilir öğe var ve teslim görünmüyor; her şey açıkta olunca hiçbiri öne çıkmıyor. ' +
+  '<b>C</b>de her iş bir panel açıyor, bu yüzden satır eklemek 3, tutar yazmak 2 dokunuş. ' +
+  '<b>D</b>nin "şimdi" kartı en yol gösteren fikir, ama satırlar ilk karede yok ve satır eklemek 3 dokunuş.</p>' +
+  '<p><b>Ölçmediklerim:</b> dokunuş sayısı bir vekil; ustanın nereye dokunacağını bulma süresi ölçülmedi. On satırlık uzun kayıt, ' +
+  'parça sor ve mesaj akışları karşılaştırmada yok. Hangisi seçilirse seçilsin sesli işlerin şeması değişmez (K-056).</p>' +
+  '<p><b>Seçince:</b> seçtiğin kurgu prototipteki kayıt ekranının yerine kurulur; ses eşdeğerlik aracı ve sağlık denetimi koşar. ' +
+  'İki kurgunun birleşimi de seçilebilir (ör. B + D’nin "şimdi" satırı).</p>';
+window.YK_SONUCLAR = SONUCLAR;
+</script>
