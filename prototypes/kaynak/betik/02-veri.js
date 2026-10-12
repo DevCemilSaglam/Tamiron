@@ -73,7 +73,7 @@ var KAYITLAR = [
     acilis: '03.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true,
     satirlar: [
-      { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
+      { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: null, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' }
     ] },
 
@@ -86,7 +86,7 @@ var KAYITLAR = [
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 260, alis: 180, kimGetirdi: 'tamirci',
         marka: 'Mann', kod: 'W 71180', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: null, kimGetirdi: '' }
     ] },
 
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
@@ -100,9 +100,9 @@ var KAYITLAR = [
     acilis: '01.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
-      { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
+      { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: null, kimGetirdi: 'musteri',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
-      { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: null, kimGetirdi: '' }
     ] },
 
   /* Teslim edilmiş — ana ekranda GÖRÜNMEZ, araç geçmişinde görünür.
@@ -117,7 +117,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: null, kimGetirdi: '' }
     ] },
 
   /* İKİNCİ KM ÖLÇÜMÜ — ay/km kuralı ancak iki ölçümle çalışıyor
@@ -132,7 +132,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: null, kimGetirdi: '' }
     ] },
 
   /* MUHASEBE EKRANI BOŞ GÖRÜNMESİN (04.09). Tohum veride bugün teslim
@@ -143,10 +143,17 @@ var KAYITLAR = [
     sikayet: 'Ön cam silecek motoru',
     acilis: '03.09.2026', teslimTarihi: '03.09.2026',
     odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
+    /* ⚠️ ALIŞI YAZILMAMIŞ PARÇA — BİLEREK (12.10 · K-055.2).
+       Gerçek kullanımda alış alanı boş kalır: ayar kapalıysa hiç
+       sorulmaz, açıksa usta geçebilir. Tohum verinin HER parçasında
+       alış dolu olunca kâr ekranı doğru görünüyordu; kusuru tohum veri
+       gizliyordu (MALIYET-VE-KAR §1). Bu satır o kusurun canlı örneği:
+       eski hesap 2.800 ₺ "fark" yazardı, doğrusu 700 ₺ + "bir parçanın
+       alışı bilinmiyor". */
     satirlar: [
-      { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
+      { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: null, kimGetirdi: 'tamirci',
         marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Söküm takım', fiyat: 700, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Söküm takım', fiyat: 700, alis: null, kimGetirdi: '' }
     ] },
 
   /* VERESİYE — "almadım" bir ödeme yoludur (K-004). Muhasebedeki
@@ -158,7 +165,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Takma', fiyat: 250, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Takma', fiyat: 250, alis: null, kimGetirdi: '' }
     ] },
 
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
@@ -170,7 +177,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: null, kimGetirdi: '' }
     ] }
 ];
 
@@ -419,7 +426,20 @@ var DUKKAN = {
   /* HATIRLATMA: AY **VEYA** KM — hangisi önce gelirse (Cemil, 03.09).
      K-002 yalnız ayı sayıyordu; gerçek bakım kuralı ikisi birden. */
   bakimPeriyoduAy: 6,
-  bakimPeriyoduKm: 10000
+  bakimPeriyoduKm: 10000,
+  /* AYARLAR SAYFASININ SAKİNLERİ (12.10 · K-055.2) — dükkânın
+     tercihi, verinin parçası. Denetim DUKKAN'ı yedekleyip geri
+     yüklüyor; ayar burada durunca ölçüm aleti onu kirletemez.
+     ⚠️ Prototipte kalıcı değil (öteki veri gibi açılışta tohuma
+     döner); kalıcılık backend'in işi. Tema ayrı: o CİHAZIN tercihi,
+     localStorage'da (K-010). */
+  /* Parça alış fiyatı sorulsun mu (A-M43). Varsayılan KAPALI:
+     Cemil — "Zorunlu ya da beklenen alan olmamalı." Sormayan dükkân
+     alanı HİÇ görmez. */
+  alisSor: false,
+  /* Gizlilik notu (A-M33) bir kez gösterildi mi — ses ya da ruhsat
+     çekimi, hangisi önce kullanılırsa. */
+  gizlilikGoruldu: false
 };
 
 /* ---- Sorgular (tek yerde; ekranlar kendi filtresini yazmaz) ---- */
@@ -919,12 +939,36 @@ function donemKayitlari(donem) {
    T-9). Girilmeyen bir şey yok, o yüzden yalan söyleyemez. Dükkân kârı
    ise girilmemiş giderler yüzünden yalan söylerdi — K-014'ün itirazı
    orada hâlâ geçerli. */
+/* ⚠️ 12.10 — BİLİNMEYEN ALIŞ KÂRA GİRMEZ (K-055.2).
+   `alis: null` = BİLİNMİYOR · `alis: 0` = BEDAVA ALDIM. İkisi aynı şey
+   değil. Eskiden `s.alis || 0` ile ikisi de sıfır sayılıyordu: alışı
+   yazılmamış 2.100 ₺'lik parça "2.100 ₺ kâr" oluyordu.
+
+   Yalnız alışı sıfır saymamak YETMEZ — o zaman satış fiyatı yine
+   farka girer ve şişme aynen sürer. Bilinmeyen alışlı satır, SATIŞIYLA
+   BİRLİKTE hesaptan çıkar; ekran kaç satırın dışarıda kaldığını
+   SÖYLER. Eksik bir rakam, yanlış bir rakamdan iyidir (K-013).
+
+   Yalnız TAMİRCİNİN aldığı ve fiyatı yazılmış parça sayılır: müşteri
+   parçası zaten toplama girmiyor (K-005), fiyatsız satır farka hiçbir
+   şey katmıyor. */
+function alisBilinmiyor(s) {
+  return s.tip === 'parca' && s.kimGetirdi === 'tamirci' &&
+         (s.alis === null || s.alis === undefined);
+}
 function isKari(k) {
   var alinan = kayitToplami(k);
-  var parca = (k.satirlar || []).reduce(function (t, s) {
-    return t + ((s.tip === 'parca' && s.kimGetirdi === 'tamirci') ? (s.alis || 0) : 0);
-  }, 0);
-  return { alinan: alinan, parca: parca, fark: alinan - parca };
+  var parca = 0, disarida = 0, bilinmeyen = 0;
+  (k.satirlar || []).forEach(function (s) {
+    if (s.tip !== 'parca' || s.kimGetirdi !== 'tamirci') return;
+    if (alisBilinmiyor(s)) {
+      if (s.fiyat) { bilinmeyen++; disarida += s.fiyat; }
+      return;
+    }
+    parca += s.alis;
+  });
+  return { alinan: alinan, parca: parca, disarida: disarida, bilinmeyen: bilinmeyen,
+           fark: alinan - disarida - parca };
 }
 
 /* ---- PARÇA ALIŞI — BEDAVAYA GELEN DÖRDÜNCÜ RAKAM (04.09) ----

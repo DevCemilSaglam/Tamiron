@@ -453,8 +453,17 @@
    display açıkça verilmiş. */
 #screen-kayit .k-getiren-sor[hidden] { display: none; }
 #screen-kayit .k-alis {
-  font-size: var(--tip-xs); color: var(--faint);
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--tip-xs); color: var(--muted);
   font-family: var(--font-mono);
+}
+/* Alış alanı küçük ama dokunma hedefi TAM (K-024): görsel ağırlık
+   ikincil, parmak için alan değil. */
+#screen-kayit .k-alis input {
+  width: 84px; min-height: var(--dokun);
+  padding: 0 8px; text-align: right;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: var(--tip-sm);
 }
 </style>
 
@@ -607,6 +616,12 @@ function kEksikler(k) {
 
    S2/K-005 aynen duruyor: müşteri parçası faturaya girmez. Kural artık
    `kayitToplami()`de işliyor — veri korunuyor, TOPLAM karar veriyor. */
+/* Alış bu satırda sorulur mu: dükkân istiyorsa ve parçayı tamirci
+   aldıysa. Müşteri getirdiyse alış diye bir şey yok (K-005). */
+function alisSorulur(s) {
+  return !!DUKKAN.alisSor && s.tip === 'parca' && s.kimGetirdi !== 'musteri';
+}
+
 function kGetireniAyarla(s, kim) {
   s.kimGetirdi = kim;
 }
@@ -738,7 +753,7 @@ function kayitCiz() {
                  A-M13'ün cevabı (*"balatayı müşteri getirdi, yağı ben
                  aldım"*) korunuyor: işaret HÂLÂ SATIR BAŞINA. Değişen
                  tek şey, sorulmadığı zaman görünmemesi. */
-              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || !s.fiyat || s.alis)
+              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || !s.fiyat || alisSorulur(s))
                 ? '<span class="k-ikincil">' +
                     (s.kimGetirdi === 'musteri'
                       ? '<button class="k-getiren-bilgi" data-getiren="' + i + '"' +
@@ -747,9 +762,20 @@ function kayitCiz() {
                           ? '<button class="k-getiren-sor" data-getiren="' + i + '">' +
                               'müşteri getirdi</button>'
                           : '')) +
-                    /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM
-                       DEĞİL: soluk ve küçük durur. */
-                    (s.alis ? '<span class="k-alis">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
+                    /* ALIŞ — yalnız AYAR AÇIKSA ve parçayı tamirci
+                       aldıysa (12.10 · K-055.2). Müşteriye söylenecek
+                       rakam DEĞİL: soluk ve küçük durur. Boş bırakılabilir
+                       ve hiçbir şey uyarmaz — boş = bilinmiyor, kâra
+                       girmez. Ayar kapalıyken alan HİÇ görünmez; eski
+                       "parçacı 1.450 ₺" yazısı da görünmez (sormayan
+                       dükkân alışı hiç görmez). */
+                    (alisSorulur(s)
+                      ? '<label class="k-alis">alış' +
+                          '<input value="' + (s.alis === null || s.alis === undefined ? '' : tutar(s.alis)) +
+                          '" data-satir-alis="' + i + '" data-giris="tutar" inputmode="numeric"' +
+                          ' placeholder="—" aria-label="Alış fiyatı (boş bırakılabilir)" />' +
+                        ' ₺</label>'
+                      : '') +
                   '</span>'
                 : '') +
             '</td>' +
@@ -889,12 +915,12 @@ document.addEventListener('click', function (e) {
   if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
 
   if (t.id === 'kParcaEkle') {
-    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
+    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: null,
                       kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
   }
   if (t.id === 'kIscilikEkle') {
-    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
+    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: null, kimGetirdi: '' });
     Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
   }
 
@@ -907,7 +933,7 @@ document.addEventListener('click', function (e) {
       /* İşçiliğin parçacısı olmaz: parçaya özel alanlar temizlenir,
          geri çevrilirse boş başlar. Kalsaydı işçilik satırında
          "parçacı 1450 ₺" yazardı. */
-      if (st.tip === 'iscilik') { st.kimGetirdi = ''; st.alis = 0; st.sorulan = null; }
+      if (st.tip === 'iscilik') { st.kimGetirdi = ''; st.alis = null; st.sorulan = null; }
       else { st.kimGetirdi = 'tamirci'; }
       Ekran.tazele(); kSatiraOdaklan(k, parseInt(tipNo, 10));
     }
@@ -917,7 +943,7 @@ document.addEventListener('click', function (e) {
   /* FOTOĞRAFTAN PARÇA LİSTESİ — okunanlar satır olur, fiyatları BOŞ. */
   if (t.id === 'kFotoParca') {
     FOTO_PARCA_ORNEK.forEach(function (p) {
-      k.satirlar.push({ tip: 'parca', ad: p[0], fiyat: p[1], alis: 0,
+      k.satirlar.push({ tip: 'parca', ad: p[0], fiyat: p[1], alis: null,
         kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     });
     balon(FOTO_PARCA_ORNEK.length + ' parça okundu — fiyatlarını yaz.', false, 3000);
@@ -1024,6 +1050,16 @@ document.addEventListener('input', function (e) {
   var ad = e.target.getAttribute('data-satir-ad');
   if (ad !== null) { k.satirlar[parseInt(ad, 10)].ad = e.target.value; return; }
 
+  /* ALIŞ: boş = BİLİNMİYOR (null), "0" = bedava (0). Fiyat alanı gibi
+     `|| 0` yazılsaydı boş alış sessizce sıfır olurdu — K-055.2'nin
+     düzelttiği kusurun ta kendisi. */
+  var al = e.target.getAttribute('data-satir-alis');
+  if (al !== null) {
+    var rakam = (e.target.value || '').replace(/[^0-9]/g, '');
+    k.satirlar[parseInt(al, 10)].alis = rakam === '' ? null : parseInt(rakam, 10);
+    return;
+  }
+
   var f = e.target.getAttribute('data-satir-fiyat');
   if (f !== null) {
     var sf = k.satirlar[parseInt(f, 10)];
@@ -1128,12 +1164,12 @@ Islem.tanim('satir-ekle', {
     return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
              tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesTutarBul(c.d) };
   },
-  /* ⚠️ `alis: 0` BİLEREK DURUYOR — 8.3 davranış değiştirmez. Bilinmeyen
-     alış 0 değil null olmalı (K-055.2); düzeltmesi 8.2'nin işi. */
+  /* Sesle söylenen satırın alışı BİLİNMİYOR (null), sıfır değil —
+     K-055.2. (8.3'te `alis: 0` bilerek taşınmıştı; 8.2 düzeltti.) */
   uygula: function (o) {
     var k = kayitBul(ACIK_KAYIT);
     if (!k) { balon('Açık kayıt yok.'); return; }
-    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: 0,
+    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: null,
       kimGetirdi: o.tip === 'parca' ? 'tamirci' : '',
       marka: '', kod: '', tanim: 'tanimlanamadi' });
     balon('Satır eklendi — fiyatını yaz.', false, 2800);

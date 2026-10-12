@@ -41,6 +41,11 @@ yok; hepsi `alis: 0` ile açılıyor.
 
 ### ⚠️ Kusur: parçacının fiyatı YANLIŞ ALANA yazılıyor
 
+> ✅ **12.10 — şişme kapandı (K-057).** Alış artık `null` = bilinmiyor;
+> bilinmeyen alışlı satır satışıyla birlikte kâr dışında ve ekran bunu
+> söylüyor (bu yıl 7.410 → 5.310 ₺). Alış alanı ayara bağlı, zorunlu değil.
+> Aşağıdaki teşhis tarih olarak duruyor.
+
 Bugünkü akış (`40-parca-sor.html`):
 
 ```

@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 12.10.2026 *(K-056 · ses şema sistemi · Tur 8.3 bitti)*
+> **Son güncelleme:** 12.10.2026 *(K-057 · ayarlar + alış · Tur 8.2 ve 8.3 bitti)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -13,18 +13,18 @@ tıklanabilir prototip.
 
 | | |
 |---|---|
-| Ekran | **16** — home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · musteri · muhasebe · is-basina · **mesajlar** *(gönderilen mesaj arşivi, K-048.2)* + **ozet** *(müşterinin gördüğü sayfa — K-023)*. **Menü hâlâ altı satır** |
+| Ekran | **17** — **ayarlar** *(12.10, K-057 — bakım periyodu · parça alış · tema · gizlilik; çekmecede tek satır)* · home · ses · ruhsat · kayit · parca-sor · teslim · arac · araclar · kayitlar · mesaj · musteriler · musteri · muhasebe · is-basina · **mesajlar** *(gönderilen mesaj arşivi, K-048.2)* + **ozet** *(müşterinin gördüğü sayfa — K-023)*. **Menü hâlâ altı satır** |
 | Ana ekran | **Menü** — altı satır, her satırın sağında mikrofon. **Bakım hatırlatma şeridi yok** (K-019.1), **"Sesli işlem" satırı yok** (K-026) |
 | Mesaj | Altı şablon, **her biri kayıt bazlı koşulla** (K-048.4) · **arşiv kendi sayfasında** (arama · kanal süzgeci · sayfalama) · mesaj yazımında **son 5** kapalı akordiyon · **sesli gönderim onay ekranından** · **toplu mesaj** (K-047.4) · **"yapay zeka düzeltsin"** — prototipte sahte, öyle yazılı (K-048.6) |
 | Süreç | Servis kaydının omurgası: açılış → parça bekleme → **mesajlar** → teslim → hatırlatma, ve *"şimdi gönderilebilir"* önerileri. Yeni durum alanı yok, türetiliyor (K-048.4) |
 | Yapay zeka | **Plan yazıldı, kod yok:** `arastirma/YAPAY-ZEKA.md` — dört iş (ses anlama · ruhsat · parça listesi · mesaj düzeltme), tek şart (**anahtar backend'de**), ölçüm yolu (değerlendirme seti) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
-| Sağlık denetimi | **51 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
+| Sağlık denetimi | **52 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **7. kontrol artık ÜRETİLEN dosyadaki betiği ayrıştırıyor** — yerleştirmeden önceki betiğe bakıyordu ve `$'` bozulmasını görmedi (K-056.4). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-056** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
+| Kararlar | **K-001 … K-057** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
 | Ses | Cümle → **işlem nesnesi** → onay. **İşi ses tanımaz: sahibi olan ekran şemasını bildirir** (`Islem.tanim`, `betik/04-islem.js`; 12 şema · 7 ekran — K-056). Onay ekranı ve uygulama şemadan. `ISLEM_SEMALARI()` = modele araç tanımı. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
-| Sıradaki | **Tur 8** — servis detayı yeniden kurgu · ayarlar sayfası + alış alanı · A-M48 (bkz. `CALISMA-KUYRUGU.md`). **8.3 bitti** |
+| Sıradaki | **Tur 8** — servis detayı yeniden kurgu · A-M48 (bkz. `CALISMA-KUYRUGU.md`). **8.2 ve 8.3 bitti** |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
@@ -317,9 +317,8 @@ kalan iki madde:
   birikim mekanizması çalışıyor ama **sayaç sıfır** — düzeltmeler
   dükkânda kalıyor (K-055.1).
 - **Alış fiyatı zorunlu değil** (A-M43) → `alis: null` ≠ `alis: 0`;
-  bilinmeyen alış kâra **girmez**. Bugünkü kâr şişmesi burada (K-055.2).
-- **Ayarlar sayfası kapsama girdi** → alış sorulsun mu · gizlilik
-  cümlesi · tema. 17. ekran olacak.
+  bilinmeyen alış kâra **girmez** — **yapıldı** (K-057; yıl 7.410 → 5.310 ₺).
+- **Ayarlar sayfası kapsama girdi** → **yapıldı**, 17. ekran (K-057).
 
 Kapsam kararlarından ikisi **tek cümleyle geri alınabilir**: `MUH`
 (kasa+gider) ve `A-M25` (toplu mesaj kalıyor).

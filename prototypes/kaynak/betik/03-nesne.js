@@ -745,3 +745,34 @@ document.addEventListener('click', function (e) {
   ACIK_PLAKA = t.getAttribute('data-arac');
   Ekran.ac('arac');
 });
+
+/* ---- GİZLİLİK CÜMLESİ (12.10 · A-M33 · K-055.7) ----
+   Cemil "evet" dedi: ayarlarda tek satır + ilk kullanımda bir kez.
+   Cümle YAPAY-ZEKA.md'deki öneriden; jargonsuz (T-18).
+
+   ORTAK NESNE: cümle ve "bir kez" kuralı TEK YERDE. Ses ve ruhsat
+   ekranı yalnız yer açar; hangisi önce açılırsa notu o gösterir, öteki
+   göstermez. İki ekran kendi bayrağını tutsaydı usta aynı cümleyi iki
+   kez okurdu.
+
+   ⚠️ AÇILIŞTA çağrılır (ekranın `ac` kancası), çizimde değil (K-040):
+   `ciz`de olsaydı ilk tazelemede not, usta okurken kaybolurdu. */
+var GIZLILIK_CUMLESI =
+  'Söyledikleriniz ve çektiğiniz fotoğraflar, yazıya çevrilmek üzere ' +
+  'internet üzerinden gönderilir.';
+
+function gizlilikIlkAcilis(kapId) {
+  var kap = document.getElementById(kapId);
+  if (!kap) return;
+  var goster = !DUKKAN.gizlilikGoruldu;
+  DUKKAN.gizlilikGoruldu = true;
+  /* Boş kap gizlenir — boş bir çocuk da `.screen`'in gap'ini alır ve
+     ritmi sessizce bozar (K-029). */
+  kap.hidden = !goster;
+  kap.innerHTML = goster
+    ? '<div class="notice"><span class="n-ic">' +
+        '<svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+        '<span class="n-body">' + GIZLILIK_CUMLESI +
+          ' Bu not bir kez gösterilir; <b>Ayarlar</b>da her zaman durur.</span></div>'
+    : '';
+}

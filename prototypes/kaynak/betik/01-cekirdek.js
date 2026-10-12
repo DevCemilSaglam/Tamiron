@@ -832,7 +832,6 @@ var Cekmece = (function () {
     o.b.setAttribute('aria-expanded', 'true');
     arkaPlan(true);
     cizBildirimler();
-    cizPeriyot();
     var ilk = o.c.querySelector('button, [tabindex]');
     if (ilk) ilk.focus();
   }
@@ -884,16 +883,9 @@ var Cekmece = (function () {
     }).join('');
   }
 
-  /* Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
-     A-3 hâlâ açık; varsayılan 6 ay. */
-  function cizPeriyot() {
-    var g = document.getElementById('periyotGrup');
-    if (!g || typeof DUKKAN === 'undefined') return;
-    g.innerHTML = [3, 6, 12].map(function (ay) {
-      return '<button class="cip" data-periyot="' + ay + '" aria-pressed="' +
-        (DUKKAN.bakimPeriyoduAy === ay) + '">' + ay + ' ay</button>';
-    }).join('');
-  }
+  /* ⚠️ 12.10 — BAKIM PERİYODU AYARLAR EKRANINA TAŞINDI (K-055.2).
+     Çizimi ve tıklaması artık 99-ayarlar.html'de; burada kopyası
+     bırakılmadı (iki yerde duran ayar iki ayrı cevaptır — K-019.1). */
 
   return { ac: ac, kapa: kapa, ciz: cizBildirimler,
            acikMi: function () { return acikMi; } };
@@ -1230,24 +1222,8 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Çekmece içinden gezinince çekmece kapanmalı — açık kalırsa
      kullanıcı gittiği ekranı göremez. */
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-git], [data-hatirlatma], [data-periyot]');
+    var t = e.target.closest('[data-git], [data-hatirlatma]');
     if (!t || !Cekmece.acikMi()) return;
-
-    var hp = t.getAttribute('data-periyot');
-    if (hp) {
-      DUKKAN.bakimPeriyoduAy = parseInt(hp, 10);
-      Cekmece.ciz();
-      var g = document.getElementById('periyotGrup');
-      if (g) {
-        var cipler = g.querySelectorAll('[data-periyot]');
-        for (var i = 0; i < cipler.length; i++) {
-          cipler[i].setAttribute('aria-pressed',
-            String(+cipler[i].getAttribute('data-periyot') === DUKKAN.bakimPeriyoduAy));
-        }
-      }
-      balon('Bakım periyodu ' + hp + ' ay oldu.');
-      return;                        /* ayar çekmecede kalır, kapatmaz */
-    }
 
     var hb = t.getAttribute('data-hatirlatma');
     if (hb) {

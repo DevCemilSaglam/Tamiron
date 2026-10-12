@@ -57,6 +57,9 @@
     </span>
   </div>
 
+  <!-- Gizlilik notu — ilk kullanımda bir kez (A-M33, gizlilikIlkAcilis) -->
+  <div id="rGizlilik" hidden></div>
+
   <div class="tab-grup" role="tablist" aria-label="Araç bilgisi nasıl girilecek">
     <button class="tab" id="sekPlaka" role="tab" aria-selected="true" aria-controls="ruhsatGovde">
       <svg class="ico"><use href="#i-file-text"></use></svg> Plakayı yaz
@@ -453,6 +456,7 @@ Ekran.tanim('ruhsat', {
     });
     rOkundu = false;
     ruhsatSekme('plaka');
+    gizlilikIlkAcilis('rGizlilik');
 
     /* MİKROFONUN YANINDA ÖRNEK CÜMLE VAR (Cemil, 06.09). Alan listesi
        değil, taklit edilebilir cümleler: plaka + ad soyad + telefon +

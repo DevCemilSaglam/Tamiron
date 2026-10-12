@@ -72,7 +72,7 @@ Tümü `tokens.css`'ten. Değiştirmek için oradaki "MARKA PALETİ" hexleri.
   - **Geri/ileri her zaman GÖRÜNÜR;** işlevsizken **disabled + silik** (`pointer-events:none`, düşük opaklık). Gizlenmez → düzen zıplamaz.
 - **Sabit ince footer (sticky bottom).** header + ekran + footer = tam yükseklik; yalnız ekran gövdesi kayar.
 - **Drawer (sağdan):** Bildirimler → Bölümler → Kullanıcı → Ayarlar sırası. **Arka ekran SABİT kalır** (kaymaz/ölçeklenmez). Kapanış: [X] · overlay · **ESC**.
-- **Tema toggle header'da DEĞİL** → drawer → **Ayarlar**. Seçim `localStorage`'da (§6).
+- **Tema toggle header'da DEĞİL** → drawer → **Ayarlar**. Seçim `localStorage`'da (§6). *(12.10: Ayarlar artık kendi ekranı — çekmecede tek satır, K-057.)*
 - **Sesli giriş her yerden:** menü satırlarının her birinde **kendi mikrofon butonu** (ana butonla birleşik görünür, bağımsız tıklanır). Tek bir "AI ekranı" yoktur.
 - **Ana menü (mobil):** tam genişlik **dikey satırlar** (K-024); birincil eylem (Araç Giriş) `--primary` ile öne çıkar.
 

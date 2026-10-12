@@ -18,7 +18,8 @@
      etmiyor; istenirse konuşulur.
 
      BİLEŞENLER: .screen-head .eyebrow .eb-say · .cip-grup .cip
-     · .card · .tablo-sar .tablo · .bos-durum. -->
+     · .card · .tablo-sar .tablo · .bos-durum · .notice · .btn
+     (bilinmeyen alış notu, 12.10). -->
 <section class="screen" id="screen-is-basina">
 
   <div class="screen-head">
@@ -40,6 +41,10 @@
     </div>
   </div>
 
+  <!-- Hesap dışında kalan satırlar BURADA söylenir (12.10 · K-055.2):
+       bilinmeyen alış kâra girmez, ama sessizce kaybolmaz da. -->
+  <div id="ibDisarida"></div>
+
   <div id="ibBos"></div>
 
 </section>
@@ -56,6 +61,7 @@ Ekran.tanim('is-basina', {
     if (!kayitlar.length) {
       document.getElementById('ibTablo').innerHTML = '';
       document.getElementById('ibTablo').closest('.card').hidden = true;
+      document.getElementById('ibDisarida').innerHTML = '';
       document.getElementById('ibBos').innerHTML = bosDurumHtml(
         'i-clipboard-list', 'Bu dönemde teslim edilmiş iş yok',
         'Dönemi genişletirsen geçmiş işler görünür.');
@@ -64,17 +70,21 @@ Ekran.tanim('is-basina', {
     document.getElementById('ibTablo').closest('.card').hidden = false;
     document.getElementById('ibBos').innerHTML = '';
 
-    var tAlinan = 0, tParca = 0, tFark = 0;
+    var tAlinan = 0, tParca = 0, tFark = 0, tDisarida = 0, tBilinmeyen = 0;
     var satirlar = kayitlar.map(function (k) {
       var kr = isKari(k);
       var a = aracBul(k.plaka) || {};
       tAlinan += kr.alinan; tParca += kr.parca; tFark += kr.fark;
+      tDisarida += kr.disarida; tBilinmeyen += kr.bilinmeyen;
       return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
         '<td><b>' + k.plaka + '</b>' +
           '<span class="t-alt">' + TUR_AD[k.tur] +
             (a.marka ? ' · ' + a.marka : '') + ' · ' + k.teslimTarihi + '</span>' +
           '<span class="t-alt">alınan ' + tutar(kr.alinan) +
-            ' · parça ' + tutar(kr.parca) + '</span>' +
+            ' · parça ' + tutar(kr.parca) +
+            /* Hesap dışı kalan satış, satırın kendi altında: usta farkın
+               neden "alınan − parça" etmediğini orada görür. */
+            (kr.bilinmeyen ? ' · ' + tutar(kr.disarida) + ' hesap dışı' : '') + '</span>' +
         '</td>' +
         '<td class="sayi">' + tutar(kr.fark) + ' ₺</td>' +
       '</tr>';
@@ -91,10 +101,30 @@ Ekran.tanim('is-basina', {
         '<tr class="genel">' +
           '<td>Toplam' +
             '<span class="t-alt">alınan ' + tutar(tAlinan) +
-            ' · parça ' + tutar(tParca) + '</span></td>' +
+            ' · parça ' + tutar(tParca) +
+            (tBilinmeyen ? ' · ' + tutar(tDisarida) + ' hesap dışı' : '') + '</span></td>' +
           '<td class="sayi">' + tutar(tFark) + ' ₺</td>' +
         '</tr>' +
       '</tbody>';
+
+    /* ⚠️ BİLİNMEYEN ALIŞ (12.10 · K-055.2). Eksik rakam yanlış rakamdan
+       iyidir — ama eksik olduğu SÖYLENMELİ, yoksa usta 700 ₺'yi tam
+       sanar. Uyarının çözümü yanında (K-021): alış sorulmuyorsa
+       ayarlara götürür, soruluyorsa nereye yazılacağını söyler. */
+    document.getElementById('ibDisarida').innerHTML = tBilinmeyen
+      ? '<div class="notice"><span class="n-ic">' +
+          '<svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+          '<span class="n-body"><b>' + tBilinmeyen + ' parçanın alışı yazılmamış.</b> ' +
+            'Satışı (' + tutar(tDisarida) + ' ₺) farka katılmadı — bilinmeyen alış ' +
+            'kâr sayılmaz. ' +
+            (DUKKAN.alisSor
+              ? 'Alışı servis kaydında parçanın altına yazabilirsin.'
+              : 'Alış fiyatı bugün sorulmuyor.') +
+          '</span></div>' +
+        (DUKKAN.alisSor ? '' :
+          '<button class="btn btn-ghost" data-git="ayarlar">' +
+            '<svg class="ico"><use href="#i-cog"></use></svg> Alış fiyatını sor</button>')
+      : '';
   }
 });
 

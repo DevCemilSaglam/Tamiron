@@ -10,6 +10,84 @@
 
 ---
 
+## K-057 · Bilinmeyen alış kâra girmez; ayarlar kendi ekranında (12.10.2026 · Tur 8.2)
+
+K-055.2'nin uygulaması. Üç parça; üçü de Cemil'in kararından türüyor,
+yeni kapsam yok.
+
+### 57.1 · `alis: null` ≠ `alis: 0` — ve satış da hesaptan çıkar
+
+| değer | anlamı | kâr hesabında |
+|---|---|---|
+| `null` | **bilinmiyor** (yazılmamış) | satır **satışıyla birlikte** dışarıda; ekran kaç satır olduğunu söyler |
+| `0` | bedava aldım | alış 0 — satış kârdır |
+| sayı | parçacıya ödenen | satıştan düşülür |
+
+⚠️ **Yalnız alışı sıfır saymamak yetmezdi** — satış fiyatı farka girmeye
+devam eder ve şişme aynen sürer. Bu yüzden satır bütünüyle dışarıda.
+Eksik bir rakam yanlış bir rakamdan iyidir (K-013); ama eksik olduğu
+**söylenir**: iş başına ekranında satırın altında *"2.100 hesap dışı"*,
+altta bir not ve — ayar kapalıysa — çözümün kendisi (*"Alış fiyatını
+sor"* → ayarlar, K-021).
+
+**Ölçüldü (aynı veri, eski ve yeni formül):**
+
+| | eski | yeni |
+|---|---|---|
+| 7 no'lu kayıt (silecek motoru, alışı yazılmamış) | 2.800 ₺ | **700 ₺** (yalnız işçilik) |
+| bu ay | 2.800 ₺ | 700 ₺ |
+| bu yıl | 7.410 ₺ | **5.310 ₺** — elle: 1.250 + 1.350 + 700 + 1.000 + 1.010 |
+
+**Tohum veri değişti, bilerek:** silecek motorunun alışı boşaltıldı.
+Tohumdaki her parçada alış dolu olunca kusur hiç görünmüyordu
+(MALIYET-VE-KAR §1 — ölçüm aletinin verisi eksiği gizliyordu). İşçilik
+ve müşteri parçası satırları `0` → `null` (alış kavramı yok). Yeni satır
+açan her yol (elle · fotoğraf · ses · tip çevirme) artık `null` yazıyor.
+
+### 57.2 · Alış alanı — ayara bağlı, zorunlu değil
+
+Kayıt ekranında, **yalnız ayar açıksa** ve **parçayı tamirci aldıysa**,
+parçanın altında küçük bir *"alış ___ ₺"* alanı. Boş geçilir, hiçbir şey
+uyarmaz. Girişte boş → `null`, *"0"* → `0` (tutar alanlarının `|| 0`
+alışkanlığı buraya sızmasın). Ayar kapalıyken alan **ve** eski
+*"parçacı 1.450 ₺"* yazısı görünmez — sormayan dükkân alışı hiç görmez.
+320 px'te ölçüldü: alan 84×48, taşma 0.
+
+### 57.3 · Ayarlar = 17. ekran; çekmecede tek satır
+
+Dört sakin: bakım periyodu · **parça alış fiyatı** · tema · gizlilik.
+İkisi çekmeceden **taşındı, kopyalanmadı** — iki yerde duran ayar iki
+ayrı cevaptır (K-019.1). Ana menü altı satır kaldı (A-M8).
+
+Seçim bir anahtar değil **iki çip** (*Sorulmasın / Sorulsun*): teknolojiden
+uzak kullanıcıya bir anahtarın hangi yönünün "açık" olduğunu sormak
+yerine iki kelime (T-18); bakım periyoduyla aynı bileşen.
+
+**Gizlilik (A-M33):** ayarlarda tek satır + **ilk kullanımda bir kez**
+not — ses ya da ruhsat ekranı, hangisi önce açılırsa. Cümle ve "bir
+kez" kuralı tek yerde (`gizlilikIlkAcilis`, 03-nesne).
+
+### 57.4 · Varsayımlar — Cemil onayına açık
+
+- **Varsayılan KAPALI.** K-055.2 *"alış soran dükkân açar"* diyor.
+- **Prototipte ayar kalıcı değil** — öteki veri gibi açılışta tohuma
+  döner; `DUKKAN` içinde durduğu için denetim onu yedekleyip geri
+  yüklüyor. Tema ayrı: o **cihazın** tercihi, `localStorage`'da kalıyor.
+- **Gizlilik cümlesi:** *"Söyledikleriniz ve çektiğiniz fotoğraflar,
+  yazıya çevrilmek üzere internet üzerinden gönderilir."* — öneriden
+  biraz uzatıldı (*"işlenmek"* jargondu).
+
+### 57.5 · 52. test (ALIS-BILINMIYOR)
+
+Hesap (yapay kayıtla: bilinmeyen 700 · bedava 2.800 · bilinen 1.200) ·
+ayar ekranı gerçekten değiştiriyor mu · giriş boş/0 ayrımını koruyor
+mu. **Üç negatif test:** eski formül → 2 bulgu · `|| 0` girişi → 1 bulgu
+· ayarı yok sayan alan → 1 bulgu; geri konunca 0. Testin kendi
+kirliliği de düzeltildi: kayıt ekranı "ayar açık" hâlinde çizili
+kalıyordu (K-041.2 — DOM da geri bırakılır).
+
+---
+
 ## K-056 · Ses işi tanımaz; işin sahibi ekran şemasını bildirir (12.10.2026 · Tur 8.3)
 
 > **Cemil, 12.10:** *"Kaydedilen ses bir json dolduracak. Bu ikisi

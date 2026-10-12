@@ -32,6 +32,9 @@
     </span>
   </div>
 
+  <!-- Gizlilik notu — ilk kullanımda bir kez (A-M33, gizlilikIlkAcilis) -->
+  <div id="sesGizlilik" hidden></div>
+
   <div class="card">
     <div class="ses-sahne">
       <button class="ses-orb" id="sesOrb" aria-label="Dinlemeyi başlat">
@@ -612,6 +615,7 @@ Ekran.tanim('ses', {
      sesleAc artik goster() cagiriyor: acilis acikca acilis. */
   ac: function () {
     sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+    gizlilikIlkAcilis('sesGizlilik');
     /* Düzeltme işareti de AÇILIŞA ait: bırakılsa bir sonraki cümle
        "Düzeltildi" diye etiketlenirdi (K-040'ın kuralı). */
     sesDuzeltildi = false;

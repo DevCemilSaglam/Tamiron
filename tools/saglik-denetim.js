@@ -2148,6 +2148,107 @@ function stilMetni() {
     });
   }
 
+  /* 52) BILINMEYEN ALIS KARA GIRIYOR (12.10.2026 · Tur 8.2 · K-055.2)
+     `alis: null` = bilinmiyor, `alis: 0` = bedava. Eskiden ikisi de
+     `s.alis || 0` ile sifir sayiliyordu: alisi yazilmamis 2.100 TL'lik
+     parca "2.100 TL kar" oluyordu. Tohum verinin her parcasinda alis
+     dolu oldugu icin kusur HIC gorunmedi -- olcum aletinin kendi verisi
+     olctugu eksigi gizliyordu (MALIYET-VE-KAR §1).
+
+     Olculen:
+       a) hesap: bilinmeyen alisli satir SATISIYLA BIRLIKTE disarida;
+          sifir alis ise bedava (karda);
+       b) ayar gercekten ekrani degistiriyor: kapaliyken alis alani
+          YOK, acikken tamircinin aldigi parcada VAR, musteri parcasinda YOK;
+       c) giris: bos birakilan alan null kaliyor, "0" 0 oluyor --
+          tutar alanlarinin `|| 0` aliskanligi buraya sizmasin.
+     NEGATIF DOGRULAMA (12.10): isKari eski `s.alis || 0` haline
+     cevrildi -> bulgu; geri konunca 0. */
+  if (typeof isKari === 'function' && typeof DUKKAN !== 'undefined' &&
+      typeof KAYITLAR !== 'undefined') {
+    /* (a) yapay kayitlarla -- tohum veriye bagli kalmasin */
+    var alisK = function (alis) {
+      return { satirlar: [
+        { tip: 'parca', ad: 'deneme', fiyat: 2100, alis: alis, kimGetirdi: 'tamirci' },
+        { tip: 'iscilik', ad: 'iscilik', fiyat: 700, alis: null, kimGetirdi: '' } ] };
+    };
+    var kBilinmeyen = isKari(alisK(null));
+    var kBedava = isKari(alisK(0));
+    var kBilinen = isKari(alisK(1600));
+    if (kBilinmeyen.fark !== 700) {
+      ek('ALIS-BILINMIYOR', 'muhasebe', 'alisi bilinmeyen parca kara girdi: fark ' +
+         kBilinmeyen.fark + ' (beklenen 700 -- yalniz iscilik)');
+    }
+    if (kBilinmeyen.bilinmeyen !== 1) {
+      ek('ALIS-BILINMIYOR', 'muhasebe', 'hesap disi kalan satir SAYILMIYOR -- ekran soyleyemez');
+    }
+    if (kBedava.fark !== 2800) {
+      ek('ALIS-BILINMIYOR', 'muhasebe', 'sifir alis (bedava) bilinmiyor sayildi: fark ' + kBedava.fark);
+    }
+    if (kBilinen.fark !== 1200) {
+      ek('ALIS-BILINMIYOR', 'muhasebe', 'bilinen alis yanlis dusuldu: fark ' + kBilinen.fark);
+    }
+
+    /* (b) + (c) kayit ekraninda -- tamircinin aldigi parcasi olan acik kayit */
+    var alisKayit = null;
+    KAYITLAR.forEach(function (k) {
+      if (alisKayit || k.teslimTarihi) return;
+      (k.satirlar || []).forEach(function (s) {
+        if (s.tip === 'parca' && s.kimGetirdi === 'tamirci') alisKayit = k;
+      });
+    });
+    if (!alisKayit) {
+      ek('ALIS-BILINMIYOR', 'kayit', 'tamirci parcasi olan acik kayit yok -- ekran olculemedi');
+    } else {
+      var alisOnce = { sor: DUKKAN.alisSor, kayit: window.ACIK_KAYIT,
+                       satir: JSON.parse(JSON.stringify(alisKayit.satirlar)) };
+      window.ACIK_KAYIT = alisKayit.id;
+      DUKKAN.alisSor = false;
+      showScreen('kayit');
+      if (document.querySelector('#screen-kayit [data-satir-alis]')) {
+        ek('ALIS-BILINMIYOR', 'kayit', 'ayar KAPALI ama alis alani gorunuyor -- sormayan dukkan gormemeli');
+      }
+      DUKKAN.alisSor = true;
+      showScreen('kayit');
+      var alisAlan = document.querySelector('#screen-kayit [data-satir-alis]');
+      if (!alisAlan) {
+        ek('ALIS-BILINMIYOR', 'kayit', 'ayar ACIK ama alis alani cikmadi -- ayar ekrani degistirmiyor');
+      } else {
+        var alisNo = parseInt(alisAlan.getAttribute('data-satir-alis'), 10);
+        var alisSatir = alisKayit.satirlar[alisNo];
+        if (alisSatir.kimGetirdi === 'musteri') {
+          ek('ALIS-BILINMIYOR', 'kayit', 'musterinin getirdigi parcada alis soruluyor');
+        }
+        alisAlan.value = '';
+        alisAlan.dispatchEvent(new Event('input', { bubbles: true }));
+        if (alisSatir.alis !== null) {
+          ek('ALIS-BILINMIYOR', 'kayit', 'bos birakilan alis ' + JSON.stringify(alisSatir.alis) +
+             ' oldu -- null (bilinmiyor) kalmaliydi');
+        }
+        alisAlan.value = '0';
+        alisAlan.dispatchEvent(new Event('input', { bubbles: true }));
+        if (alisSatir.alis !== 0) {
+          ek('ALIS-BILINMIYOR', 'kayit', '"0" yazilan alis ' + JSON.stringify(alisSatir.alis) +
+             ' oldu -- 0 (bedava) olmaliydi');
+        }
+      }
+      /* musteri parcasinda alis alani olmamali */
+      document.querySelectorAll('#screen-kayit [data-satir-alis]').forEach(function (el) {
+        var s = alisKayit.satirlar[parseInt(el.getAttribute('data-satir-alis'), 10)];
+        if (s && s.kimGetirdi === 'musteri') {
+          ek('ALIS-BILINMIYOR', 'kayit', 'musteri parcasinda alis alani var');
+        }
+      });
+      alisKayit.satirlar = alisOnce.satir;
+      DUKKAN.alisSor = alisOnce.sor;
+      /* DOM DA GERI BIRAKILIR (K-041.2): kayit ekrani "ayar acik"
+         haliyle cizili kalmasin -- eski ayarla bir kez daha ciz. */
+      showScreen('kayit');
+      window.ACIK_KAYIT = alisOnce.kayit;
+      Ekran.sifirla();
+    }
+  }
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

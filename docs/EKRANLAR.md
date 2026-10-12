@@ -209,11 +209,16 @@ bilgileri → geçmiş. Önce **eylem**, sonra **başvuru**.
 
 Bunlar **bütçeye dahil değil** çünkü akışta yer almıyorlar; ayda bir açılır.
 
-| Ekran | Ne için |
-|---|---|
-| **Ayarlar** | Dükkân bilgisi · **parçacılar** (ad + telefon, T-12b) · bakım periyodu · tema |
+| Ekran | Ne için | Üzerinde ne YOK |
+|---|---|---|
+| **Ayarlar** *(17. ekran — 12.10, K-055.2 · K-057)* | Bakım periyodu · **parça alış fiyatı sorulsun mu** (A-M43) · tema · gizlilik satırı (A-M33). Bakım periyodu ve tema **çekmeceden taşındı**, kopyalanmadı | Dükkân bilgisi düzenleme · parçacı listesi · kullanıcı/şifre · yedekleme · bildirim tercihleri · dil |
 
 Tek ekran. Personel, rol, yetki **yok** — tamirci bahsetmedi (K-004 notu).
+Buraya **çekmecedeki tek satırdan** gelinir; ana menü altı satır kaldı (A-M8).
+
+⚠️ 03.09'daki taslak *"dükkân bilgisi · parçacılar"* da sayıyordu. 12.10'da
+yalnız K-055.2'nin sakinleri girdi: dükkân bilgisi bugün değiştirilen bir
+şey değil, parçacı ağı sonraki faz (A-M46). İstenirse konuşulur.
 
 ---
 

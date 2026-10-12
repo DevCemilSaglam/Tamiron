@@ -163,28 +163,14 @@
 
       <hr class="divider" />
 
-      <div class="drawer-sec-label">
-        <svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar
-      </div>
-
-      <!-- Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
-           Native <select> KULLANILMAZ (tema uygulanmaz); v1'in .cip'i. -->
-      <div class="setting-row">
-        <span class="sr-txt">
-          <span class="sr-label">Bakım periyodu</span>
-          <span class="sr-sub">Teslimden sonra ne kadar süre için hatırlatma kurulsun</span>
-        </span>
-      </div>
-      <div class="cip-grup" id="periyotGrup" role="group" aria-label="Bakım periyodu"></div>
-
-      <div class="setting-row">
-        <span class="sr-label">Tema</span>
-        <button class="theme-toggle" id="temaBtn" aria-label="Tema değiştir" title="Tema değiştir">
-          <svg class="ico" id="temaIkon"><use href="#i-moon"></use></svg>
-          <span id="temaEtiket">Koyu tema</span>
-        </button>
-      </div>
-      <p class="plate-hint" style="padding:0 12px 6px" id="temaIpucu"></p>
+      <!-- 12.10 — AYARLAR KENDİ EKRANINDA (K-055.2). Bakım periyodu ve
+           tema buradan TAŞINDI; çekmece bir ayar sayfası taklidi
+           yapıyordu ve üçüncü ayar (parça alış fiyatı) gelince sığmazdı.
+           Ana menüye satır eklenmedi (A-M8). -->
+      <button class="drawer-item" data-git="ayarlar">
+        <span class="di-ic"><svg class="ico"><use href="#i-cog"></use></svg></span>
+        Ayarlar
+      </button>
 
     </div>
   </aside>

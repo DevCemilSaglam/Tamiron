@@ -1,0 +1,140 @@
+<!-- ekran: ayarlar · AYARLAR (12.10.2026 · K-055.2 · 17. ekran)
+     Cemil: *"Hatta müşteri kullanım için ayar sayfamız olsun.
+     Tercihleri / ayarları burada saklayalım."*
+
+     KAPSAMI CEMİL GENİŞLETTİ (K-055.2). Dört sakin:
+       1. Bakım periyodu — çekmeceden taşındı
+       2. Parça alış fiyatı sorulsun mu — YENİ (A-M43)
+       3. Tema — çekmeceden taşındı (TASARIM-SISTEMI §3 zaten "drawer →
+          Ayarlar" diyordu; çekmece bir ayar sayfası taklidi yapıyordu)
+       4. Gizlilik — tek satır (A-M33)
+
+     ⚠️ TAŞINAN, KOPYALANMADI: periyot çipleri ve tema düğmesi
+     çekmeceden SİLİNDİ. İki yerde dursalardı iki ayrı yerden ayar
+     değiştirilir, biri er ya da geç ötekini tazelemeyi unuturdu (K-019.1).
+
+     MENÜ BÜYÜMEDİ (A-M8): ana menü altı satır kaldı. Buraya çekmecedeki
+     tek satırdan gelinir — ayar günlük iş değil, bir kez yapılır.
+
+     ÜZERİNDE YOK: dükkân adı/adresi düzenleme · parçacı listesi ·
+     kullanıcı/şifre · yedekleme · bildirim tercihleri · dil. Hiçbiri
+     bugün bir ayar değil ya da yedi işe hizmet etmiyor; istenirse
+     konuşulur.
+
+     BİLEŞENLER: .screen-head .eyebrow · .card · .setting-row > .sr-txt
+     > .sr-label + .sr-sub · .cip-grup .cip · .theme-toggle · .plate-hint.
+     Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-ayarlar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar
+    </span>
+  </div>
+
+  <!-- Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
+       Native <select> KULLANILMAZ (tema uygulanmaz); v1'in .cip'i. -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-txt">
+        <span class="sr-label">Bakım periyodu</span>
+        <span class="sr-sub">Teslimden sonra ne kadar süre için hatırlatma kurulsun</span>
+      </span>
+    </div>
+    <div class="cip-grup" id="periyotGrup" role="group" aria-label="Bakım periyodu"></div>
+  </div>
+
+  <!-- PARÇA ALIŞ FİYATI (A-M43). İki çip, anahtar değil: "Sorulsun /
+       Sorulmasın" yazan iki düğme, teknolojiden uzak kullanıcıya bir
+       anahtarın hangi yönünün "açık" olduğunu sormaktan daha az şey
+       sorar (T-18). Bakım periyoduyla aynı bileşen. -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-txt">
+        <span class="sr-label">Parça alış fiyatı</span>
+        <span class="sr-sub">Parçacıya ödediğini parçanın altına yazmak istersen sorulur.
+          Boş bırakabilirsin — boşsa kâra katılmaz.</span>
+      </span>
+    </div>
+    <div class="cip-grup" id="alisGrup" role="group" aria-label="Parça alış fiyatı sorulsun mu"></div>
+  </div>
+
+  <!-- TEMA — çekmeceden taşındı. Kimlikler AYNI (temaBtn · temaIkon ·
+       temaEtiket · temaIpucu): Tema modülü bunları arıyor ve yeri
+       değişti diye modül değişmedi. -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-label">Tema</span>
+      <button class="theme-toggle" id="temaBtn" aria-label="Tema değiştir" title="Tema değiştir">
+        <svg class="ico" id="temaIkon"><use href="#i-moon"></use></svg>
+        <span id="temaEtiket">Koyu tema</span>
+      </button>
+    </div>
+    <p class="plate-hint" id="temaIpucu"></p>
+  </div>
+
+  <!-- GİZLİLİK — tek satır (A-M33 · K-055.7). Cümle YAPAY-ZEKA.md'deki
+       öneriden; jargonsuz. "İlk kullanımda bir kez" yarısı ses ve ruhsat
+       ekranlarında (gizlilikNotuHtml, 03-nesne.js). -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-txt">
+        <span class="sr-label">Gizlilik</span>
+        <span class="sr-sub" id="ayarGizlilik"></span>
+      </span>
+    </div>
+  </div>
+
+</section>
+
+<style>
+/* Ayar satırı çekmecede kenardan 12 px içerideydi; kartın kendi
+   dolgusu var, ikinci kez içeri girmesin. */
+#screen-ayarlar .setting-row { padding: 0; }
+#screen-ayarlar .plate-hint { margin: 0; }
+</style>
+
+<script>
+function ayarCiz() {
+  document.getElementById('periyotGrup').innerHTML = [3, 6, 12].map(function (ay) {
+    return '<button class="cip" data-periyot="' + ay + '" aria-pressed="' +
+      (DUKKAN.bakimPeriyoduAy === ay) + '">' + ay + ' ay</button>';
+  }).join('');
+  document.getElementById('alisGrup').innerHTML = [[false, 'Sorulmasın'], [true, 'Sorulsun']]
+    .map(function (x) {
+      return '<button class="cip" data-ayar-alis="' + (x[0] ? '1' : '0') + '" aria-pressed="' +
+        (!!DUKKAN.alisSor === x[0]) + '">' + x[1] + '</button>';
+    }).join('');
+  document.getElementById('ayarGizlilik').textContent = GIZLILIK_CUMLESI;
+}
+
+Ekran.tanim('ayarlar', { ciz: ayarCiz });
+
+document.addEventListener('click', function (e) {
+  if (Ekran.adi() !== 'ayarlar') return;
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var hp = t.getAttribute('data-periyot');
+  if (hp) {
+    DUKKAN.bakimPeriyoduAy = parseInt(hp, 10);
+    /* Çekmecedeki hatırlatma rozeti periyoda bakmıyor ama bildirim
+       listesi bakıyor — tazelensin. */
+    Cekmece.ciz();
+    ayarCiz();
+    balon('Bakım periyodu ' + hp + ' ay oldu.');
+    return;
+  }
+
+  var al = t.getAttribute('data-ayar-alis');
+  if (al !== null) {
+    DUKKAN.alisSor = (al === '1');
+    ayarCiz();
+    /* Balon SONUCU söyler, ayarı tekrar etmez: usta "ne değişti"
+       sorusunun cevabını görsün. */
+    balon(DUKKAN.alisSor
+      ? 'Parçaların altında "alış" alanı çıkacak — boş bırakabilirsin.'
+      : 'Alış fiyatı sorulmayacak.', false, 3000);
+  }
+});
+</script>

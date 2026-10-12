@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-12 11:13
+  Üretim: 2026-10-12 11:25
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2402,8 +2402,17 @@ kirpilsin. */
    display açıkça verilmiş. */
 #screen-kayit .k-getiren-sor[hidden] { display: none; }
 #screen-kayit .k-alis {
-  font-size: var(--tip-xs); color: var(--faint);
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--tip-xs); color: var(--muted);
   font-family: var(--font-mono);
+}
+/* Alış alanı küçük ama dokunma hedefi TAM (K-024): görsel ağırlık
+   ikincil, parmak için alan değil. */
+#screen-kayit .k-alis input {
+  width: 84px; min-height: var(--dokun);
+  padding: 0 8px; text-align: right;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: var(--tip-sm);
 }
 
 /* ===== ekran: 40-parca-sor.html ===== */
@@ -2469,6 +2478,12 @@ kirpilsin. */
   font-size: var(--tip-xs);
   color: var(--muted);
 }
+
+/* ===== ekran: 99-ayarlar.html ===== */
+/* Ayar satırı çekmecede kenardan 12 px içerideydi; kartın kendi
+   dolgusu var, ikinci kez içeri girmesin. */
+#screen-ayarlar .setting-row { padding: 0; }
+#screen-ayarlar .plate-hint { margin: 0; }
 
 </style>
 <style>
@@ -2729,6 +2744,9 @@ kirpilsin. */
     </span>
   </div>
 
+  <!-- Gizlilik notu — ilk kullanımda bir kez (A-M33, gizlilikIlkAcilis) -->
+  <div id="sesGizlilik" hidden></div>
+
   <div class="card">
     <div class="ses-sahne">
       <button class="ses-orb" id="sesOrb" aria-label="Dinlemeyi başlat">
@@ -2807,6 +2825,9 @@ kirpilsin. */
       <svg class="ico ico-sm"><use href="#i-plus"></use></svg> Servis kaydı ekle
     </span>
   </div>
+
+  <!-- Gizlilik notu — ilk kullanımda bir kez (A-M33, gizlilikIlkAcilis) -->
+  <div id="rGizlilik" hidden></div>
 
   <div class="tab-grup" role="tablist" aria-label="Araç bilgisi nasıl girilecek">
     <button class="tab" id="sekPlaka" role="tab" aria-selected="true" aria-controls="ruhsatGovde">
@@ -4113,7 +4134,8 @@ kirpilsin. */
      etmiyor; istenirse konuşulur.
 
      BİLEŞENLER: .screen-head .eyebrow .eb-say · .cip-grup .cip
-     · .card · .tablo-sar .tablo · .bos-durum. -->
+     · .card · .tablo-sar .tablo · .bos-durum · .notice · .btn
+     (bilinmeyen alış notu, 12.10). -->
 <section class="screen" id="screen-is-basina">
 
   <div class="screen-head">
@@ -4134,6 +4156,10 @@ kirpilsin. */
       <table class="tablo" id="ibTablo"></table>
     </div>
   </div>
+
+  <!-- Hesap dışında kalan satırlar BURADA söylenir (12.10 · K-055.2):
+       bilinmeyen alış kâra girmez, ama sessizce kaybolmaz da. -->
+  <div id="ibDisarida"></div>
 
   <div id="ibBos"></div>
 
@@ -4243,6 +4269,95 @@ kirpilsin. */
 
 </section>
 
+<!-- ekran: ayarlar · AYARLAR (12.10.2026 · K-055.2 · 17. ekran)
+     Cemil: *"Hatta müşteri kullanım için ayar sayfamız olsun.
+     Tercihleri / ayarları burada saklayalım."*
+
+     KAPSAMI CEMİL GENİŞLETTİ (K-055.2). Dört sakin:
+       1. Bakım periyodu — çekmeceden taşındı
+       2. Parça alış fiyatı sorulsun mu — YENİ (A-M43)
+       3. Tema — çekmeceden taşındı (TASARIM-SISTEMI §3 zaten "drawer →
+          Ayarlar" diyordu; çekmece bir ayar sayfası taklidi yapıyordu)
+       4. Gizlilik — tek satır (A-M33)
+
+     ⚠️ TAŞINAN, KOPYALANMADI: periyot çipleri ve tema düğmesi
+     çekmeceden SİLİNDİ. İki yerde dursalardı iki ayrı yerden ayar
+     değiştirilir, biri er ya da geç ötekini tazelemeyi unuturdu (K-019.1).
+
+     MENÜ BÜYÜMEDİ (A-M8): ana menü altı satır kaldı. Buraya çekmecedeki
+     tek satırdan gelinir — ayar günlük iş değil, bir kez yapılır.
+
+     ÜZERİNDE YOK: dükkân adı/adresi düzenleme · parçacı listesi ·
+     kullanıcı/şifre · yedekleme · bildirim tercihleri · dil. Hiçbiri
+     bugün bir ayar değil ya da yedi işe hizmet etmiyor; istenirse
+     konuşulur.
+
+     BİLEŞENLER: .screen-head .eyebrow · .card · .setting-row > .sr-txt
+     > .sr-label + .sr-sub · .cip-grup .cip · .theme-toggle · .plate-hint.
+     Yeni bileşen yazılmadı. -->
+<section class="screen" id="screen-ayarlar">
+
+  <div class="screen-head">
+    <span class="eyebrow">
+      <svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar
+    </span>
+  </div>
+
+  <!-- Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
+       Native <select> KULLANILMAZ (tema uygulanmaz); v1'in .cip'i. -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-txt">
+        <span class="sr-label">Bakım periyodu</span>
+        <span class="sr-sub">Teslimden sonra ne kadar süre için hatırlatma kurulsun</span>
+      </span>
+    </div>
+    <div class="cip-grup" id="periyotGrup" role="group" aria-label="Bakım periyodu"></div>
+  </div>
+
+  <!-- PARÇA ALIŞ FİYATI (A-M43). İki çip, anahtar değil: "Sorulsun /
+       Sorulmasın" yazan iki düğme, teknolojiden uzak kullanıcıya bir
+       anahtarın hangi yönünün "açık" olduğunu sormaktan daha az şey
+       sorar (T-18). Bakım periyoduyla aynı bileşen. -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-txt">
+        <span class="sr-label">Parça alış fiyatı</span>
+        <span class="sr-sub">Parçacıya ödediğini parçanın altına yazmak istersen sorulur.
+          Boş bırakabilirsin — boşsa kâra katılmaz.</span>
+      </span>
+    </div>
+    <div class="cip-grup" id="alisGrup" role="group" aria-label="Parça alış fiyatı sorulsun mu"></div>
+  </div>
+
+  <!-- TEMA — çekmeceden taşındı. Kimlikler AYNI (temaBtn · temaIkon ·
+       temaEtiket · temaIpucu): Tema modülü bunları arıyor ve yeri
+       değişti diye modül değişmedi. -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-label">Tema</span>
+      <button class="theme-toggle" id="temaBtn" aria-label="Tema değiştir" title="Tema değiştir">
+        <svg class="ico" id="temaIkon"><use href="#i-moon"></use></svg>
+        <span id="temaEtiket">Koyu tema</span>
+      </button>
+    </div>
+    <p class="plate-hint" id="temaIpucu"></p>
+  </div>
+
+  <!-- GİZLİLİK — tek satır (A-M33 · K-055.7). Cümle YAPAY-ZEKA.md'deki
+       öneriden; jargonsuz. "İlk kullanımda bir kez" yarısı ses ve ruhsat
+       ekranlarında (gizlilikNotuHtml, 03-nesne.js). -->
+  <div class="card">
+    <div class="setting-row">
+      <span class="sr-txt">
+        <span class="sr-label">Gizlilik</span>
+        <span class="sr-sub" id="ayarGizlilik"></span>
+      </span>
+    </div>
+  </div>
+
+</section>
+
 
   <!-- ALT GEZİNME (Cemil, 07.09: "Footerda da navigasyon tuşları
        olsun. Headerdaki ile entegre/birlikte çalışsın.")
@@ -4326,28 +4441,14 @@ kirpilsin. */
 
       <hr class="divider" />
 
-      <div class="drawer-sec-label">
-        <svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar
-      </div>
-
-      <!-- Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
-           Native <select> KULLANILMAZ (tema uygulanmaz); v1'in .cip'i. -->
-      <div class="setting-row">
-        <span class="sr-txt">
-          <span class="sr-label">Bakım periyodu</span>
-          <span class="sr-sub">Teslimden sonra ne kadar süre için hatırlatma kurulsun</span>
-        </span>
-      </div>
-      <div class="cip-grup" id="periyotGrup" role="group" aria-label="Bakım periyodu"></div>
-
-      <div class="setting-row">
-        <span class="sr-label">Tema</span>
-        <button class="theme-toggle" id="temaBtn" aria-label="Tema değiştir" title="Tema değiştir">
-          <svg class="ico" id="temaIkon"><use href="#i-moon"></use></svg>
-          <span id="temaEtiket">Koyu tema</span>
-        </button>
-      </div>
-      <p class="plate-hint" style="padding:0 12px 6px" id="temaIpucu"></p>
+      <!-- 12.10 — AYARLAR KENDİ EKRANINDA (K-055.2). Bakım periyodu ve
+           tema buradan TAŞINDI; çekmece bir ayar sayfası taklidi
+           yapıyordu ve üçüncü ayar (parça alış fiyatı) gelince sığmazdı.
+           Ana menüye satır eklenmedi (A-M8). -->
+      <button class="drawer-item" data-git="ayarlar">
+        <span class="di-ic"><svg class="ico"><use href="#i-cog"></use></svg></span>
+        Ayarlar
+      </button>
 
     </div>
   </aside>
@@ -5492,7 +5593,6 @@ var Cekmece = (function () {
     o.b.setAttribute('aria-expanded', 'true');
     arkaPlan(true);
     cizBildirimler();
-    cizPeriyot();
     var ilk = o.c.querySelector('button, [tabindex]');
     if (ilk) ilk.focus();
   }
@@ -5544,16 +5644,9 @@ var Cekmece = (function () {
     }).join('');
   }
 
-  /* Bakım periyodu — teslimde kurulan hatırlatmanın kaynağı (K-002).
-     A-3 hâlâ açık; varsayılan 6 ay. */
-  function cizPeriyot() {
-    var g = document.getElementById('periyotGrup');
-    if (!g || typeof DUKKAN === 'undefined') return;
-    g.innerHTML = [3, 6, 12].map(function (ay) {
-      return '<button class="cip" data-periyot="' + ay + '" aria-pressed="' +
-        (DUKKAN.bakimPeriyoduAy === ay) + '">' + ay + ' ay</button>';
-    }).join('');
-  }
+  /* ⚠️ 12.10 — BAKIM PERİYODU AYARLAR EKRANINA TAŞINDI (K-055.2).
+     Çizimi ve tıklaması artık 99-ayarlar.html'de; burada kopyası
+     bırakılmadı (iki yerde duran ayar iki ayrı cevaptır — K-019.1). */
 
   return { ac: ac, kapa: kapa, ciz: cizBildirimler,
            acikMi: function () { return acikMi; } };
@@ -5890,24 +5983,8 @@ document.addEventListener('DOMContentLoaded', function () {
   /* Çekmece içinden gezinince çekmece kapanmalı — açık kalırsa
      kullanıcı gittiği ekranı göremez. */
   document.addEventListener('click', function (e) {
-    var t = e.target.closest('[data-git], [data-hatirlatma], [data-periyot]');
+    var t = e.target.closest('[data-git], [data-hatirlatma]');
     if (!t || !Cekmece.acikMi()) return;
-
-    var hp = t.getAttribute('data-periyot');
-    if (hp) {
-      DUKKAN.bakimPeriyoduAy = parseInt(hp, 10);
-      Cekmece.ciz();
-      var g = document.getElementById('periyotGrup');
-      if (g) {
-        var cipler = g.querySelectorAll('[data-periyot]');
-        for (var i = 0; i < cipler.length; i++) {
-          cipler[i].setAttribute('aria-pressed',
-            String(+cipler[i].getAttribute('data-periyot') === DUKKAN.bakimPeriyoduAy));
-        }
-      }
-      balon('Bakım periyodu ' + hp + ' ay oldu.');
-      return;                        /* ayar çekmecede kalır, kapatmaz */
-    }
 
     var hb = t.getAttribute('data-hatirlatma');
     if (hb) {
@@ -6004,7 +6081,7 @@ var KAYITLAR = [
     acilis: '03.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true,
     satirlar: [
-      { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: 0, kimGetirdi: 'tamirci',
+      { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: null, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' }
     ] },
 
@@ -6017,7 +6094,7 @@ var KAYITLAR = [
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 260, alis: 180, kimGetirdi: 'tamirci',
         marka: 'Mann', kod: 'W 71180', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: null, kimGetirdi: '' }
     ] },
 
   { id: 3, plaka: '35 KLM 45', tur: 'tamirat', km: '',
@@ -6031,9 +6108,9 @@ var KAYITLAR = [
     acilis: '01.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     satirlar: [
-      { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: 0, kimGetirdi: 'musteri',
+      { tip: 'parca', ad: 'Ön fren balatası', fiyat: 0, alis: null, kimGetirdi: 'musteri',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
-      { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Balata değişimi', fiyat: 800, alis: null, kimGetirdi: '' }
     ] },
 
   /* Teslim edilmiş — ana ekranda GÖRÜNMEZ, araç geçmişinde görünür.
@@ -6048,7 +6125,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1800, alis: 1400, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 850, alis: null, kimGetirdi: '' }
     ] },
 
   /* İKİNCİ KM ÖLÇÜMÜ — ay/km kuralı ancak iki ölçümle çalışıyor
@@ -6063,7 +6140,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Motor yağı', fiyat: 1950, alis: 1500, kimGetirdi: 'tamirci',
         marka: 'Motul', kod: '8100 5W-30', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: null, kimGetirdi: '' }
     ] },
 
   /* MUHASEBE EKRANI BOŞ GÖRÜNMESİN (04.09). Tohum veride bugün teslim
@@ -6074,10 +6151,17 @@ var KAYITLAR = [
     sikayet: 'Ön cam silecek motoru',
     acilis: '03.09.2026', teslimTarihi: '03.09.2026',
     odemeYolu: 'nakit', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
+    /* ⚠️ ALIŞI YAZILMAMIŞ PARÇA — BİLEREK (12.10 · K-055.2).
+       Gerçek kullanımda alış alanı boş kalır: ayar kapalıysa hiç
+       sorulmaz, açıksa usta geçebilir. Tohum verinin HER parçasında
+       alış dolu olunca kâr ekranı doğru görünüyordu; kusuru tohum veri
+       gizliyordu (MALIYET-VE-KAR §1). Bu satır o kusurun canlı örneği:
+       eski hesap 2.800 ₺ "fark" yazardı, doğrusu 700 ₺ + "bir parçanın
+       alışı bilinmiyor". */
     satirlar: [
-      { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: 1600, kimGetirdi: 'tamirci',
+      { tip: 'parca', ad: 'Silecek motoru', fiyat: 2100, alis: null, kimGetirdi: 'tamirci',
         marka: 'Valeo', kod: '579713', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Söküm takım', fiyat: 700, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Söküm takım', fiyat: 700, alis: null, kimGetirdi: '' }
     ] },
 
   /* VERESİYE — "almadım" bir ödeme yoludur (K-004). Muhasebedeki
@@ -6089,7 +6173,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
-      { tip: 'iscilik', ad: 'Takma', fiyat: 250, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Takma', fiyat: 250, alis: null, kimGetirdi: '' }
     ] },
 
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
@@ -6101,7 +6185,7 @@ var KAYITLAR = [
     satirlar: [
       { tip: 'parca', ad: 'Yağ filtresi', fiyat: 320, alis: 210, kimGetirdi: 'tamirci',
         marka: '', kod: '', tanim: 'tanimlanamadi' },
-      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: 0, kimGetirdi: '' }
+      { tip: 'iscilik', ad: 'Bakım işçiliği', fiyat: 900, alis: null, kimGetirdi: '' }
     ] }
 ];
 
@@ -6350,7 +6434,20 @@ var DUKKAN = {
   /* HATIRLATMA: AY **VEYA** KM — hangisi önce gelirse (Cemil, 03.09).
      K-002 yalnız ayı sayıyordu; gerçek bakım kuralı ikisi birden. */
   bakimPeriyoduAy: 6,
-  bakimPeriyoduKm: 10000
+  bakimPeriyoduKm: 10000,
+  /* AYARLAR SAYFASININ SAKİNLERİ (12.10 · K-055.2) — dükkânın
+     tercihi, verinin parçası. Denetim DUKKAN'ı yedekleyip geri
+     yüklüyor; ayar burada durunca ölçüm aleti onu kirletemez.
+     ⚠️ Prototipte kalıcı değil (öteki veri gibi açılışta tohuma
+     döner); kalıcılık backend'in işi. Tema ayrı: o CİHAZIN tercihi,
+     localStorage'da (K-010). */
+  /* Parça alış fiyatı sorulsun mu (A-M43). Varsayılan KAPALI:
+     Cemil — "Zorunlu ya da beklenen alan olmamalı." Sormayan dükkân
+     alanı HİÇ görmez. */
+  alisSor: false,
+  /* Gizlilik notu (A-M33) bir kez gösterildi mi — ses ya da ruhsat
+     çekimi, hangisi önce kullanılırsa. */
+  gizlilikGoruldu: false
 };
 
 /* ---- Sorgular (tek yerde; ekranlar kendi filtresini yazmaz) ---- */
@@ -6850,12 +6947,36 @@ function donemKayitlari(donem) {
    T-9). Girilmeyen bir şey yok, o yüzden yalan söyleyemez. Dükkân kârı
    ise girilmemiş giderler yüzünden yalan söylerdi — K-014'ün itirazı
    orada hâlâ geçerli. */
+/* ⚠️ 12.10 — BİLİNMEYEN ALIŞ KÂRA GİRMEZ (K-055.2).
+   `alis: null` = BİLİNMİYOR · `alis: 0` = BEDAVA ALDIM. İkisi aynı şey
+   değil. Eskiden `s.alis || 0` ile ikisi de sıfır sayılıyordu: alışı
+   yazılmamış 2.100 ₺'lik parça "2.100 ₺ kâr" oluyordu.
+
+   Yalnız alışı sıfır saymamak YETMEZ — o zaman satış fiyatı yine
+   farka girer ve şişme aynen sürer. Bilinmeyen alışlı satır, SATIŞIYLA
+   BİRLİKTE hesaptan çıkar; ekran kaç satırın dışarıda kaldığını
+   SÖYLER. Eksik bir rakam, yanlış bir rakamdan iyidir (K-013).
+
+   Yalnız TAMİRCİNİN aldığı ve fiyatı yazılmış parça sayılır: müşteri
+   parçası zaten toplama girmiyor (K-005), fiyatsız satır farka hiçbir
+   şey katmıyor. */
+function alisBilinmiyor(s) {
+  return s.tip === 'parca' && s.kimGetirdi === 'tamirci' &&
+         (s.alis === null || s.alis === undefined);
+}
 function isKari(k) {
   var alinan = kayitToplami(k);
-  var parca = (k.satirlar || []).reduce(function (t, s) {
-    return t + ((s.tip === 'parca' && s.kimGetirdi === 'tamirci') ? (s.alis || 0) : 0);
-  }, 0);
-  return { alinan: alinan, parca: parca, fark: alinan - parca };
+  var parca = 0, disarida = 0, bilinmeyen = 0;
+  (k.satirlar || []).forEach(function (s) {
+    if (s.tip !== 'parca' || s.kimGetirdi !== 'tamirci') return;
+    if (alisBilinmiyor(s)) {
+      if (s.fiyat) { bilinmeyen++; disarida += s.fiyat; }
+      return;
+    }
+    parca += s.alis;
+  });
+  return { alinan: alinan, parca: parca, disarida: disarida, bilinmeyen: bilinmeyen,
+           fark: alinan - disarida - parca };
 }
 
 /* ---- PARÇA ALIŞI — BEDAVAYA GELEN DÖRDÜNCÜ RAKAM (04.09) ----
@@ -7652,6 +7773,37 @@ document.addEventListener('click', function (e) {
   ACIK_PLAKA = t.getAttribute('data-arac');
   Ekran.ac('arac');
 });
+
+/* ---- GİZLİLİK CÜMLESİ (12.10 · A-M33 · K-055.7) ----
+   Cemil "evet" dedi: ayarlarda tek satır + ilk kullanımda bir kez.
+   Cümle YAPAY-ZEKA.md'deki öneriden; jargonsuz (T-18).
+
+   ORTAK NESNE: cümle ve "bir kez" kuralı TEK YERDE. Ses ve ruhsat
+   ekranı yalnız yer açar; hangisi önce açılırsa notu o gösterir, öteki
+   göstermez. İki ekran kendi bayrağını tutsaydı usta aynı cümleyi iki
+   kez okurdu.
+
+   ⚠️ AÇILIŞTA çağrılır (ekranın `ac` kancası), çizimde değil (K-040):
+   `ciz`de olsaydı ilk tazelemede not, usta okurken kaybolurdu. */
+var GIZLILIK_CUMLESI =
+  'Söyledikleriniz ve çektiğiniz fotoğraflar, yazıya çevrilmek üzere ' +
+  'internet üzerinden gönderilir.';
+
+function gizlilikIlkAcilis(kapId) {
+  var kap = document.getElementById(kapId);
+  if (!kap) return;
+  var goster = !DUKKAN.gizlilikGoruldu;
+  DUKKAN.gizlilikGoruldu = true;
+  /* Boş kap gizlenir — boş bir çocuk da `.screen`'in gap'ini alır ve
+     ritmi sessizce bozar (K-029). */
+  kap.hidden = !goster;
+  kap.innerHTML = goster
+    ? '<div class="notice"><span class="n-ic">' +
+        '<svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+        '<span class="n-body">' + GIZLILIK_CUMLESI +
+          ' Bu not bir kez gösterilir; <b>Ayarlar</b>da her zaman durur.</span></div>'
+    : '';
+}
 
 
 /* ===== betik/04-islem.js ===== */
@@ -8572,6 +8724,7 @@ Ekran.tanim('ses', {
      sesleAc artik goster() cagiriyor: acilis acikca acilis. */
   ac: function () {
     sesDurumu = 'bos'; sesCumle = ''; sesIslem = null;
+    gizlilikIlkAcilis('sesGizlilik');
     /* Düzeltme işareti de AÇILIŞA ait: bırakılsa bir sonraki cümle
        "Düzeltildi" diye etiketlenirdi (K-040'ın kuralı). */
     sesDuzeltildi = false;
@@ -8873,6 +9026,7 @@ Ekran.tanim('ruhsat', {
     });
     rOkundu = false;
     ruhsatSekme('plaka');
+    gizlilikIlkAcilis('rGizlilik');
 
     /* MİKROFONUN YANINDA ÖRNEK CÜMLE VAR (Cemil, 06.09). Alan listesi
        değil, taklit edilebilir cümleler: plaka + ad soyad + telefon +
@@ -9266,6 +9420,12 @@ function kEksikler(k) {
 
    S2/K-005 aynen duruyor: müşteri parçası faturaya girmez. Kural artık
    `kayitToplami()`de işliyor — veri korunuyor, TOPLAM karar veriyor. */
+/* Alış bu satırda sorulur mu: dükkân istiyorsa ve parçayı tamirci
+   aldıysa. Müşteri getirdiyse alış diye bir şey yok (K-005). */
+function alisSorulur(s) {
+  return !!DUKKAN.alisSor && s.tip === 'parca' && s.kimGetirdi !== 'musteri';
+}
+
 function kGetireniAyarla(s, kim) {
   s.kimGetirdi = kim;
 }
@@ -9397,7 +9557,7 @@ function kayitCiz() {
                  A-M13'ün cevabı (*"balatayı müşteri getirdi, yağı ben
                  aldım"*) korunuyor: işaret HÂLÂ SATIR BAŞINA. Değişen
                  tek şey, sorulmadığı zaman görünmemesi. */
-              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || !s.fiyat || s.alis)
+              (s.tip === 'parca' && (s.kimGetirdi === 'musteri' || !s.fiyat || alisSorulur(s))
                 ? '<span class="k-ikincil">' +
                     (s.kimGetirdi === 'musteri'
                       ? '<button class="k-getiren-bilgi" data-getiren="' + i + '"' +
@@ -9406,9 +9566,20 @@ function kayitCiz() {
                           ? '<button class="k-getiren-sor" data-getiren="' + i + '">' +
                               'müşteri getirdi</button>'
                           : '')) +
-                    /* Parçacıdan gelen fiyat MÜŞTERİYE SÖYLENECEK RAKAM
-                       DEĞİL: soluk ve küçük durur. */
-                    (s.alis ? '<span class="k-alis">parçacı ' + tutar(s.alis) + ' ₺</span>' : '') +
+                    /* ALIŞ — yalnız AYAR AÇIKSA ve parçayı tamirci
+                       aldıysa (12.10 · K-055.2). Müşteriye söylenecek
+                       rakam DEĞİL: soluk ve küçük durur. Boş bırakılabilir
+                       ve hiçbir şey uyarmaz — boş = bilinmiyor, kâra
+                       girmez. Ayar kapalıyken alan HİÇ görünmez; eski
+                       "parçacı 1.450 ₺" yazısı da görünmez (sormayan
+                       dükkân alışı hiç görmez). */
+                    (alisSorulur(s)
+                      ? '<label class="k-alis">alış' +
+                          '<input value="' + (s.alis === null || s.alis === undefined ? '' : tutar(s.alis)) +
+                          '" data-satir-alis="' + i + '" data-giris="tutar" inputmode="numeric"' +
+                          ' placeholder="—" aria-label="Alış fiyatı (boş bırakılabilir)" />' +
+                        ' ₺</label>'
+                      : '') +
                   '</span>'
                 : '') +
             '</td>' +
@@ -9548,12 +9719,12 @@ document.addEventListener('click', function (e) {
   if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
 
   if (t.id === 'kParcaEkle') {
-    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: 0,
+    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: null,
                       kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
   }
   if (t.id === 'kIscilikEkle') {
-    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: 0, kimGetirdi: '' });
+    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: null, kimGetirdi: '' });
     Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
   }
 
@@ -9566,7 +9737,7 @@ document.addEventListener('click', function (e) {
       /* İşçiliğin parçacısı olmaz: parçaya özel alanlar temizlenir,
          geri çevrilirse boş başlar. Kalsaydı işçilik satırında
          "parçacı 1450 ₺" yazardı. */
-      if (st.tip === 'iscilik') { st.kimGetirdi = ''; st.alis = 0; st.sorulan = null; }
+      if (st.tip === 'iscilik') { st.kimGetirdi = ''; st.alis = null; st.sorulan = null; }
       else { st.kimGetirdi = 'tamirci'; }
       Ekran.tazele(); kSatiraOdaklan(k, parseInt(tipNo, 10));
     }
@@ -9576,7 +9747,7 @@ document.addEventListener('click', function (e) {
   /* FOTOĞRAFTAN PARÇA LİSTESİ — okunanlar satır olur, fiyatları BOŞ. */
   if (t.id === 'kFotoParca') {
     FOTO_PARCA_ORNEK.forEach(function (p) {
-      k.satirlar.push({ tip: 'parca', ad: p[0], fiyat: p[1], alis: 0,
+      k.satirlar.push({ tip: 'parca', ad: p[0], fiyat: p[1], alis: null,
         kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     });
     balon(FOTO_PARCA_ORNEK.length + ' parça okundu — fiyatlarını yaz.', false, 3000);
@@ -9683,6 +9854,16 @@ document.addEventListener('input', function (e) {
   var ad = e.target.getAttribute('data-satir-ad');
   if (ad !== null) { k.satirlar[parseInt(ad, 10)].ad = e.target.value; return; }
 
+  /* ALIŞ: boş = BİLİNMİYOR (null), "0" = bedava (0). Fiyat alanı gibi
+     `|| 0` yazılsaydı boş alış sessizce sıfır olurdu — K-055.2'nin
+     düzelttiği kusurun ta kendisi. */
+  var al = e.target.getAttribute('data-satir-alis');
+  if (al !== null) {
+    var rakam = (e.target.value || '').replace(/[^0-9]/g, '');
+    k.satirlar[parseInt(al, 10)].alis = rakam === '' ? null : parseInt(rakam, 10);
+    return;
+  }
+
   var f = e.target.getAttribute('data-satir-fiyat');
   if (f !== null) {
     var sf = k.satirlar[parseInt(f, 10)];
@@ -9787,12 +9968,12 @@ Islem.tanim('satir-ekle', {
     return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
              tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesTutarBul(c.d) };
   },
-  /* ⚠️ `alis: 0` BİLEREK DURUYOR — 8.3 davranış değiştirmez. Bilinmeyen
-     alış 0 değil null olmalı (K-055.2); düzeltmesi 8.2'nin işi. */
+  /* Sesle söylenen satırın alışı BİLİNMİYOR (null), sıfır değil —
+     K-055.2. (8.3'te `alis: 0` bilerek taşınmıştı; 8.2 düzeltti.) */
   uygula: function (o) {
     var k = kayitBul(ACIK_KAYIT);
     if (!k) { balon('Açık kayıt yok.'); return; }
-    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: 0,
+    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: null,
       kimGetirdi: o.tip === 'parca' ? 'tamirci' : '',
       marka: '', kod: '', tanim: 'tanimlanamadi' });
     balon('Satır eklendi — fiyatını yaz.', false, 2800);
@@ -11932,6 +12113,7 @@ Ekran.tanim('is-basina', {
     if (!kayitlar.length) {
       document.getElementById('ibTablo').innerHTML = '';
       document.getElementById('ibTablo').closest('.card').hidden = true;
+      document.getElementById('ibDisarida').innerHTML = '';
       document.getElementById('ibBos').innerHTML = bosDurumHtml(
         'i-clipboard-list', 'Bu dönemde teslim edilmiş iş yok',
         'Dönemi genişletirsen geçmiş işler görünür.');
@@ -11940,17 +12122,21 @@ Ekran.tanim('is-basina', {
     document.getElementById('ibTablo').closest('.card').hidden = false;
     document.getElementById('ibBos').innerHTML = '';
 
-    var tAlinan = 0, tParca = 0, tFark = 0;
+    var tAlinan = 0, tParca = 0, tFark = 0, tDisarida = 0, tBilinmeyen = 0;
     var satirlar = kayitlar.map(function (k) {
       var kr = isKari(k);
       var a = aracBul(k.plaka) || {};
       tAlinan += kr.alinan; tParca += kr.parca; tFark += kr.fark;
+      tDisarida += kr.disarida; tBilinmeyen += kr.bilinmeyen;
       return '<tr data-kayit="' + k.id + '" role="button" tabindex="0">' +
         '<td><b>' + k.plaka + '</b>' +
           '<span class="t-alt">' + TUR_AD[k.tur] +
             (a.marka ? ' · ' + a.marka : '') + ' · ' + k.teslimTarihi + '</span>' +
           '<span class="t-alt">alınan ' + tutar(kr.alinan) +
-            ' · parça ' + tutar(kr.parca) + '</span>' +
+            ' · parça ' + tutar(kr.parca) +
+            /* Hesap dışı kalan satış, satırın kendi altında: usta farkın
+               neden "alınan − parça" etmediğini orada görür. */
+            (kr.bilinmeyen ? ' · ' + tutar(kr.disarida) + ' hesap dışı' : '') + '</span>' +
         '</td>' +
         '<td class="sayi">' + tutar(kr.fark) + ' ₺</td>' +
       '</tr>';
@@ -11967,10 +12153,30 @@ Ekran.tanim('is-basina', {
         '<tr class="genel">' +
           '<td>Toplam' +
             '<span class="t-alt">alınan ' + tutar(tAlinan) +
-            ' · parça ' + tutar(tParca) + '</span></td>' +
+            ' · parça ' + tutar(tParca) +
+            (tBilinmeyen ? ' · ' + tutar(tDisarida) + ' hesap dışı' : '') + '</span></td>' +
           '<td class="sayi">' + tutar(tFark) + ' ₺</td>' +
         '</tr>' +
       '</tbody>';
+
+    /* ⚠️ BİLİNMEYEN ALIŞ (12.10 · K-055.2). Eksik rakam yanlış rakamdan
+       iyidir — ama eksik olduğu SÖYLENMELİ, yoksa usta 700 ₺'yi tam
+       sanar. Uyarının çözümü yanında (K-021): alış sorulmuyorsa
+       ayarlara götürür, soruluyorsa nereye yazılacağını söyler. */
+    document.getElementById('ibDisarida').innerHTML = tBilinmeyen
+      ? '<div class="notice"><span class="n-ic">' +
+          '<svg class="ico ico-sm"><use href="#i-info"></use></svg></span>' +
+          '<span class="n-body"><b>' + tBilinmeyen + ' parçanın alışı yazılmamış.</b> ' +
+            'Satışı (' + tutar(tDisarida) + ' ₺) farka katılmadı — bilinmeyen alış ' +
+            'kâr sayılmaz. ' +
+            (DUKKAN.alisSor
+              ? 'Alışı servis kaydında parçanın altına yazabilirsin.'
+              : 'Alış fiyatı bugün sorulmuyor.') +
+          '</span></div>' +
+        (DUKKAN.alisSor ? '' :
+          '<button class="btn btn-ghost" data-git="ayarlar">' +
+            '<svg class="ico"><use href="#i-cog"></use></svg> Alış fiyatını sor</button>')
+      : '';
   }
 });
 
@@ -12108,6 +12314,52 @@ Ekran.tanim('ozet', {
 });
 })();
 
+/* ===== ekran: 99-ayarlar.html ===== */
+(function () {
+function ayarCiz() {
+  document.getElementById('periyotGrup').innerHTML = [3, 6, 12].map(function (ay) {
+    return '<button class="cip" data-periyot="' + ay + '" aria-pressed="' +
+      (DUKKAN.bakimPeriyoduAy === ay) + '">' + ay + ' ay</button>';
+  }).join('');
+  document.getElementById('alisGrup').innerHTML = [[false, 'Sorulmasın'], [true, 'Sorulsun']]
+    .map(function (x) {
+      return '<button class="cip" data-ayar-alis="' + (x[0] ? '1' : '0') + '" aria-pressed="' +
+        (!!DUKKAN.alisSor === x[0]) + '">' + x[1] + '</button>';
+    }).join('');
+  document.getElementById('ayarGizlilik').textContent = GIZLILIK_CUMLESI;
+}
+
+Ekran.tanim('ayarlar', { ciz: ayarCiz });
+
+document.addEventListener('click', function (e) {
+  if (Ekran.adi() !== 'ayarlar') return;
+  var t = e.target.closest('button');
+  if (!t) return;
+
+  var hp = t.getAttribute('data-periyot');
+  if (hp) {
+    DUKKAN.bakimPeriyoduAy = parseInt(hp, 10);
+    /* Çekmecedeki hatırlatma rozeti periyoda bakmıyor ama bildirim
+       listesi bakıyor — tazelensin. */
+    Cekmece.ciz();
+    ayarCiz();
+    balon('Bakım periyodu ' + hp + ' ay oldu.');
+    return;
+  }
+
+  var al = t.getAttribute('data-ayar-alis');
+  if (al !== null) {
+    DUKKAN.alisSor = (al === '1');
+    ayarCiz();
+    /* Balon SONUCU söyler, ayarı tekrar etmez: usta "ne değişti"
+       sorusunun cevabını görsün. */
+    balon(DUKKAN.alisSor
+      ? 'Parçaların altında "alış" alanı çıkacak — boş bırakabilirsin.'
+      : 'Alış fiyatı sorulmayacak.', false, 3000);
+  }
+});
+})();
+
 </script>
 <script>
 /* Service worker — cevrimdisi acilis. file:// uzerinde calismaz (normal). */
@@ -12176,7 +12428,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>e335db31</b><br>' +
+      'Sürüm <b>32539748</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
