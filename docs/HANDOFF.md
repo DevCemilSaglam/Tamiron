@@ -25,7 +25,7 @@ tıklanabilir prototip.
 | Kararlar | **K-001 … K-055** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
 | Ses | Cümle → **işlem nesnesi** → onay. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
 | Sıradaki | **Tur 8** — servis detayı yeniden kurgu · ayarlar sayfası + alış alanı · ses şema sistemi · A-M48 (bkz. `CALISMA-KUYRUGU.md`) |
-| Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 alan)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
+| Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
 ---
