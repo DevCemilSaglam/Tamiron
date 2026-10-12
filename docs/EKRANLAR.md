@@ -102,6 +102,14 @@ ve *"Ruhsatı çek"* (kamera + galeri). **Plaka kapının kendisidir**
 
 Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açık ve düzenlenebilir** (K-003).
 
+> **12.10 — K-058: adım şeridi kalktı.** Tek sayfa: künye → Yapılanlar
+> (+ toplam + **Teslim et**) → **Ne oldu** (süreç, `surecHtml`) → Açıklama
+> (+ iş türü) → Parça bekliyor. Altta **yapışkan eylem çubuğu**: Ekle ·
+> Sesle · Fotoğraf · Parça sor · Mesaj — teslim çubukta **değil**.
+> Dokunuş: satır 2 · tutar 1 · teslim **3** (önce 4). **Üzerinde YOK:** adım
+> sekmeleri · "devam" düğmeleri · ayrı "İşçilik ekle" düğmesi (rozetle
+> çevrilir). Aşağıdaki tarih 08.09'un üç adımlı hâlini anlatıyor.
+
 | Üzerinde ne var | Üzerinde ne YOK |
 |---|---|
 | Araç künyesi + **müşteri bilgileri** (aranabilir telefon — K-033.5) | Durum rozeti, durum geçmişi |

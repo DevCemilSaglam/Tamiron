@@ -22,7 +22,7 @@
       { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: null, kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' },
       { tip: 'iscilik', ad: 'Triger işçiliği', fiyat: 1500, alis: null, kimGetirdi: '' }
     ];
-    k.adim = null; k.teslimTarihi = null; k.odemeYolu = null;
+    k.teslimTarihi = null; k.odemeYolu = null;
     ACIK_KAYIT = 1;
     Ekran.ac('kayit');
     return k;
@@ -39,14 +39,18 @@
     if (document.activeElement !== el) { el.focus(); n++; iz.push('odak ' + sec); }
     el.value = metin; el.dispatchEvent(new Event('input', { bubbles: true }));
   }
-  /* İlk kare: ekran gövdesinin üstünden 610 px */
+  /* İlk kare: ekranın üstünden, eylem çubuğu varsa ÇUBUĞUN üst kenarına
+     kadar (çubuğun altında kalan şey görünmez); yoksa 610 px.
+     12.10 (K-058): adımlar kalktı — sekme yok, çubuk var. */
   var k = hazirla();
-  await bekle(300);
+  await bekle(700);
   var ekran = document.querySelector('#screen-kayit');
   var ust = ekran.getBoundingClientRect().top;
-  var gor = function (el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.height > 0 && r.top < ust + 610 - 8 && r.bottom > ust && !el.closest('[hidden]'); };
+  var cubuk = document.getElementById('kCubuk');
+  var alt = cubuk ? cubuk.getBoundingClientRect().top : ust + 610;
+  var gor = function (el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.height > 0 && r.top < alt - 8 && r.bottom > ust && !el.closest('[hidden]'); };
   var ilk = {
-    adim: (document.querySelector('#kAdimSerit [aria-selected="true"]') || {}).textContent,
+    adim: (document.querySelector('#kAdimSerit [aria-selected="true"]') || {}).textContent || 'adımsız',
     satir: gor(document.querySelector('#screen-kayit [data-satir-ad]')),
     teslim: gor(document.querySelector('#screen-kayit [data-git="teslim"]')),
     karar: Array.prototype.filter.call(ekran.querySelectorAll('button, input, textarea'), gor).length
@@ -64,15 +68,15 @@
   /* G2 */
   k = hazirla(); n = 0; iz = []; await bekle(200);
   var f0 = document.querySelector('[data-satir-fiyat="0"]');
-  if (f0.closest('[hidden]')) { tik('#kAdimTab2'); await bekle(150); f0 = document.querySelector('[data-satir-fiyat="0"]'); }
+  if (f0.closest('[hidden]') && document.getElementById('kAdimTab2')) { tik('#kAdimTab2'); await bekle(150); f0 = document.querySelector('[data-satir-fiyat="0"]'); }
   yaz(f0, '3800');
   sonuc.gorev.G2 = k.satirlar[0].fiyat === 3800 ? n : null; sonuc.iz.G2 = iz.slice();
 
   /* G3 */
   k = hazirla(); n = 0; iz = []; await bekle(200);
-  var ts = document.querySelector('#kAdim3 [data-git="teslim"]');
-  if (ts.closest('[hidden]')) { tik('#kAdimTab3'); await bekle(150); }
-  tik('#kAdim3 [data-git="teslim"]'); await bekle(200);
+  var ts = document.querySelector('#screen-kayit [data-git="teslim"]');
+  if (ts.closest('[hidden]') && document.getElementById('kAdimTab3')) { tik('#kAdimTab3'); await bekle(150); }
+  tik('#screen-kayit [data-git="teslim"]'); await bekle(200);
   tik('#tsOdeme [data-odeme="nakit"]'); await bekle(100);
   tik('#tsTeslim'); await bekle(100);
   sonuc.gorev.G3 = (k.teslimTarihi && k.odemeYolu === 'nakit') ? n : null; sonuc.iz.G3 = iz.slice();

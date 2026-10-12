@@ -47,204 +47,107 @@
      · red paneli · kabul formu · iskonto mekanizması. -->
 <section class="screen" id="screen-kayit">
 
+  <!-- ⚠️ 12.10 — ADIM ŞERİDİ KALKTI, EKRAN YENİDEN KURULDU (K-058 · Tur 8.1).
+       Cemil, dört kurguyu yan yana görüp seçti:
+         *"Zaman çizelgesinin Ne oldu alanı olsun. Eylem merkezli olanın
+          altta buttonlarının olması olacak. Fakat burada ses ve kamera
+          buttonları da gerekli. Teslim alanı burada olmayabilir."*
+
+       NEDEN: 08.09'da kurulan üç adımlı sihirbaz (İş · Yapılanlar ·
+       Teslim) bir oturuşta biten işe uyar; servis kaydı günlerce açık
+       kalır. Ölçüldü (yaklasimlar/servis-detay.html): 320 px'te kayıt
+       açılınca satırlar da teslim düğmesi de İLK KAREDE YOKTU, teslim
+       adım sekmesi yüzünden bir dokunuş uzundu. 7.1'in kusuru (eklenen
+       satır görünmüyordu) da aynı yapının ürünüydü: eylem bir adımda,
+       sonucu başka adımda.
+
+       ŞİMDİ TEK SAYFA, SIRA ÖNEMİNE GÖRE:
+         künye → Yapılanlar (+ toplam + teslim) → Ne oldu → Açıklama
+         → Parça bekliyor · altta YAPIŞKAN eylem çubuğu
+       İşler çubukta (Ekle · Sesle · Fotoğraf · Parça sor · Mesaj);
+       teslim çubukta DEĞİL — Cemil'in sözü — Yapılanlar'ın altında,
+       toplamın hemen yanında: ödeme sorusu tutarın yanında sorulur.
+
+       K-003 DURUYOR: kayıt teslim edilene kadar açık, her şey her an
+       yapılabilir. Artık bunu söyleyen bir ekran da var. -->
+
   <div class="screen-head">
     <span class="eyebrow" id="kayitBaslik"></span>
   </div>
 
   <!-- KÜNYE + MÜŞTERİ. Künyeye dokununca ARAÇ açılır: geçmiş, son bakım
-       ve "parçayı geçen sefer kim getirmişti" orada (K-005). -->
+       ve "parçayı geçen sefer kim getirmişti" orada (K-005).
+       ⚠️ MÜŞTERİ BİLGİLERİ (Cemil, 06.09): "kimi arayacağım" sorusunun
+       cevabı burada; numara dokunulunca arıyor. -->
   <div class="card">
     <div id="kayitKunye" data-arac-ac="1" role="button" tabindex="0"
          aria-label="Aracın geçmişini aç"></div>
-    <!-- ⚠️ MÜŞTERİ BİLGİLERİ (Cemil, 06.09). Kayıt ekranı ustanın en
-         çok durduğu ekran ve "kimi arayacağım" sorusunun cevabı burada
-         yoktu: araç ekranına gidip geri gelmek gerekiyordu. Numara
-         dokunulunca arıyor — okuyup elle tuşlamak gereksiz adım. -->
     <div id="kayitMusteri"></div>
   </div>
 
-  <!-- ⚠️ 08.09 — ADIM ŞERİDİ (Cemil, telefon testi: "Servis kaydı ekle,
-       düzenle sayfalarını akışa uydurmak gerekiyor. Sayfada herşey
-       yapılabiliyor gözüküyor. Adımlar birbirini takip etmeli.").
-
-       NE OLMUŞTU: bu ekran IS-AKISI.md'deki 2., 3., 4., 5., 6. ve 7.
-       adımların HEPSİNİ aynı anda gösteriyordu — açıklama, tablo,
-       parça ekle, sesle ekle, fotoğraftan oku, parça bekliyor, parçacıya
-       sor, özet gönder, teslim et. Dokuz eylem, tek ekran, hiçbiri
-       ötekinden önce değil. Usta hangisiyle başlayacağını ekrandan
-       okuyamıyordu; ekran ona bir SIRA önermiyordu.
-
-       ARTIK ÜÇ ADIM — ve üçü IS-AKISI'nın adımlarının birebir karşılığı:
-         1 · İş         → Adım 2 (ne istiyor)
-         2 · Yapılanlar → Adım 3-4-5-6 (fiyat sor · fiyat geldi ·
-                          parça geldi · iş yapıldı)
-         3 · Teslim     → Adım 7 (teslim ve ödeme)
-
-       ⚠️ ADIM KİLİTLİ DEĞİL, KONUŞUYOR (K-040.3: "kapalı düğme yok,
-       konuşan düğme var"). Şeritteki hiçbir adım `disabled` değil;
-       hazır olmayan bir adıma dokunulunca ekran NE EKSİK olduğunu
-       söylüyor ve eksiğin bulunduğu adıma götürüyor. Sönük bir sekme
-       ustaya "burası bozuk" dedirtir; konuşan bir sekme ne yapacağını
-       söyler.
-
-       ⚠️ K-003 DURUYOR: kayıt teslim edilene kadar AÇIK. Adımlar bir
-       sihirbaz değil — geriye serbestçe dönülür, satır her adımdan
-       sonra eklenebilir. Sıralanan şey ekranın SUNUMU, kaydın hayatı
-       değil. -->
-  <div class="tab-grup" id="kAdimSerit" role="tablist"
-       aria-label="Servis kaydı adımları"></div>
-
-  <!-- ⚠️ 14.09 — SES VE FOTOĞRAF HER ADIMDA (Cemil: "Servis kaydı
-       sayfasında foto ve mik buttonları gerekli. Yeni işlemler için
-       sesli olarak söyleyebilir. Bunlar parça olabilir, işçilik
-       olabilir. Fiyat güncellenebilir. Teslime edilebilir.").
-
-       İkisi de ADIM 2'nin içindeydi. Oysa ustanın eli yağlıyken
-       söyleyeceği şey adımı beklemiyor: 1. adımdayken "balata da
-       değişecek" diyebilir, 3. adımdayken "teslim ettim nakit aldım"
-       diyebilir. Adım şeridi bir SUNUM sırası; ses ona tabi değil.
-
-       İKİ DÜĞME, ADIM ŞERİDİNİN ALTINDA VE HEP GÖRÜNÜR. Kopya
-       değiller: adım 2'deki eski düğmeler kalktı, tek yer burası. -->
-  <!-- ⚠️ 14.09 — SÜREÇ ŞERİDİ ADIMLARIN DIŞINDA VE HEP GÖRÜNÜR
-       (Cemil: "Süreç mesaj göndermeyle birlikte süreç şeklinde olsun...
-       Bunu iyi kontrol et.").
-
-       Adım şeridi ustanın NE YAPACAĞINI sıralıyor; süreç NE OLDUĞUNU.
-       İkisi ayrı sorular ve ikisi de her adımda geçerli: 1. adımdayken
-       de "özet gönderildi mi" sorulabilir. Bir adımın içine konsaydı
-       cevap o adıma girildiğinde görünürdü. -->
-  <div class="card" id="kSurecKart">
-    <div class="section-label">
-      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Süreç
-    </div>
-    <div id="kSurec"></div>
-  </div>
-
-  <div class="btn-row tek-satir" id="kHizli">
-    <button class="btn btn-ghost" id="kSesleEkle">
-      <svg class="ico"><use href="#i-mic"></use></svg> Sesle
-    </button>
-    <button class="btn btn-ghost" id="kFotoParca">
-      <svg class="ico"><use href="#i-camera"></use></svg> Fotoğraftan parça
-    </button>
-  </div>
-
-  <!-- ================= ADIM 1 · İŞ ================= -->
-  <div class="yigin" id="kAdim1" role="tabpanel" aria-labelledby="kAdimTab1">
-
-  <div class="card">
-    <div class="section-label with-action">
-      <!-- ⚠️ "Ne istiyor?" DEĞİL "Açıklama" (Cemil, 07.09).
-           Soru biçimi alanı daraltıyordu: usta oraya yalnız müşterinin
-           İSTEĞİNİ yazacağını sanıyor. Oysa alan işin kendisini
-           taşıyor — sonradan eklenen işler, tespitler, notlar. -->
-      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Açıklama</span>
-      <button class="daire-btn" id="kSikayetMik" aria-label="Açıklamayı sesle yaz" title="Sesle">
-        <svg class="ico"><use href="#i-mic"></use></svg>
-      </button>
-    </div>
-    <div class="field">
-      <!-- ⚠️ INPUT DEĞİL TEXTAREA (Cemil: "text alanı daha büyük olmalı,
-           yapılan işlemler uzun olabilir"). Tek satırlık bir input,
-           iki cümlelik bir şikâyetin başını gizliyordu: usta yazdığını
-           göremeden yazıyordu. -->
-      <!-- ⚠️ "ALT SATIRA EKLE" DÜĞMESİ KALKTI (Cemil, 07.09):
-           *"Gereksiz. Text area alanına yazınca kaydetsin."*
-
-           Haklı — düğme benim uydurduğum bir sorunu çözüyordu.
-           `textarea` zaten çok satırlı; Enter alt satıra geçiyor.
-           Düğme, klavyenin kendi işini ekrana taşımıştı. Yazılan
-           her tuşta kayda işleniyor (aşağıdaki input dinleyicisi),
-           ayrı bir "kaydet" adımı yok. -->
-      <textarea id="kSikayet" rows="4" aria-label="Açıklama"
-                placeholder="ör. triger seti değişecek"></textarea>
-    </div>
-
-    <!-- ⚠️ İŞ TÜRÜ BURADA, "SERVİS KAYDI EKLE"DE DEĞİL (06.09).
-         Cemil kayıt açma ekranından "ne için geldi"yi kaldırdı: tür
-         önemli değil, metinden çıkarılabilir. Çıkarılıyor da
-         (isTuruTahmin) — ama tahmin DÜZELTİLEBİLİR olmalı, yoksa
-         tahmin değil hüküm olur.
-
-         Yeri burası çünkü sonucu burada doğuyor: bakım seçilirse
-         kilometre sorulur ve teslimde hatırlatma kurulur (K-002).
-         Kayıt açılırken kimse bunu bilmiyordu; kayıt işlenirken usta
-         zaten aracın başında.
-
-         Metin değiştikçe tür KENDİLİĞİNDEN güncellenir — ta ki usta
-         elle bir şey seçene kadar. Elle seçim, tahmini bir daha
-         ezmez: ustanın kararı bizim tahminimizi yener. -->
-    <div class="cip-grup" id="kTurGrup" role="group" aria-label="İş türü"></div>
-  </div>
-
-  <button class="btn btn-primary btn-lg" id="kDevam1">
-    Yapılanlara geç
-    <svg class="ico"><use href="#i-chevron-right"></use></svg>
-  </button>
-
-  </div><!-- /kAdim1 -->
-
-  <!-- ================= ADIM 2 · YAPILANLAR ================= -->
-  <div class="yigin" id="kAdim2" role="tabpanel" aria-labelledby="kAdimTab2">
-
+  <!-- ================= YAPILANLAR =================
+       ⚠️ TABLO, LİSTE DEĞİL (Cemil, 06.09): "Böyle 10 tane parça eklense,
+       okunabilir olmaz." İki sütun: İş ve Tutar; ikincil bilgi adın altında.
+       Satır YERİNDE düzenlenir — ad, tutar, alış (ayar açıksa), tip
+       rozeti, sola kaydırarak silme. 12.10'da bunlara dokunulmadı;
+       Cemil'in seçtiği şey çubuk ve akıştı, satır düzeni değil.
+       ⚠️ "Parçaları müşteri getirdi" TEK YERDE: satırın ikincil satırı
+       ve orada da yalnız fiyat yazılmamışsa (08.09). -->
   <div class="card">
     <div class="section-label">
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılanlar
       </span>
     </div>
-    <!-- ⚠️ 08.09 — "PARÇALARI MÜŞTERİ GETİRDİ" TOPLU DÜĞMESİ KALKTI.
-         Cemil: *"Her yere parçayı müşteri getirdi bilgisini yazma. Bu
-         lazım olursa kullanılacak bir özellik."* + *"Servis
-         kayıtlarında yine parçayı müşteri getirdi yazıyor. Bu konuyu
-         abartmışsin sanki?"*
-
-         Haklı, ve sayıyla haklı: aynı cümle DÖRT yerde duruyordu —
-         bölüm başlığındaki toplu düğmede, her parça satırının altındaki
-         çipte, tutar hücresinin `title`ında ve örnek verinin açıklama
-         metninde. Bir istisna kolu (IS-AKISI Kol D), ana yolun
-         görünümünü ele geçirmişti.
-
-         ARTIK TEK YER: satırın kendi ikincil satırı, ve orada da
-         yalnız FİYAT YAZILMAMIŞSA. Fiyat varsa soru zaten sorulmuyor
-         — parayı sen alıyorsan parçayı sen getirmişsindir. -->
-
     <div id="kSatirlar"></div>
-
-    <div class="btn-row">
-      <button class="btn btn-ghost" id="kParcaEkle">
-        <svg class="ico"><use href="#i-plus"></use></svg> Parça
-      </button>
-      <button class="btn btn-ghost" id="kIscilikEkle">
-        <svg class="ico"><use href="#i-plus"></use></svg> İşçilik
-      </button>
-    </div>
-    <!-- ⚠️ 14.09 — "Sesle" ve "Fotoğraftan parça listesi" düğmeleri
-         BURADAN KALKTI, adım şeridinin altına taşındı: ikisi de her
-         adımda gerekli (Cemil, 14.09). Kopya bırakılmadı — aynı işin
-         iki düğmesi, bir gün birbirinden ayrılır. -->
+    <!-- TESLİM — tutarın yanında (K-058). BİR ÖZET, BİR KAPI DEĞİL: eksik
+         varsa SÖYLER ama YOLU KAPATMAZ; fiyatı gelmemiş satırla da
+         teslim edilebilir. Teslim ekranı ödemeyi soruyor (IS-AKISI 7). -->
+    <div id="kTeslim"></div>
   </div>
 
-  <!-- ⚠️ PARÇA BEKLİYOR — KENDİ ALANI (Cemil, 06.09).
-       Bugüne kadar "bekliyor" bilgisi fiyatı girilmemiş satırdan
-       TÜRETİLİYORDU (fiyatiBekleyen). O, başka bir şey: fiyatı
-       gelmemiş demek. Parça sipariş edilip yolda olabilir ve fiyatı
-       belli olabilir; ya da fiyat belli olmayabilir ve parça elde
-       olabilir. İkisini tek alana bindirmek, ikisini de yanlış
-       söylemekti.
+  <!-- ================= NE OLDU =================
+       Cemil'in seçtiği zaman çizelgesi. Yeni bir nesne YAZILMADI: 14.09'dan
+       beri duran süreç (surecHtml, 03-nesne) zaten tarihli bir akıştı —
+       açıldı → parça bekleniyor → mesajlar → teslim → hatırlatma — ve
+       altında "şimdi gönderilebilir" mesajları. Adı Cemil'in koyduğu ad
+       oldu. Satırlar akışa girmiyor: tarihleri yok ve hemen üstte duruyorlar. -->
+  <div class="card" id="kSurecKart">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clock"></use></svg> Ne oldu
+    </div>
+    <div id="kSurec"></div>
+  </div>
 
-       Bu YENİ BİR DURUM DEĞİL — K-004 duruyor, tek durum alanı hâlâ
-       teslimTarihi. Bu, kaydın bir bilgisi (bir bayrak), akışı
-       değiştirmiyor: kayıt yine açık, yine teslim edilebilir. -->
+  <!-- ================= AÇIKLAMA =================
+       ⚠️ "Ne istiyor?" DEĞİL "Açıklama" (Cemil, 07.09): alan işin kendisini
+       taşıyor — sonradan eklenen işler, tespitler, notlar. TEXTAREA, input
+       değil ("yapılan işlemler uzun olabilir"); ayrı "kaydet" yok, yazılan
+       her tuşta kayda işleniyor.
+       İŞ TÜRÜ burada: metinden tahmin edilir (isTuruTahmin), usta elle
+       seçene kadar takip eder; elle seçim tahmini bir daha ezmez. -->
+  <div class="card">
+    <div class="section-label with-action">
+      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Açıklama</span>
+      <button class="daire-btn" id="kSikayetMik" aria-label="Açıklamayı sesle yaz" title="Sesle">
+        <svg class="ico"><use href="#i-mic"></use></svg>
+      </button>
+    </div>
+    <div class="field">
+      <textarea id="kSikayet" rows="3" aria-label="Açıklama"
+                placeholder="ör. triger seti değişecek"></textarea>
+    </div>
+    <div class="cip-grup" id="kTurGrup" role="group" aria-label="İş türü"></div>
+  </div>
+
+  <!-- ================= PARÇA BEKLİYOR =================
+       Kendi bayrağı (K-033.5) — yeni bir DURUM değil (K-004 duruyor):
+       kayıt yine açık, yine teslim edilebilir. -->
   <div class="card">
     <div class="section-label with-action">
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça bekliyor
       </span>
-      <!-- Baslik ve cip birlikte okunuyor: "Parca bekliyor — Bekliyor"
-           degil, "Parca bekliyor" bolumu icinde basili/basisiz bir
-           anahtar. Uzun metin 375 px'te iki satira sariyordu. -->
       <span class="lbl-eylem">
         <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
       </span>
@@ -252,51 +155,24 @@
     <div id="kBekliyorGovde"></div>
   </div>
 
-  <!-- PARÇA FİYATI SOR — IS-AKISI Adım 3, ve o adım BU adımın içinde.
-       Eskiden teslim düğmesinin yanında duruyordu: fiyat sormak ile
-       işi bitirmek yan yana iki eşit seçenek gibi görünüyordu. -->
-  <button class="btn btn-ghost" data-git="parca-sor">
-    <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor
-  </button>
+  <!-- ================= EYLEM ÇUBUĞU (K-058) =================
+       Cemil: "Eylem merkezli olanın altta buttonlarının olması olacak.
+       Fakat burada ses ve kamera buttonları da gerekli."
+       Beş iş, ekranın altında YAPIŞKAN — usta sayfanın neresinde olursa
+       olsun eli altında. Kimlikler ESKİ düğmelerinkiyle AYNI (kParcaEkle ·
+       kSesleEkle · kFotoParca · kOzetGonder): davranış değişmedi, yeri
+       değişti; 49. denetim testi ve ses yolu aynı kapıdan giriyor.
 
-  <button class="btn btn-primary btn-lg" id="kDevam2">
-    Teslime geç
-    <svg class="ico"><use href="#i-chevron-right"></use></svg>
-  </button>
-
-  </div><!-- /kAdim2 -->
-
-  <!-- ================= ADIM 3 · TESLİM ================= -->
-  <div class="yigin" id="kAdim3" role="tabpanel" aria-labelledby="kAdimTab3">
-
-  <!-- ⚠️ BU KART BİR ÖZET, BİR KAPI DEĞİL. Teslim ekranı ödemeyi
-       soruyor (IS-AKISI Adım 7); burada usta ne teslim ettiğini son bir
-       kez görüyor. Eksik varsa SÖYLENİYOR ama YOL KAPANMIYOR: fiyatı
-       gelmemiş bir satırla da teslim edilebilir — "fiyat bekleniyor"
-       gerçek bir durum (kayıt kartındaki rozet de bunu diyor). -->
-  <div class="card">
-    <div class="section-label">
-      <span class="lbl-txt">
-        <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Teslime hazır mı?
-      </span>
-    </div>
-    <div id="kTeslimOzet"></div>
+       "Ekle" PARÇA ekler — işlerin çoğu parça (T-2); işçiliğe satırın
+       rozetiyle tek dokunuşta çevrilir (7.1). Ayrı bir "İşçilik" düğmesi
+       çubuğu altıya çıkarırdı; 320 px'te altı düğme okunmaz. -->
+  <div class="k-cubuk" id="kCubuk" role="toolbar" aria-label="Servis kaydı işleri">
+    <button id="kParcaEkle"><svg class="ico"><use href="#i-plus"></use></svg>Ekle</button>
+    <button id="kSesleEkle"><svg class="ico"><use href="#i-mic"></use></svg>Sesle</button>
+    <button id="kFotoParca"><svg class="ico"><use href="#i-camera"></use></svg>Fotoğraf</button>
+    <button data-git="parca-sor"><svg class="ico"><use href="#i-package"></use></svg>Parça sor</button>
+    <button id="kOzetGonder"><svg class="ico"><use href="#i-message-square"></use></svg>Mesaj</button>
   </div>
-
-  <!-- ⚠️ 04.09 — "Onay iste" -> "Özet gönder" (ölü uç turu).
-       Düğme "Onay iste" diyordu, bastığında balon "Özet gönderildi"
-       diyordu ve GERÇEKTE HİÇBİR ŞEY GÖNDERİLMİYORDU. Ad artık
-       yapılan işi söylüyor ve gerçekten mesaj ekranına götürüyor.
-       Cemil onayına açık (A-M6). -->
-  <button class="btn btn-ghost" id="kOzetGonder">
-    <svg class="ico"><use href="#i-message-square"></use></svg> Özet gönder
-  </button>
-
-  <button class="btn btn-primary btn-lg" data-git="teslim">
-    <svg class="ico"><use href="#i-wallet"></use></svg> Teslim et
-  </button>
-
-  </div><!-- /kAdim3 -->
 
 </section>
 
@@ -409,15 +285,43 @@
   }
 }
 
-/* ⚠️ ADIM ŞERİDİ SARMAZ (08.09, ölçüm). `.tab` varsayılanı
-   `flex: 1 1 0` — üç sekme eşit genişlikte oluyor ve "2 · Yapılanlar"
-   375 px'te İKİ SATIRA sarıyordu: şerit 48 px'ten 76 px'e çıkıyor ve
-   ekranın üstünden bir kart boyu yer yiyor. Sekmeler içeriklerine göre
-   genişliyor, taşarsa şerit kayıyor — sarmıyor. */
-#kAdimSerit { overflow-x: auto; }
-#kAdimSerit .tab {
-  flex: 1 1 auto; white-space: nowrap; padding-left: 6px; padding-right: 6px;
+/* ---- EYLEM ÇUBUĞU (12.10 · K-058) ----
+   Ekranın altında YAPIŞKAN: `.screen` kaydırma kabı, `sticky` onun
+   görünen alt kenarına yapışır. Negatif kenar boşluğu ekranın yan ve
+   alt dolgusunu yer — çubuk kenardan kenara durur, içerikle hizalı
+   bir kart gibi değil, ekranın tabanı gibi.
+
+   Beş düğme 320 px'te ~58 px; ikon üstte, kısa ad altta. Yazı küçük
+   ama DOKUNMA ALANI TAM (K-024): yükseklik 60 px, genişlik sütunun
+   tamamı. "Ekle" birincil renkte — en sık yapılan iş. */
+/* ⚠️ ÇUBUK DİBE DEĞMİYORDU (12.10, ölçüm): `sticky` kabın İÇ
+   dolgusunu da hesaba katıyor — ekranın 26 px'lik alt dolgusu çubuğu
+   dipten 26 px yukarıda tutuyordu ve altından içerik görünüyordu.
+   Bu ekranda alt dolguyu çubuğun kendisi üstleniyor. */
+#screen-kayit.screen { padding-bottom: 0; }
+#screen-kayit .k-cubuk {
+  position: sticky; bottom: 0; z-index: 5;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;
+  margin: 0 -16px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface); border-top: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
 }
+#screen-kayit .k-cubuk button {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-width: 0; min-height: 60px; padding: 4px 2px;
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text);
+  font-size: var(--tip-xs); font-weight: 600; line-height: 1.15;
+  overflow-wrap: anywhere; text-align: center;
+}
+#screen-kayit .k-cubuk button:hover { background: var(--nav-hover); }
+#screen-kayit .k-cubuk #kParcaEkle {
+  background: var(--primary); color: var(--on-primary); border-color: var(--primary);
+}
+#screen-kayit .k-cubuk .ico { width: 20px; height: 20px; }
+/* Teslim düğmesi ve ipucu tablonun altında, kartın gap'iyle ayrılıyor. */
+#kTeslim { display: flex; flex-direction: column; gap: 8px; }
+#kTeslim:empty { display: none; }
 
 /* ⚠️ 08.09 — ÜSTÜ ÇİZİLİ TUTAR KALKTI (.tutar-disi).
    Cemil: *"Değişen parça fiyatı yerine bilgi olarak sadece
@@ -496,10 +400,11 @@ var FOTO_PARCA_ORNEK = [
    Bunu elle denerken görmedim: ekran bir önceki denemeden 2. adımda
    kalmıştı. 49. denetim testi yakaladı — çünkü o, ekranı TEMİZ açıyor.
 
-   Çözüm iki parçalı: önce satırın DURDUĞU adıma geç, sonra odaklan.
-   Odak ÇİZİMDEN SONRA veriliyor; önce verilseydi yeni DOM onu silerdi. */
+   Çözüm iki parçalıydı: önce satırın DURDUĞU adıma geç, sonra odaklan.
+   12.10'da adımlar kalktı (K-058) — tablo artık HEP görünür, kusurun
+   yapısal sebebi ortadan kalktı. Kalan yarı: odak ÇİZİMDEN SONRA
+   veriliyor; önce verilseydi yeni DOM onu silerdi. */
 function kSatiraOdaklan(k, i) {
-  if (k && k.adim !== 2) kAdimGit(k, 2);
   var e = document.querySelector('#kSatirlar [data-satir-ad="' + i + '"]');
   if (!e) return;
   try { e.focus({ preventScroll: true }); } catch (h) { e.focus(); }
@@ -511,76 +416,9 @@ function kayitToplamCiz(k) {
   if (el) el.textContent = tutar(kayitToplami(k)) + ' ₺';
 }
 
-/* ================= ADIMLAR (08.09) =================
-   Cemil: *"Adımlar birbirini takip etmeli."*
-
-   Üç adım, IS-AKISI.md'nin yedi adımının bu ekrana düşen kısmı:
-     1 · İş         → Adım 2 (ne istiyor)
-     2 · Yapılanlar → Adım 3-4-5-6
-     3 · Teslim     → Adım 7
-
-   ⚠️ ADIM KAYDIN ÜSTÜNDE (k.adim), EKRANIN DEĞİL. Bu dosyanın en
-   başındaki dersin aynısı (`k.turElle`): ekran değişkeni çizimle
-   birlikte ölür. Usta kayıttan çıkıp araç geçmişine bakıp geri
-   gelince, bıraktığı adımda olmalı — başa dönmemeli. */
-var K_ADIMLAR = [
-  { no: 1, ad: 'İş' },
-  { no: 2, ad: 'Yapılanlar' },
-  { no: 3, ad: 'Teslim' }
-];
-
-function kIsVar(k) { return !!(k.sikayet || '').trim(); }
-function kSatirVar(k) { return ((k.satirlar || []).length > 0); }
-
-/* Adım TAMAM MI — şeritteki onay işareti buna bakıyor. */
-function kAdimTamam(k, no) {
-  if (no === 1) return kIsVar(k);
-  if (no === 2) return kSatirVar(k);
-  return !!k.teslimTarihi;
-}
-
-/* Adıma GİDİLEBİLİR Mİ. Kilit değil, önkoşul: bir sonraki adımın
-   anlamı olması için öncekinin bir şey üretmiş olması gerekiyor. */
-function kAdimHazir(k, no) {
-  if (no === 2) return kIsVar(k) || kSatirVar(k);
-  if (no === 3) return kSatirVar(k);
-  return true;
-}
-
-/* Kaydın şu anki adımı. `k.adim` ustanın seçimi; yoksa VERİDEN
-   türetiliyor — eski kayıtlar ve örnek veri de doğru adımda açılsın.
-   Seçim artık geçerli değilse (satırlar silinmişse) geri çekiliyor:
-   var olmayan bir adımda durmak, boş ekran göstermektir. */
-function kAdimNo(k) {
-  var no = k.adim ||
-    (k.teslimTarihi ? 3 : (kSatirVar(k) ? 2 : (kIsVar(k) ? 2 : 1)));
-  while (no > 1 && !kAdimHazir(k, no)) no--;
-  return no;
-}
-
-/* ⚠️ KAPALI SEKME YOK, KONUŞAN SEKME VAR (K-040.3).
-   Hazır olmayan adıma dokunmak hiçbir şey yapmasaydı usta ekranı
-   bozuk sanardı — Cemil'in bu turda müşteri listesi için söylediği
-   şeyin aynısı: *"Tıklayınca herhangi bir şey yapmıyor."*
-   Sekme ne eksik olduğunu söylüyor ve eksiğin durduğu adıma
-   götürüyor. */
-function kAdimGit(k, no) {
-  if (kAdimHazir(k, no)) {
-    k.adim = no;
-    Ekran.tazele();
-    var el = document.getElementById('screen-kayit');
-    if (el) el.scrollTop = 0;
-    return;
-  }
-  if (no === 2) {
-    k.adim = 1; Ekran.tazele();
-    balon('Önce ne yapılacağını yaz.', false, 3000);
-    try { document.getElementById('kSikayet').focus(); } catch (x) {}
-  } else {
-    k.adim = 2; Ekran.tazele();
-    balon('Önce yapılanları yaz — en az bir parça ya da işçilik.', false, 3400);
-  }
-}
+/* ⚠️ ADIMLAR KALKTI (12.10 · K-058). K_ADIMLAR · kAdimNo · kAdimGit ·
+   kAdimHazir · kAdimTamam ve `k.adim` alanı buradaydı. Cemil dört kurguyu
+   yan yana görüp adımsız birleşimi seçti; gerekçesi ekranın başında. */
 
 /* Teslime hazır mı — EKSİKLERİ SÖYLER, YOLU KAPATMAZ.
    "Fiyat bekleniyor" gerçek bir durumdur (kayıt kartındaki rozet de
@@ -803,41 +641,26 @@ function kayitCiz() {
         'Parça ya da işçilik ekle. Parçacının listesini fotoğraflayarak ' +
         'da girebilirsin. Satırı silmek için sola kaydır.');
 
-  /* ---- ADIM ŞERİDİ + PANOLAR ---- */
-  var adim = kAdimNo(k);
-  document.getElementById('kAdimSerit').innerHTML = K_ADIMLAR.map(function (a) {
-    return '<button class="tab" id="kAdimTab' + a.no + '" data-kadim="' + a.no + '"' +
-      ' role="tab" aria-selected="' + (adim === a.no) + '"' +
-      ' aria-controls="kAdim' + a.no + '">' +
-      (kAdimTamam(k, a.no)
-        ? '<svg class="ico ico-sm"><use href="#i-check"></use></svg>' : '') +
-      a.no + ' · ' + a.ad +
-    '</button>';
-  }).join('');
-  [1, 2, 3].forEach(function (n) {
-    document.getElementById('kAdim' + n).hidden = (adim !== n);
-  });
-
-  /* ---- SÜREÇ — her adımda, ortak nesneden ---- */
+  /* ---- NE OLDU — ortak nesneden (surecHtml) ---- */
   document.getElementById('kSurec').innerHTML = surecHtml(k);
 
-  /* ---- ADIM 3 · TESLİM ÖZETİ ---- */
-  if (adim === 3) {
-    var sat = k.satirlar || [];
-    var eksik = kEksikler(k);
-    document.getElementById('kTeslimOzet').innerHTML =
-      '<div class="tutar-serit">' +
-        '<div class="tutar-sat"><span>' + sat.length + ' kalem</span>' +
-          '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>' +
-      '</div>' +
-      (eksik.length
-        ? '<div class="notice warn" style="margin-top:12px">' +
-            '<span class="n-ic"><svg class="ico ico-sm">' +
-              '<use href="#i-triangle-alert"></use></svg></span>' +
-            '<span class="n-body">Eksik görünen: ' + eksik.join(' · ') +
-              '. Yine de teslim edebilirsin.</span></div>'
-        : '<p class="plate-hint">Her şey yazılmış görünüyor.</p>');
-  }
+  /* ---- TESLİM — Yapılanlar'ın altında, tutarın yanında (K-058) ----
+     Teslim edildiyse düğme yerine NE OLDUĞU yazar; edilmediyse eksikler
+     KÜÇÜK bir ipucu: yarım kayıt olağan bir hâl (parça bekleniyor,
+     fiyat gelmedi) ve her açılışta sarı bir uyarı görmek, uyarıyı
+     gürültüye çevirirdi. Yol hiçbir zaman kapanmaz. */
+  var eksik = kEksikler(k);
+  document.getElementById('kTeslim').innerHTML = k.teslimTarihi
+    ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
+        '<use href="#i-circle-check"></use></svg></span>' +
+        '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
+          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') + '</span></div>'
+    : '<button class="btn btn-primary btn-lg" data-git="teslim">' +
+        '<svg class="ico"><use href="#i-wallet"></use></svg> Teslim et</button>' +
+      (eksik.length && satirlar.length
+        ? '<p class="plate-hint">Eksik görünen: ' + eksik.join(' · ') +
+          '. Yine de teslim edebilirsin.</p>'
+        : '');
 
   /* ---- PARÇA BEKLİYOR ---- */
   document.getElementById('kBekliyor')
@@ -919,10 +742,6 @@ document.addEventListener('click', function (e) {
                       kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
   }
-  if (t.id === 'kIscilikEkle') {
-    k.satirlar.push({ tip: 'iscilik', ad: '', fiyat: 0, alis: null, kimGetirdi: '' });
-    Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
-  }
 
   /* Tip çevirme — ad ve tutar KORUNUR. */
   var tipNo = t.getAttribute('data-satir-tip');
@@ -947,18 +766,9 @@ document.addEventListener('click', function (e) {
         kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
     });
     balon(FOTO_PARCA_ORNEK.length + ' parça okundu — fiyatlarını yaz.', false, 3000);
-    /* Aynı tuzak burada da vardı: balon "fiyatlarını yaz" diyor ama
-       1. adımdayken yazılacak satırlar görünmüyordu. */
     Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - FOTO_PARCA_ORNEK.length);
     return;
   }
-
-  /* ADIM ŞERİDİ ve "devam" düğmeleri AYNI YOLU kullanıyor (kAdimGit):
-     iki ayrı yol olsaydı biri önkoşulu sorar öteki sormazdı. */
-  var ad = t.getAttribute('data-kadim');
-  if (ad) { kAdimGit(k, parseInt(ad, 10)); return; }
-  if (t.id === 'kDevam1') { kAdimGit(k, 2); return; }
-  if (t.id === 'kDevam2') { kAdimGit(k, 3); return; }
 
   if (t.id === 'kBekliyor') {
     k.parcaBekliyor = !k.parcaBekliyor;

@@ -10,6 +10,66 @@
 
 ---
 
+## K-058 · Servis detayı: adım yok — "Ne oldu" + alttaki eylem çubuğu (12.10.2026 · Tur 8.1)
+
+> **Cemil, 12.10** (dört kurguyu yan yana gördükten sonra): *"Zaman
+> çizelgesinin Ne oldu alanı olsun. Eylem merkezli olanın altta
+> buttonlarının olması olacak. Fakat burada ses ve kamera buttonları da
+> gerekli. Teslim alanı burada olmayabilir."*
+
+A-M49 kapandı. Cemil **önerimi (B) seçmedi, birleşim seçti** (D + C) —
+ve gerekçesi ekranın kendisinde: B'nin üstünlüğü satır düzenindeydi, o
+zaten bugünkü tabloda var; Cemil'in istediği, **işlerin elin altında**
+durması ve kaydın **hikâyesinin** okunmasıydı.
+
+### 58.1 · Ne yapıldı
+
+| | önce | sonra |
+|---|---|---|
+| Yapı | 3 adımlı sihirbaz (İş · Yapılanlar · Teslim) | **tek sayfa:** künye → Yapılanlar (+ toplam + Teslim) → **Ne oldu** → Açıklama → Parça bekliyor |
+| İşler | adımlara dağılmış düğmeler | **alttaki yapışkan çubuk:** Ekle · **Sesle** · **Fotoğraf** · Parça sor · Mesaj |
+| Teslim | 3. adımın içinde | **çubukta değil** (Cemil) — tutarın altında |
+| Süreç | "Süreç" kartı | **"Ne oldu"** — aynı ortak nesne (`surecHtml`), yeni çizim yazılmadı |
+
+### 58.2 · Ölçüldü — gerçek prototipte, aynı görevler (`tools/servis-detay-olc.js`, 320 × 760)
+
+| | satır ekle | tutar | teslim | ilk karede satırlar | ilk karede teslim |
+|---|---|---|---|---|---|
+| önce (3 adım) | 2 | 1 | 4 | yok | yok |
+| **sonra** | **2** | **1** | **3** | **var** | yok |
+
+Çubuk düğmeleri 320 px'te 53 × 64 px; taşma 0. Ses eşdeğerliği:
+tanıma 568/0 · onay ekranı 392/0 (uygulamadaki farkların hepsi K-057'nin
+alış değişikliği).
+
+### 58.3 · Varsayımlar — Cemil onayına açık
+
+- **Satır düzeni dokunulmadı:** tablo yerinde düzenleniyor (ad · tutar ·
+  alış · rozet · kaydırarak silme). C'nin *"satıra dokun → panel"*
+  kısmı alınmadı; Cemil yalnız alttaki düğmeleri istedi.
+- **"Ekle" PARÇA ekler**, işçiliğe satırın rozetiyle çevrilir (7.1).
+  Ayrı "İşçilik" düğmesi çubuğu altıya çıkarırdı; 320 px'te okunmaz.
+  Bedeli: işçilik eklemek 1 dokunuş uzadı.
+- **"Mesaj"** eski *"Özet gönder"*in yerinde: mesaj ekranını özet
+  şablonuyla açar; orada başka şablon seçilir.
+- **Teslim ilk karede değil** — künye kartı (müşterinin büyük adı ve
+  telefonu, Cemil 07.09) 320 px'te ilk karenin yarısını kaplıyor.
+  Künye sıkıştırılırsa teslim de ilk kareye girer; **sormadan
+  dokunmadım.**
+- **Gözle kontrol yapılamadı:** önizleme bölmesi bu oturumun sonunda
+  0 × 0 açıldı; bütün düzen ölçümleri sabit boyutlu çerçevede yapıldı.
+  Telefonda ilk bakış Cemil'in.
+
+### 58.4 · Yeni hata sınıfı → 53. test (YAPISKAN-ALT)
+
+Çubuk ilk yazışta dipten **26 px yukarıda** duruyordu: `sticky`, kaydırma
+kabının iç dolgusunu hesaba katıyor. Altından içerik akıyordu; hiçbir
+şey taşmadığı ya da kesilmediği için hiçbir test görmedi — ölçüm
+yakaladı. Test her ekranda alttan yapışan öğenin kabın dibine oturduğunu
+ölçüyor; negatif testle doğrulandı (düzeltme geri alındı → 1 bulgu).
+
+---
+
 ## K-057 · Bilinmeyen alış kâra girmez; ayarlar kendi ekranında (12.10.2026 · Tur 8.2)
 
 K-055.2'nin uygulaması. Üç parça; üçü de Cemil'in kararından türüyor,
@@ -4330,7 +4390,7 @@ oradan bakılır.
 | Kod | Soru | Durum |
 |---|---|---|
 | **A-M48** | **Dükkân sesine erişmeden ses tarafı nasıl ölçülür?** | **ARAŞTIRILDI (12.10) — öneri E yolu, Cemil'in üç onayı bekleniyor** (`arastirma/SES-OLCUM.md`). Bulgu: Chrome 152'nin tanıyıcısı **dosyadan beslenebiliyor** (`start(track)`; mikrofon izni yokken dinlemeye başladı) → dükkân **kaydı** şart değil. E: konuşma evden (Cemil 40 cümleyi okur, ~20 dk) + gürültü açık arşivden (Freesound CC0 atölye kayıtları) + `ses-bozucu.js` + yeni `ses-dosya-kos.html` + aynı cetvel → SNR eğrisi. Onaylar: ① *"gürültü uydurulmaz"* kuralının esnetilmesi (gerçek atölye sesi, bizim dükkânın değil) ② kendi sesin ③ indirme (MediaSpeech TR ~618 MB CC BY 4.0 + CC0 gürültü). Ölçülemeyen kalır: dükkân akustiği · ustanın ağzı · gerçek telefon/bağlantı → sunumda risk olarak yazılır |
-| **A-M49** | **Servis detayının kurgusu (Tur 8.1):** A tek sayfa · **B kayıt kartı + yerinde düzenleme** · C eylem merkezli · D zaman çizelgesi — ya da birleşimi. Dört kurgu çalışır hâlde, aynı kayıtla yan yana; ölçüm sayfanın içinde koşuyor (`prototypes/yaklasimlar/servis-detay.html`, yayın: claude.ai/artifact/4boFRu36EEpniK5n9MEVHY). Dokunuş G1/G2/G3: bugün 2/1/4 · A 2/1/3 · B 2/1/3 · C 3/2/3 · D 3/2/3. 320 px ilk karede satırlar+teslim: bugün **ikisi de yok** · A satır · **B ikisi** · C ikisi · D teslim | **CEMİL'İN SEÇİMİ** — önerim **B** (en az dokunuş + ilk karede ikisi + en düşük karar yükü 3). Seçilince kayıt ekranının yerine kurulur; ses eşdeğerlik aracı ve denetim koşar |
+| ~~A-M49~~ | **Cemil, 12.10:** *"Zaman çizelgesinin Ne oldu alanı olsun. Eylem merkezli olanın altta buttonlarının olması olacak… ses ve kamera buttonları da gerekli. Teslim alanı burada olmayabilir."* → **K-058** (önerim B'ydi; birleşim seçildi) |
 | **A-M36** | TC/vergi no ve adres tutuluyorsa **KVKK aydınlatma + saklama süresi** (K-050.5) | **ERTELENDİ** — Cemil: *"Uygulama kullanıma başladığında karar veririz."* Aydınlatma A-M33 ile çözüldü; **saklama süresi gerçek veri tutulmadan önce kapanmalı** |
 
 ### Sonraki fazın soruları — şimdi cevap gerekmiyor

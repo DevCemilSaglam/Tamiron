@@ -26,7 +26,8 @@ function stilMetni() {
     'YATAY-TASMA': 1, 'IC-TASMA': 1, 'KIRPILAN-METIN': 1, 'KIRPILMIS-KUTU': 1,
     'GIZLI-KAYDIRMA': 1, 'SESSIZCE-KIRPILAN-ALAN': 1, 'SIKISIK': 1,
     'KUCUK-HEDEF': 1, 'ORTEN-YAPISKAN': 1, 'EZILEN-GOVDE': 1,
-    'GIZLI-AMA-GORUNUR': 1, 'DRAWER-ARKA-PLAN': 1, 'KOYU-SIYAH': 1
+    'GIZLI-AMA-GORUNUR': 1, 'DRAWER-ARKA-PLAN': 1, 'KOYU-SIYAH': 1,
+    'YAPISKAN-ALT': 1
   };
   var b=[];function ek(t,e,d){
     if (!OLCULEBILIR && OLCUME_BAGLI[t]) return;
@@ -1864,14 +1865,11 @@ function stilMetni() {
     if (typeof ACIK_KAYIT !== 'undefined') ACIK_KAYIT = k.id;
     Ekran.ac('kayit');
 
-    /* ⚠️ EKRAN 1. ADIMDA ACILIYOR — BILEREK.
-       Kusur tam burada yasandi: "Parca ekle" dugmesi adimlarin
-       ustunde her adimda gorunuyor, satir tablosu ise 2. adimin
-       icinde. 1. adimdayken basilinca satir ekleniyor ama EKRANDA
-       HICBIR SEY OLMUYOR. Elle denerken gorulmedi cunku ekran onceki
-       denemeden 2. adimda kalmisti; test ekrani TEMIZ actigi icin
-       yakaladi. */
-    if (k.adim !== 1) { k.adim = 1; Ekran.tazele(); }
+    /* Kusur burada yasandi (16.09): "Parca ekle" adimlarin ustundeydi,
+       satir tablosu 2. adimin icinde; 1. adimda basilinca satir
+       GORUNMEDEN ekleniyordu. 12.10'da adimlar kalkti (K-058) ve ekle
+       dugmesi alttaki eylem cubuguna gecti — test ayni soruyu soruyor:
+       basilan dugmenin sonucu GORUNUYOR mu, odak oraya gidiyor mu. */
 
     var ekleTus = document.getElementById('kParcaEkle');
     if (!ekleTus) {
@@ -2247,6 +2245,42 @@ function stilMetni() {
       window.ACIK_KAYIT = alisOnce.kayit;
       Ekran.sifirla();
     }
+  }
+
+  /* 53) YAPISKAN ALT OGE DIBE OTURMUYOR (12.10.2026 · K-058)
+     Kayit ekranina alttan yapisan bir eylem cubugu geldi ve ilk yazista
+     dipten 26 px YUKARIDA duruyordu: `position: sticky` kaydirma kabinin
+     IC DOLGUSUNU hesaba katiyor, ekranin alt dolgusu cubugu yukari
+     itiyordu. Altindan icerik akiyordu; ne tasma ne kirpma testi gorur,
+     cunku hicbir sey tasmiyor ya da kesilmiyor. Olcum yakaladi, test
+     degil.
+
+     Olculen: her ekranda `sticky` + `bottom` verilmis oge, icerik kabi
+     doldurdugunda kabin ALT KENARINA oturuyor mu.
+     NEGATIF DOGRULAMA (12.10): kayit ekraninin `padding-bottom: 0`
+     duzeltmesi geri alindi -> bulgu; geri konunca 0. */
+  if (OLCULEBILIR) {
+    ekranlar.forEach(function (a) {
+      var kok = document.getElementById('screen-' + a);
+      if (!kok) return;
+      var yapiskan = Array.prototype.filter.call(kok.querySelectorAll('*'), function (el) {
+        var cs = getComputedStyle(el);
+        return cs.position === 'sticky' && cs.bottom !== 'auto';
+      });
+      if (!yapiskan.length) return;
+      showScreen(a);
+      if (kok.scrollHeight <= kok.clientHeight + 1) return; /* kap dolmadiysa yapisma olmaz */
+      kok.scrollTop = 0;
+      var kAlt = kok.getBoundingClientRect().bottom;
+      yapiskan.forEach(function (el) {
+        var fark = Math.round(kAlt - el.getBoundingClientRect().bottom);
+        if (Math.abs(fark) > 1) {
+          ek('YAPISKAN-ALT', a, (el.id || el.className) + ' dibe ' + fark +
+             ' px uzak — altindan icerik gorunur');
+        }
+      });
+      kok.scrollTop = 0;
+    });
   }
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
