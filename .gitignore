@@ -30,3 +30,6 @@ tools/degerlendirme/foto-harita.json
 # Kontrol sayfasinin URETILMIS hali — icinde kisisel alanlar birlesmis olur.
 # Sablon ve ureteci depoda; ciktisi degil.
 tools/degerlendirme/kontrol.html
+
+# Ses eşdeğerlik ölçümünün taban kopyası (tools/ses-esdeger.js) — geçici
+prototypes/_taban.html

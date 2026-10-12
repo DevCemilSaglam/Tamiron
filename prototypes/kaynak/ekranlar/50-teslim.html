@@ -220,4 +220,59 @@ document.addEventListener('click', function (e) {
     Ekran.ac('home');
   }
 });
+
+/* ================= SESLİ İŞ — bu ekranın şeması (Tur 8.3) =================
+   Teslim iki yerden söylenir ve İKİ TANIYICISI var, tek şeması:
+     baglamda — açık kaydın içinde: "teslim ettim nakit aldım", plaka yok
+     tani     — genel yolda: "35 KLM 45 teslim ettim", plakadan */
+
+/* Sesle söylenebilen ödeme yolları. "Almadım" BİLEREK YOK: "parayı
+   almadım" cümlesi değerlendirme setinde bir TUZAK (4. cümle) — sesle
+   veresiye yazmak yerine teslim ekranında seçiliyor. */
+var SES_ODEME = { nakit: ODEME_ETIKET.nakit, kart: ODEME_ETIKET.kart,
+                  havale: ODEME_ETIKET.havale };
+function sesOdemeYolu(d) {
+  return d.indexOf('nakit') >= 0 ? 'nakit'
+       : d.indexOf('kart') >= 0 ? 'kart'
+       : d.indexOf('havale') >= 0 ? 'havale' : null;
+}
+
+Islem.tanim('teslim', {
+  ekran: 'teslim', baglam: ['kayit-icinde'], oncelik: 60,
+  baslik: 'Araç teslim edilecek',
+  eylem: function (o) { return o.odeme ? 'Teslim et' : 'Teslim ekranını aç'; },
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true },
+    { ad: 'toplam', etiket: 'Tutar', turet: function (o) {
+        return tutar(kayitToplami(o.kayit)) + ' ₺'; } },
+    { ad: 'odeme', etiket: 'Ödeme', tip: 'secim', secenek: SES_ODEME,
+      bos: '— (teslim ekranında seçilecek)' }
+  ],
+  baglamda: function (c) {
+    var k = c.kayit;
+    if (!k || c.d.indexOf('teslim') < 0 || k.teslimTarihi) return null;
+    return { tur: 'teslim', plaka: k.plaka, arac: aracBul(k.plaka),
+             kayit: k, odeme: sesOdemeYolu(c.d) };
+  },
+  tani: function (c) {
+    if (!c.p || !c.arac || c.dk.indexOf('teslim') < 0) return null;
+    var plaka = c.p.plaka;
+    var acik = icerideki().filter(function (k) { return k.plaka === plaka; })[0];
+    if (!acik) return { tur: 'teslim-edilecek-kayit-yok', plaka: plaka, arac: c.arac };
+    return { tur: 'teslim', plaka: plaka, arac: c.arac, kayit: acik,
+             odeme: sesOdemeYolu(c.dk) };
+  },
+  /* Ödeme söylendiyse SEÇİLİ gelir ama teslimi usta onaylar: para
+     işinde son dokunuş ustanın. Seçim ekranın kendi durumuna yazılıyor
+     — eskiden ses ekranı buradaki düğmeye DIŞARIDAN tıklıyordu. */
+  uygula: function (o) {
+    ACIK_KAYIT = o.kayit.id;
+    Ekran.ac('teslim');
+    if (o.odeme) {
+      tsSecili = o.odeme;
+      tsCiz();
+      balon('Ödeme "' + SES_ODEME[o.odeme] + '" seçildi — teslimi sen onayla.', false, 3200);
+    }
+  }
+});
 </script>

@@ -1038,4 +1038,137 @@ document.addEventListener('input', function (e) {
     if (teklif) teklif.hidden = !!sf.fiyat;
   }
 });
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) =================
+   Kayıt ekranı üç işini kendisi bildiriyor; ses ekranı bunları tanır,
+   şemadan onay ekranı çizer ve buradaki `uygula`yı çağırır.
+   Öncesi: üç iş, ses ekranında üç ayrı yerde (çözümle · özet · uygula)
+   elle yazılmış dallardı. */
+
+/* Söylenenden satırın ADI — tutar ve komut kelimeleri atılır.
+   kelimeleriAt kullanılıyor, \b DEĞİL: /\bde\b/ "değişecek"i
+   "ğişecek" yapıyordu (K-018, çekirdekteki uyarıya bak). */
+function sesSatirAdi(c) {
+  return kelimeleriAt(sesTutarsiz(c.metin),
+    ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
+     'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
+     'güncelle', 'guncelle']);
+}
+
+/* ⚠️ AÇIK KAYITTA SES ÜÇ İŞ YAPIYOR (14.09 — Cemil: "Bunlar parça
+   olabilir, işçilik olabilir. Fiyat güncellenebilir. Teslime
+   edilebilir."). SIRA DAR OLANDAN GENİŞE: teslim (60, teslim ekranında)
+   → fiyat güncelleme (65) → satır ekleme (VARSAYILAN). Ters sırada
+   "teslim ettim nakit aldım" kayda "teslim ettim" diye satır eklerdi. */
+
+/* FİYAT GÜNCELLEME — söylenen ad VAR OLAN bir satıra uyuyorsa.
+   ⚠️ TEK ADAY KURALI (A-M27'nin aynısı): iki satır birden uyuyorsa
+   hangisi olduğunu bilmiyoruz demektir — o zaman güncelleme YOK, yeni
+   satır eklenir ve usta görür. Tahmin etmek, ustanın yazdığı rakamı
+   sessizce değiştirmenin yoludur. */
+Islem.tanim('fiyat-guncelle', {
+  ekran: 'kayit', baglam: ['kayit-icinde'], oncelik: 65,
+  baslik: 'Satırın fiyatı değişecek',
+  eylem: 'Fiyatı güncelle',
+  alanlar: [
+    { ad: 'satir', etiket: 'Ne', tip: 'satir', zorunlu: true },
+    { ad: 'simdiki', etiket: 'Şimdiki', turet: function (o) {
+        return o.satir.fiyat ? tutar(o.satir.fiyat) + ' ₺' : '— (boş)'; } },
+    { ad: 'fiyat', etiket: 'Yeni', tip: 'para', zorunlu: true }
+  ],
+  baglamda: function (c) {
+    var k = c.kayit, tutarR = sesTutarBul(c.d), ad = sesSatirAdi(c);
+    if (!k || !tutarR || !ad) return null;
+    var adN = norm(ad), uyan = [];
+    (k.satirlar || []).forEach(function (s, i) {
+      var sN = norm(s.ad || '');
+      if (sN.length < 3 || adN.length < 3) return;
+      if (sN === adN || sN.indexOf(adN) >= 0 || adN.indexOf(sN) >= 0) {
+        uyan.push({ satir: s, indeks: i });
+      }
+    });
+    if (uyan.length !== 1) return null;
+    return { tur: 'fiyat-guncelle', kayit: k, indeks: uyan[0].indeks,
+             satir: uyan[0].satir, fiyat: tutarR };
+  },
+  /* Satır nesnesi kaydın içinde duruyor; indeks de taşınıyor ki aynı
+     adı taşıyan iki satır olsa bile doğru olan değişsin. */
+  uygula: function (o) {
+    var gk = kayitBul(o.kayit.id);
+    var gs = gk && gk.satirlar ? gk.satirlar[o.indeks] : null;
+    if (!gs) { balon('Satır bulunamadı.', false, 2600); return; }
+    gs.fiyat = o.fiyat;
+    ACIK_KAYIT = gk.id;
+    balon((gs.ad || 'Satır') + ' → ' + tutar(o.fiyat) + ' ₺', false, 2800);
+    Ekran.ac('kayit');
+  }
+});
+
+/* SATIR EKLE — açık kaydın VARSAYILAN işi. Başka bir iş tanınırsa o asıl
+   olur, bu ÖNERİ olarak durur (7.3); tanınmazsa bu olur.
+   ⚠️ 16.09'a kadar bu dal bir çöplüktü: kayıt açıkken söylenen HER
+   cümle ("servistekileri göster", "bugün ne kadar tahsilat") bir
+   PARÇA oluyordu. */
+Islem.tanim('satir-ekle', {
+  ekran: 'kayit', baglam: ['kayit-icinde'], varsayilan: true,
+  baslik: 'Açık kayda satır eklenecek',
+  eylem: 'Satırı ekle',
+  alanlar: [
+    { ad: 'tip', etiket: 'Tür', tip: 'secim', zorunlu: true,
+      secenek: { parca: 'Parça', iscilik: 'İşçilik' } },
+    { ad: 'ad', etiket: 'Ne', tip: 'metin', zorunlu: true },
+    { ad: 'fiyat', etiket: 'Tutar', tip: 'para', bos: '— (sonra yazılır)' }
+  ],
+  baglamda: function (c) {
+    if (!c.kayitId) return null;
+    var iscilikMi = c.d.indexOf('iscilik') >= 0;
+    var ad = sesSatirAdi(c);
+    /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
+       yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
+    return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
+             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesTutarBul(c.d) };
+  },
+  /* ⚠️ `alis: 0` BİLEREK DURUYOR — 8.3 davranış değiştirmez. Bilinmeyen
+     alış 0 değil null olmalı (K-055.2); düzeltmesi 8.2'nin işi. */
+  uygula: function (o) {
+    var k = kayitBul(ACIK_KAYIT);
+    if (!k) { balon('Açık kayıt yok.'); return; }
+    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: 0,
+      kimGetirdi: o.tip === 'parca' ? 'tamirci' : '',
+      marka: '', kod: '', tanim: 'tanimlanamadi' });
+    balon('Satır eklendi — fiyatını yaz.', false, 2800);
+    Ekran.ac('kayit');
+  }
+});
+
+/* SERVİS KAYDI AÇ — kayıtlı araç. Kayıtlı değilse aynı cümle
+   yeni-arac'a (ruhsat ekranı, öncelik 70) düşer; bu en geniş kalıp,
+   o yüzden en son denenir. */
+Islem.tanim('servis-ac', {
+  ekran: 'kayit', baglam: ['servis-ekle'], oncelik: 80,
+  baslik: 'Servis kaydı açılacak',
+  eylem: 'Kaydı aç',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true },
+    { ad: 'isTuru', etiket: 'İş türü', tip: 'secim', secenek: SES_IS_TURU },
+    { ad: 'is', etiket: 'Ne istiyor', tip: 'metin', bos: '— (sonra yazılır)' },
+    { ad: 'km', etiket: 'Kilometre', tip: 'km', bosGizle: true }
+  ],
+  tani: function (c) {
+    if (!c.p || !c.arac) return null;
+    var s = sesServisOku(c);
+    return { tur: 'servis-ac', plaka: c.p.plaka, arac: c.arac, isTuru: s.isTuru,
+             km: s.km, is: s.is };
+  },
+  uygula: function (o) {
+    var yeni = { id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
+      km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
+      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: [] };
+    KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
+    balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
+    Ekran.ac('kayit');
+  }
+});
 </script>

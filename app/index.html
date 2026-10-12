@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-09-16 21:21
+  Üretim: 2026-10-12 11:13
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -7654,6 +7654,330 @@ document.addEventListener('click', function (e) {
 });
 
 
+/* ===== betik/04-islem.js ===== */
+/* ============ İŞLEM ŞEMALARI (Tur 8.3 · 12.10.2026) ============
+   Cemil, 12.10: *"İşlemleri için bir yol / sistem oluşturmak
+   istiyorduk. Kaydedilen ses bir json dolduracak. Bu ikisi eşleşmeli.
+   Hangi sayfada olduğuna göre bu json'u dolduracak ve işlem yapacak."*
+
+   NEDEN: ses ekranı her iş için ÜÇ ayrı yerde elle dal yazıyordu —
+   çözümleyicide (`if … return {tur:…}`), onay ekranında (`if (o.tur
+   === …) return {baslik, satirlar…}`) ve uygulamada (`if (o.tur ===
+   …) {…}`). Yeni bir iş üç dal demekti; üçü ayrışabiliyordu ve Tur 7'de
+   ayrıştı: kayıt dalı "geri kalan her şey" dalına dönmüştü ve kayıt
+   açıkken söylenen HER cümle parça oluyordu.
+
+   ŞİMDİ: işin sahibi ekran, işini TEK YERDE bildirir —
+
+     Islem.tanim('gider-ekle', {
+       ekran: 'muhasebe',            sahibi
+       baglam: ['muhasebe'],         hangi bağlamda "kendi işi"
+       oncelik: 20,                  genel yolda kaçıncı denenir
+       baslik / eylem / notice,      onay ekranının sözleri
+       alanlar: [ {ad, etiket, tip, …} ],   JSON'un kendisi
+       tani(c)      → genel yolda tanır ve doldurur (yoksa null)
+       baglamda(c)  → yalnız kendi bağlamında tanır
+       varsayilan   → bağlamında hiçbir şey tutmazsa bu olur
+       uygula(o)    → onaydan sonra yapılan iş
+     });
+
+   ses → işlem nesnesi (JSON) → onay ekranı ŞEMADAN çizilir → uygula
+   ŞEMADAN çağrılır. Ses ekranında işe özgü tek bir dal kalmadı.
+
+   ⚠️ İŞLEM NESNESİNİN BİÇİMİ DEĞİŞMEDİ: düz bir nesne, `tur` + alanlar.
+   Değerlendirme seti (ses-seti.json) ve denetim bu biçimi okuyor; geçiş
+   sırasında 568 cümle×bağlam durumu eski çözümleyiciyle BİREBİR
+   karşılaştırıldı (0 fark). Şema, nesneyi değiştirmedi — TARİF etti.
+
+   BACKEND KÖPRÜSÜ: `Islem.json()` aynı şemaları bir dil modelinin
+   anlayacağı araç tanımı biçiminde verir. Model geldiğinde tanıyan
+   fonksiyon (`tani`) değişir; alanlar, onay ekranı ve uygulama
+   DEĞİŞMEZ. (K-054: model doldurur, usta onay ekranında düzeltir.) */
+
+/* ---- METİNDEN OKUYUCULAR — her şema aynı okuyucuyu kullanır ----
+   Ses ekranının içindeydiler; şemalar başka ekranlarda durduğu için
+   buraya taşındı (ekran betikleri kendi IIFE'sinde, birbirini görmez). */
+
+/* ⚠️ Birleştirme ÇÖZÜMLEMENİN GİRİŞİNDE bir kez yapılır, burada
+   değil: indeks/uzunluk döndüren bir fonksiyon metni değiştirirse,
+   çağıran taraf ORİJİNAL metni yanlış yerden keser. */
+function sesPlakaBul(metin) {
+  var m = metin.toLocaleUpperCase('tr')
+               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
+  if (!m) return null;
+  return { plaka: m[1] + ' ' + m[2] + ' ' + m[3], indeks: m.index, uzunluk: m[0].length };
+}
+
+function sesTelefonBul(metin) {
+  var m = metin.replace(/\s/g, '').match(/0\d{10}/);
+  if (!m) return null;
+  var t = m[0];
+  return t.slice(0, 4) + ' ' + t.slice(4, 7) + ' ' + t.slice(7, 9) + ' ' + t.slice(9);
+}
+
+/* "2400 TL", "850 lira" — rakam bekliyoruz; kelimeyle söylenen sayı
+   girişte rakama çevrildi (sesSayilariCevir).
+   ⚠️ SÖYLENMEYEN TUTAR 0 DÖNER, null DEĞİL. Bugünkü bütün şemalar
+   0'ı "söylenmedi" diye okuyor (onay ekranında "— (sonra yazılır)").
+   K-055.2'nin `alis: null ≠ 0` ayrımı ALIŞ içindir; satış tutarında
+   bu ayrım 8.2'de ele alınacak, burada davranış değiştirilmedi. */
+function sesTutarBul(d) {
+  var m = d.match(/(\d[\d.]*)\s*(tl|lira|₺)/);
+  if (m) return parseInt(m[1].replace(/\./g, ''), 10);
+  return 0;
+}
+
+/* Metinden tutarı söküp atar — açıklama/ad kalsın diye. */
+function sesTutarsiz(metin) {
+  return metin.replace(/(\d[\d.]*)\s*(tl|lira|₺)/gi, '');
+}
+
+/* SERVİS KAYDININ ALANLARI — plakadan sonra kalan cümleden. İki şema
+   okuyor (servis-ac: kayıtlı araç · yeni-arac: ruhsat bekleyen) ve
+   ikisi ayrı ekranlarda; ayrı ayrı yazılsaydı biri km'yi "88 bin"den
+   okur, öteki okumazdı. */
+function sesServisOku(c) {
+  var dk = c.dk, kalan = c.kalan;
+  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('periyodik') >= 0) ? 'bakim' : 'tamirat';
+  var km = '';
+  var kmE = dk.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
+            dk.match(/(?:km|kilometre)\s*(\d[\d.]*)\s*(bin)?/);
+  if (kmE) {
+    km = kmE[1].replace(/\./g, '');
+    if ((kmE[2] || '') === 'bin') km = String(parseInt(km, 10) * 1000);
+    km = parseInt(km, 10).toLocaleString('tr-TR');
+  }
+  var tel = sesTelefonBul(kalan);
+  /* Sahip adı: telefon ve km çıkarıldıktan sonra kalan BAŞ HARFİ BÜYÜK
+     iki kelime. Kaba ama ustanın söyleyiş sırasına uyuyor:
+     "plaka · ad soyad · telefon · iş". */
+  var adE = kalan.match(/\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\s+([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\b/);
+  var sahip = adE ? adE[0] : '';
+  var is = kalan
+    .replace(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/gi, '')
+    .replace(/(km|kilometre)\s*(\d[\d.]*)\s*(bin)?/gi, '')
+    .replace(/0\s*\d[\d\s]{9,}/g, '')
+    .replace(sahip, '')
+    .replace(/\s+/g, ' ').trim();
+  return { isTuru: isTuru, km: km, tel: tel, sahip: sahip, is: is };
+}
+
+/* İş türünün sesle söylenebilen iki hâli ("ikisi" ekranda seçilir). */
+var SES_IS_TURU = { tamirat: TUR_AD.tamirat, bakim: TUR_AD.bakim };
+
+var Islem = (function () {
+  var SEMALAR = {};
+  var GENEL = [];          /* tani'si olanlar, oncelik sırasında */
+
+  /* ---- ALAN TİPLERİ ----
+     Bir tip üç şeyi bilir: onay ekranında nasıl GÖRÜNÜR, ne zaman BOŞ
+     sayılır, modele nasıl TARİF edilir. Tip başına bir kez yazılır;
+     şemalar yalnız tipin adını söyler. */
+  var TIP = {
+    metin:   { json: { type: 'string' } },
+    /* `aracla: true` → kayıtlı aracın marka/modeli yanına yazılır:
+       usta plakadan çok aracı tanır. */
+    plaka:   { json: { type: 'string', pattern: '^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$' },
+               goster: function (v, a, o) {
+                 return a.aracla && o.arac ? v + ' · ' + o.arac.marka + ' ' + o.arac.model : v;
+               } },
+    telefon: { json: { type: 'string', description: '0 ile başlayan 11 hane' } },
+    km:      { json: { type: 'string', description: 'binlik noktalı: 88.000' },
+               goster: function (v) { return v + ' km'; } },
+    /* ⚠️ 0 = SÖYLENMEDİ (yukarıdaki sesTutarBul notu). */
+    para:    { json: { type: 'integer', description: 'Türk lirası, kuruşsuz' },
+               bos: function (v) { return !v; },
+               goster: function (v) { return tutar(v) + ' ₺'; } },
+    secim:   { json: function (a) { return { type: 'string', enum: Object.keys(a.secenek) }; },
+               goster: function (v, a) { return a.secenek[v]; } },
+    /* Açık kayıttaki bir satır. Model satırın ADINI söyler; hangi satır
+       olduğunu sistem bulur (fiyat-guncelle'nin tek aday kuralı). */
+    satir:   { json: { type: 'string', description: 'Açık kayıttaki satırın adı' },
+               goster: function (v) { return v.ad || '—'; } },
+    uzunMetin: { json: { type: 'string' } }
+  };
+
+  function bosMu(a, v) {
+    if (v === undefined || v === null || v === '') return true;
+    var t = TIP[a.tip];
+    return !!(t && t.bos && t.bos(v));
+  }
+
+  function tanim(tur, s) {
+    /* İki ekran aynı işi bildirirse hangisinin geçerli olduğu yükleme
+       sırasına kalır — sessiz bir çakışma. Patlasın ki görülsün. */
+    if (SEMALAR[tur]) throw new Error('İşlem şeması iki kez bildirildi: ' + tur);
+    s.tur = tur;
+    s.alanlar = s.alanlar || [];
+    s.baglam = s.baglam || [];
+    s.alanlar.forEach(function (a) {
+      if (a.turet) return;   /* türetilen alanın tipi yok: sistem hesaplar */
+      if (!TIP[a.tip]) throw new Error(tur + '.' + a.ad + ': tanımsız alan tipi "' + a.tip + '"');
+    });
+    SEMALAR[tur] = s;
+    if (s.tani) {
+      /* SIRA DAR OLANDAN GENİŞE — ve sıra AÇIKÇA yazılır. Şemalar ayrı
+         ekran dosyalarında durduğu için yükleme sırası tesadüftür;
+         aynı öncelik iki kez verilirse sıra yine tesadüfe kalırdı. */
+      GENEL.forEach(function (g) {
+        if (g.oncelik === s.oncelik) {
+          throw new Error('Aynı öncelik iki şemada: ' + g.tur + ' / ' + tur + ' (' + s.oncelik + ')');
+        }
+      });
+      GENEL.push(s);
+      GENEL.sort(function (a, b) { return a.oncelik - b.oncelik; });
+    }
+  }
+
+  function anlasilmadi(metin) { return { tur: 'plakasiz', metin: metin }; }
+
+  /* Bütün şemaların okuduğu ortak bağlam — metin bir kez hazırlanır. */
+  function baglamKur(metin, baglam, kayitId) {
+    var p = sesPlakaBul(metin);
+    var c = { metin: metin, d: norm(metin), p: p, baglam: baglam || 'genel',
+              kayitId: kayitId || null, kayit: kayitId ? kayitBul(kayitId) : null };
+    if (p) {
+      c.kalan = (metin.slice(0, p.indeks) + metin.slice(p.indeks + p.uzunluk))
+                .replace(/\s+/g, ' ').trim();
+      c.dk = norm(c.kalan);
+      c.arac = aracBul(p.plaka);
+    }
+    return c;
+  }
+
+  function kendiSemalari(baglam) {
+    return Object.keys(SEMALAR).map(function (k) { return SEMALAR[k]; })
+      .filter(function (s) { return s.baglam.indexOf(baglam) >= 0; })
+      .sort(function (a, b) { return (a.oncelik || 0) - (b.oncelik || 0); });
+  }
+
+  function genelCozumle(c) {
+    for (var i = 0; i < GENEL.length; i++) {
+      var r = GENEL[i].tani(c);
+      if (r) return r;
+    }
+    return anlasilmadi(c.metin);
+  }
+
+  /* Bir sonuç, bağlamın kendi işini ÖNERİYE düşürecek kadar güçlü mü.
+     "Anlaşılmadı" değildir; bazı şemalar kendini zayıf ilan eder. */
+  function gucluMu(o) {
+    var s = o && SEMALAR[o.tur];
+    return !!(s && s.guclu !== false);
+  }
+
+  /* ---- DOLDURMA ----
+     1) Bağlamın kendi işleri, kendi sıralarıyla (dar olan önce).
+     2) Genel yol — bütün şemalar, öncelik sırasıyla.
+     3) Bağlamın VARSAYILAN işi: genel yol güçlü bir iş bulduysa o asıl
+        olur, varsayılan ÖNERİ olarak durur ("bunu mu demek istedin" —
+        7.3); bulamadıysa varsayılan asıl olur.
+     Kural Tur 7'de yalnız kayıt ekranı için elle yazılmıştı; artık
+     varsayılan işi olan HER bağlam için aynı yoldan geçiyor. */
+  function cozumle(metin, baglam, kayitId) {
+    var c = baglamKur(metin, baglam, kayitId);
+    var kendi = kendiSemalari(c.baglam);
+    var varsayilan = null;
+    for (var i = 0; i < kendi.length; i++) {
+      var s = kendi[i];
+      if (s.varsayilan) { varsayilan = varsayilan || s; continue; }
+      var r = s.baglamda ? s.baglamda(c) : null;
+      if (r) return r;
+    }
+    var yedek = varsayilan && varsayilan.baglamda ? varsayilan.baglamda(c) : null;
+    var genel = genelCozumle(c);
+    if (!yedek) return genel;
+    if (gucluMu(genel)) { genel.baskaIslem = yedek; return genel; }
+    return yedek;
+  }
+
+  /* ---- ONAY EKRANININ MODELİ — şemadan üretilir ----
+     Satırlar alan sırasıyla gelir. `sor: true` olan alan satır olmaz;
+     onay ekranında ustaya SORULUR (çip ya da metin kutusu) ve cevabı
+     işleme geri yazılır. */
+  function deger(o, x) {
+    return typeof x === 'function' ? x(o) : x;
+  }
+
+  function ozet(o) {
+    var s = o && SEMALAR[o.tur];
+    if (!s) return null;
+    var satirlar = [], sorulan = [];
+    s.alanlar.forEach(function (a) {
+      if (a.ozette === false) return;
+      if (a.sor) { sorulan.push(a); return; }
+      var v = a.turet ? a.turet(o) : o[a.ad];
+      var metin;
+      if (a.goster) metin = a.goster(o);
+      else if (a.turet) metin = v;
+      else if (bosMu(a, v)) {
+        if (a.bosGizle) return;
+        metin = a.bos !== undefined ? a.bos : '—';
+      } else {
+        var t = TIP[a.tip];
+        metin = t.goster ? t.goster(v, a, o) : v;
+        if ((metin === undefined || metin === null || metin === '') && a.bos !== undefined) metin = a.bos;
+      }
+      satirlar.push([a.etiket, metin]);
+    });
+    return {
+      baslik: deger(o, s.baslik),
+      satirlar: satirlar,
+      sorulan: sorulan,
+      notice: deger(o, s.notice) || '',
+      eylem: deger(o, s.eylem),
+      eylem2: deger(o, s.eylem2) || ''
+    };
+  }
+
+  function uygula(o) {
+    var s = o && SEMALAR[o.tur];
+    if (!s || !s.uygula) { balon('Bu iş yapılamıyor.', false, 2600); return; }
+    s.uygula(o);
+  }
+
+  /* Bir iş, açıldığı bağlamın kendi işi mi — "Kayda dön" teklifi
+     yalnız BAŞKA bir ekrana götüren işler için çıkar (7.4). */
+  function kendiIsiMi(tur, baglam) {
+    var s = SEMALAR[tur];
+    return !!(s && s.baglam.indexOf(baglam) >= 0);
+  }
+
+  /* ---- MODELE TARİF — araç tanımı biçiminde ----
+     Türetilen alanlar (toplam, alıcı listesi…) modelin değil sistemin
+     işidir; tarife girmez. */
+  function json() {
+    return Object.keys(SEMALAR).sort().map(function (tur) {
+      var s = SEMALAR[tur], ozellik = {}, zorunlu = [];
+      s.alanlar.forEach(function (a) {
+        if (a.turet) return;
+        var t = TIP[a.tip].json;
+        var j = typeof t === 'function' ? t(a) : JSON.parse(JSON.stringify(t));
+        j.description = a.etiket + (j.description ? ' — ' + j.description : '');
+        ozellik[a.ad] = j;
+        if (a.zorunlu) zorunlu.push(a.ad);
+      });
+      return {
+        name: tur,
+        description: (typeof s.baslik === 'string' ? s.baslik : s.tarif || tur) +
+                     ' · ekran: ' + s.ekran,
+        input_schema: { type: 'object', properties: ozellik, required: zorunlu }
+      };
+    });
+  }
+
+  return {
+    tanim: tanim, cozumle: cozumle, ozet: ozet, uygula: uygula,
+    kendiIsiMi: kendiIsiMi, json: json, anlasilmadi: anlasilmadi,
+    sema: function (tur) { return SEMALAR[tur] || null; },
+    turler: function () { return Object.keys(SEMALAR).sort(); }
+  };
+})();
+
+/* Denetim ve değerlendirme dışarıdan okuyabilsin. */
+window.ISLEM_SEMALARI = function () { return Islem.json(); };
+
+
 /* ===== ekran: 10-home.html ===== */
 (function () {
 Ekran.tanim('home', {
@@ -7907,473 +8231,39 @@ function sesSayilariCevir(metin) {
   return cikti.join('').replace(/\s+/g, ' ').trim();
 }
 
-/* ⚠️ Birleştirme ÇÖZÜMLEMENİN GİRİŞİNDE bir kez yapılır, burada
-   değil: indeks/uzunluk döndüren bir fonksiyon metni değiştirirse,
-   çağıran taraf ORİJİNAL metni yanlış yerden keser. */
-function sesPlakaBul(metin) {
-  var m = metin.toLocaleUpperCase('tr')
-               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
-  if (!m) return null;
-  return { plaka: m[1] + ' ' + m[2] + ' ' + m[3], indeks: m.index, uzunluk: m[0].length };
-}
+/* ================= ÇÖZÜMLEME → ŞEMA (Tur 8.3 · 12.10) =================
+   Bu ekran artık hiçbir işi TANIMIYOR. Yaptığı iki şey kaldı:
+     1) tanıma motorunun bozuk metnini düzeltmek (harf · sayı — yukarıda)
+     2) metni, bağlamı ve açık kaydı şema sistemine vermek
+   İşleri, işin SAHİBİ ekran bildiriyor (`Islem.tanim`, betik/04-islem.js):
+     kayıt · teslim · araç · ruhsat · mesaj · muhasebe · araçlar.
 
-function sesTelefonBul(metin) {
-  var m = metin.replace(/\s/g, '').match(/0\d{10}/);
-  if (!m) return null;
-  var t = m[0];
-  return t.slice(0, 4) + ' ' + t.slice(4, 7) + ' ' + t.slice(7, 9) + ' ' + t.slice(9);
-}
+   ÖNCESİ (rakamla): çözümleyici zincirinde 15 `return {tur…}`, onay
+   ekranında 12, uygulamada 12 elle yazılmış `o.tur ===` dalı — üç yerde
+   aynı 12 iş (+ "anlaşılmadı"). Şimdi bu dosyada işe özgü dal SIFIR. Yeni bir iş eklemek
+   bir şema yazmaktır; ses ekranına dokunulmaz.
 
-function sesTutarBul(d) {
-  /* "2400 TL", "850 lira", "iki bin dört yüz" değil — rakam bekliyoruz.
-     Motor Türkçe sayıyı rakama çeviriyor; çevirmezse usta düzeltir. */
-  var m = d.match(/(\d[\d.]*)\s*(tl|lira|₺)/);
-  if (m) return parseInt(m[1].replace(/\./g, ''), 10);
-  return 0;
-}
-
-/* KANAL: söylenmediyse WhatsApp (WHATSAPP.md A yolu — bedava ve
-   kurulumsuz). SMS parayla ve İYS kaydı istiyor; varsayılan olamaz. */
-function sesKanali(d) {
-  if (d.indexOf('sms') >= 0) return 'sms';
-  return 'whatsapp';
-}
-
-/* TOPLU MU — *"tüm müşterilere"*, *"bütün müşterilere"*, *"herkese"*.
-   ⚠️ Türkçede kelime sınırı aranmaz (K-018); "tum musteri" gibi İKİ
-   KELİMELİK bir dizi aranıyor — "müşteri" tek başına her cümlede
-   geçebilir ve tek kelimeye bakmak her mesajı toplu sanmaya götürürdü. */
-function sesTopluMu(d) {
-  return d.indexOf('tum musteri') >= 0 || d.indexOf('butun musteri') >= 0 ||
-         kelimeVarMi(d, ['herkese', 'hepsine']);
-}
-
+   ⚠️ PLAKA / TUTAR / TELEFON OKUYUCULARI çekirdeğe (04-islem.js) taşındı:
+   şemalar başka ekranlarda duruyor ve ekran betikleri birbirini
+   göremez (her biri kendi IIFE'sinde). */
 function sesCozumle(c) {
   /* Ham metnin düzeltmeleri BURADA, tek giriş noktasında: harf harf
      söylenen plaka birleşiyor, kelimeyle söylenen sayı rakama
      dönüyor. Böylece bütün indeksler aynı metne göre. */
   var metin = sesSayilariCevir(sesHarfleriBirlestir((c || '').trim()));
-  var d = norm(metin);
-  var p = sesPlakaBul(metin);
-  var baglam = SESLI_NIYET || 'genel';
-
-  /* --- AÇIK KAYDA SATIR (Cemil: "servis kaydı açıkken yine sesli
-         işlem yapabilir, balata örneği gibi") --- */
-  if (baglam === 'kayit-icinde' && ACIK_KAYIT) {
-    var acikK = kayitBul(ACIK_KAYIT);
-    var tutarR = sesTutarBul(d);
-    var iscilikMi = d.indexOf('iscilik') >= 0;
-    /* kelimeleriAt kullanılıyor, \b DEĞİL: /\bde\b/ "değişecek"i
-       "ğişecek" yapıyordu (çekirdekteki uyarıya bak). */
-    var ad = kelimeleriAt(metin.replace(/(\d[\d.]*)\s*(tl|lira|₺)/gi, ''),
-                          ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
-                           'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
-                           'güncelle', 'guncelle']);
-
-    /* ⚠️ 14.09 — AÇIK KAYITTA SES ÜÇ İŞ YAPIYOR (Cemil: "Yeni işlemler
-       için sesli olarak söyleyebilir. Bunlar parça olabilir, işçilik
-       olabilir. Fiyat güncellenebilir. Teslime edilebilir.").
-
-       SIRA DAR OLANDAN GENİŞE: teslim → fiyat güncelleme → satır ekleme.
-       Ters sırada olsaydı "teslim ettim nakit aldım" cümlesi kayda
-       "teslim ettim" diye bir satır eklerdi. */
-    if (acikK && d.indexOf('teslim') >= 0 && !acikK.teslimTarihi) {
-      var odemeYolu = d.indexOf('nakit') >= 0 ? 'nakit'
-                    : d.indexOf('kart') >= 0 ? 'kart'
-                    : d.indexOf('havale') >= 0 ? 'havale' : null;
-      return { tur: 'teslim', plaka: acikK.plaka, arac: aracBul(acikK.plaka),
-               kayit: acikK, odeme: odemeYolu };
-    }
-
-    /* FİYAT GÜNCELLEME — söylenen ad VAR OLAN bir satıra uyuyorsa.
-       "yağ filtresi 300 lira" iki şey demek olabilir: yeni satır ya da
-       duran satırın fiyatı. Ayırt eden şey kaydın kendisi.
-
-       ⚠️ TEK ADAY KURALI (A-M27'nin aynısı): iki satır birden uyuyorsa
-       hangisi olduğunu bilmiyoruz demektir — o zaman güncelleme YOK,
-       yeni satır eklenir ve usta görür. Tahmin etmek, ustanın
-       yazdığı rakamı sessizce değiştirmenin yoludur. */
-    if (acikK && tutarR && ad) {
-      var adN = norm(ad);
-      var uyan = [];
-      (acikK.satirlar || []).forEach(function (s, i) {
-        var sN = norm(s.ad || '');
-        if (sN.length < 3 || adN.length < 3) return;
-        if (sN === adN || sN.indexOf(adN) >= 0 || adN.indexOf(sN) >= 0) {
-          uyan.push({ satir: s, indeks: i });
-        }
-      });
-      if (uyan.length === 1) {
-        return { tur: 'fiyat-guncelle', kayit: acikK, indeks: uyan[0].indeks,
-                 satir: uyan[0].satir, fiyat: tutarR };
-      }
-    }
-
-    /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
-       yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
-    var satirIslemi = { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
-             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: tutarR };
-
-    /* ⚠️ BU DAL BİR ÇÖPLÜKTÜ (16.09 — Cemil: "Kullanıcı farklı ekranda
-       farklı bir işlem yapmak isteyebilir. Google aramada olduğu gibi
-       'bunu mu demek istediniz' diye yönlendirebilelim.").
-
-       Önce kayıt açıkken SÖYLENEN HER CÜMLE satır oluyordu:
-         "servistekileri göster"        -> adı bu olan bir PARÇA
-         "34 ABC 123 sahibine selam at" -> adı bu olan bir PARÇA
-         "bugün ne kadar tahsilat"      -> adı bu olan bir PARÇA
-       Usta onaylarsa kayda saçma bir satır giriyor; onaylamazsa
-       istediği iş hiç yapılmıyor. İkisi de sessiz.
-
-       Artık cümle GENEL yola da veriliyor. Orada tanınmış bir iş
-       çıkarsa o asıl olur ve satır ekleme ÖNERİ olarak sunulur —
-       kendiliğinden bağlam değiştirmiyoruz, SORUYORUZ. */
-    var genelIslem = sesGenel(metin, d, p, 'genel');
-    if (genelIslem && SES_GUCLU_TUR.indexOf(genelIslem.tur) >= 0) {
-      genelIslem.baskaIslem = satirIslemi;
-      return genelIslem;
-    }
-    return satirIslemi;
-  }
-
-  return sesGenel(metin, d, p, baglam);
+  return Islem.cozumle(metin, SESLI_NIYET || 'genel', ACIK_KAYIT);
 }
 
-/* Bağlamdan BAĞIMSIZ çözümleme. Ayrı bir fonksiyon oldu ki kayıt
-   içindeki dal da ona sorabilsin: aynı cümle iki yerde iki ayrı
-   şekilde anlaşılmasın (tek yol, tek sonuç — A-M27'nin kuralı). */
-var SES_GUCLU_TUR = ['mesaj-gonder', 'toplu-mesaj', 'ara', 'tahsilat-sor',
-  'gider-ekle', 'teslim', 'servis-ac', 'yeni-arac', 'bilinmeyen-arac'];
+/* ⚠️ ÖNERİ ÖZETİN İÇİNDE DEĞİL, KENDİ DÜĞMESİNDE (14.09). Satır olarak
+   yazılsaydı ("Benziyor: 34 ABC 123") usta okur ve ne yapacağını
+   bilemezdi. Soru bir düğmedir: dokunursan düzeltilir, dokunmazsan ekran
+   olduğu gibi kalır. sesCiz `o.oneri`yi görünce çiziyor. */
 
-function sesGenel(metin, d, p, baglam) {
-  /* ⚠️ `baglam` PARAMETRE OLARAK GEÇİYOR. Ayırma sırasında bunu
-     unutmuştum: genel yol `baglam`ı sesCozumle'nin yerel değişkeni
-     olarak kullanıyordu, ayrılınca ReferenceError atıyor ve hata
-     sessizce yutuluyordu — öneri hiç çıkmıyordu, sebebi de görünmüyordu.
-     Kayıt içinden çağrılırken 'genel' veriliyor: orada bağlam zaten
-     "bu ekran değil" demek. */
-  baglam = baglam || 'genel';
-  /* --- TAHSİLAT SORUSU (14.09) ---
-     Ekranın kendi örneği *"bugün ne kadar tahsil ettim"* diyordu ve
-     çözümleyicide karşılığı YOKTU — 45. test yakaladı. Örneği silmek
-     de bir seçenekti; soru tamircinin DÖRDÜNCÜ işinin ta kendisi
-     (*"teslimde ödemeyi nasıl aldığını bilmek"*) ve cevabı zaten
-     kayıtlı veriden çıkıyor. Yeni alan istemeyen bir soru, yeni
-     özellik değil — var olanın sesle sorulması.
-
-     ⚠️ TUTAR VARSA BU BİR SORU DEĞİL, GİDER GİRİŞİDİR: "2400 TL
-     elektrik faturası" cümlesi buraya düşmesin diye tutar kontrolü
-     başta duruyor. */
-  if (!sesTutarBul(d) && (d.indexOf('tahsil') >= 0 || d.indexOf('kasa') >= 0)) {
-    var sorulanDonem = (d.indexOf('bugun') >= 0) ? 'bugun'
-                     : (d.indexOf('yil') >= 0) ? 'yil'
-                     : (d.indexOf('ay') >= 0) ? 'ay' : 'bugun';
-    return { tur: 'tahsilat-sor', donem: sorulanDonem };
-  }
-
-  /* --- GİDER EKLE --- */
-  if (d.indexOf('gider') >= 0 || d.indexOf('fatura') >= 0 || d.indexOf('kira') >= 0 ||
-      (baglam === 'muhasebe' && sesTutarBul(d))) {
-    var t = sesTutarBul(d);
-    if (t) {
-      var aciklama = kelimeleriAt(metin.replace(/(\d[\d.]*)\s*(tl|lira|₺)/gi, ''),
-                                  ['ekle', 'gider', 'olarak', 'için', 'icin']);
-      return { tur: 'gider-ekle', tutar: t, aciklama: aciklama || 'Gider' };
-    }
-  }
-
-  /* --- MESAJ GÖNDER --- */
-  /* "yaz" KELİME OLARAK aranıyor: "beyaz" içinde geçiyordu ve
-     "34 ABC 123 beyaz araba geldi" mesaj sanılıyordu (K-018). */
-  /* ⚠️ 14.09 — DEĞERLENDİRME SETİ İKİ EKSİK BULDU (ses-seti.json).
-     `sms`  : *"herkese sms at yarın kapalıyız"* hiç anlaşılmıyordu —
-              cümlede mesaj/whatsapp/yaz/gönder yok, ama "sms" tek
-              başına yeterince ayırt edici (başka kelimenin içine
-              düşmüyor).
-     `sahibine`: *"...sahibine parça bekliyoruz de"* servis kaydı
-              sanılıyordu. Türkçe burada işi kolaylaştırıyor —
-              **"sahibine" yönelme hâli (mesaj), "sahibini" belirtme
-              hâli (arama)**; ikisi ayrı kelime, eşitlikle ayrılıyor
-              (K-018: boşluktan böl, eşitlikle karşılaştır). */
-  var mesajKomutu = (d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
-                     d.indexOf('sms') >= 0 ||
-                     kelimeVarMi(d, ['yaz', 'yazdir', 'sahibine']) ||
-                     d.indexOf('gonder') >= 0);
-
-  /* ⚠️ TOPLU MESAJ (14.09) — Cemil: *"Mesela tüm müşterilere bayram
-     mesajı gönder diyecek sesli olarak. Uygun bir bayram mesajı bulacak
-     ve onay ekranı ile SMS yada WhatsApp üzerinden mesaj gönderecek."*
-
-     TEK MESAJDAN ÖNCE BAKILIYOR çünkü cümlede plaka YOK; plakasız bir
-     mesaj komutu bugüne kadar sessizce düşüyordu.
-
-     ⚠️ Bu özellik K-045.2 ile ÇELİŞİYOR: orada *"kampanya bu fazda
-     yazılmaz"* demiştim, gerekçesi de sağlamdı (izin yok · toplu
-     gönderim ustanın WhatsApp numarasını riske atıyor). Cemil kapsamı
-     genişletti — onun sözü kazanır (CLAUDE.md). Gerekçe silinmedi:
-     onay ekranı riski YAZIYOR ve prototip hiçbir şey göndermiyor. */
-  if (mesajKomutu && sesTopluMu(d)) {
-    var hzT = hazirMetinBul(metin);
-    /* Hazır metin tanınmadıysa söylenen cümlenin kalanı metin olur —
-       usta "tüm müşterilere yarın kapalıyız yaz" diyebilir. */
-    var kalanT = kelimeleriAt(metin, ['tüm', 'tum', 'bütün', 'butun', 'herkese',
-      'hepsine', 'müşterilere', 'musterilere', 'müşteriye', 'musteriye',
-      'mesaj', 'mesajı', 'mesaji', 'gönder', 'gonder', 'at', 'yaz',
-      'whatsapp', 'sms', 'üzerinden', 'uzerinden', 'ile']);
-    if (!hzT && !kalanT) return { tur: 'plakasiz', metin: metin };
-    return { tur: 'toplu-mesaj', metinTuru: hzT ? hzT.k : 'serbest',
-             govde: hzT ? hzT.metin : kalanT, kanal: sesKanali(d) };
-  }
-
-  if (mesajKomutu && p) {
-    var ar = aracBul(p.plaka);
-    /* Plaka kayıtlı değil: yanlış duyulmuş olabilir (A-M27). Öneri
-       varsa onay ekranı SORAR; yoksa bugünkü davranış aynen sürer. */
-    if (!ar) return { tur: 'bilinmeyen-arac', plaka: p.plaka,
-                      oneri: benzerPlaka(p.plaka) };
-    /* ŞABLON: önce adı söylenen hazır metin, sonra iş şablonları.
-       "selam mesajı" bir şablon adı değil ama ustanın söylediği şey. */
-    var hz = hazirMetinBul(metin);
-    /* "parça bekliyoruz" şablonu da adıyla söylenebiliyor — değerlendirme
-       seti 28. cümlede bunu sordu ve motor cevaplayamıyordu. */
-    var sablon = hz ? hz.k
-               : d.indexOf('hatirlatma') >= 0 ? 'hatirlatma'
-               : d.indexOf('bekliyor') >= 0 ? 'bekliyor'
-               : d.indexOf('hazir') >= 0 ? 'hazir'
-               : d.indexOf('teslim') >= 0 ? 'teslim' : 'ozet';
-    return { tur: 'mesaj-gonder', plaka: p.plaka, arac: ar, sablon: sablon,
-             kanal: sesKanali(d),
-             /* Metin ŞİMDİ üretiliyor ve onay ekranında GÖRÜNÜYOR —
-                usta neyi gönderdiğini gönderMEDEN önce okuyor. */
-             govde: mesajMetniUret(p.plaka, sablon) };
-  }
-
-  /* --- ARAMA --- */
-  /* ⚠️ ÜÇ KOMUT KELİMESİ DE KELİME OLARAK ARANIYOR (K-018, 04.09).
-     Önce " ara" diye İÇİNDE aranıyordu ve "yeni ARAÇ" bunu tutuyordu;
-     "GÖSTERGE paneli" de "göster"i tutuyordu. Usta aracını tarif
-     edince program arama yapıyordu. */
-  if (kelimeVarMi(d, ['ara', 'bul', 'goster']) ||
-      ['araclar', 'kayitlar', 'musteriler'].indexOf(baglam) >= 0) {
-    /* \b DEĞİL: /\bara\b/ deseni "araç" kelimesini "ç"ye indiriyordu. */
-    var terim = kelimeleriAt(metin,
-      ['ara', 'bul', 'göster', 'goster', 'sahibini', 'sahibi', 'aracını', 'aracini']);
-    var hedef = baglam === 'musteriler' ? 'musteriler'
-              : baglam === 'kayitlar' ? 'kayitlar' : 'araclar';
-    /* "34 ABC 123 sahibini ara" — müşteriye plakadan gidilir. */
-    if (p && d.indexOf('sahib') >= 0) {
-      var a2 = aracBul(p.plaka);
-      terim = a2 && a2.sahipAd ? a2.sahipAd : p.plaka;
-      hedef = 'musteriler';
-    }
-    /* ⚠️ 14.09 — "SERVİSTEKİLER" BURADA YOKTU VE ÖRNEK ÇİP ÇALIŞMIYORDU.
-       Cemil: *"Servis kayıtları listesinde sesli olarak servistekileri
-       göster seçeneğini seçtim ama sonuç bulunamadı çıktı."*
-
-       Sebep: 07.09'da *"içeride"* kelimesi **"serviste"** oldu (K-046'nın
-       turu) ve ekranların hepsi güncellendi — ama çözümleyici hâlâ
-       yalnız `iceridek` arıyordu. Örnek çip *"servistekileri göster"*
-       diyordu; cümle süzgece değil DÜZ ARAMAYA düşüyor, arama kutusuna
-       "servistekileri" yazılıyor ve liste boş dönüyordu.
-
-       Bir terimi değiştirmek, o terimi ARAYAN yerleri de değiştirmektir.
-       Örnek çipin kendisi negatif testti ve kimse dokunmamıştı —
-       45. test (ORNEK-CUMLE) artık her örneği işletiyor. */
-    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0) {
-      return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'serviste' };
-    }
-    if (terim) return { tur: 'ara', hedef: hedef, terim: terim };
-  }
-
-  if (!p) return { tur: 'plakasiz', metin: metin };
-
-  var plaka = p.plaka;
-  var kalan = (metin.slice(0, p.indeks) + metin.slice(p.indeks + p.uzunluk))
-              .replace(/\s+/g, ' ').trim();
-  var dk = norm(kalan);
-  var arac = aracBul(plaka);
-
-  /* --- TESLİM --- */
-  if (dk.indexOf('teslim') >= 0 && arac) {
-    var acik = icerideki().filter(function (k) { return k.plaka === plaka; })[0];
-    if (!acik) return { tur: 'teslim-edilecek-kayit-yok', plaka: plaka, arac: arac };
-    var yol = dk.indexOf('nakit') >= 0 ? 'nakit'
-            : dk.indexOf('kart') >= 0 ? 'kart'
-            : dk.indexOf('havale') >= 0 ? 'havale' : null;
-    return { tur: 'teslim', plaka: plaka, arac: arac, kayit: acik, odeme: yol };
-  }
-
-  /* --- SERVİS KAYDI (kayıtlı ya da yeni araç) --- */
-  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('periyodik') >= 0) ? 'bakim' : 'tamirat';
-  var km = '';
-  var kmE = dk.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
-            dk.match(/(?:km|kilometre)\s*(\d[\d.]*)\s*(bin)?/);
-  if (kmE) {
-    km = kmE[1].replace(/\./g, '');
-    if ((kmE[2] || '') === 'bin') km = String(parseInt(km, 10) * 1000);
-    km = parseInt(km, 10).toLocaleString('tr-TR');
-  }
-  var tel = sesTelefonBul(kalan);
-  /* Sahip adı: telefon ve km çıkarıldıktan sonra kalan BAŞ HARFİ BÜYÜK
-     iki kelime. Kaba ama ustanın söyleyiş sırasına uyuyor:
-     "plaka · ad soyad · telefon · iş". */
-  var adE = kalan.match(/\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\s+([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\b/);
-  var sahip = adE ? adE[0] : '';
-
-  var is = kalan
-    .replace(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/gi, '')
-    .replace(/(km|kilometre)\s*(\d[\d.]*)\s*(bin)?/gi, '')
-    .replace(/0\s*\d[\d\s]{9,}/g, '')
-    .replace(sahip, '')
-    .replace(/\s+/g, ' ').trim();
-
-  if (!arac) {
-    /* Aynı tuzak burada da var (A-M27): yanlış duyulan bir harf,
-       kayıtlı aracı "yeni araç" yapıp ustayı ruhsat çekmeye gönderir. */
-    return { tur: 'yeni-arac', plaka: plaka, sahip: sahip, tel: tel,
-             is: is, isTuru: isTuru, km: km, oneri: benzerPlaka(plaka) };
-  }
-  return { tur: 'servis-ac', plaka: plaka, arac: arac, isTuru: isTuru, km: km, is: is };
-}
-
-/* ================= ANLAŞILANI YAZIYLA GÖSTER ================= */
-function sesOzet(o) {
-  if (o.tur === 'servis-ac') return {
-    baslik: 'Servis kaydı açılacak',
-    satirlar: [['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model],
-               ['İş türü', TUR_AD[o.isTuru]],
-               ['Ne istiyor', o.is || '— (sonra yazılır)']]
-              .concat(o.km ? [['Kilometre', o.km + ' km']] : []),
-    eylem: 'Kaydı aç' };
-
-  if (o.tur === 'yeni-arac') return {
-    baslik: 'Yeni araç — önce ruhsat',
-    satirlar: [['Plaka', o.plaka],
-               ['Sahibi', o.sahip || '— (ruhsattan gelecek)'],
-               ['Telefon', o.tel || '— (ruhsatta yazmaz)'],
-               ['Ne istiyor', o.is || '—']],
-    eylem: 'Ruhsatı çek',
-    notice: 'Bu araç kayıtlı değil. Söylediklerin ruhsat ekranına yazıldı; ' +
-            'ruhsatı çekince marka, model ve motor kendiliğinden dolar.' };
-
-  if (o.tur === 'teslim') return {
-    baslik: 'Araç teslim edilecek',
-    satirlar: [['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model],
-               ['Tutar', tutar(kayitToplami(o.kayit)) + ' ₺'],
-               ['Ödeme', o.odeme ? ODEME_AD_SES[o.odeme] : '— (teslim ekranında seçilecek)']],
-    eylem: o.odeme ? 'Teslim et' : 'Teslim ekranını aç' };
-
-  if (o.tur === 'satir-ekle') return {
-    baslik: 'Açık kayda satır eklenecek',
-    satirlar: [['Tür', o.tip === 'iscilik' ? 'İşçilik' : 'Parça'],
-               ['Ne', o.ad],
-               ['Tutar', o.fiyat ? tutar(o.fiyat) + ' ₺' : '— (sonra yazılır)']],
-    eylem: 'Satırı ekle' };
-
-  /* SORUNUN CEVABI ONAY EKRANINDA. Muhasebeyi açıp ustayı rakamı
-     aramaya bırakmak, sorduğu şeyi cevaplamamaktır. */
-  if (o.tur === 'tahsilat-sor') return {
-    baslik: donemAdi(o.donem) + ' tahsilat',
-    satirlar: [['Tahsil edilen', tutar(tahsilatToplami(o.donem)) + ' ₺'],
-               ['Alacak (veresiye)', tutar(veresiyeToplami()) + ' ₺']],
-    eylem: 'Muhasebeyi aç' };
-
-  if (o.tur === 'fiyat-guncelle') return {
-    baslik: 'Satırın fiyatı değişecek',
-    satirlar: [['Ne', o.satir.ad || '—'],
-               ['Şimdiki', o.satir.fiyat ? tutar(o.satir.fiyat) + ' ₺' : '— (boş)'],
-               ['Yeni', tutar(o.fiyat) + ' ₺']],
-    eylem: 'Fiyatı güncelle' };
-
-  if (o.tur === 'gider-ekle') return {
-    baslik: 'Gider eklenecek',
-    satirlar: [['Açıklama', o.aciklama], ['Tutar', tutar(o.tutar) + ' ₺'],
-               ['Tarih', bugunMetin()]],
-    eylem: 'Gideri ekle' };
-
-  /* ⚠️ 14.09 — ONAY EKRANI ARTIK GÖNDERİYOR (Cemil: "Buradan mesaj
-     sesli olarak gönderebilmeliyiz." + "Burada da bir onay ekranı
-     gerekli.").
-
-     Eskiden sesli yol mesaj ekranını AÇIYORDU: usta söylüyor, ekran
-     açılıyor, bir kez daha gönder düğmesine basıyordu. Onay ekranı
-     zaten bir onaydı; ikinci onay, aynı soruyu iki kez sormaktı.
-
-     GÖNDERİLECEK METİN BURADA VE DÜZENLENEBİLİR: usta neyi gönderdiğini
-     gönderMEDEN önce okuyor. "Ekranda aç" duruyor — özet linkine
-     bakmak ya da hedefi değiştirmek isteyen oraya gider (ölü uç yok). */
-  if (o.tur === 'mesaj-gonder') {
-    var hd = mesajHedefi(o.plaka);
-    return {
-      baslik: 'Mesaj gönderilecek',
-      satirlar: [['Kime', (hd && hd.ad ? hd.ad : 'sahip yazılmamış') +
-                          (hd && hd.tel ? ' · ' + hd.tel : ' · telefon yok')],
-                 ['Araç', o.plaka],
-                 ['Ne', SABLON_AD[o.sablon] || 'Mesaj']],
-      kanal: true, metin: true,
-      notice: (hd && hd.tel) ? '' :
-        'Bu aracın telefonu yok — mesaj gönderilemez. "Ekranda aç" ile ' +
-        'numarayı ekleyebilirsin.',
-      eylem: (hd && hd.tel) ? 'Gönder' : 'Ekranda aç',
-      eylem2: (hd && hd.tel) ? 'Ekranda aç' : '' };
-  }
-
-  if (o.tur === 'toplu-mesaj') {
-    var alici = topluAlicilar();
-    return {
-      baslik: alici.length + ' müşteriye mesaj',
-      /* KİMLERE GİDİYOR, ADLARIYLA. "3 müşteri" demek yetmiyordu:
-         toplu gönderim geri alınamaz ve usta onayladığı şeyi
-         görmeli. Üçten fazlası satırı şişirir, sayıyla söyleniyor. */
-      satirlar: [['Kime', alici.length
-                    ? alici.slice(0, 3).map(function (x) { return x.ad; }).join(', ') +
-                      (alici.length > 3 ? ' +' + (alici.length - 3) : '')
-                    : 'telefonu olan müşteri yok'],
-                 ['Kaç kişi', alici.length + ' müşteri'],
-                 ['Ne', SABLON_AD[o.metinTuru] || 'Serbest mesaj']],
-      kanal: true, metin: true,
-      /* ⚠️ RİSK ONAY EKRANINDA YAZILI (K-045.2). Toplu gönderim,
-         ustanın KENDİ WhatsApp numarasından yapılırsa Meta'nın
-         şartlarına aykırı ve numara engellenebilir — engellenirse
-         yalnız kampanya değil, özet ve bakım hatırlatması da durur.
-         İzinsiz ticari ileti ayrıca cezalı. Cemil kapsamı genişletti;
-         gerekçeyi silmek yerine ustanın gözüne yazdım. */
-      notice: 'Toplu mesaj, izin vermiş müşterilere gönderilmelidir. ' +
-              'Kendi numaranızdan toplu gönderim, numaranızın ' +
-              'engellenmesine yol açabilir.',
-      eylem: alici.length ? 'Onayla ve gönder' : 'Telefonu olan müşteri yok' };
-  }
-
-  if (o.tur === 'ara') return {
-    baslik: 'Aranacak',
-    satirlar: [['Nerede', ({ araclar: 'Araçlar', kayitlar: 'Servis kayıtları',
-                             musteriler: 'Müşteriler' })[o.hedef]],
-               ['Ne', o.terim || 'servistekiler']],
-    eylem: 'Ara' };
-
-  if (o.tur === 'bilinmeyen-arac') return {
-    baslik: 'Bu araç kayıtlı değil',
-    satirlar: [['Duyulan plaka', o.plaka]], eylem: 'Ruhsatı çek' };
-
-  /* ⚠️ ÖNERİ ÖZETİN İÇİNDE DEĞİL, KENDİ DÜĞMESİNDE (14.09). Satır
-     olarak yazılsaydı ("Benziyor: 34 ABC 123") usta okur ve ne
-     yapacağını bilemezdi. Soru bir düğmedir: dokunursan düzeltilir,
-     dokunmazsan ekran olduğu gibi kalır. sesCiz `o.oneri`yi görünce
-     çiziyor; işlemdeki `oneri` alanı çözümleyiciden geliyor. */
-
-  if (o.tur === 'teslim-edilecek-kayit-yok') return {
-    baslik: 'Bu araç zaten serviste değil',
-    satirlar: [['Araç', o.plaka + ' · ' + o.arac.marka + ' ' + o.arac.model]],
-    eylem: 'Aracın geçmişini aç' };
-
-  return null;
-}
-
-var ODEME_AD_SES = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale' };
-/* ⚠️ 14.09 — ŞABLON ADLARI BURADAN KALKTI, veri katmanına taşındı
-   (SABLON_AD). Burada kendi kopyası vardı ve adlar mesaj ekranındaki
-   çiplerle AYNI DEĞİLDİ: onay ekranı "Yapılan işin özeti" diyor, çip
-   "İşin özeti" diyordu — usta iki ekranda iki ad görüyordu. */
+/* ⚠️ 14.09 — ŞABLON ADLARI veri katmanında (SABLON_AD). Burada kendi
+   kopyası vardı ve adlar mesaj ekranındaki çiplerle AYNI DEĞİLDİ — usta
+   iki ekranda iki ad görüyordu. 12.10'da ödeme adları da aynı yoldan
+   gitti: ses ekranının ODEME_AD_SES kopyası kalktı, teslim şeması
+   ODEME_ETIKET'ten okuyor. */
 
 /* ================= UYGULA ================= */
 /* ⚠️ BAĞLAM DIŞI İŞ BİTİNCE KAYDA DÖNÜŞ (16.09 — 7.4).
@@ -8395,8 +8285,9 @@ var ODEME_AD_SES = { nakit: 'Nakit', kart: 'Kart', havale: 'Havale' };
 function sesDonusHedefi(o) {
   if (SESLI_NIYET !== 'kayit-icinde' || !ACIK_KAYIT) return null;
   /* Kaydın kendi işleri zaten kayıtta kalıyor; teklif yalnız BAŞKA
-     bir ekrana götüren işler için. */
-  if (['satir-ekle', 'fiyat-guncelle', 'teslim'].indexOf(o.tur) >= 0) return null;
+     bir ekrana götüren işler için. "Kendi işi" listesi artık burada
+     elle tutulmuyor — şema hangi bağlamın işi olduğunu kendisi söylüyor. */
+  if (Islem.kendiIsiMi(o.tur, SESLI_NIYET)) return null;
   return kayitBul(ACIK_KAYIT) || null;
 }
 
@@ -8410,128 +8301,36 @@ function sesKaydaDonusEkle(k) {
 
 function sesUygula(o) {
   var donus = sesDonusHedefi(o);
-  sesUygulaIs(o);
+  Islem.uygula(o);
   if (donus) sesKaydaDonusEkle(donus);
 }
 
-function sesUygulaIs(o) {
-  if (o.tur === 'servis-ac') {
-    var yeni = { id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
-      km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
-      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
-      hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
-      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: [] };
-    KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
-    balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
-    Ekran.ac('kayit'); return;
+/* ================= ÇİZİM ================= */
+/* Sorulan bir alan, TİPİNE göre çizilir:
+     secim     → çip grubu. Söylenen seçili gelir; usta tek dokunuşla
+                 değiştirir. Çip bir SEÇİM aracıdır — doğru bileşen.
+     uzunMetin → düzenlenebilir kutu. Onay ekranı "ne yapılacağını"
+                 söylüyor; mesajda yapılacak şey METNİN KENDİSİ —
+                 göstermeseydik usta neyi onayladığını bilmeden onaylardı. */
+function sesSoruHtml(a) {
+  var v = sesIslem[a.ad];
+  if (a.tip === 'secim') {
+    return '<div class="section-label" style="margin-top:14px">' + (a.soru || a.etiket) + '</div>' +
+      '<div class="cip-grup" role="group" aria-label="' + a.etiket + '">' +
+        Object.keys(a.secenek).map(function (k) {
+          return '<button class="cip" data-ses-secim="' + a.ad + '" data-deger="' + k +
+            '" aria-pressed="' + (v === k) + '">' + a.secenek[k] + '</button>';
+        }).join('') +
+      '</div>';
   }
-  if (o.tur === 'yeni-arac') {
-    /* Söylenenler ruhsat ekranına TAŞINIR — usta aynı şeyi iki kez
-       söylemesin. Ruhsat çekilince üstüne yazılır. */
-    RUHSAT_ONDOLGU = { plaka: o.plaka, sahipAd: o.sahip, sahipTel: o.tel,
-                       is: o.is, tur: o.isTuru, km: o.km };
-    Ekran.ac('ruhsat'); return;
-  }
-  if (o.tur === 'teslim') {
-    ACIK_KAYIT = o.kayit.id; Ekran.ac('teslim');
-    if (o.odeme) {
-      var dg = document.querySelector('#tsOdeme [data-odeme="' + o.odeme + '"]');
-      if (dg) dg.click();
-      balon('Ödeme "' + ODEME_AD_SES[o.odeme] + '" seçildi — teslimi sen onayla.', false, 3200);
-    }
-    return;
-  }
-  if (o.tur === 'satir-ekle') {
-    var k = kayitBul(ACIK_KAYIT);
-    if (!k) { balon('Açık kayıt yok.'); return; }
-    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: 0,
-      kimGetirdi: o.tip === 'parca' ? 'tamirci' : '',
-      marka: '', kod: '', tanim: 'tanimlanamadi' });
-    balon('Satır eklendi — fiyatını yaz.', false, 2800);
-    Ekran.ac('kayit'); return;
-  }
-  if (o.tur === 'fiyat-guncelle') {
-    /* Satır nesnesi kaydın içinde duruyor; indeks de taşınıyor ki
-       aynı adı taşıyan iki satır olsa bile doğru olan değişsin. */
-    var gk = kayitBul(o.kayit.id);
-    var gs = gk && gk.satirlar ? gk.satirlar[o.indeks] : null;
-    if (!gs) { balon('Satır bulunamadı.', false, 2600); return; }
-    gs.fiyat = o.fiyat;
-    ACIK_KAYIT = gk.id;
-    balon((gs.ad || 'Satır') + ' → ' + tutar(o.fiyat) + ' ₺', false, 2800);
-    Ekran.ac('kayit');
-    return;
-  }
-
-  if (o.tur === 'tahsilat-sor') {
-    /* Dönem muhasebe ekranıyla ORTAK (çekirdekteki muhDonemSecili):
-       usta sorduğu pencereyi ekranda da bulsun. */
-    muhDonemSecili = o.donem;
-    Ekran.ac('muhasebe');
-    return;
-  }
-  if (o.tur === 'gider-ekle') {
-    GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
-      aciklama: o.aciklama, tutar: o.tutar, tur: 'fatura' });
-    balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
-    Ekran.ac('muhasebe'); return;
-  }
-  /* ⚠️ 14.09 — SESLİ YOL ARTIK GERÇEKTEN GÖNDERİYOR. Gönderim ve
-     ARŞİVE YAZMA aynı yerden: mesajKaydet(). Mesaj ekranı da onu
-     çağırıyor; iki yol iki ayrı kayıt yazsaydı biri er ya da geç
-     unutulurdu (43. denetim testi tam bunu ölçüyor). */
-  if (o.tur === 'mesaj-gonder') {
-    var hedef = mesajHedefi(o.plaka);
-    /* Telefon yoksa gönderilmez — ekrana götürülür, orada numara
-       eklenebiliyor (K-021: uyarının çözümü kendi yanında olmalı). */
-    if (!hedef || !hedef.tel || o.ekranaGit) {
-      MESAJ_HEDEF = { plaka: o.plaka, sablon: o.sablon };
-      Ekran.ac('mesaj');
-      if (!hedef || !hedef.tel) balon('Bu aracın telefonu yok — önce numarayı ekle.', false, 3200);
-      return;
-    }
-    if (o.sablon === 'hatirlatma') {
-      aracKayitlari(o.plaka).forEach(function (k) {
-        if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
-      });
-    }
-    var gk = acikKayit(o.plaka) || sonKayit(o.plaka);
-    mesajKaydet({ plaka: o.plaka, ad: hedef.ad, tel: hedef.tel, kanal: o.kanal,
-                  sablon: o.sablon, kayit: gk ? gk.id : null, metin: o.govde });
-    balon(KANAL_AD[o.kanal] + ' açılıyor — ' + hedef.ad + ', mesaj hazır.', false, 3200);
-    Ekran.ac('home');
-    return;
-  }
-
-  if (o.tur === 'toplu-mesaj') {
-    var alicilar = topluAlicilar();
-    if (!alicilar.length) { balon('Telefonu olan müşteri yok.', false, 2800); return; }
-    /* HER ALICI KENDİ KAYDINI ALIR. Tek bir "toplu gönderim" kaydı
-       yazmak kolaydı ama ispat yükü KİŞİ BAŞINA (K-045.3): hangi
-       numaraya, ne zaman, hangi metin. */
-    alicilar.forEach(function (x) {
-      mesajKaydet({ plaka: x.plaka, ad: x.ad, tel: x.tel, kanal: o.kanal,
-                    sablon: o.metinTuru, toplu: true,
-                    metin: mesajHitabi(x.plaka) + o.govde + mesajImzasi() });
-    });
-    balon(alicilar.length + ' müşteriye ' + KANAL_AD[o.kanal] + ' mesajı hazırlandı.',
-          false, 3400);
-    Ekran.ac('mesaj');
-    return;
-  }
-  if (o.tur === 'ara') {
-    ARAMA_TERIMI = { hedef: o.hedef, terim: o.terim, suzgec: o.suzgec || null };
-    Ekran.ac(o.hedef); return;
-  }
-  if (o.tur === 'bilinmeyen-arac') {
-    RUHSAT_ONDOLGU = { plaka: o.plaka }; Ekran.ac('ruhsat'); return;
-  }
-  if (o.tur === 'teslim-edilecek-kayit-yok') {
-    ACIK_PLAKA = o.plaka; Ekran.ac('arac'); return;
-  }
+  var id = 'sesAlan-' + a.ad;
+  return '<div class="field" style="margin-top:12px">' +
+      '<label for="' + id + '">' + a.etiket + '</label>' +
+      '<textarea id="' + id + '" data-ses-alan="' + a.ad + '" rows="5" aria-label="' +
+        a.etiket + '">' + (v || '') + '</textarea>' +
+    '</div>';
 }
 
-/* ================= ÇİZİM ================= */
 function sesCiz() {
   var b = sesBaglam();
   document.getElementById('sesBaslik').textContent =
@@ -8598,7 +8397,8 @@ function sesCiz() {
     return;
   }
 
-  var o = sesOzet(sesIslem);
+  var o = Islem.ozet(sesIslem);
+  var baskaOzet = sesIslem.baskaIslem ? Islem.ozet(sesIslem.baskaIslem) : null;
   durum.textContent = o.baslik;
   acik.textContent = 'Doğruysa onayla, değilse tekrar söyle.';
   gov.innerHTML =
@@ -8625,33 +8425,17 @@ function sesCiz() {
        mi". İkisi de SORU: dokunmazsan hiçbir şey değişmiyor. Kendi
        kendine bağlam değiştirmek, ustanın onayladığından başka bir
        işi yapmak olurdu. */
-    (sesIslem.baskaIslem
+    /* Önerinin de şeması olmalı; yoksa öneri hiç gösterilmez (51. test
+       ayrıca raporlar). */
+    (baskaOzet
       ? '<button class="btn btn-ghost" id="sesBaskaIs" style="margin-top:12px">' +
           '<svg class="ico"><use href="#i-search-check"></use></svg>' +
-          ' Bunu mu demek istedin: ' + sesOzet(sesIslem.baskaIslem).baslik + '</button>'
+          ' Bunu mu demek istedin: ' + baskaOzet.baslik + '</button>'
       : '') +
-    /* KANAL SEÇİMİ ONAY EKRANINDA (Cemil: "SMS yada WhatsApp üzerinden
-       mesaj gönderecek"). Söylenmediyse WhatsApp seçili gelir; usta
-       tek dokunuşla değiştirir. Çip bir SEÇİM aracıdır — doğru bileşen. */
-    (o.kanal
-      ? '<div class="section-label" style="margin-top:14px">Nereden gitsin?</div>' +
-        '<div class="cip-grup" role="group" aria-label="Gönderim kanalı">' +
-          ['whatsapp', 'sms'].map(function (k) {
-            return '<button class="cip" data-ses-kanal="' + k + '" aria-pressed="' +
-              (sesIslem.kanal === k) + '">' + KANAL_AD[k] + '</button>';
-          }).join('') +
-        '</div>'
-      : '') +
-    /* GİDECEK METİN GÖRÜNÜR VE DÜZENLENEBİLİR. Onay ekranı "ne
-       yapılacağını" söylüyor; mesajda yapılacak şey METNİN KENDİSİ.
-       Göstermeseydik usta neyi onayladığını bilmeden onaylardı. */
-    (o.metin
-      ? '<div class="field" style="margin-top:12px">' +
-          '<label for="sesMesajMetni">Gidecek mesaj</label>' +
-          '<textarea id="sesMesajMetni" rows="5" aria-label="Gidecek mesaj">' +
-            (sesIslem.govde || '') + '</textarea>' +
-        '</div>'
-      : '') +
+    /* SORULAN ALANLAR — şema `sor: true` dediği alanı satır olarak
+       değil, SORU olarak çizer; usta cevabı burada değiştirir.
+       Bugün mesajın kanalı (çip) ve metni (kutu) böyle. */
+    o.sorulan.map(sesSoruHtml).join('') +
     '<div class="btn-row" style="margin-top:14px">' +
       '<button class="btn btn-ghost" id="sesVazgec">' +
         '<svg class="ico"><use href="#i-x"></use></svg> Tekrar söyle</button>' +
@@ -8765,7 +8549,17 @@ window.SES_SOYLE = function (c) { sesCumleIsle(c); return sesIslem; };
 function sesCumleIsle(cumle) {
   sesCumle = cumle;
   sesIslem = sesCozumle(cumle);
-  sesDurumu = (sesIslem.tur === 'plakasiz') ? 'anlasilmadi' : 'anlasildi';
+  /* ⚠️ ŞEMASI OLMAYAN İŞ "ANLAŞILMADI"DIR (12.10). Tanıyıcı ile onay
+     ekranı artık ayrı parçalar; biri bir iş üretip öteki onu
+     bulamazsa ekran çöküyordu — usta yarım çizilmiş bir ekranla
+     kalırdı. Güvenli yön: hiçbir şey yapma, söyle, izine yaz. 51. test
+     bu durumu ayrıca BULGU olarak raporluyor; burası yalnız ustayı
+     korur, hatayı gizlemez. */
+  var bilinen = sesIslem.tur !== 'plakasiz' && Islem.ozet(sesIslem);
+  if (sesIslem.tur !== 'plakasiz' && !bilinen) {
+    Iz.hata('ses-semasiz-is', new Error('Şeması olmayan iş: ' + sesIslem.tur));
+  }
+  sesDurumu = bilinen ? 'anlasildi' : 'anlasilmadi';
   sesCiz();
 }
 
@@ -8821,10 +8615,10 @@ document.addEventListener('click', function (e) {
      yazılır, sonra ekran tazelenir. Yoksa tek bir kanal dokunuşu
      ustanın cümlesini siler — v1'in "ciz() kararı da siliyor"
      hatasının (K-033.12) aynısı. */
-  var ka = t.getAttribute('data-ses-kanal');
-  if (ka && sesIslem) {
+  var secilen = t.getAttribute('data-ses-secim');
+  if (secilen && sesIslem) {
     sesMetniAl();
-    sesIslem.kanal = ka;
+    sesIslem[secilen] = t.getAttribute('data-deger');
     sesCiz();
     return;
   }
@@ -8879,11 +8673,15 @@ function sesPlakayiDuzelt(yeniPlaka) {
   balon('Plaka ' + yeniPlaka + ' olarak düzeltildi — göndermeden önce bak.', false, 3000);
 }
 
-/* Onay ekranındaki metin alanı varsa içeriğini işleme yaz — gönderilen
-   şey ustanın EKRANDA GÖRDÜĞÜ metin olsun. */
+/* Onay ekranındaki metin kutularının içeriğini işleme yaz — yapılan şey
+   ustanın EKRANDA GÖRDÜĞÜ olsun. Kutunun hangi alana yazacağını şema
+   söylüyor (`data-ses-alan`), burada alan adı yazılı değil. */
 function sesMetniAl() {
-  var el = document.getElementById('sesMesajMetni');
-  if (el && sesIslem) sesIslem.govde = el.value;
+  if (!sesIslem) return;
+  var kutular = document.querySelectorAll('#sesGovde [data-ses-alan]');
+  for (var i = 0; i < kutular.length; i++) {
+    sesIslem[kutular[i].getAttribute('data-ses-alan')] = kutular[i].value;
+  }
 }
 })();
 
@@ -9266,6 +9064,55 @@ document.addEventListener('input', function (e) {
   if (!e.target || Ekran.adi() !== 'ruhsat') return;
   if (['rPlaka', 'rYil', 'rTel'].indexOf(e.target.id) >= 0) { ruhsatDurum(); return; }
   if (e.target.closest('#rDetayGovde')) rDetaySayac();
+});
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) =================
+   Kayıtlı olmayan bir plaka söylendiğinde iş ruhsat ekranına düşer:
+   marka, model ve motor ruhsattan gelir, sesten değil. */
+
+/* YENİ ARAÇ — "41 KV 5588 Ahmet Yılmaz 0532… debriyaj kaçırıyor".
+   ⚠️ Aynı tuzak burada da var (A-M27): yanlış duyulan bir harf, kayıtlı
+   aracı "yeni araç" yapıp ustayı ruhsat çekmeye gönderir — `oneri`
+   benzer kayıtlı plakayı SORAR. */
+Islem.tanim('yeni-arac', {
+  ekran: 'ruhsat', baglam: ['servis-ekle'], oncelik: 70,
+  baslik: 'Yeni araç — önce ruhsat',
+  eylem: 'Ruhsatı çek',
+  notice: 'Bu araç kayıtlı değil. Söylediklerin ruhsat ekranına yazıldı; ' +
+          'ruhsatı çekince marka, model ve motor kendiliğinden dolar.',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Plaka', tip: 'plaka', zorunlu: true },
+    { ad: 'sahip', etiket: 'Sahibi', tip: 'metin', bos: '— (ruhsattan gelecek)' },
+    { ad: 'tel', etiket: 'Telefon', tip: 'telefon', bos: '— (ruhsatta yazmaz)' },
+    { ad: 'is', etiket: 'Ne istiyor', tip: 'metin', bos: '—' },
+    { ad: 'isTuru', etiket: 'İş türü', tip: 'secim', secenek: SES_IS_TURU, ozette: false },
+    { ad: 'km', etiket: 'Kilometre', tip: 'km', ozette: false }
+  ],
+  tani: function (c) {
+    if (!c.p || c.arac) return null;
+    var s = sesServisOku(c);
+    return { tur: 'yeni-arac', plaka: c.p.plaka, sahip: s.sahip, tel: s.tel,
+             is: s.is, isTuru: s.isTuru, km: s.km, oneri: benzerPlaka(c.p.plaka) };
+  },
+  /* Söylenenler ruhsat ekranına TAŞINIR — usta aynı şeyi iki kez
+     söylemesin. Ruhsat çekilince üstüne yazılır. */
+  uygula: function (o) {
+    RUHSAT_ONDOLGU = { plaka: o.plaka, sahipAd: o.sahip, sahipTel: o.tel,
+                       is: o.is, tur: o.isTuru, km: o.km };
+    Ekran.ac('ruhsat');
+  }
+});
+
+/* BİLİNMEYEN ARAÇ — kendi tanıyıcısı yok; mesaj şeması, kayıtlı
+   olmayan bir plakaya mesaj gönderilmek istendiğinde buraya düşürür. */
+Islem.tanim('bilinmeyen-arac', {
+  ekran: 'ruhsat',
+  baslik: 'Bu araç kayıtlı değil',
+  eylem: 'Ruhsatı çek',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Duyulan plaka', tip: 'plaka', zorunlu: true }
+  ],
+  uygula: function (o) { RUHSAT_ONDOLGU = { plaka: o.plaka }; Ekran.ac('ruhsat'); }
 });
 })();
 
@@ -9850,6 +9697,139 @@ document.addEventListener('input', function (e) {
     if (teklif) teklif.hidden = !!sf.fiyat;
   }
 });
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) =================
+   Kayıt ekranı üç işini kendisi bildiriyor; ses ekranı bunları tanır,
+   şemadan onay ekranı çizer ve buradaki `uygula`yı çağırır.
+   Öncesi: üç iş, ses ekranında üç ayrı yerde (çözümle · özet · uygula)
+   elle yazılmış dallardı. */
+
+/* Söylenenden satırın ADI — tutar ve komut kelimeleri atılır.
+   kelimeleriAt kullanılıyor, \b DEĞİL: /\bde\b/ "değişecek"i
+   "ğişecek" yapıyordu (K-018, çekirdekteki uyarıya bak). */
+function sesSatirAdi(c) {
+  return kelimeleriAt(sesTutarsiz(c.metin),
+    ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
+     'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
+     'güncelle', 'guncelle']);
+}
+
+/* ⚠️ AÇIK KAYITTA SES ÜÇ İŞ YAPIYOR (14.09 — Cemil: "Bunlar parça
+   olabilir, işçilik olabilir. Fiyat güncellenebilir. Teslime
+   edilebilir."). SIRA DAR OLANDAN GENİŞE: teslim (60, teslim ekranında)
+   → fiyat güncelleme (65) → satır ekleme (VARSAYILAN). Ters sırada
+   "teslim ettim nakit aldım" kayda "teslim ettim" diye satır eklerdi. */
+
+/* FİYAT GÜNCELLEME — söylenen ad VAR OLAN bir satıra uyuyorsa.
+   ⚠️ TEK ADAY KURALI (A-M27'nin aynısı): iki satır birden uyuyorsa
+   hangisi olduğunu bilmiyoruz demektir — o zaman güncelleme YOK, yeni
+   satır eklenir ve usta görür. Tahmin etmek, ustanın yazdığı rakamı
+   sessizce değiştirmenin yoludur. */
+Islem.tanim('fiyat-guncelle', {
+  ekran: 'kayit', baglam: ['kayit-icinde'], oncelik: 65,
+  baslik: 'Satırın fiyatı değişecek',
+  eylem: 'Fiyatı güncelle',
+  alanlar: [
+    { ad: 'satir', etiket: 'Ne', tip: 'satir', zorunlu: true },
+    { ad: 'simdiki', etiket: 'Şimdiki', turet: function (o) {
+        return o.satir.fiyat ? tutar(o.satir.fiyat) + ' ₺' : '— (boş)'; } },
+    { ad: 'fiyat', etiket: 'Yeni', tip: 'para', zorunlu: true }
+  ],
+  baglamda: function (c) {
+    var k = c.kayit, tutarR = sesTutarBul(c.d), ad = sesSatirAdi(c);
+    if (!k || !tutarR || !ad) return null;
+    var adN = norm(ad), uyan = [];
+    (k.satirlar || []).forEach(function (s, i) {
+      var sN = norm(s.ad || '');
+      if (sN.length < 3 || adN.length < 3) return;
+      if (sN === adN || sN.indexOf(adN) >= 0 || adN.indexOf(sN) >= 0) {
+        uyan.push({ satir: s, indeks: i });
+      }
+    });
+    if (uyan.length !== 1) return null;
+    return { tur: 'fiyat-guncelle', kayit: k, indeks: uyan[0].indeks,
+             satir: uyan[0].satir, fiyat: tutarR };
+  },
+  /* Satır nesnesi kaydın içinde duruyor; indeks de taşınıyor ki aynı
+     adı taşıyan iki satır olsa bile doğru olan değişsin. */
+  uygula: function (o) {
+    var gk = kayitBul(o.kayit.id);
+    var gs = gk && gk.satirlar ? gk.satirlar[o.indeks] : null;
+    if (!gs) { balon('Satır bulunamadı.', false, 2600); return; }
+    gs.fiyat = o.fiyat;
+    ACIK_KAYIT = gk.id;
+    balon((gs.ad || 'Satır') + ' → ' + tutar(o.fiyat) + ' ₺', false, 2800);
+    Ekran.ac('kayit');
+  }
+});
+
+/* SATIR EKLE — açık kaydın VARSAYILAN işi. Başka bir iş tanınırsa o asıl
+   olur, bu ÖNERİ olarak durur (7.3); tanınmazsa bu olur.
+   ⚠️ 16.09'a kadar bu dal bir çöplüktü: kayıt açıkken söylenen HER
+   cümle ("servistekileri göster", "bugün ne kadar tahsilat") bir
+   PARÇA oluyordu. */
+Islem.tanim('satir-ekle', {
+  ekran: 'kayit', baglam: ['kayit-icinde'], varsayilan: true,
+  baslik: 'Açık kayda satır eklenecek',
+  eylem: 'Satırı ekle',
+  alanlar: [
+    { ad: 'tip', etiket: 'Tür', tip: 'secim', zorunlu: true,
+      secenek: { parca: 'Parça', iscilik: 'İşçilik' } },
+    { ad: 'ad', etiket: 'Ne', tip: 'metin', zorunlu: true },
+    { ad: 'fiyat', etiket: 'Tutar', tip: 'para', bos: '— (sonra yazılır)' }
+  ],
+  baglamda: function (c) {
+    if (!c.kayitId) return null;
+    var iscilikMi = c.d.indexOf('iscilik') >= 0;
+    var ad = sesSatirAdi(c);
+    /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
+       yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
+    return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
+             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesTutarBul(c.d) };
+  },
+  /* ⚠️ `alis: 0` BİLEREK DURUYOR — 8.3 davranış değiştirmez. Bilinmeyen
+     alış 0 değil null olmalı (K-055.2); düzeltmesi 8.2'nin işi. */
+  uygula: function (o) {
+    var k = kayitBul(ACIK_KAYIT);
+    if (!k) { balon('Açık kayıt yok.'); return; }
+    k.satirlar.push({ tip: o.tip, ad: o.ad, fiyat: o.fiyat || 0, alis: 0,
+      kimGetirdi: o.tip === 'parca' ? 'tamirci' : '',
+      marka: '', kod: '', tanim: 'tanimlanamadi' });
+    balon('Satır eklendi — fiyatını yaz.', false, 2800);
+    Ekran.ac('kayit');
+  }
+});
+
+/* SERVİS KAYDI AÇ — kayıtlı araç. Kayıtlı değilse aynı cümle
+   yeni-arac'a (ruhsat ekranı, öncelik 70) düşer; bu en geniş kalıp,
+   o yüzden en son denenir. */
+Islem.tanim('servis-ac', {
+  ekran: 'kayit', baglam: ['servis-ekle'], oncelik: 80,
+  baslik: 'Servis kaydı açılacak',
+  eylem: 'Kaydı aç',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true },
+    { ad: 'isTuru', etiket: 'İş türü', tip: 'secim', secenek: SES_IS_TURU },
+    { ad: 'is', etiket: 'Ne istiyor', tip: 'metin', bos: '— (sonra yazılır)' },
+    { ad: 'km', etiket: 'Kilometre', tip: 'km', bosGizle: true }
+  ],
+  tani: function (c) {
+    if (!c.p || !c.arac) return null;
+    var s = sesServisOku(c);
+    return { tur: 'servis-ac', plaka: c.p.plaka, arac: c.arac, isTuru: s.isTuru,
+             km: s.km, is: s.is };
+  },
+  uygula: function (o) {
+    var yeni = { id: KAYITLAR.length + 1, plaka: o.plaka, tur: o.isTuru,
+      km: o.isTuru === 'bakim' ? o.km : '', sikayet: o.is || '',
+      acilis: bugunMetin(), teslimTarihi: null, odemeYolu: null,
+      hatirlatmaTarihi: null, hatirlatmaGonderildi: false,
+      parcaBekliyor: false, bekliyorMusteriye: false, satirlar: [] };
+    KAYITLAR.push(yeni); ACIK_KAYIT = yeni.id;
+    balon('Kayıt açıldı — yanlış varsa düzelt.', false, 3000);
+    Ekran.ac('kayit');
+  }
+});
 })();
 
 /* ===== ekran: 40-parca-sor.html ===== */
@@ -10152,6 +10132,61 @@ document.addEventListener('click', function (e) {
     Ekran.ac('home');
   }
 });
+
+/* ================= SESLİ İŞ — bu ekranın şeması (Tur 8.3) =================
+   Teslim iki yerden söylenir ve İKİ TANIYICISI var, tek şeması:
+     baglamda — açık kaydın içinde: "teslim ettim nakit aldım", plaka yok
+     tani     — genel yolda: "35 KLM 45 teslim ettim", plakadan */
+
+/* Sesle söylenebilen ödeme yolları. "Almadım" BİLEREK YOK: "parayı
+   almadım" cümlesi değerlendirme setinde bir TUZAK (4. cümle) — sesle
+   veresiye yazmak yerine teslim ekranında seçiliyor. */
+var SES_ODEME = { nakit: ODEME_ETIKET.nakit, kart: ODEME_ETIKET.kart,
+                  havale: ODEME_ETIKET.havale };
+function sesOdemeYolu(d) {
+  return d.indexOf('nakit') >= 0 ? 'nakit'
+       : d.indexOf('kart') >= 0 ? 'kart'
+       : d.indexOf('havale') >= 0 ? 'havale' : null;
+}
+
+Islem.tanim('teslim', {
+  ekran: 'teslim', baglam: ['kayit-icinde'], oncelik: 60,
+  baslik: 'Araç teslim edilecek',
+  eylem: function (o) { return o.odeme ? 'Teslim et' : 'Teslim ekranını aç'; },
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true },
+    { ad: 'toplam', etiket: 'Tutar', turet: function (o) {
+        return tutar(kayitToplami(o.kayit)) + ' ₺'; } },
+    { ad: 'odeme', etiket: 'Ödeme', tip: 'secim', secenek: SES_ODEME,
+      bos: '— (teslim ekranında seçilecek)' }
+  ],
+  baglamda: function (c) {
+    var k = c.kayit;
+    if (!k || c.d.indexOf('teslim') < 0 || k.teslimTarihi) return null;
+    return { tur: 'teslim', plaka: k.plaka, arac: aracBul(k.plaka),
+             kayit: k, odeme: sesOdemeYolu(c.d) };
+  },
+  tani: function (c) {
+    if (!c.p || !c.arac || c.dk.indexOf('teslim') < 0) return null;
+    var plaka = c.p.plaka;
+    var acik = icerideki().filter(function (k) { return k.plaka === plaka; })[0];
+    if (!acik) return { tur: 'teslim-edilecek-kayit-yok', plaka: plaka, arac: c.arac };
+    return { tur: 'teslim', plaka: plaka, arac: c.arac, kayit: acik,
+             odeme: sesOdemeYolu(c.dk) };
+  },
+  /* Ödeme söylendiyse SEÇİLİ gelir ama teslimi usta onaylar: para
+     işinde son dokunuş ustanın. Seçim ekranın kendi durumuna yazılıyor
+     — eskiden ses ekranı buradaki düğmeye DIŞARIDAN tıklıyordu. */
+  uygula: function (o) {
+    ACIK_KAYIT = o.kayit.id;
+    Ekran.ac('teslim');
+    if (o.odeme) {
+      tsSecili = o.odeme;
+      tsCiz();
+      balon('Ödeme "' + SES_ODEME[o.odeme] + '" seçildi — teslimi sen onayla.', false, 3200);
+    }
+  }
+});
 })();
 
 /* ===== ekran: 60-arac.html ===== */
@@ -10436,6 +10471,22 @@ document.addEventListener('click', function (e) {
   if (t.id === 'arNotMik') { sesleAc('genel'); return; }
   if (t.id === 'arSesle') { sesleAc('genel'); return; }
 });
+
+/* ================= SESLİ İŞ — bu ekranın şeması (Tur 8.3) =================
+   Kendi tanıyıcısı yok: teslim şeması, serviste olmayan bir aracı
+   teslim etmeye kalkan cümleyi buraya düşürüyor. Usta aracın geçmişine
+   gider — belki kaydı başka bir plakadaydı.
+   `guclu: false`: açık kayıttayken bu sonuç bağlamın kendi işini
+   ÖNERİYE düşürmez (Tur 7'deki SES_GUCLU_TUR listesinde de yoktu). */
+Islem.tanim('teslim-edilecek-kayit-yok', {
+  ekran: 'arac', guclu: false,
+  baslik: 'Bu araç zaten serviste değil',
+  eylem: 'Aracın geçmişini aç',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true }
+  ],
+  uygula: function (o) { ACIK_PLAKA = o.plaka; Ekran.ac('arac'); }
+});
 })();
 
 /* ===== ekran: 70-araclar.html ===== */
@@ -10492,6 +10543,50 @@ document.addEventListener('click', function (e) {
 });
 document.addEventListener('input', function (e) {
   if (e.target && e.target.id === 'arcQ') Ekran.tazele();
+});
+
+/* ================= SESLİ İŞ — ARAMA (Tur 8.3) =================
+   Üç liste ekranının (araçlar · kayıtlar · müşteriler) ORTAK işi; şema
+   tek yerde, burada. Listelerin bağlamında komut kelimesi gerekmez:
+   söylenen her şey aranır.
+   ⚠️ KOMUT KELİMELERİ KELİME OLARAK ARANIYOR (K-018): "yeni ARAÇ"
+   " ara"yı, "GÖSTERGE paneli" "göster"i tutuyordu. */
+Islem.tanim('ara', {
+  ekran: 'araclar', baglam: ['araclar', 'kayitlar', 'musteriler'], oncelik: 50,
+  baslik: 'Aranacak',
+  eylem: 'Ara',
+  alanlar: [
+    { ad: 'hedef', etiket: 'Nerede', tip: 'secim', zorunlu: true,
+      secenek: { araclar: 'Araçlar', kayitlar: 'Servis kayıtları', musteriler: 'Müşteriler' } },
+    { ad: 'terim', etiket: 'Ne', tip: 'metin', bos: 'servistekiler' },
+    { ad: 'suzgec', etiket: 'Süzgeç', tip: 'secim', ozette: false,
+      secenek: { serviste: 'Serviste' } }
+  ],
+  tani: function (c) {
+    var d = c.d, baglam = c.baglam;
+    if (!kelimeVarMi(d, ['ara', 'bul', 'goster']) &&
+        ['araclar', 'kayitlar', 'musteriler'].indexOf(baglam) < 0) return null;
+    var terim = kelimeleriAt(c.metin,
+      ['ara', 'bul', 'göster', 'goster', 'sahibini', 'sahibi', 'aracını', 'aracini']);
+    var hedef = baglam === 'musteriler' ? 'musteriler'
+              : baglam === 'kayitlar' ? 'kayitlar' : 'araclar';
+    /* "34 ABC 123 sahibini ara" — müşteriye plakadan gidilir. */
+    if (c.p && d.indexOf('sahib') >= 0) {
+      terim = c.arac && c.arac.sahipAd ? c.arac.sahipAd : c.p.plaka;
+      hedef = 'musteriler';
+    }
+    /* "SERVİSTEKİLER" bir arama terimi değil, SÜZGEÇ (14.09 — örnek çip
+       düz aramaya düşüp boş liste döndürüyordu; 45. test korur). */
+    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0) {
+      return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'serviste' };
+    }
+    if (!terim) return null;
+    return { tur: 'ara', hedef: hedef, terim: terim };
+  },
+  uygula: function (o) {
+    ARAMA_TERIMI = { hedef: o.hedef, terim: o.terim, suzgec: o.suzgec || null };
+    Ekran.ac(o.hedef);
+  }
 });
 })();
 
@@ -11088,6 +11183,179 @@ document.addEventListener('click', function (e) {
 document.addEventListener('input', function (e) {
   if (e.target && e.target.id === 'msjQ') Ekran.tazele();
 });
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) =================
+   İki iş, iki SORULAN alan: kanal ve metin onay ekranında ustaya
+   sorulur (`sor: true`) — satır olarak değil, seçilip düzenlenerek.
+   Usta neyi gönderdiğini gönderMEDEN önce okur. */
+
+/* KANAL: söylenmediyse WhatsApp (WHATSAPP.md A yolu — bedava ve
+   kurulumsuz). SMS parayla ve İYS kaydı istiyor; varsayılan olamaz. */
+function sesKanali(d) {
+  if (d.indexOf('sms') >= 0) return 'sms';
+  return 'whatsapp';
+}
+var SES_KANAL = { whatsapp: KANAL_AD.whatsapp, sms: KANAL_AD.sms };
+
+/* TOPLU MU — *"tüm müşterilere"*, *"bütün müşterilere"*, *"herkese"*.
+   ⚠️ Türkçede kelime sınırı aranmaz (K-018); "tum musteri" gibi İKİ
+   KELİMELİK bir dizi aranıyor — "müşteri" tek başına her cümlede
+   geçebilir ve tek kelimeye bakmak her mesajı toplu sanmaya götürürdü. */
+function sesTopluMu(d) {
+  return d.indexOf('tum musteri') >= 0 || d.indexOf('butun musteri') >= 0 ||
+         kelimeVarMi(d, ['herkese', 'hepsine']);
+}
+
+/* "yaz" KELİME OLARAK aranıyor: "beyaz" içinde geçiyordu ve "34 ABC 123
+   beyaz araba geldi" mesaj sanılıyordu (K-018).
+   `sms` tek başına yeter (*"herkese sms at yarın kapalıyız"*).
+   **"sahibine" yönelme hâli (mesaj), "sahibini" belirtme hâli (arama)**;
+   ikisi ayrı kelime, eşitlikle ayrılıyor. */
+function sesMesajKomutu(d) {
+  return d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
+         d.indexOf('sms') >= 0 ||
+         kelimeVarMi(d, ['yaz', 'yazdir', 'sahibine']) ||
+         d.indexOf('gonder') >= 0;
+}
+
+/* ⚠️ TOPLU MESAJ (14.09) — Cemil: *"Mesela tüm müşterilere bayram
+   mesajı gönder diyecek sesli olarak."* TEK MESAJDAN ÖNCE (öncelik 30 <
+   40) çünkü cümlede plaka YOK; plakasız bir mesaj komutu bugüne kadar
+   sessizce düşüyordu.
+   ⚠️ K-045.2 ile ÇELİŞİYOR (*"kampanya bu fazda yazılmaz"*); Cemil
+   kapsamı genişletti, onun sözü kazanır. Gerekçe silinmedi: onay
+   ekranı riski YAZIYOR ve prototip hiçbir şey göndermiyor. */
+Islem.tanim('toplu-mesaj', {
+  ekran: 'mesaj', baglam: ['mesaj'], oncelik: 30,
+  baslik: function () { return topluAlicilar().length + ' müşteriye mesaj'; },
+  tarif: 'Telefonu olan bütün müşterilere mesaj',
+  /* ⚠️ RİSK ONAY EKRANINDA YAZILI (K-045.2). Kendi numaradan toplu
+     gönderim Meta'nın şartlarına aykırı, numara engellenebilir —
+     engellenirse özet ve bakım hatırlatması da durur. */
+  notice: 'Toplu mesaj, izin vermiş müşterilere gönderilmelidir. ' +
+          'Kendi numaranızdan toplu gönderim, numaranızın ' +
+          'engellenmesine yol açabilir.',
+  eylem: function () {
+    return topluAlicilar().length ? 'Onayla ve gönder' : 'Telefonu olan müşteri yok';
+  },
+  alanlar: [
+    /* KİMLERE GİDİYOR, ADLARIYLA. Toplu gönderim geri alınamaz; usta
+       onayladığı şeyi görmeli. Üçten fazlası sayıyla söyleniyor. */
+    { ad: 'kime', etiket: 'Kime', turet: function () {
+        var a = topluAlicilar();
+        return a.length
+          ? a.slice(0, 3).map(function (x) { return x.ad; }).join(', ') +
+            (a.length > 3 ? ' +' + (a.length - 3) : '')
+          : 'telefonu olan müşteri yok'; } },
+    { ad: 'kac', etiket: 'Kaç kişi', turet: function () {
+        return topluAlicilar().length + ' müşteri'; } },
+    { ad: 'metinTuru', etiket: 'Ne', tip: 'secim', secenek: SABLON_AD,
+      bos: 'Serbest mesaj' },
+    { ad: 'kanal', etiket: 'Gönderim kanalı', soru: 'Nereden gitsin?',
+      tip: 'secim', secenek: SES_KANAL, sor: true, zorunlu: true },
+    { ad: 'govde', etiket: 'Gidecek mesaj', tip: 'uzunMetin', sor: true, zorunlu: true }
+  ],
+  tani: function (c) {
+    if (!sesMesajKomutu(c.d) || !sesTopluMu(c.d)) return null;
+    var hzT = hazirMetinBul(c.metin);
+    /* Hazır metin tanınmadıysa söylenen cümlenin kalanı metin olur —
+       usta "tüm müşterilere yarın kapalıyız yaz" diyebilir. */
+    var kalanT = kelimeleriAt(c.metin, ['tüm', 'tum', 'bütün', 'butun', 'herkese',
+      'hepsine', 'müşterilere', 'musterilere', 'müşteriye', 'musteriye',
+      'mesaj', 'mesajı', 'mesaji', 'gönder', 'gonder', 'at', 'yaz',
+      'whatsapp', 'sms', 'üzerinden', 'uzerinden', 'ile']);
+    /* Toplu olduğu belli ama NE gideceği belli değil: anlaşılmadı.
+       Burada durulur — cümle başka bir işe düşmesin. */
+    if (!hzT && !kalanT) return Islem.anlasilmadi(c.metin);
+    return { tur: 'toplu-mesaj', metinTuru: hzT ? hzT.k : 'serbest',
+             govde: hzT ? hzT.metin : kalanT, kanal: sesKanali(c.d) };
+  },
+  /* HER ALICI KENDİ KAYDINI ALIR. Tek bir "toplu gönderim" kaydı
+     kolaydı ama ispat yükü KİŞİ BAŞINA (K-045.3). */
+  uygula: function (o) {
+    var alicilar = topluAlicilar();
+    if (!alicilar.length) { balon('Telefonu olan müşteri yok.', false, 2800); return; }
+    alicilar.forEach(function (x) {
+      mesajKaydet({ plaka: x.plaka, ad: x.ad, tel: x.tel, kanal: o.kanal,
+                    sablon: o.metinTuru, toplu: true,
+                    metin: mesajHitabi(x.plaka) + o.govde + mesajImzasi() });
+    });
+    balon(alicilar.length + ' müşteriye ' + KANAL_AD[o.kanal] + ' mesajı hazırlandı.',
+          false, 3400);
+    Ekran.ac('mesaj');
+  }
+});
+
+/* ⚠️ 14.09 — ONAY EKRANI GÖNDERİYOR (Cemil: "Buradan mesaj sesli
+   olarak gönderebilmeliyiz." + "Burada da bir onay ekranı gerekli.").
+   Eskiden sesli yol mesaj ekranını AÇIYORDU ve usta bir kez daha
+   gönder'e basıyordu — aynı soruyu iki kez sormak. "Ekranda aç"
+   duruyor: hedefi değiştirmek isteyen oraya gider (ölü uç yok). */
+Islem.tanim('mesaj-gonder', {
+  ekran: 'mesaj', baglam: ['mesaj'], oncelik: 40,
+  baslik: 'Mesaj gönderilecek',
+  notice: function (o) {
+    var hd = mesajHedefi(o.plaka);
+    return (hd && hd.tel) ? '' :
+      'Bu aracın telefonu yok — mesaj gönderilemez. "Ekranda aç" ile ' +
+      'numarayı ekleyebilirsin.';
+  },
+  eylem: function (o) { var hd = mesajHedefi(o.plaka); return (hd && hd.tel) ? 'Gönder' : 'Ekranda aç'; },
+  eylem2: function (o) { var hd = mesajHedefi(o.plaka); return (hd && hd.tel) ? 'Ekranda aç' : ''; },
+  alanlar: [
+    { ad: 'kime', etiket: 'Kime', turet: function (o) {
+        var hd = mesajHedefi(o.plaka);
+        return (hd && hd.ad ? hd.ad : 'sahip yazılmamış') +
+               (hd && hd.tel ? ' · ' + hd.tel : ' · telefon yok'); } },
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', zorunlu: true },
+    { ad: 'sablon', etiket: 'Ne', tip: 'secim', secenek: SABLON_AD, bos: 'Mesaj' },
+    { ad: 'kanal', etiket: 'Gönderim kanalı', soru: 'Nereden gitsin?',
+      tip: 'secim', secenek: SES_KANAL, sor: true, zorunlu: true },
+    { ad: 'govde', etiket: 'Gidecek mesaj', tip: 'uzunMetin', sor: true }
+  ],
+  tani: function (c) {
+    if (!sesMesajKomutu(c.d) || !c.p) return null;
+    /* Plaka kayıtlı değil: yanlış duyulmuş olabilir (A-M27). Öneri
+       varsa onay ekranı SORAR. */
+    if (!c.arac) return { tur: 'bilinmeyen-arac', plaka: c.p.plaka,
+                          oneri: benzerPlaka(c.p.plaka) };
+    /* ŞABLON: önce adı söylenen hazır metin, sonra iş şablonları.
+       "selam mesajı" bir şablon adı değil ama ustanın söylediği şey. */
+    var hz = hazirMetinBul(c.metin), d = c.d;
+    var sablon = hz ? hz.k
+               : d.indexOf('hatirlatma') >= 0 ? 'hatirlatma'
+               : d.indexOf('bekliyor') >= 0 ? 'bekliyor'
+               : d.indexOf('hazir') >= 0 ? 'hazir'
+               : d.indexOf('teslim') >= 0 ? 'teslim' : 'ozet';
+    return { tur: 'mesaj-gonder', plaka: c.p.plaka, arac: c.arac, sablon: sablon,
+             kanal: sesKanali(d),
+             /* Metin ŞİMDİ üretiliyor ve onay ekranında GÖRÜNÜYOR. */
+             govde: mesajMetniUret(c.p.plaka, sablon) };
+  },
+  /* Gönderim ve ARŞİVE YAZMA aynı yerden: mesajKaydet(). Mesaj ekranı da
+     onu çağırıyor (43. denetim testi). */
+  uygula: function (o) {
+    var hedef = mesajHedefi(o.plaka);
+    /* Telefon yoksa gönderilmez — ekrana götürülür, orada numara
+       eklenebiliyor (K-021: uyarının çözümü kendi yanında olmalı). */
+    if (!hedef || !hedef.tel || o.ekranaGit) {
+      MESAJ_HEDEF = { plaka: o.plaka, sablon: o.sablon };
+      Ekran.ac('mesaj');
+      if (!hedef || !hedef.tel) balon('Bu aracın telefonu yok — önce numarayı ekle.', false, 3200);
+      return;
+    }
+    if (o.sablon === 'hatirlatma') {
+      aracKayitlari(o.plaka).forEach(function (k) {
+        if (k.hatirlatmaTarihi && !k.hatirlatmaGonderildi) k.hatirlatmaGonderildi = true;
+      });
+    }
+    var gk = acikKayit(o.plaka) || sonKayit(o.plaka);
+    mesajKaydet({ plaka: o.plaka, ad: hedef.ad, tel: hedef.tel, kanal: o.kanal,
+                  sablon: o.sablon, kayit: gk ? gk.id : null, metin: o.govde });
+    balon(KANAL_AD[o.kanal] + ' açılıyor — ' + hedef.ad + ', mesaj hazır.', false, 3200);
+    Ekran.ac('home');
+  }
+});
 })();
 
 /* ===== ekran: 90-musteriler.html ===== */
@@ -11581,6 +11849,74 @@ Kaydirma.tanim('muhasebe', function (anahtar) {
     Ekran.tazele();
   });
 });
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) ================= */
+
+/* TAHSİLAT SORUSU (14.09) — tamircinin DÖRDÜNCÜ işinin ta kendisi
+   (*"teslimde ödemeyi nasıl aldığını bilmek"*) ve cevabı kayıtlı
+   veriden çıkıyor. Yeni alan istemeyen bir soru, yeni özellik değil.
+   SORUNUN CEVABI ONAY EKRANINDA: muhasebeyi açıp ustayı rakamı aramaya
+   bırakmak, sorduğu şeyi cevaplamamaktır.
+   ⚠️ TUTAR VARSA BU BİR SORU DEĞİL, GİDER GİRİŞİDİR — en önde (10)
+   duruyor ama "2400 TL elektrik faturası" buraya düşmesin diye tutarı
+   olan cümleyi geri çeviriyor. */
+Islem.tanim('tahsilat-sor', {
+  ekran: 'muhasebe', baglam: ['muhasebe'], oncelik: 10,
+  baslik: function (o) { return donemAdi(o.donem) + ' tahsilat'; },
+  tarif: 'Tahsilat sorusu — cevap kayıtlı veriden',
+  eylem: 'Muhasebeyi aç',
+  alanlar: [
+    { ad: 'donem', etiket: 'Dönem', tip: 'secim', ozette: false, zorunlu: true,
+      secenek: { bugun: 'Bugün', ay: 'Bu ay', yil: 'Bu yıl' } },
+    { ad: 'tahsil', etiket: 'Tahsil edilen', turet: function (o) {
+        return tutar(tahsilatToplami(o.donem)) + ' ₺'; } },
+    { ad: 'alacak', etiket: 'Alacak (veresiye)', turet: function () {
+        return tutar(veresiyeToplami()) + ' ₺'; } }
+  ],
+  tani: function (c) {
+    var d = c.d;
+    if (sesTutarBul(d) || (d.indexOf('tahsil') < 0 && d.indexOf('kasa') < 0)) return null;
+    var donem = (d.indexOf('bugun') >= 0) ? 'bugun'
+              : (d.indexOf('yil') >= 0) ? 'yil'
+              : (d.indexOf('ay') >= 0) ? 'ay' : 'bugun';
+    return { tur: 'tahsilat-sor', donem: donem };
+  },
+  /* Dönem muhasebe ekranıyla ORTAK (çekirdekteki muhDonemSecili):
+     usta sorduğu pencereyi ekranda da bulsun. */
+  uygula: function (o) {
+    muhDonemSecili = o.donem;
+    Ekran.ac('muhasebe');
+  }
+});
+
+/* GİDER EKLE — muhasebe bağlamında yalnız tutar yeter ("850 lira"); başka
+   yerde "gider/fatura/kira" kelimesi aranır. */
+Islem.tanim('gider-ekle', {
+  ekran: 'muhasebe', baglam: ['muhasebe'], oncelik: 20,
+  baslik: 'Gider eklenecek',
+  eylem: 'Gideri ekle',
+  alanlar: [
+    { ad: 'aciklama', etiket: 'Açıklama', tip: 'metin', zorunlu: true },
+    { ad: 'tutar', etiket: 'Tutar', tip: 'para', zorunlu: true },
+    { ad: 'tarih', etiket: 'Tarih', turet: function () { return bugunMetin(); } }
+  ],
+  tani: function (c) {
+    var d = c.d;
+    if (!(d.indexOf('gider') >= 0 || d.indexOf('fatura') >= 0 || d.indexOf('kira') >= 0 ||
+          (c.baglam === 'muhasebe' && sesTutarBul(d)))) return null;
+    var t = sesTutarBul(d);
+    if (!t) return null;
+    var aciklama = kelimeleriAt(sesTutarsiz(c.metin),
+                                ['ekle', 'gider', 'olarak', 'için', 'icin']);
+    return { tur: 'gider-ekle', tutar: t, aciklama: aciklama || 'Gider' };
+  },
+  uygula: function (o) {
+    GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
+      aciklama: o.aciklama, tutar: o.tutar, tur: 'fatura' });
+    balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
+    Ekran.ac('muhasebe');
+  }
+});
 })();
 
 /* ===== ekran: 96-is-basina.html ===== */
@@ -11840,7 +12176,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>92cb79c3</b><br>' +
+      'Sürüm <b>e335db31</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

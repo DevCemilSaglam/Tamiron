@@ -105,4 +105,48 @@ document.addEventListener('click', function (e) {
 document.addEventListener('input', function (e) {
   if (e.target && e.target.id === 'arcQ') Ekran.tazele();
 });
+
+/* ================= SESLİ İŞ — ARAMA (Tur 8.3) =================
+   Üç liste ekranının (araçlar · kayıtlar · müşteriler) ORTAK işi; şema
+   tek yerde, burada. Listelerin bağlamında komut kelimesi gerekmez:
+   söylenen her şey aranır.
+   ⚠️ KOMUT KELİMELERİ KELİME OLARAK ARANIYOR (K-018): "yeni ARAÇ"
+   " ara"yı, "GÖSTERGE paneli" "göster"i tutuyordu. */
+Islem.tanim('ara', {
+  ekran: 'araclar', baglam: ['araclar', 'kayitlar', 'musteriler'], oncelik: 50,
+  baslik: 'Aranacak',
+  eylem: 'Ara',
+  alanlar: [
+    { ad: 'hedef', etiket: 'Nerede', tip: 'secim', zorunlu: true,
+      secenek: { araclar: 'Araçlar', kayitlar: 'Servis kayıtları', musteriler: 'Müşteriler' } },
+    { ad: 'terim', etiket: 'Ne', tip: 'metin', bos: 'servistekiler' },
+    { ad: 'suzgec', etiket: 'Süzgeç', tip: 'secim', ozette: false,
+      secenek: { serviste: 'Serviste' } }
+  ],
+  tani: function (c) {
+    var d = c.d, baglam = c.baglam;
+    if (!kelimeVarMi(d, ['ara', 'bul', 'goster']) &&
+        ['araclar', 'kayitlar', 'musteriler'].indexOf(baglam) < 0) return null;
+    var terim = kelimeleriAt(c.metin,
+      ['ara', 'bul', 'göster', 'goster', 'sahibini', 'sahibi', 'aracını', 'aracini']);
+    var hedef = baglam === 'musteriler' ? 'musteriler'
+              : baglam === 'kayitlar' ? 'kayitlar' : 'araclar';
+    /* "34 ABC 123 sahibini ara" — müşteriye plakadan gidilir. */
+    if (c.p && d.indexOf('sahib') >= 0) {
+      terim = c.arac && c.arac.sahipAd ? c.arac.sahipAd : c.p.plaka;
+      hedef = 'musteriler';
+    }
+    /* "SERVİSTEKİLER" bir arama terimi değil, SÜZGEÇ (14.09 — örnek çip
+       düz aramaya düşüp boş liste döndürüyordu; 45. test korur). */
+    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0) {
+      return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'serviste' };
+    }
+    if (!terim) return null;
+    return { tur: 'ara', hedef: hedef, terim: terim };
+  },
+  uygula: function (o) {
+    ARAMA_TERIMI = { hedef: o.hedef, terim: o.terim, suzgec: o.suzgec || null };
+    Ekran.ac(o.hedef);
+  }
+});
 </script>

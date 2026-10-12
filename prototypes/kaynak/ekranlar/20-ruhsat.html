@@ -645,6 +645,55 @@ document.addEventListener('input', function (e) {
   if (['rPlaka', 'rYil', 'rTel'].indexOf(e.target.id) >= 0) { ruhsatDurum(); return; }
   if (e.target.closest('#rDetayGovde')) rDetaySayac();
 });
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) =================
+   Kayıtlı olmayan bir plaka söylendiğinde iş ruhsat ekranına düşer:
+   marka, model ve motor ruhsattan gelir, sesten değil. */
+
+/* YENİ ARAÇ — "41 KV 5588 Ahmet Yılmaz 0532… debriyaj kaçırıyor".
+   ⚠️ Aynı tuzak burada da var (A-M27): yanlış duyulan bir harf, kayıtlı
+   aracı "yeni araç" yapıp ustayı ruhsat çekmeye gönderir — `oneri`
+   benzer kayıtlı plakayı SORAR. */
+Islem.tanim('yeni-arac', {
+  ekran: 'ruhsat', baglam: ['servis-ekle'], oncelik: 70,
+  baslik: 'Yeni araç — önce ruhsat',
+  eylem: 'Ruhsatı çek',
+  notice: 'Bu araç kayıtlı değil. Söylediklerin ruhsat ekranına yazıldı; ' +
+          'ruhsatı çekince marka, model ve motor kendiliğinden dolar.',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Plaka', tip: 'plaka', zorunlu: true },
+    { ad: 'sahip', etiket: 'Sahibi', tip: 'metin', bos: '— (ruhsattan gelecek)' },
+    { ad: 'tel', etiket: 'Telefon', tip: 'telefon', bos: '— (ruhsatta yazmaz)' },
+    { ad: 'is', etiket: 'Ne istiyor', tip: 'metin', bos: '—' },
+    { ad: 'isTuru', etiket: 'İş türü', tip: 'secim', secenek: SES_IS_TURU, ozette: false },
+    { ad: 'km', etiket: 'Kilometre', tip: 'km', ozette: false }
+  ],
+  tani: function (c) {
+    if (!c.p || c.arac) return null;
+    var s = sesServisOku(c);
+    return { tur: 'yeni-arac', plaka: c.p.plaka, sahip: s.sahip, tel: s.tel,
+             is: s.is, isTuru: s.isTuru, km: s.km, oneri: benzerPlaka(c.p.plaka) };
+  },
+  /* Söylenenler ruhsat ekranına TAŞINIR — usta aynı şeyi iki kez
+     söylemesin. Ruhsat çekilince üstüne yazılır. */
+  uygula: function (o) {
+    RUHSAT_ONDOLGU = { plaka: o.plaka, sahipAd: o.sahip, sahipTel: o.tel,
+                       is: o.is, tur: o.isTuru, km: o.km };
+    Ekran.ac('ruhsat');
+  }
+});
+
+/* BİLİNMEYEN ARAÇ — kendi tanıyıcısı yok; mesaj şeması, kayıtlı
+   olmayan bir plakaya mesaj gönderilmek istendiğinde buraya düşürür. */
+Islem.tanim('bilinmeyen-arac', {
+  ekran: 'ruhsat',
+  baslik: 'Bu araç kayıtlı değil',
+  eylem: 'Ruhsatı çek',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Duyulan plaka', tip: 'plaka', zorunlu: true }
+  ],
+  uygula: function (o) { RUHSAT_ONDOLGU = { plaka: o.plaka }; Ekran.ac('ruhsat'); }
+});
 </script>
 
 <style>

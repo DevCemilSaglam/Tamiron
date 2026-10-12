@@ -32,7 +32,7 @@
 |---|---|---|
 | 8.1 | **Servis detayı — birkaç yaklaşım** üretilip Cemil'e sunulur | AÇIK |
 | 8.2 | **Ayarlar sayfası + alış alanı** (A-M43 · A-M33 · tema) | AÇIK |
-| 8.3 | **Ses → şema sistemi** — dal değil, bildirilen şema | AÇIK |
+| 8.3 | **Ses → şema sistemi** — dal değil, bildirilen şema | **BİTTİ** — 12 şema, 7 ekranda, sahibinin dosyasında (K-056). Ses ekranında işe özgü dal **39 → 0**. Davranış değişmedi: eski/yeni yan yana 568 + 392 + 16 durum, **0 fark**, karne %93 → %93. Yolda iki hata sınıfı: derleyici `$'` ile betiği bozuyordu (7. denetim yanlış şeye bakıyordu), tanıyan/yapan yol ayrışabiliyordu (**51. test**). Kalıcı araç: `tools/ses-esdeger.js` |
 | 8.4 | **A-M48** — dükkân sesine erişmeden ölçüm: seçenekler | AÇIK |
 | 8.5 | **Ölçüt doğrulama + model koşusu** (A-M34 → A-M35) | **BEKLİYOR** — Cemil'in doğrulaması olmadan koşu karne değil tahmin üretir |
 

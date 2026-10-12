@@ -10,6 +10,88 @@
 
 ---
 
+## K-056 · Ses işi tanımaz; işin sahibi ekran şemasını bildirir (12.10.2026 · Tur 8.3)
+
+> **Cemil, 12.10:** *"Kaydedilen ses bir json dolduracak. Bu ikisi
+> eşleşmeli. Hangi sayfada olduğuna göre bu json'u dolduracak ve işlem
+> yapacak."*
+
+### 56.1 · Karar: şema, sahibi olan ekranda
+
+Her sesli iş **bir şemadır** ve şemayı işin **sahibi olan ekran** bildirir
+(`Islem.tanim`, çekirdek `betik/04-islem.js`). Şema tek yerde dört şeyi
+söyler: **alanlar** (JSON'un kendisi, tipleriyle) · **tanıma** (genel yolda
+ve kendi bağlamında) · **onay ekranının sözleri** · **uygula**.
+
+| | önce | sonra |
+|---|---|---|
+| Ses ekranında işe özgü dal | çözümleyicide 15 `return`, onay ekranında 12, uygulamada 12 `o.tur ===` | **0** |
+| Yeni iş eklemek | üç yerde üç dal | **bir şema**, sahibinin dosyasında |
+| "Bunu mu demek istedin" (7.3) | yalnız kayıt ekranı için elle | **varsayılan işi olan her bağlam** için aynı yol |
+| Onay ekranı | iş başına elle çizilmiş | şemadan; `sor: true` alan **soru** olur (çip / kutu) |
+
+12 şema · 7 ekran: kayıt (satır-ekle · fiyat-güncelle · servis-aç) ·
+teslim · araç · ruhsat (yeni-araç · bilinmeyen-araç) · mesaj (tekli ·
+toplu) · muhasebe (tahsilat · gider) · araçlar (ara).
+
+**Neden ekranda, ses ekranında değil:** ortak nesne kuralı. Teslim
+işinin ödeme seçimi teslim ekranının durumudur; eskiden ses ekranı o
+ekranın düğmesine **dışarıdan tıklıyordu.** İşi bilen yer, işi yapan yer.
+
+### 56.2 · Davranış DEĞİŞMEDİ — ve bu ölçüldü
+
+Yeniden yapılandırma bir özellik değildir; usta bir fark görmemeli.
+Eski ve yeni derleme yan yana yüklenip karşılaştırıldı
+(`tools/ses-esdeger.js`, kalıcı araç):
+
+| ölçüm | durum | fark |
+|---|---|---|
+| işlem nesnesi (cümle × 8 bağlam) | 568 | 0 |
+| onay ekranı (metin · düğme · seçim · kutu) | 392 | 0 |
+| uygulama (veri · ekran · balon · kayda dönüş) | 16 iş | 0 |
+| değerlendirme seti | 40 | **%93 → %93** |
+
+Araç negatif testle doğrulandı (öncelik bozuldu → 18 fark; gider şeması
+bozuldu → 30 + 10 fark). ⚠️ **Sınırı:** toplu/tekli mesaj önceliğini
+takas etmek **0 fark** verdi — derlemde plakalı toplu mesaj cümlesi yok.
+0 fark *"aynı"* değil, *"bu derlemde aynı"* demektir.
+
+### 56.3 · Bilerek taşınan iki kusur
+
+- `satir-ekle` hâlâ `alis: 0` yazıyor → **8.2'nin işi** (K-055.2).
+- Söylenmeyen tutar `0` (null değil) — bugünkü bütün şemalar 0'ı
+  *"söylenmedi"* okuyor. Satış tutarında null/0 ayrımı 8.2'de bakılacak.
+
+### 56.4 · Bulunan iki hata sınıfı
+
+1. **Derleyici betiği bozuyordu ve 7. denetimi "temiz" diyordu.**
+   `replace(yer, js)` dizgedeki `$'` kalıbını *"eşleşmeden sonrası"*
+   diye yorumladı; 04-islem.js'teki bir düzenli ifade dizgesi tam bu
+   kalıbı taşıyordu. Denetim yerleştirmeden **önceki** betiği ölçüyordu.
+   Şimdi yerleştirme fonksiyonla, denetim **üretilen dosyadan** —
+   negatif testle doğrulandı. Bugüne kadar tutması tesadüftü.
+2. **Tanıyan yol ile yapan yol ayrışabiliyor.** Şemayı kayda düşüren
+   satırı unutmuştum: cümle doğru anlaşıldı, onay ekranı şemayı bulamadı
+   ve çöktü. Eşdeğerlik aracı yakaladı, denetim değil → **51. test
+   (ISLEM-SEMA)**, negatif testle doğrulandı. Ses ekranı da artık
+   şemasız işi *"Anlayamadım"* sayıyor (güvenli yön: hiçbir şey yapma)
+   ve izine yazıyor.
+
+### 56.5 · Backend köprüsü
+
+`ISLEM_SEMALARI()` aynı 12 şemayı araç tanımı biçiminde veriyor (`name`
+· `description` · `input_schema`). Model geldiğinde değişen yalnız
+**tanıyıcıdır**; alanlar, onay ekranı ve uygulama aynı kalır (K-054 ①:
+model doldurur, usta onay ekranında düzeltir).
+
+⚠️ **Cemil onayına açık — 8.1'le kesişme:** kayıt ekranının şeması
+ekranın **işlerine** bağlandı, düzenine değil (satır ekle · fiyat
+güncelle · servis aç). Servis detayı hangi kurguyla yeniden kurulursa
+kurulsun bu işler aynı kalıyor; kurgu yeni bir iş getirirse o iş bir
+şema olur.
+
+---
+
 ## K-055 · Bekleyen on beş madde kapandı; bir ayar sayfası ve iki yeni iş açıldı (12.10.2026)
 
 > **Cemil, 12.10:** *"Öncelikle kararlar. Ardından sunumu tekrar gözden

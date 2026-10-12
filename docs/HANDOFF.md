@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 12.10.2026 *(K-055 · on beş açık madde kapandı · Tur 8 açıldı)*
+> **Son güncelleme:** 12.10.2026 *(K-056 · ses şema sistemi · Tur 8.3 bitti)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -20,11 +20,11 @@ tıklanabilir prototip.
 | Yapay zeka | **Plan yazıldı, kod yok:** `arastirma/YAPAY-ZEKA.md` — dört iş (ses anlama · ruhsat · parça listesi · mesaj düzeltme), tek şart (**anahtar backend'de**), ölçüm yolu (değerlendirme seti) |
 | Dokunuş | ana yol **13** · kısa yol **10** · **ruhsatsız yol 8** · **kayıtlı araç 8** · sesli yol **2 dokunuş + 1 konuşma** · müşteriye özet **2** — *hepsi 06.09'da yeniden yürütülerek ölçüldü.* Ana yol **+1**: tür seçimi −1, ruhsat sekmesi +1, teslim sonrası kapatma +1 (A-M14) |
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
-| Sağlık denetimi | **50 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
-| Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-055** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
-| Ses | Cümle → **işlem nesnesi** → onay. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
-| Sıradaki | **Tur 8** — servis detayı yeniden kurgu · ayarlar sayfası + alış alanı · ses şema sistemi · A-M48 (bkz. `CALISMA-KUYRUGU.md`) |
+| Sağlık denetimi | **51 test · 0 bulgu** · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
+| Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **7. kontrol artık ÜRETİLEN dosyadaki betiği ayrıştırıyor** — yerleştirmeden önceki betiğe bakıyordu ve `$'` bozulmasını görmedi (K-056.4). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
+| Kararlar | **K-001 … K-056** · açık yalnız **A-M48** (ses ölçümü) ve **A-M36** (saklama süresi, ertelendi) |
+| Ses | Cümle → **işlem nesnesi** → onay. **İşi ses tanımaz: sahibi olan ekran şemasını bildirir** (`Islem.tanim`, `betik/04-islem.js`; 12 şema · 7 ekran — K-056). Onay ekranı ve uygulama şemadan. `ISLEM_SEMALARI()` = modele araç tanımı. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
+| Sıradaki | **Tur 8** — servis detayı yeniden kurgu · ayarlar sayfası + alış alanı · A-M48 (bkz. `CALISMA-KUYRUGU.md`). **8.3 bitti** |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
@@ -55,7 +55,7 @@ prototypes/kaynak/**        <- ELLE BURASI DÜZENLENİR
   kabuk.html                   header + çekmece + toast + yuvalar
   ikonlar.svg                  33 ikon (Lucide, v1'den)
   stil/  01-taban 02-kabuk 03-bilesen.css
-  betik/ 01-cekirdek 02-veri 03-nesne.js
+  betik/ 00-iz 01-cekirdek 02-veri 03-nesne 04-islem.js
   ekranlar/ 10-home 15-ses 20-ruhsat 30-kayit 40-parca-sor
             50-teslim 60-arac 70-araclar 80-kayitlar
             85-mesaj 90-musteriler 95-muhasebe
@@ -258,6 +258,20 @@ düzeltildi. **Bilmediğini yazan belge, bilmediğini gizleyenden
 kullanışlıdır.**
 
 ---
+
+### 12.10 turunda öğrenilen iki şey
+
+**Yeniden yapılandırmanın ölçüsü "bir şey değişmedi"dir — ve bu ÖLÇÜLÜR.**
+Ses şemaya taşınırken eski derleme kopyalanıp yenisiyle yan yana
+yüklendi; ~70 cümle × 8 bağlam nesne, onay ekranı ve uygulama düzeyinde
+birebir karşılaştırıldı (`tools/ses-esdeger.js`). Bu araç benim hatamı
+denetimden **önce** yakaladı. 8.1'de servis detayı yeniden kurulurken
+de aynı araç koşmalı.
+
+**Derleyici de bir ölçüm aletidir.** `replace(yer, js)` dizgedeki `$'`'ı
+yorumlayıp betiği bozdu; 7. denetim yerleştirmeden ÖNCEKİ betiğe
+bakıyordu ve "temiz" dedi. Kaynak doğru, araç yalancıydı. Ölçülecek
+şey tarayıcının aldığı dosyadır.
 
 ### Bayat sayfa — ölçülen şey yüklenen şey değil (16.09.2026)
 

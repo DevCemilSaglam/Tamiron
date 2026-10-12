@@ -384,4 +384,20 @@ document.addEventListener('click', function (e) {
   if (t.id === 'arNotMik') { sesleAc('genel'); return; }
   if (t.id === 'arSesle') { sesleAc('genel'); return; }
 });
+
+/* ================= SESLİ İŞ — bu ekranın şeması (Tur 8.3) =================
+   Kendi tanıyıcısı yok: teslim şeması, serviste olmayan bir aracı
+   teslim etmeye kalkan cümleyi buraya düşürüyor. Usta aracın geçmişine
+   gider — belki kaydı başka bir plakadaydı.
+   `guclu: false`: açık kayıttayken bu sonuç bağlamın kendi işini
+   ÖNERİYE düşürmez (Tur 7'deki SES_GUCLU_TUR listesinde de yoktu). */
+Islem.tanim('teslim-edilecek-kayit-yok', {
+  ekran: 'arac', guclu: false,
+  baslik: 'Bu araç zaten serviste değil',
+  eylem: 'Aracın geçmişini aç',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true }
+  ],
+  uygula: function (o) { ACIK_PLAKA = o.plaka; Ekran.ac('arac'); }
+});
 </script>

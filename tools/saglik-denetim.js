@@ -2052,6 +2052,102 @@ function stilMetni() {
     }
   }
 
+  /* 51) ISLEM SEMASI EKSIK — TANINAN IS YAPILAMIYOR (12.10.2026 · Tur 8.3)
+     Ses artik isi TANIMIYOR; isin sahibi ekran bir sema bildiriyor
+     (Islem.tanim) ve ses o semayi dolduruyor. Tanima, onay ekrani ve
+     uygulama UC AYRI parcada duruyor: tani() bir nesne uretir, ozet()
+     o nesnenin semasini arar, uygula() semanin uygula'sini cagirir.
+
+     YASANAN: semayi kaydeden satir unutulmustu (SEMALAR[tur] = s).
+     Taniyicilar ayri bir listede durdugu icin CALISTI -- cumle dogru
+     anlasildi, nesne dogru doldu -- ama onay ekrani semayi bulamadi.
+     Taniyan yol ile yapan yol AYRISABILIYOR ve hicbir test bunu
+     gormuyordu; esdegerlik olcumu yakaladi, denetim degil.
+
+     Olculen: ekranin onerdigi her cumle, her baglamda --
+       a) uretilen isin (ve onerinin) semasi VAR mi,
+       b) onay ekrani bos ya da "undefined" yazmadan ciziliyor mu,
+       c) semanin uygula'si var mi,
+       d) modele tarif (ISLEM_SEMALARI) her semayi veriyor mu.
+     NEGATIF DOGRULAMA (12.10): `SEMALAR[tur] = s` satiri silindi ->
+     bulgu; geri konunca 0. */
+  if (typeof Islem !== 'undefined' && typeof window.SES_COZUMLE === 'function' &&
+      typeof window.SES_BAGLAMLAR === 'function') {
+    var semaYedek = { niyet: window.SESLI_NIYET, kayit: window.ACIK_KAYIT };
+    var semaKayit = null;
+    KAYITLAR.forEach(function (k) {
+      if (!semaKayit && !k.teslimTarihi && (k.satirlar || []).length > 1) semaKayit = k;
+    });
+    var semaGorulen = {};
+    var semaBak = function (o, baglam, cumle) {
+      if (!o || o.tur === 'plakasiz') return;
+      var nerede = baglam + ' "' + cumle + '"';
+      if (!Islem.sema(o.tur)) {
+        ek('ISLEM-SEMA', 'ses', nerede + ' -> "' + o.tur + '" taniniyor ama SEMASI YOK');
+        return;
+      }
+      semaGorulen[o.tur] = 1;
+      var oz = null;
+      try { oz = Islem.ozet(o); } catch (e) {
+        ek('ISLEM-SEMA', 'ses', nerede + ' -> onay ekrani patladi: ' + e.message); return;
+      }
+      if (!oz || !oz.baslik || !oz.eylem) {
+        ek('ISLEM-SEMA', 'ses', nerede + ' -> onay ekraninda baslik/eylem yok (' + o.tur + ')');
+        return;
+      }
+      oz.satirlar.forEach(function (s) {
+        var m = String(s[1]);
+        if (s[1] === undefined || s[1] === null || m === '' ||
+            m.indexOf('undefined') >= 0 || m.indexOf('[object') >= 0 || m.indexOf('NaN') >= 0) {
+          ek('ISLEM-SEMA', 'ses', nerede + ' -> "' + s[0] + '" satiri bos/bozuk: ' + m);
+        }
+      });
+      if (typeof Islem.sema(o.tur).uygula !== 'function') {
+        ek('ISLEM-SEMA', 'ses', nerede + ' -> "' + o.tur + '" onaylanir ama YAPILAMAZ (uygula yok)');
+      }
+    };
+    var semaOrnek = window.SES_BAGLAMLAR();
+    var semaCumleler = [];
+    Object.keys(semaOrnek).forEach(function (b) { semaCumleler = semaCumleler.concat(semaOrnek[b]); });
+    Object.keys(semaOrnek).forEach(function (baglam) {
+      semaCumleler.forEach(function (cumle) {
+        window.SESLI_NIYET = baglam;
+        window.ACIK_KAYIT = (baglam === 'kayit-icinde' && semaKayit) ? semaKayit.id : null;
+        var o = null;
+        try { o = window.SES_COZUMLE(cumle); } catch (e) {
+          ek('ISLEM-SEMA', 'ses', baglam + ' "' + cumle + '" -> cozumleyici patladi: ' + e.message);
+          return;
+        }
+        semaBak(o, baglam, cumle);
+        if (o && o.baskaIslem) semaBak(o.baskaIslem, baglam + ' (oneri)', cumle);
+      });
+    });
+    window.SESLI_NIYET = semaYedek.niyet;
+    window.ACIK_KAYIT = semaYedek.kayit;
+
+    /* Bos kalan olcum yalanci gecer (48. testin dersi): ornekler hic
+       is uretmediyse bunu soyle. */
+    if (!Object.keys(semaGorulen).length) {
+      ek('ISLEM-SEMA', 'ses', 'ornek cumlelerin hicbiri bir is uretmedi -- olcum yapilamadi');
+    }
+
+    /* (d) modele tarif: her sema, bir kez, alanlariyla */
+    var tarif = typeof window.ISLEM_SEMALARI === 'function' ? window.ISLEM_SEMALARI() : [];
+    var turler = Islem.turler();
+    if (!turler.length || tarif.length !== turler.length) {
+      ek('ISLEM-SEMA', 'ses', 'modele tarif ' + tarif.length + ' sema veriyor, kayitli ' +
+         turler.length);
+    }
+    tarif.forEach(function (t) {
+      var ozl = (t.input_schema || {}).properties || {};
+      Object.keys(ozl).forEach(function (a) {
+        if (ozl[a].enum && !ozl[a].enum.length) {
+          ek('ISLEM-SEMA', 'ses', t.name + '.' + a + ' secim alani ama secenegi yok');
+        }
+      });
+    });
+  }
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

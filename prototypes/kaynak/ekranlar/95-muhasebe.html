@@ -406,4 +406,72 @@ Kaydirma.tanim('muhasebe', function (anahtar) {
     Ekran.tazele();
   });
 });
+
+/* ================= SESLİ İŞLER — bu ekranın şeması (Tur 8.3) ================= */
+
+/* TAHSİLAT SORUSU (14.09) — tamircinin DÖRDÜNCÜ işinin ta kendisi
+   (*"teslimde ödemeyi nasıl aldığını bilmek"*) ve cevabı kayıtlı
+   veriden çıkıyor. Yeni alan istemeyen bir soru, yeni özellik değil.
+   SORUNUN CEVABI ONAY EKRANINDA: muhasebeyi açıp ustayı rakamı aramaya
+   bırakmak, sorduğu şeyi cevaplamamaktır.
+   ⚠️ TUTAR VARSA BU BİR SORU DEĞİL, GİDER GİRİŞİDİR — en önde (10)
+   duruyor ama "2400 TL elektrik faturası" buraya düşmesin diye tutarı
+   olan cümleyi geri çeviriyor. */
+Islem.tanim('tahsilat-sor', {
+  ekran: 'muhasebe', baglam: ['muhasebe'], oncelik: 10,
+  baslik: function (o) { return donemAdi(o.donem) + ' tahsilat'; },
+  tarif: 'Tahsilat sorusu — cevap kayıtlı veriden',
+  eylem: 'Muhasebeyi aç',
+  alanlar: [
+    { ad: 'donem', etiket: 'Dönem', tip: 'secim', ozette: false, zorunlu: true,
+      secenek: { bugun: 'Bugün', ay: 'Bu ay', yil: 'Bu yıl' } },
+    { ad: 'tahsil', etiket: 'Tahsil edilen', turet: function (o) {
+        return tutar(tahsilatToplami(o.donem)) + ' ₺'; } },
+    { ad: 'alacak', etiket: 'Alacak (veresiye)', turet: function () {
+        return tutar(veresiyeToplami()) + ' ₺'; } }
+  ],
+  tani: function (c) {
+    var d = c.d;
+    if (sesTutarBul(d) || (d.indexOf('tahsil') < 0 && d.indexOf('kasa') < 0)) return null;
+    var donem = (d.indexOf('bugun') >= 0) ? 'bugun'
+              : (d.indexOf('yil') >= 0) ? 'yil'
+              : (d.indexOf('ay') >= 0) ? 'ay' : 'bugun';
+    return { tur: 'tahsilat-sor', donem: donem };
+  },
+  /* Dönem muhasebe ekranıyla ORTAK (çekirdekteki muhDonemSecili):
+     usta sorduğu pencereyi ekranda da bulsun. */
+  uygula: function (o) {
+    muhDonemSecili = o.donem;
+    Ekran.ac('muhasebe');
+  }
+});
+
+/* GİDER EKLE — muhasebe bağlamında yalnız tutar yeter ("850 lira"); başka
+   yerde "gider/fatura/kira" kelimesi aranır. */
+Islem.tanim('gider-ekle', {
+  ekran: 'muhasebe', baglam: ['muhasebe'], oncelik: 20,
+  baslik: 'Gider eklenecek',
+  eylem: 'Gideri ekle',
+  alanlar: [
+    { ad: 'aciklama', etiket: 'Açıklama', tip: 'metin', zorunlu: true },
+    { ad: 'tutar', etiket: 'Tutar', tip: 'para', zorunlu: true },
+    { ad: 'tarih', etiket: 'Tarih', turet: function () { return bugunMetin(); } }
+  ],
+  tani: function (c) {
+    var d = c.d;
+    if (!(d.indexOf('gider') >= 0 || d.indexOf('fatura') >= 0 || d.indexOf('kira') >= 0 ||
+          (c.baglam === 'muhasebe' && sesTutarBul(d)))) return null;
+    var t = sesTutarBul(d);
+    if (!t) return null;
+    var aciklama = kelimeleriAt(sesTutarsiz(c.metin),
+                                ['ekle', 'gider', 'olarak', 'için', 'icin']);
+    return { tur: 'gider-ekle', tutar: t, aciklama: aciklama || 'Gider' };
+  },
+  uygula: function (o) {
+    GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
+      aciklama: o.aciklama, tutar: o.tutar, tur: 'fatura' });
+    balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
+    Ekran.ac('muhasebe');
+  }
+});
 </script>
