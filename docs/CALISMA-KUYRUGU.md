@@ -19,6 +19,123 @@
 
 ---
 
+## Tur 8 · 12.10.2026 · açık · son commit `a50aad8`
+
+> **Cemil:** *"Servis detay sayfası kullanışlı olmadı gibi görüyorum.
+> Burası için iş mekanizmasına uygun birkaç farklı yaklaşımda sayfa
+> oluştur. Buna göre değerlendirelim."*
+> *"İşlemleri için bir yol / sistem oluşturmak istiyorduk. Kaydedilen
+> ses bir json dolduracak. Bu ikisi eşleşmeli. Hangi sayfada olduğuna
+> göre bu json'u dolduracak ve işlem yapacak."*
+
+| # | İş | Durum |
+|---|---|---|
+| 8.1 | **Servis detayı — birkaç yaklaşım** üretilip Cemil'e sunulur | AÇIK |
+| 8.2 | **Ayarlar sayfası + alış alanı** (A-M43 · A-M33 · tema) | AÇIK |
+| 8.3 | **Ses → şema sistemi** — dal değil, bildirilen şema | AÇIK |
+| 8.4 | **A-M48** — dükkân sesine erişmeden ölçüm: seçenekler | AÇIK |
+| 8.5 | **Ölçüt doğrulama + model koşusu** (A-M34 → A-M35) | **BEKLİYOR** — Cemil'in doğrulaması olmadan koşu karne değil tahmin üretir |
+
+---
+
+### 8.1 · Servis detayı: neden ve ne üretilecek
+
+**Bu ekran ikinci kez şikâyet konusu.** 7.1'de de *"istediğim gibi
+değil"* denmişti; o tur bir **kusuru** düzeltti (görünmeyen satır),
+**kurgusunu** değiştirmedi. Bu kez istenen kurgu.
+
+**Hipotez — adım yapısının kendisi sürtünme üretiyor.** Bugün ekran üç
+adımlı bir sihirbaz (`K_ADIMLAR`: İş · Yapılanlar · Teslim). Sihirbaz
+**bir oturuşta biten** işler için iyidir. Oysa servis kaydı günlerce
+açık kalır: araç gelir, parça beklenir, ertesi gün satır eklenir, sonra
+teslim edilir. Her dönüşte usta *"hangi adımdaydım"* sorusunu yeniden
+cevaplıyor.
+
+Bunun kanıtı 7.1'in kusurunda duruyor: *"Parça ekle" adımların
+üstündeydi, tablo 2. adımın içindeydi* → usta 1. adımda basınca satır
+**görünmeden** ekleniyordu. Bu bir dikkatsizlik değil, **yapının
+ürettiği bir hata sınıfı**: eylem bir yerde, sonucu başka yerde.
+
+**Üretilecek: en az üç yaklaşım**, her biri çalışır hâlde ve aynı veriyle:
+
+| | Yaklaşım | Temel iddia |
+|---|---|---|
+| **A** | **Tek sayfa, bölümler** | Adım yok; her şey görünür, bölümler katlanır. Usta nereye isterse dokunur |
+| **B** | **Kayıt kartı + yerinde düzenleme** | Üstte kaydın özeti (plaka · iş · tutar · teslim), altta satırlar; düzenleme satırın kendisinde |
+| **C** | **Eylem merkezli** | Sayfa sabit; altta büyük eylem çubuğu (Satır ekle · Parça sor · Mesaj · Teslim et). Usta *işi* seçer, ekran ona açılır |
+| **D** | **Zaman çizelgesi** | Kayıt bir akıştır: açıldı → satır → parça soruldu → teslim. Yukarıdan aşağı okunur, en altta *"şimdi ne yapsam"* |
+
+**Ölçüt — iddia değil rakam:** her yaklaşım için **dokunuş sayısı**
+(satır ekleme · tutar girme · teslim) ve **320 px'te taşma/kırpma**
+ölçülür. T-18 kazanır: en az karar soran, en büyük hedefli olan.
+
+**Bitti sayılır:** yaklaşımlar gezilebilir hâlde, her birinin dokunuş
+sayısı yazılı, Cemil'e **tek sayfada yan yana** sunuldu. Seçim Cemil'in.
+
+### 8.2 · Ayarlar sayfası + alış alanı (K-055.2)
+
+Üç sakin: *"Parça alış fiyatı sorulsun mu"* (A-M43) · gizlilik cümlesi
+(A-M33) · tema (bugün çekmecede, K-010'un üç hâli korunur).
+
+⚠️ **`alis: null` ≠ `alis: 0`.** Bugünkü kusur tam burada: 0 *"bedava
+aldım"* demek, boş *"bilinmiyor"* demek. Bilinmeyen alış kâr
+hesabından **elenir**, sıfır sayılmaz. Bugün parçacının fiyatı `fiyat`e
+yazılıyor ve kâr şişik çıkıyor (`MALIYET-VE-KAR §1`).
+
+**Menü bütçesi sınanacak** (A-M8: ≤ 8 başlık) — ayarlar menüye satır
+ekliyorsa çekmecede kalmalı.
+
+**Bitti sayılır:** ayar değiştirince ekran **gerçekten** değişiyor;
+boş alışlı kayıtta kâr rakamı şişmiyor (elle hesapla doğrulanmış, eski
+ve yeni rakam commit mesajında); denetime *"bilinmeyen alış kâra
+girmiyor"* testi eklendi ve **negatif testle** doğrulandı.
+
+### 8.3 · Ses → şema sistemi
+
+**Bugün ne var:** `sesCozumle()` bir işlem nesnesi üretiyor, `sesGenel()`
+bağlamdan bağımsız yolu kovalıyor, onay ekranı alan alan gösteriyor
+(7.2–7.4). **Çalışıyor ama bir sistem değil: her yeni iş için elle bir
+dal yazılıyor.**
+
+**İstenen:** her ekran **kendi şemasını bildirsin**; ses o şemayı
+doldursun; onay ekranı şemadan **üretilsin**; uygulama şemadan çağrılsın.
+
+```
+ekran 'kayit' bildirir:
+  { eylem: 'satirEkle',
+    alanlar: { ad:'metin', tutar:'para', tip:['parca','iscilik'] } }
+
+ses → şemayı doldurur → onay ekranı şemadan çizilir → uygula
+```
+
+**Neden bu iş değerli — üç sebep:**
+
+1. **Yeni ekran eklemek dal yazmak olmaktan çıkar**, şema yazmak olur.
+   Tur 7'nin dersi buydu: bağlam dalı *"geri kalan her şey"* dalına
+   dönüşmüştü ve kayıt açıkken söylenen **her cümle parça oluyordu**.
+2. **Ortak nesne kuralı** onay ekranına da uygulanır — bugün alan alan
+   elle çiziliyor, yarın şemadan tek yerde.
+3. **Backend'e köprü.** Aynı şema, gerçek modele geçildiğinde
+   `tool definition` / yapılandırılmış çıktı tanımı olur — backend
+   turunda sıfırdan yazılmaz. Ve model doldurur, usta düzeltir: fark
+   **düzeltme birikimidir** (K-054 ①). Bu iş K-054'ün ölçütünü geçiyor.
+
+**Bitti sayılır:** en az üç ekran şemayla çalışıyor (kayıt · gider ·
+mesaj); onay ekranı şemadan üretiliyor; elle yazılmış dal sayısı
+**azalmış** (rakamla); 50. denetim testi şema yolunda da geçiyor; ses
+bağlam dışı işi hâlâ tanıyor ve *"Kayda dön"* çalışıyor.
+
+### 8.4 · A-M48 — sese erişmeden ölçüm
+
+Araştırma işi, kod değil. Dört aday: hazır Türkçe konuşma derlemleri ·
+sentetik üretim + `ses-bozucu.js` · tanıdık bir dükkânda tek seferlik
+kayıt · ölçümü erteleyip **riski yazmak**. Çıktı: `arastirma/` altında
+bir not + öneri. **Çözümsüzse riskin kendisi yazılır** — ölçülmemiş bir
+şey *"çalışıyor"* diye anlatılmaz (sunumun *"henüz hazır olmayanlar"*
+bölümüne girer).
+
+---
+
 ## Tur 7 · 16.09.2026 · son commit `0a3b205`
 
 > **Cemil:** *"Servis kayıt ekranı istediğim gibi değil. Orada parça
