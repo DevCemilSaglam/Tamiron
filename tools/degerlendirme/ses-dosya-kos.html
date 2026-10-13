@@ -73,6 +73,7 @@
     <label for="gurultu">Gürültü (isteğe bağlı — tek dosya; seçilirse bozulmuş varyantlar da koşar)</label>
     <input type="file" id="gurultu" accept="audio/*,.mp3,.wav" aria-label="Gürültü dosyası">
     <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code> — karşılaştırma için ayrı koşu)</label>
+    <label><input type="checkbox" id="esitle" checked> Seviyeyi eşitle (konuşma −20 dB — mikrofonun otomatik kazancının taklidi)</label>
     <label><input type="checkbox" id="kirp" checked> Baştaki ve sondaki sessizliği kırp (koşu biraz kısalır — s01: 17,2 → 14,9 sn; ortadaki duraklamalara dokunmaz)</label>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <button id="kos" disabled>Koş</button>
@@ -89,6 +90,7 @@
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button data-sunucu="dogrula">1 · Tek dosyayla doğrula</button>
       <button data-sunucu="temiz">2 · 40 cümle (temiz)</button>
+      <button data-sunucu="derlem5">Derlem 5 (hızlı kontrol, ~1,5 dk)</button>
       <button data-sunucu="derlem">3 · Derlem 100 (genel Türkçe)</button>
     </div>
     <label for="gurultuSec">4 · 40 cümle + gürültü (temiz · uzak · kırpık · 18/12/6 dB):</label>
@@ -202,6 +204,25 @@ function tani(kaynak, ifadeAcik) {
       }
     }
     catch (e) { ctx.close(); return bitti({ hata: 'çözülemedi: ' + e.message }); }
+    /* SEVİYE EŞİTLEME (13.10): mikrofondan dinlerken Chrome otomatik
+       kazanç uyguluyor; dosyadan beslerken uygulamıyor. Cemil'in kayıtları
+       ortalama −35 dB RMS — mikrofondan gelen sesten ~15 dB kısık. Konuşma
+       seviyesi ses-olcu.js'in AYNI tanımıyla (%90'lık çerçeve) −20 dB'ye
+       getirilir; tepe 0,98'i aşmaz. Seçenek: sonuç JSON'unda yazılı. */
+    if ($('esitle').checked) {
+      var kanal0 = tampon.getChannelData(0);
+      var kon = SesOlcu.seviyeler(kanal0, tampon.sampleRate).konusma || 1e-6;
+      var tepe = 0;
+      for (var ci = 0; ci < tampon.numberOfChannels; ci++) {
+        var kd0 = tampon.getChannelData(ci);
+        for (var ii = 0; ii < kd0.length; ii++) { var av = Math.abs(kd0[ii]); if (av > tepe) tepe = av; }
+      }
+      var kaz = Math.min(Math.pow(10, -20 / 20) / kon, tepe > 0 ? 0.98 / tepe : 1);
+      for (var cj = 0; cj < tampon.numberOfChannels; cj++) {
+        var kd1 = tampon.getChannelData(cj);
+        for (var jj = 0; jj < kd1.length; jj++) kd1[jj] *= kaz;
+      }
+    }
     var hedef = ctx.createMediaStreamDestination();
     /* ⚠️ ADI "oynatici" — "kaynak" DEĞİL. İlk yazışta `var kaynak` idi ve
        `var` fonksiyonun başına taşındığı için PARAMETREYİ gölgeledi: her
@@ -251,7 +272,10 @@ function kho(beklenen, duyulan) {
   return a.length ? d[a.length][b.length] / a.length : 0;
 }
 
-var SECIM = null, SON_HAM = null, SON_AD = '';
+var SECIM = null, SON_HAM = null, SON_AD = '', KOSUYOR = false, MESGUL = false;
+function secenekler() {
+  return { esitle: $('esitle').checked, kirp: $('kirp').checked, ifadeler: $('ifadeler').checked };
+}
 async function sunucuDosya(yol, ad) {
   var r = await fetch(yol + '?t=' + Date.now());
   if (!r.ok) throw new Error(yol + ' — ' + r.status);
@@ -260,6 +284,14 @@ async function sunucuDosya(yol, ad) {
 document.addEventListener('click', async function (e) {
   var b = e.target.closest('[data-sunucu]');
   if (b) {
+    /* ⚠️ KOŞU SÜRERKEN İKİNCİ DÜĞME YOK (13.10): ilk gerçek koşuda iki
+       düğmeye art arda basıldı; ikincisi koşmadı ama DOSYA ADINI değiştirdi
+       — 40 cümlenin sonucu "derlem" adıyla indi. */
+    /* MESGUL basıldığı ANDA konur — dosyalar sunucudan inerken de koşu
+       sürüyor sayılır (ilk yazışta işaret indirmeden SONRA konuyordu ve
+       indirme sırasında basılan ikinci düğme geçiyordu). */
+    if (KOSUYOR || MESGUL) { durum('Bir koşu sürüyor — bitmesini bekle.'); return; }
+    MESGUL = true;
     var tur = b.getAttribute('data-sunucu');
     try {
       durum('Sunucudan alınıyor…');
@@ -267,9 +299,10 @@ document.addEventListener('click', async function (e) {
       var adlar = dz.kayitlar.map(function (k) { return k.dosya; });
       if (tur === 'dogrula') adlar = adlar.slice(0, 1);
       var tum = [], g = null;
-      if (tur === 'derlem') {
+      if (tur === 'derlem' || tur === 'derlem5') {
         var liste = await (await fetch(KOK + 'sesler/derlem-100/')).text();
-        var dos = (liste.match(/href="([^"]+\.(?:flac|txt))"/g) || []).map(function (h) { return decodeURIComponent(h.slice(6, -1)); });
+        var dos = (liste.match(/href="([^"]+\.(?:flac|txt))"/g) || []).map(function (h) { return decodeURIComponent(h.slice(6, -1)); }).sort();
+        if (tur === 'derlem5') dos = dos.slice(0, 10);   /* ilk 5 ses + 5 metin */
         for (var i = 0; i < dos.length; i++) tum.push(await sunucuDosya(KOK + 'sesler/derlem-100/' + dos[i], dos[i]));
       } else {
         for (var j = 0; j < adlar.length; j++) tum.push(await sunucuDosya(KOK + 'sesler/kayitlar/' + adlar[j], adlar[j]));
@@ -279,7 +312,7 @@ document.addEventListener('click', async function (e) {
       SON_AD = 'ses-olcum-' + tur + (g ? '-' + b.getAttribute('data-g') : '') + '.json';
       $('kos').disabled = false;
       $('kos').click();
-    } catch (x) { durum('Alınamadı: ' + x.message); SECIM = null; }
+    } catch (x) { durum('Alınamadı: ' + x.message + ' — yerel sunucu açık mı?'); SECIM = null; MESGUL = false; }
     return;
   }
   if (e.target.id === 'indir' && SON_HAM) {
@@ -291,10 +324,12 @@ document.addEventListener('click', async function (e) {
 });
 
 $('kos').addEventListener('click', async function () {
+  if (KOSUYOR) return;
   var P = $('prototip').contentWindow;
   if (!P || typeof P.SES_COZUMLE !== 'function') { durum('Prototip yüklenmedi — sayfayı yenile.'); return; }
   var ifadeAcik = $('ifadeler').checked;
   var tum = SECIM ? SECIM.tum : Array.prototype.slice.call($('dosyalar').files);
+  KOSUYOR = true;
 
   /* DERLEM KİPİ — ses + aynı adlı .txt */
   var metinler = {};
@@ -330,7 +365,7 @@ $('kos').addEventListener('click', async function () {
   var dosyalar = tum
     .map(function (f) { return { f: f, ad: adCoz(f.name) }; })
     .filter(function (x) { return x.ad && SET.cumleler.some(function (c) { return c.id === x.ad.id; }); });
-  if (!dosyalar.length) { durum('Adı sözleşmeye uyan dosya yok (s01.wav …).'); return; }
+  if (!dosyalar.length) { KOSUYOR = false; MESGUL = false; durum('Adı sözleşmeye uyan dosya yok (s01.wav …).'); return; }
   this.disabled = true;
 
   /* GÜRÜLTÜ SEÇİLDİYSE: her TEMİZ kayıttan varyantlar — ortak modülden. */
@@ -415,6 +450,10 @@ $('kos').addEventListener('click', async function () {
    sunucu kipinde JSON KENDİLİĞİNDEN iner (İndirilenler) — lider oradan
    okur. Elle seçilen dosyalarda yalnız düğme açılır. */
 function kosuBitti() {
+  KOSUYOR = false; MESGUL = false;
+  /* Hangi seçeneklerle koşulduğu sonucun İÇİNDE — iki karne ancak
+     böyle karşılaştırılır. */
+  try { var hj = JSON.parse($('ham').textContent); hj.secenekler = secenekler(); $('ham').textContent = JSON.stringify(hj, null, 1); } catch (x) {}
   SON_HAM = $('ham').textContent;
   $('indir').disabled = false;
   var sunucudan = !!SECIM;
