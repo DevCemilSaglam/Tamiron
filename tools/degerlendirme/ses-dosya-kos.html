@@ -290,6 +290,17 @@ function kho(beklenen, duyulan) {
 }
 
 var SECIM = null, SON_HAM = null, SON_AD = '', KOSUYOR = false, MESGUL = false;
+/* ART ARDA AĞ HATASINDA DUR (13.10): ikinci gerçek koşuda tanıma sunucusu
+   cevap vermedi ve koşucu 40 dosyayı ~9 dk boşuna denedi. Art arda 3
+   "network" = sunucuya ulaşılamıyor; koşu durur ve SÖYLER. Bugün kısa
+   sürede ~130 oturum açılmıştı — ücretsiz hizmetin kotası olabilir. */
+var AG_SINIRI = 3;
+function agKesildiMi(sonuclar) {
+  if (sonuclar.length < AG_SINIRI) return false;
+  return sonuclar.slice(-AG_SINIRI).every(function (x) { return x.hata === 'network'; });
+}
+var AG_UYARI = ' Tanıma sunucusuna art arda ulaşılamadı — koşu durduruldu. İnternet ' +
+  'bağlantısını kontrol et; bağlantı varsa ücretsiz hizmetin kotası dolmuş olabilir, bir süre sonra dene.';
 function secenekler() {
   return { esitle: $('esitle').checked, dinamik: $('dinamik').checked, kirp: $('kirp').checked, ifadeler: $('ifadeler').checked };
 }
@@ -363,6 +374,7 @@ $('kos').addEventListener('click', async function () {
       var rr = await tani(kd, ifadeAcik);
       ds.push({ dosya: derlem[d].name, beklenen: dogru, duyulan: rr.yazi || '', hata: rr.hata || null,
                 kho: kho(dogru, rr.yazi) });
+      if (agKesildiMi(ds)) break;
     }
     var basarili = ds.filter(function (x) { return !x.hata; });
     var ort = basarili.length ? basarili.reduce(function (t, x) { return t + x.kho; }, 0) / basarili.length : null;
@@ -373,7 +385,7 @@ $('kos').addEventListener('click', async function () {
       (ds.length - basarili.length) + '</td></tr></tbody>';
     $('ham').textContent = JSON.stringify({ tarih: new Date().toISOString(), kip: 'derlem', ifadeler: ifadeAcik,
       tarayici: navigator.userAgent, ortalamaKho: ort, sonuc: ds }, null, 1);
-    durum('Derlem bitti — ' + ds.length + ' dosya.');
+    durum('Derlem bitti — ' + ds.length + ' dosya.' + (agKesildiMi(ds) ? AG_UYARI : ''));
     kosuBitti();
     this.disabled = false;
     return;
@@ -425,6 +437,7 @@ $('kos').addEventListener('click', async function () {
     P.SESLI_NIYET = yed.niyet; P.ACIK_KAYIT = yed.kayit;
     sonuc.push({ dosya: x.f.name, id: c.id, tur: x.ad.tur, beklenen: c.cumle, duyulan: r.yazi || '',
                  hata: r.hata || null, kho: kho(c.cumle, r.yazi), islem: islem });
+    if (agKesildiMi(sonuc)) break;
   }
 
   /* Bozma türü başına karne — AYNI cetvel (puanla.js). */
@@ -458,7 +471,8 @@ $('kos').addEventListener('click', async function () {
     }).join('') + '</tbody>';
   $('ham').textContent = JSON.stringify({ tarih: new Date().toISOString(), ifadeler: ifadeAcik,
     tarayici: navigator.userAgent, karne: karne, sonuc: sonuc }, null, 1);
-  durum('Bitti — ' + sonuc.length + ' dosya.' + (karne.some(function (k) { return k.hata; }) ? ' Tanıma hataları var: ağ bağlantısını kontrol et.' : ''));
+  durum('Bitti — ' + sonuc.length + ' dosya.' + (agKesildiMi(sonuc) ? AG_UYARI
+    : karne.some(function (k) { return k.hata; }) ? ' Tanıma hataları var: ağ bağlantısını kontrol et.' : ''));
   kosuBitti();
   this.disabled = false;
 });

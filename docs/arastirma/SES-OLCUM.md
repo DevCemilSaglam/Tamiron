@@ -207,6 +207,16 @@ Chrome neredeyse kusursuz duyuyor. Sorun Cemil'in kayıtlarıyla düzeneğin
 ⚠️ **Ölçmeden yorum yok:** bu tablo "Web Speech dükkânda yetmez" demiyor —
 iki deney bitmeden bu kayıtlardan ürün hakkında hüküm çıkmaz.
 
+**13.10 akşam — iki deney de GEÇERSİZ:** dinamik kazanç koşusunun 40
+kaydının 40'ı `network` (16:28 UTC); Cemil'in canlı mikrofon denemesi de
+*"Tanıma sunucusuna ulaşılamadı"*. Bir önceki koşu (16:19) temizdi.
+Sebep ya bağlantı ya da **ücretsiz hizmetin kotası** — o gün kısa sürede
+~130 tanıma oturumu açılmıştı. Kota ise bu bir **ürün riskidir**: tek
+dükkân bu sayıya ulaşmaz ama ücretsiz Web Speech'in sınırı bizim
+kontrolümüzde değil ve **belgelenmiş değil** (A-M48'e eklenir).
+Koşucu artık art arda 3 `network`ta duruyor ve sebebini söylüyor.
+Yeniden deneme: önce **tek dosya**, tutarsa uzun koşu.
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
