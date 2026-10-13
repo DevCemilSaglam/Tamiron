@@ -83,15 +83,26 @@ bir yığına çevirir. **Model tam buraya giriyor.**
 npm install @anthropic-ai/sdk
 set ANTHROPIC_API_KEY=sk-ant-...
 node tools/degerlendirme/model-kos.js
-node tools/degerlendirme/model-kos.js --model claude-sonnet-5
-node tools/degerlendirme/model-kos.js --model claude-haiku-4-5
+node tools/degerlendirme/model-kos.js --model claude-sonnet-5-5
+node tools/degerlendirme/model-kos.js --model claude-haiku-5-5
+# ses + model: Web Speech'in duyduğu metni modele ver
+node tools/degerlendirme/model-kos.js --duyulan <ses-olcum-....json>
 ```
+
+`--duyulan`: ses-dosya-kos.html'in indirdiği sonuç dosyasındaki `duyulan`
+metinler cümlenin yerine geçer; tanınamayan kayıt puana girmez (ses
+koşucusuyla aynı payda). `--efor low|medium|high` düşünme derinliği.
+
+⚠️ Opus 5.5 / Sonnet 5.5 zorunlu araç çağrısını (`tool_choice: tool`)
+400 ile reddediyor; koşucu aracı istemle istiyor, araç gelmezse cevap
+YANLIŞ sayılıyor. Ret (`refusal`) başka modele düşürülmüyor — ölçülen
+model değişirse rakam o modelin olmaz.
 
 **Anahtar bu depoda durmaz** — ortam değişkeninden okunur; commit'lenen
 hiçbir dosyada anahtar yoktur ve olmayacaktır.
 
-**Maliyet (40 cümle, istem önbellekli kaba hesap):** Opus 5 ~$0,25 ·
-Sonnet 5 ~$0,10 · Haiku 4.5 ~$0,05. Üçünü de koşmak **yarım dolardan
+**Maliyet (40 cümle kaba hesap; gerçek rakam koşu sonunda basılır):**
+Opus 5.5 ~$0,25 · Sonnet 5.5 ~$0,12 · Haiku 5.5 ~$0,01. Üçünü de koşmak **yarım dolardan
 az** — ve A-M30 (*"hangi model"*) kararını rakamla verdirir.
 
 **İki motor aynı dünyayı görüyor:** model koşucusu dükkân özetini

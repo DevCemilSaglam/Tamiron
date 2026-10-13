@@ -11,13 +11,21 @@
      npm install @anthropic-ai/sdk         (bir kez)
      set ANTHROPIC_API_KEY=sk-ant-...      (Windows: setx ya da oturumluk)
      node tools/degerlendirme/model-kos.js
-     node tools/degerlendirme/model-kos.js --model claude-sonnet-5
-     node tools/degerlendirme/model-kos.js --model claude-haiku-4-5
+     node tools/degerlendirme/model-kos.js --model claude-sonnet-5-5
+     node tools/degerlendirme/model-kos.js --model claude-haiku-5-5
 
-   MALİYET: 40 cümle, istem önbelleğiyle birlikte kaba hesap —
-     claude-opus-5    ~$0,25
-     claude-sonnet-5  ~$0,10
-     claude-haiku-4-5 ~$0,05
+   SES + MODEL (13.10): Web Speech'in DUYDUĞU metni modele vermek için
+   ses-dosya-kos.html'in indirdiği sonuç dosyası verilir:
+     node tools/degerlendirme/model-kos.js --duyulan C:/.../ses-olcum-temiz-kayitlar-tel.json
+   Cümle yerine `duyulan` gider; tanınamayan kayıt (hata / boş) puana
+   GİRMEZ — ses-dosya-kos.html'deki kuralın aynısı, yoksa iki karne
+   farklı paydalarla karşılaştırılmış olur.
+
+   MALİYET: 40 cümle kaba hesap (düşünme jetonları dahil, koşu sonunda
+   gerçek rakam usage'dan basılır) —
+     claude-opus-5-5   ~$0,25
+     claude-sonnet-5-5 ~$0,12
+     claude-haiku-5-5  ~$0,01
    Her koşu GERÇEK PARA harcar; Cemil onaylamadan koşturulmaz.
 
    ⚠️ MODEL SERBEST METİN DÖNDÜRMEZ: şema `strict: true` bir araçla
@@ -36,7 +44,33 @@ const arg = (ad, varsayilan) => {
   const i = process.argv.indexOf(ad);
   return i > 0 && process.argv[i + 1] ? process.argv[i + 1] : varsayilan;
 };
-const MODEL = arg('--model', 'claude-opus-5');
+const MODEL = arg('--model', 'claude-opus-5-5');
+/* Düşünme derinliği. Boş = modelin kendi varsayılanı. */
+const EFOR = arg('--efor', null);
+
+/* $ / 1M jeton — koşu sonunda gerçek maliyeti basmak için. */
+const FIYAT = {
+  'claude-opus-5-5': [4, 20], 'claude-opus-5': [5, 25],
+  'claude-sonnet-5-5': [2, 10], 'claude-sonnet-5': [2, 10],
+  'claude-haiku-5-5': [0.10, 0.50], 'claude-haiku-4-5': [1, 5]
+};
+
+/* --duyulan: Web Speech'in duyduğu metin cümlenin yerine geçer. */
+const DUYULAN_DOSYA = arg('--duyulan', null);
+let calisanSet = set;
+if (DUYULAN_DOSYA) {
+  const kos = JSON.parse(fs.readFileSync(DUYULAN_DOSYA, 'utf8'));
+  const duyulan = {};
+  (kos.sonuc || []).forEach(r => {
+    if (!r.hata && r.duyulan && r.duyulan.trim()) duyulan[r.id] = r.duyulan.trim();
+  });
+  calisanSet = Object.assign({}, set, {
+    cumleler: set.cumleler.filter(c => duyulan[c.id] !== undefined)
+      .map(c => Object.assign({}, c, { yazilan: c.cumle, cumle: duyulan[c.id] }))
+  });
+  console.log('duyulan: ' + calisanSet.cumleler.length + '/' + set.cumleler.length +
+              ' kayıt tanınmış (' + path.basename(DUYULAN_DOSYA) + ')');
+}
 
 /* ---- DÜKKÂNIN HÂLİ ----
    Model, bu dükkânın verisini bilmeden "şu Mégane" diyemez. Prototipin
@@ -97,7 +131,13 @@ KURALLAR:
 3. Ödeme yolu söylenmediyse odeme alanını boş bırak — nakit varsayma.
 4. Cümlede iş yoksa (havadan sudan), tur = "plakasiz".
 5. Plaka kayıtlı değilse tur = "yeni-arac"; harf grubu bir karakter
-   farkıyla kayıtlı bir plakaya benziyorsa oneri alanına onu yaz.`;
+   farkıyla kayıtlı bir plakaya benziyorsa oneri alanına onu yaz.
+6. Cümle konuşma tanımadan geliyor olabilir: harfler küçük, sayılar
+   yazıyla ya da eksik, kelimeler sesçe yanlış duyulmuş olabilir
+   ("kelime" ↔ KLM gibi). Anlamı ve dükkândaki araçları kullanarak
+   ustanın NE DEDİĞİNİ çıkar; yine de uydurma.
+
+Her cümle için cevabını YALNIZCA islem aracını bir kez çağırarak ver.`;
 
 const ARAC = {
   name: 'islem',
@@ -150,27 +190,38 @@ const ARAC = {
   const client = new (Anthropic.default || Anthropic)();
 
   const cevaplar = {};
-  let girdiJeton = 0, ciktiJeton = 0;
+  let girdiJeton = 0, ciktiJeton = 0, onbellekOkunan = 0;
 
-  for (const c of set.cumleler) {
+  for (const c of calisanSet.cumleler) {
     try {
-      const yanit = await client.messages.create({
+      const istek = {
         model: MODEL,
-        max_tokens: 2000,
+        /* Yeni modellerde düşünme kapatılamıyor; 2000 jetonda düşünme
+           cevabı kesebilirdi. */
+        max_tokens: 16000,
         /* Sistem istemi HER ÇAĞRIDA AYNI — önbelleğe alınıyor, girdi
            maliyetinin büyük kısmı böyle düşüyor (YAPAY-ZEKA.md §5). */
         system: [{ type: 'text', text: SISTEM, cache_control: { type: 'ephemeral' } }],
         tools: [ARAC],
-        tool_choice: { type: 'tool', name: 'islem' },
+        /* ⚠️ `tool_choice: {type:'tool'}` Opus 5.5 / Sonnet 5.5'te 400
+           döndürüyor (zorunlu araç kaldırıldı). Araç istemle isteniyor,
+           biçim `strict: true` ile korunuyor; araç çağrısı gelmezse cevap
+           YANLIŞ sayılır — kayırma yok. */
         messages: [{
           role: 'user',
           content: `Bağlam (hangi ekrandan söylendi): ${c.baglam}\nCümle: "${c.cumle}"`
         }]
-      });
+      };
+      if (EFOR) istek.output_config = { effort: EFOR };
+      /* Reddedilirse başka modele DÜŞÜLMEZ: ölçülen model değişirse
+         rakam o modelin olmaz. Ret cevabı hata olarak yazılır. */
+      const yanit = await client.messages.create(istek);
       girdiJeton += yanit.usage.input_tokens || 0;
       ciktiJeton += yanit.usage.output_tokens || 0;
+      onbellekOkunan += yanit.usage.cache_read_input_tokens || 0;
       const blok = yanit.content.find(b => b.type === 'tool_use');
-      cevaplar[c.id] = blok ? blok.input : { hata: 'araç çağrısı gelmedi' };
+      cevaplar[c.id] = yanit.stop_reason === 'refusal' ? { hata: 'model reddetti' }
+        : blok ? blok.input : { hata: 'araç çağrısı gelmedi (' + yanit.stop_reason + ')' };
     } catch (e) {
       cevaplar[c.id] = { hata: e.message };
     }
@@ -178,18 +229,25 @@ const ARAC = {
   }
   process.stdout.write('\n');
 
-  const sonuc = puanla(set, cevaplar);
-  sonuc.motor = MODEL;
-  sonuc.jeton = { girdi: girdiJeton, cikti: ciktiJeton };
+  const sonuc = puanla(calisanSet, cevaplar);
+  sonuc.motor = MODEL + (DUYULAN_DOSYA ? ' + Web Speech' : '');
+  sonuc.jeton = { girdi: girdiJeton, cikti: ciktiJeton, onbellek: onbellekOkunan };
+  const f = FIYAT[MODEL];
+  if (f) sonuc.maliyetUsd = +((girdiJeton * f[0] + ciktiJeton * f[1]) / 1e6).toFixed(4);
 
-  const dosya = path.join(KOK, 'sonuc-' + MODEL + '.json');
+  const ek = DUYULAN_DOSYA ? '-' + path.basename(DUYULAN_DOSYA, '.json') : '';
+  const dosya = path.join(KOK, 'sonuc-' + MODEL + ek + '.json');
   fs.writeFileSync(dosya, JSON.stringify({ sonuc, cevaplar }, null, 2), 'utf8');
 
-  console.log('\nMOTOR: ' + MODEL);
+  console.log('\nMOTOR: ' + sonuc.motor);
   console.log(sonuc.ozet);
-  console.log('jeton: ' + girdiJeton + ' girdi · ' + ciktiJeton + ' çıktı');
+  console.log('jeton: ' + girdiJeton + ' girdi · ' + ciktiJeton + ' çıktı · ' +
+              onbellekOkunan + ' önbellekten' +
+              (sonuc.maliyetUsd != null ? ' · ~$' + sonuc.maliyetUsd : ''));
   sonuc.satirlar.filter(s => s.puan !== 'TAM').forEach(s => {
-    console.log('  ' + s.id + ' [' + s.puan + '] "' + s.cumle + '" → bekl:' +
+    const c = calisanSet.cumleler.find(x => x.id === s.id);
+    console.log('  ' + s.id + ' [' + s.puan + '] "' + s.cumle + '"' +
+                (c && c.yazilan ? ' (söylenen: "' + c.yazilan + '")' : '') + ' → bekl:' +
                 s.beklenen + ' gelen:' + s.gelen + (s.alanlar ? ' (' + s.alanlar + ')' : ''));
   });
   console.log('\nayrıntı: ' + dosya);
