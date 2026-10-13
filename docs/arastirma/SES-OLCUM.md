@@ -253,6 +253,20 @@ dükkânda usta Bluetooth kulaklıkla konuşursa aynı şey olur.
 Sıradaki ayrım: hangi mikrofon kullanıldı · 5 cümle telefonun/dizüstünün
 kendi mikrofonuyla, normal hızda yeniden.
 
+**Yeniden kayıt (13.10 akşam) — kayıt aleti artık hızını ölçüyor:**
+
+| set | cihaz | ort. süre | SNR | dosya ÷ duvar saati |
+|---|---|---|---|---|
+| ilk | dizüstü iç mikrofon | **12,6 sn** | 28,7 dB | — (ölçülmüyordu) |
+| pc2 | Windows · Chrome 155 · 48 kHz | 2,8 sn | 19,3 dB | 0,95–1,03 |
+| **tel** | Android 10 · Chrome 153 · 48 kHz | 2,7 sn | **38,8 dB** | 0,97–1,05 |
+
+→ **Alet sağlam.** İlk setteki "yavaşlık" teknik değilmiş: cümleler yavaş
+okunmuş ve kayıt uzun açık kalmış (Cemil: *"Gecikmiş olabilirim"*).
+Bant enerjisi (dB, 4 / 5 / 6 kHz): derlem −21/−37/−43 · **telefon −45/−40/−39**
+· pc2 −43/−50/−52 · ilk −42/−46/−48 → **dizüstü mikrofonu iki kayıtta da
+boğuk; telefon ıslıklı seslerde stüdyo düzeyinde.** Tanıma koşusu bekleniyor.
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
