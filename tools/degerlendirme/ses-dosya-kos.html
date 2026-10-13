@@ -181,8 +181,10 @@ function sessizlikKirp(a, hiz) {
   var esik = en * Math.pow(10, -30 / 20), bas = 0, son = n - 1;
   while (bas < n && r[bas] < esik) bas++;
   while (son > bas && r[son] < esik) son--;
-  var pay = Math.round(0.3 / 0.02);
-  bas = Math.max(0, bas - pay) * cer; son = Math.min(n, son + 1 + pay) * cer;
+  /* Sona 0,8 sn pay (önce 0,3): son hece sönerken eşiğin altına düşüp
+     kırpılıyordu. Başa 0,3 sn yeter. */
+  var pay = Math.round(0.3 / 0.02), sonPay = Math.round(0.8 / 0.02);
+  bas = Math.max(0, bas - pay) * cer; son = Math.min(n, son + 1 + sonPay) * cer;
   return a.slice(bas, son);
 }
 
@@ -213,6 +215,18 @@ function tani(kaynak, ifadeAcik) {
       }
     }
     catch (e) { ctx.close(); return bitti({ hata: 'çözülemedi: ' + e.message }); }
+    /* SESSİZLİK PAYI (13.10): telefon kayıtları son heceden HEMEN sonra
+       bitiyor ("yağ filtresi 300 lira" 1,71 sn). Tanıyıcı son kelimeyi
+       kesinleştirmek için arkasında sessizlik bekliyor; yoksa kelime
+       kayboluyordu ("yağ filtresi 3"). Gerçek kullanımda mikrofon
+       konuşmadan sonra açık kalır — burada 0,5 sn baş, 1,0 sn son
+       sessizlik ekleniyor. Konuşmaya dokunulmuyor. */
+    (function () {
+      var hz = tampon.sampleRate, bas = Math.round(hz * 0.5), son = Math.round(hz * 1.0);
+      var yeni = ctx.createBuffer(tampon.numberOfChannels, tampon.length + bas + son, hz);
+      for (var kn = 0; kn < tampon.numberOfChannels; kn++) yeni.getChannelData(kn).set(tampon.getChannelData(kn), bas);
+      tampon = yeni;
+    })();
     /* SEVİYE EŞİTLEME (13.10): mikrofondan dinlerken Chrome otomatik
        kazanç uyguluyor; dosyadan beslerken uygulamıyor. Cemil'in kayıtları
        ortalama −35 dB RMS — mikrofondan gelen sesten ~15 dB kısık. Konuşma
@@ -255,7 +269,7 @@ function tani(kaynak, ifadeAcik) {
       oynatici.connect(hedef);
     }
     var t = new S();
-    t.lang = 'tr-TR'; t.interimResults = false; t.maxAlternatives = 1; t.continuous = true;
+    t.lang = 'tr-TR'; t.interimResults = true; t.maxAlternatives = 1; t.continuous = true;
     /* ⚠️ SÜREKLİ (13.10): `continuous = false` cümlenin ortasındaki İLK
        duraklamada keser — usta "34 ABC 123 … triger seti" derken nefes
        alır. Çalma bitince 1,2 sn sonra elle durduruluyor (onended). */
@@ -269,12 +283,24 @@ function tani(kaynak, ifadeAcik) {
       ctx.close();
       bitti(hata ? { hata: hata, yazi: yazi } : { yazi: yazi });
     };
+    /* ⚠️ CÜMLE SONU KESİLİYORDU (13.10, telefon ve bilgisayar setleri):
+       "yağ filtresi 300 lira" → "yağ filtresi 3", "balata ara" → "Balat".
+       Yalnız KESİNLEŞEN sonuçlar toplanıyordu; son kelime GEÇİCİ sonuçta
+       beklerken dinleme kapanıyor ve kayboluyordu. Artık her olayda
+       bütün sonuç listesi yeniden okunuyor: kesinler + varsa en son
+       geçici parça. Kapanışta elde ne varsa o yazı.
+       İkinci kusur: parçalar BOŞLUKSUZ ekleniyordu (`yazi += …`) — iki
+       parçaya bölünen cümlede kelimeler yapışırdı. Boşlukla birleşiyor. */
     t.onresult = function (e) {
-      for (var i = e.resultIndex; i < e.results.length; i++) if (e.results[i].isFinal) yazi += e.results[i][0].transcript;
+      var parcalar = [];
+      for (var i = 0; i < e.results.length; i++) parcalar.push(e.results[i][0].transcript.trim());
+      yazi = parcalar.filter(Boolean).join(' ');
     };
     t.onerror = function (e) { if (e.error !== 'no-speech' && e.error !== 'aborted') hata = e.error; };
     t.onend = kapat;
-    oynatici.onended = function () { setTimeout(function () { try { t.stop(); } catch (e) {} }, 1200); };
+    /* Ses bitince 2,5 sn daha dinlenir (önce 1,2): tanıyıcı son kelimeyi
+       kesinleştirmek için sessizlik bekliyor. */
+    oynatici.onended = function () { setTimeout(function () { try { t.stop(); } catch (e) {} }, 2500); };
     setTimeout(function () { try { t.abort(); } catch (e) {} kapat(); }, (tampon.duration + 12) * 1000);
     try { t.start(hedef.stream.getAudioTracks()[0]); }
     catch (e) { hata = 'start(track) desteklenmiyor: ' + e.message; return kapat(); }
@@ -336,6 +362,9 @@ document.addEventListener('click', async function (e) {
       if (!dzYanit.ok) throw new Error('sesler/' + klasor + '/ klasöründe kayıt yok (zip oraya açılmalı)');
       var dz = await dzYanit.json();
       var adlar = dz.kayitlar.map(function (k) { return k.dosya; });
+      /* Yeni setlerde dizinin başında ortam.wav var — "tek dosya" ilk
+         CÜMLEYİ almalı (13.10: ortamı alıp "dosya yok" diyordu). */
+      adlar = adlar.filter(function (a) { return /^s\d+\.wav$/i.test(a); });
       if (tur === 'dogrula') adlar = adlar.slice(0, 1);
       var tum = [], g = null;
       if (tur === 'derlem' || tur === 'derlem5') {

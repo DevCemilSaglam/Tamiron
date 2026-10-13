@@ -265,7 +265,39 @@ kendi mikrofonuyla, normal hızda yeniden.
 okunmuş ve kayıt uzun açık kalmış (Cemil: *"Gecikmiş olabilirim"*).
 Bant enerjisi (dB, 4 / 5 / 6 kHz): derlem −21/−37/−43 · **telefon −45/−40/−39**
 · pc2 −43/−50/−52 · ilk −42/−46/−48 → **dizüstü mikrofonu iki kayıtta da
-boğuk; telefon ıslıklı seslerde stüdyo düzeyinde.** Tanıma koşusu bekleniyor.
+boğuk; telefon ıslıklı seslerde stüdyo düzeyinde.**
+
+**İlk gerçek rakamlar (13.10 21:00–21:24, Chrome 154) — çözümleme, aynı cetvel:**
+
+| koşu | işlem doğru | kelime hatası |
+|---|---|---|
+| yazı (temiz metin, karşılaştırma) | **%93** | — |
+| ilk set (yavaş okuma) | %25–28 | %83 |
+| **telefon, normal hız** | **%65** | %30 |
+| **bilgisayar, normal hız** | **%66** | %26 |
+| bilgisayar · uzak | %69 | %28 |
+| bilgisayar · kırpık | %65 | %27 |
+| bilgisayar · kompresör 18 dB | %63 | %32 |
+| bilgisayar · kompresör 12 dB | %49 | %44 |
+| bilgisayar · kompresör 6 dB | %25 | %66 |
+
+⚠️ **Bu rakamlar DÜZENEĞİN İKİ KUSURUNU taşıyor** (düzeltildi, yeniden koşu
+bekleniyor): (1) **cümle sonu kesiliyordu** — "yağ filtresi 300 lira" →
+"yağ filtresi 3", "balata ara" → "Balat". Telefon kayıtları son heceden
+hemen sonra bitiyor (1,71 sn); tanıyıcı son kelimeyi kesinleştirmek için
+arkasında sessizlik bekliyor, yalnız kesin sonuçlar toplanıyordu. Artık
+geçici sonuç da okunuyor, kayda 0,5 sn baş / 1,0 sn son sessizlik
+ekleniyor (mikrofonun açık kalmasının taklidi), dinleme 2,5 sn sonra
+kapanıyor. (2) Parçalar boşluksuz birleşiyordu. Telefonda en az 4
+cümle doğrudan (1) yüzünden yanlış.
+
+**Gerçek tanıma zorlukları (ürün bulgusu):**
+- **plaka harfleri:** TMR → "PNR / PVR / dmr", KLM → "kelime", ABC →
+  "abiciğim", KV → "kw", QBC → "KBC/KVC"
+- **"sahibine" → "sahibinden" / "tarihinde"** — mesaj işi kayboluyor
+- tutarda "TL/lira" düşünce gider tanınmıyor ("2.400 elektrik faturası")
+→ §6'daki `phrases` (beklenen kelimeler) tam bu yerler için; ölçmeden
+açılmaz.
 
 ## 10 · Önceki hâli: onaya açık maddeler
 
