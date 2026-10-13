@@ -74,6 +74,7 @@
     <input type="file" id="gurultu" accept="audio/*,.mp3,.wav" aria-label="Gürültü dosyası">
     <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code> — karşılaştırma için ayrı koşu)</label>
     <label><input type="checkbox" id="esitle" checked> Seviyeyi eşitle (konuşma −20 dB — mikrofonun otomatik kazancının taklidi)</label>
+    <label><input type="checkbox" id="dinamik"> Dinamik kazanç (kısık kelimeyi yükselt — mikrofonun otomatik kazancının taklidi)</label>
     <label><input type="checkbox" id="kirp" checked> Baştaki ve sondaki sessizliği kırp (koşu biraz kısalır — s01: 17,2 → 14,9 sn; ortadaki duraklamalara dokunmaz)</label>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <button id="kos" disabled>Koş</button>
@@ -228,7 +229,23 @@ function tani(kaynak, ifadeAcik) {
        `var` fonksiyonun başına taşındığı için PARAMETREYİ gölgeledi: her
        kayıt "çözülemedi" döndü. v1'in sekiz kez yaşadığı hata sınıfı. */
     var oynatici = ctx.createBufferSource();
-    oynatici.buffer = tampon; oynatici.connect(hedef);
+    oynatici.buffer = tampon;
+    /* DİNAMİK KAZANÇ (13.10, seçenek): ilk gerçek koşuda tanıyıcı yavaş
+       ve parça parça okunan cümlelerin İLK öbeğini duyup kısık öbekleri
+       kaçırıyordu ("35 KLM 45 teslim ettim parayı almadım" → "35 kalemle
+       45 parayı al"). Kayıtta öbekler arası fark 15–20 dB. Mikrofondan
+       dinlerken Chrome DİNAMİK kazanç uygular (kısık kelimeyi o an
+       yükseltir); sabit eşitleme öbekler arasındaki farkı korur. Tarayıcının
+       kendi sıkıştırıcısı + telafi kazancı bu farkı daraltır. */
+    if ($('dinamik').checked) {
+      var sik = ctx.createDynamicsCompressor();
+      sik.threshold.value = -40; sik.knee.value = 10; sik.ratio.value = 8;
+      sik.attack.value = 0.005; sik.release.value = 0.25;
+      var telafi = ctx.createGain(); telafi.gain.value = Math.pow(10, 12 / 20);
+      oynatici.connect(sik); sik.connect(telafi); telafi.connect(hedef);
+    } else {
+      oynatici.connect(hedef);
+    }
     var t = new S();
     t.lang = 'tr-TR'; t.interimResults = false; t.maxAlternatives = 1; t.continuous = true;
     /* ⚠️ SÜREKLİ (13.10): `continuous = false` cümlenin ortasındaki İLK
@@ -274,7 +291,7 @@ function kho(beklenen, duyulan) {
 
 var SECIM = null, SON_HAM = null, SON_AD = '', KOSUYOR = false, MESGUL = false;
 function secenekler() {
-  return { esitle: $('esitle').checked, kirp: $('kirp').checked, ifadeler: $('ifadeler').checked };
+  return { esitle: $('esitle').checked, dinamik: $('dinamik').checked, kirp: $('kirp').checked, ifadeler: $('ifadeler').checked };
 }
 async function sunucuDosya(yol, ad) {
   var r = await fetch(yol + '?t=' + Date.now());

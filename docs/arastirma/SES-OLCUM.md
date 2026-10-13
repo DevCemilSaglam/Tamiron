@@ -173,6 +173,40 @@ anlatılmaz (K-055.5).
    kırpık · 18/12/6 dB karnesini verir. Her gürültü ayrı koşu (~20 dk).
 5. Sonuç `SES-OLCUM.md`'ye ve sunumun *"henüz hazır olmayanlar"* bölümüne.
 
+## 11 · İlk gerçek ölçümler (13.10, Cemil'in Chrome 154'ü)
+
+**Yol açık:** Chrome kayıtlı dosyayı mikrofonsuz yazıya çeviriyor (§2'nin
+son adımı kapandı). Dükkân kaydı şart değil.
+
+| koşu | seçenek | sonuç |
+|---|---|---|
+| 40 cümle (Cemil, temiz) | kırpma | çözümleme **%28** (8 tam · 6 yarım · 26 yanlış) · kelime hatası %83 · 6 kısa cümlede **boş** |
+| 40 cümle (Cemil, temiz) | kırpma + seviye eşitleme (−20 dB) | **%25** · kelime hatası %83 — eşitleme **işe yaramadı** |
+| **Derlem 5 (kontrol)** | kırpma + eşitleme | kelime hatası **%13** — çoğu yazım farkı ("süleymaniye'si/süleymaniyesi") |
+
+**Kontrol kararı verdi: düzenek sağlam** — akıcı, düz seviyeli konuşmada
+Chrome neredeyse kusursuz duyuyor. Sorun Cemil'in kayıtlarıyla düzeneğin
+**buluştuğu yerde**:
+
+- Kayıtlarda cümle **yavaş ve öbek öbek** okunmuş: "34 ABC 123 triger seti
+  değişecek" (~3 sn) → 11 sn kesintisiz ses, 7–8 öbek. Plaka harf harf.
+- Öbekler arası seviye farkı **15–20 dB**.
+- Tanıyıcı çoğunlukla İLK öbeği duyuyor, kısık öbekleri kaçırıyor:
+  "35 KLM 45 teslim ettim parayı almadım" → "35 kalemle 45 parayı al".
+- Hipotez: mikrofondan dinlerken Chrome **dinamik** kazanç uyguluyor (kısık
+  kelimeyi o an yükseltir); dosyadan beslerken yok. Sabit eşitleme
+  öbekler arasındaki farkı korur — o yüzden işe yaramadı.
+
+**Ayıracak iki deney:**
+1. **Dinamik kazanç** seçeneği (tarayıcının sıkıştırıcısı + 12 dB telafi)
+   ile 40 cümle — kısık öbekler yükselince sonuç düzeliyor mu.
+2. **Canlı mikrofon** — Cemil aynı cümleleri prototipin ses ekranında
+   söyler. Mikrofon yolu iyiyse sorun DÜZENEĞİMİZDE (ürün sağlam); o da
+   kötüyse sorun tanıyıcının bizim cümlelerimizde (ürün riski).
+
+⚠️ **Ölçmeden yorum yok:** bu tablo "Web Speech dükkânda yetmez" demiyor —
+iki deney bitmeden bu kayıtlardan ürün hakkında hüküm çıkmaz.
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
