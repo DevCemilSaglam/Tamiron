@@ -299,6 +299,46 @@ cümle doğrudan (1) yüzünden yanlış.
 → §6'daki `phrases` (beklenen kelimeler) tam bu yerler için; ölçmeden
 açılmaz.
 
+### 11.1 · Düzeltilmiş düzenekle yeniden koşu (13.10 21:48–21:55)
+
+Aynı kayıtlar, aynı seçenekler (eşitle + kırp); tek fark kesilme düzeltmesi.
+
+| koşu | işlem doğru | kelime hatası | son kelimesi eksik kayıt |
+|---|---|---|---|
+| telefon — önce | %65 | %30 | 28 / 40 |
+| **telefon — düzeltilmiş** | **%74** | **%16** | 11 / 40 |
+| bilgisayar — önce | %66 | %26 | 20 / 40 |
+| **bilgisayar — düzeltilmiş** | **%68** | **%18** | 8 / 40 |
+
+**Okuma:** kelime hatası yarıya yakın düştü, yani dünkü rakamın büyük payı
+tanıyıcının değil **bizim düzeneğimizin** kusuruydu. "Son kelimesi eksik"
+sayısının hâlâ 8–11 olması kesilme değil: kalanların çoğu yanlış duyulan
+son kelime ("aşınmış" → "açılmıyor") ya da cetvelin **biçim farkını hata
+sayması** — "88 bin" ↔ "88.000", "dört bin beş yüz lira" ↔ "4500", "2400" ↔
+"2.400". Yani kelime hatası %16–18'in bir kısmı da ölçüm yapaylığı; işlem
+doğruluğu (%68–74) asıl rakam.
+
+**Kalan yanlışların üç sınıfı:**
+1. **Plaka harfi** (en büyük sınıf): TMR → PNR/PVR/dmr, KLM → "kelime",
+   QBC → KBC/KVC, ABC → "Dur daha beceri", 8890 → "88 90". Motor bunları
+   kayıtsız plaka sanıp **yeni-arac**'a gidiyor — en tehlikeli yanlış,
+   çünkü sessizce yeni kayıt açtırır.
+2. **Anlam kayması:** "sahibine" → "sahibinden/tarihinde", "tahsil ettim"
+   → "tavsiye ettin", "gideri ekle" → "giderek / gider reklam",
+   "Mégane'ın" → "mekanını".
+3. **Motorun kendi katı kuralı — tanıma DOĞRU:** tutar yalnız
+   "TL/lira" kelimesiyle okunuyor (`04-islem.js` `sesTutarBul`); tanıyıcı
+   bu kelimeyi sık düşürüyor ("2.400 elektrik faturası ekle" → gider
+   tanınmadı; "motor yağı 4500", "hava filtresi 18"). **Cemil onayına
+   açık:** fiyat/gider bağlamında birimsiz sayıyı tutar saymak. Risk:
+   plaka ve km sayılarıyla karışması — önce bu cetvelle eşdeğerlik
+   ölçülmeden açılmaz.
+
+**Model ne kazandırır (tahmin, ölçülmedi):** 2. sınıfı büyük ölçüde,
+1. sınıfı dükkândaki kayıtlı plaka listesiyle kısmen düzeltebilir
+("06 pvr 07" → tek benzer kayıtlı plaka 06 TMR 07). Ölçüm aracı hazır
+(`model-kos.js --duyulan <dosya>`); anahtar + harcama onayı bekliyor.
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
