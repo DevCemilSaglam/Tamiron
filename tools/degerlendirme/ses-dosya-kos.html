@@ -73,10 +73,34 @@
     <label for="gurultu">Gürültü (isteğe bağlı — tek dosya; seçilirse bozulmuş varyantlar da koşar)</label>
     <input type="file" id="gurultu" accept="audio/*,.mp3,.wav" aria-label="Gürültü dosyası">
     <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code> — karşılaştırma için ayrı koşu)</label>
+    <label><input type="checkbox" id="kirp" checked> Baştaki ve sondaki sessizliği kırp (koşu biraz kısalır — s01: 17,2 → 14,9 sn; ortadaki duraklamalara dokunmaz)</label>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <button id="kos" disabled>Koş</button>
       <span id="durum" aria-live="polite"></span>
     </div>
+  </div>
+
+  <!-- SUNUCUDAN AL (13.10) — dosya seçmeden, depo klasöründen:
+       sesler/kayitlar (dizin.json) · sesler/derlem-100 · sesler/gurultu.
+       Cemil'in tek tıkla koşturması için; sonuç JSON olarak İNER ve
+       lider İndirilenler'den okur. -->
+  <div class="kutu">
+    <strong>Sunucudan al — tek tık</strong>
+    <div style="display:flex;gap:10px;flex-wrap:wrap">
+      <button data-sunucu="dogrula">1 · Tek dosyayla doğrula</button>
+      <button data-sunucu="temiz">2 · 40 cümle (temiz)</button>
+      <button data-sunucu="derlem">3 · Derlem 100 (genel Türkçe)</button>
+    </div>
+    <label for="gurultuSec">4 · 40 cümle + gürültü (temiz · uzak · kırpık · 18/12/6 dB):</label>
+    <div style="display:flex;gap:10px;flex-wrap:wrap" id="gurultuSec">
+      <button data-sunucu="gurultu" data-g="tamirhane-ortami">Tamirhane ortamı</button>
+      <button data-sunucu="gurultu" data-g="kompresor">Kompresör</button>
+      <button data-sunucu="gurultu" data-g="havali-somun-sokucu">Havalı somun sökücü</button>
+      <button data-sunucu="gurultu" data-g="atolye-taslama">Taşlama</button>
+      <button data-sunucu="gurultu" data-g="circir">Cırcır</button>
+      <button data-sunucu="gurultu" data-g="metal-metale">Metal metale</button>
+    </div>
+    <button id="indir" disabled>Son sonucu JSON olarak indir</button>
   </div>
 
   <div class="kutu">
@@ -130,6 +154,27 @@ function adCoz(ad) {
   return m ? { id: parseInt(m[1], 10), tur: m[2] || 'temiz' } : null;
 }
 
+/* SESSİZLİK KIRPMA (13.10): kayıtların yarısı sessizlik (dizin.json:
+   ortalama %50) ve her dosya GERÇEK ZAMANLI çalınıyor — 40 cümle bir
+   bozma türü için ~8 dk. Baştaki ve sondaki sessizlik atılır (0,3 sn
+   pay bırakılır); ORTADAKİNE dokunulmaz — duraklama konuşmanın parçası.
+   Eşik: en gürültülü 20 ms çerçevenin -30 dB altı. Gürültü KARIŞTIRMADAN
+   ÖNCE kırpılır; karışımın kendisi kırpılmaz. */
+function sessizlikKirp(a, hiz) {
+  var cer = Math.round(hiz * 0.02), n = Math.floor(a.length / cer), en = 0, r = [];
+  for (var i = 0; i < n; i++) {
+    var t = 0;
+    for (var j = i * cer; j < (i + 1) * cer; j++) t += a[j] * a[j];
+    r[i] = Math.sqrt(t / cer); if (r[i] > en) en = r[i];
+  }
+  var esik = en * Math.pow(10, -30 / 20), bas = 0, son = n - 1;
+  while (bas < n && r[bas] < esik) bas++;
+  while (son > bas && r[son] < esik) son--;
+  var pay = Math.round(0.3 / 0.02);
+  bas = Math.max(0, bas - pay) * cer; son = Math.min(n, son + 1 + pay) * cer;
+  return a.slice(bas, son);
+}
+
 /* Dosya → tek kanal örnekler (ortak çözücü; tanıyıcıyla aynı hız). */
 var COZUCU = null;
 async function ornekleriAl(dosya) {
@@ -164,7 +209,10 @@ function tani(kaynak, ifadeAcik) {
     var oynatici = ctx.createBufferSource();
     oynatici.buffer = tampon; oynatici.connect(hedef);
     var t = new S();
-    t.lang = 'tr-TR'; t.interimResults = false; t.maxAlternatives = 1; t.continuous = false;
+    t.lang = 'tr-TR'; t.interimResults = false; t.maxAlternatives = 1; t.continuous = true;
+    /* ⚠️ SÜREKLİ (13.10): `continuous = false` cümlenin ortasındaki İLK
+       duraklamada keser — usta "34 ABC 123 … triger seti" derken nefes
+       alır. Çalma bitince 1,2 sn sonra elle durduruluyor (onended). */
     if (ifadeAcik && window.SpeechRecognitionPhrase && 'phrases' in t) {
       t.phrases = BEKLENEN.map(function (k) { return new SpeechRecognitionPhrase(k, 5.0); });
     }
@@ -203,11 +251,50 @@ function kho(beklenen, duyulan) {
   return a.length ? d[a.length][b.length] / a.length : 0;
 }
 
+var SECIM = null, SON_HAM = null, SON_AD = '';
+async function sunucuDosya(yol, ad) {
+  var r = await fetch(yol + '?t=' + Date.now());
+  if (!r.ok) throw new Error(yol + ' — ' + r.status);
+  return new File([await r.blob()], ad || yol.split('/').pop());
+}
+document.addEventListener('click', async function (e) {
+  var b = e.target.closest('[data-sunucu]');
+  if (b) {
+    var tur = b.getAttribute('data-sunucu');
+    try {
+      durum('Sunucudan alınıyor…');
+      var dz = await (await fetch(KOK + 'sesler/kayitlar/dizin.json?t=' + Date.now())).json();
+      var adlar = dz.kayitlar.map(function (k) { return k.dosya; });
+      if (tur === 'dogrula') adlar = adlar.slice(0, 1);
+      var tum = [], g = null;
+      if (tur === 'derlem') {
+        var liste = await (await fetch(KOK + 'sesler/derlem-100/')).text();
+        var dos = (liste.match(/href="([^"]+\.(?:flac|txt))"/g) || []).map(function (h) { return decodeURIComponent(h.slice(6, -1)); });
+        for (var i = 0; i < dos.length; i++) tum.push(await sunucuDosya(KOK + 'sesler/derlem-100/' + dos[i], dos[i]));
+      } else {
+        for (var j = 0; j < adlar.length; j++) tum.push(await sunucuDosya(KOK + 'sesler/kayitlar/' + adlar[j], adlar[j]));
+        if (tur === 'gurultu') g = await sunucuDosya(KOK + 'sesler/gurultu/' + b.getAttribute('data-g') + '.mp3');
+      }
+      SECIM = { tum: tum, gurultu: g };
+      SON_AD = 'ses-olcum-' + tur + (g ? '-' + b.getAttribute('data-g') : '') + '.json';
+      $('kos').disabled = false;
+      $('kos').click();
+    } catch (x) { durum('Alınamadı: ' + x.message); SECIM = null; }
+    return;
+  }
+  if (e.target.id === 'indir' && SON_HAM) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([SON_HAM], { type: 'application/json' }));
+    a.download = SON_AD || 'ses-olcum.json';
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+});
+
 $('kos').addEventListener('click', async function () {
   var P = $('prototip').contentWindow;
   if (!P || typeof P.SES_COZUMLE !== 'function') { durum('Prototip yüklenmedi — sayfayı yenile.'); return; }
   var ifadeAcik = $('ifadeler').checked;
-  var tum = Array.prototype.slice.call($('dosyalar').files);
+  var tum = SECIM ? SECIM.tum : Array.prototype.slice.call($('dosyalar').files);
 
   /* DERLEM KİPİ — ses + aynı adlı .txt */
   var metinler = {};
@@ -219,7 +306,9 @@ $('kos').addEventListener('click', async function () {
     for (var d = 0; d < derlem.length; d++) {
       durum('Derlem ' + (d + 1) + ' / ' + derlem.length + ' — ' + derlem[d].name);
       var dogru = (await metinler[derlem[d].name.replace(/\.[^.]+$/, '')].text()).trim();
-      var rr = await tani(derlem[d], ifadeAcik);
+      var kd = derlem[d];
+      if ($('kirp').checked) { var od = await ornekleriAl(kd); kd = { ornekler: sessizlikKirp(od.ornekler, od.hiz), hiz: od.hiz }; }
+      var rr = await tani(kd, ifadeAcik);
       ds.push({ dosya: derlem[d].name, beklenen: dogru, duyulan: rr.yazi || '', hata: rr.hata || null,
                 kho: kho(dogru, rr.yazi) });
     }
@@ -233,6 +322,7 @@ $('kos').addEventListener('click', async function () {
     $('ham').textContent = JSON.stringify({ tarih: new Date().toISOString(), kip: 'derlem', ifadeler: ifadeAcik,
       tarayici: navigator.userAgent, ortalamaKho: ort, sonuc: ds }, null, 1);
     durum('Derlem bitti — ' + ds.length + ' dosya.');
+    kosuBitti();
     this.disabled = false;
     return;
   }
@@ -244,8 +334,14 @@ $('kos').addEventListener('click', async function () {
   this.disabled = true;
 
   /* GÜRÜLTÜ SEÇİLDİYSE: her TEMİZ kayıttan varyantlar — ortak modülden. */
-  var gf = $('gurultu').files[0];
-  var is = dosyalar.map(function (x) { return { ad: x.f.name, id: x.ad.id, tur: x.ad.tur, kaynak: x.f }; });
+  var gf = SECIM ? SECIM.gurultu : $('gurultu').files[0];
+  var kirpAcik = $('kirp').checked;
+  var is = [];
+  for (var q = 0; q < dosyalar.length; q++) {
+    var kay = dosyalar[q].f;
+    if (kirpAcik) { var oo = await ornekleriAl(kay); kay = { ornekler: sessizlikKirp(oo.ornekler, oo.hiz), hiz: oo.hiz }; }
+    is.push({ ad: dosyalar[q].f.name, id: dosyalar[q].ad.id, tur: dosyalar[q].ad.tur, kaynak: kay });
+  }
   if (gf) {
     durum('Gürültü çözülüyor — ' + gf.name);
     var ortam = (await ornekleriAl(gf)).ornekler;
@@ -253,6 +349,7 @@ $('kos').addEventListener('click', async function () {
     for (var v = 0; v < dosyalar.length; v++) {
       if (dosyalar[v].ad.tur !== 'temiz') continue;
       var o = await ornekleriAl(dosyalar[v].f);
+      if (kirpAcik) o = { ornekler: sessizlikKirp(o.ornekler, o.hiz), hiz: o.hiz };
       SesBozma.varyantlar(o.ornekler, ortam, o.hiz).forEach(function (vr) {
         is.push({ ad: dosyalar[v].f.name.replace(/\.wav$/i, '') + '.' + vr[0] + (/^snr/.test(vr[0]) ? '·' + gAd : '') + '.wav',
                   id: dosyalar[v].ad.id, tur: vr[0] + (/^snr/.test(vr[0]) ? '·' + gAd : ''),
@@ -310,8 +407,20 @@ $('kos').addEventListener('click', async function () {
   $('ham').textContent = JSON.stringify({ tarih: new Date().toISOString(), ifadeler: ifadeAcik,
     tarayici: navigator.userAgent, karne: karne, sonuc: sonuc }, null, 1);
   durum('Bitti — ' + sonuc.length + ' dosya.' + (karne.some(function (k) { return k.hata; }) ? ' Tanıma hataları var: ağ bağlantısını kontrol et.' : ''));
+  kosuBitti();
   this.disabled = false;
 });
+
+/* Koşu bitince: sonuç saklanır, sunucudan alınan seçim temizlenir ve
+   sunucu kipinde JSON KENDİLİĞİNDEN iner (İndirilenler) — lider oradan
+   okur. Elle seçilen dosyalarda yalnız düğme açılır. */
+function kosuBitti() {
+  SON_HAM = $('ham').textContent;
+  $('indir').disabled = false;
+  var sunucudan = !!SECIM;
+  SECIM = null;
+  if (sunucudan) $('indir').click();
+}
 </script>
 </body>
 </html>
