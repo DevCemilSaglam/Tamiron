@@ -187,7 +187,14 @@ const ARAC = {
     console.error('ANTHROPIC_API_KEY yok. Anahtar bu depoda durmaz — ortamdan okunur.');
     process.exit(1);
   }
-  const client = new (Anthropic.default || Anthropic)();
+  /* Anahtar bir workspace'e bağlı değilse API her isteği 400 ile
+     reddediyor ("must include the anthropic-workspace-id header").
+     Kimlik ortamdan okunur — anahtar gibi depoda durmaz. */
+  const secenek = {};
+  if (process.env.ANTHROPIC_WORKSPACE_ID) {
+    secenek.defaultHeaders = { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID };
+  }
+  const client = new (Anthropic.default || Anthropic)(secenek);
 
   const cevaplar = {};
   let girdiJeton = 0, ciktiJeton = 0, onbellekOkunan = 0;
@@ -224,6 +231,13 @@ const ARAC = {
         : blok ? blok.input : { hata: 'araç çağrısı gelmedi (' + yanit.stop_reason + ')' };
     } catch (e) {
       cevaplar[c.id] = { hata: e.message };
+      /* 400/401/403/404 kalıcıdır: 40 isteği boşuna atmak yerine ilk
+         hatada dur (13.10: workspace'siz anahtarla 40 istek 400 yedi). */
+      if ([400, 401, 403, 404].indexOf(e.status) >= 0) {
+        console.error('\nKOŞU DURDU — kalıcı API hatası (' + e.status + '): ' + e.message);
+        process.exitCode = 2;
+        return;
+      }
     }
     process.stdout.write('.');
   }
