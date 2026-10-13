@@ -252,8 +252,16 @@ button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff
     return sonuc;
   }
 
+  /* HIZ TEŞHİSİ (13.10): ilk 40 kayıtta cümleler ~3 kat uzun çıktı
+     ("34 ABC 123 triger seti değişecek" 3 sn → 11 sn) ve Cemil "ses
+     yavaşlamış duyuluyor" dedi. Perde ölçümü normal çıktı; sebep ayırt
+     edilemedi — alet mi yavaşlatıyor, konuşma mı yavaştı? Artık her kayıt
+     GERÇEK geçen süreyi de yazıyor: dosya süresi ÷ duvar saati ≈ 1 olmalı.
+     Belirgin sapma ALETİN hatasıdır ve kayıt "kötü" sayılır. */
+  var kayitBas = 0;
   function kayitBaslat() {
     if (kaydediyor) return;
+    kayitBas = performance.now();
     toplayici = [];
     kaydediyor = true;
     ciz();
@@ -262,9 +270,28 @@ button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff
   function kayitBitir() {
     if (!kaydediyor) return;
     kaydediyor = false;
+    var duvar = (performance.now() - kayitBas) / 1000;
+    var hamOrnek = toplayici.reduce(function (t, p) { return t + p.length; }, 0);
     var ornekler = indirge(toplayici, ctx.sampleRate);
     toplayici = null;
     var sonuc = puanla(ornekler, CUMLELER[sira]);
+    var dosyaSure = ornekler.length / HEDEF_HIZ;
+    sonuc.teshis = {
+      duvarSn: +duvar.toFixed(2), dosyaSn: +dosyaSure.toFixed(2),
+      oran: duvar > 0 ? +(dosyaSure / duvar).toFixed(2) : null,
+      ctxHiz: ctx.sampleRate, hamOrnek: hamOrnek,
+      izHiz: (akim && akim.getAudioTracks()[0] && akim.getAudioTracks()[0].getSettings)
+        ? (akim.getAudioTracks()[0].getSettings().sampleRate || null) : null
+    };
+    /* Kayıt düğmesine basma/bırakma payı ~0,3 sn; kısa kayıtta oran
+       oynar. Eşik geniş tutuldu: yalnız GERÇEK bozulmayı yakalasın. */
+    if (sonuc.teshis.oran && duvar > 1.5 && (sonuc.teshis.oran > 1.25 || sonuc.teshis.oran < 0.8)) {
+      sonuc.kusurlar.push({ kod: 'hiz-bozuk', agir: true,
+        mesaj: 'Kayıt hızı bozuk: ' + duvar.toFixed(1) + ' sn konuştun, dosya ' +
+               dosyaSure.toFixed(1) + ' sn (×' + sonuc.teshis.oran + '). Bu ALETİN hatası — ' +
+               'tekrar etme, bu ekranın fotoğrafını bana gönder.' });
+      sonuc.durum = 'kotu';
+    }
     var tampon = wavYap(ornekler, HEDEF_HIZ);
     kayitlar[CUMLELER[sira].id] = {
       wav: tampon,
@@ -335,11 +362,16 @@ button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff
       dizin.push({ id: c.id, dosya: ad, cumle: c.cumle,
                    durum: k.sonuc.durum,
                    kusurlar: k.sonuc.kusurlar.map(function (x) { return x.kod; }),
-                   olcum: k.sonuc.olcum });
+                   olcum: k.sonuc.olcum, teshis: k.sonuc.teshis || null });
     });
     if (!dosyalar.length) { alert('Henüz kayıt yok.'); return; }
     dosyalar.push({ ad: 'dizin.json',
-      veri: new TextEncoder().encode(JSON.stringify({ hiz: HEDEF_HIZ, kayitlar: dizin }, null, 1)) });
+      veri: new TextEncoder().encode(JSON.stringify({ hiz: HEDEF_HIZ,
+        /* Hangi cihazda, hangi tarayıcıda kaydedildi — koşu sonuçları
+           cihaza göre karşılaştırılabilsin (13.10). */
+        cihaz: { tarayici: navigator.userAgent, ctxHiz: ctx ? ctx.sampleRate : null,
+                 tarih: new Date().toISOString() },
+        kayitlar: dizin }, null, 1)) });
 
     var url = URL.createObjectURL(zipYap(dosyalar));
     var a = document.createElement('a');
@@ -365,7 +397,7 @@ button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff
       '<p class="ipucu">' + (c.ortam
         ? 'Telefonu tezgâha koy, yaklaşık 20 saniye bekle. Konuşma; '
           + 'kompresör, radyo, ne varsa çalışsın.'
-        : 'Normal konuş; dükkân sesi kapanmasın.') + '</p>' +
+        : 'Normal hızında, tek nefeste söyle — tane tane okuma; usta nasıl konuşuyorsa öyle.') + '</p>' +
       '<div class="seviye" id="seviye"><i></i></div>';
 
     s += '<div class="eylem">' +

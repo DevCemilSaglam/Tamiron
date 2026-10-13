@@ -88,6 +88,14 @@
        lider İndirilenler'den okur. -->
   <div class="kutu">
     <strong>Sunucudan al — tek tık</strong>
+    <!-- Hangi kayıt seti (13.10): ilk 40 kayıt korunuyor, yenileri ayrı
+         klasörde — karşılaştırılabilsinler. -->
+    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center" id="klasorSec">
+      <span>Kayıt seti:</span>
+      <label><input type="radio" name="klasor" value="kayitlar" checked> İlk kayıtlar (dizüstü, 13.10)</label>
+      <label><input type="radio" name="klasor" value="kayitlar-pc2"> Bilgisayar — yeniden</label>
+      <label><input type="radio" name="klasor" value="kayitlar-tel"> Telefon</label>
+    </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button data-sunucu="dogrula">1 · Tek dosyayla doğrula</button>
       <button data-sunucu="temiz">2 · 40 cümle (temiz)</button>
@@ -323,7 +331,10 @@ document.addEventListener('click', async function (e) {
     var tur = b.getAttribute('data-sunucu');
     try {
       durum('Sunucudan alınıyor…');
-      var dz = await (await fetch(KOK + 'sesler/kayitlar/dizin.json?t=' + Date.now())).json();
+      var klasor = (document.querySelector('input[name="klasor"]:checked') || {}).value || 'kayitlar';
+      var dzYanit = await fetch(KOK + 'sesler/' + klasor + '/dizin.json?t=' + Date.now());
+      if (!dzYanit.ok) throw new Error('sesler/' + klasor + '/ klasöründe kayıt yok (zip oraya açılmalı)');
+      var dz = await dzYanit.json();
       var adlar = dz.kayitlar.map(function (k) { return k.dosya; });
       if (tur === 'dogrula') adlar = adlar.slice(0, 1);
       var tum = [], g = null;
@@ -333,11 +344,12 @@ document.addEventListener('click', async function (e) {
         if (tur === 'derlem5') dos = dos.slice(0, 10);   /* ilk 5 ses + 5 metin */
         for (var i = 0; i < dos.length; i++) tum.push(await sunucuDosya(KOK + 'sesler/derlem-100/' + dos[i], dos[i]));
       } else {
-        for (var j = 0; j < adlar.length; j++) tum.push(await sunucuDosya(KOK + 'sesler/kayitlar/' + adlar[j], adlar[j]));
+        for (var j = 0; j < adlar.length; j++) tum.push(await sunucuDosya(KOK + 'sesler/' + klasor + '/' + adlar[j], adlar[j]));
         if (tur === 'gurultu') g = await sunucuDosya(KOK + 'sesler/gurultu/' + b.getAttribute('data-g') + '.mp3');
       }
       SECIM = { tum: tum, gurultu: g };
-      SON_AD = 'ses-olcum-' + tur + (g ? '-' + b.getAttribute('data-g') : '') + '.json';
+      SON_AD = 'ses-olcum-' + tur + (tur === 'derlem' || tur === 'derlem5' ? '' : '-' + klasor) +
+               (g ? '-' + b.getAttribute('data-g') : '') + '.json';
       $('kos').disabled = false;
       $('kos').click();
     } catch (x) { durum('Alınamadı: ' + x.message + ' — yerel sunucu açık mı?'); SECIM = null; MESGUL = false; }
