@@ -223,6 +223,36 @@ aynı dosyada her seferinde aynı şeyi duyuyor: rastgele değil, kaydın
 içeriğiyle ilgili. Sıradaki en ucuz ayrım: Cemil s01.wav'ı DİNLESİN —
 dosyada söylenen gerçekten o cümle mi.
 
+**17:07 UTC — dinamik kazanç** (sunucu cevap verdi, 40/40): **%20**, kelime
+hatası %91 — DAHA KÖTÜ. Seviye hipotezi (sabit de dinamik de) düştü.
+
+**Cemil: "Kayıt çok yavaş."** Ölçüldü (aynı kod, tarayıcıda, derleme karşı):
+
+| | s01 | derlem erkek | derlem kadın |
+|---|---|---|---|
+| perde (NCCF, 120 ms) | **110 Hz** | 124 Hz | 308 Hz |
+| ardışık blok benzerliği | 0,15 | — | — |
+
+→ **Teknik yavaşlama YOK** (3× olsaydı perde ~40 Hz olurdu; parça tekrarı da
+yok). İlk perde ölçümüm normalize edilmemişti ve yüksek perdeye sapıyordu —
+düzeltilmiş ölçüm aynı sonucu verdi.
+
+Bant enerjisi (dB, en güçlü bant 0):
+
+| | 3,5 kHz | 4 kHz | ≥ 4,5 kHz |
+|---|---|---|---|
+| derlem erkek | −20 | −21 | −29 → −81 doğal iniş |
+| s01 / s20 | −37 / −34 | −42 / −39 | **−45…−49 DÜZ (gürültü zemini)** |
+
+→ Kayıtlar **dar bantlı ve boğuk**: ıslıklı sesler (s ş ç z — Türkçede çok
+sık) derlemden 15–20 dB zayıf, 4 kHz üstünde konuşma yok. Tipik iz:
+Bluetooth kulaklık mikrofonu (telefon kipi) ya da uzak/iç mikrofon. Buna
+yavaş, öbek öbek okuma eklenince tanıyıcı düşüyor. **Bu bir ürün bulgusu da:**
+dükkânda usta Bluetooth kulaklıkla konuşursa aynı şey olur.
+
+Sıradaki ayrım: hangi mikrofon kullanıldı · 5 cümle telefonun/dizüstünün
+kendi mikrofonuyla, normal hızda yeniden.
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
