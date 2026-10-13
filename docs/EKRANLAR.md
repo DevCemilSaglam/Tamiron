@@ -103,12 +103,13 @@ ve *"Ruhsatı çek"* (kamera + galeri). **Plaka kapının kendisidir**
 Akışın dört adımı burada (2, 4, 5, 6). **Kayıt teslim edilene kadar açık ve düzenlenebilir** (K-003).
 
 > **12–13.10 — K-058: adım şeridi kalktı.** Tek sayfa: künye → Yapılanlar
-> (+ toplam) → **Ne oldu** (süreç, `surecHtml`; son adımı **"Teslim
-> bekliyor" teslimin kapısı**) → Açıklama (+ iş türü) → Parça bekliyor.
-> Altta **yapışkan eylem çubuğu**: Ekle (**panel**) · Sesle · Fotoğraf ·
+> (+ toplam; başlık satırı yok, tür **renkli noktayla**) → **İşlemler**
+> (Teslim et · Parça bekliyor · şimdi gönderilebilir) → **Ne oldu** (yalnız
+> geçmiş; saat tarihin altında) → Açıklama (+ iş türü).
+> Altta **yapışkan eylem çubuğu**: Ekle (**panel**) · Sesle · Kamera ·
 > Parça sor · Mesaj. Dokunuş: satır 3 · tutar 1 · teslim **3** (önce
-> 2/1/4). **Üzerinde YOK:** adım sekmeleri · "devam" düğmeleri · ayrı
-> "Teslim et" düğmesi. Aşağıdaki tarih 08.09'un üç adımlı hâlini anlatıyor.
+> 2/1/4). **Üzerinde YOK:** adım sekmeleri · "devam" düğmeleri · tablo
+> başlığı · PARÇA/İŞÇİLİK yazısı. Aşağıdaki tarih 08.09'un üç adımlı hâlini anlatıyor.
 
 | Üzerinde ne var | Üzerinde ne YOK |
 |---|---|

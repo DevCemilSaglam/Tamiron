@@ -769,7 +769,17 @@ kirpilsin. */
   gap: 12px;
   font-size: 14px;
   color: var(--muted);
-}.tutar-sat .tv {
+}
+/* ⚠️ 13.10 — DÜĞME GİBİ DAVRANAN SATIR TAM YÜKSEKLİKTE (denetim yakaladı:
+   araç ekranında borçlu kaydın satırı `role="button"` ama 22 px idi —
+   K-033'ten beri). Satıra dokununca kayıt açılıyor; parmak için alan
+   yazının boyu değil, dokunma hedefi (K-024). Yalnız düğme olan satır
+   büyür; okunacak satırlar sıkı kalır. Denetim bunu ancak veresiyeli
+   bir araç çizili kaldığında görüyordu — kapsamı tesadüfe bağlıydı. */
+.tutar-sat[role="button"] {
+  min-height: var(--dokun); align-items: center; cursor: pointer;
+}
+.tutar-sat .tv {
   font-family: var(--font-mono);
   color: var(--text);
 }.tutar-sat.genel {
@@ -1108,15 +1118,9 @@ kirpilsin. */
 }.tutar-sat.kar .tv {
   color: var(--muted);
   ;
-}/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
-/* Parca ve iscilik satirlari BITISIKTI (Cemil,
-01.09). */
-.kalem-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  ;
-}/* ---------- ARAC BASLIGI — v1'den (03.09'da gozden kacmisti) ----------
+}/* ⚠️ 13.10 — BURADA .kalem-list'in BİREBİR KOPYASI duruyordu (ilki
+   yukarıda, "PARÇA / İŞÇİLİK KALEMLERİ"). Sınıf çakışması testi kuralları
+   birer atlayarak okuduğu için aylardır görmüyordu; test düzelince çıktı. *//* ---------- ARAC BASLIGI — v1'den (03.09'da gozden kacmisti) ----------
    30-kayit ve 60-arac ekranlari bu siniflari kullaniyordu ama kurallar
    tasinmamisti; kunye stilsiz ciziliyordu. */
 .arac-bas { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }.arac-bas .veh-title { margin-top: 9px; }.veh-title { font-family: var(--font-display); font-weight: 700; font-size: 23px; margin-top: 12px; }.veh-title .yr { color: var(--muted); font-weight: 500; }/* Detaylar TEK SERIT (tasarsa yatay kaydir; alta inmez) */
@@ -1553,16 +1557,15 @@ kirpilsin. */
   flex: 0 0 auto; margin-left: auto;
   font-family: var(--font-mono); font-size: var(--tip-xs);
   color: var(--muted); padding-top: 2px; white-space: nowrap;
+  /* 13.10 — saat TARİHİN ALTINDA (Cemil: "sol sütun daha geniş
+     olabilir"). Tek satırda "02.09.2026 · 10:20" sağ sütunu
+     genişletip adı ve açıklamayı daraltıyordu. */
+  text-align: right; line-height: 1.35;
 }
 /* Mesaj adımı tıklanabilir — satırın tamamı hedef (44 px'i aşıyor). */
 .surec-adim[data-mesaj] { cursor: pointer; }
 .surec-adim[data-mesaj]:hover .sa-ad { text-decoration: underline; }
-/* TESLİM KAPISI (13.10 · K-058): "Teslim bekliyor" adımına dokununca
-   teslim açılır. Kapı olduğu GÖRÜNMELİ — tarihin yerinde birincil
-   renkte "Teslim et ›" yazar; dokunma alanı satırın tamamı (≥ 48 px). */
-.surec-adim[data-git] { cursor: pointer; min-height: var(--dokun); }
-.surec-adim[data-git] .sa-tarih { color: var(--primary); font-weight: 700; }
-.surec-adim[data-git]:hover .sa-ad { text-decoration: underline; }
+
 
 /* ---------- ARAÇ RENGİ KUTUCUĞU ----------
    Renk ADI yerine rengin KENDİSİ (Cemil, 04.09). Renk değerleri
@@ -1756,8 +1759,15 @@ kirpilsin. */
   font-size: var(--tip-xs); font-weight: 700; letter-spacing: .06em;
   text-transform: uppercase; color: var(--muted);
   background: var(--surface-2);
-  position: sticky; top: 0;
 }
+/* ⚠️ 13.10 — TABLO BAŞLIĞI ARTIK YAPIŞMIYOR (Cemil, ekran görüntüsüyle:
+   "başlıklar static, aşağıya doğru divin de dışına çıkıyor").
+   `position: sticky; top: 0` v1'den kalmıştı, gerekçesi yazılı değildi.
+   Tablolar kartın içinde, kaydıran ise EKRAN: ekran kayınca başlık
+   ekranın üstüne yapışıp satırların ve kart kenarının üstünden kayıyordu.
+   04.09'da çekmecedeki "Bildirimler" başlığı aynı sebeple bildirimi
+   örtmüştü — İKİNCİ KEZ. Kural genel: bütün tablolarda kalktı; 54. test
+   kartın içinde yapışan bir şey bırakmıyor. */
 /* Metin sütunu sarabilir — tek uzun açıklama tabloyu enine germesin. */
 .tablo td.metin { white-space: normal; min-width: 140px; }
 .tablo td.sayi, .tablo th.sayi {

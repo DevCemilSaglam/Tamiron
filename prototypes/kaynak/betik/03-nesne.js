@@ -433,11 +433,8 @@ function surecAdimlari(k) {
     /* SIRADAKİ ADIM DA SÜRECİN PARÇASI — ve henüz olmadığı için
        "bekliyor" hâlinde duruyor. Ekran ne olduğunu değil, NE
        OLACAĞINI da söylüyor. */
-    /* `kapi`: bu adım, isteyen ekranda TESLİMİN KAPISIDIR (K-058 —
-       Cemil: teslim "Ne oldu"nun son adımında). Kapıyı açıp açmamak
-       çizen ekranın işi (surecHtml'in `secenek`i). */
     adimlar.push({ ad: 'Teslim bekliyor', tarih: '', saat: '',
-                   ikon: 'i-clock', hal: 'bekliyor', sira: 9, kapi: 'teslim',
+                   ikon: 'i-clock', hal: 'bekliyor', sira: 9,
                    alt: 'Ödeme teslimde soruluyor' });
   }
 
@@ -462,39 +459,45 @@ function surecAdimlari(k) {
   });
 }
 
-/* `secenek.teslimKapi` (13.10 · K-058): "Teslim bekliyor" adımı teslim
-   ekranını açan bir KAPI olur ve altında `secenek.teslimAlt` yazar
-   (eksikler). Kayıt ekranı açıyor; başka bir yerde çizilirse adım
-   yalnız bilgi kalır — kapı, kaydın kendisi açıkken anlamlı. */
+/* ⚠️ 13.10 — SÜREÇ YALNIZ GEÇMİŞİ ANLATIR (Cemil: "Teslim et burada
+   olmasın. Şimdi gönderilebilir de orada olmasın. Teslim et, parça
+   bekliyor vb aynı benzer işlemler.").
+   Bir gün önce teslimi buraya KAPI olarak koymuştum; "Ne oldu" bir
+   hikâye, işlem değil. İşlemler kayıt ekranında bir arada duruyor.
+   `secenek.mesajlar === false` → "şimdi gönderilebilir" çizilmez;
+   o öneriler ayrı fonksiyonda (siradakiMesajHtml), isteyen yere. */
 function surecHtml(k, secenek) {
   if (!k) return '';
   var sec = secenek || {};
   var adimlar = surecAdimlari(k);
-  var siradaki = kayitSiradakiMesajlar(k);
 
   return '<div class="surec">' +
     adimlar.map(function (a) {
-      var kapi = a.kapi === 'teslim' && sec.teslimKapi;
       return '<div class="surec-adim ' + a.hal + '"' +
-          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') +
-          (kapi ? ' data-git="teslim" role="button" tabindex="0" aria-label="Teslim et"' : '') + '>' +
+          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') + '>' +
         '<span class="sa-ic"><svg class="ico ico-sm"><use href="#' + a.ikon + '"></use></svg></span>' +
         '<span class="sa-govde">' +
           '<span class="sa-ad">' + a.ad + '</span>' +
-          ((kapi && sec.teslimAlt) || a.alt
-            ? '<span class="sa-alt">' + ((kapi && sec.teslimAlt) || a.alt) + '</span>' : '') +
+          (a.alt ? '<span class="sa-alt">' + a.alt + '</span>' : '') +
         '</span>' +
-        '<span class="sa-tarih">' + (kapi ? 'Teslim et ›' : (a.tarih || '—') +
-          (a.saat ? ' · ' + a.saat : '')) + '</span>' +
+        /* Saat tarihin ALTINDA (13.10) — sağ sütun dar kalsın. */
+        '<span class="sa-tarih">' + (a.tarih || '—') +
+          (a.saat ? '<br>' + a.saat : '') + '</span>' +
       '</div>';
     }).join('') +
   '</div>' +
-  /* ⚠️ SÜREÇ MESAJLA BİRLİKTE İŞLER (Cemil'in cümlesi). Sıradaki
-     adımın mesajı BURADAN gönderiliyor — usta mesaj ekranını arayıp
-     müşteriyi yeniden seçmiyor. Koşullar mesaj ekranıyla AYNI tablodan
-     (MESAJ_SABLONLARI), yoksa iki ekran iki şey önerirdi. Fark yalnız
-     SORULAN ŞEY: burada BU KAYIT, mesaj ekranında aracın şu anki işi. */
-  (siradaki.length
+  (sec.mesajlar === false ? '' : siradakiMesajHtml(k));
+}
+
+/* ⚠️ SÜREÇ MESAJLA BİRLİKTE İŞLER (Cemil'in cümlesi, 14.09). Sıradaki
+   adımın mesajı buradan gönderiliyor — usta mesaj ekranını arayıp
+   müşteriyi yeniden seçmiyor. Koşullar mesaj ekranıyla AYNI tablodan
+   (MESAJ_SABLONLARI), yoksa iki ekran iki şey önerirdi.
+   13.10: ayrı fonksiyon — kayıt ekranında "Ne oldu"dan çıkıp İşlemler'e
+   taşındı; sürecin altında hâlâ çizilebilir (varsayılan). */
+function siradakiMesajHtml(k) {
+  var siradaki = kayitSiradakiMesajlar(k);
+  return siradaki.length
     ? '<div class="section-label" style="margin-top:14px">' +
         '<svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Şimdi gönderilebilir' +
       '</div>' +
@@ -504,7 +507,7 @@ function surecHtml(k, secenek) {
             '" data-surec-plaka="' + k.plaka + '">' + SABLON_AD[s.k] + '</button>';
         }).join('') +
       '</div>'
-    : '');
+    : '';
 }
 
 /* Süreçten mesaja: şablon ve araç birlikte taşınıyor. Davranış ortak

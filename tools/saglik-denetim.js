@@ -536,9 +536,19 @@ function stilMetni() {
 
   var KURUCU = /(^|;)\s*(display|position|padding|flex|grid-template|grid-template-columns)\s*:/;
   var yer = {};
-  var re = /(^|[}])([^{}]*)\{([^{}]*)\}/g, m;
+  /* ⚠️ 13.10 — BU TEST KURALLARIN YARISINI GÖRMÜYORDU. Desen
+     `(^|})sec{govde}` idi: her eşleşme bir önceki kuralın kapanış `}`
+     işaretini TÜKETİYOR, arka arkaya iki kuraldan ikincisi atlanıyordu —
+     kurallar BİRER ATLAYARAK okunuyordu. Hangi yarının görüleceği sıraya
+     bağlıydı: 13.10'da tek bir kural eklenince sıra kaydı ve aylardır
+     duran gerçek bir çift tanım (.kalem-list) ortaya çıktı. Yalancı geçen
+     test, olmayan testten kötüdür. Artık sınır tüketilmiyor ve seçicinin
+     önündeki yorum atılıyor.
+     NEGATİF DOĞRULAMA: eski desenle 1 bulgu (rastlantı), yeni desenle
+     bütün çiftler; çiftler giderilince 0. */
+  var re = /([^{}]*)\{([^{}]*)\}/g, m;
   while ((m = re.exec(temiz))) {
-    var sec = m[2].trim(), govde = m[3];
+    var sec = m[1].replace(/\/\*[\s\S]*?\*\//g, '').trim(), govde = m[2];
     if (!/^\.[a-zA-Z][\w-]*$/.test(sec)) continue;
     if (!KURUCU.test(';' + govde)) continue;
     var ad = sec.slice(1);
@@ -2311,6 +2321,38 @@ function stilMetni() {
       kok.scrollTop = 0;
     });
   }
+
+  /* 54) KARTIN ICINDE YAPISAN OGE (13.10.2026 · Cemil'in ekran goruntusu)
+     "Yapilanlar altinda basliklar static, asagiya dogru divin de disina
+     cikiyor." Tablo basligi `position: sticky; top: 0` idi. Kart bir
+     kaydirma kabi DEGIL — kaydiran ekran; ekran kayinca baslik ekranin
+     ustune yapisip satirlarin ve kart kenarinin ustunden kayiyordu.
+     IKINCI KEZ yasandi (04.09: cekmecede "Bildirimler" basligi bildirimi
+     ortuyordu). Kural listeye degil YAPIYA: bir kartin icinde, kaydirma
+     kabi olmayan bir yerde, yapisan oge olmaz.
+     NEGATIF DOGRULAMA (13.10): `.tablo th`'ye sticky geri kondu -> bulgu;
+     kalkinca 0. */
+  ekranlar.forEach(function (a) {
+    var kok = document.getElementById('screen-' + a);
+    if (!kok) return;
+    showScreen(a);
+    kok.querySelectorAll('.card *').forEach(function (el) {
+      var cs = getComputedStyle(el);
+      if (cs.position !== 'sticky' || cs.top === 'auto') return;
+      /* Arada KENDI kaydirma kabi varsa (overflow auto/scroll) yapisma
+         orada kalir — o mesru. */
+      var kap = el.parentElement, mesru = false;
+      while (kap && !kap.classList.contains('card')) {
+        var o = getComputedStyle(kap).overflowY;
+        if (o === 'auto' || o === 'scroll') { mesru = true; break; }
+        kap = kap.parentElement;
+      }
+      if (!mesru) {
+        ek('KART-ICI-YAPISKAN', a, (el.tagName.toLowerCase() + (el.className ? '.' + el.className : '')) +
+           ' kartin icinde yapisiyor — ekran kayinca kartin disina tasar');
+      }
+    });
+  });
 
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.

@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-13 08:24
+  Üretim: 2026-10-13 08:53
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -265,8 +265,9 @@ button { min-height: var(--dokun); cursor: pointer; }
 /* Rakam kolonları hizalı — plaka, tutar, km, yıl */
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-/* İkon — currentColor ile boyanır, token rengine uyar */
-.ico { width: 24px; height: 24px; flex: none; }
+/* İkon kuralı 03-bilesen.css'te (Lucide tabanı, tam hâli). Burada bir
+   alt kümesi daha duruyordu — iki yerde duran kural iki ayrı cevaptır;
+   13.10'da sınıf çakışması testi düzelince çıktı, silindi. */
 
 /* ⚠️ 05.09 — GİZLİ OLAN GERÇEKTEN GİZLİ KALIR.
    `hidden` özniteliği tarayıcının kendi stilinde `display: none`
@@ -1123,7 +1124,17 @@ kirpilsin. */
   gap: 12px;
   font-size: 14px;
   color: var(--muted);
-}.tutar-sat .tv {
+}
+/* ⚠️ 13.10 — DÜĞME GİBİ DAVRANAN SATIR TAM YÜKSEKLİKTE (denetim yakaladı:
+   araç ekranında borçlu kaydın satırı `role="button"` ama 22 px idi —
+   K-033'ten beri). Satıra dokununca kayıt açılıyor; parmak için alan
+   yazının boyu değil, dokunma hedefi (K-024). Yalnız düğme olan satır
+   büyür; okunacak satırlar sıkı kalır. Denetim bunu ancak veresiyeli
+   bir araç çizili kaldığında görüyordu — kapsamı tesadüfe bağlıydı. */
+.tutar-sat[role="button"] {
+  min-height: var(--dokun); align-items: center; cursor: pointer;
+}
+.tutar-sat .tv {
   font-family: var(--font-mono);
   color: var(--text);
 }.tutar-sat.genel {
@@ -1462,15 +1473,9 @@ kirpilsin. */
 }.tutar-sat.kar .tv {
   color: var(--muted);
   ;
-}/* ---------- PARÇA / İŞÇİLİK KALEMLERİ ---------- */
-/* Parca ve iscilik satirlari BITISIKTI (Cemil,
-01.09). */
-.kalem-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  ;
-}/* ---------- ARAC BASLIGI — v1'den (03.09'da gozden kacmisti) ----------
+}/* ⚠️ 13.10 — BURADA .kalem-list'in BİREBİR KOPYASI duruyordu (ilki
+   yukarıda, "PARÇA / İŞÇİLİK KALEMLERİ"). Sınıf çakışması testi kuralları
+   birer atlayarak okuduğu için aylardır görmüyordu; test düzelince çıktı. *//* ---------- ARAC BASLIGI — v1'den (03.09'da gozden kacmisti) ----------
    30-kayit ve 60-arac ekranlari bu siniflari kullaniyordu ama kurallar
    tasinmamisti; kunye stilsiz ciziliyordu. */
 .arac-bas { display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }.arac-bas .veh-title { margin-top: 9px; }.veh-title { font-family: var(--font-display); font-weight: 700; font-size: 23px; margin-top: 12px; }.veh-title .yr { color: var(--muted); font-weight: 500; }/* Detaylar TEK SERIT (tasarsa yatay kaydir; alta inmez) */
@@ -1907,16 +1912,15 @@ kirpilsin. */
   flex: 0 0 auto; margin-left: auto;
   font-family: var(--font-mono); font-size: var(--tip-xs);
   color: var(--muted); padding-top: 2px; white-space: nowrap;
+  /* 13.10 — saat TARİHİN ALTINDA (Cemil: "sol sütun daha geniş
+     olabilir"). Tek satırda "02.09.2026 · 10:20" sağ sütunu
+     genişletip adı ve açıklamayı daraltıyordu. */
+  text-align: right; line-height: 1.35;
 }
 /* Mesaj adımı tıklanabilir — satırın tamamı hedef (44 px'i aşıyor). */
 .surec-adim[data-mesaj] { cursor: pointer; }
 .surec-adim[data-mesaj]:hover .sa-ad { text-decoration: underline; }
-/* TESLİM KAPISI (13.10 · K-058): "Teslim bekliyor" adımına dokununca
-   teslim açılır. Kapı olduğu GÖRÜNMELİ — tarihin yerinde birincil
-   renkte "Teslim et ›" yazar; dokunma alanı satırın tamamı (≥ 48 px). */
-.surec-adim[data-git] { cursor: pointer; min-height: var(--dokun); }
-.surec-adim[data-git] .sa-tarih { color: var(--primary); font-weight: 700; }
-.surec-adim[data-git]:hover .sa-ad { text-decoration: underline; }
+
 
 /* ---------- ARAÇ RENGİ KUTUCUĞU ----------
    Renk ADI yerine rengin KENDİSİ (Cemil, 04.09). Renk değerleri
@@ -2110,8 +2114,15 @@ kirpilsin. */
   font-size: var(--tip-xs); font-weight: 700; letter-spacing: .06em;
   text-transform: uppercase; color: var(--muted);
   background: var(--surface-2);
-  position: sticky; top: 0;
 }
+/* ⚠️ 13.10 — TABLO BAŞLIĞI ARTIK YAPIŞMIYOR (Cemil, ekran görüntüsüyle:
+   "başlıklar static, aşağıya doğru divin de dışına çıkıyor").
+   `position: sticky; top: 0` v1'den kalmıştı, gerekçesi yazılı değildi.
+   Tablolar kartın içinde, kaydıran ise EKRAN: ekran kayınca başlık
+   ekranın üstüne yapışıp satırların ve kart kenarının üstünden kayıyordu.
+   04.09'da çekmecedeki "Bildirimler" başlığı aynı sebeple bildirimi
+   örtmüştü — İKİNCİ KEZ. Kural genel: bütün tablolarda kalktı; 54. test
+   kartın içinde yapışan bir şey bırakmıyor. */
 /* Metin sütunu sarabilir — tek uzun açıklama tabloyu enine germesin. */
 .tablo td.metin { white-space: normal; min-width: 140px; }
 .tablo td.sayi, .tablo th.sayi {
@@ -2297,13 +2308,38 @@ kirpilsin. */
 #screen-kayit .k-satir {
   display: flex; align-items: center; gap: 8px;
 }
-#screen-kayit .k-satir .pill { flex: none; }
-/* Rozet bir düğme oldu: dokunulabilir göründüğü kadar dursun, ama
-   satırın içinde gürültü yapmasın — çerçeve yok, yalnız imleç. */
-/* Odak halkası GENEL kuralda (stil/01-taban.css :focus-visible);
-   burada tekrarlanmıyor — iki yerde durursa biri eskir. */
-#screen-kayit .k-satir .k-tip { cursor: pointer; border: 0; font: inherit;
-  font-size: 10.5px; font-weight: 700; letter-spacing: .04em; }
+/* ⚠️ 13.10 — PARÇA / İŞÇİLİK YAZISI KALKTI, RENK KALDI (Cemil: "Parça /
+   İşçilik belirtmeye gerek. Renkleri farklı olsun, yeter.").
+   Her satırda bir kelime, on satırda on kelime: ad alanından yer
+   yiyordu (320 px'te rozet 52–65 px idi). Artık bir NOKTA:
+     parça   → --primary   (mavi)
+     işçilik → --highlight (turuncu — "üçüncü vurgu"; uyarı rengi DEĞİL,
+                            uyarı başka bir şey söyler)
+   Nokta hâlâ DÜĞME (7.1): dokununca tür değişir, ad ve tutar korunur.
+   Görünüşü 14 px, dokunma alanı 44 × 48 (K-024). Rengin anlamı Ekle
+   panelinde öğreniliyor — oradaki çiplerde aynı noktalar var.
+   Ekran okuyucu için anlam `aria-label`da (renk tek başına söylemez).
+   Sınıf ekranın <style>'ında ve kapsamsız: Ekle paneli katmanda,
+   ekranın dışında çiziliyor. */
+.k-tip {
+  flex: none; position: relative;
+  width: 44px; min-height: var(--dokun); padding: 0; margin-left: -10px;
+  background: transparent; border: 0; cursor: pointer;
+}
+.k-tip::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+}
+.k-tip-parca::after { background: var(--primary); }
+.k-tip-iscilik::after { background: var(--highlight); }
+/* Ekle panelindeki çiplerde: nokta yazının yanında, aynı renk. */
+.k-tip-renk {
+  display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+  margin-right: 6px; vertical-align: -1px;
+}
+.k-tip-renk.k-tip-parca { background: var(--primary); }
+.k-tip-renk.k-tip-iscilik { background: var(--highlight); }
+.k-tip-renk::after { content: none; }
 #screen-kayit .tablo input {
   width: 100%; background: transparent; border: 0;
   border-bottom: 1px dashed var(--line);
@@ -2342,19 +2378,13 @@ kirpilsin. */
 
    İki yerden yer açıldı, ikisi de yalnız dar ekranda:
    · tutar sütunu 96 → 74 px ("1.900 ₺" 50 px'e sığıyor)
-   · tip rozeti küçülüyor (65 → ~52 px)
-   Kazanç ~35 px; ad alanı 65 → ~101 px oluyor.
+   · tip rozeti küçülüyor (65 → ~52 px) — 13.10'da rozet NOKTA oldu
+     (34 px, her genişlikte), bu kural kalktı.
 
    375 px ve üstünde hiçbir şey değişmiyor — dar ekranın çözümü geniş
    ekrana bulaşmaz. */
 @media (max-width: 359px) {
-  #screen-kayit .tablo td.sayi,
-  #screen-kayit .tablo th.sayi { width: 74px; }
-  #screen-kayit .k-satir .pill {
-    padding: 2px 5px;
-    font-size: 10px;
-    letter-spacing: 0;
-  }
+  #screen-kayit .tablo td.sayi { width: 74px; }
 }
 
 /* ---- EYLEM ÇUBUĞU (12.10 · K-058) ----
@@ -2384,13 +2414,19 @@ kirpilsin. */
   border: 1px solid var(--line); border-radius: var(--radius-md);
   background: var(--surface); color: var(--text);
   font-size: var(--tip-xs); font-weight: 600; line-height: 1.15;
-  overflow-wrap: anywhere; text-align: center;
+  /* ⚠️ 13.10 — KELİME ORTADAN BÖLÜNMEZ. `overflow-wrap: anywhere` idi ve
+     320 px'te "Fotoğraf" → "Fotoğr / af" oldu (ekran görüntüsünde
+     görüldü; taşma ya da kırpma testi görmez, çünkü hiçbir şey taşmıyor).
+     Etiket Cemil'in kelimesiyle "Kamera" oldu ve kelimeler bütün kalır. */
+  overflow-wrap: normal; word-break: keep-all; text-align: center;
 }
 #screen-kayit .k-cubuk button:hover { background: var(--nav-hover); }
 #screen-kayit .k-cubuk #kParcaEkle {
   background: var(--primary); color: var(--on-primary); border-color: var(--primary);
 }
 #screen-kayit .k-cubuk .ico { width: 20px; height: 20px; }
+/* Sıradaki mesaj yoksa kap boş — boş çocuk da kartın gap'ini alır (K-029). */
+#kMesajOneri:empty { display: none; }
 
 /* ⚠️ 08.09 — ÜSTÜ ÇİZİLİ TUTAR KALKTI (.tutar-disi).
    Cemil: *"Değişen parça fiyatı yerine bilgi olarak sadece
@@ -3098,12 +3134,15 @@ kirpilsin. */
        satır görünmüyordu) da aynı yapının ürünüydü: eylem bir adımda,
        sonucu başka adımda.
 
-       ŞİMDİ TEK SAYFA, SIRA ÖNEMİNE GÖRE:
-         künye → Yapılanlar (+ toplam + teslim) → Ne oldu → Açıklama
-         → Parça bekliyor · altta YAPIŞKAN eylem çubuğu
-       İşler çubukta (Ekle · Sesle · Fotoğraf · Parça sor · Mesaj);
-       teslim çubukta DEĞİL — Cemil'in sözü. 13.10'da yeri netleşti:
-       "Ne oldu"nun son adımı ("Teslim bekliyor") teslimin kapısı.
+       ŞİMDİ TEK SAYFA, SIRA ÖNEMİNE GÖRE (13.10'da Cemil'le netleşti):
+         künye → Yapılanlar (+ toplam) → İşlemler (teslim · parça bekliyor
+         · sıradaki mesajlar) → Ne oldu (yalnız geçmiş) → Açıklama
+         · altta YAPIŞKAN eylem çubuğu
+       İçerik ekleyen işler çubukta (Ekle · Sesle · Fotoğraf · Parça sor ·
+       Mesaj); kaydın hâlini değiştiren işler İşlemler kartında. Teslim
+       çubukta DEĞİL (Cemil). Yolculuk: 12.10 tablonun altında → 13.10
+       sabah "Ne oldu"nun son adımında → 13.10 öğle İşlemler'de, çünkü
+       Cemil "Ne oldu"yu yalnız geçmiş istedi.
 
        K-003 DURUYOR: kayıt teslim edilene kadar açık, her şey her an
        yapılabilir. Artık bunu söyleyen bir ekran da var. -->
@@ -3139,16 +3178,45 @@ kirpilsin. */
     <div id="kSatirlar"></div>
   </div>
 
+  <!-- ================= İŞLEMLER (13.10 · K-058) =================
+       Cemil: "Teslim et burada olmasın. Şimdi gönderilebilir de orada
+       olmasın. Teslim et, parça bekliyor vb aynı benzer işlemler."
+       Kaydın DURUMUNU değiştiren işler tek kartta: teslim, parça bekliyor
+       bayrağı, sıradaki mesajlar. "Ne oldu" yalnız geçmişi anlatıyor.
+       Alttaki çubuk İÇERİK ekleyen işler için (Ekle · Sesle · Fotoğraf ·
+       Parça sor · Mesaj); bu kart kaydın HÂLİNİ değiştiren işler için.
+       ⚠️ Cemil onayına açık: "aynı benzer işlemler" cümlesini "bir arada
+       dursunlar" diye okudum; "alttaki çubukta dursunlar" da olabilir.
+       PARÇA BEKLİYOR kendi bayrağı (K-033.5) — yeni bir DURUM değil (K-004):
+       kayıt yine açık, yine teslim edilebilir.
+       TESLİM eksikleri SÖYLER ama yolu KAPATMAZ: fiyatı gelmemiş satırla
+       da teslim edilebilir. -->
+  <div class="card" id="kIslemler">
+    <div class="section-label">
+      <span class="lbl-txt">
+        <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> İşlemler
+      </span>
+    </div>
+    <div id="kTeslim"></div>
+    <div class="section-label with-action">
+      <span class="lbl-txt">
+        <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça bekliyor
+      </span>
+      <span class="lbl-eylem">
+        <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
+      </span>
+    </div>
+    <div id="kBekliyorGovde"></div>
+    <div id="kMesajOneri"></div>
+  </div>
+
   <!-- ================= NE OLDU =================
-       Cemil'in seçtiği zaman çizelgesi. Yeni bir nesne YAZILMADI: 14.09'dan
-       beri duran süreç (surecHtml, 03-nesne) zaten tarihli bir akıştı —
-       açıldı → parça bekleniyor → mesajlar → teslim → hatırlatma — ve
-       altında "şimdi gönderilebilir" mesajları. Adı Cemil'in koyduğu ad
-       oldu. Satırlar akışa girmiyor: tarihleri yok ve hemen üstte duruyorlar.
-       ⚠️ 13.10 — TESLİM BURADA (Cemil seçti): akışın son adımı "Teslim
-       bekliyor" teslimin KAPISI; dokununca teslim ekranı açılır. Eksikler
-       o adımın altında yazar ama yolu KAPATMAZ (fiyatı gelmemiş satırla da
-       teslim edilebilir). Ayrı bir "Teslim et" düğmesi YOK. -->
+       Cemil'in seçtiği zaman çizelgesi; yeni nesne yazılmadı — 14.09'dan
+       beri duran süreç (surecHtml, 03-nesne): açıldı → parça bekleniyor →
+       mesajlar → teslim → hatırlatma. Satırlar akışa girmiyor: tarihleri
+       yok ve hemen üstte duruyorlar (Cemil 13.10: "İkisi de kalsın").
+       ⚠️ 13.10 — YALNIZ GEÇMİŞ: teslim kapısı ve "şimdi gönderilebilir"
+       buradan İşlemler'e taşındı. Saat tarihin ALTINDA. -->
   <div class="card" id="kSurecKart">
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-clock"></use></svg> Ne oldu
@@ -3177,21 +3245,6 @@ kirpilsin. */
     <div class="cip-grup" id="kTurGrup" role="group" aria-label="İş türü"></div>
   </div>
 
-  <!-- ================= PARÇA BEKLİYOR =================
-       Kendi bayrağı (K-033.5) — yeni bir DURUM değil (K-004 duruyor):
-       kayıt yine açık, yine teslim edilebilir. -->
-  <div class="card">
-    <div class="section-label with-action">
-      <span class="lbl-txt">
-        <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça bekliyor
-      </span>
-      <span class="lbl-eylem">
-        <button class="cip" id="kBekliyor" aria-pressed="false">Bekliyor</button>
-      </span>
-    </div>
-    <div id="kBekliyorGovde"></div>
-  </div>
-
   <!-- ================= EYLEM ÇUBUĞU (K-058) =================
        Cemil: "Eylem merkezli olanın altta buttonlarının olması olacak.
        Fakat burada ses ve kamera buttonları da gerekli."
@@ -3206,7 +3259,7 @@ kirpilsin. */
   <div class="k-cubuk" id="kCubuk" role="toolbar" aria-label="Servis kaydı işleri">
     <button id="kParcaEkle"><svg class="ico"><use href="#i-plus"></use></svg>Ekle</button>
     <button id="kSesleEkle"><svg class="ico"><use href="#i-mic"></use></svg>Sesle</button>
-    <button id="kFotoParca"><svg class="ico"><use href="#i-camera"></use></svg>Fotoğraf</button>
+    <button id="kFotoParca" aria-label="Fotoğraftan parça listesi"><svg class="ico"><use href="#i-camera"></use></svg>Kamera</button>
     <button data-git="parca-sor"><svg class="ico"><use href="#i-package"></use></svg>Parça sor</button>
     <button id="kOzetGonder"><svg class="ico"><use href="#i-message-square"></use></svg>Mesaj</button>
   </div>
@@ -7349,11 +7402,8 @@ function surecAdimlari(k) {
     /* SIRADAKİ ADIM DA SÜRECİN PARÇASI — ve henüz olmadığı için
        "bekliyor" hâlinde duruyor. Ekran ne olduğunu değil, NE
        OLACAĞINI da söylüyor. */
-    /* `kapi`: bu adım, isteyen ekranda TESLİMİN KAPISIDIR (K-058 —
-       Cemil: teslim "Ne oldu"nun son adımında). Kapıyı açıp açmamak
-       çizen ekranın işi (surecHtml'in `secenek`i). */
     adimlar.push({ ad: 'Teslim bekliyor', tarih: '', saat: '',
-                   ikon: 'i-clock', hal: 'bekliyor', sira: 9, kapi: 'teslim',
+                   ikon: 'i-clock', hal: 'bekliyor', sira: 9,
                    alt: 'Ödeme teslimde soruluyor' });
   }
 
@@ -7378,39 +7428,45 @@ function surecAdimlari(k) {
   });
 }
 
-/* `secenek.teslimKapi` (13.10 · K-058): "Teslim bekliyor" adımı teslim
-   ekranını açan bir KAPI olur ve altında `secenek.teslimAlt` yazar
-   (eksikler). Kayıt ekranı açıyor; başka bir yerde çizilirse adım
-   yalnız bilgi kalır — kapı, kaydın kendisi açıkken anlamlı. */
+/* ⚠️ 13.10 — SÜREÇ YALNIZ GEÇMİŞİ ANLATIR (Cemil: "Teslim et burada
+   olmasın. Şimdi gönderilebilir de orada olmasın. Teslim et, parça
+   bekliyor vb aynı benzer işlemler.").
+   Bir gün önce teslimi buraya KAPI olarak koymuştum; "Ne oldu" bir
+   hikâye, işlem değil. İşlemler kayıt ekranında bir arada duruyor.
+   `secenek.mesajlar === false` → "şimdi gönderilebilir" çizilmez;
+   o öneriler ayrı fonksiyonda (siradakiMesajHtml), isteyen yere. */
 function surecHtml(k, secenek) {
   if (!k) return '';
   var sec = secenek || {};
   var adimlar = surecAdimlari(k);
-  var siradaki = kayitSiradakiMesajlar(k);
 
   return '<div class="surec">' +
     adimlar.map(function (a) {
-      var kapi = a.kapi === 'teslim' && sec.teslimKapi;
       return '<div class="surec-adim ' + a.hal + '"' +
-          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') +
-          (kapi ? ' data-git="teslim" role="button" tabindex="0" aria-label="Teslim et"' : '') + '>' +
+          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') + '>' +
         '<span class="sa-ic"><svg class="ico ico-sm"><use href="#' + a.ikon + '"></use></svg></span>' +
         '<span class="sa-govde">' +
           '<span class="sa-ad">' + a.ad + '</span>' +
-          ((kapi && sec.teslimAlt) || a.alt
-            ? '<span class="sa-alt">' + ((kapi && sec.teslimAlt) || a.alt) + '</span>' : '') +
+          (a.alt ? '<span class="sa-alt">' + a.alt + '</span>' : '') +
         '</span>' +
-        '<span class="sa-tarih">' + (kapi ? 'Teslim et ›' : (a.tarih || '—') +
-          (a.saat ? ' · ' + a.saat : '')) + '</span>' +
+        /* Saat tarihin ALTINDA (13.10) — sağ sütun dar kalsın. */
+        '<span class="sa-tarih">' + (a.tarih || '—') +
+          (a.saat ? '<br>' + a.saat : '') + '</span>' +
       '</div>';
     }).join('') +
   '</div>' +
-  /* ⚠️ SÜREÇ MESAJLA BİRLİKTE İŞLER (Cemil'in cümlesi). Sıradaki
-     adımın mesajı BURADAN gönderiliyor — usta mesaj ekranını arayıp
-     müşteriyi yeniden seçmiyor. Koşullar mesaj ekranıyla AYNI tablodan
-     (MESAJ_SABLONLARI), yoksa iki ekran iki şey önerirdi. Fark yalnız
-     SORULAN ŞEY: burada BU KAYIT, mesaj ekranında aracın şu anki işi. */
-  (siradaki.length
+  (sec.mesajlar === false ? '' : siradakiMesajHtml(k));
+}
+
+/* ⚠️ SÜREÇ MESAJLA BİRLİKTE İŞLER (Cemil'in cümlesi, 14.09). Sıradaki
+   adımın mesajı buradan gönderiliyor — usta mesaj ekranını arayıp
+   müşteriyi yeniden seçmiyor. Koşullar mesaj ekranıyla AYNI tablodan
+   (MESAJ_SABLONLARI), yoksa iki ekran iki şey önerirdi.
+   13.10: ayrı fonksiyon — kayıt ekranında "Ne oldu"dan çıkıp İşlemler'e
+   taşındı; sürecin altında hâlâ çizilebilir (varsayılan). */
+function siradakiMesajHtml(k) {
+  var siradaki = kayitSiradakiMesajlar(k);
+  return siradaki.length
     ? '<div class="section-label" style="margin-top:14px">' +
         '<svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Şimdi gönderilebilir' +
       '</div>' +
@@ -7420,7 +7476,7 @@ function surecHtml(k, secenek) {
             '" data-surec-plaka="' + k.plaka + '">' + SABLON_AD[s.k] + '</button>';
         }).join('') +
       '</div>'
-    : '');
+    : '';
 }
 
 /* Süreçten mesaja: şablon ve araç birlikte taşınıyor. Davranış ortak
@@ -9325,7 +9381,9 @@ function kayitCiz() {
   var satirlar = k.satirlar || [];
   document.getElementById('kSatirlar').innerHTML = satirlar.length
     ? '<div class="tablo-sar"><table class="tablo">' +
-        '<thead><tr><th>İş</th><th class="sayi">Tutar</th></tr></thead><tbody>' +
+        /* 13.10 — BAŞLIK SATIRI YOK (Cemil: "Hatta İş + Tutar başlığı da
+           olmasın"). Sol ad, sağ rakam — sütunun ne olduğu kendinden belli. */
+        '<tbody>' +
         satirlar.map(function (s, i) {
           return '<tr class="kaydirilir" data-kaydir="' + i + '" tabindex="0"' +
               ' aria-label="' + (s.ad || 'satır') + ' — silmek için sola kaydır">' +
@@ -9336,12 +9394,12 @@ function kayitCiz() {
                    Önce yalnız bir etiketti: usta yanlış tipi seçtiyse
                    satırı SİLİP yeniden ekliyordu — yazdığı ad ve tutar
                    da onunla gidiyordu. Tek dokunuşla dönüyor. */
-                '<button class="pill ' + (s.tip === 'parca' ? 'info' : 'muted') +
-                  ' k-tip" data-satir-tip="' + i + '"' +
-                  ' title="Dokun — ' + (s.tip === 'parca' ? 'işçiliğe' : 'parçaya') + ' çevir"' +
-                  ' aria-label="Satır tipi: ' + (s.tip === 'parca' ? 'parça' : 'işçilik') +
-                  ' — değiştirmek için dokun">' +
-                  (s.tip === 'parca' ? 'PARÇA' : 'İŞÇİLİK') + '</button>' +
+                '<button class="k-tip ' + (s.tip === 'parca' ? 'k-tip-parca' : 'k-tip-iscilik') +
+                  '" data-satir-tip="' + i + '"' +
+                  ' title="' + (s.tip === 'parca' ? 'Parça' : 'İşçilik') + ' — dokun, ' +
+                    (s.tip === 'parca' ? 'işçiliğe' : 'parçaya') + ' çevir"' +
+                  ' aria-label="' + (s.tip === 'parca' ? 'Parça' : 'İşçilik') +
+                  ' — türü değiştirmek için dokun"></button>' +
                 '<input value="' + (s.ad || '').replace(/"/g, '&quot;') +
                   '" data-satir-ad="' + i + '" placeholder="' +
                   (s.tip === 'parca' ? 'Parça adı' : 'Ne yapıldı') +
@@ -9440,17 +9498,28 @@ function kayitCiz() {
         'Parça ya da işçilik ekle. Parçacının listesini fotoğraflayarak ' +
         'da girebilirsin. Satırı silmek için sola kaydır.');
 
-  /* ---- NE OLDU — ortak nesneden (surecHtml) ----
-     13.10: teslim KAPISI burada (K-058). Eksikler kapının altında,
-     KÜÇÜK: yarım kayıt olağan bir hâl ve her açılışta sarı bir uyarı
-     görmek uyarıyı gürültüye çevirirdi. Yol hiçbir zaman kapanmaz. */
+  /* ---- NE OLDU — yalnız geçmiş (13.10) ---- */
+  document.getElementById('kSurec').innerHTML = surecHtml(k, { mesajlar: false });
+
+  /* ---- İŞLEMLER · TESLİM (13.10 · K-058) ----
+     Teslim edildiyse düğme yerine NE OLDUĞU yazar. Eksikler KÜÇÜK bir
+     ipucu: yarım kayıt olağan bir hâl (parça bekleniyor, fiyat gelmedi)
+     ve her açılışta sarı bir uyarı, uyarıyı gürültüye çevirirdi. */
   var eksik = kEksikler(k);
-  document.getElementById('kSurec').innerHTML = surecHtml(k, {
-    teslimKapi: true,
-    teslimAlt: (eksik.length && satirlar.length)
-      ? 'Eksik görünen: ' + eksik.join(' · ') + '. Yine de teslim edebilirsin.'
-      : 'Ödeme teslimde soruluyor'
-  });
+  document.getElementById('kTeslim').innerHTML = k.teslimTarihi
+    ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
+        '<use href="#i-circle-check"></use></svg></span>' +
+        '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
+          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') + '</span></div>'
+    : '<button class="btn btn-primary btn-lg" data-git="teslim">' +
+        '<svg class="ico"><use href="#i-wallet"></use></svg> Teslim et</button>' +
+      (eksik.length && satirlar.length
+        ? '<p class="plate-hint">Eksik görünen: ' + eksik.join(' · ') +
+          '. Yine de teslim edebilirsin.</p>'
+        : '');
+
+  /* ---- İŞLEMLER · SIRADAKİ MESAJLAR (Ne oldu'dan taşındı) ---- */
+  document.getElementById('kMesajOneri').innerHTML = siradakiMesajHtml(k);
 
   /* ---- PARÇA BEKLİYOR ---- */
   document.getElementById('kBekliyor')
@@ -9535,8 +9604,10 @@ document.addEventListener('click', function (e) {
   if (t.id === 'kParcaEkle') {
     Katman.ac('Ne yapıldı?',
       '<div class="cip-grup" role="group" aria-label="Tür">' +
-        '<button class="cip" data-k-yeni-tip="parca" aria-pressed="true">Parça</button>' +
-        '<button class="cip" data-k-yeni-tip="iscilik" aria-pressed="false">İşçilik</button>' +
+        '<button class="cip" data-k-yeni-tip="parca" aria-pressed="true">' +
+          '<span class="k-tip-renk k-tip-parca" aria-hidden="true"></span>Parça</button>' +
+        '<button class="cip" data-k-yeni-tip="iscilik" aria-pressed="false">' +
+          '<span class="k-tip-renk k-tip-iscilik" aria-hidden="true"></span>İşçilik</button>' +
       '</div>' +
       '<div class="field"><label for="kYeniAd">Ne</label>' +
         '<input id="kYeniAd" autocomplete="off" placeholder="ör. balata" /></div>' +

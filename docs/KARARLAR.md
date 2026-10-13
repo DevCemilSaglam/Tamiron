@@ -63,6 +63,45 @@ kaynağından kontrol etmeden kurmamak. "Ne oldu alanı" bir başlık değil,
 içeriğiyle bir alandı; "altta buttonlar" yalnız düğmeler değil,
 davranışlarıyla düğmelerdi.
 
+### 58.2c · 13.10 öğle — Cemil telefonda baktı (ekran görüntüleriyle)
+
+> *"Yapılanlar altında başlıklar static, aşağıya doğru divin de dışına
+> çıkıyor. Parça / İşçilik belirtmeye gerek. Renkleri farklı olsun, yeter.
+> Hatta İş + Tutar başlığı da olmasın. … tarih, altında saat olsun.
+> Teslim et burada olmasın. Şimdi gönderilebilir de orada olmasın. Teslim
+> et, parça bekliyor vb aynı benzer işlemler."*
+
+| istek | yapılan |
+|---|---|
+| başlık kartın dışına taşıyor | **tablo başlığı yapışmıyor — BÜTÜN tablolarda** (muhasebe ×2, iş başına da aynıydı); kayıtta başlık satırı **yok** |
+| PARÇA/İŞÇİLİK yazısı | **renkli nokta:** parça mavi (`--primary`), işçilik turuncu (`--highlight` — uyarı rengi değil). Nokta hâlâ düğme (tür değişir); anlamı Ekle panelindeki çiplerde aynı noktalarla öğreniliyor |
+| saat tarihin altında | `surecHtml`'de tarih / saat iki satır, sağ sütun dar |
+| teslim ve öneriler "Ne oldu"da olmasın | "Ne oldu" **yalnız geçmiş**; teslim · parça bekliyor · şimdi gönderilebilir **İşlemler** kartında bir arada |
+
+⚠️ **Cemil onayına açık:** *"aynı benzer işlemler"*i **"bir arada dursunlar"**
+diye okudum. *"Alttaki çubukta dursunlar"* da olabilir — çubuk 5'ten 7
+düğmeye çıkardı ve 320 px'te okunmazdı.
+
+**Yolda çıkan üç şey:**
+1. **Sınıf çakışması testi kuralların YARISINI görmüyordu** — desen her
+   eşleşmede bir önceki kuralın `}`ini tüketiyor, kuralları birer atlayarak
+   okuyordu. Tek bir kural eklenince sıra kaydı ve aylardır duran iki
+   gerçek çift tanım çıktı (`.kalem-list` birebir kopya · `.ico` tabanda
+   alt küme). Test düzeldi, çiftler silindi. **Yalancı geçen test.**
+2. **Araç ekranında borçlu kaydın satırı 22 px** (`role="button"`,
+   K-033'ten beri). Denetim yalnız veresiyeli bir araç çizili kaldığında
+   görüyordu — kapsamı tesadüfe bağlıydı. Düğme gibi davranan satır artık
+   48 px.
+3. **Çubukta "Fotoğraf" → "Fotoğr / af"** (kelime ortadan bölünüyordu).
+   Kelimeler bütün kalıyor; etiket Cemil'in kelimesiyle **"Kamera"**.
+
+**54. test (KART-ICI-YAPISKAN):** kartın içinde, kendi kaydırma kabı
+olmayan yapışkan öğe → bulgu. Negatif: başlığa yapışkanlık geri kondu →
+6 bulgu (muhasebe 4, iş başına 2); kalkınca 0.
+
+Ölçüldü (320 px): dokunuş 3/1/3 · satırlar ilk karede · denetim 54 test
+0 bulgu 320/375/430 — ilk koşu ve art arda iki koşu.
+
 ### 58.3 · Varsayımlar — Cemil onayına açık (13.10'da güncellendi)
 
 - **Satır düzeni dokunulmadı:** tablo yerinde düzenleniyor (ad · tutar ·

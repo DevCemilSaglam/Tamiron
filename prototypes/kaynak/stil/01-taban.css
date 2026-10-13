@@ -46,8 +46,9 @@ button { min-height: var(--dokun); cursor: pointer; }
 /* Rakam kolonları hizalı — plaka, tutar, km, yıl */
 .mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
 
-/* İkon — currentColor ile boyanır, token rengine uyar */
-.ico { width: 24px; height: 24px; flex: none; }
+/* İkon kuralı 03-bilesen.css'te (Lucide tabanı, tam hâli). Burada bir
+   alt kümesi daha duruyordu — iki yerde duran kural iki ayrı cevaptır;
+   13.10'da sınıf çakışması testi düzelince çıktı, silindi. */
 
 /* ⚠️ 05.09 — GİZLİ OLAN GERÇEKTEN GİZLİ KALIR.
    `hidden` özniteliği tarayıcının kendi stilinde `display: none`
