@@ -28,7 +28,8 @@ durması ve kaydın **hikâyesinin** okunmasıydı.
 |---|---|---|
 | Yapı | 3 adımlı sihirbaz (İş · Yapılanlar · Teslim) | **tek sayfa:** künye → Yapılanlar (+ toplam + Teslim) → **Ne oldu** → Açıklama → Parça bekliyor |
 | İşler | adımlara dağılmış düğmeler | **alttaki yapışkan çubuk:** Ekle · **Sesle** · **Fotoğraf** · Parça sor · Mesaj |
-| Teslim | 3. adımın içinde | **çubukta değil** (Cemil) — tutarın altında |
+| Ekle | tabloya boş satır | **panel** (13.10 — C'deki gibi): Parça/İşçilik · ad · tutar (· alış) · Ekle |
+| Teslim | 3. adımın içinde | **çubukta değil** — **"Ne oldu"nun son adımı ("Teslim bekliyor") teslimin kapısı** (13.10) |
 | Süreç | "Süreç" kartı | **"Ne oldu"** — aynı ortak nesne (`surecHtml`), yeni çizim yazılmadı |
 
 ### 58.2 · Ölçüldü — gerçek prototipte, aynı görevler (`tools/servis-detay-olc.js`, 320 × 760)
@@ -36,20 +37,44 @@ durması ve kaydın **hikâyesinin** okunmasıydı.
 | | satır ekle | tutar | teslim | ilk karede satırlar | ilk karede teslim |
 |---|---|---|---|---|---|
 | önce (3 adım) | 2 | 1 | 4 | yok | yok |
-| **sonra** | **2** | **1** | **3** | **var** | yok |
+| 12.10 ilk kurulum | 2 | 1 | 3 | var | yok |
+| **13.10 düzeltilmiş** | **3** | **1** | **3** | **var** | yok |
+
+Satır eklemek bir dokunuş uzadı (panel); bedeli bilerek seçildi —
+panelde işçilik de doğrudan ekleniyor.
 
 Çubuk düğmeleri 320 px'te 53 × 64 px; taşma 0. Ses eşdeğerliği:
 tanıma 568/0 · onay ekranı 392/0 (uygulamadaki farkların hepsi K-057'nin
 alış değişikliği).
 
-### 58.3 · Varsayımlar — Cemil onayına açık
+### 58.2b · 13.10 — kendi okumamı yeniden kontrol ettim (Cemil istedi)
+
+Cemil cümlesini tekrar kontrol etmemi istedi. Karşılaştırma sayfasının
+kendi kaynağına bakınca üç sapma çıktı ve Cemil üçünü de cevapladı:
+
+| sapma | 12.10'da ben | Cemil, 13.10 |
+|---|---|---|
+| D'nin *"Ne oldu"* alanında **satırların kendisi** vardı; ben eski süreç kartının adını değiştirmiştim | tablo + süreç | **"İkisi de kalsın"** — bugünkü hâl doğru |
+| C'de "Ekle" bir **panel** açıyordu; ben boş satır bırakıyordum | boş satır | **"C'deki gibi panel aç"** |
+| *"Teslim alanı burada olmayabilir"*: "burada"yı çubuk diye okuyup teslimi tablonun altına koymuştum | tablonun altında düğme | **"Ne oldu'nun son adımında"** |
+
+**Ders:** birleşim isteyen bir cümlede her parçanın **neyi taşıdığını**
+kaynağından kontrol etmeden kurmamak. "Ne oldu alanı" bir başlık değil,
+içeriğiyle bir alandı; "altta buttonlar" yalnız düğmeler değil,
+davranışlarıyla düğmelerdi.
+
+### 58.3 · Varsayımlar — Cemil onayına açık (13.10'da güncellendi)
 
 - **Satır düzeni dokunulmadı:** tablo yerinde düzenleniyor (ad · tutar ·
   alış · rozet · kaydırarak silme). C'nin *"satıra dokun → panel"*
   kısmı alınmadı; Cemil yalnız alttaki düğmeleri istedi.
-- **"Ekle" PARÇA ekler**, işçiliğe satırın rozetiyle çevrilir (7.1).
-  Ayrı "İşçilik" düğmesi çubuğu altıya çıkarırdı; 320 px'te okunmaz.
-  Bedeli: işçilik eklemek 1 dokunuş uzadı.
+- ~~"Ekle" PARÇA ekler~~ → **13.10: panel** (Cemil).
+- **Teslim kapısı ilk karede değil:** "Ne oldu", Yapılanlar'ın altında.
+- **Panelden eklenen satıra odak verilmiyor**, yalnız ekrana kaydırılıyor —
+  telefonda klavye yeniden açılmasın; yazılacak her şey panelde yazıldı.
+- **Klavye:** `role="button"` taşıyan öğeler (künye, mesaj adımları,
+  teslim kapısı) artık Enter/Boşluk ile açılıyor — üçü de açılmıyordu;
+  kural çekirdekte, yapıya bağlı.
 - **"Mesaj"** eski *"Özet gönder"*in yerinde: mesaj ekranını özet
   şablonuyla açar; orada başka şablon seçilir.
 - **Teslim ilk karede değil** — künye kartı (müşterinin büyük adı ve

@@ -65,8 +65,8 @@
          künye → Yapılanlar (+ toplam + teslim) → Ne oldu → Açıklama
          → Parça bekliyor · altta YAPIŞKAN eylem çubuğu
        İşler çubukta (Ekle · Sesle · Fotoğraf · Parça sor · Mesaj);
-       teslim çubukta DEĞİL — Cemil'in sözü — Yapılanlar'ın altında,
-       toplamın hemen yanında: ödeme sorusu tutarın yanında sorulur.
+       teslim çubukta DEĞİL — Cemil'in sözü. 13.10'da yeri netleşti:
+       "Ne oldu"nun son adımı ("Teslim bekliyor") teslimin kapısı.
 
        K-003 DURUYOR: kayıt teslim edilene kadar açık, her şey her an
        yapılabilir. Artık bunu söyleyen bir ekran da var. -->
@@ -100,10 +100,6 @@
       </span>
     </div>
     <div id="kSatirlar"></div>
-    <!-- TESLİM — tutarın yanında (K-058). BİR ÖZET, BİR KAPI DEĞİL: eksik
-         varsa SÖYLER ama YOLU KAPATMAZ; fiyatı gelmemiş satırla da
-         teslim edilebilir. Teslim ekranı ödemeyi soruyor (IS-AKISI 7). -->
-    <div id="kTeslim"></div>
   </div>
 
   <!-- ================= NE OLDU =================
@@ -111,7 +107,11 @@
        beri duran süreç (surecHtml, 03-nesne) zaten tarihli bir akıştı —
        açıldı → parça bekleniyor → mesajlar → teslim → hatırlatma — ve
        altında "şimdi gönderilebilir" mesajları. Adı Cemil'in koyduğu ad
-       oldu. Satırlar akışa girmiyor: tarihleri yok ve hemen üstte duruyorlar. -->
+       oldu. Satırlar akışa girmiyor: tarihleri yok ve hemen üstte duruyorlar.
+       ⚠️ 13.10 — TESLİM BURADA (Cemil seçti): akışın son adımı "Teslim
+       bekliyor" teslimin KAPISI; dokununca teslim ekranı açılır. Eksikler
+       o adımın altında yazar ama yolu KAPATMAZ (fiyatı gelmemiş satırla da
+       teslim edilebilir). Ayrı bir "Teslim et" düğmesi YOK. -->
   <div class="card" id="kSurecKart">
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-clock"></use></svg> Ne oldu
@@ -163,9 +163,9 @@
        kSesleEkle · kFotoParca · kOzetGonder): davranış değişmedi, yeri
        değişti; 49. denetim testi ve ses yolu aynı kapıdan giriyor.
 
-       "Ekle" PARÇA ekler — işlerin çoğu parça (T-2); işçiliğe satırın
-       rozetiyle tek dokunuşta çevrilir (7.1). Ayrı bir "İşçilik" düğmesi
-       çubuğu altıya çıkarırdı; 320 px'te altı düğme okunmaz. -->
+       "Ekle" bir PANEL açar (13.10 — Cemil: C'deki gibi): Parça / İşçilik
+       · ad · tutar (· alış, ayar açıksa) · Ekle. İşçilik de doğrudan
+       eklenir; ayrı bir "İşçilik" düğmesi çubuğu altıya çıkarırdı. -->
   <div class="k-cubuk" id="kCubuk" role="toolbar" aria-label="Servis kaydı işleri">
     <button id="kParcaEkle"><svg class="ico"><use href="#i-plus"></use></svg>Ekle</button>
     <button id="kSesleEkle"><svg class="ico"><use href="#i-mic"></use></svg>Sesle</button>
@@ -319,9 +319,6 @@
   background: var(--primary); color: var(--on-primary); border-color: var(--primary);
 }
 #screen-kayit .k-cubuk .ico { width: 20px; height: 20px; }
-/* Teslim düğmesi ve ipucu tablonun altında, kartın gap'iyle ayrılıyor. */
-#kTeslim { display: flex; flex-direction: column; gap: 8px; }
-#kTeslim:empty { display: none; }
 
 /* ⚠️ 08.09 — ÜSTÜ ÇİZİLİ TUTAR KALKTI (.tutar-disi).
    Cemil: *"Değişen parça fiyatı yerine bilgi olarak sadece
@@ -641,26 +638,17 @@ function kayitCiz() {
         'Parça ya da işçilik ekle. Parçacının listesini fotoğraflayarak ' +
         'da girebilirsin. Satırı silmek için sola kaydır.');
 
-  /* ---- NE OLDU — ortak nesneden (surecHtml) ---- */
-  document.getElementById('kSurec').innerHTML = surecHtml(k);
-
-  /* ---- TESLİM — Yapılanlar'ın altında, tutarın yanında (K-058) ----
-     Teslim edildiyse düğme yerine NE OLDUĞU yazar; edilmediyse eksikler
-     KÜÇÜK bir ipucu: yarım kayıt olağan bir hâl (parça bekleniyor,
-     fiyat gelmedi) ve her açılışta sarı bir uyarı görmek, uyarıyı
-     gürültüye çevirirdi. Yol hiçbir zaman kapanmaz. */
+  /* ---- NE OLDU — ortak nesneden (surecHtml) ----
+     13.10: teslim KAPISI burada (K-058). Eksikler kapının altında,
+     KÜÇÜK: yarım kayıt olağan bir hâl ve her açılışta sarı bir uyarı
+     görmek uyarıyı gürültüye çevirirdi. Yol hiçbir zaman kapanmaz. */
   var eksik = kEksikler(k);
-  document.getElementById('kTeslim').innerHTML = k.teslimTarihi
-    ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
-        '<use href="#i-circle-check"></use></svg></span>' +
-        '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
-          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') + '</span></div>'
-    : '<button class="btn btn-primary btn-lg" data-git="teslim">' +
-        '<svg class="ico"><use href="#i-wallet"></use></svg> Teslim et</button>' +
-      (eksik.length && satirlar.length
-        ? '<p class="plate-hint">Eksik görünen: ' + eksik.join(' · ') +
-          '. Yine de teslim edebilirsin.</p>'
-        : '');
+  document.getElementById('kSurec').innerHTML = surecHtml(k, {
+    teslimKapi: true,
+    teslimAlt: (eksik.length && satirlar.length)
+      ? 'Eksik görünen: ' + eksik.join(' · ') + '. Yine de teslim edebilirsin.'
+      : 'Ödeme teslimde soruluyor'
+  });
 
   /* ---- PARÇA BEKLİYOR ---- */
   document.getElementById('kBekliyor')
@@ -737,10 +725,75 @@ document.addEventListener('click', function (e) {
 
   if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
 
+  /* ---- EKLE PANELİ (13.10 · K-058) ----
+     Cemil "C'deki gibi panel aç" dedi. Panel ORTAK katmanda (K-043 —
+     ikinci bir popup yazılmaz); odak, Esc ve örtü onun işi.
+     Tür seçimi panelin DOM'unda duruyor (aria-pressed), çizim yok:
+     çipe dokunmak yazılan adı ve tutarı silmesin (K-033.12'nin dersi). */
   if (t.id === 'kParcaEkle') {
-    k.satirlar.push({ tip: 'parca', ad: '', fiyat: 0, alis: null,
-                      kimGetirdi: 'tamirci', marka: '', kod: '', tanim: 'tanimlanamadi' });
-    Ekran.tazele(); kSatiraOdaklan(k, k.satirlar.length - 1); return;
+    Katman.ac('Ne yapıldı?',
+      '<div class="cip-grup" role="group" aria-label="Tür">' +
+        '<button class="cip" data-k-yeni-tip="parca" aria-pressed="true">Parça</button>' +
+        '<button class="cip" data-k-yeni-tip="iscilik" aria-pressed="false">İşçilik</button>' +
+      '</div>' +
+      '<div class="field"><label for="kYeniAd">Ne</label>' +
+        '<input id="kYeniAd" autocomplete="off" placeholder="ör. balata" /></div>' +
+      '<div class="field"><label for="kYeniTutar">Tutar</label>' +
+        '<input id="kYeniTutar" class="mono" data-giris="tutar" inputmode="numeric"' +
+          ' placeholder="sonra da yazılabilir" autocomplete="off" /></div>' +
+      /* Alış yalnız AYAR AÇIKSA ve PARÇAYSA (K-057) — boş = bilinmiyor. */
+      (DUKKAN.alisSor
+        ? '<div class="field" id="kYeniAlisAlan"><label for="kYeniAlis">Alış (boş bırakılabilir)</label>' +
+            '<input id="kYeniAlis" class="mono" data-giris="tutar" inputmode="numeric"' +
+              ' placeholder="—" autocomplete="off" /></div>'
+        : '') +
+      '<button class="btn btn-primary btn-lg" id="kYeniEkle">' +
+        '<svg class="ico"><use href="#i-plus"></use></svg> Ekle</button>');
+    /* Katman odağı ilk düğmeye (Parça çipi) verir; usta ise önce ADI
+       yazacak — imleç oraya. */
+    var adAlan = document.getElementById('kYeniAd');
+    if (adAlan) { try { adAlan.focus(); } catch (x) {} }
+    return;
+  }
+  var yeniTip = t.getAttribute('data-k-yeni-tip');
+  if (yeniTip) {
+    var cipler = document.querySelectorAll('[data-k-yeni-tip]');
+    for (var c = 0; c < cipler.length; c++) {
+      cipler[c].setAttribute('aria-pressed', String(cipler[c] === t));
+    }
+    /* İşçiliğin alışı olmaz — alan gizlenir, değeri eklemede okunmaz. */
+    var alisAlan = document.getElementById('kYeniAlisAlan');
+    if (alisAlan) alisAlan.hidden = (yeniTip !== 'parca');
+    return;
+  }
+  if (t.id === 'kYeniEkle') {
+    var yAd = document.getElementById('kYeniAd');
+    var ad1 = yAd ? yAd.value.trim() : '';
+    /* KONUŞAN DÜĞME (K-040.3): eksik varsa söyler ve eksiğe götürür. */
+    if (!ad1) {
+      balon('Ne yapıldığını yaz — ör. balata.', false, 2600);
+      if (yAd) { try { yAd.focus(); } catch (x) {} }
+      return;
+    }
+    var tipSec = document.querySelector('[data-k-yeni-tip][aria-pressed="true"]');
+    var tip1 = tipSec ? tipSec.getAttribute('data-k-yeni-tip') : 'parca';
+    var rakam1 = (document.getElementById('kYeniTutar').value || '').replace(/[^0-9]/g, '');
+    var alisEl = document.getElementById('kYeniAlis');
+    var alisR = (tip1 === 'parca' && alisEl) ? alisEl.value.replace(/[^0-9]/g, '') : '';
+    k.satirlar.push({ tip: tip1, ad: ad1, fiyat: rakam1 === '' ? 0 : parseInt(rakam1, 10),
+      /* boş alış = BİLİNMİYOR (null), "0" = bedava (K-057) */
+      alis: alisR === '' ? null : parseInt(alisR, 10),
+      kimGetirdi: tip1 === 'parca' ? 'tamirci' : '',
+      marka: '', kod: '', tanim: 'tanimlanamadi' });
+    Katman.kapa();
+    Ekran.tazele();
+    /* Sonuç GÖRÜNSÜN (49. testin sorusu): satır ekrana kaydırılır ama
+       ODAK VERİLMEZ — telefonda klavye yeniden açılırdı; usta zaten
+       yazacağını panelde yazdı. */
+    var yeniSatir = document.querySelector('#kSatirlar [data-kaydir="' + (k.satirlar.length - 1) + '"]');
+    if (yeniSatir && yeniSatir.scrollIntoView) yeniSatir.scrollIntoView({ block: 'center' });
+    balon(ad1 + ' eklendi.', false, 2400);
+    return;
   }
 
   /* Tip çevirme — ad ve tutar KORUNUR. */

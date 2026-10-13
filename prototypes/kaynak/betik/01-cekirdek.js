@@ -1176,6 +1176,21 @@ function akordiyonHtml(id, ikon, baslik, sayac, govdeHtml) {
 
 /* Denetimin 14. testi (DRAWER-ODAK-SIZINTISI) v1'in adlarini ariyor.
    Cekmece v2'de modul icinde; test yeniden yazilmasin diye kopru. */
+/* ============ DÜĞME GİBİ DAVRANAN ÖĞE — KLAVYE (13.10) ============
+   `role="button"` + `tabindex` taşıyan ama <button> OLMAYAN öğeler
+   (künye, süreçteki mesaj adımları, teslim kapısı) fareyle açılıyordu,
+   klavyeyle açılmıyordu: tarayıcı Enter/Boşluk'u yalnız gerçek düğmeye
+   bağlar. Tek tek yazılsaydı biri unutulurdu — nitekim üçü de
+   unutulmuştu. Kural YAPIYA bağlı: rolü taşıyan her öğe. */
+document.addEventListener('keydown', function (e) {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  var t = e.target;
+  if (!t || !t.getAttribute || t.getAttribute('role') !== 'button') return;
+  if (t.tagName === 'BUTTON' || t.tagName === 'A') return;
+  e.preventDefault();
+  t.click();
+});
+
 function openDrawer() { Cekmece.ac(); }
 function closeDrawer() { Cekmece.kapa(); }
 

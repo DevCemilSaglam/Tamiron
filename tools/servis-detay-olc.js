@@ -57,12 +57,21 @@
   };
   var sonuc = { gorev: {}, iz: {} };
 
-  /* G1 */
+  /* G1 — 13.10'dan beri PANEL (K-058): Ekle → ad → tutar → Ekle.
+     Eski ekranda (kSatiraOdaklan) satır anında ekleniyordu; o yol da
+     duruyor ki eski bir sürümde koşulabilsin. */
   k = hazirla(); n = 0; iz = []; await bekle(200);
   tik('#kParcaEkle'); await bekle(200);
-  var son = k.satirlar.length - 1;
-  yaz('[data-satir-ad="' + son + '"]', 'Balata');
-  yaz('[data-satir-fiyat="' + son + '"]', '450');
+  if (document.getElementById('kYeniAd')) {
+    yaz('#kYeniAd', 'Balata');
+    yaz('#kYeniTutar', '450');
+    tik('#kYeniEkle'); await bekle(200);
+    var son = k.satirlar.length - 1;
+  } else {
+    var son = k.satirlar.length - 1;
+    yaz('[data-satir-ad="' + son + '"]', 'Balata');
+    yaz('[data-satir-fiyat="' + son + '"]', '450');
+  }
   sonuc.gorev.G1 = (k.satirlar[son].ad === 'Balata' && k.satirlar[son].fiyat === 450) ? n : null; sonuc.iz.G1 = iz.slice();
 
   /* G2 */

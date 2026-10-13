@@ -1867,29 +1867,58 @@ function stilMetni() {
 
     /* Kusur burada yasandi (16.09): "Parca ekle" adimlarin ustundeydi,
        satir tablosu 2. adimin icinde; 1. adimda basilinca satir
-       GORUNMEDEN ekleniyordu. 12.10'da adimlar kalkti (K-058) ve ekle
-       dugmesi alttaki eylem cubuguna gecti — test ayni soruyu soruyor:
-       basilan dugmenin sonucu GORUNUYOR mu, odak oraya gidiyor mu. */
-
+       GORUNMEDEN ekleniyordu. 12.10'da adimlar kalkti, 13.10'da "Ekle"
+       bir PANEL acti (K-058 — Cemil: C'deki gibi). Soru ayni: basilan
+       dugmenin sonucu GORUNUYOR mu. Artik iki adimda soruluyor:
+         - Ekle -> panel aciliyor mu, imlec AD alaninda mi,
+         - ad bosken Ekle satir EKLEMEMELI ve panel acik kalmali,
+         - ad + tutar yazilip Ekle -> satir tabloda GORUNUYOR mu. */
     var ekleTus = document.getElementById('kParcaEkle');
     if (!ekleTus) {
-      ek('SATIR-DUZEN', '(kayit)', 'parca ekle dugmesi yok');
+      ek('SATIR-DUZEN', '(kayit)', 'ekle dugmesi yok');
     } else {
       var once = k.satirlar.length;
       ekleTus.click();
-      if (k.satirlar.length !== once + 1) {
-        ek('SATIR-DUZEN', '(kayit)', 'parca ekle satir eklemedi');
+      var adAlan = document.getElementById('kYeniAd');
+      if (typeof Katman === 'undefined' || !Katman.acikMi() || !adAlan) {
+        ek('SATIR-DUZEN', '(kayit)', 'ekle paneli acilmadi');
       } else {
+        if (document.activeElement !== adAlan) {
+          ek('SATIR-DUZEN', '(kayit)', 'panelde imlec AD alaninda degil — usta once nereye yazacagini arar');
+        }
+        /* bos ad: eklememeli, konusmali */
+        document.getElementById('kYeniEkle').click();
+        if (k.satirlar.length !== once || !Katman.acikMi()) {
+          ek('SATIR-DUZEN', '(kayit)', 'ad bosken satir eklendi ya da panel kapandi');
+          /* ⚠️ TEST BURADA COKMEZ (13.10, negatif testte coktu): panel
+             kapandiysa alanlari yok — kayit geri alinir, panel yeniden
+             acilir, olcum devam eder. Bulgu veren test, cokup BUTUN
+             denetimi dusuren testten iyidir. */
+          k.satirlar.length = once;
+          if (Katman.acikMi()) Katman.kapa();
+          ekleTus.click();
+          adAlan = document.getElementById('kYeniAd');
+        }
+        if (adAlan && document.getElementById('kYeniTutar')) {
+          adAlan.value = 'deneme parca';
+          document.getElementById('kYeniTutar').value = '777';
+          document.getElementById('kYeniEkle').click();
+        }
+      }
+      if (k.satirlar.length !== once + 1) {
+        ek('SATIR-DUZEN', '(kayit)', 'panelden ekle satir eklemedi');
+      } else {
+        if (typeof Katman !== 'undefined' && Katman.acikMi()) {
+          ek('SATIR-DUZEN', '(kayit)', 'ekledikten sonra panel acik kaldi');
+          Katman.kapa();
+        }
         /* (a) sonuc gorunuyor mu */
         var giris = document.querySelector('#kSatirlar [data-satir-ad="' + once + '"]');
         if (!giris || !giris.offsetParent) {
-          ek('SATIR-DUZEN', '(kayit)',
-             'eklenen satir GORUNMUYOR — dugme adimlarin ustunde, tablo 2. adimda');
+          ek('SATIR-DUZEN', '(kayit)', 'eklenen satir tabloda GORUNMUYOR');
         }
-        var odak = document.activeElement;
-        if (!odak || odak.getAttribute('data-satir-ad') !== String(once)) {
-          ek('SATIR-DUZEN', '(kayit)',
-             'eklenen satira odak gitmiyor — usta bastigi dugmenin sonucunu arar');
+        if (k.satirlar[once].ad !== 'deneme parca' || k.satirlar[once].fiyat !== 777) {
+          ek('SATIR-DUZEN', '(kayit)', 'panelde yazilan ad/tutar satira gecmedi');
         }
 
         /* (b) tip cevrilince yazilan korunuyor mu */

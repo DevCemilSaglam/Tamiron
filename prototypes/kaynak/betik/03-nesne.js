@@ -433,8 +433,11 @@ function surecAdimlari(k) {
     /* SIRADAKİ ADIM DA SÜRECİN PARÇASI — ve henüz olmadığı için
        "bekliyor" hâlinde duruyor. Ekran ne olduğunu değil, NE
        OLACAĞINI da söylüyor. */
+    /* `kapi`: bu adım, isteyen ekranda TESLİMİN KAPISIDIR (K-058 —
+       Cemil: teslim "Ne oldu"nun son adımında). Kapıyı açıp açmamak
+       çizen ekranın işi (surecHtml'in `secenek`i). */
     adimlar.push({ ad: 'Teslim bekliyor', tarih: '', saat: '',
-                   ikon: 'i-clock', hal: 'bekliyor', sira: 9,
+                   ikon: 'i-clock', hal: 'bekliyor', sira: 9, kapi: 'teslim',
                    alt: 'Ödeme teslimde soruluyor' });
   }
 
@@ -459,22 +462,30 @@ function surecAdimlari(k) {
   });
 }
 
-function surecHtml(k) {
+/* `secenek.teslimKapi` (13.10 · K-058): "Teslim bekliyor" adımı teslim
+   ekranını açan bir KAPI olur ve altında `secenek.teslimAlt` yazar
+   (eksikler). Kayıt ekranı açıyor; başka bir yerde çizilirse adım
+   yalnız bilgi kalır — kapı, kaydın kendisi açıkken anlamlı. */
+function surecHtml(k, secenek) {
   if (!k) return '';
+  var sec = secenek || {};
   var adimlar = surecAdimlari(k);
   var siradaki = kayitSiradakiMesajlar(k);
 
   return '<div class="surec">' +
     adimlar.map(function (a) {
+      var kapi = a.kapi === 'teslim' && sec.teslimKapi;
       return '<div class="surec-adim ' + a.hal + '"' +
-          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') + '>' +
+          (a.mesaj ? ' data-mesaj="' + a.mesaj + '" role="button" tabindex="0"' : '') +
+          (kapi ? ' data-git="teslim" role="button" tabindex="0" aria-label="Teslim et"' : '') + '>' +
         '<span class="sa-ic"><svg class="ico ico-sm"><use href="#' + a.ikon + '"></use></svg></span>' +
         '<span class="sa-govde">' +
           '<span class="sa-ad">' + a.ad + '</span>' +
-          (a.alt ? '<span class="sa-alt">' + a.alt + '</span>' : '') +
+          ((kapi && sec.teslimAlt) || a.alt
+            ? '<span class="sa-alt">' + ((kapi && sec.teslimAlt) || a.alt) + '</span>' : '') +
         '</span>' +
-        '<span class="sa-tarih">' + (a.tarih || '—') +
-          (a.saat ? ' · ' + a.saat : '') + '</span>' +
+        '<span class="sa-tarih">' + (kapi ? 'Teslim et ›' : (a.tarih || '—') +
+          (a.saat ? ' · ' + a.saat : '')) + '</span>' +
       '</div>';
     }).join('') +
   '</div>' +

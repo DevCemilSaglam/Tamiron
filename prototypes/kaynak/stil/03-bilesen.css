@@ -1557,6 +1557,12 @@ kirpilsin. */
 /* Mesaj adımı tıklanabilir — satırın tamamı hedef (44 px'i aşıyor). */
 .surec-adim[data-mesaj] { cursor: pointer; }
 .surec-adim[data-mesaj]:hover .sa-ad { text-decoration: underline; }
+/* TESLİM KAPISI (13.10 · K-058): "Teslim bekliyor" adımına dokununca
+   teslim açılır. Kapı olduğu GÖRÜNMELİ — tarihin yerinde birincil
+   renkte "Teslim et ›" yazar; dokunma alanı satırın tamamı (≥ 48 px). */
+.surec-adim[data-git] { cursor: pointer; min-height: var(--dokun); }
+.surec-adim[data-git] .sa-tarih { color: var(--primary); font-weight: 700; }
+.surec-adim[data-git]:hover .sa-ad { text-decoration: underline; }
 
 /* ---------- ARAÇ RENGİ KUTUCUĞU ----------
    Renk ADI yerine rengin KENDİSİ (Cemil, 04.09). Renk değerleri
