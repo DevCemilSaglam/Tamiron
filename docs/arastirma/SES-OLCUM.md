@@ -217,6 +217,12 @@ kontrolümüzde değil ve **belgelenmiş değil** (A-M48'e eklenir).
 Koşucu artık art arda 3 `network`ta duruyor ve sebebini söylüyor.
 Yeniden deneme: önce **tek dosya**, tutarsa uzun koşu.
 
+**16:52 UTC — sunucu geri geldi** (kesinti ~25 dk). Tek dosya: s01 yine
+**"orospik diye"** — sabahki (eşitlemesiz) koşuyla BİREBİR aynı. Tanıyıcı
+aynı dosyada her seferinde aynı şeyi duyuyor: rastgele değil, kaydın
+içeriğiyle ilgili. Sıradaki en ucuz ayrım: Cemil s01.wav'ı DİNLESİN —
+dosyada söylenen gerçekten o cümle mi.
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
