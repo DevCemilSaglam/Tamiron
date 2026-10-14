@@ -24,7 +24,20 @@ window.DEGERLENDIR = async function (secenek) {
     eval(await (await fetch(kok + 'puanla.js')).text());
   }
 
-  var yedek = { niyet: window.SESLI_NIYET, kayit: window.ACIK_KAYIT };
+  var yedek = { niyet: window.SESLI_NIYET, kayit: window.ACIK_KAYIT,
+                araclar: window.ARACLAR, kayitlar: window.KAYITLAR };
+
+  /* KURMACA DÜKKÂN (14.10 · buyuk-set.json): set kendi dükkânını
+     getiriyorsa ölçüm o dükkânda yapılır — tohum verinin 9 aracıyla
+     1000 cümle sınanamaz. Derin kopya: çözümleyici veriyi değiştirmez
+     ama ölçüm aleti ölçtüğü şeyi değiştirmemeli (K-024.1); sonda
+     prototipin kendi verisi geri konur. */
+  if (s.dukkan) {
+    window.ARACLAR = JSON.parse(JSON.stringify(s.dukkan.araclar));
+    window.KAYITLAR = JSON.parse(JSON.stringify(s.dukkan.kayitlar));
+  }
+  /* `yari`: 'gelistirme' | 'sinav' — yalnız o yarı ölçülür. */
+  if (s.yari) set = Object.assign({}, set, { cumleler: set.cumleler.filter(function (c) { return c.yari === s.yari; }) });
 
   /* "kayit-icinde" bağlamı AÇIK BİR KAYIT ister; yoksa çözümleyici o
      dalı hiç denemez ve ölçüm sessizce yanlış olur. Birden çok satırı
@@ -36,15 +49,20 @@ window.DEGERLENDIR = async function (secenek) {
   var acikKayitId = kayit ? kayit.id : ((window.KAYITLAR || [{}])[0] || {}).id;
 
   var cevaplar = {};
-  set.cumleler.forEach(function (c) {
-    window.SESLI_NIYET = c.baglam;
-    window.ACIK_KAYIT = (c.baglam === 'kayit-icinde') ? acikKayitId : null;
-    try { cevaplar[c.id] = window.SES_COZUMLE(c.cumle); }
-    catch (e) { cevaplar[c.id] = { hata: e.message }; }
-  });
-
-  window.SESLI_NIYET = yedek.niyet;
-  window.ACIK_KAYIT = yedek.kayit;
+  try {
+    set.cumleler.forEach(function (c) {
+      window.SESLI_NIYET = c.baglam;
+      /* Cümle kendi açık kaydını söylüyorsa (kayitId) o kayıt. */
+      window.ACIK_KAYIT = (c.baglam === 'kayit-icinde') ? (c.kayitId || acikKayitId) : null;
+      try { cevaplar[c.id] = window.SES_COZUMLE(c.cumle); }
+      catch (e) { cevaplar[c.id] = { hata: e.message }; }
+    });
+  } finally {
+    window.SESLI_NIYET = yedek.niyet;
+    window.ACIK_KAYIT = yedek.kayit;
+    window.ARACLAR = yedek.araclar;
+    window.KAYITLAR = yedek.kayitlar;
+  }
 
   var sonuc = window.DEGERLENDIRME_PUANLA(set, cevaplar);
   sonuc.motor = 'desen-eslestirici';
