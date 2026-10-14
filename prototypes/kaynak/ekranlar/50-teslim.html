@@ -231,10 +231,13 @@ document.addEventListener('click', function (e) {
    veresiye yazmak yerine teslim ekranında seçiliyor. */
 var SES_ODEME = { nakit: ODEME_ETIKET.nakit, kart: ODEME_ETIKET.kart,
                   havale: ODEME_ETIKET.havale };
+/* Usta ödeme yolunu farklı sözlerle söyler (14.10 · büyük set): "peşin"
+   nakittir; "EFT", "hesaba yatırdı" havaledir. Söylenmeyen ödeme null —
+   nakit VARSAYILMAZ. */
 function sesOdemeYolu(d) {
-  return d.indexOf('nakit') >= 0 ? 'nakit'
+  return (d.indexOf('nakit') >= 0 || d.indexOf('pesin') >= 0) ? 'nakit'
        : d.indexOf('kart') >= 0 ? 'kart'
-       : d.indexOf('havale') >= 0 ? 'havale' : null;
+       : (d.indexOf('havale') >= 0 || kelimeVarMi(d, ['eft']) || d.indexOf('hesaba') >= 0) ? 'havale' : null;
 }
 
 Islem.tanim('teslim', {

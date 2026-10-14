@@ -1012,7 +1012,8 @@ function sesSatirAdi(c) {
     if (son) metin = metin.slice(0, metin.lastIndexOf(son.parca));
   }
   return kelimeleriAt(metin,
-    ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
+    ['parça', 'parca', 'işçilik', 'iscilik', 'işçiliği', 'isciligi', 'ücreti', 'ucreti',
+     'yaz', 'da', 'de', 'ekle',
      'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
      'güncelle', 'guncelle']);
 }
@@ -1093,7 +1094,9 @@ Islem.tanim('satir-ekle', {
   ],
   baglamda: function (c) {
     if (!c.kayitId) return null;
-    var iscilikMi = c.d.indexOf('iscilik') >= 0;
+    /* Kök "iscili": ek alınca k → ğ olur ("işçiliği 600 lira yaz") ve
+       "iscilik" aranırsa satır PARÇA sanılıyordu (14.10 · büyük set). */
+    var iscilikMi = c.d.indexOf('iscili') >= 0;
     var ad = sesSatirAdi(c);
     /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
        yerine türün kendi adı yazılır, usta gerekirse düzeltir. */

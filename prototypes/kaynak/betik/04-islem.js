@@ -64,8 +64,11 @@ function plakaHarfiGecersizMi(harf) {
 
 function sesPlakaBul(metin) {
   var m = metin.toLocaleUpperCase('tr')
-               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
+               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,5})\b/);
   if (!m) return null;
+  /* ⚠️ 5 RAKAM (14.10 · büyük set): tek harfli plaka 4–5 rakamlıdır
+     ("34 M 49109"); okuyucu en çok 4 rakam alıyordu ve bu plakaların
+     HİÇBİRİ tanınmıyordu. Harf sayısına göre fazla rakam = geçersiz. */
   var il = parseInt(m[1], 10);
   if (il < 1 || il > 81) return null;
   var harf = m[2].replace(/[ÇĞİÖŞÜ]/g, function (h) { return PLAKA_TR_HARF[h]; });
@@ -84,7 +87,7 @@ function sesPlakaBul(metin) {
     }
   }
   return { plaka: m[1] + ' ' + harf + ' ' + rakam, indeks: m.index, uzunluk: uzunluk,
-           gecersiz: plakaHarfiGecersizMi(harf) };
+           gecersiz: plakaHarfiGecersizMi(harf) || rakam.length > sinir[1] };
 }
 
 /* ---- DUYULAN PLAKAYI KAYITLI PLAKAYA BAĞLAMAK (14.10) ----
@@ -146,6 +149,47 @@ function duzenlemeUzakligi(a, b) {
     }
   }
   return o[b.length];
+}
+
+/* ---- ARACI TARİFİNDEN BULMAK (14.10 · büyük set) ----
+   "Mehmet Kaya'nın arabası geldi", "şu Mégane'ın trigerini değiştirdik",
+   "Ford Focus geldi …". 14.09'dan beri değerlendirme setinde (id 5, 6)
+   beklenen davranıştı ve motorda HİÇ YOKTU — Claude çözüyordu.
+   Kurallar dar:
+   - yalnız genel / servis-ekle bağlamında (araçlar ekranında "Renault ara"
+     bir ARAMADIR, araç seçimi değil);
+   - sahip: "Ad Soyad" + iyelik + "araba/araç" ("'ın arabası");
+   - model: "Marka Model" birlikte, ya da model + iyelik ("Mégane'ın");
+     yalnız rakamdan oluşan model adı (301) iyelikle aranmaz — tutarla
+     karışır;
+   - TEK ARAÇ: sahibin iki aracı ya da aynı modelden iki araç varsa
+     bağlanmaz — "uydurmak, anlamamaktan kötüdür". */
+function regKacir(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+function sesAracTarif(metin, baglam) {
+  if (typeof ARACLAR === 'undefined') return null;
+  if (baglam && baglam !== 'genel' && baglam !== 'servis-ekle') return null;
+  var d = norm(metin), bulunan = [];
+  var iyelik = "'?n?[iu]n";
+  ARACLAR.forEach(function (a) {
+    var ad = norm(a.sahipAd || '').trim();
+    if (ad.indexOf(' ') < 0) return;
+    var m = d.match(new RegExp('(^|\\s)(' + regKacir(ad) + iyelik + '\\s+(?:araba|arac)\\S*)'));
+    if (m) bulunan.push({ a: a, i: m.index + m[1].length, n: m[2].length, tur: 'sahip' });
+  });
+  if (!bulunan.length) {
+    ARACLAR.forEach(function (a) {
+      var mm = norm((a.marka || '') + ' ' + (a.model || '')).trim();
+      var mo = norm(a.model || '').trim();
+      var m = mm.indexOf(' ') > 0 ? d.match(new RegExp('(^|\\s)(' + regKacir(mm) + ")(?=\\s|$|')")) : null;
+      if (!m && mo && !/^\d+$/.test(mo)) m = d.match(new RegExp('(^|\\s)(' + regKacir(mo) + iyelik + ')(?=\\s|$)'));
+      if (m) bulunan.push({ a: a, i: m.index + m[1].length, n: m[2].length, tur: 'model' });
+    });
+  }
+  if (!bulunan.length) return null;
+  if (bulunan.length !== 1) return { belirsiz: true };
+  var b = bulunan[0];
+  return { plaka: b.a.plaka, indeks: b.i, uzunluk: b.n, tarif: b.tur };
 }
 
 /* Duyulan plakayı kayıtlı TEK bir plakaya bağlar; bağlayamazsa null.
@@ -250,7 +294,10 @@ function sesTutarsiz(metin) {
    okur, öteki okumazdı. */
 function sesServisOku(c) {
   var dk = c.dk, kalan = c.kalan;
-  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('periyodik') >= 0) ? 'bakim' : 'tamirat';
+  /* "yağ değişimi" bakımdır (14.10 · büyük set: hep tamirat çıkıyordu);
+     "yağ kaçırıyor" DEĞİL — bu yüzden kök değil, ikili kelime. */
+  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('periyodik') >= 0 ||
+                dk.indexOf('yag degis') >= 0) ? 'bakim' : 'tamirat';
   var km = '';
   var kmE = dk.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
             dk.match(/(?:km|kilometre)\s*(\d[\d.]*)\s*(bin)?/);
@@ -263,8 +310,10 @@ function sesServisOku(c) {
   /* Sahip adı: telefon ve km çıkarıldıktan sonra kalan BAŞ HARFİ BÜYÜK
      iki kelime. Kaba ama ustanın söyleyiş sırasına uyuyor:
      "plaka · ad soyad · telefon · iş". */
-  var adE = kalan.match(/\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\s+([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\b/);
-  var sahip = adE ? adE[0] : '';
+  /* ⚠️ K-018: Türkçe metinde \b YOK — JS'te \b yalnız ASCII harfi tanır;
+     "İsmail Özdemir"in baş harfi sözcük sınırı sayılmıyordu. */
+  var adE = kalan.match(/(?:^|[^A-Za-zÇĞİÖŞÜçğıöşü])([A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s+[A-ZÇĞİÖŞÜ][a-zçğıöşü]+)(?![A-Za-zçğıöşü])/);
+  var sahip = adE ? adE[1] : '';
   var is = kalan
     .replace(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/gi, '')
     .replace(/(km|kilometre)\s*(\d[\d.]*)\s*(bin)?/gi, '')
@@ -351,6 +400,11 @@ var Islem = (function () {
        geçer ki onay ekranı söylesin (cozumle sonunda). */
     var bag = sesPlakaBagla(metin, p);
     if (bag) p = bag;
+    /* Plaka hiç söylenmediyse araç tarifinden (sahip / model). */
+    if (!p) {
+      var tarif = sesAracTarif(metin, baglam);
+      if (tarif && !tarif.belirsiz) p = tarif;
+    }
     var c = { metin: metin, d: norm(metin), p: p, baglam: baglam || 'genel',
               kayitId: kayitId || null, kayit: kayitId ? kayitBul(kayitId) : null };
     if (p) {
