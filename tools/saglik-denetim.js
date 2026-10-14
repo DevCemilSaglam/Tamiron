@@ -2354,6 +2354,60 @@ function stilMetni() {
     });
   });
 
+  /* 55) TANIMANIN BOZDUGU METIN (14.10.2026 · SES-OLCUM §11.4)
+     Yazili derlem (%93) bu sinifi GORMUYOR: o cumleler dogru yazilmis.
+     Gercek seste taniyici plaka harfini kaydiriyor (TMR -> "PVR",
+     KLM -> "kelime"), rakami boluyor (8890 -> "88 90"), "TL/lira"yi
+     dusuruyor. Motor kayitli araci KAYITSIZ sanip sessizce yeni kayit
+     actiriyordu -- en tehlikeli yanlis.
+     Olculen: duzeltmeler calisiyor VE uc tuzak kapali kaliyor --
+       a) sesce yakin tek kayitli plakaya baglaniyor, duyulan tasiniyor
+          ve onay ekrani soyluyor;
+       b) "34 QBC 123" BAGLANMIYOR (Q~A sesce yakin degil: gercekten
+          baska arac -- degerlendirme setinin tuzagi);
+       c) bolunmus rakam ve harf yerine kelime;
+       d) birimsiz tutar YALNIZ gider cumlesinde; telefon parcasi ve
+          adet ("3 fatura") tutar sayilmiyor.
+     NEGATIF DOGRULAMA (14.10): sesPlakaBagla null dondurdu -> bulgu;
+     telefon korumasi kaldirildi -> bulgu; geri konunca 0. */
+  (function () {
+    if (typeof window.SES_COZUMLE !== 'function') {
+      ek('SES-DUYULAN', 'ses', 'SES_COZUMLE yok -- olculemedi');
+      return;
+    }
+    if (!aracBul('06 TMR 07') || !aracBul('35 KLM 45') || !aracBul('16 XY 8890') || !aracBul('34 ABC 123')) {
+      ek('SES-DUYULAN', 'ses', 'tohum veride beklenen plakalar yok -- test guncellenmeli');
+      return;
+    }
+    var yed = [window.SESLI_NIYET, window.ACIK_KAYIT];
+    window.SESLI_NIYET = 'genel'; window.ACIK_KAYIT = null;
+    function coz(m) { try { return window.SES_COZUMLE(m) || {}; } catch (e) { return { hata: e.message }; } }
+    var o = coz('06 pvr 07 bakima geldi');
+    if (o.plaka !== '06 TMR 07' || o.duyulanPlaka !== '06 PVR 07') {
+      ek('SES-DUYULAN', 'ses', '"06 pvr 07" kayitli 06 TMR 07ye baglanmadi: ' + o.tur + ' ' + o.plaka);
+    } else {
+      var oz = Islem.ozet(o);
+      if (!oz || (oz.notice || '').indexOf('06 PVR 07') < 0) {
+        ek('SES-DUYULAN', 'ses', 'plaka degistirildi ama onay ekrani duyulani SOYLEMIYOR');
+      }
+    }
+    o = coz('34 QBC 123 triger seti degisecek');
+    if (o.tur !== 'yeni-arac' || o.plaka !== '34 QBC 123') {
+      ek('SES-DUYULAN', 'ses', '"34 QBC 123" kayitli araca baglandi (' + o.tur + ' ' + o.plaka + ') -- Q~A sesce yakin degil');
+    }
+    o = coz('16 XY 88 90 sahibine bakim hatirlatmasi gonder');
+    if (o.plaka !== '16 XY 8890') ek('SES-DUYULAN', 'ses', 'bolunmus rakam birlesmedi: ' + o.plaka);
+    o = coz('35 kelime 45 teslim ettim');
+    if (o.plaka !== '35 KLM 45') ek('SES-DUYULAN', 'ses', '"35 kelime 45" 35 KLM 45e baglanmadi: ' + o.tur + ' ' + o.plaka);
+    o = coz('2.400 elektrik faturasi ekle');
+    if (o.tur !== 'gider-ekle' || o.tutar !== 2400) ek('SES-DUYULAN', 'muhasebe', 'birimsiz gider okunmadi: ' + o.tur + ' ' + o.tutar);
+    o = coz('kira gideri 0532 111 22 33');
+    if (o.tur === 'gider-ekle') ek('SES-DUYULAN', 'muhasebe', 'telefonun parcasi tutar sayildi: ' + o.tutar);
+    o = coz('bu ay 3 fatura geldi');
+    if (o.tur === 'gider-ekle') ek('SES-DUYULAN', 'muhasebe', 'adet tutar sayildi: ' + o.tutar);
+    window.SESLI_NIYET = yed[0]; window.ACIK_KAYIT = yed[1];
+  })();
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

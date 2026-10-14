@@ -400,8 +400,65 @@ cevaplarından değil). Strict şemanın ikinci sınırı da çıktı: 16'dan fa
 - **Ders:** ilk %64 "model motordan kötü" diye okunsaydı yanlış karar
   çıkardı. Model koşusu, aracın şeması kadar iyi ölçer.
 
-Bilgisayar seti KOŞTURULMADI: onaylanan ~$0,50'nin $0,39'u harcandı; ikinci
-set (~$0,19) bütçeyi aşar.
+Bilgisayar seti KOŞTURULMADI. (Düzeltme: gerçek harcama **~$0,45** —
+koşucunun hesabı önbellek okuma/yazma jetonlarını saymıyordu.)
+
+### 11.4 · Claude'un kazandığı işi motora öğretmek (14.10, dal `ses-motor-iyilestirme`)
+
+**Cemil onayına açık** — motorun davranışını değiştiriyor; ana dala onayla
+girer. Ölçüm parasız: dökümler (80) motordan doğrudan geçirildi
+(`DEGERLENDIR({set})`), tanıyıcı yok. Düzenek önce DÜNKÜ rakamları
+birebir verdi (%93 / %74 / %68) — ölçüm aleti doğrulandı.
+
+**Dört kural, hepsi `04-islem.js`'in ortak okuyucularında:**
+1. **Bölünmüş rakam:** "16 XY 88 90" → 16 XY 8890. Türk plaka biçiminden:
+   harf sayısı rakam sayısını sınırlar (1→4–5, 2→3–4, 3→2–3).
+2. **Sesçe yakın harf:** kayıtsız plaka, il ve rakamı aynı, harfleri
+   aynı SES SINIFINDA olan TEK kayıtlı plakaya bağlanır ("06 PVR 07" →
+   06 TMR 07). Sınıflar Türkçe ses bilgisinden (patlamalı · sürtünmeli ·
+   genizsi · akıcı); tek gözlemsel ekleme M~V. ⚠️ Düz "tek harf farkı"
+   OLMAZ: setin "34 QBC 123" tuzağı (gerçekten başka araç) da tek harf
+   uzak; Q~A sesçe yakın olmadığı için bağlanmıyor.
+3. **Harf yerine kelime:** "35 kelime 45" → 35 KLM 45 (KLM'nin okunuşu
+   "ke-le-me"; ünsüz iskeleti aynı, il+rakam birebir).
+4. **Birimsiz tutar:** yalnız gider cümlesinde ve açık kayıtta cümlenin
+   son sayısı. Telefon geçen cümlede, tek haneli sayıda, "tane/adet"
+   önünde OKUNMAZ.
+
+Usta plakanın değiştirildiğini GÖRÜR: onay ekranı *"Duyulan plaka 06 PVR
+07 kayıtlı değil — sesçe en yakın kayıtlı araç 06 TMR 07 alındı. Değilse
+tekrar söyle."* der.
+
+| aynı cetvel | önce | sonra |
+|---|---|---|
+| yazı (temiz metin) | %93 | **%93** |
+| telefon dökümleri | %74 | **%86** |
+| bilgisayar dökümleri | %68 | **%78** |
+| Claude (Opus 5.5), telefon | %75 | — |
+
+**Motor artık telefon dökümlerinde Claude'un 11 puan üstünde, internetsiz
+ve bedava.**
+
+**Eşdeğerlik:** 568/0 · 392/0 · 16/0 — yazılı derlemde hiçbir davranış
+değişmedi. ⚠️ Bu "0" aynı zamanda derlemin yeni kuralları hiç
+tetiklemediğini söylüyor; o yüzden ayrıca **zorlama örnekleri** denendi
+ve İKİ GERÇEK KUSUR bulundu, kapatıldı: "kira gideri 0532 111 22 33" →
+tutar 532 (telefonun parçası); "bu ay 3 fatura geldi" → 3 TL gider (adet).
+
+**Yeni denetim testi 55 · SES-DUYULAN** — bu sınıf yazılı derlemde
+görünmediği için. Negatif doğrulama: bağlama kapatıldı → 2 bulgu; telefon
+koruması kaldırıldı → 1; sesçe kural gevşetildi ("her harf yakın") →
+QBC tuzağı düştü, yeni test + eski PLAKA-ONERISI yakaladı. Geri konunca 0.
+320 / 375 / 430 px'te 0 bulgu, art arda iki koşuda 0.
+
+**Kalan yanlışlar (telefon 7, bilgisayar 11):** anlam kayması ("sahibine"
+→ "sahibinden/tarihinde", "tahsil ettim" → "tavsiye ettin"), cümle sonunun
+yanlış duyulması, "Mégane'ın" → "mekanını". Bunların ilacı tanıyıcıya
+beklenen kelimeleri vermek (`phrases`) ya da model — sıradaki ölçüm.
+
+**Risk (yazılı):** kayıtsız gerçek bir araç sesçe yakın tek kayıtlı plakaya
+bağlanabilir ("34 APC 123" → 34 ABC 123). Onay ekranı bunu söylüyor; usta
+"tekrar söyle" der. Sessiz yanlış değil, söylenen öneri.
 
 ## 10 · Önceki hâli: onaya açık maddeler
 
