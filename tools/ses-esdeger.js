@@ -104,7 +104,7 @@ window.SES_ESDEGER = async function () {
   window.ESDEGER = { toplam: toplam, cumle: cumleler.length, fark: fark,
                      taze: !!B.ISLEM_SEMALARI };
   return { toplam: toplam, cumle: cumleler.length, farkSayisi: fark.length,
-           taze: !!B.ISLEM_SEMALARI, ilkFarklar: fark.slice(0, 6) };
+           taze: !!B.ISLEM_SEMALARI, ilkFarklar: fark.slice(0, 6), farklar: fark };
 })();
   var ekranVeIs = await (async function () {
   var BAGLAMLAR = ['genel', 'servis-ekle', 'araclar', 'kayitlar', 'musteriler',
@@ -228,7 +228,8 @@ window.SES_ESDEGER = async function () {
 
   var r = { ekranToplam: ekranToplam, ekranFark: ekranFark.length, isToplam: IS.length,
             isFark: isFark.length, taze: !!B.ISLEM_SEMALARI,
-            ilkEkranFark: ekranFark.slice(0, 2), ilkIsFark: isFark.slice(0, 1) };
+            ilkEkranFark: ekranFark.slice(0, 2), ilkIsFark: isFark.slice(0, 1),
+            ekranFarklar: ekranFark, isFarklar: isFark };
   window.ESDEGER2 = { ekranFark: ekranFark, isFark: isFark };
   return r;
 })();

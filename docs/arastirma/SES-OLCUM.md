@@ -468,3 +468,50 @@ bağlanabilir ("34 APC 123" → 34 ABC 123). Onay ekranı bunu söylüyor; usta
 3. **İndirme:** MediaSpeech TR (~618 MB, CC BY 4.0) ve seçilen CC0 gürültü
    dosyaları. Ses dosyaları depoya **girmez** (`.gitignore`, ruhsat
    fotoğraflarıyla aynı kural); yalnız kaynak + lisans listesi girer.
+
+### 11.5 · Türk plakasının kuralları (14.10, dal `plaka-kurallari`)
+
+> **Cemil, 14.10:** *"Türkiye'de Q harfi yok. Plakaların bazı kuralları
+> var. Bunları da dahil edebiliriz."*
+
+**Kurallar:** il kodu **01–81** · harfler Türk alfabesinin **23** harfi (Ç Ğ
+İ Ö Ş Ü **ve Q W X yok**) · harf sayısı rakam sayısını sınırlar. Tanıyıcının
+Türkçe yazdığı harf düzeltilir ("kbi" → KBİ → KBI).
+
+**Q/W/X'li plaka gerçek olamaz → kesinlikle yanlış duyulmuştur:** yeni
+araç önerilmez, tek harf uzaktaki TEK kayıtlı plakaya bağlanır (sesçe
+yakınlık aranmaz). Tarihçe: tanıyıcı 14.09'da "34 ABC 123"ü gerçekten
+"34 QBC 123" duymuştu.
+
+**Kendi verimiz kuralla çelişiyordu — düzeltildi:**
+- tohum araç **"16 XY 8890"** (X yok) → **"16 SY 8890"**;
+- değerlendirme seti **sürüm 2**: id 11 ("34 qbc 123") artık kayıtlı ABC'ye
+  bağlanmalı; "gerçekten başka araç" tuzağı geçerli harflerle **id 41
+  "34 ARC 123"** (R~B sesçe yakın değil → bağlanmaz, sorulur).
+- Dökümlerden id 24 çıkarıldı: ses "XY" diyor, cümle artık "SY".
+
+| sürüm-2 set, aynı cetvel | önceki motor | plaka kurallı |
+|---|---|---|
+| yazı (41) | %88 | **%93** |
+| telefon dökümü (39) | %85 | %85 |
+| bilgisayar dökümü (39) | %76 | %76 |
+
+Dökümlerde fark yok: id 11'de tanıyıcı Q'yu **"K"** yazdı ("34 kbc 123") —
+K geçerli harf, plakanın yanlış olduğu anlaşılamıyor.
+
+**Eşdeğerlik 41 / 33 / 16 fark — hepsi okundu, hepsi bilerek:** tohum
+plakasının değişmesi, QBC'nin ABC'ye bağlanması, XY'li cümlelerin SY'ye
+bağlanması, "99 ZZZ 999"un artık plaka sayılmaması (il 99 yok). Uygulama
+farklarının tohum dışı 4'ü TEK kaynaktan: "34 QBC 123 sahibine selam gönder"
+artık 34 ABC 123'e selam mesajı hazırlıyor (eskiden ruhsata gidiyordu).
+
+**Test 55 genişledi:** QBC bağlanır, ARC bağlanmaz, "16 XY 88 90" → 16 SY
+8890, "88 BIN 900" plaka değil. Negatif: il kodu denetimi kaldırıldı → 1
+bulgu; geçersiz harf kuralı kaldırıldı → 2 bulgu; geri konunca 0. 320 /
+375 / 430 px'te 0 bulgu.
+
+⚠️ **AÇIK — Cemil onayı (K-047.6 ile çatışma):** 14.09 kararı *"yanlış
+duyulan plakada SOR, kendiliğinden düzeltme — yanlış araca mesaj gider"*.
+11.4'teki sesçe bağlama ve buradaki Q bağlaması plakayı KENDİSİ seçiyor,
+onay ekranında söylüyor. Bu, kararı gevşetiyor ve 14.10'daki onaydan önce
+Cemil'e söylenmedi.

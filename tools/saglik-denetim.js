@@ -2363,19 +2363,22 @@ function stilMetni() {
      Olculen: duzeltmeler calisiyor VE uc tuzak kapali kaliyor --
        a) sesce yakin tek kayitli plakaya baglaniyor, duyulan tasiniyor
           ve onay ekrani soyluyor;
-       b) "34 QBC 123" BAGLANMIYOR (Q~A sesce yakin degil: gercekten
-          baska arac -- degerlendirme setinin tuzagi);
+       b) "34 ARC 123" BAGLANMIYOR (R~B sesce yakin degil: gercek bir
+          baska arac olabilir -- setin tuzagi); ama "34 QBC 123"
+          BAGLANIYOR: Q plakada yok, gercek olamaz (Cemil 14.10);
+       b2) il kodu 01-81 disi plaka sayilmiyor ("88 bin 900");
        c) bolunmus rakam ve harf yerine kelime;
        d) birimsiz tutar YALNIZ gider cumlesinde; telefon parcasi ve
           adet ("3 fatura") tutar sayilmiyor.
      NEGATIF DOGRULAMA (14.10): sesPlakaBagla null dondurdu -> bulgu;
+     il kodu denetimi kaldirildi -> bulgu; gecersiz harf kurali kaldirildi -> bulgu;
      telefon korumasi kaldirildi -> bulgu; geri konunca 0. */
   (function () {
     if (typeof window.SES_COZUMLE !== 'function') {
       ek('SES-DUYULAN', 'ses', 'SES_COZUMLE yok -- olculemedi');
       return;
     }
-    if (!aracBul('06 TMR 07') || !aracBul('35 KLM 45') || !aracBul('16 XY 8890') || !aracBul('34 ABC 123')) {
+    if (!aracBul('06 TMR 07') || !aracBul('35 KLM 45') || !aracBul('16 SY 8890') || !aracBul('34 ABC 123')) {
       ek('SES-DUYULAN', 'ses', 'tohum veride beklenen plakalar yok -- test guncellenmeli');
       return;
     }
@@ -2391,12 +2394,20 @@ function stilMetni() {
         ek('SES-DUYULAN', 'ses', 'plaka degistirildi ama onay ekrani duyulani SOYLEMIYOR');
       }
     }
+    o = coz('34 ARC 123 triger seti degisecek');
+    if (o.tur !== 'yeni-arac' || o.plaka !== '34 ARC 123') {
+      ek('SES-DUYULAN', 'ses', '"34 ARC 123" kayitli araca baglandi (' + o.tur + ' ' + o.plaka + ') -- R~B sesce yakin degil, gercek plaka olabilir');
+    }
     o = coz('34 QBC 123 triger seti degisecek');
-    if (o.tur !== 'yeni-arac' || o.plaka !== '34 QBC 123') {
-      ek('SES-DUYULAN', 'ses', '"34 QBC 123" kayitli araca baglandi (' + o.tur + ' ' + o.plaka + ') -- Q~A sesce yakin degil');
+    if (o.plaka !== '34 ABC 123') {
+      ek('SES-DUYULAN', 'ses', '"34 QBC 123" baglanmadi (' + o.tur + ' ' + o.plaka + ') -- Q plakada yok, yanlis duyulmustur');
     }
     o = coz('16 XY 88 90 sahibine bakim hatirlatmasi gonder');
-    if (o.plaka !== '16 XY 8890') ek('SES-DUYULAN', 'ses', 'bolunmus rakam birlesmedi: ' + o.plaka);
+    if (o.plaka !== '16 SY 8890') ek('SES-DUYULAN', 'ses', 'bolunmus rakam + gecersiz X: ' + o.plaka);
+    o = coz('06 TMR 07 kilometre 88 bin 900');
+    if (o.plaka !== '06 TMR 07') ek('SES-DUYULAN', 'ses', 'il kodu 81 ustu plaka sayildi: ' + o.plaka);
+    o = coz('88 BIN 900 bakima geldi');
+    if (o.plaka) ek('SES-DUYULAN', 'ses', '"88 BIN 900" plaka sayildi -- il kodu 01-81');
     o = coz('35 kelime 45 teslim ettim');
     if (o.plaka !== '35 KLM 45') ek('SES-DUYULAN', 'ses', '"35 kelime 45" 35 KLM 45e baglanmadi: ' + o.tur + ' ' + o.plaka);
     o = coz('2.400 elektrik faturasi ekle');
