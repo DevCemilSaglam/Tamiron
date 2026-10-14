@@ -363,7 +363,45 @@ bu yüzden KOŞTURULMADI.
 
 Koşucunun iki kusuru bu koşuda düzeldi: workspace'siz anahtar (API 400,
 ilk istekte durma eklendi) ve strict şemada `type:['string','null']` +
-enum'un reddi (`anyOf` ile).
+enum'un reddi.
+
+### 11.3 · Açıklamalı şemayla (14.10, Opus 5.5, aynı telefon dökümleri)
+
+Alan açıklamaları **programın kendi şemalarından** yazıldı (setin
+cevaplarından değil). Strict şemanın ikinci sınırı da çıktı: 16'dan fazla
+"boş olabilir" alan 400 veriyor → alanlar null'suz, yazılmayan alan boş.
+
+| aynı 40 döküm, aynı cetvel | sonuç | maliyet |
+|---|---|---|
+| bugünkü motor (desen) | 28 tam · 3 yarım · 9 yanlış · **%74** | 0 |
+| Claude, açıklamasız şema | 18 · 15 · 7 · %64 | $0,20 |
+| **Claude, açıklamalı şema** | 27 · 6 · 7 · **%75** | $0,19 |
+
+**Ortalama başa baş — ama iki motor FARKLI cümlelerde yanılıyor:**
+
+| | cümle |
+|---|---|
+| ikisi de tam | 21 |
+| yalnız motor tam | 7 |
+| yalnız Claude tam | 6 |
+| ikisi de değil | 6 |
+
+- **Claude'un kazandığı yer tam da beklenen sınıflar:** yanlış duyulan
+  plakayı kayıtlı plakaya bağlamak ("06 dmr 07" → 06 TMR 07, "35 kelime
+  45" → 35 KLM 45, "16 XY 88 90"), birimsiz tutar ("2.400 elektrik
+  faturası", "motor yağı 4500"), sahip adından araç ("Mehmet Kaya'nın
+  arabası").
+- **Motorun kazandığı yer:** kısa, kalıplı cümleler — "34 ABC 123 yarın
+  gelecek", kayıt içinde "işçilik 750 lira", "balata ara". Claude burada
+  ya fazla temkinli (plakasiz) ya da bağlamı fazla yorumluyor.
+- **Tavan:** biri ötekinin yanlışını yakalasa 34/40 tam (~%85+). Bu bir
+  MİMARİ soru (motor önce, emin değilse model?) ve backend bu fazda yok
+  (K-055.1) — **Cemil onayına açık**, karar değil bulgu.
+- **Ders:** ilk %64 "model motordan kötü" diye okunsaydı yanlış karar
+  çıkardı. Model koşusu, aracın şeması kadar iyi ölçer.
+
+Bilgisayar seti KOŞTURULMADI: onaylanan ~$0,50'nin $0,39'u harcandı; ikinci
+set (~$0,19) bütçeyi aşar.
 
 ## 10 · Önceki hâli: onaya açık maddeler
 

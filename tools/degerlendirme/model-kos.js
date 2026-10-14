@@ -139,10 +139,12 @@ KURALLAR:
 
 Her cümle için cevabını YALNIZCA islem aracını bir kez çağırarak ver.`;
 
-/* Boş bırakılabilen seçim alanı. ⚠️ `type: ['string','null']` + enum
-   strict şemada 400 veriyor ("Enum value ... does not match declared
-   type"); anyOf ile yazılır. */
-const secim = degerler => ({ anyOf: [{ type: 'string', enum: degerler }, { type: 'null' }] });
+/* Seçim alanı. Alanlar zorunlu değil: bilinmeyen alan YAZILMAZ —
+   null yok. ⚠️ İki API sınırı: `type:['string','null']` + enum strict
+   şemada 400 ("Enum value ... does not match declared type"); anyOf ya
+   da tip dizisi 16'dan fazla alanda 400 ("too many parameters with union
+   types"). Puanlayıcı yazılmamış alanı null ile aynı sayıyor. */
+const secim = degerler => ({ type: 'string', enum: degerler });
 
 const ARAC = {
   name: 'islem',
@@ -162,25 +164,25 @@ const ARAC = {
          14.10'da açıklamasız şemayla model işlemi doğru seçip alanı boş
          bıraktı (%64, SES-OLCUM §11.2). Setten yazılsaydı model sınava
          çalıştırılmış olurdu. */
-      plaka: { type: ['string', 'null'], description: 'Aracın plakası, büyük harf, boşluklu: "34 ABC 123".' },
-      oneri: { type: ['string', 'null'], description: 'yeni-arac: söylenen plaka kayıtlı değil ama bir kayıtlı plakaya çok benziyorsa o kayıtlı plaka.' },
+      plaka: { type: 'string', description: 'Aracın plakası, büyük harf, boşluklu: "34 ABC 123".' },
+      oneri: { type: 'string', description: 'yeni-arac: söylenen plaka kayıtlı değil ama bir kayıtlı plakaya çok benziyorsa o kayıtlı plaka.' },
       isTuru: Object.assign(secim(['tamirat', 'bakim', 'ikisi']), { description: 'servis-ac / yeni-arac: işin türü.' }),
-      km: { type: ['string', 'null'], description: 'servis-ac / yeni-arac: kilometre, binlik noktalı: "125.000".' },
-      tel: { type: ['string', 'null'], description: 'yeni-arac: sahibin telefonu, "0532 111 22 33" biçiminde.' },
-      odeme: Object.assign(secim(['nakit', 'kart', 'havale']), { description: 'teslim: ödeme yolu; söylenmediyse null.' }),
+      km: { type: 'string', description: 'servis-ac / yeni-arac: kilometre, binlik noktalı: "125.000".' },
+      tel: { type: 'string', description: 'yeni-arac: sahibin telefonu, "0532 111 22 33" biçiminde.' },
+      odeme: Object.assign(secim(['nakit', 'kart', 'havale']), { description: 'teslim: ödeme yolu; söylenmediyse yazma.' }),
       tip: Object.assign(secim(['parca', 'iscilik']), { description: 'satir-ekle: eklenen satır parça mı işçilik mi.' }),
-      ad: { type: ['string', 'null'], description: 'satir-ekle / fiyat-guncelle: satırın adı (parça ya da işçilik adı).' },
-      fiyat: { type: ['number', 'null'], description: 'satir-ekle / fiyat-guncelle: satırın TL tutarı, sayı olarak.' },
-      tutar: { type: ['number', 'null'], description: 'gider-ekle: giderin TL tutarı, sayı olarak.' },
+      ad: { type: 'string', description: 'satir-ekle / fiyat-guncelle: satırın adı (parça ya da işçilik adı).' },
+      fiyat: { type: 'number', description: 'satir-ekle / fiyat-guncelle: satırın TL tutarı, sayı olarak.' },
+      tutar: { type: 'number', description: 'gider-ekle: giderin TL tutarı, sayı olarak.' },
       donem: Object.assign(secim(['bugun', 'ay', 'yil']), { description: 'tahsilat-sor: hangi dönemin tahsilatı.' }),
       sablon: Object.assign(secim(['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma', 'selam', 'bayram', 'tesekkur', 'serbest']),
                             { description: 'mesaj-gonder: tek araç sahibine gidecek mesajın hazır metni.' }),
-      kanal: Object.assign(secim(['whatsapp', 'sms']), { description: 'mesaj-gonder / toplu-mesaj: gönderim kanalı; söylenmediyse null.' }),
+      kanal: Object.assign(secim(['whatsapp', 'sms']), { description: 'mesaj-gonder / toplu-mesaj: gönderim kanalı; söylenmediyse yazma.' }),
       metinTuru: Object.assign(secim(['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma', 'selam', 'bayram', 'tesekkur', 'serbest']),
                                { description: 'toplu-mesaj: herkese gidecek mesajın hazır metni.' }),
       hedef: Object.assign(secim(['araclar', 'kayitlar', 'musteriler']),
                            { description: 'ara: nerede aranacak — araçlar, servis kayıtları, müşteriler.' }),
-      terim: { type: ['string', 'null'], description: 'ara: aranan şey (plaka, marka, parça, kişi adı).' },
+      terim: { type: 'string', description: 'ara: aranan şey (plaka, marka, parça, kişi adı).' },
       suzgec: Object.assign(secim(['serviste']), { description: 'ara: yalnız şu an serviste olanlar isteniyorsa "serviste".' })
     },
     required: ['tur'],
