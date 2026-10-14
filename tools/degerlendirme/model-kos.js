@@ -50,8 +50,9 @@ const EFOR = arg('--efor', null);
 
 /* $ / 1M jeton — koşu sonunda gerçek maliyeti basmak için. */
 const FIYAT = {
-  'claude-opus-5-5': [4, 20], 'claude-opus-5': [5, 25],
-  'claude-sonnet-5-5': [2, 10], 'claude-sonnet-5': [2, 10],
+  /* [girdi, çıktı, önbellek okuma] — okuma yazılmadıysa girdinin 1/10'u */
+  'claude-opus-5-5': [4, 20, 0.20], 'claude-opus-5': [5, 25],
+  'claude-sonnet-5-5': [2, 10, 0.20], 'claude-sonnet-5': [2, 10],
   'claude-haiku-5-5': [0.10, 0.50], 'claude-haiku-4-5': [1, 5]
 };
 
@@ -211,7 +212,7 @@ const ARAC = {
   const client = new (Anthropic.default || Anthropic)(secenek);
 
   const cevaplar = {};
-  let girdiJeton = 0, ciktiJeton = 0, onbellekOkunan = 0;
+  let girdiJeton = 0, ciktiJeton = 0, onbellekOkunan = 0, onbellegeYazilan = 0;
 
   for (const c of calisanSet.cumleler) {
     try {
@@ -240,6 +241,7 @@ const ARAC = {
       girdiJeton += yanit.usage.input_tokens || 0;
       ciktiJeton += yanit.usage.output_tokens || 0;
       onbellekOkunan += yanit.usage.cache_read_input_tokens || 0;
+      onbellegeYazilan += yanit.usage.cache_creation_input_tokens || 0;
       const blok = yanit.content.find(b => b.type === 'tool_use');
       cevaplar[c.id] = yanit.stop_reason === 'refusal' ? { hata: 'model reddetti' }
         : blok ? blok.input : { hata: 'araç çağrısı gelmedi (' + yanit.stop_reason + ')' };
@@ -259,9 +261,16 @@ const ARAC = {
 
   const sonuc = puanla(calisanSet, cevaplar);
   sonuc.motor = MODEL + (DUYULAN_DOSYA ? ' + Web Speech' : '');
-  sonuc.jeton = { girdi: girdiJeton, cikti: ciktiJeton, onbellek: onbellekOkunan };
+  sonuc.jeton = { girdi: girdiJeton, cikti: ciktiJeton, onbellek: onbellekOkunan, onbellegeYazilan };
+  /* ⚠️ 14.10: önbellek jetonları ayrı faturalanıyor — okuma girdinin
+     ~1/10–1/20'si, yazma 1,25 katı. İlk iki koşuda sayılmadı; hesap
+     $0,39 dedi, Console $0,45 gösterdi. */
   const f = FIYAT[MODEL];
-  if (f) sonuc.maliyetUsd = +((girdiJeton * f[0] + ciktiJeton * f[1]) / 1e6).toFixed(4);
+  if (f) {
+    const okuma = f[2] != null ? f[2] : f[0] / 10;
+    sonuc.maliyetUsd = +((girdiJeton * f[0] + ciktiJeton * f[1] +
+                          onbellekOkunan * okuma + onbellegeYazilan * f[0] * 1.25) / 1e6).toFixed(4);
+  }
 
   const ek = DUYULAN_DOSYA ? '-' + path.basename(DUYULAN_DOSYA, '.json') : '';
   const dosya = path.join(KOK, 'sonuc-' + MODEL + ek + '.json');
