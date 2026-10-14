@@ -139,6 +139,11 @@ KURALLAR:
 
 Her cümle için cevabını YALNIZCA islem aracını bir kez çağırarak ver.`;
 
+/* Boş bırakılabilen seçim alanı. ⚠️ `type: ['string','null']` + enum
+   strict şemada 400 veriyor ("Enum value ... does not match declared
+   type"); anyOf ile yazılır. */
+const secim = degerler => ({ anyOf: [{ type: 'string', enum: degerler }, { type: 'null' }] });
+
 const ARAC = {
   name: 'islem',
   description: 'Ustanın cümlesinden çıkan tek işlem.',
@@ -154,20 +159,18 @@ const ARAC = {
       },
       plaka: { type: ['string', 'null'] },
       oneri: { type: ['string', 'null'], description: 'benzer kayıtlı plaka' },
-      isTuru: { type: ['string', 'null'], enum: ['tamirat', 'bakim', 'ikisi', null] },
+      isTuru: secim(['tamirat', 'bakim', 'ikisi']),
       km: { type: ['string', 'null'] },
       tel: { type: ['string', 'null'] },
-      odeme: { type: ['string', 'null'], enum: ['nakit', 'kart', 'havale', null] },
-      tip: { type: ['string', 'null'], enum: ['parca', 'iscilik', null] },
+      odeme: secim(['nakit', 'kart', 'havale']),
+      tip: secim(['parca', 'iscilik']),
       fiyat: { type: ['number', 'null'] },
       tutar: { type: ['number', 'null'] },
-      donem: { type: ['string', 'null'], enum: ['bugun', 'ay', 'yil', null] },
-      sablon: { type: ['string', 'null'],
-                enum: ['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma',
-                       'selam', 'bayram', 'tesekkur', 'serbest', null] },
-      kanal: { type: ['string', 'null'], enum: ['whatsapp', 'sms', null] },
+      donem: secim(['bugun', 'ay', 'yil']),
+      sablon: secim(['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma', 'selam', 'bayram', 'tesekkur', 'serbest']),
+      kanal: secim(['whatsapp', 'sms']),
       metinTuru: { type: ['string', 'null'] },
-      hedef: { type: ['string', 'null'], enum: ['araclar', 'kayitlar', 'musteriler', null] },
+      hedef: secim(['araclar', 'kayitlar', 'musteriler']),
       terim: { type: ['string', 'null'] },
       suzgec: { type: ['string', 'null'] }
     },

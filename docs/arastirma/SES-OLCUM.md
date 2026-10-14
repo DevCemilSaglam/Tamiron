@@ -339,6 +339,32 @@ doğruluğu (%68–74) asıl rakam.
 ("06 pvr 07" → tek benzer kayıtlı plaka 06 TMR 07). Ölçüm aracı hazır
 (`model-kos.js --duyulan <dosya>`); anahtar + harcama onayı bekliyor.
 
+### 11.2 · İlk Claude koşusu (14.10, Opus 5.5, telefon dökümleri) — ŞEMA KUSURU
+
+**%64** (18 tam · 15 yarım · 7 yanlış), **$0,20**. Motorun %74'ünün
+ALTINDA — ama rakam modeli değil **bizim aracımızı** ölçüyor:
+
+- 15 yarımın **11'inde** model işlemi DOĞRU seçmiş, alanı boş bırakmış.
+  "yağ filtresi 300 lira" → `fiyat-guncelle` doğru, ama tutar yok; parça
+  adı `terim` ve `suzgec`'e konmuş. Sebep: `model-kos.js`'teki araç
+  şemasında **hiçbir alanın açıklaması yok**; model `fiyat`'ın ne olduğunu,
+  `suzgec`'in hangi değerleri aldığını ("serviste") bilmiyor.
+- Alan boşlukları düzelse kaba hesap **~%78** — motorun biraz üstü.
+  Bu bir tahmin; ölçülmeden yazılmaz.
+- Gerçek anlam yanlışları (7): "sahibini ara" ↔ mesaj karışması (34,
+  39), "yarın gelecek" → plakasiz, bağlamsız "bir de balata değişecek"
+  → satir-ekle (beklenen plakasiz), "işçilik 750" → açık kayıtta işçilik
+  satırı olduğu için fiyat-guncelle (istem kuralı 2'ye göre savunulabilir;
+  cetvelin mi modelin mi hatası — A-M34'ün sorusu).
+
+**Sonuç:** model koşusu bugünkü hâliyle karar verdirmez. Önce şemaya alan
+açıklamaları (parasız), sonra iki set yeniden (~$0,40). Bilgisayar seti
+bu yüzden KOŞTURULMADI.
+
+Koşucunun iki kusuru bu koşuda düzeldi: workspace'siz anahtar (API 400,
+ilk istekte durma eklendi) ve strict şemada `type:['string','null']` +
+enum'un reddi (`anyOf` ile).
+
 ## 10 · Önceki hâli: onaya açık maddeler
 
 1. **E yolu** ve *"gürültü uydurulmaz"* kuralının esnetilmesi — gerçek atölye
