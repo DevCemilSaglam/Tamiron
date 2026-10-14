@@ -2414,6 +2414,15 @@ function stilMetni() {
     if (o.plaka !== '06 TMR 07') ek('SES-DUYULAN', 'ses', 'il kodu 81 ustu plaka sayildi: ' + o.plaka);
     o = coz('88 BIN 900 bakima geldi');
     if (o.plaka) ek('SES-DUYULAN', 'ses', '"88 BIN 900" plaka sayildi -- il kodu 01-81');
+    /* Buyuk set (14.10) uc sinif daha buldu: */
+    var p5 = sesPlakaBul('34 M 49109 fren balatasi bitmis');
+    if (!p5 || p5.plaka !== '34 M 49109') ek('SES-DUYULAN', 'ses', 'tek harfli 5 rakamli plaka okunmadi: ' + (p5 && p5.plaka));
+    o = coz('41 KV 5588 İsmail Özdemir 0532 111 22 33 debriyaj kaciriyor');
+    if (o.sahip !== 'İsmail Özdemir') ek('SES-DUYULAN', 'ses', 'Turkce harfle baslayan ad okunmadi (K-018 \\b): "' + o.sahip + '"');
+    o = coz("Mehmet Kaya'nın arabası geldi yağ değişimi yapılacak");
+    if (o.tur !== 'servis-ac' || o.plaka !== '34 ABC 123' || o.isTuru !== 'bakim') {
+      ek('SES-DUYULAN', 'ses', 'sahibin adiyla arac bulunmadi / yag degisimi bakim degil: ' + o.tur + ' ' + o.plaka + ' ' + o.isTuru);
+    }
     o = coz('35 kelime 45 teslim ettim');
     if (o.plaka !== '35 KLM 45') ek('SES-DUYULAN', 'ses', '"35 kelime 45" 35 KLM 45e baglanmadi: ' + o.tur + ' ' + o.plaka);
     o = coz('2.400 elektrik faturasi ekle');

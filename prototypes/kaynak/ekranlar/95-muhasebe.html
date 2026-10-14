@@ -434,7 +434,7 @@ Islem.tanim('tahsilat-sor', {
     var d = c.d;
     if (sesTutarBul(d) || (d.indexOf('tahsil') < 0 && d.indexOf('kasa') < 0)) return null;
     var donem = (d.indexOf('bugun') >= 0) ? 'bugun'
-              : (d.indexOf('yil') >= 0) ? 'yil'
+              : (d.indexOf('yil') >= 0 || d.indexOf('sene') >= 0) ? 'yil'
               : (d.indexOf('ay') >= 0) ? 'ay' : 'bugun';
     return { tur: 'tahsilat-sor', donem: donem };
   },

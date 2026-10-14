@@ -135,10 +135,14 @@ Islem.tanim('ara', {
     if (c.p && d.indexOf('sahib') >= 0) {
       terim = c.arac && c.arac.sahipAd ? c.arac.sahipAd : c.p.plaka;
       hedef = 'musteriler';
+    } else if (c.p && hedef === 'araclar' && !c.kalan.replace(/\s/g, '')) {
+      /* Yalnız plaka söylendiyse arama terimi plakanın OKUNMUŞ hâli —
+         "07 R 13 03" değil "07 R 1303" (bölünmüş rakam birleşmiş). */
+      terim = c.p.plaka;
     }
     /* "SERVİSTEKİLER" bir arama terimi değil, SÜZGEÇ (14.09 — örnek çip
        düz aramaya düşüp boş liste döndürüyordu; 45. test korur). */
-    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0) {
+    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0 || d.indexOf('serviste ne') >= 0) {
       return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'serviste' };
     }
     if (!terim) return null;

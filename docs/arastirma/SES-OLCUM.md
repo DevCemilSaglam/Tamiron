@@ -528,3 +528,53 @@ istedin"). Sesçe yakın aday artık `benzerPlaka`'nın önerisine giriyor.
 
 Negatif: eski "hep bağla" geri getirildi → 3 bulgu (test 55 ×2 + 44). 320 /
 375 / 430 px'te 0 bulgu.
+
+## 12 · Büyük set — 1010 cümle, kurmaca dükkân (14.10)
+
+> **Cemil, 14.10:** *"Daha fazla test yapabiliriz. Belki de 1000 adet okuma
+> bile olabilir. Ne kadar çok olursa."* — yazılı + sesli yolu seçti.
+
+`tools/degerlendirme/buyuk-set-uret.js` (tohum 20261014) → `buyuk-set.json`:
+62 araçlık kurmaca dükkân (Türk plaka kurallarına uygun, **6 ikiz** —
+tek harfi farklı iki kayıtlı plaka, iki aracı olan sahipler, aynı modelden
+birden çok araç), 31 açık kayıt; yedi işin her biri için farklı
+söyleyişler (plaka başta/sonda/küçük harf/bölünmüş rakam, sayı rakamla ya
+da yazıyla, ödemenin farklı sözleri). Set ölçülmeden ÖNCE commit'lendi
+(dondu). İki yarı: `gelistirme` / `sinav`.
+
+| | önce | sonra |
+|---|---|---|
+| geliştirme (505) | %90 | **%99** |
+| **sınav (505)** | %87 | **%100** |
+| eski 40'lık yazı | %93 | **%98** (id 5, 6 İLK KEZ) |
+| telefon dökümü (39) | %82 | %85 |
+| bilgisayar dökümü (39) | %71 | %73 |
+
+⚠️ **Sınavın %100'ü ŞİŞKİN — dürüst okuma:** iki yarı AYNI kalıplardan
+üretildi. Bir kalıbı düzeltmek iki yarıyı birlikte düzeltir. Bu set
+"benim aklıma gelen söyleyişlerin çeşitliliği"ni ölçüyor; ustanın benim
+aklıma gelmeyen söyleyişini ÖLÇMÜYOR. Gerçekten bağımsız sınav: başka
+birinin yazdığı ya da söylediği cümleler (tamirci!).
+
+**Büyük setin bulduğu motor kusurları (hepsi gerçek, hepsi düzeldi):**
+1. **Tek harfli 5 rakamlı plaka HİÇ tanınmıyordu** ("34 M 49109") —
+   okuyucu en çok 4 rakam alıyordu. Teslim, bakım, mesaj yanlışlarının
+   çoğu buydu.
+2. **K-018 ihlali:** yeni araç cümlesinde sahip adı `\b` ile okunuyordu;
+   "İsmail Özdemir" gibi Türkçe harfle başlayan ad BOŞ dönüyordu
+   (negatif testte doğrulandı).
+3. **Araç tarifi motorda hiç yoktu:** "Mehmet Kaya'nın arabası",
+   "şu Mégane'ın" — 14.09'dan beri setin beklediği davranış. Şimdi var;
+   dar: yalnız genel/servis-ekle bağlamı, yalnız TEK araca uyan tarif.
+4. "yağ değişimi" bakım sayılmıyordu · "işçiliği" (k→ğ) parça sanılıyordu
+   · "peşin", "EFT", "hesaba yatırdı", "bu sene", "serviste ne var"
+   bilinmiyordu · aramada plaka bölünmüş hâliyle aranıyordu.
+
+**Eşdeğerlik:** 576/5 · 400/4 · 16/0 — farkların hepsi okundu: araç
+tarifiyle çözülen iki cümle (bilerek) + bir öneri satırının adından "yaz"
+düşmesi. **Test 55 genişledi** (5 rakam, K-018 adı, sahip tarifi);
+negatif: her biri tek tek bozuldu → bulgu; geri → 0. 320/375/430 px 0 bulgu.
+
+**Kalan küçük kusur (yazıldı, düzeltilmedi):** araç tarifinde "Ne istiyor"
+alanına dolgu sözü kalıyor ("geldi yağ değişimi yapılacak", "şu
+trigerini…"). Usta onay ekranında görür; zararsız.
