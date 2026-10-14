@@ -501,7 +501,13 @@ function benzerPlaka(plaka) {
     var q = plakaParcala(a.plaka);
     if (!q) return;
     if (q.il !== p.il || q.rakam !== p.rakam) return;
-    if (harfFarki(p.harf, q.harf) > 1) return;
+    /* Tek harf farkı YA DA her harfi sesçe yakın (06 PVR 07 → 06 TMR 07,
+       iki harf farklı ama "pe/te", "ve/me"). K-059: gerçek olabilecek
+       plaka kendiliğinden DEĞİŞTİRİLMEZ, burada SORULUR. sesceYakinHarf
+       04-islem.js'te — çağrı anında yüklü. */
+    var sesce = typeof sesceYakinHarf === 'function' && p.harf.length === q.harf.length &&
+      p.harf.split('').every(function (h, i) { return sesceYakinHarf(h, q.harf[i]); });
+    if (harfFarki(p.harf, q.harf) > 1 && !sesce) return;
     adaylar.push(a.plaka);
   });
   /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,

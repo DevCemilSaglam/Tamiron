@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-14 18:01
+  Üretim: 2026-10-14 18:05
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -6450,7 +6450,13 @@ function benzerPlaka(plaka) {
     var q = plakaParcala(a.plaka);
     if (!q) return;
     if (q.il !== p.il || q.rakam !== p.rakam) return;
-    if (harfFarki(p.harf, q.harf) > 1) return;
+    /* Tek harf farkı YA DA her harfi sesçe yakın (06 PVR 07 → 06 TMR 07,
+       iki harf farklı ama "pe/te", "ve/me"). K-059: gerçek olabilecek
+       plaka kendiliğinden DEĞİŞTİRİLMEZ, burada SORULUR. sesceYakinHarf
+       04-islem.js'te — çağrı anında yüklü. */
+    var sesce = typeof sesceYakinHarf === 'function' && p.harf.length === q.harf.length &&
+      p.harf.split('').every(function (h, i) { return sesceYakinHarf(h, q.harf[i]); });
+    if (harfFarki(p.harf, q.harf) > 1 && !sesce) return;
     adaylar.push(a.plaka);
   });
   /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,
@@ -7920,6 +7926,12 @@ function duzenlemeUzakligi(a, b) {
 function sesPlakaBagla(metin, p) {
   if (typeof ARACLAR === 'undefined') return null;
   if (p && aracBul(p.plaka)) return null;
+  /* K-059 (Cemil, 14.10 — "karma"): GERÇEK OLABİLECEK plaka burada
+     BAĞLANMAZ. "06 PVR 07" var olan başka bir araç olabilir; sesçe yakın
+     kayıtlı plaka benzerPlaka'da ÖNERİ olur, usta seçer (K-047.6).
+     Yalnız gerçek OLAMAYAN plaka bağlanır: Q/W/X'li ya da harf yerine
+     kelime ("35 kelime 45"). Orada yeni araç ihtimali yok. */
+  if (p && !p.gecersiz) return null;
   var adaylar = [], duyulan, indeks, uzunluk;
   if (p) {
     var q = plakaParcala(p.plaka);
@@ -7927,15 +7939,8 @@ function sesPlakaBagla(metin, p) {
     ARACLAR.forEach(function (a) {
       var r = plakaParcala(a.plaka);
       if (!r || r.il !== q.il || r.rakam !== q.rakam) return;
-      if (p.gecersiz) {
-        /* Gerçek olamayan plaka: tek harf farkı yeter (harfFarki bir
-           eksik/fazla harfi de sayar). */
-        if (harfFarki(q.harf, r.harf) <= 1) adaylar.push(a.plaka);
-        return;
-      }
-      if (r.harf.length !== q.harf.length) return;
-      for (var i = 0; i < q.harf.length; i++) if (!sesceYakinHarf(q.harf[i], r.harf[i])) return;
-      adaylar.push(a.plaka);
+      /* Tek harf farkı yeter (harfFarki bir eksik/fazla harfi de sayar). */
+      if (harfFarki(q.harf, r.harf) <= 1) adaylar.push(a.plaka);
     });
   } else {
     /* Harf yerine kelime: "35 kelime 45". İl ve rakam BİREBİR kayıtlı
@@ -8218,7 +8223,7 @@ var Islem = (function () {
       satirlar: satirlar,
       sorulan: sorulan,
       notice: (o.duyulanPlaka
-                ? 'Duyulan plaka ' + o.duyulanPlaka + ' kayıtlı değil — sesçe en yakın kayıtlı araç ' +
+                ? 'Duyulan "' + o.duyulanPlaka + '" geçerli bir plaka değil — en yakın kayıtlı araç ' +
                   o.plaka + ' alındı. Değilse tekrar söyle. '
                 : '') + (deger(o, s.notice) || ''),
       eylem: deger(o, s.eylem),

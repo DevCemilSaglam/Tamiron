@@ -156,6 +156,12 @@ function duzenlemeUzakligi(a, b) {
 function sesPlakaBagla(metin, p) {
   if (typeof ARACLAR === 'undefined') return null;
   if (p && aracBul(p.plaka)) return null;
+  /* K-059 (Cemil, 14.10 — "karma"): GERÇEK OLABİLECEK plaka burada
+     BAĞLANMAZ. "06 PVR 07" var olan başka bir araç olabilir; sesçe yakın
+     kayıtlı plaka benzerPlaka'da ÖNERİ olur, usta seçer (K-047.6).
+     Yalnız gerçek OLAMAYAN plaka bağlanır: Q/W/X'li ya da harf yerine
+     kelime ("35 kelime 45"). Orada yeni araç ihtimali yok. */
+  if (p && !p.gecersiz) return null;
   var adaylar = [], duyulan, indeks, uzunluk;
   if (p) {
     var q = plakaParcala(p.plaka);
@@ -163,15 +169,8 @@ function sesPlakaBagla(metin, p) {
     ARACLAR.forEach(function (a) {
       var r = plakaParcala(a.plaka);
       if (!r || r.il !== q.il || r.rakam !== q.rakam) return;
-      if (p.gecersiz) {
-        /* Gerçek olamayan plaka: tek harf farkı yeter (harfFarki bir
-           eksik/fazla harfi de sayar). */
-        if (harfFarki(q.harf, r.harf) <= 1) adaylar.push(a.plaka);
-        return;
-      }
-      if (r.harf.length !== q.harf.length) return;
-      for (var i = 0; i < q.harf.length; i++) if (!sesceYakinHarf(q.harf[i], r.harf[i])) return;
-      adaylar.push(a.plaka);
+      /* Tek harf farkı yeter (harfFarki bir eksik/fazla harfi de sayar). */
+      if (harfFarki(q.harf, r.harf) <= 1) adaylar.push(a.plaka);
     });
   } else {
     /* Harf yerine kelime: "35 kelime 45". İl ve rakam BİREBİR kayıtlı
@@ -454,7 +453,7 @@ var Islem = (function () {
       satirlar: satirlar,
       sorulan: sorulan,
       notice: (o.duyulanPlaka
-                ? 'Duyulan plaka ' + o.duyulanPlaka + ' kayıtlı değil — sesçe en yakın kayıtlı araç ' +
+                ? 'Duyulan "' + o.duyulanPlaka + '" geçerli bir plaka değil — en yakın kayıtlı araç ' +
                   o.plaka + ' alındı. Değilse tekrar söyle. '
                 : '') + (deger(o, s.notice) || ''),
       eylem: deger(o, s.eylem),

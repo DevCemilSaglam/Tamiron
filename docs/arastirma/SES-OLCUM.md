@@ -515,3 +515,16 @@ duyulan plakada SOR, kendiliğinden düzeltme — yanlış araca mesaj gider"*.
 11.4'teki sesçe bağlama ve buradaki Q bağlaması plakayı KENDİSİ seçiyor,
 onay ekranında söylüyor. Bu, kararı gevşetiyor ve 14.10'daki onaydan önce
 Cemil'e söylenmedi.
+
+**GÜNCELLEME — Cemil "karma"yı seçti (K-059):** gerçek OLAMAYAN plaka
+bağlanır; gerçek OLABİLECEK sesçe yakın plaka SORULUR ("Bunu mu demek
+istedin"). Sesçe yakın aday artık `benzerPlaka`'nın önerisine giriyor.
+
+| sürüm-2 set | kendiliğinden doğru | + doğru öneri | tek dokunuşla |
+|---|---|---|---|
+| yazı (41) | %93 | — | %93 |
+| telefon (39) | %82 | 2 | ~%87 |
+| bilgisayar (39) | %71 | 2 | ~%76 |
+
+Negatif: eski "hep bağla" geri getirildi → 3 bulgu (test 55 ×2 + 44). 320 /
+375 / 430 px'te 0 bulgu.
