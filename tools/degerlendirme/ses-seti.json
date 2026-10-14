@@ -1,6 +1,6 @@
 {
   "ad": "Sesli komut değerlendirme seti",
-  "surum": 1,
+  "surum": 2,
   "tarih": "14.09.2026",
   "aciklama": "Cümle -> beklenen işlem nesnesi. Bugünkü desen eşleştirici ile gelecekteki model AYNI setle ölçülür. Beklenen alanlar YALNIZ kritik olanlardır; ekranın doldurduğu yardımcı alanlar (arac nesnesi, govde metni) karşılaştırmaya girmez.",
   "kurallar": [
@@ -50,8 +50,8 @@
       "not": "kayıtsız araç: ruhsat yoluna gidecek, söylenenler taşınacak" },
 
     { "id": 11, "baglam": "servis-ekle", "cumle": "34 qbc 123 triger seti değişecek",
-      "beklenen": { "tur": "yeni-arac", "plaka": "34 QBC 123", "oneri": "34 ABC 123" },
-      "not": "A-M27: tanıma A'yı Q duydu. Doğru davranış SORMAK — kendiliğinden düzeltmek DEĞİL" },
+      "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123" },
+      "not": "A-M27: tanıma A'yı Q duydu. SÜRÜM 2 (14.10, Cemil: 'Türkiye'de Q harfi yok'): Q'lu plaka gerçek olamaz → yeni araç DEĞİL, tek harf uzaktaki kayıtlı araç (onay ekranı duyulanı söyler). 'Gerçekten başka araç' tuzağı id 41'e taşındı" },
 
     { "id": 12, "baglam": "kayit-icinde", "cumle": "balata da değişecek",
       "beklenen": { "tur": "satir-ekle", "tip": "parca" },
@@ -101,8 +101,8 @@
       "beklenen": { "tur": "mesaj-gonder", "plaka": "34 ABC 123", "sablon": "selam", "kanal": "whatsapp" },
       "not": "Cemil'in ses kaydındaki cümle" },
 
-    { "id": 24, "baglam": "mesaj", "cumle": "16 XY 8890 sahibine bakım hatırlatması gönder",
-      "beklenen": { "tur": "mesaj-gonder", "plaka": "16 XY 8890", "sablon": "hatirlatma" },
+    { "id": 24, "baglam": "mesaj", "cumle": "16 SY 8890 sahibine bakım hatırlatması gönder",
+      "beklenen": { "tur": "mesaj-gonder", "plaka": "16 SY 8890", "sablon": "hatirlatma" },
       "not": "şablon adıyla" },
 
     { "id": 25, "baglam": "mesaj", "cumle": "tüm müşterilere bayram mesajı gönder",
@@ -167,6 +167,10 @@
 
     { "id": 40, "baglam": "kayit-icinde", "cumle": "motor yağı dört bin beş yüz lira",
       "beklenen": { "tur": "fiyat-guncelle", "fiyat": 4500 },
-      "not": "kelimeyle söylenen büyük sayı + var olan satır. ⚠️ SETİN KENDİ HATASIYDI: ilk yazımda AÇIK KAYITTA OLMAYAN bir parça adı yazmıştım (triger seti başka kayıtta). Bağlam cümlenin değil, koşucunun seçtiği kaydın" }
+      "not": "kelimeyle söylenen büyük sayı + var olan satır. ⚠️ SETİN KENDİ HATASIYDI: ilk yazımda AÇIK KAYITTA OLMAYAN bir parça adı yazmıştım (triger seti başka kayıtta). Bağlam cümlenin değil, koşucunun seçtiği kaydın" },
+
+    { "id": 41, "baglam": "servis-ekle", "cumle": "34 ARC 123 triger seti değişecek",
+      "beklenen": { "tur": "yeni-arac", "plaka": "34 ARC 123", "oneri": "34 ABC 123" },
+      "not": "SÜRÜM 2 TUZAĞI (eski id 11'in yerine): geçerli harflerle, kayıtlı 34 ABC 123'e TEK HARF uzak — gerçek bir başka araç olabilir. R ile B sesçe yakın değil → bağlanmaz, SORULUR (A-M27)" }
   ]
 }

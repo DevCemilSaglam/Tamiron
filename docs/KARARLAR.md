@@ -10,6 +10,41 @@
 
 ---
 
+## K-059 · Sesli komutta plaka: Türk plaka kuralları + "karma" bağlama (14.10.2026)
+
+> **Cemil, 14.10:** *"Türkiye'de Q harfi yok. Plakaların bazı kuralları
+> var. Bunları da dahil edebiliriz."* — ve yanlış duyulan plaka için üç
+> yoldan **"Karma"**yı seçti.
+
+**59.1 · Plaka kuralları motorda.** İl kodu **01–81** · harfler Türk
+alfabesinin **23** harfi (Ç Ğ İ Ö Ş Ü, Q W X **yok**) · harf sayısı rakam
+sayısını sınırlar (1→4–5, 2→3–4, 3→2–3). Tanıyıcının Türkçe yazdığı harf
+düzeltilir. Kendi verimiz kurala aykırıydı: tohum **16 XY 8890 → 16 SY
+8890**; değerlendirme seti sürüm 2.
+
+**59.2 · Karma bağlama — K-047.6'yı daraltır, kaldırmaz.**
+
+| Duyulan plaka | Davranış |
+|---|---|
+| **Gerçek olamaz** (Q/W/X'li, "35 kelime 45") | Tek harf uzaktaki TEK kayıtlı plakaya **bağlanır**; onay ekranı *"Duyulan … geçerli bir plaka değil — en yakın kayıtlı araç … alındı"* der |
+| **Gerçek olabilir** ama sesçe yakın ("06 PVR 07") | **Bağlanmaz — SORULUR:** *"Bunu mu demek istedin: 06 TMR 07"* (K-047.6) |
+
+**Gerekçe:** K-047.6'nın korktuğu şey yanlış araca mesaj gitmesi.
+Gerçek olamayan bir plaka için o risk yok — yeni araç ihtimali sıfır.
+Gerçek olabilecek plakada risk aynen duruyor; orada usta seçer.
+
+**59.3 · Hata — kayda geçsin.** 14.10'da ilk iyileştirme (§11.4) gerçek
+olabilecek plakayı da kendiliğinden bağlıyordu ve K-047.6 ile çatışması
+Cemil onaylamadan ÖNCE söylenmedi. Lider kararlar defterini kontrol
+etmeden davranış değiştirdi. Ders: **ses/plaka davranışına dokunmadan önce
+K-047.6 ve A-M27 okunur.** Test 55 artık iki yönü de ölçüyor (bağlanması
+gereken ve SORULMASI gereken).
+
+**Ölçüm (sürüm-2 set, dökümler):** yazı %93 · telefon %82 kendiliğinden
+(+2 doğru öneri → tek dokunuşla ~%87) · bilgisayar %71 (+2 → ~%76).
+
+---
+
 ## K-058 · Servis detayı: adım yok — "Ne oldu" + alttaki eylem çubuğu (12.10.2026 · Tur 8.1)
 
 > **Cemil, 12.10** (dört kurguyu yan yana gördükten sonra): *"Zaman

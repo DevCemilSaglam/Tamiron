@@ -44,10 +44,31 @@
 /* ⚠️ Birleştirme ÇÖZÜMLEMENİN GİRİŞİNDE bir kez yapılır, burada
    değil: indeks/uzunluk döndüren bir fonksiyon metni değiştirirse,
    çağıran taraf ORİJİNAL metni yanlış yerden keser. */
+/* ---- TÜRK PLAKASININ KURALLARI (Cemil, 14.10: "Türkiye'de Q harfi
+   yok. Plakaların bazı kuralları var.") ----
+   - İl kodu 01–81. Dışındaki "iki rakam + harf + rakam" plaka değildir
+     ("kilometre 88 bin 900" → "88 BİN 900" plaka sanılmasın).
+   - Harfler: Türk alfabesinin 23 harfi — Ç Ğ İ Ö Ş Ü YOK, Q W X YOK.
+   - Harf sayısı rakam sayısını sınırlar (aşağıda `sinir`).
+   Tanıyıcı Türkçe yazar: "kbi" büyütülünce "KBİ" olur, "ç" duyabilir.
+   Plakada bu harfler olmadığına göre karşılıkları kastedilmiştir. */
+var PLAKA_HARFLERI = 'ABCDEFGHIJKLMNOPRSTUVYZ';
+var PLAKA_TR_HARF = { 'Ç': 'C', 'Ğ': 'G', 'İ': 'I', 'Ö': 'O', 'Ş': 'S', 'Ü': 'U' };
+
+/* Q W X'in karşılığı yok: böyle bir plaka KESİNLİKLE yanlış duyulmuştur
+   (sesPlakaBagla bunu bilir). Tarihçe: 14.09'da tanıyıcı "34 ABC 123"ü
+   "34 QBC 123" duydu — A-M27'nin doğduğu kayıt. */
+function plakaHarfiGecersizMi(harf) {
+  return harf.split('').some(function (h) { return PLAKA_HARFLERI.indexOf(h) < 0; });
+}
+
 function sesPlakaBul(metin) {
   var m = metin.toLocaleUpperCase('tr')
                .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
   if (!m) return null;
+  var il = parseInt(m[1], 10);
+  if (il < 1 || il > 81) return null;
+  var harf = m[2].replace(/[ÇĞİÖŞÜ]/g, function (h) { return PLAKA_TR_HARF[h]; });
   var rakam = m[3], uzunluk = m[0].length;
   /* RAKAM GRUBU BÖLÜNMÜŞ MÜ (14.10 ölçümü): tanıyıcı "8890"ı "88 90"
      yazıyor. Türk plakasında harf sayısı rakam sayısını sınırlar —
@@ -62,7 +83,8 @@ function sesPlakaBul(metin) {
       uzunluk += ek[0].length;
     }
   }
-  return { plaka: m[1] + ' ' + m[2] + ' ' + rakam, indeks: m.index, uzunluk: uzunluk };
+  return { plaka: m[1] + ' ' + harf + ' ' + rakam, indeks: m.index, uzunluk: uzunluk,
+           gecersiz: plakaHarfiGecersizMi(harf) };
 }
 
 /* ---- DUYULAN PLAKAYI KAYITLI PLAKAYA BAĞLAMAK (14.10) ----
@@ -70,12 +92,18 @@ function sesPlakaBul(metin) {
    harfi — TMR "PNR/PVR/DMR", KLM "kelime" duyuluyor ve motor bunu
    KAYITSIZ araç sanıp yeni kayıt açtırıyor.
 
-   ⚠️ DÜZ "TEK HARF FARKI" YETMEZ, YANLIŞ BİLE OLUR: "34 QBC 123" de
-   kayıtlı 34 ABC 123'e tek harf uzak ama o GERÇEKTEN başka araç
-   (değerlendirme setinin bilerek konmuş tuzağı → yeni-arac + öneri).
+   ⚠️ DÜZ "TEK HARF FARKI" YETMEZ, YANLIŞ BİLE OLUR: "34 ARC 123" de
+   kayıtlı 34 ABC 123'e tek harf uzak ama GERÇEK bir plaka olabilir —
+   başka bir araç (değerlendirme setinin tuzağı → yeni-arac + öneri).
    Ayırt eden SESÇE yakınlık: Türkçede harf adları "be, ce, de, te…"
    diye okunur; tanıyıcının karıştırdığı, ünsüzü AYNI BİÇİMDE çıkan
-   harflerdir (te/de/pe, me/ne). Q ile A sesçe yakın değil.
+   harflerdir (te/de/pe, me/ne). R ile B sesçe yakın değil.
+
+   GEÇERSİZ HARFLİ PLAKA BAŞKADIR: "34 QBC 123" gerçek olamaz (Q plakada
+   yok) — yeni araç değil, KESİNLİKLE yanlış duyulmuş bir plaka. Orada
+   sesçe yakınlık aranmaz; tek harf uzaktaki TEK kayıtlı plaka yeter.
+   (14.10'a kadar set QBC'yi "başka araç" tuzağı sayıyordu — Cemil'in
+   kuralıyla çelişiyordu; tuzak geçerli harflerle yeniden kuruldu.)
 
    Sınıflar Türkçe ses bilgisinden (çıkış biçimi), ölçümden değil —
    TEK İSTİSNA M~V: 14.10'da "TMR" iki kez "PVR" duyuldu (dudak sesi). */
@@ -128,15 +156,21 @@ function duzenlemeUzakligi(a, b) {
 function sesPlakaBagla(metin, p) {
   if (typeof ARACLAR === 'undefined') return null;
   if (p && aracBul(p.plaka)) return null;
+  /* K-059 (Cemil, 14.10 — "karma"): GERÇEK OLABİLECEK plaka burada
+     BAĞLANMAZ. "06 PVR 07" var olan başka bir araç olabilir; sesçe yakın
+     kayıtlı plaka benzerPlaka'da ÖNERİ olur, usta seçer (K-047.6).
+     Yalnız gerçek OLAMAYAN plaka bağlanır: Q/W/X'li ya da harf yerine
+     kelime ("35 kelime 45"). Orada yeni araç ihtimali yok. */
+  if (p && !p.gecersiz) return null;
   var adaylar = [], duyulan, indeks, uzunluk;
   if (p) {
     var q = plakaParcala(p.plaka);
     duyulan = p.plaka; indeks = p.indeks; uzunluk = p.uzunluk;
     ARACLAR.forEach(function (a) {
       var r = plakaParcala(a.plaka);
-      if (!r || r.il !== q.il || r.rakam !== q.rakam || r.harf.length !== q.harf.length) return;
-      for (var i = 0; i < q.harf.length; i++) if (!sesceYakinHarf(q.harf[i], r.harf[i])) return;
-      adaylar.push(a.plaka);
+      if (!r || r.il !== q.il || r.rakam !== q.rakam) return;
+      /* Tek harf farkı yeter (harfFarki bir eksik/fazla harfi de sayar). */
+      if (harfFarki(q.harf, r.harf) <= 1) adaylar.push(a.plaka);
     });
   } else {
     /* Harf yerine kelime: "35 kelime 45". İl ve rakam BİREBİR kayıtlı
@@ -419,7 +453,7 @@ var Islem = (function () {
       satirlar: satirlar,
       sorulan: sorulan,
       notice: (o.duyulanPlaka
-                ? 'Duyulan plaka ' + o.duyulanPlaka + ' kayıtlı değil — sesçe en yakın kayıtlı araç ' +
+                ? 'Duyulan "' + o.duyulanPlaka + '" geçerli bir plaka değil — en yakın kayıtlı araç ' +
                   o.plaka + ' alındı. Değilse tekrar söyle. '
                 : '') + (deger(o, s.notice) || ''),
       eylem: deger(o, s.eylem),

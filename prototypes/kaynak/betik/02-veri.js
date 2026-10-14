@@ -51,7 +51,7 @@ var ARACLAR = [
     /* Fatura alanları BOŞ — her araçta dolu olmayacak; ruhsat
        okunmadıysa ya da okunamadıysa usta sonra yazar. */
     tcVergiNo: '', adres: '', vergiDairesi: '', not: '' },
-  { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
+  { plaka: '16 SY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
     motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
     renk: 'Siyah', yakit: 'Dizel', motorNo: 'CLH1234567',
     silindir: '1598', guc: '110', koltuk: '5', ilkTescil: '08.08.2016',
@@ -170,7 +170,7 @@ var KAYITLAR = [
 
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
      Menü rozeti ve çekmecedeki bildirim bu kayıttan besleniyor. */
-  { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
+  { id: 5, plaka: '16 SY 8890', tur: 'bakim', km: '88.000',
     sikayet: 'Periyodik bakım',
     acilis: '20.02.2026', teslimTarihi: '20.02.2026',
     odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
@@ -501,7 +501,13 @@ function benzerPlaka(plaka) {
     var q = plakaParcala(a.plaka);
     if (!q) return;
     if (q.il !== p.il || q.rakam !== p.rakam) return;
-    if (harfFarki(p.harf, q.harf) > 1) return;
+    /* Tek harf farkı YA DA her harfi sesçe yakın (06 PVR 07 → 06 TMR 07,
+       iki harf farklı ama "pe/te", "ve/me"). K-059: gerçek olabilecek
+       plaka kendiliğinden DEĞİŞTİRİLMEZ, burada SORULUR. sesceYakinHarf
+       04-islem.js'te — çağrı anında yüklü. */
+    var sesce = typeof sesceYakinHarf === 'function' && p.harf.length === q.harf.length &&
+      p.harf.split('').every(function (h, i) { return sesceYakinHarf(h, q.harf[i]); });
+    if (harfFarki(p.harf, q.harf) > 1 && !sesce) return;
     adaylar.push(a.plaka);
   });
   /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,
