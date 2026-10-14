@@ -157,22 +157,31 @@ const ARAC = {
                'gider-ekle', 'tahsilat-sor', 'mesaj-gonder', 'toplu-mesaj', 'ara',
                'plakasiz']
       },
-      plaka: { type: ['string', 'null'] },
-      oneri: { type: ['string', 'null'], description: 'benzer kayıtlı plaka' },
-      isTuru: secim(['tamirat', 'bakim', 'ikisi']),
-      km: { type: ['string', 'null'] },
-      tel: { type: ['string', 'null'] },
-      odeme: secim(['nakit', 'kart', 'havale']),
-      tip: secim(['parca', 'iscilik']),
-      fiyat: { type: ['number', 'null'] },
-      tutar: { type: ['number', 'null'] },
-      donem: secim(['bugun', 'ay', 'yil']),
-      sablon: secim(['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma', 'selam', 'bayram', 'tesekkur', 'serbest']),
-      kanal: secim(['whatsapp', 'sms']),
-      metinTuru: { type: ['string', 'null'] },
-      hedef: secim(['araclar', 'kayitlar', 'musteriler']),
-      terim: { type: ['string', 'null'] },
-      suzgec: { type: ['string', 'null'] }
+      /* ⚠️ AÇIKLAMALAR PROGRAMIN KENDİ ŞEMALARINDAN (Islem.tanim alanları,
+         ekranlar/*.html) — değerlendirme setinin cevaplarından DEĞİL.
+         14.10'da açıklamasız şemayla model işlemi doğru seçip alanı boş
+         bıraktı (%64, SES-OLCUM §11.2). Setten yazılsaydı model sınava
+         çalıştırılmış olurdu. */
+      plaka: { type: ['string', 'null'], description: 'Aracın plakası, büyük harf, boşluklu: "34 ABC 123".' },
+      oneri: { type: ['string', 'null'], description: 'yeni-arac: söylenen plaka kayıtlı değil ama bir kayıtlı plakaya çok benziyorsa o kayıtlı plaka.' },
+      isTuru: Object.assign(secim(['tamirat', 'bakim', 'ikisi']), { description: 'servis-ac / yeni-arac: işin türü.' }),
+      km: { type: ['string', 'null'], description: 'servis-ac / yeni-arac: kilometre, binlik noktalı: "125.000".' },
+      tel: { type: ['string', 'null'], description: 'yeni-arac: sahibin telefonu, "0532 111 22 33" biçiminde.' },
+      odeme: Object.assign(secim(['nakit', 'kart', 'havale']), { description: 'teslim: ödeme yolu; söylenmediyse null.' }),
+      tip: Object.assign(secim(['parca', 'iscilik']), { description: 'satir-ekle: eklenen satır parça mı işçilik mi.' }),
+      ad: { type: ['string', 'null'], description: 'satir-ekle / fiyat-guncelle: satırın adı (parça ya da işçilik adı).' },
+      fiyat: { type: ['number', 'null'], description: 'satir-ekle / fiyat-guncelle: satırın TL tutarı, sayı olarak.' },
+      tutar: { type: ['number', 'null'], description: 'gider-ekle: giderin TL tutarı, sayı olarak.' },
+      donem: Object.assign(secim(['bugun', 'ay', 'yil']), { description: 'tahsilat-sor: hangi dönemin tahsilatı.' }),
+      sablon: Object.assign(secim(['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma', 'selam', 'bayram', 'tesekkur', 'serbest']),
+                            { description: 'mesaj-gonder: tek araç sahibine gidecek mesajın hazır metni.' }),
+      kanal: Object.assign(secim(['whatsapp', 'sms']), { description: 'mesaj-gonder / toplu-mesaj: gönderim kanalı; söylenmediyse null.' }),
+      metinTuru: Object.assign(secim(['ozet', 'bekliyor', 'hazir', 'teslim', 'hatirlatma', 'selam', 'bayram', 'tesekkur', 'serbest']),
+                               { description: 'toplu-mesaj: herkese gidecek mesajın hazır metni.' }),
+      hedef: Object.assign(secim(['araclar', 'kayitlar', 'musteriler']),
+                           { description: 'ara: nerede aranacak — araçlar, servis kayıtları, müşteriler.' }),
+      terim: { type: ['string', 'null'], description: 'ara: aranan şey (plaka, marka, parça, kişi adı).' },
+      suzgec: Object.assign(secim(['serviste']), { description: 'ara: yalnız şu an serviste olanlar isteniyorsa "serviste".' })
     },
     required: ['tur'],
     additionalProperties: false
