@@ -48,7 +48,115 @@ function sesPlakaBul(metin) {
   var m = metin.toLocaleUpperCase('tr')
                .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
   if (!m) return null;
-  return { plaka: m[1] + ' ' + m[2] + ' ' + m[3], indeks: m.index, uzunluk: m[0].length };
+  var rakam = m[3], uzunluk = m[0].length;
+  /* RAKAM GRUBU BÖLÜNMÜŞ MÜ (14.10 ölçümü): tanıyıcı "8890"ı "88 90"
+     yazıyor. Türk plakasında harf sayısı rakam sayısını sınırlar —
+     1 harf → 4–5 rakam, 2 harf → 3–4, 3 harf → 2–3. Rakam grubu harf
+     sayısına göre KISAYSA ve hemen ardından rakam geliyorsa ikisi bir
+     plakadır. Biçime uyan grup (06 TMR 07) birleştirilmez. */
+  var sinir = { 1: [4, 5], 2: [3, 4], 3: [2, 3] }[m[2].length];
+  if (rakam.length < sinir[0]) {
+    var ek = metin.toLocaleUpperCase('tr').slice(m.index + uzunluk).match(/^\s+(\d{1,3})(?!\d)/);
+    if (ek && rakam.length + ek[1].length <= sinir[1]) {
+      rakam += ek[1];
+      uzunluk += ek[0].length;
+    }
+  }
+  return { plaka: m[1] + ' ' + m[2] + ' ' + rakam, indeks: m.index, uzunluk: uzunluk };
+}
+
+/* ---- DUYULAN PLAKAYI KAYITLI PLAKAYA BAĞLAMAK (14.10) ----
+   Ölçüm (SES-OLCUM §11.3): sesli komutta kaybın en büyük kalemi plaka
+   harfi — TMR "PNR/PVR/DMR", KLM "kelime" duyuluyor ve motor bunu
+   KAYITSIZ araç sanıp yeni kayıt açtırıyor.
+
+   ⚠️ DÜZ "TEK HARF FARKI" YETMEZ, YANLIŞ BİLE OLUR: "34 QBC 123" de
+   kayıtlı 34 ABC 123'e tek harf uzak ama o GERÇEKTEN başka araç
+   (değerlendirme setinin bilerek konmuş tuzağı → yeni-arac + öneri).
+   Ayırt eden SESÇE yakınlık: Türkçede harf adları "be, ce, de, te…"
+   diye okunur; tanıyıcının karıştırdığı, ünsüzü AYNI BİÇİMDE çıkan
+   harflerdir (te/de/pe, me/ne). Q ile A sesçe yakın değil.
+
+   Sınıflar Türkçe ses bilgisinden (çıkış biçimi), ölçümden değil —
+   TEK İSTİSNA M~V: 14.10'da "TMR" iki kez "PVR" duyuldu (dudak sesi). */
+var SES_SINIFI = (function () {
+  var s = {};
+  [['B', 'P', 'D', 'T', 'G', 'K'],          // patlamalı
+   ['C', 'Ç'],                              // yarı patlamalı
+   ['F', 'V', 'S', 'Z', 'Ş', 'J', 'H'],     // sürtünmeli
+   ['M', 'N', 'V'],                         // genizsi + gözlenen M~V
+   ['L', 'R']].forEach(function (g, i) {
+    g.forEach(function (h) { (s[h] = s[h] || []).push(i); });
+  });
+  return s;
+})();
+
+function sesceYakinHarf(a, b) {
+  if (a === b) return true;
+  var x = SES_SINIFI[a] || [], y = SES_SINIFI[b] || [];
+  return x.some(function (i) { return y.indexOf(i) >= 0; });
+}
+
+/* Harf adlarının okunuşu: KLM → "KELEME". Tanıyıcı harf yerine kelime
+   yazdığında ("35 kelime 45") karşılaştırma bununla yapılır. */
+var HARF_OKUNUS = { A: 'A', E: 'E', I: 'I', İ: 'İ', O: 'O', Ö: 'Ö', U: 'U', Ü: 'Ü' };
+function harfOkunusu(harf) {
+  return harf.split('').map(function (h) { return HARF_OKUNUS[h] || (h + 'E'); }).join('');
+}
+function iskelet(s) { return s.replace(/[AEIİOÖUÜ]/g, ''); }
+
+/* İki metin arası düzenleme uzaklığı (ekle/sil/değiştir). */
+function duzenlemeUzakligi(a, b) {
+  var o = [], i, j;
+  for (j = 0; j <= b.length; j++) o[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    var sol = i - 1; o[0] = i;
+    for (j = 1; j <= b.length; j++) {
+      var ust = o[j];
+      o[j] = Math.min(o[j] + 1, o[j - 1] + 1, sol + (a[i - 1] === b[j - 1] ? 0 : 1));
+      sol = ust;
+    }
+  }
+  return o[b.length];
+}
+
+/* Duyulan plakayı kayıtlı TEK bir plakaya bağlar; bağlayamazsa null.
+   p: sesPlakaBul sonucu (ya da null). Döner: { plaka, duyulan, indeks,
+   uzunluk } — `duyulan` onay ekranında gösterilir, usta görsün.
+   ⚠️ İKİ ADAY = BAĞLAMA YOK (benzerPlaka'nın kuralı): hangisi olduğunu
+   bilmiyorsak tahmin etmek ustaya yanlış aracı onaylatmaktır. */
+function sesPlakaBagla(metin, p) {
+  if (typeof ARACLAR === 'undefined') return null;
+  if (p && aracBul(p.plaka)) return null;
+  var adaylar = [], duyulan, indeks, uzunluk;
+  if (p) {
+    var q = plakaParcala(p.plaka);
+    duyulan = p.plaka; indeks = p.indeks; uzunluk = p.uzunluk;
+    ARACLAR.forEach(function (a) {
+      var r = plakaParcala(a.plaka);
+      if (!r || r.il !== q.il || r.rakam !== q.rakam || r.harf.length !== q.harf.length) return;
+      for (var i = 0; i < q.harf.length; i++) if (!sesceYakinHarf(q.harf[i], r.harf[i])) return;
+      adaylar.push(a.plaka);
+    });
+  } else {
+    /* Harf yerine kelime: "35 kelime 45". İl ve rakam BİREBİR kayıtlı
+       bir plakayla aynı olmalı; kelimenin ünsüz iskeleti harflerin
+       okunuşununkiyle aynı, okunuşa en çok 2 düzenleme uzak. */
+    var b = metin.toLocaleUpperCase('tr').match(/(^|\s)(\d{2})\s+([A-ZÇĞİÖŞÜ]{4,9})\s+(\d{2,4})(?!\d)/);
+    if (!b) return null;
+    duyulan = b[2] + ' ' + b[3] + ' ' + b[4];
+    indeks = b.index + b[1].length; uzunluk = b[0].length - b[1].length;
+    ARACLAR.forEach(function (a) {
+      var r = plakaParcala(a.plaka);
+      if (!r || r.il !== b[2] || r.rakam !== b[4]) return;
+      var ok = harfOkunusu(r.harf);
+      if (iskelet(ok) !== iskelet(b[3])) return;
+      if (duzenlemeUzakligi(ok, b[3]) > 2) return;
+      adaylar.push(a.plaka);
+    });
+  }
+  if (adaylar.length !== 1) return null;
+  return { plaka: adaylar[0], duyulan: duyulan, indeks: indeks, uzunluk: uzunluk };
 }
 
 function sesTelefonBul(metin) {
@@ -68,6 +176,33 @@ function sesTutarBul(d) {
   var m = d.match(/(\d[\d.]*)\s*(tl|lira|₺)/);
   if (m) return parseInt(m[1].replace(/\./g, ''), 10);
   return 0;
+}
+
+/* BİRİMSİZ TUTAR (14.10 ölçümü): tanıyıcı "TL/lira"yı sık düşürüyor —
+   "2.400 elektrik faturası ekle", "motor yağı 4500". Tanıma DOĞRU, motor
+   okumuyordu. ⚠️ GENEL KURAL DEĞİL: çıplak sayı plaka, km, telefon da
+   olabilir. Yalnız tutardan başka bir şey olamayacak iki yerde okunur:
+   gider cümlesinde (gider/fatura/kira geçiyor) ve açık kayıtta cümlenin
+   SON kelimesi sayıysa. Çağıran taraf plakayı önceden ayıklar (c.dk).
+   Döner: { tutar, parca } — parca metinden silinecek ham hâl. */
+/* Zorlama örnekleriyle (14.10) bulunan iki tuzak:
+   - "kira gideri 0532 111 22 33" → 532: boşluklu telefonun parçası.
+     Telefon geçen cümlede çıplak sayı HİÇ okunmaz.
+   - "bu ay 3 fatura geldi", "buji 4" → 3 / 4 TL: tek haneli sayı ve
+     "tane/adet"ten önceki sayı ADETTİR. Tutar en az iki hane. */
+function ciplakSonuc(m, d) {
+  if (!m || sesTelefonBul(d)) return null;
+  var rakam = m[2].replace(/\./g, '');
+  if (rakam.length < 2 || rakam.length >= 10) return null;
+  return { tutar: parseInt(rakam, 10), parca: m[2] };
+}
+
+function sesCiplakTutar(d) {
+  return ciplakSonuc(d.match(/(^|\s)(\d{1,3}(?:\.\d{3})+|\d+)(?=\s|$)(?!\s+(tane|adet))/i), d);
+}
+
+function sesSonTutar(d) {
+  return ciplakSonuc(d.match(/(^|\s)(\d{1,3}(?:\.\d{3})+|\d+)\s*$/), d);
 }
 
 /* Metinden tutarı söküp atar — açıklama/ad kalsın diye. */
@@ -177,6 +312,11 @@ var Islem = (function () {
   /* Bütün şemaların okuduğu ortak bağlam — metin bir kez hazırlanır. */
   function baglamKur(metin, baglam, kayitId) {
     var p = sesPlakaBul(metin);
+    /* Duyulan plaka kayıtlı değilse sesçe yakın TEK kayıtlı plakaya
+       bağlanır; duyulan hâli işlem nesnesine `duyulanPlaka` olarak
+       geçer ki onay ekranı söylesin (cozumle sonunda). */
+    var bag = sesPlakaBagla(metin, p);
+    if (bag) p = bag;
     var c = { metin: metin, d: norm(metin), p: p, baglam: baglam || 'genel',
               kayitId: kayitId || null, kayit: kayitId ? kayitBul(kayitId) : null };
     if (p) {
@@ -219,6 +359,17 @@ var Islem = (function () {
      varsayılan işi olan HER bağlam için aynı yoldan geçiyor. */
   function cozumle(metin, baglam, kayitId) {
     var c = baglamKur(metin, baglam, kayitId);
+    return duyulaniIsaretle(doldur(c), c);
+  }
+
+  /* Plaka kayıtlıya bağlandıysa (sesPlakaBagla) işlem DUYULANI da
+     taşır — usta onay ekranında ne duyulduğunu, neyin alındığını görür. */
+  function duyulaniIsaretle(r, c) {
+    if (r && c.p && c.p.duyulan && r.plaka === c.p.plaka) r.duyulanPlaka = c.p.duyulan;
+    return r;
+  }
+
+  function doldur(c) {
     var kendi = kendiSemalari(c.baglam);
     var varsayilan = null;
     for (var i = 0; i < kendi.length; i++) {
@@ -267,7 +418,10 @@ var Islem = (function () {
       baslik: deger(o, s.baslik),
       satirlar: satirlar,
       sorulan: sorulan,
-      notice: deger(o, s.notice) || '',
+      notice: (o.duyulanPlaka
+                ? 'Duyulan plaka ' + o.duyulanPlaka + ' kayıtlı değil — sesçe en yakın kayıtlı araç ' +
+                  o.plaka + ' alındı. Değilse tekrar söyle. '
+                : '') + (deger(o, s.notice) || ''),
       eylem: deger(o, s.eylem),
       eylem2: deger(o, s.eylem2) || ''
     };

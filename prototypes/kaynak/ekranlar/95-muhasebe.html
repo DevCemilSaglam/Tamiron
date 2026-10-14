@@ -461,9 +461,16 @@ Islem.tanim('gider-ekle', {
     var d = c.d;
     if (!(d.indexOf('gider') >= 0 || d.indexOf('fatura') >= 0 || d.indexOf('kira') >= 0 ||
           (c.baglam === 'muhasebe' && sesTutarBul(d)))) return null;
-    var t = sesTutarBul(d);
+    var t = sesTutarBul(d), metin = sesTutarsiz(c.metin);
+    /* "TL/lira" düşmüşse (tanıyıcı sık düşürüyor) gider cümlesindeki
+       çıplak sayı tutardır — 04-islem.js sesCiplakTutar notu. Plaka
+       varsa plakasız kalandan okunur. */
+    if (!t) {
+      var ciplak = sesCiplakTutar(c.p ? c.kalan : c.metin);
+      if (ciplak) { t = ciplak.tutar; metin = metin.replace(ciplak.parca, ''); }
+    }
     if (!t) return null;
-    var aciklama = kelimeleriAt(sesTutarsiz(c.metin),
+    var aciklama = kelimeleriAt(metin,
                                 ['ekle', 'gider', 'olarak', 'için', 'icin']);
     return { tur: 'gider-ekle', tutar: t, aciklama: aciklama || 'Gider' };
   },

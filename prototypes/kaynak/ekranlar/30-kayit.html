@@ -1005,7 +1005,13 @@ document.addEventListener('input', function (e) {
    kelimeleriAt kullanılıyor, \b DEĞİL: /\bde\b/ "değişecek"i
    "ğişecek" yapıyordu (K-018, çekirdekteki uyarıya bak). */
 function sesSatirAdi(c) {
-  return kelimeleriAt(sesTutarsiz(c.metin),
+  var metin = sesTutarsiz(c.metin);
+  /* Birimsiz son sayı tutardır (sesKayitTutari) — addan da düşer. */
+  if (!sesTutarBul(c.d) && !c.p) {
+    var son = sesSonTutar(metin);
+    if (son) metin = metin.slice(0, metin.lastIndexOf(son.parca));
+  }
+  return kelimeleriAt(metin,
     ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
      'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
      'güncelle', 'guncelle']);
@@ -1016,6 +1022,16 @@ function sesSatirAdi(c) {
    edilebilir."). SIRA DAR OLANDAN GENİŞE: teslim (60, teslim ekranında)
    → fiyat güncelleme (65) → satır ekleme (VARSAYILAN). Ters sırada
    "teslim ettim nakit aldım" kayda "teslim ettim" diye satır eklerdi. */
+
+/* AÇIK KAYITTA TUTAR: "lira/TL" ile söylendiyse o; tanıyıcı birimi
+   düşürdüyse cümlenin SON kelimesi olan sayı ("motor yağı 4500").
+   Plaka geçen cümlede çıplak sayı okunmaz — plakanın rakamı olabilir. */
+function sesKayitTutari(c) {
+  var t = sesTutarBul(c.d);
+  if (t || c.p) return t;
+  var son = sesSonTutar(c.metin);
+  return son ? son.tutar : 0;
+}
 
 /* FİYAT GÜNCELLEME — söylenen ad VAR OLAN bir satıra uyuyorsa.
    ⚠️ TEK ADAY KURALI (A-M27'nin aynısı): iki satır birden uyuyorsa
@@ -1033,7 +1049,7 @@ Islem.tanim('fiyat-guncelle', {
     { ad: 'fiyat', etiket: 'Yeni', tip: 'para', zorunlu: true }
   ],
   baglamda: function (c) {
-    var k = c.kayit, tutarR = sesTutarBul(c.d), ad = sesSatirAdi(c);
+    var k = c.kayit, tutarR = sesKayitTutari(c), ad = sesSatirAdi(c);
     if (!k || !tutarR || !ad) return null;
     var adN = norm(ad), uyan = [];
     (k.satirlar || []).forEach(function (s, i) {
@@ -1082,7 +1098,7 @@ Islem.tanim('satir-ekle', {
     /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
        yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
     return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
-             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesTutarBul(c.d) };
+             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesKayitTutari(c) };
   },
   /* Sesle söylenen satırın alışı BİLİNMİYOR (null), sıfır değil —
      K-055.2. (8.3'te `alis: 0` bilerek taşınmıştı; 8.2 düzeltti.) */
