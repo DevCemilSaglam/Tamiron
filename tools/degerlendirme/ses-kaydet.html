@@ -371,11 +371,14 @@ button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff
            cihaza göre karşılaştırılabilsin (13.10). */
         cihaz: { tarayici: navigator.userAgent, ctxHiz: ctx ? ctx.sampleRate : null,
                  tarih: new Date().toISOString() },
+        /* Büyük set partisi mi — ölçüm sayfası seti ve kurmaca dükkânı
+           buradan seçer (14.10). */
+        set: BUYUK ? 'buyuk' : 'esas', parti: BUYUK ? BUYUK.parti : null,
         kayitlar: dizin }, null, 1)) });
 
     var url = URL.createObjectURL(zipYap(dosyalar));
     var a = document.createElement('a');
-    a.href = url; a.download = 'tamiron-ses-kayitlari.zip';
+    a.href = url; a.download = BUYUK ? 'tamiron-buyuk-' + BUYUK.parti + '.zip' : 'tamiron-ses-kayitlari.zip';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function () { URL.revokeObjectURL(url); }, 8000);
   }
@@ -508,22 +511,33 @@ button.kayitta { background: var(--crit); border-color: var(--crit); color: #fff
      büyüdüğünde ya da bir cümle düzeldiğinde sayfayı yeniden üretmek
      gerekmesin. İkisi ayrışırsa ustanın okuduğu cümle ile ölçütteki
      cümle farklı olur — ve fark sessizdir. */
-  fetch('ses-seti.json').then(function (r) {
-    if (!r.ok) throw new Error('ses-seti.json okunamadı (' + r.status + ')');
+  /* BÜYÜK SET PARTİSİ (14.10): ?set=buyuk&parti=1..10 — buyuk-set.json'ın
+     SINAV yarısından 50'şer cümle (~7 dk okuma). Sınav yarısı üretimde
+     karıştırıldığı için her partiye her işten cümle düşer. Ortam kaydı
+     yalnız 1. partide istenir. */
+  var q = new URLSearchParams(location.search);
+  var BUYUK = q.get('set') === 'buyuk' ? { parti: Math.max(1, parseInt(q.get('parti') || '1', 10) || 1) } : null;
+  fetch((BUYUK ? 'buyuk-set.json' : 'ses-seti.json') + '?t=' + Date.now()).then(function (r) {
+    if (!r.ok) throw new Error((BUYUK ? 'buyuk-set.json' : 'ses-seti.json') + ' okunamadı (' + r.status + ')');
     return r.json();
   }).then(function (set) {
+    if (BUYUK) {
+      var sinav = set.cumleler.filter(function (c) { return c.yari === 'sinav'; });
+      set = { cumleler: sinav.slice((BUYUK.parti - 1) * 50, BUYUK.parti * 50) };
+      if (!set.cumleler.length) throw new Error('Parti ' + BUYUK.parti + ' boş — sınav yarısı ' + sinav.length + ' cümle.');
+    }
     /* ⚠️ İLK KAYIT CÜMLE DEĞİL: dükkânın kendi sesi.
        Gürültüyü UYDURMAK yerine gerçeğini almak gerekiyor — beyaz
        gürültü kompresörü, çekiç sesini, radyoyu taklit etmiyor.
        Bu 20 saniye elimizde olursa, temiz kaydedilmiş her cümleyi
        istediğimiz gürültü seviyesinde kirletebiliriz (ses-bozucu.js)
        ve 40 kayıttan yüzlerce zor örnek çıkar. */
-    CUMLELER = [{
+    CUMLELER = (BUYUK && BUYUK.parti > 1 ? [] : [{
       id: 0,
       baglam: 'ortam',
       cumle: 'Hiçbir şey söyleme — dükkânın sesini kaydet',
       ortam: true
-    }].concat(set.cumleler || []);
+    }]).concat(set.cumleler || []);
     ciz();
   }).catch(function (hata) {
     govde.innerHTML = '<div class="uyari"><b>Cümleler yüklenemedi.</b><br />' +

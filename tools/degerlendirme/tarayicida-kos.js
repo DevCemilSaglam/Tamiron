@@ -16,12 +16,12 @@
 window.DEGERLENDIR = async function (secenek) {
   var s = secenek || {};
   var kok = s.kok || '/tools/degerlendirme/';
-  var set = s.set || await (await fetch(kok + 'ses-seti.json')).json();
+  var set = s.set || await (await fetch(kok + 'ses-seti.json?t=' + Date.now())).json();
 
   /* Puanlama ORTAK (puanla.js) — model koşucusu da aynı cetveli
      kullanıyor, yoksa iki karne karşılaştırılamaz. */
   if (!window.DEGERLENDIRME_PUANLA) {
-    eval(await (await fetch(kok + 'puanla.js')).text());
+    eval(await (await fetch(kok + 'puanla.js?t=' + Date.now())).text());
   }
 
   var yedek = { niyet: window.SESLI_NIYET, kayit: window.ACIK_KAYIT,

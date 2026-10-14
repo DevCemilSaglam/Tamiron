@@ -95,6 +95,7 @@
       <label><input type="radio" name="klasor" value="kayitlar" checked> İlk kayıtlar (dizüstü, 13.10)</label>
       <label><input type="radio" name="klasor" value="kayitlar-pc2"> Bilgisayar — yeniden</label>
       <label><input type="radio" name="klasor" value="kayitlar-tel"> Telefon</label>
+      <label><input type="radio" name="klasor" value="buyuk"> Büyük set, parti: <input id="buyukKlasor" value="buyuk-1" size="10" aria-label="Büyük set klasörü"></label>
     </div>
     <div style="display:flex;gap:10px;flex-wrap:wrap">
       <button data-sunucu="dogrula">1 · Tek dosyayla doğrula</button>
@@ -142,6 +143,10 @@
 <script>
 var KOK = './';
 var SET = null, PUANLA = null;
+/* BÜYÜK SET (14.10): kayıt klasörünün dizini `set: 'buyuk'` diyorsa
+   cümleler buyuk-set.json'dan, çözümleme KURMACA DÜKKÂNDA yapılır —
+   o cümlelerin plakaları prototipin tohum verisinde yok. */
+var SET_ESAS = null, SET_BUYUK = null;
 var S = window.SpeechRecognition || window.webkitSpeechRecognition;
 /* Tamiron'un en sık yanlış duyulacak kelimeleri (SES-OLCUM.md §6). Ölçmeden
    ürüne girmez; burada yalnız açık/kapalı farkı ölçülsün diye. */
@@ -152,8 +157,8 @@ function durum(m) { $('durum').textContent = m; }
 
 (async function hazirla() {
   if (!S) { durum('Bu tarayıcıda Web Speech yok — masaüstü Chrome gerekli.'); return; }
-  SET = await (await fetch(KOK + 'ses-seti.json')).json();
-  eval(await (await fetch(KOK + 'puanla.js')).text());
+  SET = SET_ESAS = await (await fetch(KOK + 'ses-seti.json?t=' + Date.now())).json();
+  eval(await (await fetch(KOK + 'puanla.js?t=' + Date.now())).text());
   PUANLA = window.DEGERLENDIRME_PUANLA;
   $('dosyalar').addEventListener('change', function () { $('kos').disabled = !this.files.length; });
   durum('Hazır — ' + SET.cumleler.length + ' cümlelik set yüklendi.');
@@ -358,9 +363,16 @@ document.addEventListener('click', async function (e) {
     try {
       durum('Sunucudan alınıyor…');
       var klasor = (document.querySelector('input[name="klasor"]:checked') || {}).value || 'kayitlar';
+      if (klasor === 'buyuk') klasor = ($('buyukKlasor').value || 'buyuk-1').replace(/[^a-z0-9-]/gi, '');
       var dzYanit = await fetch(KOK + 'sesler/' + klasor + '/dizin.json?t=' + Date.now());
       if (!dzYanit.ok) throw new Error('sesler/' + klasor + '/ klasöründe kayıt yok (zip oraya açılmalı)');
       var dz = await dzYanit.json();
+      if (dz.set === 'buyuk') {
+        SET_BUYUK = SET_BUYUK || await (await fetch(KOK + 'buyuk-set.json?t=' + Date.now())).json();
+        SET = SET_BUYUK;
+      } else {
+        SET = SET_ESAS;
+      }
       var adlar = dz.kayitlar.map(function (k) { return k.dosya; });
       /* Yeni setlerde dizinin başında ortam.wav var — "tek dosya" ilk
          CÜMLEYİ almalı (13.10: ortamı alıp "dosya yok" diyordu). */
@@ -464,7 +476,15 @@ $('kos').addEventListener('click', async function () {
   }
 
   var sonuc = [];
+  /* Kurmaca dükkân koşu süresince prototipe yüklenir, sonda geri konur
+     (ölçüm aleti ölçtüğü şeyi değiştirmez — K-024.1). */
+  var veriYedek = SET.dukkan ? { araclar: P.ARACLAR, kayitlar: P.KAYITLAR } : null;
+  if (veriYedek) {
+    P.ARACLAR = JSON.parse(JSON.stringify(SET.dukkan.araclar));
+    P.KAYITLAR = JSON.parse(JSON.stringify(SET.dukkan.kayitlar));
+  }
   var kayitId = P.eval("(icerideki().filter(function(k){return (k.satirlar||[]).length>1;})[0]||{}).id");
+  try {
   for (var n = 0; n < is.length; n++) {
     var x = { f: { name: is[n].ad }, ad: { id: is[n].id, tur: is[n].tur } };
     durum((n + 1) + ' / ' + is.length + ' — ' + x.f.name);
@@ -472,13 +492,16 @@ $('kos').addEventListener('click', async function () {
     var c = SET.cumleler.filter(function (k) { return k.id === x.ad.id; })[0];
     var yed = { niyet: P.SESLI_NIYET, kayit: P.ACIK_KAYIT };
     P.SESLI_NIYET = c.baglam;
-    P.ACIK_KAYIT = c.baglam === 'kayit-icinde' ? kayitId : null;
+    P.ACIK_KAYIT = c.baglam === 'kayit-icinde' ? (c.kayitId || kayitId) : null;
     var islem = null;
     try { islem = r.yazi ? P.SES_COZUMLE(r.yazi) : { tur: 'plakasiz', metin: '' }; } catch (e) { islem = { hata: e.message }; }
     P.SESLI_NIYET = yed.niyet; P.ACIK_KAYIT = yed.kayit;
     sonuc.push({ dosya: x.f.name, id: c.id, tur: x.ad.tur, beklenen: c.cumle, duyulan: r.yazi || '',
                  hata: r.hata || null, kho: kho(c.cumle, r.yazi), islem: islem });
     if (agKesildiMi(sonuc)) break;
+  }
+  } finally {
+    if (veriYedek) { P.ARACLAR = veriYedek.araclar; P.KAYITLAR = veriYedek.kayitlar; }
   }
 
   /* Bozma türü başına karne — AYNI cetvel (puanla.js). */
