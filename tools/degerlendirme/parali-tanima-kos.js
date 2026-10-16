@@ -31,6 +31,9 @@ const SAGLAYICI = arg('--saglayici', '');
 const IPUCU = var_('--ipucu');
 const [P1, P2] = arg('--partiler', '1-6').split('-').map(Number);
 const SINIR = parseInt(arg('--sinir', '0'), 10) || 0;
+/* --model: Gemini modeli. Varsayılan yazıya çevirme modeli; ücretsiz katmanda
+   yoksa genel bir Flash modeli verilir (istemle çevirir). */
+const GEMINI_MODEL = arg('--model', 'gemini-3.5-transcribe');
 const ES_ZAMAN = 4;
 
 /* ---- kayıtlar ---- */
@@ -125,13 +128,21 @@ const SAG = {
     anahtar: 'GEMINI_API_KEY',
     esZaman: 1,
     async tani(dosya, anahtar) {
-      const atc = { languageCodes: ['tr-TR'] };
-      if (IPUCU) atc.customVocabulary = IFADELER.slice(0, 1000);
-      const govde = {
-        contents: [{ parts: [{ inlineData: { mimeType: 'audio/wav', data: fs.readFileSync(dosya).toString('base64') } }] }],
-        generationConfig: { audioTranscriptionConfig: atc }
-      };
-      const d = await iste('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-transcribe:generateContent',
+      const ses = { inlineData: { mimeType: 'audio/wav', data: fs.readFileSync(dosya).toString('base64') } };
+      let govde;
+      if (/transcribe/.test(GEMINI_MODEL)) {
+        const atc = { languageCodes: ['tr-TR'] };
+        if (IPUCU) atc.customVocabulary = IFADELER.slice(0, 1000);
+        govde = { contents: [{ parts: [ses] }], generationConfig: { audioTranscriptionConfig: atc } };
+      } else {
+        /* Genel Gemini modeli (ör. Flash — ücretsiz katman): yazıya çevirme
+           İSTEMLE istenir; ipucu istemin içinde. Yorum yok, düz metin. */
+        let istem = 'Bu Türkçe ses kaydını kelimesi kelimesine yazıya çevir. Yalnız söyleneni yaz; ' +
+                    'yorum, açıklama, tırnak ekleme. Sayıları rakamla yaz.';
+        if (IPUCU) istem += '\nKayıtta geçebilecek özel kelimeler (doğru yazımlarıyla): ' + IFADELER.join(', ');
+        govde = { contents: [{ parts: [{ text: istem }, ses] }] };
+      }
+      const d = await iste('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent',
         { method: 'POST', headers: { 'x-goog-api-key': anahtar, 'content-type': 'application/json' }, body: JSON.stringify(govde) });
       const parcalar = (((d.candidates || [])[0] || {}).content || {}).parts || [];
       let yazi = parcalar.map(p => p.text || '').join(' ').trim();
@@ -140,7 +151,7 @@ const SAG = {
         parcalar.forEach(p => ((p.audioTranscription || {}).words || []).forEach(w => k.push(w.word)));
         yazi = k.join(' ').trim();
       }
-      return { yazi: yazi, model: 'gemini-3.5-transcribe' };
+      return { yazi: yazi, model: GEMINI_MODEL };
     }
   },
   /* Speechmatics — asr.api.speechmatics.com/v2/jobs (multipart: data_file +
@@ -203,7 +214,7 @@ const SAG = {
   if (durdu) console.error('\nDURDU — ' + durdu.message + '\n(' + tamam.length + ' kayıt tamamlanmıştı)');
 
   const ort = tamam.length ? tamam.reduce((t, x) => t + x.kho, 0) / tamam.length : null;
-  const dosya = path.join(SES, 'parali-' + SAGLAYICI + (IPUCU ? '-ipucu' : '') + '.json');
+  const dosya = path.join(SES, 'parali-' + SAGLAYICI + (SAGLAYICI === 'gemini' && GEMINI_MODEL !== 'gemini-3.5-transcribe' ? '-' + GEMINI_MODEL : '') + (IPUCU ? '-ipucu' : '') + '.json');
   fs.writeFileSync(dosya, JSON.stringify({ tarih: new Date().toISOString(), saglayici: SAGLAYICI, ipucu: IPUCU,
     ifadeSayisi: IFADELER.length, kayit: tamam.length, ortalamaKho: ort, sonuc: tamam }, null, 1), 'utf8');
   console.log(tamam.length + ' kayıt · ortalama kelime hatası ' + (ort === null ? '—' : '%' + Math.round(ort * 100)));
