@@ -145,12 +145,18 @@ const SAG = {
       const d = await iste('https://generativelanguage.googleapis.com/v1beta/models/' + GEMINI_MODEL + ':generateContent',
         { method: 'POST', headers: { 'x-goog-api-key': anahtar, 'content-type': 'application/json' }, body: JSON.stringify(govde) });
       const parcalar = (((d.candidates || [])[0] || {}).content || {}).parts || [];
-      let yazi = parcalar.map(p => p.text || '').join(' ').trim();
+      /* Yazıya çevirme modeli metni parts[].audioTranscription.text'te verir
+         (16.10 ham yanıt); genel model parts[].text'te. */
+      let yazi = parcalar.map(p => p.text || (p.audioTranscription || {}).text || '').join(' ').trim();
       if (!yazi) {
         const k = [];
         parcalar.forEach(p => ((p.audioTranscription || {}).words || []).forEach(w => k.push(w.word)));
         yazi = k.join(' ').trim();
       }
+      /* ⚠️ BOŞ YANIT HATADIR (16.10): ilk denemede metinsiz bir yanıt
+         "duyulan: ''" diye yazıldı ve kelime hatası %100 sayıldı — ölçüm
+         sessizce bozulurdu. Ham yanıtın başı hataya yazılır. */
+      if (!yazi) throw new ApiHatasi('metin yok — ham yanıt: ' + JSON.stringify(d).slice(0, 400));
       return { yazi: yazi, model: GEMINI_MODEL };
     }
   },
