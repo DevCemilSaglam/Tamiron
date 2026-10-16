@@ -20,7 +20,7 @@ Speechmatics'e (ipuçlu) gider. Ölçüldü (300 kayıt, canlandırma —
 PARALI-TANIMA "Kademeli tanıma"): sınavda **%79, paralıya %7** = tamamen
 Speechmatics'in doğruluğu, maliyetin 1/14'ü.
 
-**62.2 · Açık — Cemil (A-M51): hangi durumda paralıya?**
+**62.2 · ~~Açık~~ KAPANDI — Cemil 17.10: *"Tamam b'de karar kılalım."* (A-M51) → (b): öneri soruyorsa YA DA anlaşılmadıysa paralıya.** Seçenekler:
 - (a) yalnız motor ÖNERİ soruyorsa — geliştirmede seçilen kural; sınav %79,
   paralıya %7;
 - (b) öneri soruyorsa YA DA anlaşılmadıysa — sınav %84, paralıya %25;
