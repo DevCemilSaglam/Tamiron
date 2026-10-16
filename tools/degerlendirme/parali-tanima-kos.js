@@ -11,7 +11,7 @@
      (--partiler 1-6 · varsayılan hepsi; --sinir N · ilk N kayıt, deneme için)
 
    ⚠️ ANAHTAR DEPODA DURMAZ — ortamdan: ASSEMBLYAI_API_KEY,
-   SPEECHMATICS_API_KEY. ⚠️ GERÇEK PARA: 300 kayıt ≈ 20 dk ses ≈ $0,05–0,50
+   SPEECHMATICS_API_KEY, GEMINI_API_KEY. ⚠️ GERÇEK PARA: 300 kayıt ≈ 20 dk ses ≈ $0,05–0,50
    sağlayıcı başına (Cemil onayladı, 16.10).
    ⚠️ İLK API HATASINDA DURUR ve hatayı olduğu gibi basar — Chrome'daki
    ipucu koşusu 300 kaydı aynı hatayla boşuna çalmıştı (SES-OLCUM §16).
@@ -76,11 +76,16 @@ function kho(dogru, duyulan) {
 
 const bekle = ms => new Promise(r => setTimeout(r, ms));
 class ApiHatasi extends Error {}
+/* 429 (dakikalık sınır) ve 503 (geçici yoğunluk) KALICI DEĞİL: bekleyip
+   yeniden dener (en çok 6 kez, artan bekleme). Diğer her hata kalıcı → dur. */
 async function iste(url, secenek) {
-  const y = await fetch(url, secenek);
-  const metin = await y.text();
-  if (!y.ok) throw new ApiHatasi(y.status + ' ' + url + ' — ' + metin.slice(0, 500));
-  try { return JSON.parse(metin); } catch (e) { return metin; }
+  for (let deneme = 0; ; deneme++) {
+    const y = await fetch(url, secenek);
+    const metin = await y.text();
+    if ((y.status === 429 || y.status === 503) && deneme < 6) { await bekle(5000 * (deneme + 1)); continue; }
+    if (!y.ok) throw new ApiHatasi(y.status + ' ' + url + ' — ' + metin.slice(0, 500));
+    try { return JSON.parse(metin); } catch (e) { return metin; }
+  }
 }
 
 /* ---- SAĞLAYICILAR ---- */
@@ -105,6 +110,37 @@ const SAG = {
         if (d.status === 'error') throw new ApiHatasi('transcript error — ' + d.error);
       }
       throw new ApiHatasi('zaman aşımı ' + is.id);
+    }
+  },
+  /* Google Gemini 3.5 Transcribe (16.10 · K-061.3'ün ön ödemesiz yolu):
+     generativelanguage.googleapis.com …/models/gemini-3.5-transcribe:
+     generateContent · ses inlineData (base64, <20 MB) · ipucu
+     generationConfig.audioTranscriptionConfig.customVocabulary (≤1.000
+     terim) · dil languageCodes. Metin parts[].text; yoksa
+     audioTranscription.words birleştirilir.
+     ⚠️ Ücretsiz katman: içerik Google'ın ürün geliştirmesinde kullanılabilir
+     — yalnız test kaydı (Cemil'in okuduğu kurmaca plakalar); yayında DEĞİL.
+     Dakikalık istek sınırı → tek tek gider, 429'da bekleyip yeniden dener. */
+  gemini: {
+    anahtar: 'GEMINI_API_KEY',
+    esZaman: 1,
+    async tani(dosya, anahtar) {
+      const atc = { languageCodes: ['tr-TR'] };
+      if (IPUCU) atc.customVocabulary = IFADELER.slice(0, 1000);
+      const govde = {
+        contents: [{ parts: [{ inlineData: { mimeType: 'audio/wav', data: fs.readFileSync(dosya).toString('base64') } }] }],
+        generationConfig: { audioTranscriptionConfig: atc }
+      };
+      const d = await iste('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-transcribe:generateContent',
+        { method: 'POST', headers: { 'x-goog-api-key': anahtar, 'content-type': 'application/json' }, body: JSON.stringify(govde) });
+      const parcalar = (((d.candidates || [])[0] || {}).content || {}).parts || [];
+      let yazi = parcalar.map(p => p.text || '').join(' ').trim();
+      if (!yazi) {
+        const k = [];
+        parcalar.forEach(p => ((p.audioTranscription || {}).words || []).forEach(w => k.push(w.word)));
+        yazi = k.join(' ').trim();
+      }
+      return { yazi: yazi, model: 'gemini-3.5-transcribe' };
     }
   },
   /* Speechmatics — asr.api.speechmatics.com/v2/jobs (multipart: data_file +
@@ -161,7 +197,7 @@ const SAG = {
       process.stdout.write(++bitti % 10 ? '' : '.');
     }
   }
-  await Promise.all(Array.from({ length: ES_ZAMAN }, isci));
+  await Promise.all(Array.from({ length: S.esZaman || ES_ZAMAN }, isci));
   process.stdout.write('\n');
   const tamam = sonuc.filter(Boolean);
   if (durdu) console.error('\nDURDU — ' + durdu.message + '\n(' + tamam.length + ' kayıt tamamlanmıştı)');

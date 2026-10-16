@@ -33,6 +33,14 @@ kullanım başlayınca ön ödeme harcanacak bakiye olur; o zaman Google ve
 Azure aynı 300 kayıtla (`parali-tanima-kos.js`) Speechmatics'le
 karşılaştırılır. Google projesi açık, ücretsiz bekliyor.
 
+**61.3b · Azure ELENDİ, Google'ın ön ödemesiz yolu denenir (Cemil, 16.10):**
+*"Azure pahalı, onu eleyelim. Fakat Google'ı merak ediyorum. Onu denemenin
+bir yolu yok mu? Fark yoksa speechmatics ile devam ederiz."* Yol: Gemini
+API'nin **gemini-3.5-transcribe** modeli (Google AI Studio anahtarı, ücretsiz
+katman, Türkiye listede, ön ödeme yok; ipucu `customVocabulary`). Chirp 3
+değil ama Google'ın tanıyıcısı. ⚠️ Ücretsiz katman içeriği Google'ın ürün
+geliştirmesinde kullanılabilir — yalnız test kayıtları; yayında değil.
+
 **61.4 · Motor tanıyıcıdan bağımsız kalır.** Yazım biçimi toparlama
 (16.10) hangi tanıyıcı seçilirse seçilsin çalışır; ölçüm koşucusu ve cetvel
 hazır — tanıyıcı değişince yalnız bir koşu.
