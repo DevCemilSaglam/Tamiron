@@ -1,0 +1,66 @@
+{
+ "ad": "Söyleyiş seti — Cemil'in örnekleri",
+ "surum": 1,
+ "tarih": "16.10.2026",
+ "aciklama": "Cemil, 16.10: 'Türkçe'de yapıyorum yerine yapıyom denilebilir. C-Elysée var Citroën. Bunu okuyabilen çok azdır. Ayrıca egzost doğru söyleyen çok azdır. … tel no söylerken 33 yerine 23 denip değiştirilebilir. … 4487 ise kırk dört seksen yedi diye okunabilir, dört bin dört yüz seksen yedi de denebilir. Courier model de örnek, doğru söylenemez genellikle. Ve kredi kartı yerine kk kısaltması da kullanılabilir. Ege'de Karadeniz'de vb ustaların şivesi olabilir.' Bu set YALNIZ bu örneklerden yazıldı — motorun bugünkü kurallarına bakılmadan, motor düzeltilmeden ÖNCE. Bağımsız kaynak: cümlelerin kökü Cemil'in bilgisi, benim üretecim değil.",
+ "kurallar": ["ses-seti.json ile aynı puanlama (puanla.js)"],
+ "dukkan": {
+  "araclar": [
+   { "plaka": "34 ABC 123", "marka": "Renault", "model": "Mégane", "yil": "2018", "sahipAd": "Mehmet Kaya", "sahipTel": "0532 215 30 00" },
+   { "plaka": "35 KLM 45", "marka": "Citroën", "model": "C-Elysée", "yil": "2019", "sahipAd": "Ayşe Kaya", "sahipTel": "" },
+   { "plaka": "16 SY 8890", "marka": "Ford", "model": "Courier", "yil": "2016", "sahipAd": "Selim Aydın", "sahipTel": "0537 662 08 41" },
+   { "plaka": "41 AB 4487", "marka": "Fiat", "model": "Doblo", "yil": "2015", "sahipAd": "Recep Kurt", "sahipTel": "0544 120 33 18" },
+   { "plaka": "06 TMR 07", "marka": "Fiat", "model": "Egea", "yil": "2021", "sahipAd": "Hasan Demir", "sahipTel": "0542 331 90 07" }
+  ],
+  "kayitlar": [
+   { "id": 1, "plaka": "34 ABC 123", "tur": "tamirat", "km": "", "sikayet": "Egzoz", "acilis": "15.10.2026", "teslimTarihi": null, "odemeYolu": null, "hatirlatmaTarihi": null, "hatirlatmaGonderildi": false, "parcaBekliyor": false, "bekliyorMusteriye": false,
+     "satirlar": [ { "tip": "parca", "ad": "Egzoz contası", "fiyat": 0, "alis": null, "kimGetirdi": "tamirci", "marka": "", "kod": "", "tanim": "tanimlanamadi" },
+                   { "tip": "parca", "ad": "Fren balatası", "fiyat": 1800, "alis": null, "kimGetirdi": "tamirci", "marka": "", "kod": "", "tanim": "tanimlanamadi" } ] },
+   { "id": 2, "plaka": "35 KLM 45", "tur": "tamirat", "km": "", "sikayet": "Debriyaj", "acilis": "15.10.2026", "teslimTarihi": null, "odemeYolu": null, "hatirlatmaTarihi": null, "hatirlatmaGonderildi": false, "parcaBekliyor": false, "bekliyorMusteriye": false,
+     "satirlar": [ { "tip": "parca", "ad": "Debriyaj seti", "fiyat": 6500, "alis": null, "kimGetirdi": "tamirci", "marka": "", "kod": "", "tanim": "tanimlanamadi" } ] },
+   { "id": 3, "plaka": "16 SY 8890", "tur": "bakim", "km": "", "sikayet": "Bakım", "acilis": "15.10.2026", "teslimTarihi": null, "odemeYolu": null, "hatirlatmaTarihi": null, "hatirlatmaGonderildi": false, "parcaBekliyor": false, "bekliyorMusteriye": false,
+     "satirlar": [ { "tip": "parca", "ad": "Motor yağı", "fiyat": 2200, "alis": null, "kimGetirdi": "tamirci", "marka": "", "kod": "", "tanim": "tanimlanamadi" } ] },
+   { "id": 4, "plaka": "41 AB 4487", "tur": "tamirat", "km": "", "sikayet": "Fren", "acilis": "15.10.2026", "teslimTarihi": null, "odemeYolu": null, "hatirlatmaTarihi": null, "hatirlatmaGonderildi": false, "parcaBekliyor": false, "bekliyorMusteriye": false,
+     "satirlar": [ { "tip": "parca", "ad": "Fren diski", "fiyat": 3000, "alis": null, "kimGetirdi": "tamirci", "marka": "", "kod": "", "tanim": "tanimlanamadi" } ] }
+  ]
+ },
+ "cumleler": [
+  { "id": 1, "konu": "konuşma dili", "baglam": "genel", "cumle": "34 ABC 123 bakımını yapıyom", "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123", "isTuru": "bakim" } },
+  { "id": 2, "konu": "konuşma dili", "baglam": "genel", "cumle": "35 KLM 45 teslim ediyom nakit aldım", "beklenen": { "tur": "teslim", "plaka": "35 KLM 45", "odeme": "nakit" } },
+  { "id": 3, "konu": "konuşma dili", "baglam": "kayit-icinde", "kayitId": 1, "cumle": "balatayı da değiştiriyoz", "beklenen": { "tur": "satir-ekle", "tip": "parca" } },
+  { "id": 4, "konu": "konuşma dili", "baglam": "genel", "cumle": "06 TMR 07 yağ değişimi yapılcak", "beklenen": { "tur": "servis-ac", "plaka": "06 TMR 07", "isTuru": "bakim" } },
+
+  { "id": 5, "konu": "C-Elysée", "baglam": "genel", "cumle": "Se Elize geldi debriyaj kaçırıyor", "beklenen": { "tur": "servis-ac", "plaka": "35 KLM 45" } },
+  { "id": 6, "konu": "C-Elysée", "baglam": "genel", "cumle": "Citroen Elize geldi debriyaj kaçırıyor", "beklenen": { "tur": "servis-ac", "plaka": "35 KLM 45" } },
+  { "id": 7, "konu": "C-Elysée", "baglam": "genel", "cumle": "selize geldi fren balatası bitmiş", "beklenen": { "tur": "servis-ac", "plaka": "35 KLM 45" } },
+  { "id": 8, "konu": "C-Elysée", "baglam": "genel", "cumle": "C Elysee geldi klima soğutmuyor", "beklenen": { "tur": "servis-ac", "plaka": "35 KLM 45" } },
+
+  { "id": 9, "konu": "egzoz", "baglam": "kayit-icinde", "kayitId": 1, "cumle": "egzost contası 900 lira", "beklenen": { "tur": "fiyat-guncelle", "fiyat": 900 } },
+  { "id": 10, "konu": "egzoz", "baglam": "kayit-icinde", "kayitId": 1, "cumle": "eksoz contası 750 lira", "beklenen": { "tur": "fiyat-guncelle", "fiyat": 750 } },
+  { "id": 11, "konu": "egzoz", "baglam": "kayit-icinde", "kayitId": 2, "cumle": "egzos borusu değişecek", "beklenen": { "tur": "satir-ekle", "tip": "parca" } },
+  { "id": 12, "konu": "egzoz", "baglam": "genel", "cumle": "34 ABC 123 eksozdan duman atıyor", "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123" } },
+
+  { "id": 13, "konu": "düzeltme", "baglam": "servis-ekle", "cumle": "41 KV 5588 Ahmet Yılmaz 0532 111 33 yok 23 44 debriyaj kaçırıyor", "beklenen": { "tur": "yeni-arac", "plaka": "41 KV 5588", "tel": "0532 111 23 44" } },
+  { "id": 14, "konu": "düzeltme", "baglam": "servis-ekle", "cumle": "41 KV 5588 Ahmet Yılmaz 0532 111 33 pardon 23 44 debriyaj kaçırıyor", "beklenen": { "tur": "yeni-arac", "plaka": "41 KV 5588", "tel": "0532 111 23 44" } },
+  { "id": 15, "konu": "düzeltme", "baglam": "kayit-icinde", "kayitId": 4, "cumle": "fren diski 3500 yok 3800 lira", "beklenen": { "tur": "fiyat-guncelle", "fiyat": 3800 } },
+  { "id": 16, "konu": "düzeltme", "baglam": "genel", "cumle": "34 ABC 124 hayır 123 bakıma geldi", "beklenen": { "tur": "servis-ac", "plaka": "34 ABC 123", "isTuru": "bakim" } },
+
+  { "id": 17, "konu": "sayı okuyuşu", "baglam": "genel", "cumle": "41 AB kırk dört seksen yedi bakıma geldi", "beklenen": { "tur": "servis-ac", "plaka": "41 AB 4487", "isTuru": "bakim" } },
+  { "id": 18, "konu": "sayı okuyuşu", "baglam": "genel", "cumle": "41 AB dört bin dört yüz seksen yedi bakıma geldi", "beklenen": { "tur": "servis-ac", "plaka": "41 AB 4487", "isTuru": "bakim" } },
+  { "id": 19, "konu": "sayı okuyuşu", "baglam": "servis-ekle", "cumle": "41 KV 5588 Ahmet Yılmaz sıfır beş yüz otuz iki yüz on bir yirmi üç kırk dört debriyaj kaçırıyor", "beklenen": { "tur": "yeni-arac", "plaka": "41 KV 5588", "tel": "0532 111 23 44" } },
+  { "id": 20, "konu": "sayı okuyuşu", "baglam": "kayit-icinde", "kayitId": 4, "cumle": "fren diski dört bin dört yüz seksen yedi lira", "beklenen": { "tur": "fiyat-guncelle", "fiyat": 4487 } },
+
+  { "id": 21, "konu": "Courier", "baglam": "genel", "cumle": "Ford Kuryer geldi fren balatası bitmiş", "beklenen": { "tur": "servis-ac", "plaka": "16 SY 8890" } },
+  { "id": 22, "konu": "Courier", "baglam": "genel", "cumle": "Kurier geldi debriyaj kaçırıyor", "beklenen": { "tur": "servis-ac", "plaka": "16 SY 8890" } },
+  { "id": 23, "konu": "Courier", "baglam": "genel", "cumle": "Ford Kurye geldi marş basmıyor", "beklenen": { "tur": "servis-ac", "plaka": "16 SY 8890" } },
+
+  { "id": 24, "konu": "kk", "baglam": "genel", "cumle": "35 KLM 45 teslim ettim kk ile ödedi", "beklenen": { "tur": "teslim", "plaka": "35 KLM 45", "odeme": "kart" } },
+  { "id": 25, "konu": "kk", "baglam": "kayit-icinde", "kayitId": 3, "cumle": "teslim ettim kk", "beklenen": { "tur": "teslim", "odeme": "kart" } },
+  { "id": 26, "konu": "kk", "baglam": "genel", "cumle": "41 AB 4487 teslim ettim kredi kartından çektim", "beklenen": { "tur": "teslim", "plaka": "41 AB 4487", "odeme": "kart" } },
+
+  { "id": 27, "konu": "şive", "baglam": "genel", "cumle": "35 KLM 45 teslim ettum parayı nakit aldum", "beklenen": { "tur": "teslim", "plaka": "35 KLM 45", "odeme": "nakit" } },
+  { "id": 28, "konu": "şive", "baglam": "genel", "cumle": "06 TMR 07 bakuma geldi", "beklenen": { "tur": "servis-ac", "plaka": "06 TMR 07", "isTuru": "bakim" } },
+  { "id": 29, "konu": "konuşma dili", "baglam": "kayit-icinde", "kayitId": 4, "cumle": "fren diskini değiştirdik üç bin sekiz yüz lira", "beklenen": { "tur": "fiyat-guncelle", "fiyat": 3800 } },
+  { "id": 30, "konu": "şive", "baglam": "genel", "cumle": "16 SY 8890 teslim ediyrum havale yaptı", "beklenen": { "tur": "teslim", "plaka": "16 SY 8890", "odeme": "havale" } }
+ ]
+}
