@@ -40,13 +40,19 @@ const ES_ZAMAN = 4;
 const SET = JSON.parse(fs.readFileSync(path.join(KOK, 'buyuk-set.json'), 'utf8'));
 const CUMLE = {}; SET.cumleler.forEach(c => { CUMLE[c.id] = c; });
 let isler = [];
-for (let p = P1; p <= (P2 || P1); p++) {
-  const klasor = path.join(SES, 'buyuk-' + p);
+/* --klasorler yapay2-karadeniz,yapay2-ege (17.10): yapay ses klasörleri; parti
+   = klasör adı. Verilmezse gerçek kayıtlar (buyuk-1..6). */
+const KLASORLER = arg('--klasorler', '');
+const kaynaklar = KLASORLER ? KLASORLER.split(',').map(k => ({ parti: k, ad: k }))
+  : Array.from({ length: (P2 || P1) - P1 + 1 }, (_, i) => ({ parti: P1 + i, ad: 'buyuk-' + (P1 + i) }));
+for (const kn of kaynaklar) {
+  const klasor = path.join(SES, kn.ad);
   if (!fs.existsSync(path.join(klasor, 'dizin.json'))) { console.error('yok: ' + klasor); continue; }
   const dz = JSON.parse(fs.readFileSync(path.join(klasor, 'dizin.json'), 'utf8'));
   dz.kayitlar.filter(k => /^s\d+\.wav$/i.test(k.dosya) && CUMLE[k.id])
-    .forEach(k => isler.push({ parti: p, id: k.id, dosya: path.join(klasor, k.dosya), ad: k.dosya }));
+    .forEach(k => isler.push({ parti: kn.parti, id: k.id, dosya: path.join(klasor, k.dosya), ad: k.dosya }));
 }
+const ETIKET = arg('--etiket', '');   /* sonuç dosyasının adına eklenir: parali-<s>-<etiket>.json */
 if (SINIR) isler = isler.slice(0, SINIR);
 
 /* ---- ipucu listesi: prototipin KENDİ sözlüğü ---- */
@@ -195,7 +201,8 @@ const SAG = {
   if (!anahtar) { console.error(S.anahtar + ' yok — anahtar depoda durmaz, ortamdan okunur.'); process.exit(1); }
   if (!isler.length) { console.error('kayıt yok (sesler/buyuk-N/)'); process.exit(1); }
 
-  const sn = isler.reduce((t, x) => t + Math.max(0, fs.statSync(x.dosya).size - 44) / 32000, 0);
+  /* süre WAV başlığından (16 kHz gerçek kayıt, 24 kHz yapay) */
+  const sn = isler.reduce((t, x) => { const b = fs.readFileSync(x.dosya); return t + Math.max(0, b.length - 44) / (b.readUInt32LE(24) * 2 || 32000); }, 0);
   console.log(SAGLAYICI + (IPUCU ? ' + ipucu (' + IFADELER.length + ' ifade)' : '') + ' · ' + isler.length +
               ' kayıt · ≈' + (sn / 60).toFixed(1) + ' dk ses');
 
@@ -220,7 +227,7 @@ const SAG = {
   if (durdu) console.error('\nDURDU — ' + durdu.message + '\n(' + tamam.length + ' kayıt tamamlanmıştı)');
 
   const ort = tamam.length ? tamam.reduce((t, x) => t + x.kho, 0) / tamam.length : null;
-  const dosya = path.join(SES, 'parali-' + SAGLAYICI + (SAGLAYICI === 'gemini' && GEMINI_MODEL !== 'gemini-3.5-transcribe' ? '-' + GEMINI_MODEL : '') + (IPUCU ? '-ipucu' : '') + '.json');
+  const dosya = path.join(SES, 'parali-' + SAGLAYICI + (SAGLAYICI === 'gemini' && GEMINI_MODEL !== 'gemini-3.5-transcribe' ? '-' + GEMINI_MODEL : '') + (ETIKET ? '-' + ETIKET : '') + (IPUCU ? '-ipucu' : '') + '.json');
   fs.writeFileSync(dosya, JSON.stringify({ tarih: new Date().toISOString(), saglayici: SAGLAYICI, ipucu: IPUCU,
     ifadeSayisi: IFADELER.length, kayit: tamam.length, ortalamaKho: ort, sonuc: tamam }, null, 1), 'utf8');
   console.log(tamam.length + ' kayıt · ortalama kelime hatası ' + (ort === null ? '—' : '%' + Math.round(ort * 100)));
