@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-16 09:33
+  Üretim: 2026-10-16 16:23
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -7778,9 +7778,12 @@ document.addEventListener('click', function (e) {
 
    ⚠️ AÇILIŞTA çağrılır (ekranın `ac` kancası), çizimde değil (K-040):
    `ciz`de olsaydı ilk tazelemede not, usta okurken kaybolurdu. */
+/* K-060 (Cemil, 16.10 onayladı): kayıtlar SAKLANIR — hatalı anlaşılanı
+   bulmak için; ayrıntı 90 gün, sonra yalnız istatistik. Not bunu söylemeli. */
 var GIZLILIK_CUMLESI =
   'Söyledikleriniz ve çektiğiniz fotoğraflar, yazıya çevrilmek üzere ' +
-  'internet üzerinden gönderilir.';
+  'internet üzerinden gönderilir; hatalı anlaşılanları düzeltebilmemiz için ' +
+  'kayıtlar 90 gün saklanır.';
 
 function gizlilikIlkAcilis(kapId) {
   var kap = document.getElementById(kapId);
@@ -7970,41 +7973,8 @@ function duzenlemeUzakligi(a, b) {
      bağlanmaz — "uydurmak, anlamamaktan kötüdür". */
 function regKacir(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-/* ---- SÖYLEYİŞ SÖZLÜĞÜ (16.10 · Cemil) ----
-   *"C-Elysée var Citroën. Bunu okuyabilen çok azdır. Ayrıca egzost doğru
-   söyleyen çok azdır. … Courier model de örnek, doğru söylenemez
-   genellikle."* Usta adı yazıldığı gibi değil, SÖYLEDİĞİ gibi söyler;
-   tanıyıcı da duyduğunu yazar. Sözlük duyulan biçimi kayıttaki biçime
-   bağlar.
-   ⚠️ "!" ile başlayan söyleyiş GERÇEK BİR TÜRKÇE KELİMEDİR ("kurye geldi"
-   bir insan olabilir) — yalnız MARKAYLA birlikte araç sayılır. */
-var SOYLEYIS_MODEL = {
-  'c elysee': ['se elize', 'si elize', 'selize', 'sielize', 'c elize', 'se elise', 'elize', 'elysee'],
-  'courier': ['kuryer', 'kurier', 'kuriyer', '!kurye'],
-  'megane': ['megan', 'mejan'],
-  'qashqai': ['kaskay', 'kaskai'],
-  'octavia': ['oktavya', 'oktavia'],
-  'tucson': ['tuson', 'tukson'],
-  'symbol': ['sembol', 'simbol'],
-  'clio': ['klio'],
-  'passat': ['pasat'],
-  'caddy': ['!kedi', 'keddi', 'kadi'],
-  /* Girişte harfe yapışık rakam ayrıldığı için "i20" → "i 20". */
-  'i20': ['i 20', 'i yirmi', 'ay yirmi']
-};
-var SOYLEYIS_MARKA = {
-  'citroen': ['sitroen', 'sitroyen', 'citroen'],
-  'peugeot': ['pejo', 'pejot', 'puju', 'pijo'],
-  'volkswagen': ['folksvagen', 'volksvagen', 'folksvagin'],
-  'hyundai': ['hundai', 'hunday', 'hyunday'],
-  'renault': ['reno'],
-  'skoda': ['skoda', 'sikoda']
-};
-/* Parça/iş adının söyleyişleri: metnin KENDİSİ düzeltilir — "eksoz
-   contası 900 lira" kayıttaki "Egzoz contası" satırına uysun. */
-var SOYLEYIS_TERIM = [
-  [['egzost', 'eksoz', 'egzos', 'ekzos', 'eksos', 'ekzoz', 'egsoz'], 'egzoz']
-];
+/* Söyleyiş sözlüğü (SOYLEYIS_MODEL / _MARKA / _TERIM) betik/05-soyleyis.js'te —
+   veri, kural değil; büyüdükçe bu dosyayı şişirmesin. */
 
 /* Aksan ve tireden arınmış karşılaştırma biçimi: "C-Elysée" → "c elysee". */
 function sade(s) {
@@ -8018,11 +7988,23 @@ function soyleyisleri(sozluk, ad) {
 }
 
 /* Metindeki terim söyleyişlerini kayıttaki biçime çevirir. Kelime başına
-   bakar ("eksozdan" → "egzozdan"); K-018: \b YOK. */
+   bakar ("eksozdan" → "egzozdan"); K-018: \b YOK. Söyleyiş hem Türkçe
+   harfli hem harfsiz yazılmış olabilir ("şanzuman"/"sanzuman") — ikisi de
+   aranır. ⚠️ Kayıttaki biçimin BAŞI olan söyleyişe dokunulmaz:
+   "manifold" içindeki "manifol" ikinci kez değiştirilmez ("manifoldd"). */
 function sesSoyleyisDuzelt(metin) {
   SOYLEYIS_TERIM.forEach(function (t) {
-    t[0].forEach(function (v) {
-      metin = metin.replace(new RegExp('(^|[^A-Za-zÇĞİÖŞÜçğıöşü])' + v, 'gi'), '$1' + t[1]);
+    var kanon = t[1], bicim = {};
+    t[0].forEach(function (v) { if (v.charAt(0) !== '!') { bicim[v] = 1; bicim[norm(v)] = 1; } });
+    Object.keys(bicim).sort(function (a, b) { return b.length - a.length; }).forEach(function (v) {
+      metin = metin.replace(new RegExp('(^|[^A-Za-zÇĞİÖŞÜçğıöşü])(' + regKacir(v) + ')', 'gi'),
+        function (tum, on, bul, yer, butun) {
+          var sonra = butun.slice(yer + on.length);
+          /* GERÇEK yazımla karşılaştır: harfsiz biçimde "amortisor" ile
+             "amortisör" aynı görünür ve düzeltme atlanırdı. */
+          if (sonra.toLocaleLowerCase('tr').indexOf(kanon) === 0) return tum;
+          return on + kanon;
+        });
     });
   });
   return metin;
@@ -8106,8 +8088,20 @@ function sesRakamlaBagla(metin, il) {
   while ((m = re.exec(metin))) t.push({ s: m[0], i: m.index, n: m[0].length });
   var adaylar = {};
   var ADET = /^\s*(tane|adet|kere|kez|gun|saat|dakika|hafta|ay|yil|sene|parca)(\s|$)/;
+  /* ÖNCE PLAKA (16.10 · Cemil: "Araçla ilgili bir şeyse önce plaka
+     söylenecek şeklinde bekleyelim?"): cümlenin BAŞINDAKİ (ilk 3 sözcük
+     içinde) rakam grubu plaka kanıtıdır — orada 3 hane yeter ("okulda b u
+     440 …"). Sonda söylenen plaka REDDEDİLMEZ; yalnız kanıt daha zayıf. */
+  /* ⚠️ Zorlama: "yarın 123 balata gelecek" 34 ABC 123'e bağlandı. Plaka
+     bölgesinde ZAMAN sözü varsa bu bir plaka değildir. */
+  function bastaMi(i) {
+    var once = norm(metin.slice(0, i)).trim().split(/\s+/).filter(Boolean);
+    return once.length <= 3 && !once.some(function (w) {
+      return /^(yarin|bugun|dun|sonra|once|sabah|aksam|ogle|hafta|gun|ay|saat)/.test(w);
+    });
+  }
   function dene(s, i, son) {
-    if (s.length < (il ? 3 : 4)) return;
+    if (s.length < (il || bastaMi(i) ? 3 : 4)) return;
     if (ADET.test(norm(metin.slice(son)))) return;
     ARACLAR.forEach(function (a) {
       var r = plakaParcala(a.plaka);
@@ -8513,6 +8507,152 @@ var Islem = (function () {
 window.ISLEM_SEMALARI = function () { return Islem.json(); };
 
 
+/* ===== betik/05-soyleyis.js ===== */
+/* ============ SÖYLEYİŞ SÖZLÜĞÜ (16.10.2026) ============
+   Cemil, 16.10: *"Araç marka modelleri için okunuşları derleyelim. Mesela
+   civic için okunuşlar nasıl olabilir, bunları motorda önce toparlamamız
+   faydalı olur derim. Ayrıca egzos, manifolt gibi bir sürü kelime var.
+   Bunları da önceden toplayalım."*
+
+   Usta adı yazıldığı gibi değil SÖYLEDİĞİ gibi söyler; tanıyıcı da
+   duyduğunu yazar. Bu sözlük duyulabilecek biçimi kayıttaki biçime bağlar.
+   İKİ YERDE kullanılır:
+     1) motor — araç tarifi (04-islem.js sesAracTarif) ve terim düzeltme
+        (sesSoyleyisDuzelt: "eksoz contası" → "egzoz contası");
+     2) tanıyıcıya İPUCU — SOYLEYIS_IFADELER(): kayıttaki doğru biçimler
+        Web Speech `phrases` olarak verilir ki tanıyıcı baştan doğru yazsın.
+
+   ⚠️ OKUNUŞLAR BİZİM DERLEMEMİZ — ustaya doğrulatılacak (ve 60.1'deki
+   dörtlüden — ustanın onayladığı son hâl — zamanla kendiliğinden büyür).
+   ⚠️ "!" ile başlayan söyleyiş GERÇEK BİR TÜRKÇE KELİMEDİR ("fiyat",
+   "nisan", "kedi", "kurye", "sivil"): yalnız MARKAYLA birlikte araç sayılır
+   ve terim düzeltmesinde KULLANILMAZ.
+   Anahtarlar `sade()` biçiminde: küçük harf, Türkçe harfsiz, aksansız,
+   tire yerine boşluk ("C-Elysée" → "c elysee"). */
+
+var SOYLEYIS_MARKA = {
+  'renault': ['reno', 'renol'],
+  'fiat': ['!fiyat', 'fiyet'],
+  'volkswagen': ['folksvagen', 'volksvagen', 'folkswagen', 'folksvagin', 'vw', 've ve'],
+  'ford': ['fort'],
+  'toyota': ['toyoto'],
+  'hyundai': ['hundai', 'hunday', 'hyunday', 'hundey'],
+  'peugeot': ['pejo', 'pejot', 'puju', 'pijo', 'pojo'],
+  'citroen': ['sitroen', 'sitroyen', 'sitroin'],
+  'dacia': ['dacya', 'dakya', 'dacia'],
+  'skoda': ['sikoda'],
+  'nissan': ['!nisan'],
+  'kia': ['kiya'],
+  'mercedes': ['mersedes', 'merso', 'mercedes benz', 'mersedes benz'],
+  'bmw': ['be me ve', 'bemve', 'beemve'],
+  'audi': ['odi', 'avdi'],
+  'seat': ['siat', '!set'],
+  'chevrolet': ['sevrole', 'sevrolet'],
+  'mitsubishi': ['mitsubisi', 'mitsibisi'],
+  'jeep': ['!cip'],
+  'tofas': ['tofas'],
+  'togg': ['tog'],
+  'chery': ['ceri', '!seri']
+};
+
+var SOYLEYIS_MODEL = {
+  /* Renault */
+  'clio': ['klio'], 'megane': ['megan', 'mejan'], 'symbol': ['sembol', 'simbol'],
+  'fluence': ['fluens', 'fluans'], 'captur': ['kaptur', 'kapcir', 'kepcir'],
+  'kangoo': ['kango', 'kangu'], 'talisman': ['talisman'],
+  /* Fiat */
+  'egea': ['ega', 'ejea'], 'linea': ['linya'], 'doblo': ['doblo'],
+  'fiorino': ['fiyorino'], 'punto': ['punto'],
+  /* Volkswagen */
+  'passat': ['pasat'], 'jetta': ['ceta', 'jeta'], 'caddy': ['!kedi', 'keddi', 'kadi'],
+  'tiguan': ['tigvan', 'tiguvan'], 't roc': ['ti rok', 'tirok'],
+  'transporter': ['transporter'],
+  /* Ford */
+  'focus': ['fokus'], 'fiesta': ['fiyesta'], 'courier': ['kuryer', 'kurier', 'kuriyer', '!kurye'],
+  'transit': ['tranzit'], 'connect': ['konnekt', 'konekt'], 'ranger': ['reyncir', 'rencir'],
+  /* Toyota */
+  'corolla': ['korolla', 'korola'], 'hilux': ['hailaks', 'hilaks'], 'c hr': ['si eyc ar', 'ce ha re'],
+  /* Hyundai — girişte harfe yapışık rakam ayrılır: "i20" → "i 20" */
+  'i20': ['i 20', 'i yirmi', 'ay yirmi'], 'i10': ['i 10', 'i on'], 'i30': ['i 30', 'i otuz'],
+  'accent': ['aksent', 'eksent'], 'tucson': ['tuson', 'tukson', 'takson'],
+  /* Opel */
+  'corsa': ['korsa'], 'insignia': ['insinya'], 'mokka': ['moka'],
+  /* Peugeot / Citroën */
+  'partner': ['partner'], 'c elysee': ['se elize', 'si elize', 'selize', 'sielize', 'c elize', 'se elise', 'elize', 'elysee'],
+  'c3': ['c 3', 'se uc', 'si uc'], 'c4': ['c 4', 'se dort', 'si dort'], 'berlingo': ['berlingo'],
+  /* Dacia */
+  'duster': ['daster'], 'sandero': ['sandero'], 'lodgy': ['lodji', 'loci'], 'dokker': ['doker'],
+  /* Honda — Cemil'in örneği */
+  'civic': ['sivik', 'civik', 'sivic', '!sivil'], 'city': ['siti'], 'cr v': ['ci ar vi', 'ce re ve'],
+  'jazz': ['!caz'],
+  /* Skoda / Nissan / Kia / Seat */
+  'octavia': ['oktavya', 'oktavia'], 'superb': ['superb'], 'fabia': ['fabya'],
+  'qashqai': ['kaskay', 'kaskai'], 'juke': ['cuk', 'cuke'], 'micra': ['mikra'],
+  'sportage': ['sportaj', 'sportec'], 'ceed': ['sid', 'cid'], 'picanto': ['pikanto'],
+  'leon': ['liyon'], 'ibiza': ['ibiza'],
+  /* Tofaş */
+  'sahin': ['sahin'], 'dogan': ['!dogan'], 'kartal': ['!kartal']
+};
+
+/* Parça / iş adlarının söyleyişleri. Metnin KENDİSİ kayıttaki biçime
+   çevrilir — "eksoz contası 900 lira" kayıttaki "Egzoz contası"na uysun,
+   onay ekranında usta doğru yazımı görsün. Gerçek kelime olan söyleyiş
+   ("kartel") buraya GİRMEZ. */
+var SOYLEYIS_TERIM = [
+  [['egzost', 'eksoz', 'egzos', 'ekzos', 'eksos', 'ekzoz', 'egsoz'], 'egzoz'],
+  [['manifolt', 'menifold', 'menifolt', 'manifol'], 'manifold'],
+  [['şanzuman', 'sanzuman', 'şanziman', 'sanziman', 'şanjman'], 'şanzıman'],
+  [['debriyaç', 'debriyac', 'debreyaj', 'debriyej', 'debiryaj'], 'debriyaj'],
+  [['tirger', 'trigır', 'trigir', 'triyger'], 'triger'],
+  [['amortisor', 'amortsör', 'amartisör', 'amörtisör', 'amortisör'], 'amortisör'],
+  [['enjektor', 'ejektör', 'encektör', 'injektör'], 'enjektör'],
+  [['radyator', 'rodyatör', 'radiatör', 'radyatör'], 'radyatör'],
+  [['alternator', 'alternetör'], 'alternatör'],
+  [['distribütor', 'distrübitör', 'distribitör'], 'distribütör'],
+  [['karbirator', 'karbaratör', 'karbürator'], 'karbüratör'],
+  [['termostad', 'termosta'], 'termostat'],
+  [['kompresor'], 'kompresör'],
+  [['bujı', 'buci'], 'buji'],
+  [['rotül', 'rotel'], 'rotil'],
+  [['salincak', 'salançak'], 'salıncak'],
+  [['rulmen', 'rülman'], 'rulman'],
+  [['kanpana'], 'kampana'],
+  [['diferansiyal', 'difransiyel'], 'diferansiyel'],
+  [['kırank'], 'krank'],
+  [['eksantirik', 'egsantrik'], 'eksantrik'],
+  [['sekman', 'segmen'], 'segman'],
+  [['subap', 'supab'], 'supap'],
+  [['silindır', 'slindir'], 'silindir'],
+  [['sensor'], 'sensör'],
+  [['interkuler', 'intırkulır', 'interkulır'], 'intercooler'],
+  [['direksyon', 'dreksiyon'], 'direksiyon'],
+  [['silicek'], 'silecek'],
+  [['antifiriz'], 'antifriz'],
+  [['kece'], 'keçe'],
+  [['bicon'], 'bijon'],
+  [['civata'], 'cıvata'],
+  [['rotbalans'], 'rot balans']
+];
+
+/* Tanıyıcıya verilecek İPUCU listesi (Web Speech `phrases`): kayıttaki
+   DOĞRU biçimler — dükkânın plakaları, araçlarının marka ve modeli,
+   terimler, işlerin sözleri. Söyleyişler değil: tanıyıcının yazmasını
+   istediğimiz şey doğru biçim. */
+var SOYLEYIS_IS_SOZLERI = ['teslim', 'tahsilat', 'işçilik', 'kilometre', 'WhatsApp', 'SMS',
+  'nakit', 'kart', 'havale', 'sahibine', 'balata', 'triger', 'devirdaim', 'gider', 'fatura'];
+
+function SOYLEYIS_IFADELER(araclar) {
+  var gorulen = {}, liste = [];
+  function ekle(s) { s = String(s || '').trim(); if (s && !gorulen[s]) { gorulen[s] = 1; liste.push(s); } }
+  (araclar || (typeof ARACLAR !== 'undefined' ? ARACLAR : [])).forEach(function (a) {
+    ekle(a.plaka); ekle(a.marka); ekle(a.model); ekle((a.marka || '') + ' ' + (a.model || ''));
+  });
+  SOYLEYIS_TERIM.forEach(function (t) { ekle(t[1]); });
+  SOYLEYIS_IS_SOZLERI.forEach(ekle);
+  return liste;
+}
+
+
 /* ===== ekran: 10-home.html ===== */
 (function () {
 Ekran.tanim('home', {
@@ -8566,7 +8706,7 @@ Ekran.tanim('home', {
 var SES_BAGLAM = {
   genel: {
     ad: 'Sesli işlem',
-    ipucu: 'Plakayı ve ne yapılacağını söylemen yeter.',
+    ipucu: 'Önce plakayı, sonra yapılacak işi söyle.',   /* Cemil, 16.10: önce plaka */
     ornekler: [
       '{plaka} triger seti değişecek',
       '{serviste} bakıma geldi kilometre 88 bin',

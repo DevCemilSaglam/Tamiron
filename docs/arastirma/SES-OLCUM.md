@@ -677,3 +677,39 @@ bağlama kapalı / rakamla öneri kapalı / adet koruması yok → her biri bulg
 bozması ("bu ayki" → "Waikiki", "teslim ettik kartla" → "teslimatik
 capture"). Motor bunu düzeltemez. Sıradaki deneme: `phrases` (kayıtlı
 plakaları ve parça adlarını tanıyıcıya ipucu vermek).
+
+## 15 · Söyleyiş sözlüğü + "önce plaka" (16.10)
+
+> **Cemil, 16.10:** *"Araç marka modelleri için okunuşları derleyelim …
+> egzos, manifolt gibi bir sürü kelime var. Bunları da önceden toplayalım.
+> … Araçla ilgili bir şeyse önce plaka söylenecek şeklinde bekleyelim?"*
+
+**Sözlük** `betik/05-soyleyis.js`'e taşındı ve genişledi: 22 marka, ~70
+model (Civic: sivik/civik/sivic), 33 terim (manifolt → manifold, şanzuman
+→ şanzıman, debriyaç → debriyaj, amortisor → amortisör …). Gerçek Türkçe
+kelime olan söyleyiş ("fiyat", "nisan", "kedi", "sivil", "caz") "!"li:
+yalnız MARKAYLA birlikte araç sayılır, terim düzeltmede kullanılmaz.
+⚠️ Okunuşlar bizim derlememiz — ustaya doğrulatılacak; K-060.1'deki
+dörtlü (ustanın onayladığı son hâl) bunu zamanla kendiliğinden besler.
+
+İkinci kullanım: **tanıyıcıya ipucu** — `SOYLEYIS_IFADELER()` dükkânın
+plakaları + marka/modelleri + terimler + işlerin sözleri (kurmaca dükkânda
+171 ifade). Ölçüm sayfası "beklenen kelimeleri bildir" işaretliyse bu
+listeyi verir (`?ipucu=1`, sonuç `…-ipucu.json`). **Ölçülmedi** — Cemil'in
+Chrome'unda 300 kaydın yeniden koşusu gerekiyor.
+
+Düzelticide bir kusur birim denemede yakalandı: "amortisor" düzeltilmiyordu
+(harfsiz biçimde "amortisör" ile aynı göründüğü için atlanıyordu) —
+koruma gerçek yazımla karşılaştıracak şekilde düzeldi.
+
+**"Önce plaka" — öncelik olarak, zorunlu değil.** Cümlenin başındaki (ilk
+3 sözcük) rakam grubu plaka kanıtı: orada il kodu olmadan da 3 hane yeter.
+Sonda söylenen plaka REDDEDİLMEZ (gerçek kayıtlarda tanıyıcı plakayı her
+yerde bozuyor; zorunlu sıra kayıp üretir). Ölçülen etki küçük: geliştirme
+ve sınavda birer kayıt (sınav %71 → %72, +11 doğru öneri). Zorlama bir
+tehlike buldu — "yarın 123 balata gelecek" 34 ABC 123'e bağlandı —
+plaka bölgesinde zaman sözü varsa öncelik uygulanmaz.
+Ekrandaki ipucu: *"Önce plakayı, sonra yapılacak işi söyle."*
+
+Gerileme yok (büyük %99/%100, esas %98, söyleyiş %100, dökümler %85/%73);
+eşdeğerlik 576/0 · 400/0 · 16/0; 320/375/430 px 0 bulgu.

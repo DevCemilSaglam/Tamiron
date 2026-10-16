@@ -771,9 +771,12 @@ document.addEventListener('click', function (e) {
 
    ⚠️ AÇILIŞTA çağrılır (ekranın `ac` kancası), çizimde değil (K-040):
    `ciz`de olsaydı ilk tazelemede not, usta okurken kaybolurdu. */
+/* K-060 (Cemil, 16.10 onayladı): kayıtlar SAKLANIR — hatalı anlaşılanı
+   bulmak için; ayrıntı 90 gün, sonra yalnız istatistik. Not bunu söylemeli. */
 var GIZLILIK_CUMLESI =
   'Söyledikleriniz ve çektiğiniz fotoğraflar, yazıya çevrilmek üzere ' +
-  'internet üzerinden gönderilir.';
+  'internet üzerinden gönderilir; hatalı anlaşılanları düzeltebilmemiz için ' +
+  'kayıtlar 90 gün saklanır.';
 
 function gizlilikIlkAcilis(kapId) {
   var kap = document.getElementById(kapId);

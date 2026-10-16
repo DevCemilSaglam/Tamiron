@@ -168,41 +168,8 @@ function duzenlemeUzakligi(a, b) {
      bağlanmaz — "uydurmak, anlamamaktan kötüdür". */
 function regKacir(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
-/* ---- SÖYLEYİŞ SÖZLÜĞÜ (16.10 · Cemil) ----
-   *"C-Elysée var Citroën. Bunu okuyabilen çok azdır. Ayrıca egzost doğru
-   söyleyen çok azdır. … Courier model de örnek, doğru söylenemez
-   genellikle."* Usta adı yazıldığı gibi değil, SÖYLEDİĞİ gibi söyler;
-   tanıyıcı da duyduğunu yazar. Sözlük duyulan biçimi kayıttaki biçime
-   bağlar.
-   ⚠️ "!" ile başlayan söyleyiş GERÇEK BİR TÜRKÇE KELİMEDİR ("kurye geldi"
-   bir insan olabilir) — yalnız MARKAYLA birlikte araç sayılır. */
-var SOYLEYIS_MODEL = {
-  'c elysee': ['se elize', 'si elize', 'selize', 'sielize', 'c elize', 'se elise', 'elize', 'elysee'],
-  'courier': ['kuryer', 'kurier', 'kuriyer', '!kurye'],
-  'megane': ['megan', 'mejan'],
-  'qashqai': ['kaskay', 'kaskai'],
-  'octavia': ['oktavya', 'oktavia'],
-  'tucson': ['tuson', 'tukson'],
-  'symbol': ['sembol', 'simbol'],
-  'clio': ['klio'],
-  'passat': ['pasat'],
-  'caddy': ['!kedi', 'keddi', 'kadi'],
-  /* Girişte harfe yapışık rakam ayrıldığı için "i20" → "i 20". */
-  'i20': ['i 20', 'i yirmi', 'ay yirmi']
-};
-var SOYLEYIS_MARKA = {
-  'citroen': ['sitroen', 'sitroyen', 'citroen'],
-  'peugeot': ['pejo', 'pejot', 'puju', 'pijo'],
-  'volkswagen': ['folksvagen', 'volksvagen', 'folksvagin'],
-  'hyundai': ['hundai', 'hunday', 'hyunday'],
-  'renault': ['reno'],
-  'skoda': ['skoda', 'sikoda']
-};
-/* Parça/iş adının söyleyişleri: metnin KENDİSİ düzeltilir — "eksoz
-   contası 900 lira" kayıttaki "Egzoz contası" satırına uysun. */
-var SOYLEYIS_TERIM = [
-  [['egzost', 'eksoz', 'egzos', 'ekzos', 'eksos', 'ekzoz', 'egsoz'], 'egzoz']
-];
+/* Söyleyiş sözlüğü (SOYLEYIS_MODEL / _MARKA / _TERIM) betik/05-soyleyis.js'te —
+   veri, kural değil; büyüdükçe bu dosyayı şişirmesin. */
 
 /* Aksan ve tireden arınmış karşılaştırma biçimi: "C-Elysée" → "c elysee". */
 function sade(s) {
@@ -216,11 +183,23 @@ function soyleyisleri(sozluk, ad) {
 }
 
 /* Metindeki terim söyleyişlerini kayıttaki biçime çevirir. Kelime başına
-   bakar ("eksozdan" → "egzozdan"); K-018: \b YOK. */
+   bakar ("eksozdan" → "egzozdan"); K-018: \b YOK. Söyleyiş hem Türkçe
+   harfli hem harfsiz yazılmış olabilir ("şanzuman"/"sanzuman") — ikisi de
+   aranır. ⚠️ Kayıttaki biçimin BAŞI olan söyleyişe dokunulmaz:
+   "manifold" içindeki "manifol" ikinci kez değiştirilmez ("manifoldd"). */
 function sesSoyleyisDuzelt(metin) {
   SOYLEYIS_TERIM.forEach(function (t) {
-    t[0].forEach(function (v) {
-      metin = metin.replace(new RegExp('(^|[^A-Za-zÇĞİÖŞÜçğıöşü])' + v, 'gi'), '$1' + t[1]);
+    var kanon = t[1], bicim = {};
+    t[0].forEach(function (v) { if (v.charAt(0) !== '!') { bicim[v] = 1; bicim[norm(v)] = 1; } });
+    Object.keys(bicim).sort(function (a, b) { return b.length - a.length; }).forEach(function (v) {
+      metin = metin.replace(new RegExp('(^|[^A-Za-zÇĞİÖŞÜçğıöşü])(' + regKacir(v) + ')', 'gi'),
+        function (tum, on, bul, yer, butun) {
+          var sonra = butun.slice(yer + on.length);
+          /* GERÇEK yazımla karşılaştır: harfsiz biçimde "amortisor" ile
+             "amortisör" aynı görünür ve düzeltme atlanırdı. */
+          if (sonra.toLocaleLowerCase('tr').indexOf(kanon) === 0) return tum;
+          return on + kanon;
+        });
     });
   });
   return metin;
@@ -304,8 +283,20 @@ function sesRakamlaBagla(metin, il) {
   while ((m = re.exec(metin))) t.push({ s: m[0], i: m.index, n: m[0].length });
   var adaylar = {};
   var ADET = /^\s*(tane|adet|kere|kez|gun|saat|dakika|hafta|ay|yil|sene|parca)(\s|$)/;
+  /* ÖNCE PLAKA (16.10 · Cemil: "Araçla ilgili bir şeyse önce plaka
+     söylenecek şeklinde bekleyelim?"): cümlenin BAŞINDAKİ (ilk 3 sözcük
+     içinde) rakam grubu plaka kanıtıdır — orada 3 hane yeter ("okulda b u
+     440 …"). Sonda söylenen plaka REDDEDİLMEZ; yalnız kanıt daha zayıf. */
+  /* ⚠️ Zorlama: "yarın 123 balata gelecek" 34 ABC 123'e bağlandı. Plaka
+     bölgesinde ZAMAN sözü varsa bu bir plaka değildir. */
+  function bastaMi(i) {
+    var once = norm(metin.slice(0, i)).trim().split(/\s+/).filter(Boolean);
+    return once.length <= 3 && !once.some(function (w) {
+      return /^(yarin|bugun|dun|sonra|once|sabah|aksam|ogle|hafta|gun|ay|saat)/.test(w);
+    });
+  }
   function dene(s, i, son) {
-    if (s.length < (il ? 3 : 4)) return;
+    if (s.length < (il || bastaMi(i) ? 3 : 4)) return;
     if (ADET.test(norm(metin.slice(son)))) return;
     ARACLAR.forEach(function (a) {
       var r = plakaParcala(a.plaka);
