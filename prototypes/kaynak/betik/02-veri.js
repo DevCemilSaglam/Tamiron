@@ -512,7 +512,39 @@ function benzerPlaka(plaka) {
   });
   /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,
      ustaya yanlış aracı onaylatmanın yoludur. */
-  return adaylar.length === 1 ? adaylar[0] : null;
+  if (adaylar.length) return adaylar.length === 1 ? adaylar[0] : null;
+  return rakamlaBenzerPlaka(p);
+}
+
+/* İKİNCİ AŞAMA — RAKAM ÖNCELİKLİ (16.10 · 300 gerçek kayıt): tanıyıcı
+   plaka HARFLERİNİ sözcüğe çeviriyor ("RIZ" → "Rus", "UR" → "Uğur", "KIH"
+   → "kız") ve il kodunu kaçırabiliyor ("38" → "34"); RAKAM GRUBU ise
+   çoğunlukla doğru duyuluyor ve dükkânda çoğu zaman tek araca ait.
+   Yalnız ilk aşama HİÇ aday bulamazsa çalışır. Aynı rakamlı kayıtlı
+   araçlar puanlanır: il aynı +2 · harf aynı +2 · sesçe yakın ya da iki
+   ünlü +1. EN YÜKSEK puan TEK ise ve en az 4 ise ÖNERİLİR — yine SORULUR
+   (K-059), kendiliğinden değiştirilmez. Beraberlik = öneri yok. */
+function rakamlaBenzerPlaka(p) {
+  var UNLU = 'AEIİOÖUÜ';
+  var puanlar = [];
+  ARACLAR.forEach(function (a) {
+    var q = plakaParcala(a.plaka);
+    if (!q || q.rakam !== p.rakam) return;
+    var puan = q.il === p.il ? 2 : 0;
+    if (q.harf.length === p.harf.length) {
+      for (var i = 0; i < q.harf.length; i++) {
+        var x = p.harf[i], y = q.harf[i];
+        if (x === y) puan += 2;
+        else if ((UNLU.indexOf(x) >= 0 && UNLU.indexOf(y) >= 0) ||
+                 (typeof sesceYakinHarf === 'function' && sesceYakinHarf(x, y))) puan += 1;
+      }
+    } else if (harfFarki(p.harf, q.harf) <= 1) puan += 2;
+    puanlar.push({ plaka: a.plaka, puan: puan });
+  });
+  puanlar.sort(function (a, b) { return b.puan - a.puan; });
+  if (!puanlar.length || puanlar[0].puan < 4) return null;
+  if (puanlar.length > 1 && puanlar[1].puan === puanlar[0].puan) return null;
+  return puanlar[0].plaka;
 }
 
 function kayitBul(id) {

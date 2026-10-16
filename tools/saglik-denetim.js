@@ -2427,6 +2427,24 @@ function stilMetni() {
     o = coz('06 TMR 07 kilometre seksen sekiz bin');
     if (o.km !== '88.000') ek('SES-DUYULAN', 'ses', '"seksen sekiz bin" km olmadi: ' + o.km);
     if (sesSoyleyisDuzelt('eksozdan duman') !== 'egzozdan duman') ek('SES-DUYULAN', 'ses', 'egzoz soyleyisi duzeltilmedi');
+    /* 300 gercek kayit (16.10): taniyici plaka harfini sozcuge cevirir,
+       il kodunu kacirir, rakama nokta koyar; RAKAM cogunlukla dogru. */
+    o = coz('Hatice 88 90 bakıma geldi');
+    if (o.plaka !== '16 SY 8890' || !o.duyulanPlaka) ek('SES-DUYULAN', 'ses', 'plakasiz cumlede 4 haneli rakam kayitli araca baglanmadi: ' + o.tur + ' ' + o.plaka);
+    o = coz('yarın 123 tane balata gelecek');
+    if (o.plaka) ek('SES-DUYULAN', 'ses', '"123 tane" (adet) plakaya baglandi: ' + o.plaka);
+    o = coz('16SY 88.90 bakıma geldi');
+    if (o.plaka !== '16 SY 8890') ek('SES-DUYULAN', 'ses', 'bitisik harf-rakam / rakamda nokta okunmadi: ' + o.plaka);
+    o = coz('38 TMR 07 bakıma geldi');
+    if (o.plaka === '06 TMR 07') ek('SES-DUYULAN', 'ses', 'il kodu farkli gercek olabilecek plaka KENDILIGINDEN baglandi (K-059)');
+    else if (o.oneri !== '06 TMR 07') ek('SES-DUYULAN', 'ses', 'il kodu kacirilan plakada rakamla oneri cikmadi: oneri=' + o.oneri);
+    var tmrKayit = KAYITLAR.filter(function (k) { return k.plaka === '06 TMR 07' && !k.teslimTarihi; })[0];
+    if (tmrKayit) {
+      var yk = window.ACIK_KAYIT; window.SESLI_NIYET = 'kayit-icinde'; window.ACIK_KAYIT = tmrKayit.id;
+      o = coz('hava filtresi 180 lira');
+      if (o.tur === 'fiyat-guncelle') ek('SES-DUYULAN', 'kayit', '"hava filtresi" yakin soyleyisle "' + (o.satir && o.satir.ad) + '" satirina uydu -- YANLIS satirin fiyati degisir');
+      window.SESLI_NIYET = 'genel'; window.ACIK_KAYIT = yk;
+    }
     ARACLAR.push({ plaka: '35 ZZ 4545', marka: 'Citroën', model: 'C-Elysée', sahipAd: '', sahipTel: '' },
                  { plaka: '35 ZZ 4546', marka: 'Ford', model: 'Courier', sahipAd: '', sahipTel: '' });
     o = coz('Se Elize geldi debriyaj kaciriyor');

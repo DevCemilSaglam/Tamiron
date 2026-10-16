@@ -1060,6 +1060,24 @@ Islem.tanim('fiyat-guncelle', {
         uyan.push({ satir: s, indeks: i });
       }
     });
+    /* YAKIN SÖYLEYİŞ (16.10 · 300 kayıt): tanıyıcı parça adını bozuyor —
+       "fren diski" → "friendiski", "triger seti" → "Driver seti", "yağ
+       filtresi" → "ya şifresi". Aday yalnız bu kaydın birkaç satırı; tam
+       eşleşme yoksa boşluksuz biçimler arasında düzenleme uzaklığı,
+       uzunluğun en çok %20'si VE ilk harf aynı ya da sesçe yakın.
+       ⚠️ %30 ile denendi: "hava filtresi" kayıttaki "Yağ filtresi"ne uydu
+       ve YANLIŞ satırın fiyatı değişti (eski setlerde 3 gerileme). Ortak
+       sonek ("filtresi") farkı küçültüyor; baştaki sözcük ayırır.
+       Yine TEK ADAY kuralı (A-M27). */
+    if (!uyan.length) {
+      var adB = adN.replace(/\s/g, '');
+      (k.satirlar || []).forEach(function (s, i) {
+        var sB = norm(s.ad || '').replace(/\s/g, '');
+        if (sB.length < 5 || !adB) return;
+        if (!sesceYakinHarf(adB.charAt(0).toLocaleUpperCase('tr'), sB.charAt(0).toLocaleUpperCase('tr'))) return;
+        if (duzenlemeUzakligi(adB, sB) <= Math.floor(sB.length * 0.2)) uyan.push({ satir: s, indeks: i });
+      });
+    }
     if (uyan.length !== 1) return null;
     return { tur: 'fiyat-guncelle', kayit: k, indeks: uyan[0].indeks,
              satir: uyan[0].satir, fiyat: tutarR };
