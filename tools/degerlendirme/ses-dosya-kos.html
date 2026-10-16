@@ -72,7 +72,7 @@
     <input type="file" id="dosyalar" accept=".wav,.flac,.txt,audio/*" multiple aria-label="Ses dosyaları">
     <label for="gurultu">Gürültü (isteğe bağlı — tek dosya; seçilirse bozulmuş varyantlar da koşar)</label>
     <input type="file" id="gurultu" accept="audio/*,.mp3,.wav" aria-label="Gürültü dosyası">
-    <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code> — karşılaştırma için ayrı koşu)</label>
+    <label><input type="checkbox" id="ifadeler"> Beklenen kelimeleri bildir (<code>phrases</code>) — ⚠️ 16.10: Chrome'un Türkçe (bulut) tanıyıcısı desteklemiyor, her kayıt "phrases-not-supported" verir</label>
     <label><input type="checkbox" id="esitle" checked> Seviyeyi eşitle (konuşma −20 dB — mikrofonun otomatik kazancının taklidi)</label>
     <label><input type="checkbox" id="dinamik"> Dinamik kazanç (kısık kelimeyi yükselt — mikrofonun otomatik kazancının taklidi)</label>
     <label><input type="checkbox" id="kirp" checked> Baştaki ve sondaki sessizliği kırp (koşu biraz kısalır — s01: 17,2 → 14,9 sn; ortadaki duraklamalara dokunmaz)</label>
@@ -346,12 +346,19 @@ var SECIM = null, SON_HAM = null, SON_AD = '', KOSUYOR = false, MESGUL = false;
    "network" = sunucuya ulaşılamıyor; koşu durur ve SÖYLER. Bugün kısa
    sürede ~130 oturum açılmıştı — ücretsiz hizmetin kotası olabilir. */
 var AG_SINIRI = 3;
+/* ⚠️ HER TÜRLÜ ART ARDA AYNI HATA DURDURUR (16.10): ipuçlu koşuda 300
+   kaydın 300'ü "phrases-not-supported" verdi — Chrome'un bulut tanıyıcısı
+   ipucunu kabul etmiyor — ve alet yalnız AĞ hatasında durduğu için 300
+   kaydı boşuna çaldı. Aynı hata 3 kez üst üste = koşu durur, hata adı
+   söylenir. */
 function agKesildiMi(sonuclar) {
   if (sonuclar.length < AG_SINIRI) return false;
-  return sonuclar.slice(-AG_SINIRI).every(function (x) { return x.hata === 'network'; });
+  var son = sonuclar.slice(-AG_SINIRI);
+  return !!son[0].hata && son.every(function (x) { return x.hata === son[0].hata; });
 }
-var AG_UYARI = ' Tanıma sunucusuna art arda ulaşılamadı — koşu durduruldu. İnternet ' +
-  'bağlantısını kontrol et; bağlantı varsa ücretsiz hizmetin kotası dolmuş olabilir, bir süre sonra dene.';
+var AG_UYARI = ' Aynı tanıma hatası art arda geldi — koşu durduruldu. "network" ise internet ' +
+  'bağlantısını kontrol et (ücretsiz hizmetin kotası dolmuş olabilir); "phrases-not-supported" ise ' +
+  'bu tanıyıcı ipucu kabul etmiyor — "Beklenen kelimeleri bildir"i kapat.';
 function secenekler() {
   return { esitle: $('esitle').checked, dinamik: $('dinamik').checked, kirp: $('kirp').checked, ifadeler: $('ifadeler').checked };
 }

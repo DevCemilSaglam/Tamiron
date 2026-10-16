@@ -713,3 +713,21 @@ Ekrandaki ipucu: *"Önce plakayı, sonra yapılacak işi söyle."*
 
 Gerileme yok (büyük %99/%100, esas %98, söyleyiş %100, dökümler %85/%73);
 eşdeğerlik 576/0 · 400/0 · 16/0; 320/375/430 px 0 bulgu.
+
+## 16 · Tanıyıcıya ipucu (`phrases`) — Chrome'da MÜMKÜN DEĞİL (16.10)
+
+Cemil 300 kaydı ipucu açık koşturdu: **300'ün 300'ü `phrases-not-supported`.**
+Chrome API'yi gösteriyor (`'phrases' in recognition` doğru) ama Türkçe
+tanıma BULUTTA yapılıyor ve bulut tanıyıcı ipucu kabul etmiyor; ipucu yalnız
+cihaz üstü tanımada çalışıyor, Türkçe için cihaz üstü tanıma YOK (§2,
+12.10 ölçümü). **Ücretsiz Web Speech ile ipucu yolu kapalı.**
+
+Sonuç: `SOYLEYIS_IFADELER()` boşa gitmiyor — aynı liste ileride ipucu kabul
+eden bir tanıyıcıya (paralı bulut tanıma, backend fazı; ya da bir dil
+modeline bağlam olarak) verilecek. Bugün iyileştirmenin tek yolu motor:
+sözlük + plaka kuralları.
+
+**Aletin kusuru (düzeldi):** ölçüm sayfası yalnız AĞ hatasında duruyordu;
+300 kaydı aynı hatayla boşuna çaldı. Artık HER TÜRLÜ aynı hata 3 kez üst
+üste gelince durur ve hatanın adını söyler. Gerçek dosyalarla denendi:
+ipuçlu koşu 3. kayıtta durur, hatasız koşu durmaz.
