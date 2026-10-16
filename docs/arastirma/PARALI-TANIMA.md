@@ -116,3 +116,10 @@ Speechmatics ~$0,40 (deneme kredisi içinde kalmış olmalı).
 **Öneri:** ikinci turda **Google Chirp 3** (belgede Türkçe + ipucu) ölçülsün;
 Speechmatics ile karşılaştırılıp backend fazının tanıyıcısı seçilsin.
 Speechmatics dükkân başına ayda ~$0,45 (Enhanced, $0,38/saat).
+
+## Google — ön ödeme (16.10) · KARAR K-061
+
+Google Cloud, Türkiye hesabını etkinleştirmek için **bir kerelik en az
+1.500 TL ön ödeme** istiyor (bakiyeye geçer, kullanım oradan düşer). Ölçüm
+~20 TL tutacaktı → ödenmedi. Google ve Azure backend fazında, gerçek
+kullanım başlayınca ölçülür. Aday: **Speechmatics + ipucu**.

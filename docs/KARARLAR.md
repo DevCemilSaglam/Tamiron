@@ -10,6 +10,35 @@
 
 ---
 
+## K-061 · Ses tanıyıcı adayı: Speechmatics + ipucu; Google/Azure backend fazında (16.10.2026)
+
+> **Cemil, 16.10:** Google Cloud'un Türkiye hesabı için istediği bir kerelik
+> **1.500 TL ön ödemeyi** gördükten sonra: *"Evet, 1 olarak devam edelim."*
+
+**61.1 · Aday:** **Speechmatics Enhanced + kelime ipucu** (dükkânın plakaları,
+marka/modelleri, terimler — `SOYLEYIS_IFADELER()`). 300 gerçek kayıtta
+(PARALI-TANIMA "İlk tur"): sınav %79 (Chrome %72), yanlış 33 → 20, plakası
+doğru duyulan 55 → 82/127. Dükkân başına ayda ~$0,45. AssemblyAI elendi
+(Türkçede ipucu etkisiz).
+
+**61.2 · Bu fazda değişen yok.** Prototip Chrome'un ücretsiz tanıyıcısıyla
+kalır; paralı tanıyıcının anahtarı tarayıcıda duramaz (YAPAY-ZEKA §4) →
+backend fazı (K-055.1).
+
+**61.3 · Google Chirp 3 ve Azure ölçülmedi — backend fazında.** Google,
+Türkiye hesabını etkinleştirmek için **bir kerelik en az 1.500 TL ön ödeme**
+istiyor (ücret değil, bakiye; ölçüm ~20 TL tutardı). Ölçüm için parayı
+aylarca kullanılmayacak bir hesaba kilitlemek gereksiz bulundu. Gerçek
+kullanım başlayınca ön ödeme harcanacak bakiye olur; o zaman Google ve
+Azure aynı 300 kayıtla (`parali-tanima-kos.js`) Speechmatics'le
+karşılaştırılır. Google projesi açık, ücretsiz bekliyor.
+
+**61.4 · Motor tanıyıcıdan bağımsız kalır.** Yazım biçimi toparlama
+(16.10) hangi tanıyıcı seçilirse seçilsin çalışır; ölçüm koşucusu ve cetvel
+hazır — tanıyıcı değişince yalnız bir koşu.
+
+---
+
 ## K-060 · Yayında ses kayıtları SAKLANIR — yanlış da olsa (16.10.2026)
 
 > **Cemil, 16.10:** *"Ses kayıtlarını yanlış da olsa saklayalım, böylece
