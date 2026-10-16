@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-16 17:41
+  Üretim: 2026-10-16 18:24
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -8579,7 +8579,19 @@ var SOYLEYIS_MARKA = {
   'jeep': ['!cip'],
   'tofas': ['tofas'],
   'togg': ['tog'],
-  'chery': ['ceri', '!seri']
+  'chery': ['ceri', '!seri'],
+  /* 16.10 genişletme — ticari ve sık gelen markalar */
+  'iveco': ['iveko', 'ivekko', 'ayveko'],
+  'isuzu': ['izuzu', 'isuzi'],
+  'mazda': ['mazda'],
+  'suzuki': ['suzuki', 'sizuki'],
+  'volvo': ['volvo'],
+  'subaru': ['subaru'],
+  'land rover': ['lend rover', 'land rover', 'lendrover'],
+  'porsche': ['porse', 'porsh'],
+  'cupra': ['kupra'],
+  'mg': ['me ge', 'em ci', 'emci'],
+  'byd': ['be ye de', 'bi way di']
 };
 
 var SOYLEYIS_MODEL = {
@@ -8618,7 +8630,28 @@ var SOYLEYIS_MODEL = {
   'sportage': ['sportaj', 'sportec'], 'ceed': ['sid', 'cid'], 'picanto': ['pikanto'],
   'leon': ['liyon'], 'ibiza': ['ibiza'],
   /* Tofaş */
-  'sahin': ['sahin'], 'dogan': ['!dogan'], 'kartal': ['!kartal']
+  'sahin': ['sahin'], 'dogan': ['!dogan'], 'kartal': ['!kartal'],
+  /* 16.10 genişletme — TİCARİ (minibüs, kamyonet: tamirhanenin sık müşterisi) */
+  'sprinter': ['ispirinter', 'sipirinter', 'sprinter'], 'vito': ['vito', 'vitto'],
+  'ducato': ['dukato', 'dukkato'], 'transit custom': ['tranzit kastim', 'transit kastim', 'tranzit kustom'],
+  'trafic': ['!trafik'], 'master': ['!master', 'mastir'], 'daily': ['deyli', 'dayli', '!deli'],
+  'boxer': ['bokser', 'boksir'], 'jumper': ['cumper', 'campır', 'camper'], 'expert': ['ekspert', 'eksper'],
+  'crafter': ['krafter', 'kraftır'], 'amarok': ['amarok'], 'navara': ['navara'], 'l200': ['l 200', 'el iki yuz'],
+  'h 100': ['h100', 'ha yuz', 'hayuz'], 'bongo': ['bongo'], 'd max': ['di maks', 'dimaks', 'de maks'],
+  /* Binek — eksikler */
+  'astra': ['astra'], 'vectra': ['vektra'], 'meriva': ['meriva'], 'zafira': ['zafira'],
+  'mondeo': ['mondeo'], 'kuga': ['kuga'], 'puma': ['puma'],
+  'golf': ['golf'], 'polo': ['polo'], 'scirocco': ['siroko', 'sirokko'], 'touran': ['!turan'],
+  'rifter': ['rifter'],
+  'c5 aircross': ['c5 eyrkros', 'se bes eyrkros'],
+  'tipo': ['tipo'], 'auris': ['oris'], 'yaris': ['yaris'], 'corolla cross': ['korolla kros'], 'arteon': ['arteon'], 'bora': ['!bora'], 'panda': ['panda'], 'palio': ['palyo', 'palio'], 'albea': ['albea', 'albeya'],
+  'taliant': ['talyant', 'taliyant'], 'austral': ['ostral'], 'koleos': ['koleos'],
+  'hr v': ['eyc ar vi', 'ha re ve'],
+  'kona': ['kona'], 'bayon': ['bayon'], 'santa fe': ['santa fe', 'santafe'], 'ix35': ['i iks 35', 'ay iks otuz bes'],
+  'stonic': ['stonik'], 'niro': ['niro'], 'sorento': ['sorento'], 'rio': ['riyo'],
+  'x trail': ['iks treyl', 'ekstreyl'], 'note': ['!not'], 'kamiq': ['kamik'], 'karoq': ['karok'],
+  'kodiaq': ['kodiyak', 'kodyak'], 'scala': ['skala'], 'arona': ['arona'], 'ateca': ['ateka'],
+  'formentor': ['formentor'], 'swift': ['svift', 'suift'], 'vitara': ['vitara'], 'cx 5': ['si eks 5', 'ce iks bes']
 };
 
 /* Parça / iş adlarının söyleyişleri. Metnin KENDİSİ kayıttaki biçime
@@ -8658,7 +8691,40 @@ var SOYLEYIS_TERIM = [
   [['kece'], 'keçe'],
   [['bicon'], 'bijon'],
   [['civata'], 'cıvata'],
-  [['rotbalans'], 'rot balans']
+  [['rotbalans'], 'rot balans'],
+  /* 16.10 genişletme — yalnız YANLIŞ söyleyiş; eş anlamlı DEĞİL ("klakson"
+     ile "korna" ikisi de doğru, biri ötekine çevrilmez). */
+  [['porya', 'porye', 'poyre'], 'poyra'],
+  [['kalipır', 'kalipir', '!kaliber'], 'kaliper'],
+  [['musir', 'müsir'], 'müşir'],
+  [['hareret', 'hararat'], 'hararet'],
+  [['susdurucu', 'susdurugu'], 'susturucu'],
+  [['rektefiye', 'rektifye', 'rektafiye'], 'rektifiye'],
+  [['lamda'], 'lambda'],
+  [['devirdaym', 'devridaim', 'devir daim'], 'devirdaim'],
+  [['debi metre', 'debimetere'], 'debimetre'],
+  [['türbo'], 'turbo'],
+  [['katalizor', 'katalizatör'], 'katalizör'],
+  [['şarz dinamosu', 'sarz dinamosu', 'şarj dinamusu'], 'şarj dinamosu'],
+  [['edblu', 'ad blu', 'adblu', 'ed blu'], 'AdBlue'],
+  [['helozon', 'helezun'], 'helezon'],
+  [['cant'], 'jant'],
+  [['vitez'], 'vites'],
+  [['e ge re', 'egr valfi'], 'EGR'],
+  [['de pe fe'], 'DPF'],
+  [['a be se'], 'ABS'],
+  [['e se pe'], 'ESP'],
+  [['marş motur', 'mars motoru'], 'marş motoru'],
+  [['aks körüğü', 'aks köryüğü', 'aks korugu'], 'aks körüğü'],
+  [['gergi rulmani', 'gergi rülmanı'], 'gergi rulmanı'],
+  [['tirger kayışı', 'triger kayisi'], 'triger kayışı'],
+  [['silindir kapağı', 'silindir kapagi', 'slindir kapağı'], 'silindir kapağı'],
+  [['yağ müşiri', 'yag musiri'], 'yağ müşiri'],
+  [['fren hidroliği', 'fren hidroligi', 'fren hidrolik yağı'], 'fren hidroliği'],
+  [['debriyaj merkezi', 'debriyaç merkezi'], 'debriyaj merkezi'],
+  [['viraj demiri', 'viraj demirı'], 'viraj demiri'],
+  [['zet rot', 'z rot'], 'Z rot'],
+  [['enjektör memesi', 'enjektor memesi'], 'enjektör memesi']
 ];
 
 /* Tanıyıcıya verilecek İPUCU listesi (Web Speech `phrases`): kayıttaki
