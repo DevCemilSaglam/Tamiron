@@ -156,3 +156,45 @@ kullanıma dönüşünce ölçülür (K-061.3).
 
 **Ölçüm aletine eklenen ders:** "söylenmemiş kayıtlı plaka" sayacı —
 tanıyıcı karşılaştırmasında doğruluktan ÖNCE bakılır.
+
+## Chirp 3 — web araştırması (17.10) · ÖLÇÜLMEDİ
+
+**Ne:** Google'ın kendi tanımıyla *"ASR-specific generative model"* —
+yalnız konuşma tanıma için eğitilmiş, USM (2 milyar parametre, Conformer
+kodlayıcı) soyundan. Gemini gibi genel bir dil modeli DEĞİL. Türkçe tr-TR
+GA (eu ve us); ipucu ("speech adaptation") GA, en çok 1.000 ifade; "custom
+prompt" önizlemede (yalnız biçim). Google: *"kaliteyi düşürmemek için
+mümkün olduğunca az ifade verin."*
+
+**Türkçe doğruluk — yayımlanmış Chirp 3 Türkçe rakamı YOK.** Bulunan:
+- Speechmatics'in kendi sayfası (FLEURS, satıcı ölçümü): Speechmatics
+  Enhanced %7,74 · Amazon %8,18 · **Google Chirp 2 %9,78** · Deepgram %10,94
+  · Azure %12,63. Chirp 3 tabloda yok; Google Chirp 3'ün Chirp 2'den iyi
+  olduğunu söylüyor (rakamsız).
+- Bağımsız: gürültülü Felemenkçede Chirp 3 sekiz sistemin en iyisi (%11,2;
+  Whisper %15,8). Türkçe değil.
+- FLEURS temiz okunmuş genel cümle — bizim alanımız değil. Bizde aynı
+  Speechmatics'in kelime hatası %26–31 (plaka, parça adı, dükkân gürültüsü).
+  **Genel benchmark farkı bizim veriye taşınmaz.**
+
+**Beklenti (tahmin):** genel Türkçede Chirp 3 ≈ Speechmatics (±1–3 puan
+kelime hatası). Bizde asıl belirleyici: plaka harfleri + ipucunun nasıl
+işlediği + uydurma — ancak ölçülür.
+
+**Gemini ile farkı:** Gemini (Transcribe dahil) bir DİL MODELİ — ipucu
+listesini bağlam olarak okuyor ve "doldurulacak cevap" gibi kullanabiliyor
+(bizde %7,7 uydurma). Chirp 3 konuşmaya özel; ipucu bir "ağırlık artırma"
+(boost) — söylenmemiş kelimeyi yazdırmaktan çok, duyulana yakın olanı
+seçtirir. Uydurma riski muhtemelen DAHA DÜŞÜK, ama "generative" ve "custom
+prompt" var → SIFIR olduğu varsayılamaz; K-061.3c sayacıyla ölçülür.
+
+**Pratik engel:** Chirp 3 Google CLOUD faturalandırması ister → 1.500 TL ön
+ödeme (AI Studio'daki 250 TL Gemini kredisi Cloud Speech'e GEÇMEZ — ayrı
+ürün, ayrı faturalandırma hesabı). Fiyat ~$0,016/dk (Speechmatics
+~$0,0063/dk; dükkân başına ayda ~$1,1 / ~$0,45).
+
+Kaynaklar: [Chirp 3 (Google)](https://docs.cloud.google.com/speech-to-text/docs/models/chirp-3) ·
+[Speechmatics Türkçe](https://www.speechmatics.com/speech-to-text/turkish) ·
+[USM (Google Research)](https://research.google/blog/universal-speech-model-usm-state-of-the-art-speech-ai-for-100-languages/) ·
+[Chirp 3 profili (OpenTranscription)](https://opentranscription.io/blog/google-cloud-chirp-3-capabilities-architecture-costs-and-com.html) ·
+[Chirp 3 sürüm notları](https://docs.cloud.google.com/speech-to-text/docs/release-notes)
