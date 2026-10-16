@@ -2432,6 +2432,18 @@ function stilMetni() {
     if (sesSoyleyisDuzelt('amortisor') !== 'amortisör') ek('SES-DUYULAN', 'ses', 'harfsiz soyleyis ("amortisor") duzeltilmedi');
     if (sesSoyleyisDuzelt('manifold contasi') !== 'manifold contasi') ek('SES-DUYULAN', 'ses', '"manifold" bozuldu: ' + sesSoyleyisDuzelt('manifold contasi'));
     if (typeof SOYLEYIS_IFADELER !== 'function' || SOYLEYIS_IFADELER().indexOf('34 ABC 123') < 0) ek('SES-DUYULAN', 'ses', 'taniyici ipucu listesi dukkanin plakalarini icermiyor');
+    /* Yazim bicimi (16.10, Speechmatics): saat gibi yazilan rakam, nokta,
+       "3 bin 900"; bicime uymayan sahte plaka atlanir. */
+    o = coz('saat 10:30 da 06 TMR 07 gelecek');
+    if (o.plaka !== '06 TMR 07') ek('SES-DUYULAN', 'ses', 'bicime uymayan sahte plaka ("30 DA 06") secildi: ' + o.plaka);
+    var tmrK2 = KAYITLAR.filter(function (k) { return k.plaka === '06 TMR 07' && !k.teslimTarihi; })[0];
+    if (!tmrK2) ek('SES-DUYULAN', 'kayit', '06 TMR 07 icin acik kayit yok -- "3 bin 900" olculemedi');
+    else {
+      var yk2 = window.ACIK_KAYIT; var tmrKayitId = tmrK2.id; window.SESLI_NIYET = 'kayit-icinde'; window.ACIK_KAYIT = tmrKayitId;
+      o = coz('Motor yağı 3 bin 900 lira.');
+      if (o.fiyat !== 3900) ek('SES-DUYULAN', 'kayit', '"3 bin 900 lira." 3900 okunmadi: ' + o.fiyat);
+      window.SESLI_NIYET = 'genel'; window.ACIK_KAYIT = yk2;
+    }
     o = coz('yarın 123 balata gelecek');
     if (o.plaka) ek('SES-DUYULAN', 'ses', 'zaman sozlu sayi ("yarin 123") plakaya baglandi: ' + o.plaka);
     /* 300 gercek kayit (16.10): taniyici plaka harfini sozcuge cevirir,
