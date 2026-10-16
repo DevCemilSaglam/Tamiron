@@ -198,3 +198,43 @@ Kaynaklar: [Chirp 3 (Google)](https://docs.cloud.google.com/speech-to-text/docs/
 [USM (Google Research)](https://research.google/blog/universal-speech-model-usm-state-of-the-art-speech-ai-for-100-languages/) ·
 [Chirp 3 profili (OpenTranscription)](https://opentranscription.io/blog/google-cloud-chirp-3-capabilities-architecture-costs-and-com.html) ·
 [Chirp 3 sürüm notları](https://docs.cloud.google.com/speech-to-text/docs/release-notes)
+
+## Kademeli tanıma: önce ücretsiz + motor, gerekirse paralı (17.10)
+
+> **Cemil, 17.10:** *"Motoru speechmatics'i minimum kullanacak şekilde
+> tasarlayabilir miyiz? Yani önce motor, sonra paralı model gibi?"*
+
+**Yapı:** Chrome (ücretsiz) tanır → motor anlar → motor EMİN DEĞİLSE aynı
+ses Speechmatics'e (ipuçlu) gider ve motor onun metnini anlar. Usta yalnız
+o komutlarda ~1–2 sn fazla bekler.
+
+**Ölçüm — canlandırma:** aynı 300 kaydın iki dökümü elimizde (Chrome,
+Speechmatics + ipucu); kademe kayıt kayıt canlandırıldı, aynı cetvel. Kural
+parti 1–3'te seçildi, parti 4–6'da raporlandı.
+
+Geliştirme (1–3): yalnız Chrome %79 · yalnız Speechmatics %83 · **"öneri
+soruyorsa" %85, paralıya %6** · "öneri ya da anlaşılmadı" %85, %20 —
+eşit doğrulukta ucuz olan seçildi (DONDURULDU: "öneri soruyorsa").
+
+| sınav (4–6) | doğru | paralıya giden | dükkân / ay |
+|---|---|---|---|
+| yalnız Chrome | %72 | %0 | $0 |
+| yalnız Speechmatics | %79 | %100 | ~$0,45 |
+| **kademe — öneri soruyorsa** (dondurulan) | **%79** | **%7** | ~$0,03 |
+| kademe — öneri **ya da anlaşılmadı** | **%84** | %25 | ~$0,11 |
+
+**Okuma:**
+1. Dondurulan kural, Speechmatics'in TAMAMININ doğruluğunu **maliyetin
+   1/14'üne** veriyor.
+2. "Anlaşılmadı"yı da eklemek sınavda +5 puan getiriyor (%84) — iki
+   tanıyıcıdan da İYİ: Chrome'un anladığını Chrome'dan, anlamadığını
+   Speechmatics'ten alıyor. ⚠️ Bu kural geliştirmede öne çıkmamıştı
+   (eşitti); sınav rakamına bakılarak seçilirse sınav kirlenir — bu yüzden
+   karar Cemil'in: ikisi de dükkân başına ayda kuruşlar.
+3. Paralı katman yalnız sorunlu komutta çalıştığı için gecikme de yalnız
+   orada.
+
+**Mimari (backend fazı, K-055.1):** tarayıcı Chrome'la tanırken sesi AYNI
+ANDA kaydeder (MediaRecorder); motor emin değilse sesi backend'e yollar,
+backend anahtarla Speechmatics'e sorar. Anahtar tarayıcıda durmaz. Prototipte
+bugün ölçülebilir, çalıştırılamaz.

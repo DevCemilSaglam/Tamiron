@@ -10,6 +10,29 @@
 
 ---
 
+## K-062 · Kademeli ses tanıma: önce ücretsiz + motor, gerekirse paralı (17.10.2026)
+
+> **Cemil, 17.10:** *"Motoru speechmatics'i minimum kullanacak şekilde
+> tasarlayabilir miyiz? Yani önce motor, sonra paralı model gibi?"*
+
+**62.1 · Yapı:** Chrome tanır → motor anlar → motor emin değilse aynı ses
+Speechmatics'e (ipuçlu) gider. Ölçüldü (300 kayıt, canlandırma —
+PARALI-TANIMA "Kademeli tanıma"): sınavda **%79, paralıya %7** = tamamen
+Speechmatics'in doğruluğu, maliyetin 1/14'ü.
+
+**62.2 · Açık — Cemil (A-M51): hangi durumda paralıya?**
+- (a) yalnız motor ÖNERİ soruyorsa — geliştirmede seçilen kural; sınav %79,
+  paralıya %7;
+- (b) öneri soruyorsa YA DA anlaşılmadıysa — sınav %84, paralıya %25;
+  geliştirmede (a) ile eşitti, sınavda öne çıktı (sınava bakılarak seçmek
+  ölçümü kirletir — bu yüzden karar Cemil'in, rakam açıkça yazıldı).
+Maliyet ikisinde de dükkân başına ayda kuruşlar (~$0,03 / ~$0,11).
+
+**62.3 · Backend fazında:** tarayıcı tanırken sesi aynı anda kaydeder;
+paralı katman backend'den (anahtar tarayıcıda durmaz). Bu fazda kod yok.
+
+---
+
 ## K-061 · Ses tanıyıcı adayı: Speechmatics + ipucu; Google/Azure backend fazında (16.10.2026)
 
 > **Cemil, 16.10:** Google Cloud'un Türkiye hesabı için istediği bir kerelik
