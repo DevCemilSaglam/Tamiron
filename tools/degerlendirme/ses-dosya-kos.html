@@ -165,13 +165,15 @@ function durum(m) { $('durum').textContent = m; }
      radyo düğmesi ("İlk kayıtlar") SESSİZCE ölçülüyordu — 16.10'da beş koşu
      büyük set yerine 13.10'un eski kayıtlarını ölçtü. */
   var adresKlasor = new URLSearchParams(location.search).get('klasor');
+  /* &ipucu=1 — "beklenen kelimeleri bildir" adresten açılır (16.10). */
+  if (new URLSearchParams(location.search).get('ipucu') === '1') $('ifadeler').checked = true;
   if (adresKlasor) {
     var radyo = document.querySelector('input[name="klasor"][value="' + adresKlasor + '"]');
     if (radyo) radyo.checked = true;
     else { document.querySelector('input[name="klasor"][value="buyuk"]').checked = true; $('buyukKlasor').value = adresKlasor; }
   }
   durum('Hazır — ' + SET.cumleler.length + ' cümlelik set yüklendi.' +
-        (adresKlasor ? ' Klasör: ' + adresKlasor : ''));
+        (adresKlasor ? ' Klasör: ' + adresKlasor : '') + ($('ifadeler').checked ? ' · İPUCU AÇIK' : ''));
 })();
 
 /* s07.snr12.wav → { id: 7, tur: 'snr12' } */
@@ -401,7 +403,7 @@ document.addEventListener('click', async function (e) {
       }
       SECIM = { tum: tum, gurultu: g };
       SON_AD = 'ses-olcum-' + tur + (tur === 'derlem' || tur === 'derlem5' ? '' : '-' + klasor) +
-               (g ? '-' + b.getAttribute('data-g') : '') + '.json';
+               (g ? '-' + b.getAttribute('data-g') : '') + ($('ifadeler').checked ? '-ipucu' : '') + '.json';
       $('kos').disabled = false;
       $('kos').click();
     } catch (x) { durum('Alınamadı: ' + x.message + ' — yerel sunucu açık mı?'); SECIM = null; MESGUL = false; }
@@ -420,6 +422,12 @@ $('kos').addEventListener('click', async function () {
   var P = $('prototip').contentWindow;
   if (!P || typeof P.SES_COZUMLE !== 'function') { durum('Prototip yüklenmedi — sayfayı yenile.'); return; }
   var ifadeAcik = $('ifadeler').checked;
+  /* İPUCU LİSTESİ SÖZLÜKTEN (16.10): dükkânın plakaları + marka/modelleri
+     + terimler + işlerin sözleri (betik/05-soyleyis.js). Kurmaca dükkânla
+     koşuluyorsa ONUN araçları. Sabit 8 kelime yalnız eski prototipte kalır. */
+  if (ifadeAcik && typeof P.SOYLEYIS_IFADELER === 'function') {
+    BEKLENEN = P.SOYLEYIS_IFADELER(SET.dukkan ? SET.dukkan.araclar : P.ARACLAR);
+  }
   var tum = SECIM ? SECIM.tum : Array.prototype.slice.call($('dosyalar').files);
   KOSUYOR = true;
 

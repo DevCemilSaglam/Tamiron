@@ -35,7 +35,7 @@ tam bu dörtlüyle yapıldı — SES-OLCUM §14):
 **Ustanın düzelttiği son hâl kendiliğinden doğru cevaptır** — elle etiket
 gerekmeden büyüyen bir değerlendirme seti.
 
-**60.2 · Açık — Cemil onayına (A-M50):**
+**60.2 · ~~Açık~~ KAPANDI — Cemil 16.10: *"Gizlilik notu ve süre'de tamamız."* (A-M50)** — not metni ve 90 gün aşağıdaki gibi; prototipte `GIZLILIK_CUMLESI` güncellendi.
 - **Gizlilik notu** bugün *"internet üzerinden GÖNDERİLİR"* diyor; *"…ve
   SAKLANIR"* demeli. Önerilen metin: *"Söyledikleriniz ve çektiğiniz
   fotoğraflar yazıya çevrilmek üzere internet üzerinden gönderilir; hatalı

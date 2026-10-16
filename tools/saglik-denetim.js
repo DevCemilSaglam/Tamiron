@@ -2427,6 +2427,13 @@ function stilMetni() {
     o = coz('06 TMR 07 kilometre seksen sekiz bin');
     if (o.km !== '88.000') ek('SES-DUYULAN', 'ses', '"seksen sekiz bin" km olmadi: ' + o.km);
     if (sesSoyleyisDuzelt('eksozdan duman') !== 'egzozdan duman') ek('SES-DUYULAN', 'ses', 'egzoz soyleyisi duzeltilmedi');
+    /* Sozluk (betik/05-soyleyis.js, 16.10): harfsiz yazim da duzelir;
+       kayittaki bicimin BASI olan soyleyis ikinci kez degismez. */
+    if (sesSoyleyisDuzelt('amortisor') !== 'amortisör') ek('SES-DUYULAN', 'ses', 'harfsiz soyleyis ("amortisor") duzeltilmedi');
+    if (sesSoyleyisDuzelt('manifold contasi') !== 'manifold contasi') ek('SES-DUYULAN', 'ses', '"manifold" bozuldu: ' + sesSoyleyisDuzelt('manifold contasi'));
+    if (typeof SOYLEYIS_IFADELER !== 'function' || SOYLEYIS_IFADELER().indexOf('34 ABC 123') < 0) ek('SES-DUYULAN', 'ses', 'taniyici ipucu listesi dukkanin plakalarini icermiyor');
+    o = coz('yarın 123 balata gelecek');
+    if (o.plaka) ek('SES-DUYULAN', 'ses', 'zaman sozlu sayi ("yarin 123") plakaya baglandi: ' + o.plaka);
     /* 300 gercek kayit (16.10): taniyici plaka harfini sozcuge cevirir,
        il kodunu kacirir, rakama nokta koyar; RAKAM cogunlukla dogru. */
     o = coz('Hatice 88 90 bakıma geldi');
