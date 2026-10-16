@@ -578,3 +578,46 @@ negatif: her biri tek tek bozuldu → bulgu; geri → 0. 320/375/430 px 0 bulgu.
 **Kalan küçük kusur (yazıldı, düzeltilmedi):** araç tarifinde "Ne istiyor"
 alanına dolgu sözü kalıyor ("geldi yağ değişimi yapılacak", "şu
 trigerini…"). Usta onay ekranında görür; zararsız.
+
+## 13 · Söyleyiş seti — Cemil'in örnekleri (16.10)
+
+> **Cemil, 16.10:** *"Türkçe'de yapıyorum yerine yapıyom denilebilir.
+> C-Elysée var Citroën. Bunu okuyabilen çok azdır. Ayrıca egzost doğru
+> söyleyen çok azdır. … tel no söylerken 33 yerine 23 denip
+> değiştirilebilir. … 4487 ise kırk dört seksen yedi diye okunabilir, dört
+> bin dört yüz seksen yedi de denebilir. Courier model de örnek, doğru
+> söylenemez genellikle. Ve kredi kartı yerine kk kısaltması da
+> kullanılabilir. Ege'de Karadeniz'de vb ustaların şivesi olabilir."*
+
+`soyleyis-seti.json` — 30 cümle, sekiz konu, kendi küçük dükkânı. Motor
+düzeltilmeden ÖNCE commit'lendi (8a5d07d). Kök Cemil'in bilgisi — benim
+üretecim değil; ama cümleleri ben yazdım, düzeltmeleri de ben yaptım →
+%100 aynı şişkinliği taşır (§12). Gerçek sınav: kayıtlar.
+
+| konu | önce | sonra | ne yapıldı |
+|---|---|---|---|
+| konuşma dili ("yapıyom", "yapılcak") | 5/5 | 5/5 | — motor kök arıyor, fiil sonu sorun değil |
+| C-Elysée ("se elize", "selize") | 0/4 | 4/4 | söyleyiş sözlüğü + model tek başına "geldi" ile |
+| egzoz ("egzost", "eksoz") | 2/4 | 4/4 | terim sözlüğü: metin kayıttaki biçime çevrilir |
+| söylerken düzeltme ("33 yok 23") | 1/4 | 4/4 | iki sayı arasındaki yok/pardon/hayır/değil/yani |
+| sayı okuyuşu ("kırk dört seksen yedi") | 2/4 | 4/4 | **sayılar toplanıyordu** → Türkçe sayı dilbilgisiyle gruplara bölünüyor |
+| Courier ("kuryer", "kurier") | 0/3 | 3/3 | sözlük; "kurye" GERÇEK KELİME → yalnız "Ford" ile |
+| kk | 1/3 | 3/3 | "kk" = kart |
+| şive ("teslim ettum", "bakuma") | 2/3 | 3/3 | "bakum" kökü |
+| **toplam** | **%53** | **%100** | |
+
+**Asıl kusur sayıdaydı:** art arda gelen BÜTÜN sayı sözcükleri tek sayıya
+toplanıyordu — "kırk dört seksen yedi" 131, sözcükle söylenen telefon tek
+bir anlamsız sayı oluyordu. Artık: birler birlerden, onlar birler/onlardan
+sonra yeni sayı başlatır; "otuz iki yüz" iki sayıdır; "dört bin dört yüz
+seksen yedi" tek sayıdır. 14 birim deneme, hepsi doğru.
+
+**Gerilemedi:** büyük set %99/%100, eski 40'lık %98, dökümler %85/%73 —
+aynı. Eşdeğerlik 576/0 · 400/0 · 16/0. Zorlama: "kurye geldi paket
+bıraktı", "kedi geldi" araç sayılmıyor; "750 yani 800" → 800.
+Test 55 genişledi; negatif: düzeltme kapatıldı → bulgu; sözlükten "!"
+kaldırıldı ("kurye" tek başına araç) → bulgu. 320/375/430 px 0 bulgu.
+
+**Şive — dürüst sınır:** yazıya geçen şive (ettum, bakuma) ele alınabilir;
+SESİN kendisini tanıyıcı çözüyor. Ege/Karadeniz konuşmacılarının kaydı
+olmadan ölçülemez.

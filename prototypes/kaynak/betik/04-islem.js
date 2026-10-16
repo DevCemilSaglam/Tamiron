@@ -166,6 +166,75 @@ function duzenlemeUzakligi(a, b) {
      bağlanmaz — "uydurmak, anlamamaktan kötüdür". */
 function regKacir(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
 
+/* ---- SÖYLEYİŞ SÖZLÜĞÜ (16.10 · Cemil) ----
+   *"C-Elysée var Citroën. Bunu okuyabilen çok azdır. Ayrıca egzost doğru
+   söyleyen çok azdır. … Courier model de örnek, doğru söylenemez
+   genellikle."* Usta adı yazıldığı gibi değil, SÖYLEDİĞİ gibi söyler;
+   tanıyıcı da duyduğunu yazar. Sözlük duyulan biçimi kayıttaki biçime
+   bağlar.
+   ⚠️ "!" ile başlayan söyleyiş GERÇEK BİR TÜRKÇE KELİMEDİR ("kurye geldi"
+   bir insan olabilir) — yalnız MARKAYLA birlikte araç sayılır. */
+var SOYLEYIS_MODEL = {
+  'c elysee': ['se elize', 'si elize', 'selize', 'sielize', 'c elize', 'se elise', 'elize', 'elysee'],
+  'courier': ['kuryer', 'kurier', 'kuriyer', '!kurye'],
+  'megane': ['megan', 'mejan'],
+  'qashqai': ['kaskay', 'kaskai'],
+  'octavia': ['oktavya', 'oktavia'],
+  'tucson': ['tuson', 'tukson'],
+  'symbol': ['sembol', 'simbol'],
+  'clio': ['klio'],
+  'passat': ['pasat'],
+  'caddy': ['!kedi', 'keddi', 'kadi']
+};
+var SOYLEYIS_MARKA = {
+  'citroen': ['sitroen', 'sitroyen', 'citroen'],
+  'peugeot': ['pejo', 'pejot', 'puju', 'pijo'],
+  'volkswagen': ['folksvagen', 'volksvagen', 'folksvagin'],
+  'hyundai': ['hundai', 'hunday', 'hyunday'],
+  'renault': ['reno'],
+  'skoda': ['skoda', 'sikoda']
+};
+/* Parça/iş adının söyleyişleri: metnin KENDİSİ düzeltilir — "eksoz
+   contası 900 lira" kayıttaki "Egzoz contası" satırına uysun. */
+var SOYLEYIS_TERIM = [
+  [['egzost', 'eksoz', 'egzos', 'ekzos', 'eksos', 'ekzoz', 'egsoz'], 'egzoz']
+];
+
+/* Aksan ve tireden arınmış karşılaştırma biçimi: "C-Elysée" → "c elysee". */
+function sade(s) {
+  return norm(s).replace(/[éèë]/g, 'e').replace(/[áâà]/g, 'a').replace(/[îï]/g, 'i')
+                .replace(/[ûù]/g, 'u').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function soyleyisleri(sozluk, ad) {
+  var a = sade(ad);
+  return [a].concat(sozluk[a] || []);
+}
+
+/* Metindeki terim söyleyişlerini kayıttaki biçime çevirir. Kelime başına
+   bakar ("eksozdan" → "egzozdan"); K-018: \b YOK. */
+function sesSoyleyisDuzelt(metin) {
+  SOYLEYIS_TERIM.forEach(function (t) {
+    t[0].forEach(function (v) {
+      metin = metin.replace(new RegExp('(^|[^A-Za-zÇĞİÖŞÜçğıöşü])' + v, 'gi'), '$1' + t[1]);
+    });
+  });
+  return metin;
+}
+
+/* SÖYLERKEN DÜZELTME (16.10 · Cemil: "tel no söylerken 33 yerine 23 denip
+   değiştirilebilir"): "33 yok 23", "124 hayır 123", "3500 pardon 3800" —
+   düzeltme sözünden ÖNCEKİ sayı atılır, sonraki kalır. Yalnız iki SAYI
+   arasında: "parayı almadım, yok" gibi cümlelere dokunmaz. */
+function sesDuzeltmeUygula(metin) {
+  var onceki;
+  do {
+    onceki = metin;
+    metin = metin.replace(/(^|\s)\d+\s+(?:yok|pardon|hayır|hayir|değil|degil|yani)\s+(\d+)/i, '$1$2');
+  } while (metin !== onceki);
+  return metin;
+}
+
 function sesAracTarif(metin, baglam) {
   if (typeof ARACLAR === 'undefined') return null;
   if (baglam && baglam !== 'genel' && baglam !== 'servis-ekle') return null;
@@ -178,11 +247,30 @@ function sesAracTarif(metin, baglam) {
     if (m) bulunan.push({ a: a, i: m.index + m[1].length, n: m[2].length, tur: 'sahip' });
   });
   if (!bulunan.length) {
+    /* Aksan/tire arınmış ama AYNI UZUNLUKTA metin — bulunan yer orijinal
+       metinden kesilecek (c.kalan). */
+    var ds = d.replace(/[éèë]/g, 'e').replace(/[áâà]/g, 'a').replace(/[îï]/g, 'i')
+              .replace(/[ûù]/g, 'u').replace(/-/g, ' ');
     ARACLAR.forEach(function (a) {
-      var mm = norm((a.marka || '') + ' ' + (a.model || '')).trim();
-      var mo = norm(a.model || '').trim();
-      var m = mm.indexOf(' ') > 0 ? d.match(new RegExp('(^|\\s)(' + regKacir(mm) + ")(?=\\s|$|')")) : null;
-      if (!m && mo && !/^\d+$/.test(mo)) m = d.match(new RegExp('(^|\\s)(' + regKacir(mo) + iyelik + ')(?=\\s|$)'));
+      var markalar = soyleyisleri(SOYLEYIS_MARKA, a.marka || '');
+      var modeller = soyleyisleri(SOYLEYIS_MODEL, a.model || '');
+      var m = null;
+      /* 1) marka + model ("Citroen Elize", "Ford Kurye") — "!"li söyleyiş
+            yalnız burada geçerli. */
+      markalar.forEach(function (mk) {
+        modeller.forEach(function (md) {
+          if (m || !mk || !md) return;
+          m = ds.match(new RegExp('(^|\\s)(' + regKacir(mk) + '\\s+' + regKacir(md.replace(/^!/, '')) + ")(?=\\s|$|')"));
+        });
+      });
+      /* 2) model tek başına: iyelikle ("Mégane'ın") ya da "geldi" ile
+            ("Se Elize geldi"). Rakamdan ibaret model (301) ve "!"li
+            söyleyiş tek başına sayılmaz. */
+      modeller.forEach(function (md) {
+        if (m || !md || md.charAt(0) === '!' || /^\d+$/.test(md)) return;
+        m = ds.match(new RegExp('(^|\\s)(' + regKacir(md) + iyelik + ')(?=\\s|$)')) ||
+            ds.match(new RegExp('(^|\\s)(' + regKacir(md) + ')(?=\\s+geldi)'));
+      });
       if (m) bulunan.push({ a: a, i: m.index + m[1].length, n: m[2].length, tur: 'model' });
     });
   }
@@ -296,7 +384,8 @@ function sesServisOku(c) {
   var dk = c.dk, kalan = c.kalan;
   /* "yağ değişimi" bakımdır (14.10 · büyük set: hep tamirat çıkıyordu);
      "yağ kaçırıyor" DEĞİL — bu yüzden kök değil, ikili kelime. */
-  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('periyodik') >= 0 ||
+  /* "bakuma" — Karadeniz söyleyişi (16.10, Cemil: şive). */
+  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('bakum') >= 0 || dk.indexOf('periyodik') >= 0 ||
                 dk.indexOf('yag degis') >= 0) ? 'bakim' : 'tamirat';
   var km = '';
   var kmE = dk.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
@@ -446,6 +535,9 @@ var Islem = (function () {
      Kural Tur 7'de yalnız kayıt ekranı için elle yazılmıştı; artık
      varsayılan işi olan HER bağlam için aynı yoldan geçiyor. */
   function cozumle(metin, baglam, kayitId) {
+    /* Önce ustanın kendi düzeltmesi ("33 yok 23"), sonra söyleyiş
+       sözlüğü ("eksoz" → "egzoz") — 16.10. */
+    metin = sesSoyleyisDuzelt(sesDuzeltmeUygula(metin));
     var c = baglamKur(metin, baglam, kayitId);
     return duyulaniIsaretle(doldur(c), c);
   }

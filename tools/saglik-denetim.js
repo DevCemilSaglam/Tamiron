@@ -2419,6 +2419,23 @@ function stilMetni() {
     if (!p5 || p5.plaka !== '34 M 49109') ek('SES-DUYULAN', 'ses', 'tek harfli 5 rakamli plaka okunmadi: ' + (p5 && p5.plaka));
     o = coz('41 KV 5588 İsmail Özdemir 0532 111 22 33 debriyaj kaciriyor');
     if (o.sahip !== 'İsmail Özdemir') ek('SES-DUYULAN', 'ses', 'Turkce harfle baslayan ad okunmadi (K-018 \\b): "' + o.sahip + '"');
+    /* Soyleyis seti (16.10, Cemil'in ornekleri): */
+    o = coz('41 KV 5588 Ahmet Yilmaz 0532 111 33 yok 23 44 debriyaj');
+    if (o.tel !== '0532 111 23 44') ek('SES-DUYULAN', 'ses', 'soylerken duzeltme ("33 yok 23") uygulanmadi: tel=' + o.tel);
+    o = coz('41 KV 5588 Ahmet Yilmaz sıfır beş yüz otuz iki yüz on bir yirmi üç kırk dört debriyaj');
+    if (o.tel !== '0532 111 23 44') ek('SES-DUYULAN', 'ses', 'telefon sozcukle okunmadi (sayilar toplaniyor mu?): tel=' + o.tel);
+    o = coz('06 TMR 07 kilometre seksen sekiz bin');
+    if (o.km !== '88.000') ek('SES-DUYULAN', 'ses', '"seksen sekiz bin" km olmadi: ' + o.km);
+    if (sesSoyleyisDuzelt('eksozdan duman') !== 'egzozdan duman') ek('SES-DUYULAN', 'ses', 'egzoz soyleyisi duzeltilmedi');
+    ARACLAR.push({ plaka: '35 ZZ 4545', marka: 'Citroën', model: 'C-Elysée', sahipAd: '', sahipTel: '' },
+                 { plaka: '35 ZZ 4546', marka: 'Ford', model: 'Courier', sahipAd: '', sahipTel: '' });
+    o = coz('Se Elize geldi debriyaj kaciriyor');
+    if (o.plaka !== '35 ZZ 4545') ek('SES-DUYULAN', 'ses', '"Se Elize" C-Elysee olarak bulunmadi: ' + o.tur + ' ' + o.plaka);
+    o = coz('Ford Kurye geldi');
+    if (o.plaka !== '35 ZZ 4546') ek('SES-DUYULAN', 'ses', '"Ford Kurye" Courier olarak bulunmadi: ' + o.tur + ' ' + o.plaka);
+    o = coz('kurye geldi paket birakti');
+    if (o.plaka) ek('SES-DUYULAN', 'ses', '"kurye geldi" (bir insan) ARAC sayildi: ' + o.plaka);
+    ARACLAR.pop(); ARACLAR.pop();
     o = coz("Mehmet Kaya'nın arabası geldi yağ değişimi yapılacak");
     if (o.tur !== 'servis-ac' || o.plaka !== '34 ABC 123' || o.isTuru !== 'bakim') {
       ek('SES-DUYULAN', 'ses', 'sahibin adiyla arac bulunmadi / yag degisimi bakim degil: ' + o.tur + ' ' + o.plaka + ' ' + o.isTuru);

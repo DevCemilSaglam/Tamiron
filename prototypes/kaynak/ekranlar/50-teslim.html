@@ -236,7 +236,7 @@ var SES_ODEME = { nakit: ODEME_ETIKET.nakit, kart: ODEME_ETIKET.kart,
    nakit VARSAYILMAZ. */
 function sesOdemeYolu(d) {
   return (d.indexOf('nakit') >= 0 || d.indexOf('pesin') >= 0) ? 'nakit'
-       : d.indexOf('kart') >= 0 ? 'kart'
+       : (d.indexOf('kart') >= 0 || kelimeVarMi(d, ['kk'])) ? 'kart'   /* "kk" = kredi kartı (Cemil, 16.10) */
        : (d.indexOf('havale') >= 0 || kelimeVarMi(d, ['eft']) || d.indexOf('hesaba') >= 0) ? 'havale' : null;
 }
 
