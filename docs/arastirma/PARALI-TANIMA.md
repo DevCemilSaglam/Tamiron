@@ -77,3 +77,42 @@ Gereken: her sağlayıcıda hesap + anahtar (Cemil) ve harcama onayı.
 - Deepgram: [diller](https://developers.deepgram.com/docs/models-languages-overview) · [keyterm](https://developers.deepgram.com/docs/keyterm) · [fiyat özeti](https://www.cartesia.ai/learn/deepgram-pricing)
 - Amazon: [fiyat özeti](https://costgoat.com/pricing/amazon-transcribe) · [15 sn asgari](https://diyai.io/ai-tools/speech-to-text/reviews/aws-transcribe-review/)
 - OpenAI: [fiyat ve durum](https://costgoat.com/pricing/openai-transcription)
+
+## İlk tur sonuç (16.10) — aynı 300 kayıt, aynı motor, aynı cetvel
+
+Koşucu: `tools/degerlendirme/parali-tanima-kos.js`. Her sağlayıcı ipuçsuz ve
+ipuçlu (171 ifade: dükkânın plakaları + marka/model + terimler). Puanlama
+tarayıcıda, Chrome dökümleriyle aynı işlevle (düzenek Chrome'un bilinen
+%72'sini birebir verdi — doğrulandı).
+
+| sınav yarısı (parti 4–6) | kendiliğinden | yanlış | plakası doğru duyulan (300'de) | kelime hatası |
+|---|---|---|---|---|
+| Chrome (ücretsiz) | %72 (+11 doğru öneri) | 33 | 55/127 | %30 |
+| Speechmatics | %59 | 49 | **15**/127 | %35 |
+| **Speechmatics + ipucu** | **%79** (+1) | **20** | **82/127** | **%26** |
+| AssemblyAI (ipuçlu = ipuçsuz) | %54 | 52 | 38/115 | %56 |
+
+- **Speechmatics'te ipucu GERÇEKTEN çalışıyor** — plaka 15 → 82. Chrome'un
+  55'inin çok üstünde; kendiliğinden doğru %72 → %79, yanlış 33 → 20.
+- **AssemblyAI'de ipucu etkisiz** — iki koşu birebir aynı; Türkçe için
+  universal-2'ye düşüyor (yeni model Türkçeyi desteklemiyor) ve ipucunu yok
+  sayıyor. 26 kayıtta metin dönmedi. İlk turda ELENDİ.
+- **Tek dokunuşla doğru** karşılaştırması daha yakın: Chrome ~%79 (motorun
+  öneri katmanı Chrome'un plaka hatalarını telafi ediyor), Speechmatics +
+  ipucu ~%80. Fark, ustanın **daha az dokunması** ve **daha az yanlış**.
+- Motor Chrome'un hatalarına bakılarak ayarlandı (SES-OLCUM §14) — bu,
+  karşılaştırmayı Chrome lehine çarpıtır; Speechmatics'e özgü ayar yapılmadı
+  (yalnız genel yazım biçimi, aşağıda).
+
+**Yazım biçimi (motor, genel):** Speechmatics sayıyı ve noktalamayı farklı
+yazıyor — "06:52", "57,01", "Rotil 1500.", "7 bin", "3 bin 900". Motor
+artık hepsini tek biçime indiriyor; ayrıca plaka okuyucusu biçime uymayan
+sahte adayı ("saat 10:30 da …" → "30 DA 06") atlayıp sıradakini alıyor.
+Speechmatics + ipucu %77 → %79; Chrome değişmedi.
+
+**Maliyet (tahmin):** 4 koşu × ~16 dk ≈ 64 dk ses → AssemblyAI ~$0,16,
+Speechmatics ~$0,40 (deneme kredisi içinde kalmış olmalı).
+
+**Öneri:** ikinci turda **Google Chirp 3** (belgede Türkçe + ipucu) ölçülsün;
+Speechmatics ile karşılaştırılıp backend fazının tanıyıcısı seçilsin.
+Speechmatics dükkân başına ayda ~$0,45 (Enhanced, $0,38/saat).

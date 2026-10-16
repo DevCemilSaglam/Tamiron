@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-16 16:23
+  Üretim: 2026-10-16 17:41
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -7867,10 +7867,27 @@ function plakaHarfiGecersizMi(harf) {
   return harf.split('').some(function (h) { return PLAKA_HARFLERI.indexOf(h) < 0; });
 }
 
+/* BİÇİME UYAN İLK ADAY (16.10): "saat 10:30 da 06 TMR 07 gelecek" →
+   "30 DA 06" sahte plaka okunuyordu; 2 harfli plakada en az 3 rakam olur.
+   Cümledeki bütün adaylar gezilir (örtüşerek — "06" iki adaya da ait
+   olabilir); biçime uyan ilki seçilir. Hiçbiri uymazsa İLK aday döner —
+   eski davranış korunur (bağlama/öneri katmanları kısmi plakayla çalışıyor). */
 function sesPlakaBul(metin) {
-  var m = metin.toLocaleUpperCase('tr')
-               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ](?: ?[A-ZÇĞİÖŞÜ]){0,2})\s*(\d{2,5})\b/);
-  if (!m) return null;
+  var re = /\b(\d{2})\s*([A-ZÇĞİÖŞÜ](?: ?[A-ZÇĞİÖŞÜ]){0,2})\s*(\d{2,5})\b/g;
+  var buyuk = metin.toLocaleUpperCase('tr'), m, ilk = null;
+  while ((m = re.exec(buyuk))) {
+    var p = sesPlakaAday(metin, m);
+    re.lastIndex = m.index + 1;
+    if (!p) continue;
+    if (!p.kisa) return p;
+    if (!ilk) ilk = p;
+  }
+  return ilk;
+}
+
+function sesPlakaAday(metin, eslesme) {
+  /* Kopya: aşağıda m[2] değiştiriliyor, arayıcının dizisi bozulmasın. */
+  var m = eslesme.slice(); m.index = eslesme.index;
   /* Harfler tek tek söylenince aralıklı yazılıyor: "Y V I 22", "K IH 11". */
   m[2] = m[2].replace(/ /g, '');
   /* ⚠️ 5 RAKAM (14.10 · büyük set): tek harfli plaka 4–5 rakamlıdır
@@ -7894,7 +7911,8 @@ function sesPlakaBul(metin) {
     }
   }
   return { plaka: m[1] + ' ' + harf + ' ' + rakam, indeks: m.index, uzunluk: uzunluk,
-           gecersiz: plakaHarfiGecersizMi(harf) || rakam.length > sinir[1] };
+           gecersiz: plakaHarfiGecersizMi(harf) || rakam.length > sinir[1],
+           kisa: rakam.length < sinir[0] };
 }
 
 /* ---- DUYULAN PLAKAYI KAYITLI PLAKAYA BAĞLAMAK (14.10) ----
@@ -8387,6 +8405,15 @@ var Islem = (function () {
        yazıyor. Derece işareti ("41° 80 644") atılır. Harfe yapışık rakam
        ayrılır: "K ıh11", "10D", "l99" — plaka okuyucusu harfle rakamı
        ayrı görmeli. */
+    /* YAZIM BİÇİMİ (16.10 · Speechmatics dökümleri): tanıyıcılar sayıyı ve
+       noktalamayı farklı yazıyor — "06:52" (saat gibi), "57,01" (ondalık
+       virgül), cümle sonu noktası ("Rotil 1500."), "7 bin", "3 bin 900".
+       Motor bunları tek biçime indirir; hangi tanıyıcı seçilirse seçilsin. */
+    metin = metin.replace(/(\d):(?=\d)/g, '$1 ').replace(/(\d),(?=\d)/g, '$1');
+    metin = metin.replace(/(\d)\.(?=\d)/g, '$1').replace(/[.!?;:,]+/g, ' ');
+    metin = metin.replace(/(^|\s)(\d{1,3})\s+bin(?:\s+(\d{1,3}))?(?=\s|$)/gi, function (t, on, b, k) {
+      return on + String(parseInt(b, 10) * 1000 + (k ? parseInt(k, 10) : 0));
+    });
     metin = metin.replace(/(\d)\.(?=\d)/g, '$1').replace(/°/g, '')
                  .replace(/([A-Za-zÇĞİÖŞÜçğıöşü])(\d)/g, '$1 $2')
                  .replace(/(\d)([A-Za-zÇĞİÖŞÜçğıöşü])/g, '$1 $2');
