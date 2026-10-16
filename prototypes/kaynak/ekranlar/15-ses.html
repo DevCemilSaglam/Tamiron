@@ -215,6 +215,50 @@ var SES_SAYI = {
 };
 var SES_BIRIM = { 'lira': 1, 'tl': 1, '₺': 1, 'km': 1, 'kilometre': 1 };
 
+/* SAYI SÖZCÜKLERİ BİRDEN ÇOK SAYI OLABİLİR (16.10 · Cemil: "4487 ise kırk
+   dört seksen yedi diye okunabilir, dört bin dört yüz seksen yedi de
+   denebilir"). Önceki hâl art arda gelen HER sayı sözcüğünü toplayıp tek
+   sayı yapıyordu: "kırk dört seksen yedi" → 131, telefon "sıfır beş yüz
+   otuz iki yüz on bir…" → tek bir anlamsız sayı.
+   Türkçe sayının dilbilgisi: birler onlardan, onlar yüzlerden sonra gelir.
+   Gelen sözcük o anki sayıyı SÜRDÜREMİYORSA yeni sayı başlar:
+     birler birlerden sonra · onlar birler/onlardan sonra ·
+     "yüz", içinde onlar ya da yüz olan bir sayıdan sonra ("otuz iki yüz") ·
+     "sıfır" her zaman kendi başına.
+   "dört bin dört yüz seksen yedi" yine TEK sayıdır (4487). */
+function sesSayiGruplari(kelimeler) {
+  var gruplar = [], toplam = 0, gecerli = 0, son = null;
+  function kapat() {
+    if (son !== null) gruplar.push(String(toplam + gecerli));
+    toplam = 0; gecerli = 0; son = null;
+  }
+  kelimeler.forEach(function (w) {
+    if (w === 'sifir') { kapat(); gruplar.push('0'); return; }
+    if (w === 'bin') {
+      if (son === 'bin') kapat();
+      toplam = (toplam + (gecerli || 1)) * 1000; gecerli = 0; son = 'bin';
+      return;
+    }
+    if (w === 'yuz') {
+      /* "beş yüz": önündeki tek birlik çarpandır; "otuz iki yüz": yeni sayı. */
+      if (son === 'birler' && gecerli < 10 && gecerli > 0) { gecerli *= 100; son = 'yuz'; return; }
+      if (son !== null && son !== 'bin') kapat();
+      gecerli += 100; son = 'yuz';
+      return;
+    }
+    var v = SES_SAYI[w];
+    if (v < 10) {
+      if (son === 'birler') kapat();
+      gecerli += v; son = 'birler';
+    } else {
+      if (son === 'birler' || son === 'onlar') kapat();
+      gecerli += v; son = 'onlar';
+    }
+  });
+  kapat();
+  return gruplar;
+}
+
 function sesSayilariCevir(metin) {
   var parcalar = metin.split(/(\s+)/);
   var cikti = [], i = 0;
@@ -258,13 +302,7 @@ function sesSayilariCevir(metin) {
         })) {
       deger = kelimeler.map(function (w) { return SES_SAYI[w]; }).join('');
     } else {
-      var toplam = 0, gecerli = 0;
-      kelimeler.forEach(function (w) {
-        if (w === 'yuz') gecerli = (gecerli || 1) * 100;
-        else if (w === 'bin') { toplam += (gecerli || 1) * 1000; gecerli = 0; }
-        else gecerli += SES_SAYI[w];
-      });
-      deger = String(toplam + gecerli);
+      deger = sesSayiGruplari(kelimeler).join(' ');
     }
     /* ⚠️ SONA BOŞLUK ŞART: dizi toplanırken aradaki boşluklar yutuldu.
        Konmazsa "otuz dört abc" → "34abc" oluyor ve plaka deseni
