@@ -123,3 +123,36 @@ Google Cloud, Türkiye hesabını etkinleştirmek için **bir kerelik en az
 1.500 TL ön ödeme** istiyor (bakiyeye geçer, kullanım oradan düşer). Ölçüm
 ~20 TL tutacaktı → ödenmedi. Google ve Azure backend fazında, gerçek
 kullanım başlayınca ölçülür. Aday: **Speechmatics + ipucu**.
+
+## Google Gemini 3.5 Transcribe (16.10) — ELENDİ: ipucuyla plaka UYDURUYOR
+
+Ödemesiz yol denendi (ücretsiz katmanda yazıya çevirme modeli yok — 402);
+Cemil 250 TL ön ödeme yükledi (kredi 1 yılda sona erer, iade yok). Model
+**günde 100 istek** kotasına takıldı (önizleme) — ipuçlu 52, ipuçsuz 35 kayıt.
+
+**Bulgu — koşuyu tamamlamaya gerek bırakmadı:** ipucu listesi verilince
+Gemini SÖYLENMEMİŞ ama dükkânda KAYITLI plakaları yazıyor:
+
+| | kayıt | söylenmemiş kayıtlı plaka yazdı |
+|---|---|---|
+| **Gemini + ipucu** | 52 | **4 (%7,7)** |
+| Gemini | 35 | 0 |
+| Speechmatics + ipucu | 300 | **0** |
+| Chrome | 300 | 1 (%0,3 — GS/GT ikizi, sesçe) |
+
+Örnek: "34 BU 440 sahibine parça bekliyoruz" → "38 ODV 111 parçayı
+bekliyoruz"; "antifriz 1200 TL" → "34 M 49109". **En tehlikeli hata
+sınıfı:** plaka geçerli ve kayıtlı — motorun hiçbir koruması (K-059,
+geçersiz plaka, öneri) onu yakalayamaz; iş SESSİZCE yanlış araca gider.
+Gemini ipucunu "olasılık" değil "doldurulacak cevap" gibi kullanıyor (bir dil
+modeli). Speechmatics aynı listeyle 300 kayıtta hiç uydurmadı.
+
+Aynı 52 kayıtta kelime hatası: Gemini + ipucu %38 · Chrome %41 ·
+Speechmatics + ipucu %31 — doğrulukta da önde değil.
+
+**Sonuç:** Speechmatics + ipucu. Google'ın klasik tanıyıcısı (Chirp 3) dil
+modeli değil, bu uydurmayı yapmayabilir — backend fazında, ön ödeme gerçek
+kullanıma dönüşünce ölçülür (K-061.3).
+
+**Ölçüm aletine eklenen ders:** "söylenmemiş kayıtlı plaka" sayacı —
+tanıyıcı karşılaştırmasında doğruluktan ÖNCE bakılır.

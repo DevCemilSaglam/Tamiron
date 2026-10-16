@@ -41,6 +41,13 @@ katman, Türkiye listede, ön ödeme yok; ipucu `customVocabulary`). Chirp 3
 değil ama Google'ın tanıyıcısı. ⚠️ Ücretsiz katman içeriği Google'ın ürün
 geliştirmesinde kullanılabilir — yalnız test kayıtları; yayında değil.
 
+**61.3c · Gemini 3.5 Transcribe ELENDİ (16.10):** Cemil 250 TL ön ödemeyle
+denetti. İpucu listesi verilince **söylenmemiş ama kayıtlı plaka yazıyor**
+(52 kayıtta 4, %7,7) — iş sessizce yanlış araca gider, motorun hiçbir
+koruması yakalayamaz. Speechmatics aynı listeyle 300 kayıtta 0. Kural:
+**tanıyıcı karşılaştırmasında "söylenmemiş kayıtlı plaka" sayısına
+doğruluktan ÖNCE bakılır** — sıfır olmayan tanıyıcı aday olamaz.
+
 **61.4 · Motor tanıyıcıdan bağımsız kalır.** Yazım biçimi toparlama
 (16.10) hangi tanıyıcı seçilirse seçilsin çalışır; ölçüm koşucusu ve cetvel
 hazır — tanıyıcı değişince yalnız bir koşu.
