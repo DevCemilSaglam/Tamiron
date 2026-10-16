@@ -161,7 +161,17 @@ function durum(m) { $('durum').textContent = m; }
   eval(await (await fetch(KOK + 'puanla.js?t=' + Date.now())).text());
   PUANLA = window.DEGERLENDIRME_PUANLA;
   $('dosyalar').addEventListener('change', function () { $('kos').disabled = !this.files.length; });
-  durum('Hazır — ' + SET.cumleler.length + ' cümlelik set yüklendi.');
+  /* ?klasor=buyuk-3 (16.10): klasör ADRESTEN seçilir. Önceki hâlde varsayılan
+     radyo düğmesi ("İlk kayıtlar") SESSİZCE ölçülüyordu — 16.10'da beş koşu
+     büyük set yerine 13.10'un eski kayıtlarını ölçtü. */
+  var adresKlasor = new URLSearchParams(location.search).get('klasor');
+  if (adresKlasor) {
+    var radyo = document.querySelector('input[name="klasor"][value="' + adresKlasor + '"]');
+    if (radyo) radyo.checked = true;
+    else { document.querySelector('input[name="klasor"][value="buyuk"]').checked = true; $('buyukKlasor').value = adresKlasor; }
+  }
+  durum('Hazır — ' + SET.cumleler.length + ' cümlelik set yüklendi.' +
+        (adresKlasor ? ' Klasör: ' + adresKlasor : ''));
 })();
 
 /* s07.snr12.wav → { id: 7, tur: 'snr12' } */
@@ -364,6 +374,7 @@ document.addEventListener('click', async function (e) {
       durum('Sunucudan alınıyor…');
       var klasor = (document.querySelector('input[name="klasor"]:checked') || {}).value || 'kayitlar';
       if (klasor === 'buyuk') klasor = ($('buyukKlasor').value || 'buyuk-1').replace(/[^a-z0-9-]/gi, '');
+      durum('Sunucudan alınıyor — klasör: ' + klasor + '…');
       var dzYanit = await fetch(KOK + 'sesler/' + klasor + '/dizin.json?t=' + Date.now());
       if (!dzYanit.ok) throw new Error('sesler/' + klasor + '/ klasöründe kayıt yok (zip oraya açılmalı)');
       var dz = await dzYanit.json();
@@ -487,7 +498,7 @@ $('kos').addEventListener('click', async function () {
   try {
   for (var n = 0; n < is.length; n++) {
     var x = { f: { name: is[n].ad }, ad: { id: is[n].id, tur: is[n].tur } };
-    durum((n + 1) + ' / ' + is.length + ' — ' + x.f.name);
+    durum((SET.dukkan ? 'BÜYÜK SET · ' : 'esas set · ') + (n + 1) + ' / ' + is.length + ' — ' + x.f.name);
     var r = await tani(is[n].kaynak, ifadeAcik);
     var c = SET.cumleler.filter(function (k) { return k.id === x.ad.id; })[0];
     var yed = { niyet: P.SESLI_NIYET, kayit: P.ACIK_KAYIT };
