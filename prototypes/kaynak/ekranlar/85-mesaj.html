@@ -725,7 +725,12 @@ function sesMesajKomutu(d) {
   return d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
          d.indexOf('sms') >= 0 ||
          kelimeVarMi(d, ['yaz', 'yazdir', 'sahibine']) ||
-         d.indexOf('gonder') >= 0;
+         d.indexOf('gonder') >= 0 ||
+         /* Tanıyıcı "sahibine"yi sık sık "sahibinden" yazıyor (16.10 · 300
+            kayıt). Yalnız bir mesaj METNİ de geçiyorsa mesaj sayılır —
+            "X sahibinden parça aldım" bir mesaj değildir. */
+         (kelimeVarMi(d, ['sahibinden']) &&
+          /bekliyor|hazir|hatirlat|selam|tesekkur|ozet/.test(d));
 }
 
 /* ⚠️ TOPLU MESAJ (14.09) — Cemil: *"Mesela tüm müşterilere bayram

@@ -621,3 +621,59 @@ kaldırıldı ("kurye" tek başına araç) → bulgu. 320/375/430 px 0 bulgu.
 **Şive — dürüst sınır:** yazıya geçen şive (ettum, bakuma) ele alınabilir;
 SESİN kendisini tanıyıcı çözüyor. Ege/Karadeniz konuşmacılarının kaydı
 olmadan ölçülemez.
+
+## 14 · 300 gerçek kayıt — büyük setin sınav yarısından (16.10)
+
+Cemil 6 parti × 50 cümle okudu (kurmaca dükkânın plakalarıyla). 299
+kayıtta metin var; ortalama kelime hatası %30, kelimesi kelimesine doğru
+duyulan 95/299.
+
+**Kayıp nerede (motor değişmeden, aynı cümleler yazıyla %100):**
+
+| sınıf | yanlış |
+|---|---|
+| **plaka yanlış duyuldu** | 61 |
+| cümle bozuk duyuldu | 27 |
+| tutar/sayı yanlış duyuldu | 26 |
+| duyuş doğru, motor yanlış | **1** |
+
+Tanıyıcı plaka HARFLERİNİ sözcüğe çeviriyor ("RIZ" → "Rus", "UR" →
+"Uğur", "JOC" → "George", "KIH" → "kız", "V" → "ve"), il kodunu
+kaçırıyor ("16 J 1139" → "Hatice 11 39"), rakama nokta koyuyor ("99.363",
+"28.30"), harfi rakama yapıştırıyor ("K ıh11", "10D"). **Rakam grubu
+çoğunlukla doğru.**
+
+**Yapılanlar (genel kurallar, cümleye özgü değil):** rakam içi nokta /
+derece işareti / yapışık harf-rakam temizliği · aralıklı harf ("Y V I 22")
+birleşir · gerçek OLAMAYAN plakada (sözcük, harf yok) rakam TEK kayıtlı
+araca uyuyorsa bağlanır ve SÖYLENİR (il duyulduysa il de eşleşmeli; il
+yoksa en az 4 hane; adet/zaman sözünden önceki sayı aday değil) · gerçek
+OLABİLECEK kayıtsız plakada aynı rakamlı kayıtlılar puanlanır, tek en iyi
+ÖNERİLİR (K-059: sorulur) · "sahibinden" + mesaj metni = mesaj · açık
+kayıtta yakın söyleyişli parça adı ("friendiski" → Fren diski; en çok %20
+fark VE ilk harf aynı/sesçe yakın).
+
+**Dürüst bölme:** kurallar parti 1–3'e bakılarak yazıldı; 4–6 en sonda.
+
+| | önce | kendiliğinden | + doğru öneri |
+|---|---|---|---|
+| geliştirme (1–3) | %68 | %79 | +9 |
+| **sınav (4–6)** | **%67** | **%71** | **+11 → tek dokunuşla ~%78** |
+
+Geliştirmedeki kazanç sınavdakinin iki katı — kuralların bir kısmı gördüğüm
+kayıtlara özgü kaldı. **Sınav rakamı asıl rakam.**
+
+**Yakalanan iki tehlike (ilk denemede vardı, düzeltildi):**
+- yakın parça adı %30 eşikle "hava filtresi"ni "Yağ filtresi"ne uydurdu —
+  YANLIŞ satırın fiyatı değişirdi (eski setlerde 3 gerileme);
+- rakamdan bağlama "yarın 123 tane balata gelecek"i 34 ABC 123'e bağladı.
+Bu ikisinin bedeli: sınavda 1 kayıt.
+
+Eski setler gerilemedi (büyük %99/%100, esas %98, dökümler %85/%73,
+söyleyiş %100); eşdeğerlik 576/0. Test 55 genişledi; negatif: rakamdan
+bağlama kapalı / rakamla öneri kapalı / adet koruması yok → her biri bulgu.
+
+**Bundan sonrası duymada:** kalan yanlışların çoğu tanıyıcının cümleyi
+bozması ("bu ayki" → "Waikiki", "teslim ettik kartla" → "teslimatik
+capture"). Motor bunu düzeltemez. Sıradaki deneme: `phrases` (kayıtlı
+plakaları ve parça adlarını tanıyıcıya ipucu vermek).

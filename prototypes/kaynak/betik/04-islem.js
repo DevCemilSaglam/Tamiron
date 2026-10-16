@@ -64,8 +64,10 @@ function plakaHarfiGecersizMi(harf) {
 
 function sesPlakaBul(metin) {
   var m = metin.toLocaleUpperCase('tr')
-               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,5})\b/);
+               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ](?: ?[A-ZÇĞİÖŞÜ]){0,2})\s*(\d{2,5})\b/);
   if (!m) return null;
+  /* Harfler tek tek söylenince aralıklı yazılıyor: "Y V I 22", "K IH 11". */
+  m[2] = m[2].replace(/ /g, '');
   /* ⚠️ 5 RAKAM (14.10 · büyük set): tek harfli plaka 4–5 rakamlıdır
      ("34 M 49109"); okuyucu en çok 4 rakam alıyordu ve bu plakaların
      HİÇBİRİ tanınmıyordu. Harf sayısına göre fazla rakam = geçersiz. */
@@ -184,7 +186,9 @@ var SOYLEYIS_MODEL = {
   'symbol': ['sembol', 'simbol'],
   'clio': ['klio'],
   'passat': ['pasat'],
-  'caddy': ['!kedi', 'keddi', 'kadi']
+  'caddy': ['!kedi', 'keddi', 'kadi'],
+  /* Girişte harfe yapışık rakam ayrıldığı için "i20" → "i 20". */
+  'i20': ['i 20', 'i yirmi', 'ay yirmi']
 };
 var SOYLEYIS_MARKA = {
   'citroen': ['sitroen', 'sitroyen', 'citroen'],
@@ -280,6 +284,45 @@ function sesAracTarif(metin, baglam) {
   return { plaka: b.a.plaka, indeks: b.i, uzunluk: b.n, tarif: b.tur };
 }
 
+/* PLAKA HİÇ DUYULMADIYSA, RAKAMDAN (16.10 · 300 gerçek kayıt): "16 J 1139"
+   → "Hatice 11 39", "07 E 21097" → "Freddy 21097", "34 BU 440" → "okulda
+   b u 440". Ortada plaka YOK — yeni araç ihtimali de yok (K-059: gerçek
+   olamayan plaka bağlanır ve SÖYLENİR). Rakam grubu (3+ hane; bölünmüşse
+   iki komşu grup birleştirilir) TEK kayıtlı plakanın rakamıysa o araç.
+   ⚠️ DAR: para/km sözü olan cümlede yapılmaz ("1200 kira gideri" bir
+   plakanın rakamına denk gelebilir); birimden önceki sayı ve telefonun
+   parçası aday değildir. */
+/* ⚠️ Zorlama (16.10): "yarın 123 tane balata gelecek" 34 ABC 123'e
+   bağlandı. Bu yüzden: adet/zaman sözünden önceki sayı aday değil; il
+   kodu duyulmuşsa (`il`) il de eşleşmeli; duyulmamışsa rakam EN AZ 4 hane
+   ("11 39", "21097") — 3 haneli bir sayı tek başına plaka kanıtı değil. */
+function sesRakamlaBagla(metin, il) {
+  var d = norm(metin);
+  if (/(lira|tl|gider|fatura|kira|tahsil|kasa|kilometre|km)(\s|$)/.test(d)) return null;
+  if (sesTelefonBul(metin)) return null;
+  var t = [], re = /\d+/g, m;
+  while ((m = re.exec(metin))) t.push({ s: m[0], i: m.index, n: m[0].length });
+  var adaylar = {};
+  var ADET = /^\s*(tane|adet|kere|kez|gun|saat|dakika|hafta|ay|yil|sene|parca)(\s|$)/;
+  function dene(s, i, son) {
+    if (s.length < (il ? 3 : 4)) return;
+    if (ADET.test(norm(metin.slice(son)))) return;
+    ARACLAR.forEach(function (a) {
+      var r = plakaParcala(a.plaka);
+      if (r && r.rakam === s && (!il || r.il === il)) adaylar[a.plaka] = { i: i, son: son, s: s };
+    });
+  }
+  t.forEach(function (x, k) {
+    dene(x.s, x.i, x.i + x.n);
+    var y = t[k + 1];
+    if (y && /^\s+$/.test(metin.slice(x.i + x.n, y.i))) dene(x.s + y.s, x.i, y.i + y.n);
+  });
+  var liste = Object.keys(adaylar);
+  if (liste.length !== 1) return null;
+  var a = adaylar[liste[0]];
+  return { plaka: liste[0], duyulan: metin.slice(a.i, a.son), indeks: a.i, uzunluk: a.son - a.i };
+}
+
 /* Duyulan plakayı kayıtlı TEK bir plakaya bağlar; bağlayamazsa null.
    p: sesPlakaBul sonucu (ya da null). Döner: { plaka, duyulan, indeks,
    uzunluk } — `duyulan` onay ekranında gösterilir, usta görsün.
@@ -309,7 +352,7 @@ function sesPlakaBagla(metin, p) {
        bir plakayla aynı olmalı; kelimenin ünsüz iskeleti harflerin
        okunuşununkiyle aynı, okunuşa en çok 2 düzenleme uzak. */
     var b = metin.toLocaleUpperCase('tr').match(/(^|\s)(\d{2})\s+([A-ZÇĞİÖŞÜ]{4,9})\s+(\d{2,4})(?!\d)/);
-    if (!b) return null;
+    if (!b) return sesRakamlaBagla(metin);
     duyulan = b[2] + ' ' + b[3] + ' ' + b[4];
     indeks = b.index + b[1].length; uzunluk = b[0].length - b[1].length;
     ARACLAR.forEach(function (a) {
@@ -320,6 +363,9 @@ function sesPlakaBagla(metin, p) {
       if (duzenlemeUzakligi(ok, b[3]) > 2) return;
       adaylar.push(a.plaka);
     });
+    /* Sözcük harflerin okunuşuna benzemiyorsa ("10 derece 63 53", "01 Uğur
+       23 56", "35 George 641") rakama düş — sözcük plaka değil. */
+    if (!adaylar.length) return sesRakamlaBagla(metin, b[2]);
   }
   if (adaylar.length !== 1) return null;
   return { plaka: adaylar[0], duyulan: duyulan, indeks: indeks, uzunluk: uzunluk };
@@ -538,6 +584,16 @@ var Islem = (function () {
     /* Önce ustanın kendi düzeltmesi ("33 yok 23"), sonra söyleyiş
        sözlüğü ("eksoz" → "egzoz") — 16.10. */
     metin = sesSoyleyisDuzelt(sesDuzeltmeUygula(metin));
+    /* Binlik noktası: tanıyıcı plakanın rakamına da nokta koyuyor
+       ("41 ve 99.363", "10 ne 5.701"). Tutar ve km okuyucuları noktasız
+       sayıyı zaten okuyor. */
+    /* Rakamlar arasındaki HER nokta kalkar: tanıyıcı "28.30" (saat gibi) de
+       yazıyor. Derece işareti ("41° 80 644") atılır. Harfe yapışık rakam
+       ayrılır: "K ıh11", "10D", "l99" — plaka okuyucusu harfle rakamı
+       ayrı görmeli. */
+    metin = metin.replace(/(\d)\.(?=\d)/g, '$1').replace(/°/g, '')
+                 .replace(/([A-Za-zÇĞİÖŞÜçğıöşü])(\d)/g, '$1 $2')
+                 .replace(/(\d)([A-Za-zÇĞİÖŞÜçğıöşü])/g, '$1 $2');
     var c = baglamKur(metin, baglam, kayitId);
     return duyulaniIsaretle(doldur(c), c);
   }

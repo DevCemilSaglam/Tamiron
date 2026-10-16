@@ -10,6 +10,44 @@
 
 ---
 
+## K-060 · Yayında ses kayıtları SAKLANIR — yanlış da olsa (16.10.2026)
+
+> **Cemil, 16.10:** *"Ses kayıtlarını yanlış da olsa saklayalım, böylece
+> nerede sorun olduğunu tespit edebiliriz, bunu yayına çıkan proje için
+> yazıyorum."*
+
+**Kapsam genişletmesi Cemil'den** — K-053'ün (*"izde DEĞERLER yazılır …
+kullanıcı problem yaşadığında arayacağı kişi olacağım"*) doğal devamı.
+Backend fazında yapılır; bu fazda kod yok.
+
+**60.1 · Saklanan DÖRTLÜ, tek ses değil.** Hatanın DUYMADA mı ANLAMADA mı
+olduğunu yalnız dördü birlikte söyler (16.10'daki 300 kaydın çözümlemesi
+tam bu dörtlüyle yapıldı — SES-OLCUM §14):
+
+| | ne |
+|---|---|
+| 1 | ses dosyası |
+| 2 | tanıyıcının yazdığı metin |
+| 3 | motorun anladığı işlem (JSON) |
+| 4 | ustanın onay ekranında düzeltip onayladığı SON hâl (ya da "tekrar söyle") |
+
+4 ile 3'ün farkı = motorun hatası; 2 ile sesin farkı = tanıyıcının hatası.
+**Ustanın düzelttiği son hâl kendiliğinden doğru cevaptır** — elle etiket
+gerekmeden büyüyen bir değerlendirme seti.
+
+**60.2 · Açık — Cemil onayına (A-M50):**
+- **Gizlilik notu** bugün *"internet üzerinden GÖNDERİLİR"* diyor; *"…ve
+  SAKLANIR"* demeli. Önerilen metin: *"Söyledikleriniz ve çektiğiniz
+  fotoğraflar yazıya çevrilmek üzere internet üzerinden gönderilir; hatalı
+  anlaşılanları düzeltebilmemiz için kayıtlar saklanır."*
+- **Süre** — K-053.4'ün düzenine göre öneri: ses + metin AYRINTI olarak 90
+  gün, sonra yalnız istatistik (hangi iş, hangi alan, ne sıklıkla yanlış).
+  Ses 90 günden sonra silinir.
+- Seste MÜŞTERİNİN adı ve telefonu geçiyor (üçüncü kişi verisi); K-053
+  bunu zaten kabul etti — not olarak.
+
+---
+
 ## K-059 · Sesli komutta plaka: Türk plaka kuralları + "karma" bağlama (14.10.2026)
 
 > **Cemil, 14.10:** *"Türkiye'de Q harfi yok. Plakaların bazı kuralları
