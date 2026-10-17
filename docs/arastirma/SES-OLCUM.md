@@ -768,7 +768,7 @@ kademe (b) her ses için.
 
 ### 17.1 · Chrome dökümleri gelince — kademe (b) her ses için (17.10)
 
-Cemil yapay sesleri Chrome'da koşturdu (Ege eksik — yeniden koşulacak).
+Cemil yapay sesleri Chrome'da koşturdu (Ege'nin ilk koşusu ağ hatasıyla 3 kayıtta durdu — durma kuralı işledi; ikinci koşu tam).
 Aynı cetvel, kademe (b) = motor öneri soruyorsa ya da anlamadıysa
 Speechmatics + ipucu (K-062):
 
@@ -777,9 +777,10 @@ Speechmatics + ipucu (K-062):
 | Karadeniz (50) | %78 | %79 | **%84** | %20 |
 | Doğu (25) | %84 | %76 | **%88** | %20 |
 | İç Anadolu (25) | %90 | %86 | **%90** | %8 |
+| Ege (25) | %78 | %86 | **%86** | %32 |
 | İstanbul — çok hızlı (25) | %56 | %67 | **%67** | %42 |
 
-- **Kademe dört seste de iki tanıyıcının iyisine eşit ya da üstünde** —
+- **Kademe beş seste de iki tanıyıcının iyisine eşit ya da üstünde** —
   K-062 (b) gerçek kayıttan sonra yapay şivelerde de doğrulandı.
 - **Kendini ayarlıyor:** konuşma zorlaştıkça paralıya giden pay kendiliğinden
   artıyor (İç Anadolu %8 → hızlı İstanbul %42). Maliyet zor konuşmaya gidiyor.
