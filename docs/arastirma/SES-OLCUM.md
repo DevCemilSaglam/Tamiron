@@ -765,3 +765,25 @@ aynı motor):
 
 **Bekleyen:** kadın + iki hızlı ses (kota) · Chrome dökümleri (Cemil) →
 kademe (b) her ses için.
+
+### 17.1 · Chrome dökümleri gelince — kademe (b) her ses için (17.10)
+
+Cemil yapay sesleri Chrome'da koşturdu (Ege eksik — yeniden koşulacak).
+Aynı cetvel, kademe (b) = motor öneri soruyorsa ya da anlamadıysa
+Speechmatics + ipucu (K-062):
+
+| ses | Chrome | Speechmatics | **kademe (b)** | paralıya |
+|---|---|---|---|---|
+| Karadeniz (50) | %78 | %79 | **%84** | %20 |
+| Doğu (25) | %84 | %76 | **%88** | %20 |
+| İç Anadolu (25) | %90 | %86 | **%90** | %8 |
+| İstanbul — çok hızlı (25) | %56 | %67 | **%67** | %42 |
+
+- **Kademe dört seste de iki tanıyıcının iyisine eşit ya da üstünde** —
+  K-062 (b) gerçek kayıttan sonra yapay şivelerde de doğrulandı.
+- **Kendini ayarlıyor:** konuşma zorlaştıkça paralıya giden pay kendiliğinden
+  artıyor (İç Anadolu %8 → hızlı İstanbul %42). Maliyet zor konuşmaya gidiyor.
+- **Hız iki tanıyıcıyı da bozuyor** (en iyisi %67). Duyulmayan hece geri
+  gelmez; burada çare onay ekranı ve "tekrar söyle". (Fikir — ölçülmeden
+  ürüne girmez: aynı cümle iki kez anlaşılmazsa ekran "biraz yavaş söyler
+  misin" desin.)
