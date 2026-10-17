@@ -731,3 +731,37 @@ sözlük + plaka kuralları.
 300 kaydı aynı hatayla boşuna çaldı. Artık HER TÜRLÜ aynı hata 3 kez üst
 üste gelince durur ve hatanın adını söyler. Gerçek dosyalarla denendi:
 ipuçlu koşu 3. kayıtta durur, hatasız koşu durmaz.
+
+## 17 · Şiveli yapay ses — ara sonuç (17.10)
+
+> **Cemil, 17.10:** *"Yapay zekaya, şiveli okutma yapıp kaydedebilir miyiz?"*
+> → pilot → *"Yeniden dene şiveleri. Biraz da hızlı konuşan birileri olabilir.
+> Kelimeleri yuvarlayabilir."* → v2 → *"2'yi kullanalım ve test edelim."*
+
+`tools/degerlendirme/yapay-ses-uret.js` (Gemini 3.8 Flash TTS + Voice
+design): sesi tariften kurar, her cümleye konuşma tarzı (hız, yutma) verir,
+metni ağızla yazar ("ettuk", "değişcek", "yapıyo"); beklenen cevap
+değişmez. ⚠️ Model günde 100 istek — üretim günlere yayılıyor.
+
+Her yapay ses büyük setin sınav yarısından cümle okudu; Cemil'in AYNI
+cümleleri okuduğu gerçek kayıtlarla karşılaştırıldı (Speechmatics + ipucu,
+aynı motor):
+
+| ses (cümle) | yapay — SM | Cemil — SM | Cemil — Chrome |
+|---|---|---|---|
+| Karadeniz (50) | %79 | %80 | %71 |
+| Ege (25) | %86 | %78 | %67 |
+| Doğu (25) | %76 | %82 | %76 |
+| İç Anadolu (25) | %86 | %78 | %86 |
+| **İstanbul — çok hızlı, yutarak (25)** | **%68** | **%92** | %86 |
+
+**Okuma (küçük örnek — 25 kayıtta ±10 puan olağan):**
+- Şiveler (sentetik hâliyle) Speechmatics'i bozmuyor.
+- **Hız bozuyor:** heceleri yutan çok hızlı ses aynı cümlelerde %92 → %68.
+  Motor/sözlük bunu düzeltemez — duyulmayan hece geri gelmez. Hızlı
+  seslerin (hizli1, hizli2) üretimi kota yenilenince.
+- Sentetik ses kelime hatasını düşürüyor (%17–23 vs Cemil %30–31) ama
+  işlem doğruluğu aynı bantta — beklendiği gibi.
+
+**Bekleyen:** kadın + iki hızlı ses (kota) · Chrome dökümleri (Cemil) →
+kademe (b) her ses için.
