@@ -28,7 +28,7 @@
 | # | İş | Durum |
 |---|---|---|
 | 9.1 | **Ölçüt doğrulama** = 8.5 | SÜRÜYOR — ruhsat Cemil'de |
-| 9.2 | **Geniş ekran (tablet · bilgisayar)** — aynı ekranların geniş düzeni; önce düzen taslağı, sonra prototip; denetim 768/1280 px | SIRADA |
+| 9.2 | **Geniş ekran (tablet · bilgisayar)** — aynı ekranların geniş düzeni; önce düzen taslağı, sonra prototip; denetim 768/1280 px | **TASLAK CEMİL'DE (18.10)** — dört pano: bilgisayar kayıtlar + açık kayıt, bilgisayar muhasebe, tablet yatay, tablet dikey (https://claude.ai/artifact/2CDjYiKzHLdwVewYxxmn3E). İlke: menü bilgisayarda solda sabit (ana ekranın kendisi, K-011), liste ve açık kayıt yan yana, eylem çubuğu kaydın altında (K-058), yeni ekran/özellik yok, genel mikrofon yok (K-020/K-026) |
 | 9.3 | **Muhasebe kapsamı (OtoMix'e göre)** — tek sayfa kapsam önerisi → Cemil seçer → backend fazı başlar | 9.2'den sonra |
 
 ---
