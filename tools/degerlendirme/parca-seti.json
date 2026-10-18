@@ -4,7 +4,7 @@
   "tarih": "15.09.2026",
   "kaynak": "Cemil'in 15.09'da gönderdiği 27 gerçek parça listesi fotoğrafı",
 
-  "⚠️ TASLAK": "Satırları FOTOĞRAFLARDAN OKUYAN ben oldum (Claude, görüntü). Ölçüt değil, ÖLÇÜT ADAYI — Cemil doğrulayana kadar. El yazısı okumada kendi okumamı kendi ölçütüm yapmak, sınavı kendim yazıp kendim puanlamak olurdu. Şüphelendiğim satırların yanında 'guven' notu var.",
+  "dogrulama": {"dogrulandi": true, "kim": "Cemil", "tarih": "16.09.2026", "sonuc": "27/27 dogru, 0 duzeltme", "yol": "yayinlanmis kontrol sayfasi (artifact db)", "not": "Satirlari fotograflardan Claude okudu (15.09); Cemil onayladi. TASLAK kalkti 18.10 (K-064.1)."},
 
   "nicin_ruhsattan_zor": [
     "Ruhsatta alanlar SABİT ve etiketli; burada her liste kendi düzenini uyduruyor.",

@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-16 18:24
+  Üretim: 2026-10-18 10:22
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -9512,6 +9512,33 @@ function rDeger(id) {
   return e ? e.value.trim() : '';
 }
 
+/* ---- RUHSAT OKUNDUĞU AN ARAÇ KAYDEDİLİR (K-065 · Cemil, 18.10) ----
+   *"İlk ruhsatı okuduğumuzda, kayıt olarak almalıyız. Belki dükkana
+   girişi olmayacak aracın, sadece parça soruyor. Fakat plaka sözlük
+   için bizi gerekebilir."*
+   Eskiden araç yalnız "Kaydı aç"ta yazılıyordu; ruhsatı okunup servis
+   kaydı açılmayan araç kayboluyordu. Kayıtlı plaka, sesli komutun
+   plaka bağlamasında aday listesidir (K-059) — kaybolan her ruhsat,
+   motorun tanıyamayacağı bir plaka demekti.
+   `rKaydedilen`: bu okumanın kaydettiği (ya da bulduğu) araç. Usta
+   okumadan SONRA bir alanı düzeltirse düzeltme ona da yazılır —
+   kaydedilen şey ustanın son hâli olur, modelin ilk okuması değil. */
+var rKaydedilen = null;
+var R_ESLE = { rMarka: 'marka', rModel: 'model', rYil: 'yil', rMotor: 'motor',
+  rRenk: 'renk', rYakit: 'yakit', rVin: 'vin', rMotorNo: 'motorNo',
+  rSilindir: 'silindir', rGuc: 'guc', rKoltuk: 'koltuk', rDepo: 'depo',
+  rIlkTescil: 'ilkTescil', rSahip: 'sahipAd', rTel: 'sahipTel',
+  /* FATURA ALANLARI (15.09 · K-050) — fatura TC/vergi numarasına ve
+     adrese kesilir. Vergi dairesi ruhsatta yok; usta yazarsa
+     kaydediliyor, yoksa boş kalıyor. */
+  rTcVergi: 'tcVergiNo', rAdres: 'adres', rVergiDairesi: 'vergiDairesi' };
+
+function rAracVerisi(p) {
+  var a = { plaka: p, not: '' };
+  Object.keys(R_ESLE).forEach(function (id) { a[R_ESLE[id]] = rDeger(id); });
+  return a;
+}
+
 function ruhsatSekme(hangi) {
   rSekme = hangi;
   document.getElementById('sekPlaka').setAttribute('aria-selected', String(hangi === 'plaka'));
@@ -9679,6 +9706,7 @@ Ekran.tanim('ruhsat', {
       var e = document.getElementById(id); if (e) e.value = '';
     });
     rOkundu = false;
+    rKaydedilen = null;
     ruhsatSekme('plaka');
     gizlilikIlkAcilis('rGizlilik');
 
@@ -9727,7 +9755,10 @@ Ekran.tanim('ruhsat', {
 /* ---- sahte okuma ----
    Gerçek okuma bir servise bağlanacak (RUHSAT-OKUMA.md C yolu).
    Burada ekranın DAVRANIŞI gösteriliyor: alanlar dolar, HEPSİ
-   DÜZELTİLEBİLİR, hiçbiri kendiliğinden kaydedilmez.
+   DÜZELTİLEBİLİR. ARAÇ okunduğu an kaydedilir (K-065 — eski kural
+   "hiçbiri kendiliğinden kaydedilmez" Cemil'in kararıyla değişti);
+   düzeltmeler kayda yazılmaya devam eder. Servis kaydı ise yine
+   yalnız "Kaydı aç"la açılır.
 
    Örnek kayıtlar ARTIK TAM: renk, yakıt, şasi, motor no, hacim, güç,
    koltuk, ilk tescil. Yarım örnek, "bu alanlar zaten dolmaz" diye
@@ -9793,8 +9824,24 @@ function ruhsatOku(kaynak) {
         ' — aşağıdaki alanlarda hepsi düzeltilebilir.</p>' +
     '</div>';
 
+  /* K-065: araç ŞİMDİ kaydedilir. Kayıtlı araç varsa üstüne yazılmaz,
+     yalnız BOŞ alanları dolar — ustanın daha önce düzelttiği bilgi
+     modelin yeni okumasına yenilmez. Plaka okunamadıysa (gerçek setin
+     r31'i) araç kaydedilmez: plakasız kayıt, yanlış araca bağlanır. */
+  var p = plakaBicim(rDeger('rPlaka'));
+  var kaydedildi = false;
+  if (plakaGecerli(p)) {
+    var yeni = rAracVerisi(p);
+    var a = aracBul(p);
+    if (!a) { ARACLAR.push(yeni); a = yeni; kaydedildi = true; }
+    else Object.keys(yeni).forEach(function (k) { if (!a[k] && yeni[k]) a[k] = yeni[k]; });
+    rKaydedilen = a;
+  }
+
   ruhsatDurum();
-  balon('Ruhsat okundu — yanlış varsa aşağıdan düzelt.', false, 3000);
+  balon(kaydedildi ? 'Ruhsat okundu, araç kaydedildi — yanlış varsa aşağıdan düzelt.'
+    : (rKaydedilen ? 'Ruhsat okundu — bu araç zaten kayıtlı.'
+      : 'Plaka okunamadı — plakayı yaz, araç öyle kaydedilir.'), false, 3000);
 }
 
 document.addEventListener('click', function (e) {
@@ -9823,25 +9870,9 @@ document.addEventListener('click', function (e) {
       return;
     }
 
-    if (!aracBul(p)) {
-      ARACLAR.push({
-        plaka: p,
-        marka: rDeger('rMarka'), model: rDeger('rModel'),
-        yil: rDeger('rYil'), motor: rDeger('rMotor'),
-        renk: rDeger('rRenk'), yakit: rDeger('rYakit'),
-        vin: rDeger('rVin'), motorNo: rDeger('rMotorNo'),
-        silindir: rDeger('rSilindir'), guc: rDeger('rGuc'),
-        koltuk: rDeger('rKoltuk'), depo: rDeger('rDepo'),
-        ilkTescil: rDeger('rIlkTescil'),
-        sahipAd: rDeger('rSahip'), sahipTel: rDeger('rTel'),
-        /* FATURA ALANLARI (15.09 · K-050) — fatura TC/vergi numarasına
-           ve adrese kesilir. Vergi dairesi ruhsatta yok; usta yazarsa
-           kaydediliyor, yoksa boş kalıyor. */
-        tcVergiNo: rDeger('rTcVergi'), adres: rDeger('rAdres'),
-        vergiDairesi: rDeger('rVergiDairesi'),
-        not: ''
-      });
-    }
+    /* Ruhsat okunduysa araç zaten kayıtlı (K-065); okunmadan, elle
+       yazılarak geldiyse burada kaydedilir. */
+    if (!aracBul(p)) ARACLAR.push(rAracVerisi(p));
 
     var isMetni = (rSesNotu && rSesNotu.is) || '';
     var yeni = {
@@ -9870,6 +9901,15 @@ document.addEventListener('click', function (e) {
    tazeleniyor. */
 document.addEventListener('input', function (e) {
   if (!e.target || Ekran.adi() !== 'ruhsat') return;
+  /* K-065: okumadan sonraki düzeltme kaydedilen araca da yazılır.
+     Plaka ancak geçerliyse ve başka bir araçla çakışmıyorsa değişir. */
+  if (rKaydedilen) {
+    if (R_ESLE[e.target.id]) rKaydedilen[R_ESLE[e.target.id]] = e.target.value.trim();
+    if (e.target.id === 'rPlaka') {
+      var yp = plakaBicim(e.target.value);
+      if (plakaGecerli(yp) && !aracBul(yp)) rKaydedilen.plaka = yp;
+    }
+  }
   if (['rPlaka', 'rYil', 'rTel'].indexOf(e.target.id) >= 0) { ruhsatDurum(); return; }
   if (e.target.closest('#rDetayGovde')) rDetaySayac();
 });

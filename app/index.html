@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-13 08:53
+  Üretim: 2026-10-18 10:22
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -6034,7 +6034,7 @@ var ARACLAR = [
     /* Fatura alanları BOŞ — her araçta dolu olmayacak; ruhsat
        okunmadıysa ya da okunamadıysa usta sonra yazar. */
     tcVergiNo: '', adres: '', vergiDairesi: '', not: '' },
-  { plaka: '16 XY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
+  { plaka: '16 SY 8890', marka: 'Volkswagen', model: 'Golf', yil: '2016',
     motor: '1.6 TDI', vin: 'WVWZZZAUZGW123456',
     renk: 'Siyah', yakit: 'Dizel', motorNo: 'CLH1234567',
     silindir: '1598', guc: '110', koltuk: '5', ilkTescil: '08.08.2016',
@@ -6153,7 +6153,7 @@ var KAYITLAR = [
 
   /* YEDİNCİ İŞ GÖRÜNSÜN: hatırlatması GELMİŞ ama gönderilmemiş bakım.
      Menü rozeti ve çekmecedeki bildirim bu kayıttan besleniyor. */
-  { id: 5, plaka: '16 XY 8890', tur: 'bakim', km: '88.000',
+  { id: 5, plaka: '16 SY 8890', tur: 'bakim', km: '88.000',
     sikayet: 'Periyodik bakım',
     acilis: '20.02.2026', teslimTarihi: '20.02.2026',
     odemeYolu: 'kart', hatirlatmaTarihi: '20.08.2026', hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
@@ -6484,12 +6484,50 @@ function benzerPlaka(plaka) {
     var q = plakaParcala(a.plaka);
     if (!q) return;
     if (q.il !== p.il || q.rakam !== p.rakam) return;
-    if (harfFarki(p.harf, q.harf) > 1) return;
+    /* Tek harf farkı YA DA her harfi sesçe yakın (06 PVR 07 → 06 TMR 07,
+       iki harf farklı ama "pe/te", "ve/me"). K-059: gerçek olabilecek
+       plaka kendiliğinden DEĞİŞTİRİLMEZ, burada SORULUR. sesceYakinHarf
+       04-islem.js'te — çağrı anında yüklü. */
+    var sesce = typeof sesceYakinHarf === 'function' && p.harf.length === q.harf.length &&
+      p.harf.split('').every(function (h, i) { return sesceYakinHarf(h, q.harf[i]); });
+    if (harfFarki(p.harf, q.harf) > 1 && !sesce) return;
     adaylar.push(a.plaka);
   });
   /* İKİ ADAY = ÖNERİ YOK. Hangisi olduğunu bilmiyorsak tahmin etmek,
      ustaya yanlış aracı onaylatmanın yoludur. */
-  return adaylar.length === 1 ? adaylar[0] : null;
+  if (adaylar.length) return adaylar.length === 1 ? adaylar[0] : null;
+  return rakamlaBenzerPlaka(p);
+}
+
+/* İKİNCİ AŞAMA — RAKAM ÖNCELİKLİ (16.10 · 300 gerçek kayıt): tanıyıcı
+   plaka HARFLERİNİ sözcüğe çeviriyor ("RIZ" → "Rus", "UR" → "Uğur", "KIH"
+   → "kız") ve il kodunu kaçırabiliyor ("38" → "34"); RAKAM GRUBU ise
+   çoğunlukla doğru duyuluyor ve dükkânda çoğu zaman tek araca ait.
+   Yalnız ilk aşama HİÇ aday bulamazsa çalışır. Aynı rakamlı kayıtlı
+   araçlar puanlanır: il aynı +2 · harf aynı +2 · sesçe yakın ya da iki
+   ünlü +1. EN YÜKSEK puan TEK ise ve en az 4 ise ÖNERİLİR — yine SORULUR
+   (K-059), kendiliğinden değiştirilmez. Beraberlik = öneri yok. */
+function rakamlaBenzerPlaka(p) {
+  var UNLU = 'AEIİOÖUÜ';
+  var puanlar = [];
+  ARACLAR.forEach(function (a) {
+    var q = plakaParcala(a.plaka);
+    if (!q || q.rakam !== p.rakam) return;
+    var puan = q.il === p.il ? 2 : 0;
+    if (q.harf.length === p.harf.length) {
+      for (var i = 0; i < q.harf.length; i++) {
+        var x = p.harf[i], y = q.harf[i];
+        if (x === y) puan += 2;
+        else if ((UNLU.indexOf(x) >= 0 && UNLU.indexOf(y) >= 0) ||
+                 (typeof sesceYakinHarf === 'function' && sesceYakinHarf(x, y))) puan += 1;
+      }
+    } else if (harfFarki(p.harf, q.harf) <= 1) puan += 2;
+    puanlar.push({ plaka: a.plaka, puan: puan });
+  });
+  puanlar.sort(function (a, b) { return b.puan - a.puan; });
+  if (!puanlar.length || puanlar[0].puan < 4) return null;
+  if (puanlar.length > 1 && puanlar[1].puan === puanlar[0].puan) return null;
+  return puanlar[0].plaka;
 }
 
 function kayitBul(id) {
@@ -7774,9 +7812,12 @@ document.addEventListener('click', function (e) {
 
    ⚠️ AÇILIŞTA çağrılır (ekranın `ac` kancası), çizimde değil (K-040):
    `ciz`de olsaydı ilk tazelemede not, usta okurken kaybolurdu. */
+/* K-060 (Cemil, 16.10 onayladı): kayıtlar SAKLANIR — hatalı anlaşılanı
+   bulmak için; ayrıntı 90 gün, sonra yalnız istatistik. Not bunu söylemeli. */
 var GIZLILIK_CUMLESI =
   'Söyledikleriniz ve çektiğiniz fotoğraflar, yazıya çevrilmek üzere ' +
-  'internet üzerinden gönderilir.';
+  'internet üzerinden gönderilir; hatalı anlaşılanları düzeltebilmemiz için ' +
+  'kayıtlar 90 gün saklanır.';
 
 function gizlilikIlkAcilis(kapId) {
   var kap = document.getElementById(kapId);
@@ -7842,11 +7883,340 @@ function gizlilikIlkAcilis(kapId) {
 /* ⚠️ Birleştirme ÇÖZÜMLEMENİN GİRİŞİNDE bir kez yapılır, burada
    değil: indeks/uzunluk döndüren bir fonksiyon metni değiştirirse,
    çağıran taraf ORİJİNAL metni yanlış yerden keser. */
+/* ---- TÜRK PLAKASININ KURALLARI (Cemil, 14.10: "Türkiye'de Q harfi
+   yok. Plakaların bazı kuralları var.") ----
+   - İl kodu 01–81. Dışındaki "iki rakam + harf + rakam" plaka değildir
+     ("kilometre 88 bin 900" → "88 BİN 900" plaka sanılmasın).
+   - Harfler: Türk alfabesinin 23 harfi — Ç Ğ İ Ö Ş Ü YOK, Q W X YOK.
+   - Harf sayısı rakam sayısını sınırlar (aşağıda `sinir`).
+   Tanıyıcı Türkçe yazar: "kbi" büyütülünce "KBİ" olur, "ç" duyabilir.
+   Plakada bu harfler olmadığına göre karşılıkları kastedilmiştir. */
+var PLAKA_HARFLERI = 'ABCDEFGHIJKLMNOPRSTUVYZ';
+var PLAKA_TR_HARF = { 'Ç': 'C', 'Ğ': 'G', 'İ': 'I', 'Ö': 'O', 'Ş': 'S', 'Ü': 'U' };
+
+/* Q W X'in karşılığı yok: böyle bir plaka KESİNLİKLE yanlış duyulmuştur
+   (sesPlakaBagla bunu bilir). Tarihçe: 14.09'da tanıyıcı "34 ABC 123"ü
+   "34 QBC 123" duydu — A-M27'nin doğduğu kayıt. */
+function plakaHarfiGecersizMi(harf) {
+  return harf.split('').some(function (h) { return PLAKA_HARFLERI.indexOf(h) < 0; });
+}
+
+/* BİÇİME UYAN İLK ADAY (16.10): "saat 10:30 da 06 TMR 07 gelecek" →
+   "30 DA 06" sahte plaka okunuyordu; 2 harfli plakada en az 3 rakam olur.
+   Cümledeki bütün adaylar gezilir (örtüşerek — "06" iki adaya da ait
+   olabilir); biçime uyan ilki seçilir. Hiçbiri uymazsa İLK aday döner —
+   eski davranış korunur (bağlama/öneri katmanları kısmi plakayla çalışıyor). */
 function sesPlakaBul(metin) {
-  var m = metin.toLocaleUpperCase('tr')
-               .match(/\b(\d{2})\s*([A-ZÇĞİÖŞÜ]{1,3})\s*(\d{2,4})\b/);
-  if (!m) return null;
-  return { plaka: m[1] + ' ' + m[2] + ' ' + m[3], indeks: m.index, uzunluk: m[0].length };
+  var re = /\b(\d{2})\s*([A-ZÇĞİÖŞÜ](?: ?[A-ZÇĞİÖŞÜ]){0,2})\s*(\d{2,5})\b/g;
+  var buyuk = metin.toLocaleUpperCase('tr'), m, ilk = null;
+  while ((m = re.exec(buyuk))) {
+    var p = sesPlakaAday(metin, m);
+    re.lastIndex = m.index + 1;
+    if (!p) continue;
+    if (!p.kisa) return p;
+    if (!ilk) ilk = p;
+  }
+  return ilk;
+}
+
+function sesPlakaAday(metin, eslesme) {
+  /* Kopya: aşağıda m[2] değiştiriliyor, arayıcının dizisi bozulmasın. */
+  var m = eslesme.slice(); m.index = eslesme.index;
+  /* Harfler tek tek söylenince aralıklı yazılıyor: "Y V I 22", "K IH 11". */
+  m[2] = m[2].replace(/ /g, '');
+  /* ⚠️ 5 RAKAM (14.10 · büyük set): tek harfli plaka 4–5 rakamlıdır
+     ("34 M 49109"); okuyucu en çok 4 rakam alıyordu ve bu plakaların
+     HİÇBİRİ tanınmıyordu. Harf sayısına göre fazla rakam = geçersiz. */
+  var il = parseInt(m[1], 10);
+  if (il < 1 || il > 81) return null;
+  var harf = m[2].replace(/[ÇĞİÖŞÜ]/g, function (h) { return PLAKA_TR_HARF[h]; });
+  var rakam = m[3], uzunluk = m[0].length;
+  /* RAKAM GRUBU BÖLÜNMÜŞ MÜ (14.10 ölçümü): tanıyıcı "8890"ı "88 90"
+     yazıyor. Türk plakasında harf sayısı rakam sayısını sınırlar —
+     1 harf → 4–5 rakam, 2 harf → 3–4, 3 harf → 2–3. Rakam grubu harf
+     sayısına göre KISAYSA ve hemen ardından rakam geliyorsa ikisi bir
+     plakadır. Biçime uyan grup (06 TMR 07) birleştirilmez. */
+  var sinir = { 1: [4, 5], 2: [3, 4], 3: [2, 3] }[m[2].length];
+  if (rakam.length < sinir[0]) {
+    var ek = metin.toLocaleUpperCase('tr').slice(m.index + uzunluk).match(/^\s+(\d{1,3})(?!\d)/);
+    if (ek && rakam.length + ek[1].length <= sinir[1]) {
+      rakam += ek[1];
+      uzunluk += ek[0].length;
+    }
+  }
+  return { plaka: m[1] + ' ' + harf + ' ' + rakam, indeks: m.index, uzunluk: uzunluk,
+           gecersiz: plakaHarfiGecersizMi(harf) || rakam.length > sinir[1],
+           kisa: rakam.length < sinir[0] };
+}
+
+/* ---- DUYULAN PLAKAYI KAYITLI PLAKAYA BAĞLAMAK (14.10) ----
+   Ölçüm (SES-OLCUM §11.3): sesli komutta kaybın en büyük kalemi plaka
+   harfi — TMR "PNR/PVR/DMR", KLM "kelime" duyuluyor ve motor bunu
+   KAYITSIZ araç sanıp yeni kayıt açtırıyor.
+
+   ⚠️ DÜZ "TEK HARF FARKI" YETMEZ, YANLIŞ BİLE OLUR: "34 ARC 123" de
+   kayıtlı 34 ABC 123'e tek harf uzak ama GERÇEK bir plaka olabilir —
+   başka bir araç (değerlendirme setinin tuzağı → yeni-arac + öneri).
+   Ayırt eden SESÇE yakınlık: Türkçede harf adları "be, ce, de, te…"
+   diye okunur; tanıyıcının karıştırdığı, ünsüzü AYNI BİÇİMDE çıkan
+   harflerdir (te/de/pe, me/ne). R ile B sesçe yakın değil.
+
+   GEÇERSİZ HARFLİ PLAKA BAŞKADIR: "34 QBC 123" gerçek olamaz (Q plakada
+   yok) — yeni araç değil, KESİNLİKLE yanlış duyulmuş bir plaka. Orada
+   sesçe yakınlık aranmaz; tek harf uzaktaki TEK kayıtlı plaka yeter.
+   (14.10'a kadar set QBC'yi "başka araç" tuzağı sayıyordu — Cemil'in
+   kuralıyla çelişiyordu; tuzak geçerli harflerle yeniden kuruldu.)
+
+   Sınıflar Türkçe ses bilgisinden (çıkış biçimi), ölçümden değil —
+   TEK İSTİSNA M~V: 14.10'da "TMR" iki kez "PVR" duyuldu (dudak sesi). */
+var SES_SINIFI = (function () {
+  var s = {};
+  [['B', 'P', 'D', 'T', 'G', 'K'],          // patlamalı
+   ['C', 'Ç'],                              // yarı patlamalı
+   ['F', 'V', 'S', 'Z', 'Ş', 'J', 'H'],     // sürtünmeli
+   ['M', 'N', 'V'],                         // genizsi + gözlenen M~V
+   ['L', 'R']].forEach(function (g, i) {
+    g.forEach(function (h) { (s[h] = s[h] || []).push(i); });
+  });
+  return s;
+})();
+
+function sesceYakinHarf(a, b) {
+  if (a === b) return true;
+  var x = SES_SINIFI[a] || [], y = SES_SINIFI[b] || [];
+  return x.some(function (i) { return y.indexOf(i) >= 0; });
+}
+
+/* Harf adlarının okunuşu: KLM → "KELEME". Tanıyıcı harf yerine kelime
+   yazdığında ("35 kelime 45") karşılaştırma bununla yapılır. */
+var HARF_OKUNUS = { A: 'A', E: 'E', I: 'I', İ: 'İ', O: 'O', Ö: 'Ö', U: 'U', Ü: 'Ü' };
+function harfOkunusu(harf) {
+  return harf.split('').map(function (h) { return HARF_OKUNUS[h] || (h + 'E'); }).join('');
+}
+function iskelet(s) { return s.replace(/[AEIİOÖUÜ]/g, ''); }
+
+/* İki metin arası düzenleme uzaklığı (ekle/sil/değiştir). */
+function duzenlemeUzakligi(a, b) {
+  var o = [], i, j;
+  for (j = 0; j <= b.length; j++) o[j] = j;
+  for (i = 1; i <= a.length; i++) {
+    var sol = i - 1; o[0] = i;
+    for (j = 1; j <= b.length; j++) {
+      var ust = o[j];
+      o[j] = Math.min(o[j] + 1, o[j - 1] + 1, sol + (a[i - 1] === b[j - 1] ? 0 : 1));
+      sol = ust;
+    }
+  }
+  return o[b.length];
+}
+
+/* ---- ARACI TARİFİNDEN BULMAK (14.10 · büyük set) ----
+   "Mehmet Kaya'nın arabası geldi", "şu Mégane'ın trigerini değiştirdik",
+   "Ford Focus geldi …". 14.09'dan beri değerlendirme setinde (id 5, 6)
+   beklenen davranıştı ve motorda HİÇ YOKTU — Claude çözüyordu.
+   Kurallar dar:
+   - yalnız genel / servis-ekle bağlamında (araçlar ekranında "Renault ara"
+     bir ARAMADIR, araç seçimi değil);
+   - sahip: "Ad Soyad" + iyelik + "araba/araç" ("'ın arabası");
+   - model: "Marka Model" birlikte, ya da model + iyelik ("Mégane'ın");
+     yalnız rakamdan oluşan model adı (301) iyelikle aranmaz — tutarla
+     karışır;
+   - TEK ARAÇ: sahibin iki aracı ya da aynı modelden iki araç varsa
+     bağlanmaz — "uydurmak, anlamamaktan kötüdür". */
+function regKacir(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
+/* Söyleyiş sözlüğü (SOYLEYIS_MODEL / _MARKA / _TERIM) betik/05-soyleyis.js'te —
+   veri, kural değil; büyüdükçe bu dosyayı şişirmesin. */
+
+/* Aksan ve tireden arınmış karşılaştırma biçimi: "C-Elysée" → "c elysee". */
+function sade(s) {
+  return norm(s).replace(/[éèë]/g, 'e').replace(/[áâà]/g, 'a').replace(/[îï]/g, 'i')
+                .replace(/[ûù]/g, 'u').replace(/-/g, ' ').replace(/\s+/g, ' ').trim();
+}
+
+function soyleyisleri(sozluk, ad) {
+  var a = sade(ad);
+  return [a].concat(sozluk[a] || []);
+}
+
+/* Metindeki terim söyleyişlerini kayıttaki biçime çevirir. Kelime başına
+   bakar ("eksozdan" → "egzozdan"); K-018: \b YOK. Söyleyiş hem Türkçe
+   harfli hem harfsiz yazılmış olabilir ("şanzuman"/"sanzuman") — ikisi de
+   aranır. ⚠️ Kayıttaki biçimin BAŞI olan söyleyişe dokunulmaz:
+   "manifold" içindeki "manifol" ikinci kez değiştirilmez ("manifoldd"). */
+function sesSoyleyisDuzelt(metin) {
+  SOYLEYIS_TERIM.forEach(function (t) {
+    var kanon = t[1], bicim = {};
+    t[0].forEach(function (v) { if (v.charAt(0) !== '!') { bicim[v] = 1; bicim[norm(v)] = 1; } });
+    Object.keys(bicim).sort(function (a, b) { return b.length - a.length; }).forEach(function (v) {
+      metin = metin.replace(new RegExp('(^|[^A-Za-zÇĞİÖŞÜçğıöşü])(' + regKacir(v) + ')', 'gi'),
+        function (tum, on, bul, yer, butun) {
+          var sonra = butun.slice(yer + on.length);
+          /* GERÇEK yazımla karşılaştır: harfsiz biçimde "amortisor" ile
+             "amortisör" aynı görünür ve düzeltme atlanırdı. */
+          if (sonra.toLocaleLowerCase('tr').indexOf(kanon) === 0) return tum;
+          return on + kanon;
+        });
+    });
+  });
+  return metin;
+}
+
+/* SÖYLERKEN DÜZELTME (16.10 · Cemil: "tel no söylerken 33 yerine 23 denip
+   değiştirilebilir"): "33 yok 23", "124 hayır 123", "3500 pardon 3800" —
+   düzeltme sözünden ÖNCEKİ sayı atılır, sonraki kalır. Yalnız iki SAYI
+   arasında: "parayı almadım, yok" gibi cümlelere dokunmaz. */
+function sesDuzeltmeUygula(metin) {
+  var onceki;
+  do {
+    onceki = metin;
+    metin = metin.replace(/(^|\s)\d+\s+(?:yok|pardon|hayır|hayir|değil|degil|yani)\s+(\d+)/i, '$1$2');
+  } while (metin !== onceki);
+  return metin;
+}
+
+function sesAracTarif(metin, baglam) {
+  if (typeof ARACLAR === 'undefined') return null;
+  if (baglam && baglam !== 'genel' && baglam !== 'servis-ekle') return null;
+  var d = norm(metin), bulunan = [];
+  var iyelik = "'?n?[iu]n";
+  ARACLAR.forEach(function (a) {
+    var ad = norm(a.sahipAd || '').trim();
+    if (ad.indexOf(' ') < 0) return;
+    var m = d.match(new RegExp('(^|\\s)(' + regKacir(ad) + iyelik + '\\s+(?:araba|arac)\\S*)'));
+    if (m) bulunan.push({ a: a, i: m.index + m[1].length, n: m[2].length, tur: 'sahip' });
+  });
+  if (!bulunan.length) {
+    /* Aksan/tire arınmış ama AYNI UZUNLUKTA metin — bulunan yer orijinal
+       metinden kesilecek (c.kalan). */
+    var ds = d.replace(/[éèë]/g, 'e').replace(/[áâà]/g, 'a').replace(/[îï]/g, 'i')
+              .replace(/[ûù]/g, 'u').replace(/-/g, ' ');
+    ARACLAR.forEach(function (a) {
+      var markalar = soyleyisleri(SOYLEYIS_MARKA, a.marka || '');
+      var modeller = soyleyisleri(SOYLEYIS_MODEL, a.model || '');
+      var m = null;
+      /* 1) marka + model ("Citroen Elize", "Ford Kurye") — "!"li söyleyiş
+            yalnız burada geçerli. */
+      markalar.forEach(function (mk) {
+        modeller.forEach(function (md) {
+          if (m || !mk || !md) return;
+          m = ds.match(new RegExp('(^|\\s)(' + regKacir(mk) + '\\s+' + regKacir(md.replace(/^!/, '')) + ")(?=\\s|$|')"));
+        });
+      });
+      /* 2) model tek başına: iyelikle ("Mégane'ın") ya da "geldi" ile
+            ("Se Elize geldi"). Rakamdan ibaret model (301) ve "!"li
+            söyleyiş tek başına sayılmaz. */
+      modeller.forEach(function (md) {
+        if (m || !md || md.charAt(0) === '!' || /^\d+$/.test(md)) return;
+        m = ds.match(new RegExp('(^|\\s)(' + regKacir(md) + iyelik + ')(?=\\s|$)')) ||
+            ds.match(new RegExp('(^|\\s)(' + regKacir(md) + ')(?=\\s+geldi)'));
+      });
+      if (m) bulunan.push({ a: a, i: m.index + m[1].length, n: m[2].length, tur: 'model' });
+    });
+  }
+  if (!bulunan.length) return null;
+  if (bulunan.length !== 1) return { belirsiz: true };
+  var b = bulunan[0];
+  return { plaka: b.a.plaka, indeks: b.i, uzunluk: b.n, tarif: b.tur };
+}
+
+/* PLAKA HİÇ DUYULMADIYSA, RAKAMDAN (16.10 · 300 gerçek kayıt): "16 J 1139"
+   → "Hatice 11 39", "07 E 21097" → "Freddy 21097", "34 BU 440" → "okulda
+   b u 440". Ortada plaka YOK — yeni araç ihtimali de yok (K-059: gerçek
+   olamayan plaka bağlanır ve SÖYLENİR). Rakam grubu (3+ hane; bölünmüşse
+   iki komşu grup birleştirilir) TEK kayıtlı plakanın rakamıysa o araç.
+   ⚠️ DAR: para/km sözü olan cümlede yapılmaz ("1200 kira gideri" bir
+   plakanın rakamına denk gelebilir); birimden önceki sayı ve telefonun
+   parçası aday değildir. */
+/* ⚠️ Zorlama (16.10): "yarın 123 tane balata gelecek" 34 ABC 123'e
+   bağlandı. Bu yüzden: adet/zaman sözünden önceki sayı aday değil; il
+   kodu duyulmuşsa (`il`) il de eşleşmeli; duyulmamışsa rakam EN AZ 4 hane
+   ("11 39", "21097") — 3 haneli bir sayı tek başına plaka kanıtı değil. */
+function sesRakamlaBagla(metin, il) {
+  var d = norm(metin);
+  if (/(lira|tl|gider|fatura|kira|tahsil|kasa|kilometre|km)(\s|$)/.test(d)) return null;
+  if (sesTelefonBul(metin)) return null;
+  var t = [], re = /\d+/g, m;
+  while ((m = re.exec(metin))) t.push({ s: m[0], i: m.index, n: m[0].length });
+  var adaylar = {};
+  var ADET = /^\s*(tane|adet|kere|kez|gun|saat|dakika|hafta|ay|yil|sene|parca)(\s|$)/;
+  /* ÖNCE PLAKA (16.10 · Cemil: "Araçla ilgili bir şeyse önce plaka
+     söylenecek şeklinde bekleyelim?"): cümlenin BAŞINDAKİ (ilk 3 sözcük
+     içinde) rakam grubu plaka kanıtıdır — orada 3 hane yeter ("okulda b u
+     440 …"). Sonda söylenen plaka REDDEDİLMEZ; yalnız kanıt daha zayıf. */
+  /* ⚠️ Zorlama: "yarın 123 balata gelecek" 34 ABC 123'e bağlandı. Plaka
+     bölgesinde ZAMAN sözü varsa bu bir plaka değildir. */
+  function bastaMi(i) {
+    var once = norm(metin.slice(0, i)).trim().split(/\s+/).filter(Boolean);
+    return once.length <= 3 && !once.some(function (w) {
+      return /^(yarin|bugun|dun|sonra|once|sabah|aksam|ogle|hafta|gun|ay|saat)/.test(w);
+    });
+  }
+  function dene(s, i, son) {
+    if (s.length < (il || bastaMi(i) ? 3 : 4)) return;
+    if (ADET.test(norm(metin.slice(son)))) return;
+    ARACLAR.forEach(function (a) {
+      var r = plakaParcala(a.plaka);
+      if (r && r.rakam === s && (!il || r.il === il)) adaylar[a.plaka] = { i: i, son: son, s: s };
+    });
+  }
+  t.forEach(function (x, k) {
+    dene(x.s, x.i, x.i + x.n);
+    var y = t[k + 1];
+    if (y && /^\s+$/.test(metin.slice(x.i + x.n, y.i))) dene(x.s + y.s, x.i, y.i + y.n);
+  });
+  var liste = Object.keys(adaylar);
+  if (liste.length !== 1) return null;
+  var a = adaylar[liste[0]];
+  return { plaka: liste[0], duyulan: metin.slice(a.i, a.son), indeks: a.i, uzunluk: a.son - a.i };
+}
+
+/* Duyulan plakayı kayıtlı TEK bir plakaya bağlar; bağlayamazsa null.
+   p: sesPlakaBul sonucu (ya da null). Döner: { plaka, duyulan, indeks,
+   uzunluk } — `duyulan` onay ekranında gösterilir, usta görsün.
+   ⚠️ İKİ ADAY = BAĞLAMA YOK (benzerPlaka'nın kuralı): hangisi olduğunu
+   bilmiyorsak tahmin etmek ustaya yanlış aracı onaylatmaktır. */
+function sesPlakaBagla(metin, p) {
+  if (typeof ARACLAR === 'undefined') return null;
+  if (p && aracBul(p.plaka)) return null;
+  /* K-059 (Cemil, 14.10 — "karma"): GERÇEK OLABİLECEK plaka burada
+     BAĞLANMAZ. "06 PVR 07" var olan başka bir araç olabilir; sesçe yakın
+     kayıtlı plaka benzerPlaka'da ÖNERİ olur, usta seçer (K-047.6).
+     Yalnız gerçek OLAMAYAN plaka bağlanır: Q/W/X'li ya da harf yerine
+     kelime ("35 kelime 45"). Orada yeni araç ihtimali yok. */
+  if (p && !p.gecersiz) return null;
+  var adaylar = [], duyulan, indeks, uzunluk;
+  if (p) {
+    var q = plakaParcala(p.plaka);
+    duyulan = p.plaka; indeks = p.indeks; uzunluk = p.uzunluk;
+    ARACLAR.forEach(function (a) {
+      var r = plakaParcala(a.plaka);
+      if (!r || r.il !== q.il || r.rakam !== q.rakam) return;
+      /* Tek harf farkı yeter (harfFarki bir eksik/fazla harfi de sayar). */
+      if (harfFarki(q.harf, r.harf) <= 1) adaylar.push(a.plaka);
+    });
+  } else {
+    /* Harf yerine kelime: "35 kelime 45". İl ve rakam BİREBİR kayıtlı
+       bir plakayla aynı olmalı; kelimenin ünsüz iskeleti harflerin
+       okunuşununkiyle aynı, okunuşa en çok 2 düzenleme uzak. */
+    var b = metin.toLocaleUpperCase('tr').match(/(^|\s)(\d{2})\s+([A-ZÇĞİÖŞÜ]{4,9})\s+(\d{2,4})(?!\d)/);
+    if (!b) return sesRakamlaBagla(metin);
+    duyulan = b[2] + ' ' + b[3] + ' ' + b[4];
+    indeks = b.index + b[1].length; uzunluk = b[0].length - b[1].length;
+    ARACLAR.forEach(function (a) {
+      var r = plakaParcala(a.plaka);
+      if (!r || r.il !== b[2] || r.rakam !== b[4]) return;
+      var ok = harfOkunusu(r.harf);
+      if (iskelet(ok) !== iskelet(b[3])) return;
+      if (duzenlemeUzakligi(ok, b[3]) > 2) return;
+      adaylar.push(a.plaka);
+    });
+    /* Sözcük harflerin okunuşuna benzemiyorsa ("10 derece 63 53", "01 Uğur
+       23 56", "35 George 641") rakama düş — sözcük plaka değil. */
+    if (!adaylar.length) return sesRakamlaBagla(metin, b[2]);
+  }
+  if (adaylar.length !== 1) return null;
+  return { plaka: adaylar[0], duyulan: duyulan, indeks: indeks, uzunluk: uzunluk };
 }
 
 function sesTelefonBul(metin) {
@@ -7868,6 +8238,33 @@ function sesTutarBul(d) {
   return 0;
 }
 
+/* BİRİMSİZ TUTAR (14.10 ölçümü): tanıyıcı "TL/lira"yı sık düşürüyor —
+   "2.400 elektrik faturası ekle", "motor yağı 4500". Tanıma DOĞRU, motor
+   okumuyordu. ⚠️ GENEL KURAL DEĞİL: çıplak sayı plaka, km, telefon da
+   olabilir. Yalnız tutardan başka bir şey olamayacak iki yerde okunur:
+   gider cümlesinde (gider/fatura/kira geçiyor) ve açık kayıtta cümlenin
+   SON kelimesi sayıysa. Çağıran taraf plakayı önceden ayıklar (c.dk).
+   Döner: { tutar, parca } — parca metinden silinecek ham hâl. */
+/* Zorlama örnekleriyle (14.10) bulunan iki tuzak:
+   - "kira gideri 0532 111 22 33" → 532: boşluklu telefonun parçası.
+     Telefon geçen cümlede çıplak sayı HİÇ okunmaz.
+   - "bu ay 3 fatura geldi", "buji 4" → 3 / 4 TL: tek haneli sayı ve
+     "tane/adet"ten önceki sayı ADETTİR. Tutar en az iki hane. */
+function ciplakSonuc(m, d) {
+  if (!m || sesTelefonBul(d)) return null;
+  var rakam = m[2].replace(/\./g, '');
+  if (rakam.length < 2 || rakam.length >= 10) return null;
+  return { tutar: parseInt(rakam, 10), parca: m[2] };
+}
+
+function sesCiplakTutar(d) {
+  return ciplakSonuc(d.match(/(^|\s)(\d{1,3}(?:\.\d{3})+|\d+)(?=\s|$)(?!\s+(tane|adet))/i), d);
+}
+
+function sesSonTutar(d) {
+  return ciplakSonuc(d.match(/(^|\s)(\d{1,3}(?:\.\d{3})+|\d+)\s*$/), d);
+}
+
 /* Metinden tutarı söküp atar — açıklama/ad kalsın diye. */
 function sesTutarsiz(metin) {
   return metin.replace(/(\d[\d.]*)\s*(tl|lira|₺)/gi, '');
@@ -7879,7 +8276,11 @@ function sesTutarsiz(metin) {
    okur, öteki okumazdı. */
 function sesServisOku(c) {
   var dk = c.dk, kalan = c.kalan;
-  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('periyodik') >= 0) ? 'bakim' : 'tamirat';
+  /* "yağ değişimi" bakımdır (14.10 · büyük set: hep tamirat çıkıyordu);
+     "yağ kaçırıyor" DEĞİL — bu yüzden kök değil, ikili kelime. */
+  /* "bakuma" — Karadeniz söyleyişi (16.10, Cemil: şive). */
+  var isTuru = (dk.indexOf('bakim') >= 0 || dk.indexOf('bakum') >= 0 || dk.indexOf('periyodik') >= 0 ||
+                dk.indexOf('yag degis') >= 0) ? 'bakim' : 'tamirat';
   var km = '';
   var kmE = dk.match(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/) ||
             dk.match(/(?:km|kilometre)\s*(\d[\d.]*)\s*(bin)?/);
@@ -7892,8 +8293,10 @@ function sesServisOku(c) {
   /* Sahip adı: telefon ve km çıkarıldıktan sonra kalan BAŞ HARFİ BÜYÜK
      iki kelime. Kaba ama ustanın söyleyiş sırasına uyuyor:
      "plaka · ad soyad · telefon · iş". */
-  var adE = kalan.match(/\b([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\s+([A-ZÇĞİÖŞÜ][a-zçğıöşü]+)\b/);
-  var sahip = adE ? adE[0] : '';
+  /* ⚠️ K-018: Türkçe metinde \b YOK — JS'te \b yalnız ASCII harfi tanır;
+     "İsmail Özdemir"in baş harfi sözcük sınırı sayılmıyordu. */
+  var adE = kalan.match(/(?:^|[^A-Za-zÇĞİÖŞÜçğıöşü])([A-ZÇĞİÖŞÜ][a-zçğıöşü]+\s+[A-ZÇĞİÖŞÜ][a-zçğıöşü]+)(?![A-Za-zçğıöşü])/);
+  var sahip = adE ? adE[1] : '';
   var is = kalan
     .replace(/(\d[\d.]*)\s*(bin)?\s*(km|kilometre)/gi, '')
     .replace(/(km|kilometre)\s*(\d[\d.]*)\s*(bin)?/gi, '')
@@ -7975,6 +8378,16 @@ var Islem = (function () {
   /* Bütün şemaların okuduğu ortak bağlam — metin bir kez hazırlanır. */
   function baglamKur(metin, baglam, kayitId) {
     var p = sesPlakaBul(metin);
+    /* Duyulan plaka kayıtlı değilse sesçe yakın TEK kayıtlı plakaya
+       bağlanır; duyulan hâli işlem nesnesine `duyulanPlaka` olarak
+       geçer ki onay ekranı söylesin (cozumle sonunda). */
+    var bag = sesPlakaBagla(metin, p);
+    if (bag) p = bag;
+    /* Plaka hiç söylenmediyse araç tarifinden (sahip / model). */
+    if (!p) {
+      var tarif = sesAracTarif(metin, baglam);
+      if (tarif && !tarif.belirsiz) p = tarif;
+    }
     var c = { metin: metin, d: norm(metin), p: p, baglam: baglam || 'genel',
               kayitId: kayitId || null, kayit: kayitId ? kayitBul(kayitId) : null };
     if (p) {
@@ -8016,7 +8429,40 @@ var Islem = (function () {
      Kural Tur 7'de yalnız kayıt ekranı için elle yazılmıştı; artık
      varsayılan işi olan HER bağlam için aynı yoldan geçiyor. */
   function cozumle(metin, baglam, kayitId) {
+    /* Önce ustanın kendi düzeltmesi ("33 yok 23"), sonra söyleyiş
+       sözlüğü ("eksoz" → "egzoz") — 16.10. */
+    metin = sesSoyleyisDuzelt(sesDuzeltmeUygula(metin));
+    /* Binlik noktası: tanıyıcı plakanın rakamına da nokta koyuyor
+       ("41 ve 99.363", "10 ne 5.701"). Tutar ve km okuyucuları noktasız
+       sayıyı zaten okuyor. */
+    /* Rakamlar arasındaki HER nokta kalkar: tanıyıcı "28.30" (saat gibi) de
+       yazıyor. Derece işareti ("41° 80 644") atılır. Harfe yapışık rakam
+       ayrılır: "K ıh11", "10D", "l99" — plaka okuyucusu harfle rakamı
+       ayrı görmeli. */
+    /* YAZIM BİÇİMİ (16.10 · Speechmatics dökümleri): tanıyıcılar sayıyı ve
+       noktalamayı farklı yazıyor — "06:52" (saat gibi), "57,01" (ondalık
+       virgül), cümle sonu noktası ("Rotil 1500."), "7 bin", "3 bin 900".
+       Motor bunları tek biçime indirir; hangi tanıyıcı seçilirse seçilsin. */
+    metin = metin.replace(/(\d):(?=\d)/g, '$1 ').replace(/(\d),(?=\d)/g, '$1');
+    metin = metin.replace(/(\d)\.(?=\d)/g, '$1').replace(/[.!?;:,]+/g, ' ');
+    metin = metin.replace(/(^|\s)(\d{1,3})\s+bin(?:\s+(\d{1,3}))?(?=\s|$)/gi, function (t, on, b, k) {
+      return on + String(parseInt(b, 10) * 1000 + (k ? parseInt(k, 10) : 0));
+    });
+    metin = metin.replace(/(\d)\.(?=\d)/g, '$1').replace(/°/g, '')
+                 .replace(/([A-Za-zÇĞİÖŞÜçğıöşü])(\d)/g, '$1 $2')
+                 .replace(/(\d)([A-Za-zÇĞİÖŞÜçğıöşü])/g, '$1 $2');
     var c = baglamKur(metin, baglam, kayitId);
+    return duyulaniIsaretle(doldur(c), c);
+  }
+
+  /* Plaka kayıtlıya bağlandıysa (sesPlakaBagla) işlem DUYULANI da
+     taşır — usta onay ekranında ne duyulduğunu, neyin alındığını görür. */
+  function duyulaniIsaretle(r, c) {
+    if (r && c.p && c.p.duyulan && r.plaka === c.p.plaka) r.duyulanPlaka = c.p.duyulan;
+    return r;
+  }
+
+  function doldur(c) {
     var kendi = kendiSemalari(c.baglam);
     var varsayilan = null;
     for (var i = 0; i < kendi.length; i++) {
@@ -8065,7 +8511,10 @@ var Islem = (function () {
       baslik: deger(o, s.baslik),
       satirlar: satirlar,
       sorulan: sorulan,
-      notice: deger(o, s.notice) || '',
+      notice: (o.duyulanPlaka
+                ? 'Duyulan "' + o.duyulanPlaka + '" geçerli bir plaka değil — en yakın kayıtlı araç ' +
+                  o.plaka + ' alındı. Değilse tekrar söyle. '
+                : '') + (deger(o, s.notice) || ''),
       eylem: deger(o, s.eylem),
       eylem2: deger(o, s.eylem2) || ''
     };
@@ -8117,6 +8566,218 @@ var Islem = (function () {
 
 /* Denetim ve değerlendirme dışarıdan okuyabilsin. */
 window.ISLEM_SEMALARI = function () { return Islem.json(); };
+
+
+/* ===== betik/05-soyleyis.js ===== */
+/* ============ SÖYLEYİŞ SÖZLÜĞÜ (16.10.2026) ============
+   Cemil, 16.10: *"Araç marka modelleri için okunuşları derleyelim. Mesela
+   civic için okunuşlar nasıl olabilir, bunları motorda önce toparlamamız
+   faydalı olur derim. Ayrıca egzos, manifolt gibi bir sürü kelime var.
+   Bunları da önceden toplayalım."*
+
+   Usta adı yazıldığı gibi değil SÖYLEDİĞİ gibi söyler; tanıyıcı da
+   duyduğunu yazar. Bu sözlük duyulabilecek biçimi kayıttaki biçime bağlar.
+   İKİ YERDE kullanılır:
+     1) motor — araç tarifi (04-islem.js sesAracTarif) ve terim düzeltme
+        (sesSoyleyisDuzelt: "eksoz contası" → "egzoz contası");
+     2) tanıyıcıya İPUCU — SOYLEYIS_IFADELER(): kayıttaki doğru biçimler
+        Web Speech `phrases` olarak verilir ki tanıyıcı baştan doğru yazsın.
+
+   ⚠️ OKUNUŞLAR BİZİM DERLEMEMİZ — ustaya doğrulatılacak (ve 60.1'deki
+   dörtlüden — ustanın onayladığı son hâl — zamanla kendiliğinden büyür).
+   ⚠️ "!" ile başlayan söyleyiş GERÇEK BİR TÜRKÇE KELİMEDİR ("fiyat",
+   "nisan", "kedi", "kurye", "sivil"): yalnız MARKAYLA birlikte araç sayılır
+   ve terim düzeltmesinde KULLANILMAZ.
+   Anahtarlar `sade()` biçiminde: küçük harf, Türkçe harfsiz, aksansız,
+   tire yerine boşluk ("C-Elysée" → "c elysee"). */
+
+var SOYLEYIS_MARKA = {
+  'renault': ['reno', 'renol'],
+  'fiat': ['!fiyat', 'fiyet'],
+  'volkswagen': ['folksvagen', 'volksvagen', 'folkswagen', 'folksvagin', 'vw', 've ve'],
+  'ford': ['fort'],
+  'toyota': ['toyoto'],
+  'hyundai': ['hundai', 'hunday', 'hyunday', 'hundey'],
+  'peugeot': ['pejo', 'pejot', 'puju', 'pijo', 'pojo'],
+  'citroen': ['sitroen', 'sitroyen', 'sitroin'],
+  'dacia': ['dacya', 'dakya', 'dacia'],
+  'skoda': ['sikoda'],
+  'nissan': ['!nisan'],
+  'kia': ['kiya'],
+  'mercedes': ['mersedes', 'merso', 'mercedes benz', 'mersedes benz'],
+  'bmw': ['be me ve', 'bemve', 'beemve'],
+  'audi': ['odi', 'avdi'],
+  'seat': ['siat', '!set'],
+  'chevrolet': ['sevrole', 'sevrolet'],
+  'mitsubishi': ['mitsubisi', 'mitsibisi'],
+  'jeep': ['!cip'],
+  'tofas': ['tofas'],
+  'togg': ['tog'],
+  'chery': ['ceri', '!seri'],
+  /* 16.10 genişletme — ticari ve sık gelen markalar */
+  'iveco': ['iveko', 'ivekko', 'ayveko'],
+  'isuzu': ['izuzu', 'isuzi'],
+  'mazda': ['mazda'],
+  'suzuki': ['suzuki', 'sizuki'],
+  'volvo': ['volvo'],
+  'subaru': ['subaru'],
+  'land rover': ['lend rover', 'land rover', 'lendrover'],
+  'porsche': ['porse', 'porsh'],
+  'cupra': ['kupra'],
+  'mg': ['me ge', 'em ci', 'emci'],
+  'byd': ['be ye de', 'bi way di']
+};
+
+var SOYLEYIS_MODEL = {
+  /* Renault */
+  'clio': ['klio'], 'megane': ['megan', 'mejan'], 'symbol': ['sembol', 'simbol'],
+  'fluence': ['fluens', 'fluans'], 'captur': ['kaptur', 'kapcir', 'kepcir'],
+  'kangoo': ['kango', 'kangu'], 'talisman': ['talisman'],
+  /* Fiat */
+  'egea': ['ega', 'ejea'], 'linea': ['linya'], 'doblo': ['doblo'],
+  'fiorino': ['fiyorino'], 'punto': ['punto'],
+  /* Volkswagen */
+  'passat': ['pasat'], 'jetta': ['ceta', 'jeta'], 'caddy': ['!kedi', 'keddi', 'kadi'],
+  'tiguan': ['tigvan', 'tiguvan'], 't roc': ['ti rok', 'tirok'],
+  'transporter': ['transporter'],
+  /* Ford */
+  'focus': ['fokus'], 'fiesta': ['fiyesta'], 'courier': ['kuryer', 'kurier', 'kuriyer', '!kurye'],
+  'transit': ['tranzit'], 'connect': ['konnekt', 'konekt'], 'ranger': ['reyncir', 'rencir'],
+  /* Toyota */
+  'corolla': ['korolla', 'korola'], 'hilux': ['hailaks', 'hilaks'], 'c hr': ['si eyc ar', 'ce ha re'],
+  /* Hyundai — girişte harfe yapışık rakam ayrılır: "i20" → "i 20" */
+  'i20': ['i 20', 'i yirmi', 'ay yirmi'], 'i10': ['i 10', 'i on'], 'i30': ['i 30', 'i otuz'],
+  'accent': ['aksent', 'eksent'], 'tucson': ['tuson', 'tukson', 'takson'],
+  /* Opel */
+  'corsa': ['korsa'], 'insignia': ['insinya'], 'mokka': ['moka'],
+  /* Peugeot / Citroën */
+  'partner': ['partner'], 'c elysee': ['se elize', 'si elize', 'selize', 'sielize', 'c elize', 'se elise', 'elize', 'elysee'],
+  'c3': ['c 3', 'se uc', 'si uc'], 'c4': ['c 4', 'se dort', 'si dort'], 'berlingo': ['berlingo'],
+  /* Dacia */
+  'duster': ['daster'], 'sandero': ['sandero'], 'lodgy': ['lodji', 'loci'], 'dokker': ['doker'],
+  /* Honda — Cemil'in örneği */
+  'civic': ['sivik', 'civik', 'sivic', '!sivil'], 'city': ['siti'], 'cr v': ['ci ar vi', 'ce re ve'],
+  'jazz': ['!caz'],
+  /* Skoda / Nissan / Kia / Seat */
+  'octavia': ['oktavya', 'oktavia'], 'superb': ['superb'], 'fabia': ['fabya'],
+  'qashqai': ['kaskay', 'kaskai'], 'juke': ['cuk', 'cuke'], 'micra': ['mikra'],
+  'sportage': ['sportaj', 'sportec'], 'ceed': ['sid', 'cid'], 'picanto': ['pikanto'],
+  'leon': ['liyon'], 'ibiza': ['ibiza'],
+  /* Tofaş */
+  'sahin': ['sahin'], 'dogan': ['!dogan'], 'kartal': ['!kartal'],
+  /* 16.10 genişletme — TİCARİ (minibüs, kamyonet: tamirhanenin sık müşterisi) */
+  'sprinter': ['ispirinter', 'sipirinter', 'sprinter'], 'vito': ['vito', 'vitto'],
+  'ducato': ['dukato', 'dukkato'], 'transit custom': ['tranzit kastim', 'transit kastim', 'tranzit kustom'],
+  'trafic': ['!trafik'], 'master': ['!master', 'mastir'], 'daily': ['deyli', 'dayli', '!deli'],
+  'boxer': ['bokser', 'boksir'], 'jumper': ['cumper', 'campır', 'camper'], 'expert': ['ekspert', 'eksper'],
+  'crafter': ['krafter', 'kraftır'], 'amarok': ['amarok'], 'navara': ['navara'], 'l200': ['l 200', 'el iki yuz'],
+  'h 100': ['h100', 'ha yuz', 'hayuz'], 'bongo': ['bongo'], 'd max': ['di maks', 'dimaks', 'de maks'],
+  /* Binek — eksikler */
+  'astra': ['astra'], 'vectra': ['vektra'], 'meriva': ['meriva'], 'zafira': ['zafira'],
+  'mondeo': ['mondeo'], 'kuga': ['kuga'], 'puma': ['puma'],
+  'golf': ['golf'], 'polo': ['polo'], 'scirocco': ['siroko', 'sirokko'], 'touran': ['!turan'],
+  'rifter': ['rifter'],
+  'c5 aircross': ['c5 eyrkros', 'se bes eyrkros'],
+  'tipo': ['tipo'], 'auris': ['oris'], 'yaris': ['yaris'], 'corolla cross': ['korolla kros'], 'arteon': ['arteon'], 'bora': ['!bora'], 'panda': ['panda'], 'palio': ['palyo', 'palio'], 'albea': ['albea', 'albeya'],
+  'taliant': ['talyant', 'taliyant'], 'austral': ['ostral'], 'koleos': ['koleos'],
+  'hr v': ['eyc ar vi', 'ha re ve'],
+  'kona': ['kona'], 'bayon': ['bayon'], 'santa fe': ['santa fe', 'santafe'], 'ix35': ['i iks 35', 'ay iks otuz bes'],
+  'stonic': ['stonik'], 'niro': ['niro'], 'sorento': ['sorento'], 'rio': ['riyo'],
+  'x trail': ['iks treyl', 'ekstreyl'], 'note': ['!not'], 'kamiq': ['kamik'], 'karoq': ['karok'],
+  'kodiaq': ['kodiyak', 'kodyak'], 'scala': ['skala'], 'arona': ['arona'], 'ateca': ['ateka'],
+  'formentor': ['formentor'], 'swift': ['svift', 'suift'], 'vitara': ['vitara'], 'cx 5': ['si eks 5', 'ce iks bes']
+};
+
+/* Parça / iş adlarının söyleyişleri. Metnin KENDİSİ kayıttaki biçime
+   çevrilir — "eksoz contası 900 lira" kayıttaki "Egzoz contası"na uysun,
+   onay ekranında usta doğru yazımı görsün. Gerçek kelime olan söyleyiş
+   ("kartel") buraya GİRMEZ. */
+var SOYLEYIS_TERIM = [
+  [['egzost', 'eksoz', 'egzos', 'ekzos', 'eksos', 'ekzoz', 'egsoz'], 'egzoz'],
+  [['manifolt', 'menifold', 'menifolt', 'manifol'], 'manifold'],
+  [['şanzuman', 'sanzuman', 'şanziman', 'sanziman', 'şanjman'], 'şanzıman'],
+  [['debriyaç', 'debriyac', 'debreyaj', 'debriyej', 'debiryaj'], 'debriyaj'],
+  [['tirger', 'trigır', 'trigir', 'triyger'], 'triger'],
+  [['amortisor', 'amortsör', 'amartisör', 'amörtisör', 'amortisör'], 'amortisör'],
+  [['enjektor', 'ejektör', 'encektör', 'injektör'], 'enjektör'],
+  [['radyator', 'rodyatör', 'radiatör', 'radyatör'], 'radyatör'],
+  [['alternator', 'alternetör'], 'alternatör'],
+  [['distribütor', 'distrübitör', 'distribitör'], 'distribütör'],
+  [['karbirator', 'karbaratör', 'karbürator'], 'karbüratör'],
+  [['termostad', 'termosta'], 'termostat'],
+  [['kompresor'], 'kompresör'],
+  [['bujı', 'buci'], 'buji'],
+  [['rotül', 'rotel'], 'rotil'],
+  [['salincak', 'salançak'], 'salıncak'],
+  [['rulmen', 'rülman'], 'rulman'],
+  [['kanpana'], 'kampana'],
+  [['diferansiyal', 'difransiyel'], 'diferansiyel'],
+  [['kırank'], 'krank'],
+  [['eksantirik', 'egsantrik'], 'eksantrik'],
+  [['sekman', 'segmen'], 'segman'],
+  [['subap', 'supab'], 'supap'],
+  [['silindır', 'slindir'], 'silindir'],
+  [['sensor'], 'sensör'],
+  [['interkuler', 'intırkulır', 'interkulır'], 'intercooler'],
+  [['direksyon', 'dreksiyon'], 'direksiyon'],
+  [['silicek'], 'silecek'],
+  [['antifiriz'], 'antifriz'],
+  [['kece'], 'keçe'],
+  [['bicon'], 'bijon'],
+  [['civata'], 'cıvata'],
+  [['rotbalans'], 'rot balans'],
+  /* 16.10 genişletme — yalnız YANLIŞ söyleyiş; eş anlamlı DEĞİL ("klakson"
+     ile "korna" ikisi de doğru, biri ötekine çevrilmez). */
+  [['porya', 'porye', 'poyre'], 'poyra'],
+  [['kalipır', 'kalipir', '!kaliber'], 'kaliper'],
+  [['musir', 'müsir'], 'müşir'],
+  [['hareret', 'hararat'], 'hararet'],
+  [['susdurucu', 'susdurugu'], 'susturucu'],
+  [['rektefiye', 'rektifye', 'rektafiye'], 'rektifiye'],
+  [['lamda'], 'lambda'],
+  [['devirdaym', 'devridaim', 'devir daim'], 'devirdaim'],
+  [['debi metre', 'debimetere'], 'debimetre'],
+  [['türbo'], 'turbo'],
+  [['katalizor', 'katalizatör'], 'katalizör'],
+  [['şarz dinamosu', 'sarz dinamosu', 'şarj dinamusu'], 'şarj dinamosu'],
+  [['edblu', 'ad blu', 'adblu', 'ed blu'], 'AdBlue'],
+  [['helozon', 'helezun'], 'helezon'],
+  [['cant'], 'jant'],
+  [['vitez'], 'vites'],
+  [['e ge re', 'egr valfi'], 'EGR'],
+  [['de pe fe'], 'DPF'],
+  [['a be se'], 'ABS'],
+  [['e se pe'], 'ESP'],
+  [['marş motur', 'mars motoru'], 'marş motoru'],
+  [['aks körüğü', 'aks köryüğü', 'aks korugu'], 'aks körüğü'],
+  [['gergi rulmani', 'gergi rülmanı'], 'gergi rulmanı'],
+  [['tirger kayışı', 'triger kayisi'], 'triger kayışı'],
+  [['silindir kapağı', 'silindir kapagi', 'slindir kapağı'], 'silindir kapağı'],
+  [['yağ müşiri', 'yag musiri'], 'yağ müşiri'],
+  [['fren hidroliği', 'fren hidroligi', 'fren hidrolik yağı'], 'fren hidroliği'],
+  [['debriyaj merkezi', 'debriyaç merkezi'], 'debriyaj merkezi'],
+  [['viraj demiri', 'viraj demirı'], 'viraj demiri'],
+  [['zet rot', 'z rot'], 'Z rot'],
+  [['enjektör memesi', 'enjektor memesi'], 'enjektör memesi']
+];
+
+/* Tanıyıcıya verilecek İPUCU listesi (Web Speech `phrases`): kayıttaki
+   DOĞRU biçimler — dükkânın plakaları, araçlarının marka ve modeli,
+   terimler, işlerin sözleri. Söyleyişler değil: tanıyıcının yazmasını
+   istediğimiz şey doğru biçim. */
+var SOYLEYIS_IS_SOZLERI = ['teslim', 'tahsilat', 'işçilik', 'kilometre', 'WhatsApp', 'SMS',
+  'nakit', 'kart', 'havale', 'sahibine', 'balata', 'triger', 'devirdaim', 'gider', 'fatura'];
+
+function SOYLEYIS_IFADELER(araclar) {
+  var gorulen = {}, liste = [];
+  function ekle(s) { s = String(s || '').trim(); if (s && !gorulen[s]) { gorulen[s] = 1; liste.push(s); } }
+  (araclar || (typeof ARACLAR !== 'undefined' ? ARACLAR : [])).forEach(function (a) {
+    ekle(a.plaka); ekle(a.marka); ekle(a.model); ekle((a.marka || '') + ' ' + (a.model || ''));
+  });
+  SOYLEYIS_TERIM.forEach(function (t) { ekle(t[1]); });
+  SOYLEYIS_IS_SOZLERI.forEach(ekle);
+  return liste;
+}
 
 
 /* ===== ekran: 10-home.html ===== */
@@ -8172,7 +8833,7 @@ Ekran.tanim('home', {
 var SES_BAGLAM = {
   genel: {
     ad: 'Sesli işlem',
-    ipucu: 'Plakayı ve ne yapılacağını söylemen yeter.',
+    ipucu: 'Önce plakayı, sonra yapılacak işi söyle.',   /* Cemil, 16.10: önce plaka */
     ornekler: [
       '{plaka} triger seti değişecek',
       '{serviste} bakıma geldi kilometre 88 bin',
@@ -8313,6 +8974,50 @@ var SES_SAYI = {
 };
 var SES_BIRIM = { 'lira': 1, 'tl': 1, '₺': 1, 'km': 1, 'kilometre': 1 };
 
+/* SAYI SÖZCÜKLERİ BİRDEN ÇOK SAYI OLABİLİR (16.10 · Cemil: "4487 ise kırk
+   dört seksen yedi diye okunabilir, dört bin dört yüz seksen yedi de
+   denebilir"). Önceki hâl art arda gelen HER sayı sözcüğünü toplayıp tek
+   sayı yapıyordu: "kırk dört seksen yedi" → 131, telefon "sıfır beş yüz
+   otuz iki yüz on bir…" → tek bir anlamsız sayı.
+   Türkçe sayının dilbilgisi: birler onlardan, onlar yüzlerden sonra gelir.
+   Gelen sözcük o anki sayıyı SÜRDÜREMİYORSA yeni sayı başlar:
+     birler birlerden sonra · onlar birler/onlardan sonra ·
+     "yüz", içinde onlar ya da yüz olan bir sayıdan sonra ("otuz iki yüz") ·
+     "sıfır" her zaman kendi başına.
+   "dört bin dört yüz seksen yedi" yine TEK sayıdır (4487). */
+function sesSayiGruplari(kelimeler) {
+  var gruplar = [], toplam = 0, gecerli = 0, son = null;
+  function kapat() {
+    if (son !== null) gruplar.push(String(toplam + gecerli));
+    toplam = 0; gecerli = 0; son = null;
+  }
+  kelimeler.forEach(function (w) {
+    if (w === 'sifir') { kapat(); gruplar.push('0'); return; }
+    if (w === 'bin') {
+      if (son === 'bin') kapat();
+      toplam = (toplam + (gecerli || 1)) * 1000; gecerli = 0; son = 'bin';
+      return;
+    }
+    if (w === 'yuz') {
+      /* "beş yüz": önündeki tek birlik çarpandır; "otuz iki yüz": yeni sayı. */
+      if (son === 'birler' && gecerli < 10 && gecerli > 0) { gecerli *= 100; son = 'yuz'; return; }
+      if (son !== null && son !== 'bin') kapat();
+      gecerli += 100; son = 'yuz';
+      return;
+    }
+    var v = SES_SAYI[w];
+    if (v < 10) {
+      if (son === 'birler') kapat();
+      gecerli += v; son = 'birler';
+    } else {
+      if (son === 'birler' || son === 'onlar') kapat();
+      gecerli += v; son = 'onlar';
+    }
+  });
+  kapat();
+  return gruplar;
+}
+
 function sesSayilariCevir(metin) {
   var parcalar = metin.split(/(\s+)/);
   var cikti = [], i = 0;
@@ -8356,13 +9061,7 @@ function sesSayilariCevir(metin) {
         })) {
       deger = kelimeler.map(function (w) { return SES_SAYI[w]; }).join('');
     } else {
-      var toplam = 0, gecerli = 0;
-      kelimeler.forEach(function (w) {
-        if (w === 'yuz') gecerli = (gecerli || 1) * 100;
-        else if (w === 'bin') { toplam += (gecerli || 1) * 1000; gecerli = 0; }
-        else gecerli += SES_SAYI[w];
-      });
-      deger = String(toplam + gecerli);
+      deger = sesSayiGruplari(kelimeler).join(' ');
     }
     /* ⚠️ SONA BOŞLUK ŞART: dizi toplanırken aradaki boşluklar yutuldu.
        Konmazsa "otuz dört abc" → "34abc" oluyor ve plaka deseni
@@ -8847,6 +9546,33 @@ function rDeger(id) {
   return e ? e.value.trim() : '';
 }
 
+/* ---- RUHSAT OKUNDUĞU AN ARAÇ KAYDEDİLİR (K-065 · Cemil, 18.10) ----
+   *"İlk ruhsatı okuduğumuzda, kayıt olarak almalıyız. Belki dükkana
+   girişi olmayacak aracın, sadece parça soruyor. Fakat plaka sözlük
+   için bizi gerekebilir."*
+   Eskiden araç yalnız "Kaydı aç"ta yazılıyordu; ruhsatı okunup servis
+   kaydı açılmayan araç kayboluyordu. Kayıtlı plaka, sesli komutun
+   plaka bağlamasında aday listesidir (K-059) — kaybolan her ruhsat,
+   motorun tanıyamayacağı bir plaka demekti.
+   `rKaydedilen`: bu okumanın kaydettiği (ya da bulduğu) araç. Usta
+   okumadan SONRA bir alanı düzeltirse düzeltme ona da yazılır —
+   kaydedilen şey ustanın son hâli olur, modelin ilk okuması değil. */
+var rKaydedilen = null;
+var R_ESLE = { rMarka: 'marka', rModel: 'model', rYil: 'yil', rMotor: 'motor',
+  rRenk: 'renk', rYakit: 'yakit', rVin: 'vin', rMotorNo: 'motorNo',
+  rSilindir: 'silindir', rGuc: 'guc', rKoltuk: 'koltuk', rDepo: 'depo',
+  rIlkTescil: 'ilkTescil', rSahip: 'sahipAd', rTel: 'sahipTel',
+  /* FATURA ALANLARI (15.09 · K-050) — fatura TC/vergi numarasına ve
+     adrese kesilir. Vergi dairesi ruhsatta yok; usta yazarsa
+     kaydediliyor, yoksa boş kalıyor. */
+  rTcVergi: 'tcVergiNo', rAdres: 'adres', rVergiDairesi: 'vergiDairesi' };
+
+function rAracVerisi(p) {
+  var a = { plaka: p, not: '' };
+  Object.keys(R_ESLE).forEach(function (id) { a[R_ESLE[id]] = rDeger(id); });
+  return a;
+}
+
 function ruhsatSekme(hangi) {
   rSekme = hangi;
   document.getElementById('sekPlaka').setAttribute('aria-selected', String(hangi === 'plaka'));
@@ -9014,6 +9740,7 @@ Ekran.tanim('ruhsat', {
       var e = document.getElementById(id); if (e) e.value = '';
     });
     rOkundu = false;
+    rKaydedilen = null;
     ruhsatSekme('plaka');
     gizlilikIlkAcilis('rGizlilik');
 
@@ -9062,7 +9789,10 @@ Ekran.tanim('ruhsat', {
 /* ---- sahte okuma ----
    Gerçek okuma bir servise bağlanacak (RUHSAT-OKUMA.md C yolu).
    Burada ekranın DAVRANIŞI gösteriliyor: alanlar dolar, HEPSİ
-   DÜZELTİLEBİLİR, hiçbiri kendiliğinden kaydedilmez.
+   DÜZELTİLEBİLİR. ARAÇ okunduğu an kaydedilir (K-065 — eski kural
+   "hiçbiri kendiliğinden kaydedilmez" Cemil'in kararıyla değişti);
+   düzeltmeler kayda yazılmaya devam eder. Servis kaydı ise yine
+   yalnız "Kaydı aç"la açılır.
 
    Örnek kayıtlar ARTIK TAM: renk, yakıt, şasi, motor no, hacim, güç,
    koltuk, ilk tescil. Yarım örnek, "bu alanlar zaten dolmaz" diye
@@ -9128,8 +9858,24 @@ function ruhsatOku(kaynak) {
         ' — aşağıdaki alanlarda hepsi düzeltilebilir.</p>' +
     '</div>';
 
+  /* K-065: araç ŞİMDİ kaydedilir. Kayıtlı araç varsa üstüne yazılmaz,
+     yalnız BOŞ alanları dolar — ustanın daha önce düzelttiği bilgi
+     modelin yeni okumasına yenilmez. Plaka okunamadıysa (gerçek setin
+     r31'i) araç kaydedilmez: plakasız kayıt, yanlış araca bağlanır. */
+  var p = plakaBicim(rDeger('rPlaka'));
+  var kaydedildi = false;
+  if (plakaGecerli(p)) {
+    var yeni = rAracVerisi(p);
+    var a = aracBul(p);
+    if (!a) { ARACLAR.push(yeni); a = yeni; kaydedildi = true; }
+    else Object.keys(yeni).forEach(function (k) { if (!a[k] && yeni[k]) a[k] = yeni[k]; });
+    rKaydedilen = a;
+  }
+
   ruhsatDurum();
-  balon('Ruhsat okundu — yanlış varsa aşağıdan düzelt.', false, 3000);
+  balon(kaydedildi ? 'Ruhsat okundu, araç kaydedildi — yanlış varsa aşağıdan düzelt.'
+    : (rKaydedilen ? 'Ruhsat okundu — bu araç zaten kayıtlı.'
+      : 'Plaka okunamadı — plakayı yaz, araç öyle kaydedilir.'), false, 3000);
 }
 
 document.addEventListener('click', function (e) {
@@ -9158,25 +9904,9 @@ document.addEventListener('click', function (e) {
       return;
     }
 
-    if (!aracBul(p)) {
-      ARACLAR.push({
-        plaka: p,
-        marka: rDeger('rMarka'), model: rDeger('rModel'),
-        yil: rDeger('rYil'), motor: rDeger('rMotor'),
-        renk: rDeger('rRenk'), yakit: rDeger('rYakit'),
-        vin: rDeger('rVin'), motorNo: rDeger('rMotorNo'),
-        silindir: rDeger('rSilindir'), guc: rDeger('rGuc'),
-        koltuk: rDeger('rKoltuk'), depo: rDeger('rDepo'),
-        ilkTescil: rDeger('rIlkTescil'),
-        sahipAd: rDeger('rSahip'), sahipTel: rDeger('rTel'),
-        /* FATURA ALANLARI (15.09 · K-050) — fatura TC/vergi numarasına
-           ve adrese kesilir. Vergi dairesi ruhsatta yok; usta yazarsa
-           kaydediliyor, yoksa boş kalıyor. */
-        tcVergiNo: rDeger('rTcVergi'), adres: rDeger('rAdres'),
-        vergiDairesi: rDeger('rVergiDairesi'),
-        not: ''
-      });
-    }
+    /* Ruhsat okunduysa araç zaten kayıtlı (K-065); okunmadan, elle
+       yazılarak geldiyse burada kaydedilir. */
+    if (!aracBul(p)) ARACLAR.push(rAracVerisi(p));
 
     var isMetni = (rSesNotu && rSesNotu.is) || '';
     var yeni = {
@@ -9205,6 +9935,15 @@ document.addEventListener('click', function (e) {
    tazeleniyor. */
 document.addEventListener('input', function (e) {
   if (!e.target || Ekran.adi() !== 'ruhsat') return;
+  /* K-065: okumadan sonraki düzeltme kaydedilen araca da yazılır.
+     Plaka ancak geçerliyse ve başka bir araçla çakışmıyorsa değişir. */
+  if (rKaydedilen) {
+    if (R_ESLE[e.target.id]) rKaydedilen[R_ESLE[e.target.id]] = e.target.value.trim();
+    if (e.target.id === 'rPlaka') {
+      var yp = plakaBicim(e.target.value);
+      if (plakaGecerli(yp) && !aracBul(yp)) rKaydedilen.plaka = yp;
+    }
+  }
   if (['rPlaka', 'rYil', 'rTel'].indexOf(e.target.id) >= 0) { ruhsatDurum(); return; }
   if (e.target.closest('#rDetayGovde')) rDetaySayac();
 });
@@ -9855,8 +10594,15 @@ document.addEventListener('input', function (e) {
    kelimeleriAt kullanılıyor, \b DEĞİL: /\bde\b/ "değişecek"i
    "ğişecek" yapıyordu (K-018, çekirdekteki uyarıya bak). */
 function sesSatirAdi(c) {
-  return kelimeleriAt(sesTutarsiz(c.metin),
-    ['parça', 'parca', 'işçilik', 'iscilik', 'da', 'de', 'ekle',
+  var metin = sesTutarsiz(c.metin);
+  /* Birimsiz son sayı tutardır (sesKayitTutari) — addan da düşer. */
+  if (!sesTutarBul(c.d) && !c.p) {
+    var son = sesSonTutar(metin);
+    if (son) metin = metin.slice(0, metin.lastIndexOf(son.parca));
+  }
+  return kelimeleriAt(metin,
+    ['parça', 'parca', 'işçilik', 'iscilik', 'işçiliği', 'isciligi', 'ücreti', 'ucreti',
+     'yaz', 'da', 'de', 'ekle',
      'yap', 'oldu', 'olsun', 'fiyat', 'fiyatı', 'fiyati',
      'güncelle', 'guncelle']);
 }
@@ -9866,6 +10612,16 @@ function sesSatirAdi(c) {
    edilebilir."). SIRA DAR OLANDAN GENİŞE: teslim (60, teslim ekranında)
    → fiyat güncelleme (65) → satır ekleme (VARSAYILAN). Ters sırada
    "teslim ettim nakit aldım" kayda "teslim ettim" diye satır eklerdi. */
+
+/* AÇIK KAYITTA TUTAR: "lira/TL" ile söylendiyse o; tanıyıcı birimi
+   düşürdüyse cümlenin SON kelimesi olan sayı ("motor yağı 4500").
+   Plaka geçen cümlede çıplak sayı okunmaz — plakanın rakamı olabilir. */
+function sesKayitTutari(c) {
+  var t = sesTutarBul(c.d);
+  if (t || c.p) return t;
+  var son = sesSonTutar(c.metin);
+  return son ? son.tutar : 0;
+}
 
 /* FİYAT GÜNCELLEME — söylenen ad VAR OLAN bir satıra uyuyorsa.
    ⚠️ TEK ADAY KURALI (A-M27'nin aynısı): iki satır birden uyuyorsa
@@ -9883,7 +10639,7 @@ Islem.tanim('fiyat-guncelle', {
     { ad: 'fiyat', etiket: 'Yeni', tip: 'para', zorunlu: true }
   ],
   baglamda: function (c) {
-    var k = c.kayit, tutarR = sesTutarBul(c.d), ad = sesSatirAdi(c);
+    var k = c.kayit, tutarR = sesKayitTutari(c), ad = sesSatirAdi(c);
     if (!k || !tutarR || !ad) return null;
     var adN = norm(ad), uyan = [];
     (k.satirlar || []).forEach(function (s, i) {
@@ -9893,6 +10649,24 @@ Islem.tanim('fiyat-guncelle', {
         uyan.push({ satir: s, indeks: i });
       }
     });
+    /* YAKIN SÖYLEYİŞ (16.10 · 300 kayıt): tanıyıcı parça adını bozuyor —
+       "fren diski" → "friendiski", "triger seti" → "Driver seti", "yağ
+       filtresi" → "ya şifresi". Aday yalnız bu kaydın birkaç satırı; tam
+       eşleşme yoksa boşluksuz biçimler arasında düzenleme uzaklığı,
+       uzunluğun en çok %20'si VE ilk harf aynı ya da sesçe yakın.
+       ⚠️ %30 ile denendi: "hava filtresi" kayıttaki "Yağ filtresi"ne uydu
+       ve YANLIŞ satırın fiyatı değişti (eski setlerde 3 gerileme). Ortak
+       sonek ("filtresi") farkı küçültüyor; baştaki sözcük ayırır.
+       Yine TEK ADAY kuralı (A-M27). */
+    if (!uyan.length) {
+      var adB = adN.replace(/\s/g, '');
+      (k.satirlar || []).forEach(function (s, i) {
+        var sB = norm(s.ad || '').replace(/\s/g, '');
+        if (sB.length < 5 || !adB) return;
+        if (!sesceYakinHarf(adB.charAt(0).toLocaleUpperCase('tr'), sB.charAt(0).toLocaleUpperCase('tr'))) return;
+        if (duzenlemeUzakligi(adB, sB) <= Math.floor(sB.length * 0.2)) uyan.push({ satir: s, indeks: i });
+      });
+    }
     if (uyan.length !== 1) return null;
     return { tur: 'fiyat-guncelle', kayit: k, indeks: uyan[0].indeks,
              satir: uyan[0].satir, fiyat: tutarR };
@@ -9927,12 +10701,14 @@ Islem.tanim('satir-ekle', {
   ],
   baglamda: function (c) {
     if (!c.kayitId) return null;
-    var iscilikMi = c.d.indexOf('iscilik') >= 0;
+    /* Kök "iscili": ek alınca k → ğ olur ("işçiliği 600 lira yaz") ve
+       "iscilik" aranırsa satır PARÇA sanılıyordu (14.10 · büyük set). */
+    var iscilikMi = c.d.indexOf('iscili') >= 0;
     var ad = sesSatirAdi(c);
     /* "işçilik 750 lira" dendiğinde geriye ad kalmıyor — boş bırakmak
        yerine türün kendi adı yazılır, usta gerekirse düzeltir. */
     return { tur: 'satir-ekle', ad: ad || (iscilikMi ? 'İşçilik' : 'Parça'),
-             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesTutarBul(c.d) };
+             tip: iscilikMi ? 'iscilik' : 'parca', fiyat: sesKayitTutari(c) };
   },
   /* Sesle söylenen satırın alışı BİLİNMİYOR (null), sıfır değil —
      K-055.2. (8.3'te `alis: 0` bilerek taşınmıştı; 8.2 düzeltti.) */
@@ -10290,10 +11066,13 @@ document.addEventListener('click', function (e) {
    veresiye yazmak yerine teslim ekranında seçiliyor. */
 var SES_ODEME = { nakit: ODEME_ETIKET.nakit, kart: ODEME_ETIKET.kart,
                   havale: ODEME_ETIKET.havale };
+/* Usta ödeme yolunu farklı sözlerle söyler (14.10 · büyük set): "peşin"
+   nakittir; "EFT", "hesaba yatırdı" havaledir. Söylenmeyen ödeme null —
+   nakit VARSAYILMAZ. */
 function sesOdemeYolu(d) {
-  return d.indexOf('nakit') >= 0 ? 'nakit'
-       : d.indexOf('kart') >= 0 ? 'kart'
-       : d.indexOf('havale') >= 0 ? 'havale' : null;
+  return (d.indexOf('nakit') >= 0 || d.indexOf('pesin') >= 0) ? 'nakit'
+       : (d.indexOf('kart') >= 0 || kelimeVarMi(d, ['kk'])) ? 'kart'   /* "kk" = kredi kartı (Cemil, 16.10) */
+       : (d.indexOf('havale') >= 0 || kelimeVarMi(d, ['eft']) || d.indexOf('hesaba') >= 0) ? 'havale' : null;
 }
 
 Islem.tanim('teslim', {
@@ -10721,10 +11500,14 @@ Islem.tanim('ara', {
     if (c.p && d.indexOf('sahib') >= 0) {
       terim = c.arac && c.arac.sahipAd ? c.arac.sahipAd : c.p.plaka;
       hedef = 'musteriler';
+    } else if (c.p && hedef === 'araclar' && !c.kalan.replace(/\s/g, '')) {
+      /* Yalnız plaka söylendiyse arama terimi plakanın OKUNMUŞ hâli —
+         "07 R 13 03" değil "07 R 1303" (bölünmüş rakam birleşmiş). */
+      terim = c.p.plaka;
     }
     /* "SERVİSTEKİLER" bir arama terimi değil, SÜZGEÇ (14.09 — örnek çip
        düz aramaya düşüp boş liste döndürüyordu; 45. test korur). */
-    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0) {
+    if (d.indexOf('iceridek') >= 0 || d.indexOf('servistek') >= 0 || d.indexOf('serviste ne') >= 0) {
       return { tur: 'ara', hedef: 'kayitlar', terim: '', suzgec: 'serviste' };
     }
     if (!terim) return null;
@@ -11362,7 +12145,12 @@ function sesMesajKomutu(d) {
   return d.indexOf('mesaj') >= 0 || d.indexOf('whatsapp') >= 0 ||
          d.indexOf('sms') >= 0 ||
          kelimeVarMi(d, ['yaz', 'yazdir', 'sahibine']) ||
-         d.indexOf('gonder') >= 0;
+         d.indexOf('gonder') >= 0 ||
+         /* Tanıyıcı "sahibine"yi sık sık "sahibinden" yazıyor (16.10 · 300
+            kayıt). Yalnız bir mesaj METNİ de geçiyorsa mesaj sayılır —
+            "X sahibinden parça aldım" bir mesaj değildir. */
+         (kelimeVarMi(d, ['sahibinden']) &&
+          /bekliyor|hazir|hatirlat|selam|tesekkur|ozet/.test(d));
 }
 
 /* ⚠️ TOPLU MESAJ (14.09) — Cemil: *"Mesela tüm müşterilere bayram
@@ -12024,7 +12812,7 @@ Islem.tanim('tahsilat-sor', {
     var d = c.d;
     if (sesTutarBul(d) || (d.indexOf('tahsil') < 0 && d.indexOf('kasa') < 0)) return null;
     var donem = (d.indexOf('bugun') >= 0) ? 'bugun'
-              : (d.indexOf('yil') >= 0) ? 'yil'
+              : (d.indexOf('yil') >= 0 || d.indexOf('sene') >= 0) ? 'yil'
               : (d.indexOf('ay') >= 0) ? 'ay' : 'bugun';
     return { tur: 'tahsilat-sor', donem: donem };
   },
@@ -12051,9 +12839,16 @@ Islem.tanim('gider-ekle', {
     var d = c.d;
     if (!(d.indexOf('gider') >= 0 || d.indexOf('fatura') >= 0 || d.indexOf('kira') >= 0 ||
           (c.baglam === 'muhasebe' && sesTutarBul(d)))) return null;
-    var t = sesTutarBul(d);
+    var t = sesTutarBul(d), metin = sesTutarsiz(c.metin);
+    /* "TL/lira" düşmüşse (tanıyıcı sık düşürüyor) gider cümlesindeki
+       çıplak sayı tutardır — 04-islem.js sesCiplakTutar notu. Plaka
+       varsa plakasız kalandan okunur. */
+    if (!t) {
+      var ciplak = sesCiplakTutar(c.p ? c.kalan : c.metin);
+      if (ciplak) { t = ciplak.tutar; metin = metin.replace(ciplak.parca, ''); }
+    }
     if (!t) return null;
-    var aciklama = kelimeleriAt(sesTutarsiz(c.metin),
+    var aciklama = kelimeleriAt(metin,
                                 ['ekle', 'gider', 'olarak', 'için', 'icin']);
     return { tur: 'gider-ekle', tutar: t, aciklama: aciklama || 'Gider' };
   },
@@ -12394,7 +13189,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>77dc774f</b><br>' +
+      'Sürüm <b>854ca2bb</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

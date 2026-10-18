@@ -3,7 +3,7 @@
  "surum": 1,
  "tarih": "15.09.2026",
  "kaynak": "Cemil'in 14–15.09'da gönderdiği 46 gerçek ruhsat fotoğrafı",
- "⚠️ TASLAK": "Bu dosyadaki alanları FOTOĞRAFLARDAN OKUYAN ben oldum (Claude, görüntü). Yani burası henüz 'ölçüt' değil, ÖLÇÜT ADAYI. Bir modelin kendi okumasını kendi ölçütü yapması, sınavı kendi yazıp kendi puanlaması olurdu. Cemil doğrulayıp 'dogrulandi: true' yazana kadar bu dosya bir TASLAKTIR. Şüphelendiğim her alanın yanında 'guven' notu var — doğrulama oradan başlasın.",
+ "dogrulama": {"dogrulandi": true, "kim": "Cemil", "tarih": "18.10.2026", "sonuc": "46/46 dogru, 0 duzeltme", "yol": "yerel kontrol sayfasi (kontrol-ruhsat.html, fotograf yaninda); kisisel veri yayinlanmadi", "not": "Alanlari fotograflardan Claude okudu (15.09); Cemil fotografla tek tek karsilastirip onayladi. TASLAK kalkti (K-064.1)."},
  "kisiselAlanlar": {
   "⚠️ 15.09 KURAL DEĞİŞTİ": "Cemil: 'Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb.' — RUHSAT-OKUMA Bulgu 2 bunları elemişti, gerekçesi doğruydu ama TEK BİR İŞE (araç kaydı) bakıyordu. Fatura TC/vergi numarasına ve adrese kesilir. Kural geri alındı (K-050).",
   "okunacak": [

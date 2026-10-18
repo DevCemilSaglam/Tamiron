@@ -27,8 +27,9 @@
 
 | # | İş | Durum |
 |---|---|---|
-| 9.1 | **Ölçüt doğrulama** = 8.5 | SÜRÜYOR — ruhsat Cemil'de |
-| 9.2 | **Geniş ekran (tablet · bilgisayar)** — aynı ekranların geniş düzeni; önce düzen taslağı, sonra prototip; denetim 768/1280 px | **TASLAK CEMİL'DE (18.10)** — dört pano: bilgisayar kayıtlar + açık kayıt, bilgisayar muhasebe, tablet yatay, tablet dikey (https://claude.ai/artifact/2CDjYiKzHLdwVewYxxmn3E). İlke: menü bilgisayarda solda sabit (ana ekranın kendisi, K-011), liste ve açık kayıt yan yana, eylem çubuğu kaydın altında (K-058), yeni ekran/özellik yok, genel mikrofon yok (K-020/K-026) |
+| 9.1 | **Ölçüt doğrulama** = 8.5 | **BİTTİ (18.10)** — ruhsat 46/46, parça 27/27 doğru; TASLAK kalktı; A-M34 kapandı. A-M35 koşusu Cemil onayıyla |
+| 9.2 | **Geniş ekran (tablet · bilgisayar)** — aynı ekranların geniş düzeni; önce düzen taslağı, sonra prototip; denetim 768/1280 px | **TASLAK ONAYLANDI (18.10: menü sabit, tablet dikeyde liste ayrı) → prototipe kurulacak** — dört pano: bilgisayar kayıtlar + açık kayıt, bilgisayar muhasebe, tablet yatay, tablet dikey (https://claude.ai/artifact/2CDjYiKzHLdwVewYxxmn3E). İlke: menü bilgisayarda solda sabit (ana ekranın kendisi, K-011), liste ve açık kayıt yan yana, eylem çubuğu kaydın altında (K-058), yeni ekran/özellik yok, genel mikrofon yok (K-020/K-026) |
+| 9.2b | **K-065 — ruhsat okununca araç kaydı** | **BİTTİ (18.10)** — 56. test, negatif doğrulandı, 320/375/430 px 0 bulgu. Açık: "yalnız parça sor" yolu (A-M52) |
 | 9.3 | **Muhasebe kapsamı (OtoMix'e göre)** — tek sayfa kapsam önerisi → Cemil seçer → backend fazı başlar | 9.2'den sonra |
 
 ---

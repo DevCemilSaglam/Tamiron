@@ -148,13 +148,14 @@ her kişisel alanına **neden boş olduğu** yazıldı (`guven` notu).
 ikincisi ölçütün kendisi; ayırt edilmezse sonraki turda model haksız
 yere suçlanır.
 
-### ⚠️ Bu ölçüt henüz TASLAK
+### Ölçüt DOĞRULANDI (A-M34 kapandı)
 
-Fotoğrafları okuyup alanları yazan **modelin kendisiydi** (Claude,
-görüntü). Bir modelin kendi okumasını kendi ölçütü yapması, sınavı
-kendi yazıp kendi puanlaması olur. Şüphelenilen her alanın yanında
-`guven` notu var; doğrulama oradan başlar. **Cemil doğrulayana kadar
-buradan çıkacak rakam bir karne değil, bir tahmindir.**
+Alanları fotoğraflardan okuyan Claude'du; bir modelin kendi okumasını kendi
+ölçütü yapması sınavı kendi yazıp kendi puanlaması olurdu. Bu yüzden iki set
+de Cemil doğrulayana kadar TASLAK'tı. **Cemil fotoğrafla yan yana tek tek
+karşılaştırdı: parça 27/27 (16.09), ruhsat 46/46 (18.10), 0 düzeltme.** Her
+dosyada `dogrulama` alanı kimin, ne zaman, hangi yolla onayladığını yazar.
+Artık bu setten çıkan rakam bir karnedir.
 
 ### Kontrol sayfası — ölçütü doğrulamanın yolu
 

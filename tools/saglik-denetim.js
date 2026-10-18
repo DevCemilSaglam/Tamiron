@@ -2488,6 +2488,44 @@ function stilMetni() {
     window.SESLI_NIYET = yed[0]; window.ACIK_KAYIT = yed[1];
   })();
 
+  /* 56 · RUHSAT-ARAC — ruhsat okundugu AN arac kaydedilir (K-065).
+     Hata sinifi (18.10, Cemil): arac yalniz "Kaydi ac"ta yaziliyordu;
+     ruhsati okunup servis kaydi acilmayan arac (yalniz parca soran)
+     KAYBOLUYORDU. Kayitli plaka sesli komutun plaka adayidir (K-059),
+     kaybolan ruhsat motorun taniyamayacagi plaka demekti.
+     Ikinci yuz: okumadan SONRAKI duzeltme kayda yazilmazsa kaydedilen
+     sey modelin ilk okumasi olur, ustanin son hali degil.
+     NEGATIF DOGRULAMA (18.10): ARACLAR.push kaldirildi -> bulgu;
+     input esitlemesi kaldirildi -> bulgu; geri konunca 0. */
+  (function () {
+    if (typeof Ekran === 'undefined' || !Ekran.ac) return;
+    /* TOHUM VERIDEN baslar: 30. test her dugmeye basiyor, "Ruhsati cek"
+       de dahil — ornek arac ONDAN kaydedilmis olur ve bu test "eklendi
+       mi"yi olcemezdi (ilk kosuda yasandi: 0 arac ekledi). */
+    if (YEDEK.ARACLAR) window.ARACLAR = JSON.parse(JSON.stringify(YEDEK.ARACLAR));
+    var once = ARACLAR.length;
+    try {
+      Ekran.ac('ruhsat');
+      var dug = document.getElementById('ruhsatCek');
+      if (!dug) { ek('RUHSAT-ARAC', 'ruhsat', '"Ruhsati cek" dugmesi yok -- olculemedi'); return; }
+      dug.click();
+      var pe = document.getElementById('rPlaka');
+      var p = plakaBicim(pe ? pe.value : '');
+      var a = aracBul(p);
+      if (!a) { ek('RUHSAT-ARAC', 'ruhsat', 'ruhsat okundu ama arac kaydedilmedi (' + p + ') -- servis kaydi acilmazsa kaybolur'); return; }
+      if (ARACLAR.length !== once + 1) ek('RUHSAT-ARAC', 'ruhsat', 'okuma ' + (ARACLAR.length - once) + ' arac ekledi, 1 bekleniyordu');
+      var me = document.getElementById('rMarka');
+      if (me) {
+        me.value = 'DENETIM-MARKA';
+        me.dispatchEvent(new Event('input', { bubbles: true }));
+        if (a.marka !== 'DENETIM-MARKA') ek('RUHSAT-ARAC', 'ruhsat', 'okumadan sonraki duzeltme kayitli araca yazilmadi: ' + a.marka);
+      }
+    } finally {
+      /* Kalan veri yedegiGeriYukle ile doner; ekran alanlari da temizlensin. */
+      Ekran.ac('ruhsat');
+    }
+  })();
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

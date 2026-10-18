@@ -10,6 +10,42 @@
 
 ---
 
+## K-065 · Ruhsat okunduğu AN araç kaydedilir — servis kaydı açılmasa da (18.10.2026)
+
+> **Cemil, 18.10:** *"İlk ruhsatı okuduğumuzda, kayıt olarak almalıyız.
+> Belki dükkana girişi olmayacak aracın, sadece parça soruyor. Fakat plaka
+> sözlük için bizi gerekebilir."*
+
+**65.1 · Ne değişti.** Eskiden araç yalnız *"Kaydı aç"*ta yazılıyordu.
+Ruhsatı okunup servis kaydı açılmayan araç (yalnız parça soran) kayboluyordu.
+Artık okuma bittiği an araç kaydedilir. Usta okumadan **sonra** bir alanı
+düzeltirse düzeltme kayda da yazılır, yani kaydedilen şey ustanın son hâlidir.
+Servis kaydı yine yalnız *"Kaydı aç"*la açılır.
+`RUHSAT-OKUMA.md` §154'teki *"otomatik kaydedilmez"* kuralı **araç için**
+bu kararla değişti. Alanlar yine ekranda görünür ve hepsi düzeltilebilir.
+
+**65.2 · Neden doğru (Cemil'in gerekçesi ölçümle örtüşüyor).** Kayıtlı plaka,
+sesli komutun plaka bağlamasında **aday listesidir** (K-059: imkânsız plaka en
+yakın KAYITLI araca bağlanır, sesçe yakın plaka KAYITLI araçtan önerilir).
+Kaybolan her ruhsat, motorun tanıyamayacağı bir plaka demekti. Aynı liste
+Speechmatics'e ipucu olarak gider (`SOYLEYIS_IFADELER`, K-063).
+
+**65.3 · İki sınır.**
+- **Kayıtlı araç yeniden okunursa üstüne yazılmaz,** yalnız boş alanları
+  dolar. Ustanın düzelttiği bilgi modelin yeni okumasına yenilmez.
+- **Plaka okunamadıysa araç kaydedilmez** (gerçek setin r31'i). Plakasız kayıt
+  yanlış araca bağlanır. Ekran *"plakayı yaz, araç öyle kaydedilir"* der.
+
+**65.4 · Denetim:** 56. test `RUHSAT-ARAC`. Negatif doğrulandı: kayıt kaldırılınca
+bulgu, düzeltme eşitlemesi kaldırılınca bulgu.
+
+**65.5 · Açık — Cemil onayına (A-M52):** *"Yalnız parça sor"* yolu. Bugün
+parça sorma bir servis kaydına bağlı (`parca-sor` açık kaydın satırlarını
+soruyor). Servis kaydı açmadan parça sormak **akış değişikliğidir**: kural
+gereği önce akış, sonra ekran. Bu karar araç kaydını o yola hazır bıraktı.
+
+---
+
 ## K-064 · Sıra: ölçüt doğrulama → geniş ekran → muhasebe backend'de (18.10.2026)
 
 > **Cemil, 18.10:** *"Ölçüt doğrulama yapalım. Tasarımla ilgili bilgisayar,
@@ -19,7 +55,12 @@
 **64.1 · Ölçüt doğrulama (A-M34) — durum ölçüldü:**
 - **Parça listeleri bitti.** 27 listenin 27'si 16.09'da Cemil tarafından
   "doğru" işaretlendi (kontrol sayfasının veritabanı).
-- **Ruhsatlar başlamadı.** 46 belgede işaret yok. Ruhsat sayfası yayınlanmadı,
+- **Ruhsatlar ~~başlamadı~~ BİTTİ (18.10): 46/46 doğru, 0 düzeltme** (Cemil, yerel
+  sayfa). İki set de doğrulandı, TASLAK kalktı (`dogrulama` alanı). **A-M34 KAPANDI.**
+  Ölçütü Claude'un okuması oluşturdu ve Cemil fotoğrafla tek tek onayladı. Bu,
+  modelin değil Cemil'in onayladığı bir ölçüttür. Sıradaki A-M35 (model
+  koşusu) para harcar, Cemil'in onayını bekler.
+- *(eski not)* 46 belgede işaret yoktu. Ruhsat sayfası yayınlanmadı,
   çünkü içinde 46 kişinin TC numarası ve adresi var (16.09 güvenlik
   denetimi). Doğrulama **yerel sayfadan** yapılır:
   `Desktop\Tamiron\kontrol-ruhsat.html` (18.10'da yeniden üretildi; 73/73
@@ -37,6 +78,9 @@ Yeni özellik değil, **aynı ekranların geniş düzeni**. Kurallar:
 - Akış ve ekran sayısı değişmez (A-2 bütçesi).
 - Akış → düzen taslağı → tartış → ekran (CLAUDE.md tasarım-önce kuralı).
 - Denetim 768 ve 1280 px'e genişler. Telefon genişliklerinde 0 bulgu korunur.
+- **Cemil 18.10 (taslağa cevap):** *"1 sabit, 2 kalsın"*:
+  bilgisayarda menü solda **sabit**; tablet dikeyde kayıt listesi **ayrı ekran
+  olarak kalır**. Taslak: https://claude.ai/artifact/2CDjYiKzHLdwVewYxxmn3E
 
 **64.3 · Muhasebe backend'de, OtoMix'e göre.** Referans:
 `arastirma/OTOMIX-HARITA.md`, `MUHASEBE-KAPSAMI.md`, `KDV.md`,
