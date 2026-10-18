@@ -30,7 +30,7 @@
 | 9.1 | **Ölçüt doğrulama + model koşusu** = 8.5 | **BİTTİ (18.10)** — A-M34: ruhsat 46/46, parça 27/27; A-M35: üç model koşuldu (~$3,7) → ruhsat ve parça için **Opus 5.5 aday** (K-067: şase 46/46, kritik yanlış 0). Ölçütte 3 plaka yanlış çıktı ve düzeltildi; ölçüm aletinde 7 kusur düzeltildi. `arastirma/FOTO-OLCUM.md` |
 | 9.2 | **Geniş ekran (tablet · bilgisayar)** | **PROTOTİPTE (18.10)** — `stil/04-genis.css`, yalnız @media içinde (telefon değişmedi). ≥768: çerçeve kalktı, listeler iki sütun, kayıt iki sütun (Yapılanlar·Açıklama \| İşlemler·Ne oldu), modüller dört sütun. ≥1200: menü solda sabit (ana ekranın kendisi), seçilen ekran sağda, alt gezinme gizli. **57. test** GENIS-DUZEN (yaşanan hizalama hatası), negatif doğrulandı; 320/375/430/768/1280 px 0 bulgu. **Ertelendi:** bilgisayarda liste ile açık kaydın aynı anda yan yana durması (Ekran tek ekran gösteriyor — mimari adım) |
 | 9.2b | **K-065 — ruhsat okununca araç kaydı** | **BİTTİ (18.10)** — 56. test, negatif doğrulandı, 320/375/430 px 0 bulgu. Açık: "yalnız parça sor" yolu (A-M52) |
-| 9.3 | **Muhasebe kapsamı (OtoMix'e göre)** — tek sayfa kapsam önerisi → Cemil seçer → backend fazı başlar | 9.2'den sonra |
+| 9.3 | **Muhasebe kapsamı (OtoMix'e göre)** | **ÖNERİ HAZIR (18.10) — Cemil'de.** `arastirma/MUHASEBE-KAPSAM-OTOMIX.md`: OtoMix'in 15 modülü yedi işe ve "ustadan yeni giriş" ölçütüne göre tartıldı. Faz 1 = prototipte çalışanı backend'e taşı (kasa · gider · alacak · iş başına kâr · CSV; KDV/tevkifat için veri modelinde YER). Faz 2 = gelen fatura fotoğrafı → alış + parçacıya borç. Faz 3 = fatura kesmek (önce soru). Dışarıda: banka · çek · stok · tam cari · POS. Dört soru Cemil'e |
 
 ---
 
