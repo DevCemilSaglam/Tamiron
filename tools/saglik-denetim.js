@@ -2505,12 +2505,21 @@ function stilMetni() {
     if (YEDEK.ARACLAR) window.ARACLAR = JSON.parse(JSON.stringify(YEDEK.ARACLAR));
     var once = ARACLAR.length;
     try {
-      Ekran.ac('ruhsat');
-      var dug = document.getElementById('ruhsatCek');
+      /* SASELI bir okuma bulunana kadar okunur: ornek sirasi 30. testin
+         tiklamalariyla kayar ve sasesiz ornekte arac KAYDEDILMEMELI
+         (K-066) — o ornekte K-065'i aramak yanlis bulgu verir (18.10). */
+      var dug = null, pe = null, p = '';
+      for (var d0 = 0; d0 < 4; d0++) {
+        Ekran.ac('home'); Ekran.ac('ruhsat');
+        dug = document.getElementById('ruhsatCek');
+        if (!dug) break;
+        once = ARACLAR.length;
+        dug.click();
+        if ((document.getElementById('rVin') || {}).value) break;
+      }
       if (!dug) { ek('RUHSAT-ARAC', 'ruhsat', '"Ruhsati cek" dugmesi yok -- olculemedi'); return; }
-      dug.click();
-      var pe = document.getElementById('rPlaka');
-      var p = plakaBicim(pe ? pe.value : '');
+      pe = document.getElementById('rPlaka');
+      p = plakaBicim(pe ? pe.value : '');
       var a = aracBul(p);
       if (!a) { ek('RUHSAT-ARAC', 'ruhsat', 'ruhsat okundu ama arac kaydedilmedi (' + p + ') -- servis kaydi acilmazsa kaybolur'); return; }
       if (ARACLAR.length !== once + 1) ek('RUHSAT-ARAC', 'ruhsat', 'okuma ' + (ARACLAR.length - once) + ' arac ekledi, 1 bekleniyordu');
@@ -2520,9 +2529,47 @@ function stilMetni() {
         me.dispatchEvent(new Event('input', { bubbles: true }));
         if (a.marka !== 'DENETIM-MARKA') ek('RUHSAT-ARAC', 'ruhsat', 'okumadan sonraki duzeltme kayitli araca yazilmadi: ' + a.marka);
       }
+
+      /* K-066 · SASE KAPISI (Cemil 18.10: "sase no okunmuyorsa devam
+         etmemeli"). Uc yuz:
+           a) kayitsiz plaka yazilinca "ruhsati gec ve kaydi ac" YOK;
+           b) sasesi okunmayan ruhsatta arac KAYDEDILMEZ;
+           c) "Kaydi ac" o durumda servis kaydi ACMAZ (dugme zorla
+              cizilse bile kapi kurala bagli).
+         NEGATIF DOGRULAMA (18.10): saseTamam her zaman true -> bulgu;
+         ruhsatOku'daki sase sarti kaldirildi -> bulgu; geri konunca 0. */
+      Ekran.ac('home'); Ekran.ac('ruhsat');  /* ayni ekran yeniden acilinca alanlar SIFIRLANMIYOR -- once ana ekran */
+      var pe2 = document.getElementById('rPlaka');
+      pe2.value = '34 ZZ 9911';
+      pe2.dispatchEvent(new Event('input', { bubbles: true }));
+      if (document.getElementById('kaydiAc')) {
+        ek('RUHSAT-ARAC', 'ruhsat', 'kayitsiz aracta ruhsat okunmadan "Kaydi ac" cikiyor -- ruhsat zorunlu (K-066)');
+      }
+      /* Sasesiz ornege gelene kadar oku (orneklerden biri silik). */
+      var saseszi = null;
+      for (var d = 0; d < 4 && !saseszi; d++) {
+        Ekran.ac('home'); Ekran.ac('ruhsat');
+        document.getElementById('sekRuhsat').click();
+        var arOnce = ARACLAR.length;
+        document.getElementById('ruhsatCek').click();
+        var vin = (document.getElementById('rVin') || {}).value || '';
+        if (!vin) saseszi = { p: plakaBicim(document.getElementById('rPlaka').value), eklendi: ARACLAR.length - arOnce };
+      }
+      if (!saseszi) {
+        ek('RUHSAT-ARAC', 'ruhsat', 'prototipte sasesi okunmayan ornek ruhsat yok -- sase kapisi olculemedi');
+      } else {
+        if (saseszi.eklendi || aracBul(saseszi.p)) ek('RUHSAT-ARAC', 'ruhsat', 'sasesi okunmayan ruhsatta arac KAYDEDILDI (' + saseszi.p + ')');
+        var kayitOnce = KAYITLAR.length;
+        var zorla = document.createElement('button');
+        zorla.id = 'kaydiAc';
+        document.getElementById('rEylem').appendChild(zorla);
+        zorla.click();
+        if (KAYITLAR.length !== kayitOnce) ek('RUHSAT-ARAC', 'ruhsat', 'sase yokken "Kaydi ac" servis kaydi acti -- kapi kurala bagli degil');
+        if (zorla.parentNode) zorla.parentNode.removeChild(zorla);
+      }
     } finally {
       /* Kalan veri yedegiGeriYukle ile doner; ekran alanlari da temizlensin. */
-      Ekran.ac('ruhsat');
+      Ekran.ac('home'); Ekran.ac('ruhsat');
     }
   })();
 

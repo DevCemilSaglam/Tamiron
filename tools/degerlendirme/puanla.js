@@ -187,10 +187,99 @@
       .trim();
   }
 
+  /* ============ PARÇA LİSTESİ CETVELİ (18.10) ============
+     ⚠️ BU CETVEL YOKTU. Parça seti `beklenen` değil `satirlar` taşıyor;
+     alanPuanla ona hiç alan bulamıyor ve her listeye "TAM" diyordu
+     (deneme koşusu: "alan %0 · belge %100"). Ölçemediğini ölçmüş gibi
+     raporlayan araç ölçüm aleti değildir (K-024.1).
+
+     Satır satır: beklenen her satır, gelen satırlardan EN YAKIN adla
+     (sadeleştirilmiş, ≥ %80 benzerlik) bire bir eşlenir. Sayılanlar:
+     bulunan satır · ditto satırı (anlamı üstteki satırda) · fiyat ·
+     iptal (üstü çizili) · işçilik satırı · FAZLA satır (uydurma).
+     Liste TAM = her satır bulundu, fazla yok, fiyat/iptal/tip doğru. */
+  function benzerlik(a, b) {
+    a = sadeMetin(a); b = sadeMetin(b);
+    if (a === b) return 1;
+    var m = a.length, n = b.length;
+    if (!m || !n) return 0;
+    var d = [], i, j;
+    for (i = 0; i <= m; i++) { d[i] = [i]; }
+    for (j = 1; j <= n; j++) { d[0][j] = j; }
+    for (i = 1; i <= m; i++) {
+      for (j = 1; j <= n; j++) {
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1,
+                           d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+      }
+    }
+    return 1 - d[m][n] / Math.max(m, n);
+  }
+
+  function listePuanla(set, cevaplar) {
+    var listeler = set.listeler || [];
+    var t = { liste: 0, listeTam: 0, satir: 0, bulunan: 0, ditto: 0, dittoBulunan: 0,
+              fiyat: 0, fiyatDogru: 0, iptal: 0, iptalDogru: 0, iscilik: 0, iscilikDogru: 0,
+              fazla: 0, hata: 0, satirlar: [] };
+    listeler.forEach(function (L) {
+      var c = cevaplar[L.id] || {};
+      var gelen = (c.satirlar || []).slice();
+      var kullanildi = gelen.map(function () { return false; });
+      var sorun = [];
+      t.liste++;
+      if (c.hata) { t.hata++; t.satirlar.push({ id: L.id, sonuc: 'HATA', yanlis: c.hata }); return; }
+      (L.satirlar || []).forEach(function (s) {
+        t.satir++;
+        if (s.ditto) t.ditto++;
+        /* Paydalar EŞLEŞMEDEN ÖNCE sayılır: bulunamayan satırın fiyatı
+           da yanlıştır (yoksa boş cevap "fiyat 0/0" ile temiz görünür). */
+        var fiyatVar = s.hasOwnProperty('fiyat');
+        if (fiyatVar) t.fiyat++;
+        if (s.iptal) t.iptal++;
+        if (s.tip === 'iscilik') t.iscilik++;
+        var en = -1, enB = 0;
+        gelen.forEach(function (g, i) {
+          if (kullanildi[i]) return;
+          var b = benzerlik(g.ad, s.ad);
+          if (b > enB) { enB = b; en = i; }
+        });
+        if (en < 0 || enB < 0.8) { sorun.push('YOK:' + s.ad); return; }
+        kullanildi[en] = true;
+        var g = gelen[en];
+        t.bulunan++;
+        if (s.ditto) t.dittoBulunan++;
+        if (fiyatVar) {
+          if ((g.fiyat == null ? null : +g.fiyat) === (s.fiyat == null ? null : +s.fiyat)) t.fiyatDogru++;
+          else sorun.push('FİYAT:' + s.ad + '=' + g.fiyat + ' (doğrusu ' + s.fiyat + ')');
+        }
+        if (s.iptal) {
+          if (g.iptal) t.iptalDogru++; else sorun.push('İPTAL-YOK:' + s.ad);
+        } else if (g.iptal) sorun.push('YANLIŞ-İPTAL:' + s.ad);
+        if (s.tip === 'iscilik') {
+          if (g.tip === 'iscilik') t.iscilikDogru++; else sorun.push('İŞÇİLİK-DEĞİL:' + s.ad);
+        }
+      });
+      var fazla = gelen.filter(function (g, i) { return !kullanildi[i]; });
+      t.fazla += fazla.length;
+      fazla.forEach(function (g) { sorun.push('FAZLA:' + g.ad); });
+      if (!sorun.length) t.listeTam++;
+      t.satirlar.push({ id: L.id, sonuc: sorun.length ? 'EKSIK' : 'TAM',
+                        alan: (L.satirlar || []).length + ' satır',
+                        yanlis: sorun.join(' · '), zorluk: (L.zorluk || []).join(' ') });
+    });
+    var yz = function (a, b) { return b ? Math.round(100 * a / b) : 0; };
+    t.ozet = 'liste: ' + t.listeTam + '/' + t.liste + ' tam (%' + yz(t.listeTam, t.liste) + ')' +
+             ' · satır bulundu %' + yz(t.bulunan, t.satir) + ' (' + t.bulunan + '/' + t.satir + ')' +
+             ' · ditto %' + yz(t.dittoBulunan, t.ditto) +
+             ' · fiyat %' + yz(t.fiyatDogru, t.fiyat) + ' (' + t.fiyatDogru + '/' + t.fiyat + ')' +
+             ' · iptal ' + t.iptalDogru + '/' + t.iptal + ' · işçilik ' + t.iscilikDogru + '/' + t.iscilik +
+             ' · FAZLA satır: ' + t.fazla + (t.hata ? ' · HATA: ' + t.hata : '');
+    return t;
+  }
+
   kok.DEGERLENDIRME_PUANLA = puanla;
   kok.DEGERLENDIRME_ALAN_PUANLA = alanPuanla;
   if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { puanla: puanla, alanPuanla: alanPuanla,
+    module.exports = { puanla: puanla, alanPuanla: alanPuanla, listePuanla: listePuanla,
                        alanKarsilastir: alanKarsilastir, sadeMetin: sadeMetin };
   }
 })(typeof globalThis !== 'undefined' ? globalThis : this);

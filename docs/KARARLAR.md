@@ -10,6 +10,55 @@
 
 ---
 
+## K-066 · Ruhsat ZORUNLU; şase okunmadan devam yok — "yalnız parça sor" yolu yok (18.10.2026)
+
+> **Cemil, 18.10:** *"Yalnız parça sor yok. Ruhsat okunmak zorunda. Servis
+> kaydı olmasa da ruhsatı çekmeli. Çünkü bize orada şase no gerekli. Hatta
+> şase no okunmuyorsa devam etmemeli."*
+
+**66.1 · Değişen eski karar.** 06.09'da Cemil *"ruhsat çekmeden devam
+edebilir"* demişti; ekranda *"Ruhsat adımını geç ve kaydı aç"* düğmesi vardı.
+**O karar bu kararla değişti**, düğme kalktı. A-M52 (*"yalnız parça sor"*)
+**KAPANDI: böyle bir yol yok.**
+
+**66.2 · Kural (prototipte, `20-ruhsat.html`):**
+- **Kayıtsız araç:** ruhsat çekilmeden araç alanları bile açılmaz. Tek düğme
+  *"Ruhsatı çek"*.
+- **Şase ruhsattan okunmadıysa:** araç **kaydedilmez** (K-065 buna göre
+  daraldı), *"Kaydı aç"* çizilmez. Ekran kırmızı uyarıyla *"Şase no okunamadı
+  — ruhsatı yeniden çek"* der. Kapı düğmeye değil kurala bağlı: başka yoldan
+  basılsa da kayıt açılmaz.
+- **Kayıtlı ama şasesiz araç:** ruhsat istenir. Okununca boş şase dolar.
+- **Kayıtlı, şaseli araç:** ruhsat yeniden istenmez (bugünkü gibi).
+- Şase alanı kapalı akordiyondan **ana alana** çıktı. Devamın bağlı olduğu
+  alan gizlenemez.
+- Biçim: 17 harf/rakam. **I/O/Q yasaklanmadı:** doğrulanmış sette r08'in
+  ruhsatında *"WOLO…"* basılı. Kural belgede yazanı esas alır.
+- Prototipe şasesi okunamayan **üçüncü örnek ruhsat** eklendi. Kapı başka türlü
+  görülemezdi.
+
+**66.3 · Cemil onayına açık (varsayımla işlendi):**
+- **(a) Elle şase.** Okunmuş şaseyi usta düzeltebilir; **okunmamış** şaseyi elle
+  yazıp geçemez. *"okunmuyorsa devam etmemeli"* kelimesi kelimesine uygulandı.
+  Ruhsat yanında yoksa ya da hiç okunmuyorsa iş durur. Gerçek hayatta bu
+  olacak; o anda ne yapılacağı Cemil'in kararı.
+- **(b) Okumadan sonra plaka değişirse** kaydedilen aracın plakası da değişir
+  (yanlış okunan plakanın düzeltilmesi). Usta aynı ekranda bambaşka bir araca
+  geçerse ilk kayıt yeniden adlandırılır. Ekran menüden her açılışta
+  sıfırlandığı için bu ancak aynı ekranda kalınırsa olur.
+
+**66.4 · Ölçümle bağı.** Şase artık devamın kapısı. Model seçiminde **şase
+doğruluğu** ayrı sayılıyor (`foto-kos.js`: doğru · boş · YANLIŞ). Boş şase
+ustaya yeniden çektirir; **yanlış şase** sessizce geçer ve parçacıya yanlış
+araç gider. Bu yüzden yanlış şase, boş şaseden ağır.
+
+**66.5 · Denetim:** 56. test genişledi (a: kayıtsız araçta ruhsatsız *"Kaydı
+aç"* yok · b: şasesiz okumada araç kaydedilmez · c: şase yokken *"Kaydı aç"*
+kayıt açmaz). Negatif doğrulandı: kapı hep açık → 2 bulgu, okumadaki şase
+şartı kaldırıldı → 1 bulgu. 320/375/430 px'te 0 bulgu.
+
+---
+
 ## K-065 · Ruhsat okunduğu AN araç kaydedilir — servis kaydı açılmasa da (18.10.2026)
 
 > **Cemil, 18.10:** *"İlk ruhsatı okuduğumuzda, kayıt olarak almalıyız.
@@ -39,7 +88,7 @@ Speechmatics'e ipucu olarak gider (`SOYLEYIS_IFADELER`, K-063).
 **65.4 · Denetim:** 56. test `RUHSAT-ARAC`. Negatif doğrulandı: kayıt kaldırılınca
 bulgu, düzeltme eşitlemesi kaldırılınca bulgu.
 
-**65.5 · Açık — Cemil onayına (A-M52):** *"Yalnız parça sor"* yolu. Bugün
+**65.5 · ~~Açık~~ KAPANDI (K-066: yalnız parça sor yolu YOK) — (A-M52):** *"Yalnız parça sor"* yolu. Bugün
 parça sorma bir servis kaydına bağlı (`parca-sor` açık kaydın satırlarını
 soruyor). Servis kaydı açmadan parça sormak **akış değişikliğidir**: kural
 gereği önce akış, sonra ekran. Bu karar araç kaydını o yola hazır bıraktı.
