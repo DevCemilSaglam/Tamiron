@@ -788,3 +788,20 @@ Speechmatics + ipucu (K-062):
   gelmez; burada çare onay ekranı ve "tekrar söyle". (Fikir — ölçülmeden
   ürüne girmez: aynı cümle iki kez anlaşılmazsa ekran "biraz yavaş söyler
   misin" desin.)
+
+### 17.2 · Kalan üç ses — HIZ bulgusu doğrulandı (18.10)
+
+gemini-3.8-flash-tts kotası (günde 100) dolunca kalan üç ses, AYNI tasarlanmış
+sesle ama `gemini-3.8-flash-lite-tts` modeliyle okutuldu (lite ses
+tasarlayamıyor ama tasarlanmış sesi okuyabiliyor; ayrı kota; klasör -lite).
+
+| ses (Speechmatics + ipucu, 25 cümle) | konuşma hızı | işlem doğru | kelime hatası |
+|---|---|---|---|
+| kadın — sakin | 1,5 kelime/sn | **%92** | %15 |
+| hızlı-1 — ağzının içinde | 2,5 kelime/sn | **%56** | %45 |
+| hızlı-2 — Rizeli, çok hızlı | 2,7 kelime/sn | **%58** | %35 |
+| (17.10) İstanbul — hızlı | 2,7 kelime/sn | %67 | %33 |
+
+**Sonuç:** şive değil HIZ belirleyici. Saniyede ~2,5 kelimenin üstünde
+(heceler yutulunca) en iyi tanıyıcı bile %56–67'ye iniyor; sakin konuşmada
+%86–92. Chrome dökümleri gelince kademe (b) bu üç ses için de hesaplanır.
