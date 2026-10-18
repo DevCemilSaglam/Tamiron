@@ -10,6 +10,40 @@
 
 ---
 
+## K-063 · Ses ölçüm dönemi kapandı; söyleyiş sözlüğü üç yerde AKTİF (18.10.2026)
+
+> **Cemil, 18.10:** *"Bu kısmı artık bitirelim. … Hataları düzeltecek,
+> kelimeleri tanıyacak sözlüğü aktif kullanmalıyız."*
+
+**63.1 · Dönem kapandı (A-M48).** Son durum `arastirma/SES-OLCUM.md`
+§11–17.3: 300 gerçek kayıt + 222 yapay şiveli kayıt. Sekiz yapay seste
+Chrome %73 · Speechmatics %75 · **kademe (b) %79, paralıya %27**. Belirleyici
+olan şive değil **hız** (~2,5 kelime/sn üstü %54–70). Yeni ölçüm **yok**;
+sıradaki veri yayındaki gerçek usta kayıtlarından gelir (K-060).
+
+**63.2 · Sözlük tek kaynak, üç kullanım** (`betik/05-soyleyis.js`):
+1. **Motor düzeltir — bugün aktif.** Her cümle `sesSoyleyisDuzelt`'ten
+   geçer ("selise" → C-Elysée, "egzos" → egzoz, "yapıyom" vb.).
+2. **Tanıyıcıya ipucu — backend fazında aktif.** Kademe (b)'de paralıya
+   giden ses `SOYLEYIS_IFADELER(dükkânın araçları)` ile gider (K-061, K-062).
+   Chrome ipucu kabul etmiyor (SES-OLCUM §16).
+3. **Büyür — backend fazında.** K-060 kayıtlarında ve onay ekranında ustanın
+   düzelttiği her *"duyulan → doğrusu"* çifti sözlüğe **aday** olur
+   (K-054 ① düzeltme birikimi).
+
+**63.3 · Cemil onayına açık — aday sözlüğe nasıl girer?** Varsayım:
+**onaylı giriş** — aday listesi biriktirilir, lider haftada bir gözden
+geçirir, Cemil onaylar. Neden otomatik değil: yanlış bir eşleme o kelimeyi
+içeren HER cümleyi bozar (Tur 8.4'te bulanık eşleme "hava filtresi"ni
+"Yağ filtresi" yaptı). Dükkâna özgü sözcük (müşteri adı, takma ad)
+yalnız o dükkânın sözlüğüne girer.
+
+**63.4 · Ustaya doğrulatma duruyor:** `arastirma/SOYLEYIS-SOZLUGU.md`
+(üretilir: `node tools/soyleyis-liste.js`) Cemil/ustanın gözden geçirmesini
+bekliyor — eksik söyleyiş en ucuz kazanç.
+
+---
+
 ## K-062 · Kademeli ses tanıma: önce ücretsiz + motor, gerekirse paralı (17.10.2026)
 
 > **Cemil, 17.10:** *"Motoru speechmatics'i minimum kullanacak şekilde

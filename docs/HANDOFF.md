@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 12.10.2026 *(K-058 · servis detayı adımsız · Tur 8.1–8.3 bitti, 8.4 kayıt bekliyor)*
+> **Son güncelleme:** 18.10.2026 *(K-063 · ses ölçüm dönemi kapandı · Tur 8.1–8.4 bitti, 8.5 bekliyor)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -22,9 +22,9 @@ tıklanabilir prototip.
 | Kabuk | header (menü+rozet · logo · geri · ileri) + **alt gezinme çubuğu** (aynı `data-nav` denetimi — K-042; ortadaki tuş **gidiş-dönüş**, K-047.1) + çekmece + **katman/popup** (K-043) + tema (3 hâl) |
 | Sağlık denetimi | **55 test · 0 bulgu** (55 · SES-DUYULAN: dal `ses-motor-iyilestirme`, onay bekliyor) · ⚠️ 13.10: sınıf çakışması testi kuralların yarısını görmüyordu, düzeldi (K-058.2c) · **320 · 375 · 430 px**'te ölçüldü (K-025) · denetim **ölçtüğü durumu geri yüklüyor** — veriyi (K-024.1), **DOM durumunu** (K-041.2), **gezinme yığınını ve mesaj arşivini** (K-047.5) — ve sekmelere dokunmuyor (K-026.7) |
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **7. kontrol artık ÜRETİLEN dosyadaki betiği ayrıştırıyor** — yerleştirmeden önceki betiğe bakıyordu ve `$'` bozulmasını görmedi (K-056.4). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
-| Kararlar | **K-001 … K-058** · açık **A-M48** (ses ölçümü — onaylar verildi, kayıt bekleniyor) · **A-M36** (saklama süresi, ertelendi) |
+| Kararlar | **K-001 … K-063** · A-M48 kapandı (K-063) · açık: **A-M34** (ölçüt doğrulaması) · **63.3** (sözlüğe aday girişi, Cemil onayına açık) |
 | Ses | Cümle → **işlem nesnesi** → onay. **İşi ses tanımaz: sahibi olan ekran şemasını bildirir** (`Islem.tanim`, `betik/04-islem.js`; 12 şema · 7 ekran — K-056). Onay ekranı ve uygulama şemadan. `ISLEM_SEMALARI()` = modele araç tanımı. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
-| Sıradaki | **Tur 8 kapanıyor.** 8.1 **bitti** (K-058 — servis detayı adımsız: *Ne oldu* + alttaki eylem çubuğu) · 8.2 · 8.3 bitti · 8.4: Cemil üç onayı verdi, **40 cümleyi 13.10 sabahı okuyacak**; derlem indi · 8.5 BEKLİYOR (A-M34) · sunum: Cemil 13.10 sabahı bakacak |
+| Sıradaki | **Tur 8 kapanıyor.** 8.1–8.4 bitti (8.4 → K-059…K-063: plaka kuralları, ses saklama, Speechmatics, kademe (b), sözlük) · 8.5 BEKLİYOR (A-M34 — Cemil'in ölçüt doğrulaması) |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
