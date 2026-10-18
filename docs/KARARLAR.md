@@ -220,6 +220,12 @@ Yeni özellik değil, **aynı ekranların geniş düzeni**. Kurallar:
 - **Cemil 18.10 (taslağa cevap):** *"1 sabit, 2 kalsın"*:
   bilgisayarda menü solda **sabit**; tablet dikeyde kayıt listesi **ayrı ekran
   olarak kalır**. Taslak: https://claude.ai/artifact/2CDjYiKzHLdwVewYxxmn3E
+- **Prototipte (18.10 akşam):** `stil/04-genis.css`, yalnız @media içinde.
+  Ana ekran bilgisayarda sol sütunda hep görünür (ikinci bir menü
+  yazılmadı); kayıt iki sütun; listeler iki sütun. Denetim artık 768 ve
+  1280 px'te de koşuyor (57. test). **Ertelenen:** liste ile açık kaydı
+  AYNI ANDA göstermek, çünkü ekran sistemi tek ekran gösteriyor; bu ayrı bir
+  mimari adım ve Cemil onayına açık.
 
 **64.3 · Muhasebe backend'de, OtoMix'e göre.** Referans:
 `arastirma/OTOMIX-HARITA.md`, `MUHASEBE-KAPSAMI.md`, `KDV.md`,

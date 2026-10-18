@@ -2596,6 +2596,42 @@ function stilMetni() {
     }
   })();
 
+  /* 57 · GENIS-DUZEN — tablet ve bilgisayar yerlesimi (K-064.2 · 04-genis.css).
+     Yalniz genislik >= 768 px iken olcer; telefonda bu dosyanin hicbir
+     kurali calismaz. Hata sinifi (18.10): ortalama kurali (align-self:
+     center) grid'de karti IKI SATIRLIK alanda dikey ortaladi — Yapilanlar
+     yanindaki Islemler'den 28 px asagida basliyordu; hicbir test gormedi.
+       a) >= 768: kayitta Yapilanlar ile Islemler YAN YANA ve AYNI HIZADA;
+       b) >= 1200: ana ekran (menu) solda GORUNUR, acik ekran onun SAGINDA,
+          alt gezinme gizli.
+     NEGATIF DOGRULAMA (18.10): align-self: start kaldirildi -> bulgu;
+     ana ekranin display kurali kaldirildi -> bulgu; geri konunca 0. */
+  (function () {
+    if (window.innerWidth < 768 || typeof Ekran === 'undefined') return;
+    var yk = window.ACIK_KAYIT;
+    var ilk = (window.KAYITLAR || []).filter(function (k) { return !k.teslimTarihi; })[0];
+    if (!ilk) { ek('GENIS-DUZEN', 'kayit', 'acik kayit yok -- olculemedi'); return; }
+    window.ACIK_KAYIT = ilk.id;
+    Ekran.ac('kayit');
+    var y = document.querySelector('#screen-kayit .k-yapilanlar'), i = document.getElementById('kIslemler');
+    if (!y || !i) {
+      ek('GENIS-DUZEN', 'kayit', 'k-yapilanlar ya da kIslemler yok -- olculemedi');
+    } else {
+      var by = y.getBoundingClientRect(), bi = i.getBoundingClientRect();
+      if (bi.left < by.right - 1) ek('GENIS-DUZEN', 'kayit', 'Yapilanlar ile Islemler yan yana degil (' + Math.round(by.right) + ' / ' + Math.round(bi.left) + ')');
+      else if (Math.abs(by.top - bi.top) > 2) ek('GENIS-DUZEN', 'kayit', 'yan yana kartlar ayni hizada degil: ' + Math.round(by.top) + ' / ' + Math.round(bi.top) + ' px');
+    }
+    if (window.innerWidth >= 1200) {
+      var h = document.getElementById('screen-home'), s = document.getElementById('screen-kayit');
+      var bh = h.getBoundingClientRect(), bs = s.getBoundingClientRect();
+      if (getComputedStyle(h).display === 'none' || bh.width < 200) ek('GENIS-DUZEN', 'home', 'bilgisayarda menu solda GORUNMUYOR');
+      else if (bs.left < bh.right - 1) ek('GENIS-DUZEN', 'kayit', 'acik ekran menunun SAGINDA degil');
+      var bb = document.querySelector('.device > .botbar');
+      if (bb && getComputedStyle(bb).display !== 'none') ek('GENIS-DUZEN', 'kabuk', 'bilgisayarda alt gezinme gorunuyor -- menu zaten solda');
+    }
+    window.ACIK_KAYIT = yk;
+  })();
+
   /* SON IS: prototipi denetim oncesi haline dondur. Ekranlar da
      yeniden cizilsin ki ekranda kirli veriden kalma bir sey durmasin.
 

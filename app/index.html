@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-18 11:41
+  Üretim: 2026-10-18 14:36
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2260,6 +2260,127 @@ kirpilsin. */
 .tablo .t-alt .t-tarih { margin-left: 6px; }
 
 
+/* ===== stil/04-genis.css ===== */
+/* ============ GENİŞ EKRAN — tablet ve bilgisayar (K-064.2 · Tur 9.2) ============
+   Cemil, 18.10: *"Tasarımla ilgili bilgisayar, tablet alanlarını da hızlıca
+   yapmalıyız."* Taslak: claude.ai/artifact/2CDjYiKzHLdwVewYxxmn3E. Cemil'in
+   cevabı: *"1 sabit, 2 kalsın"* — bilgisayarda menü solda SABİT; tablet
+   dikeyde kayıt listesi AYRI ekran kalır.
+
+   KURALLAR (K-064.2):
+   · Yeni ekran, yeni özellik YOK. Aynı ekranlar geniş alana yerleşir.
+   · Telefon (< 768 px) HİÇ DEĞİŞMEZ — bu dosyanın her kuralı bir
+     @media'nın içinde. 320/375/430 px denetimi bu dosyadan etkilenemez.
+   · Genel mikrofon yok (K-020/K-026): mikrofon işin yanında kalır.
+   · Ham renk yok; yalnız tokens.css.
+
+   ERTELENEN (ayrı adım, mimari): bilgisayarda kayıt listesi ile açık
+   kaydın AYNI ANDA yan yana durması. Ekran sistemi tek ekran gösteriyor;
+   ikisini birden göstermek `Ekran`ın değişmesi demek. */
+
+/* ---------------- TABLET ve üstü (≥ 768 px) ---------------- */
+@media (min-width: 768px) {
+  /* Telefon çerçevesi kalkar: 460 px'lik "cihaz" geniş ekranda boşa yer
+     bırakıyordu (taslaktaki ekran görüntüsü: ortada dar bir sütun). */
+  .device { max-width: none; box-shadow: none; }
+
+  /* İçerik okunabilir genişlikte ortalanır — 1.200 px'lik satır göz
+     yorar. */
+  .screen { padding: 18px 28px 32px; }
+  .screen.active > * { width: 100%; max-width: 1000px; align-self: center; }
+
+  /* LİSTELER İKİ SÜTUN: kayıtlar · araçlar · müşteriler. Kart aynı kart;
+     yalnız yan yana dizilir. */
+  #kytListe, #arcListe, #msListe {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+  #kytListe .arac-kart + .arac-kart,
+  #arcListe .arac-kart + .arac-kart,
+  #msListe .arac-kart + .arac-kart { margin-top: 0; }
+
+  /* SERVİS KAYDI İKİ SÜTUN (taslak, tablet dikey):
+       künye tam genişlik
+       Yapılanlar · Açıklama   |   İşlemler · Ne oldu
+       eylem çubuğu tam genişlik, yine altta yapışkan (K-058).
+     Sıra telefondakiyle aynı kalır; yalnız ikinci sütun yan yana gelir. */
+  #screen-kayit.active {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-areas:
+      "bas bas"
+      "kun kun"
+      "yap isl"
+      "yap sur"
+      "aci sur"
+      "cub cub";
+    column-gap: 18px;
+    align-content: start;
+    justify-content: center;
+  }
+  /* align-self: start — üstteki genel kural (ortalama) grid'de kartı İKİ
+     SATIRLIK alanın içinde DİKEY ortalıyordu: Yapılanlar, yanındaki
+     İşlemler'den 28 px aşağıda başlıyordu (18.10 ölçüldü). */
+  #screen-kayit.active > * { max-width: none; align-self: start; }
+  #screen-kayit > .screen-head { grid-area: bas; }
+  #screen-kayit > .k-kunye { grid-area: kun; }
+  #screen-kayit > .k-yapilanlar { grid-area: yap; }
+  #screen-kayit > #kIslemler { grid-area: isl; }
+  #screen-kayit > #kSurecKart { grid-area: sur; }
+  #screen-kayit > .k-aciklama { grid-area: aci; }
+  #screen-kayit > #kCubuk { grid-area: cub; }
+
+  /* Muhasebe modülleri dört sütun — kutular telefonda ikişer duruyordu. */
+  .modul-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* ---------------- BİLGİSAYAR (≥ 1200 px) ---------------- */
+@media (min-width: 1200px) {
+  /* MENÜ SOLDA SABİT (Cemil: "1 sabit"). Ana ekran ZATEN menünün kendisi
+     (K-011) — ikinci bir menü yazılmadı: ana ekran sol sütunda hep
+     görünür, seçilen ekran sağda açılır. Aynı denetim, ikinci gövde değil
+     (K-042'nin dersi). */
+  .device {
+    display: grid;
+    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+  }
+  .device > .topbar { grid-column: 1 / -1; grid-row: 1; }
+  .device > #kurulumYuva { grid-column: 1 / -1; grid-row: 2; }
+
+  #screen-home {
+    display: flex;
+    grid-column: 1; grid-row: 3;
+    overflow-y: auto;
+    border-right: 1px solid var(--line);
+    padding: 16px 14px 24px;
+  }
+  /* Selam yazısı sol sütunda yer yer; menünün kendisi kalır. */
+  #screen-home .greeting { display: none; }
+  #screen-home.active > *,
+  #screen-home > * { max-width: none; }
+
+  .device > .screen.active:not(#screen-home) { grid-column: 2; grid-row: 3; }
+
+  /* Ana ekrandayken sağ sütun BOŞ kalmasın: ne yapılacağını söyleyen tek
+     satır. (Boşluk da bir cevaptır — ama burada boşluk "bozuk mu?"
+     diye okunur; sol menü zaten açık.) */
+  .device:has(#screen-home.active)::after {
+    content: "Soldan bir iş seç — ya da satırın mikrofonuna bas.";
+    grid-column: 2; grid-row: 3;
+    align-self: center; justify-self: center;
+    color: var(--muted);
+    font-size: var(--tip-md);
+  }
+
+  /* ALT GEZİNME GİZLİ: menü zaten görünür, geri/ileri üstte (topbar).
+     Ana tuşunun "gidiş-dönüş" işi (K-047.1) sol menüyle gereksizleşir. */
+  .device > .botbar { display: none; }
+}
+
+
 /* ===== ekran: 20-ruhsat.html ===== */
 /* Plaka alanının içindeki mikrofon — alan zaten çerçeveli, düğme
    içeride duruyor ve kutuyu şişirmiyor. */
@@ -3194,7 +3315,7 @@ kirpilsin. */
        ve "parçayı geçen sefer kim getirmişti" orada (K-005).
        ⚠️ MÜŞTERİ BİLGİLERİ (Cemil, 06.09): "kimi arayacağım" sorusunun
        cevabı burada; numara dokunulunca arıyor. -->
-  <div class="card">
+  <div class="card k-kunye">
     <div id="kayitKunye" data-arac-ac="1" role="button" tabindex="0"
          aria-label="Aracın geçmişini aç"></div>
     <div id="kayitMusteri"></div>
@@ -3208,7 +3329,7 @@ kirpilsin. */
        Cemil'in seçtiği şey çubuk ve akıştı, satır düzeni değil.
        ⚠️ "Parçaları müşteri getirdi" TEK YERDE: satırın ikincil satırı
        ve orada da yalnız fiyat yazılmamışsa (08.09). -->
-  <div class="card">
+  <div class="card k-yapilanlar">
     <div class="section-label">
       <span class="lbl-txt">
         <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılanlar
@@ -3270,7 +3391,7 @@ kirpilsin. */
        her tuşta kayda işleniyor.
        İŞ TÜRÜ burada: metinden tahmin edilir (isTuruTahmin), usta elle
        seçene kadar takip eder; elle seçim tahmini bir daha ezmez. -->
-  <div class="card">
+  <div class="card k-aciklama">
     <div class="section-label with-action">
       <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Açıklama</span>
       <button class="daire-btn" id="kSikayetMik" aria-label="Açıklamayı sesle yaz" title="Sesle">
@@ -13326,7 +13447,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>a5a0b917</b><br>' +
+      'Sürüm <b>47382724</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +
