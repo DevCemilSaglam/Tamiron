@@ -28,7 +28,11 @@ const SES_KOK = path.join(KOK, 'sesler');
 const arg = (ad, v) => { const i = process.argv.indexOf(ad); return i > 0 && process.argv[i + 1] && !process.argv[i + 1].startsWith('--') ? process.argv[i + 1] : v; };
 const PILOT = process.argv.indexOf('--pilot') > 0;
 const ADET = PILOT ? 3 : parseInt(arg('--adet', '50'), 10);
-const MODEL = 'gemini-3.8-flash-tts';
+/* --model (18.10): gemini-3.8-flash-tts günde 100 istekte kalınca ayrı kotalı
+   gemini-3.8-flash-lite-tts. Lite sesler AYRI klasöre (-lite) — iki model
+   karışmasın, sonuçlar ayrı okunsun. */
+const MODEL = arg('--model', 'gemini-3.8-flash-tts');
+const MS = MODEL === 'gemini-3.8-flash-tts' ? '' : '-lite';
 const API = 'https://generativelanguage.googleapis.com/v1beta/';
 
 /* ---- AĞIZ: metnin KENDİSİ ağızla yazılır (v2 · Cemil 17.10: "kelimeleri
@@ -101,18 +105,20 @@ async function iste(url, govde) {
 const KIMLIK_DOSYA = path.join(SES_KOK, 'yapay-ses-kimlikleri.json');
 const kimlik = fs.existsSync(KIMLIK_DOSYA) ? JSON.parse(fs.readFileSync(KIMLIK_DOSYA, 'utf8')) : {};
 async function sesKimligi(ad) {
+  /* Ses kimliği MODELDEN BAĞIMSIZ: lite model ses tasarlayamıyor ama
+     tasarlanmış sesi okuyabiliyor (18.10 API cevabı) → aynı ses, iki model. */
   const anahtarAd = ON + ad;
   if (kimlik[anahtarAd]) return kimlik[anahtarAd];
   const s = SESLER[ad];
   const d = await iste(API + 'voices', { store: true, voice: {
-    model: MODEL, type: 'prompted', display_name: 'tamiron-' + ON + ad, gender: s.cins, language_code: 'tr-TR',
+    model: 'gemini-3.8-flash-tts', type: 'prompted', display_name: 'tamiron-' + ON + ad, gender: s.cins, language_code: 'tr-TR',
     prompted: { input: s.tarif } } });
   if (!d.id) throw new Error('ses kimliği gelmedi: ' + JSON.stringify(d).slice(0, 300));
   kimlik[anahtarAd] = d.id;
   fs.writeFileSync(KIMLIK_DOSYA, JSON.stringify(kimlik, null, 1));
   if (d.sample_audio && d.sample_audio.data) {
-    fs.mkdirSync(path.join(SES_KOK, ON + ad), { recursive: true });
-    fs.writeFileSync(path.join(SES_KOK, ON + ad, 'ornek-ses.wav'), Buffer.from(d.sample_audio.data, 'base64'));
+    fs.mkdirSync(path.join(SES_KOK, ON + ad + MS), { recursive: true });
+    fs.writeFileSync(path.join(SES_KOK, ON + ad + MS, 'ornek-ses.wav'), Buffer.from(d.sample_audio.data, 'base64'));
   }
   return d.id;
 }
@@ -142,7 +148,7 @@ async function oku(sesId, metin, stil) {
   for (let si = 0; si < secilen.length; si++) {
     const ad = secilen[si];
     const id = await sesKimligi(ad);
-    const klasor = path.join(SES_KOK, ON + ad);
+    const klasor = path.join(SES_KOK, ON + ad + MS);
     const agiz = AGIZ[SESLER[ad].agiz || 'yok'];
     fs.mkdirSync(klasor, { recursive: true });
     /* Her ses FARKLI cümleler okur (kaydırma) — aynı 50 cümle 6 sesle
@@ -157,7 +163,7 @@ async function oku(sesId, metin, stil) {
       dizin.push({ id: c.id, dosya: dosya, cumle: c.cumle, okunan: okunan, durum: 'iyi', kusurlar: [] });
       process.stdout.write('.'); toplam++;
     }
-    fs.writeFileSync(path.join(klasor, 'dizin.json'), JSON.stringify({ hiz: 24000, set: 'buyuk', parti: ON + ad,
+    fs.writeFileSync(path.join(klasor, 'dizin.json'), JSON.stringify({ hiz: 24000, set: 'buyuk', parti: ON + ad + MS,
       yapay: { model: MODEL, surum: SURUM, ses: ad, tarif: SESLER[ad].tarif, stil: SESLER[ad].stil || null, agiz: SESLER[ad].agiz || null }, kayitlar: dizin }, null, 1));
     console.log(' ' + ad + ': ' + cumleler.length + ' cümle → ' + klasor);
   }
