@@ -103,3 +103,37 @@ gözden kaçırmıştı.
 Düzeltildi (`ruhsat-seti.json` → `dogrulama.duzeltme`). **Ders:** bağımsız
 modellerin birleştiği ama ölçütten ayrıldığı yer, ölçütün kendisini sınar.
 Gelecek her yeni sette bu kontrol koşudan sonra yapılır.
+
+## 6 · Maliyeti düşürmek (18.10, sürüyor)
+
+> Cemil: *"Ruhsat okuma tutarını düşürmenin yoluna ihtiyacımız var."*
+
+**Maliyet nereden geliyor (Opus 5.5, ruhsat başına ~2,9 cent):**
+
+| | jeton | pay |
+|---|---|---|
+| girdi (fotoğraf + istem) | ~2.200 | ~0,9 cent |
+| **çıktı** | ~1.000 | **~2,0 cent** |
+
+18 kısa alanın cevabı ~150 jeton; çıktının kalanı modelin düşünmesi.
+
+**Denemeler** (`foto-kos.js --efor`, `--foto-kok`, `foto-kucult.ps1`):
+- Tek belge (r27), `efor=low` + 1100 px: girdi **2.199 → 1.305** (−%40),
+  çıktı ~650. Okuma tam doğru.
+- **Tam koşu YARIM KALDI:** Anthropic kredisi bitti ("credit balance is
+  too low"). 38 okuma (~$0,7) yapılmıştı ama koşucu durunca sonucu
+  yazmıyordu, kayboldular. **Düzeltildi:** artık durunca o ana kadarki
+  cevaplar `-YARIM` diye kaydediliyor. Geçersiz anahtarla sınandı.
+- Kredi yüklenince üç deneme koşulacak: Opus `low`, Opus `low` + 1100 px,
+  Sonnet `low`. Tahmin ~$1,5.
+
+**Göndermeden önce kalite denetimi (yeniden çektirme) maliyeti düşürür mü?**
+Opus'un sonuçlarına bakıldı:
+- Kalite sorunu etiketli 23 fotoğrafın **11'i**, temiz 23 fotoğrafın
+  **14'ü** tam okundu. Opus kötü fotoğrafta da iyi okuyor.
+- Yeniden çekmenin kurtaracağı tek örnek r11: plaka parlamanın altında.
+  r31'de belgenin kendisi silik; yeniden çekmek kurtarmaz.
+- **Sonuç:** maliyeti çok az düşürür (en çok ~%5). Asıl değeri doğrulukta
+  ve **kırpmada**: telefonda belgenin kenarını bulup yalnız belgeyi
+  göndermek. Fotoğrafların çoğunda belgenin çevresi masa, el ve kılıf;
+  kırpma girdiyi küçültmenin en temiz yolu.

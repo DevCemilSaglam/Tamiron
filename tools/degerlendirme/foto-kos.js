@@ -54,6 +54,15 @@ const FIYAT = {
 const HARITA_YOL = path.join(KOK, 'foto-harita.json');
 const HARITA = fs.existsSync(HARITA_YOL) ? JSON.parse(fs.readFileSync(HARITA_YOL, 'utf8')).yollar || {} : {};
 const SADECE = arg('--sadece', '');
+/* MALİYET DENEMELERİ (18.10, K-067): Opus'ta ruhsat maliyetinin üçte
+   ikisi ÇIKTI — 18 kısa alan ~150 jeton, kalan ~850 jeton modelin
+   düşünmesi. `--efor low|medium|high` düşünmeyi kısar. `--foto-kok`
+   küçültülmüş fotoğrafların klasörü (foto-kucult.ps1); haritadan önce
+   bakılır. `--etiket` sonuç dosyasının adına eklenir — iki deneme aynı
+   modelde birbirinin üstüne yazmasın. */
+const EFOR = arg('--efor', null);
+const FOTO_KOK = arg('--foto-kok', null);
+const ETIKET = arg('--etiket', '');
 
 const AYAR = {
   ruhsat: {
@@ -225,13 +234,15 @@ function fiyatSayi(v) {
   }
 
   const cevaplar = {};
+  let durdu = false;
   let girdi = 0, cikti = 0, onbellekOkunan = 0, onbellegeYazilan = 0, atlanan = 0;
 
   for (const k of kayitlar) {
     /* Fotoğraf yoksa ATLANIR ve bu SÖYLENİR — ölçemediğini ölçmüş
        gibi raporlayan bir araç, ölçüm aleti değildir (K-024.1). */
-    const dosya = ['jpg', 'jpeg', 'png', 'webp']
-      .map(u => path.join(KOK, AYAR.klasor, k.id + '.' + u))
+    /* Öncelik: --foto-kok (küçültülmüş) → depo klasörü → harita. */
+    const dosya = (FOTO_KOK ? [path.join(FOTO_KOK, k.id + '.jpg')] : [])
+      .concat(['jpg', 'jpeg', 'png', 'webp'].map(u => path.join(KOK, AYAR.klasor, k.id + '.' + u)))
       .concat(HARITA[k.id] ? [HARITA[k.id]] : [])
       .filter(y => fs.existsSync(y))[0];
     if (!dosya) { cevaplar[k.id] = { hata: 'fotoğraf yok: ' + k.id }; atlanan++; continue; }
@@ -241,7 +252,7 @@ function fiyatSayi(v) {
     const veri = fs.readFileSync(dosya).toString('base64');
 
     try {
-      const yanit = await client.messages.create({
+      const istek = {
         model: MODEL,
         /* Yeni modellerde düşünme kapatılamıyor; düşük sınır cevabı keser. */
         max_tokens: 16000,
@@ -265,7 +276,9 @@ function fiyatSayi(v) {
                 : 'Bu parça listesinin satırlarını çıkar ve YALNIZ parca_satirlari aracını çağırarak cevap ver. Ditto işaretlerini çöz, okuyamadığını işaretle.' }
           ]
         }]
-      });
+      };
+      if (EFOR) istek.output_config = { effort: EFOR };
+      const yanit = await client.messages.create(istek);
       girdi += yanit.usage.input_tokens || 0;
       cikti += yanit.usage.output_tokens || 0;
       onbellekOkunan += yanit.usage.cache_read_input_tokens || 0;
@@ -279,7 +292,12 @@ function fiyatSayi(v) {
       if ([400, 401, 403, 404].indexOf(e.status) >= 0) {
         console.error('\nKOŞU DURDU — kalıcı API hatası (' + e.status + '): ' + e.message);
         process.exitCode = 2;
-        return;
+        /* 18.10: kredi bittiğinde 38 okuma YAZILMADAN kayboldu (~$0,7).
+           Durunca o ana kadarki cevaplar puanlanıp YARIM diye kaydedilir —
+           ödenmiş okuma çöpe gitmez. */
+        delete cevaplar[k.id];
+        durdu = true;
+        break;
       }
     }
     process.stdout.write('.');
@@ -287,10 +305,10 @@ function fiyatSayi(v) {
   process.stdout.write('\n');
 
   const olcSet = Object.assign({}, set);
-  olcSet[AYAR.kayitAlani] = kayitlar;
+  olcSet[AYAR.kayitAlani] = durdu ? kayitlar.filter(k => cevaplar[k.id]) : kayitlar;
   /* Parça listesi KENDİ cetveliyle (18.10) — alanPuanla listeyi ölçemiyordu. */
   const sonuc = TUR === 'parca' ? listePuanla(olcSet, cevaplar) : alanPuanla(olcSet, cevaplar);
-  sonuc.motor = MODEL;
+  sonuc.motor = MODEL + (EFOR ? ' efor=' + EFOR : '') + (FOTO_KOK ? ' foto=' + path.basename(FOTO_KOK) : '');
   sonuc.tur = TUR;
   sonuc.jeton = { girdi, cikti, onbellek: onbellekOkunan, onbellegeYazilan };
   sonuc.atlanan = atlanan;
@@ -322,7 +340,7 @@ function fiyatSayi(v) {
     sonuc.sase = sase;
   }
 
-  const dosya = path.join(KOK, 'sonuc-' + TUR + '-' + MODEL + '.json');
+  const dosya = path.join(KOK, 'sonuc-' + TUR + '-' + MODEL + (ETIKET ? '-' + ETIKET : '') + (durdu ? '-YARIM' : '') + '.json');
   fs.writeFileSync(dosya, JSON.stringify({ sonuc, cevaplar }, null, 2), 'utf8');
 
   console.log('\nMOTOR: ' + MODEL + ' · TÜR: ' + TUR);
