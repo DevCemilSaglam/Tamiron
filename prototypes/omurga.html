@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-18 10:48
+  Üretim: 2026-10-18 11:41
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2958,15 +2958,14 @@ kirpilsin. */
         <div class="field"><label for="rRenk">Renk</label><input id="rRenk" placeholder="Gri Metalik" /></div>
         <div class="field"><label for="rYakit">Yakıt</label><input id="rYakit" placeholder="Dizel" /></div>
       </div>
-      <!-- ŞASE ANA ALANDA (K-066 · Cemil, 18.10): *"bize orada şase no
-           gerekli. Hatta şase no okunmuyorsa devam etmemeli."* Eskiden
-           kapalı akordiyondaydı — devamı ona bağlı bir alan
-           gizlenemez. Parçacıya giden parçanın araca uyumu şaseyle
-           kurulur (T-12). -->
+      <!-- ŞASE ANA ALANDA (K-066 → K-068 · Cemil, 18.10): *"bize orada
+           şase no gerekli"*. Eskiden kapalı akordiyondaydı. Parça sormak
+           ona bağlı (K-068) — bir kapının bağlı olduğu alan gizlenemez.
+           Parçacıya giden parçanın araca uyumu şaseyle kurulur (T-12). -->
       <div class="field">
         <label for="rVin">Şase no</label>
         <input id="rVin" class="mono" data-giris="kod" placeholder="VF1RFB00858123456" autocomplete="off" />
-        <div class="plate-hint">Ruhsattan okunur. Şase olmadan kayıt açılmaz.</div>
+        <div class="plate-hint">Ruhsattan okunur. Parça sorarken gerekir.</div>
       </div>
       <div class="field">
         <label for="rSahip">Sahibi</label>
@@ -3294,6 +3293,38 @@ kirpilsin. */
     <span class="eyebrow">
       <svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça fiyatı sor
     </span>
+  </div>
+
+  <!-- ARACIN KİMLİĞİ (K-068 · Cemil, 18.10): *"Parça fiyat listesi
+       isterse, ruhsat zorunlu olacak. Şase yoksa, model marka hepsini
+       seçtirmemiz gerekiyor. Yani aracın parça listesi bilinmez
+       olmayacak."* Şase varsa bu kart görünmez; yoksa dört alan
+       SEÇTİRİLİR ve hepsi dolmadan soru gitmez. Seçenekler söyleyiş
+       sözlüğünden (tek kaynak); gerçek katalog backend fazında
+       (A-11-3 TecDoc araştırması). -->
+  <div class="card" id="psAracKart" hidden>
+    <div class="notice warn">
+      <span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>
+      <span class="n-body"><b>Şase no yok.</b> Parçacı doğru parçayı bulsun diye aracı seç —
+        ya da ruhsatı çek.</span>
+    </div>
+    <div class="field-2">
+      <div class="field"><label for="psMarka">Marka</label>
+        <input id="psMarka" list="psMarkaListe" autocomplete="off" /></div>
+      <div class="field"><label for="psModel">Model</label>
+        <input id="psModel" list="psModelListe" autocomplete="off" /></div>
+    </div>
+    <div class="field-2">
+      <div class="field"><label for="psYil">Yıl</label>
+        <input id="psYil" class="mono" data-giris="yil" inputmode="numeric" placeholder="2018" /></div>
+      <div class="field"><label for="psMotor">Motor</label>
+        <input id="psMotor" placeholder="1.5 dCi" autocomplete="off" /></div>
+    </div>
+    <datalist id="psMarkaListe"></datalist>
+    <datalist id="psModelListe"></datalist>
+    <button class="btn btn-ghost" id="psRuhsatCek">
+      <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+    </button>
   </div>
 
   <div class="card">
@@ -6401,6 +6432,21 @@ var DUKKAN = {
 function aracBul(plaka) {
   for (var i = 0; i < ARACLAR.length; i++) if (ARACLAR[i].plaka === plaka) return ARACLAR[i];
   return null;
+}
+/* ---- ARACIN KİMLİĞİ — parça sormanın şartı (K-068 · Cemil, 18.10) ----
+   *"Parça fiyat listesi isterse, ruhsat zorunlu olacak. Şase yoksa,
+   model marka hepsini seçtirmemiz gerekiyor. Yani aracın parça listesi
+   bilinmez olmayacak."* Kayıt açmak için ruhsat GEREKMEZ; parçacıya
+   soru gitmesi için araç ya ŞASEYLE ya da marka+model+yıl+motorla
+   tanınmalı — yoksa parçacı yanlış parça gönderir.
+   Şase 17 harf/rakam; I/O/Q yasaklanmaz (ruhsatta "WOLO…" basılı belge
+   var, set r08 — kural belgede yazanı esas alır). İki ekran kullandığı
+   için ÇEKİRDEKTE (ortak nesne kuralı). */
+function saseGecerli(v) {
+  return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').length === 17;
+}
+function aracKimligiTamam(a) {
+  return !!a && (saseGecerli(a.vin) || !!(a.marka && a.model && a.yil && a.motor));
 }
 /* ---- YANLIŞ DUYULAN PLAKA (14.09 · A-M27) ----
    Cemil'in ses kaydı *"34 qbc 123 sahibine WhatsApp üzerinden selam
@@ -9563,48 +9609,32 @@ function rDetaySayac() {
   if (e) e.textContent = dolu ? dolu + ' alan dolu' : '';
 }
 
-/* ---- ŞASE KAPISI (K-066 · Cemil, 18.10) ----
-   *"Ruhsat okunmak zorunda. Servis kaydı olmasa da ruhsatı çekmeli.
-   Çünkü bize orada şase no gerekli. Hatta şase no okunmuyorsa devam
-   etmemeli."*
-   06.09'daki *"ruhsat çekmeden devam edebilir"* kararı BU KARARLA
-   DEĞİŞTİ. Şase 17 harf/rakam; I/O/Q YASAKLANMIYOR — ruhsatta "WOLO…"
-   basılı olan gerçek belge var (set r08) ve kural belgede yazanı
-   esas alır. */
-function saseBicim(v) { return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, ''); }
-function saseGecerli(v) { return saseBicim(v).length === 17; }
-
-/* Bu plakayla devam etmek için şase tamam mı?
-   kayıtlı + şasesi var → tamam (ruhsat yeniden istenmez)
-   aksi hâlde           → ruhsat OKUNMUŞ olmalı ve şase geçerli olmalı */
-/* `rSaseOkundu`: son okuma şaseyi GETİRDİ mi. Usta okunmuş şaseyi
-   düzeltebilir (her alan düzeltilebilir), ama okunmamış şaseyi elle
-   yazıp geçemez — "okunmuyorsa devam etmemeli". (Cemil onayına açık:
-   K-066.3.) */
-var rSaseOkundu = false;
-function saseTamam(p) {
-  var a = plakaGecerli(p) ? aracBul(p) : null;
-  if (a && saseGecerli(a.vin)) return true;
-  return rOkundu && rSaseOkundu && saseGecerli(rDeger('rVin'));
-}
+/* ---- ŞASE (K-068 · Cemil, 18.10 — K-066'yı DÜZELTİR) ----
+   *"Araç gelir ve ruhsatı vermek istemeyebilir. [...] Parça fiyat
+   listesi isterse, ruhsat zorunlu olacak. Şase yoksa, model marka
+   hepsini seçtirmemiz gerekiyor. [...] Ruhsat zorunlu olmamalı."*
+   K-066'da "şase okunmuyorsa devam etmemeli" sözünü KAYIT AÇMAYA
+   uygulamıştım; Cemil'in kastettiği PARÇA SORMAK. Kapı artık parça
+   sorma ekranında (aracKimligiTamam, çekirdekte). Burada şase yalnız
+   OKUNUR ve okunamadıysa bunun parça sorarken ne demek olduğu söylenir. */
 
 /* ---- PLAKA KAPININ KENDİSİ ----
-   kayıtlı + şaseli → ruhsat İSTENMEZ, tek düğme: kaydı aç
-   kayıtlı, şasesiz → ruhsat İSTENİR (K-066)
-   kayıtsız         → ruhsat ZORUNLU, şase okunmadan kayıt açılmaz (K-066) */
+   kayıtlı  → ruhsat İSTENMEZ, tek düğme: kaydı aç (şasesizse not düşülür)
+   kayıtsız → ruhsat TEKLİF EDİLİR ama ZORUNLU DEĞİL (Cemil 06.09 ve
+              18.10: "ruhsatı vermek istemeyebilir") */
 function ruhsatDurum() {
   var p = plakaBicim(document.getElementById('rPlaka').value);
   var ip = document.getElementById('rPlakaIpucu');
   var tanima = document.getElementById('rTanima');
   var aracKart = document.getElementById('rAracKart');
   var a = plakaGecerli(p) ? aracBul(p) : null;
-  /* Ruhsat okundu ama şase gelmediyse bunu ekran SÖYLER — sessiz
-     kalan kapı, kapalı düğme kadar kötüdür (K-040.3). */
-  var saseUyari = rOkundu && !saseTamam(p)
-    ? '<div class="notice crit" style="margin-top:12px">' +
+  /* Ruhsat okundu ama şase gelmediyse ekran bunun SONUCUNU söyler:
+     kayıt açılır, ama parça sorarken araç seçtirilecek (K-068). */
+  var saseUyari = rOkundu && !saseGecerli(rDeger('rVin'))
+    ? '<div class="notice warn" style="margin-top:12px">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
-        '<span class="n-body"><b>Şase no okunamadı.</b> Ruhsatı yeniden çek — ' +
-          'şase olmadan kayıt açılmaz.</span></div>'
+        '<span class="n-body"><b>Şase no okunamadı.</b> Kayıt açılır; parça sorarken ' +
+          'marka, model, yıl ve motoru seçmen gerekir. İstersen ruhsatı yeniden çek.</span></div>'
     : '';
 
   if (p && !plakaGecerli(p)) {
@@ -9618,18 +9648,8 @@ function ruhsatDurum() {
   if (!plakaGecerli(p)) {
     tanima.innerHTML = '';
     aracKart.hidden = true;
-  } else if (a && !saseGecerli(a.vin)) {
-    /* KAYITLI AMA ŞASESİZ (K-066): "servis kaydı olmasa da ruhsatı
-       çekmeli". Eski kayıtlarda şase yok; bir kez çekilince tamamlanır. */
-    tanima.innerHTML =
-      '<div class="notice warn">' +
-        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
-        '<span class="n-body"><b>Bu araç kayıtlı</b> — ' + a.marka + ' ' + a.model +
-          '.<br>Şase numarası yok. <b>Ruhsatı çek</b>, şase oradan okunur.</span>' +
-      '</div>' + saseUyari;
-    aracKart.hidden = true;
   } else if (a) {
-    /* DAHA ÖNCE GELMİŞ, ŞASESİ OLAN ARAÇ — RUHSATA GEREK YOK. */
+    /* DAHA ÖNCE GELMİŞ ARAÇ — RUHSATA GEREK YOK. */
     var acik = icerideki().filter(function (k) { return k.plaka === p; })[0];
     tanima.innerHTML =
       '<div class="notice ok">' +
@@ -9638,7 +9658,9 @@ function ruhsatDurum() {
           (a.sahipAd ? ' · ' + a.sahipAd : '') + '.<br>' +
           (acik
             ? 'Zaten <b>serviste</b> ve açık bir kaydı var.'
-            : 'Ruhsat çekmene gerek yok.') +
+            : (saseGecerli(a.vin) ? 'Ruhsat çekmene gerek yok.'
+              /* K-068: şasesiz kayıtlı araç — engel değil, bilgi. */
+              : 'Şase numarası yok — parça sorarken ruhsat ya da araç seçimi gerekir.')) +
         '</span>' +
       '</div>' +
       (acik
@@ -9663,13 +9685,14 @@ function ruhsatDurum() {
              Oysa ekranda zaten iki düğme var ve ikisi ne yapılacağını
              söylüyor. Açıklama, düğmelerin söylediğini tekrar
              ediyordu. */
-          /* K-066: "atlayabilirsin" KALKTI — ruhsat zorunlu. */
+          /* K-068: "atlayabilirsin" GERİ GELDİ (K-066'da yanlışlıkla
+             kalkmıştı). */
           (rOkundu
             ? 'Ruhsat okundu — alanları kontrol et, yanlış varsa düzelt.'
-            : '<b>Ruhsatı çek</b> — şase no ruhsattan okunur.') +
+            : 'Ruhsatı çekebilirsin ya da bu aşamayı atlayabilirsin.') +
         '</span>' +
       '</div>' + saseUyari;
-    aracKart.hidden = !rOkundu;
+    aracKart.hidden = false;
   }
 
   /* ---- YIL ve TELEFON: yazarken değil, YAZILDIKTAN sonra denetlenir. */
@@ -9692,7 +9715,7 @@ function ruhsatDurum() {
   }
 
   rDetaySayac();
-  rEylemCiz(plakaGecerli(p), saseTamam(p));
+  rEylemCiz(plakaGecerli(p), !!a);
 }
 
 /* ---- DÜĞMELER ----
@@ -9700,21 +9723,22 @@ function ruhsatDurum() {
    "Kaydı aç"a bastı, hiçbir şey olmadı ve neden olmadığını ekran
    söylemedi. Düğme artık her zaman basılabilir; eksik varsa BASINCA
    söylüyor ve eksik alana götürüyor. */
-function rEylemCiz(plakaTamam, saseHazir) {
+function rEylemCiz(plakaTamam, kayitli) {
   var el = document.getElementById('rEylem');
   if (!el) return;
 
-  /* K-066: şase tamam değilse TEK yol ruhsatı çekmek. "Ruhsat adımını
-     geç ve kaydı aç" düğmesi KALKTI (06.09 kararı Cemil'in 18.10
-     kararıyla değişti). Ruhsat sekmesindeysek "Kamerayı aç" zaten
-     orada; ikinci bir düğme konmaz. */
-  var ruhsatGerek = plakaTamam && !saseHazir;
+  /* Ruhsat TEKLİFİ yalnız: plaka geçerli · araç kayıtsız · ruhsat
+     henüz okunmamış · plaka sekmesindeyiz. Dördü de doğruysa Cemil'in
+     istediği iki düğme çıkar. (K-066 bu düğmeyi kaldırmıştı; K-068
+     geri koydu — "ruhsatı vermek istemeyebilir".) */
+  var ruhsatTeklif = plakaTamam && !kayitli && !rOkundu && rSekme === 'plaka';
 
-  el.innerHTML = ruhsatGerek
-    ? (rSekme === 'plaka'
-        ? '<button class="btn btn-primary btn-lg" id="ruhsataGit">' +
-            '<svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek</button>'
-        : '')
+  el.innerHTML = ruhsatTeklif
+    ? '<button class="btn btn-primary btn-lg" id="kaydiAc">' +
+        '<svg class="ico"><use href="#i-check"></use></svg>' +
+        ' Ruhsat adımını geç ve kaydı aç</button>' +
+      '<button class="btn btn-ghost" id="ruhsataGit" style="margin-top:10px">' +
+        '<svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek</button>'
     /* ⚠️ 08.09 — PLAKA YOKKEN "KAYDI AÇ" GÖRÜNMÜYOR.
        Cemil (telefon testi): *"Sayfada herşey yapılabiliyor gözüküyor.
        Adımlar birbirini takip etmeli."* Bunu servis kaydı ekranı için
@@ -9757,7 +9781,6 @@ Ekran.tanim('ruhsat', {
     });
     rOkundu = false;
     rKaydedilen = null;
-    rSaseOkundu = false;
     ruhsatSekme('plaka');
     gizlilikIlkAcilis('rGizlilik');
 
@@ -9831,10 +9854,10 @@ var RUHSAT_ORNEK = [
     silindir: '1499', guc: '88', koltuk: '5', depo: '52',
     ilkTescil: '28.02.2017',
     tcVergiNo: '9876543210', adres: 'Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara' },
-  /* ÜÇÜNCÜ ÖRNEK: ŞASESİ OKUNAMAYAN SİLİK RUHSAT (K-066). Gerçek sette
-     var (r06 "çok silik", r31 plakası okunmuyor). Prototipte hiç
-     olmasaydı şase kapısı görülemezdi — görülemeyen kural, çalışmıyor
-     sayılır. */
+  /* ÜÇÜNCÜ ÖRNEK: ŞASESİ OKUNAMAYAN SİLİK RUHSAT (K-066/K-068). Gerçek
+     sette var (r06 "çok silik", r31 plakası okunmuyor). Prototipte hiç
+     olmasaydı parça sorma ekranındaki araç seçimi görülemezdi —
+     görülemeyen kural, çalışmıyor sayılır. */
   { plaka: '16 RT 724', marka: 'Opel', model: 'Astra', yil: '2009',
     motor: '1.6', renk: 'Gümüş', yakit: 'Benzin - LPG',
     vin: '', motorNo: '', silindir: '1598', guc: '85', koltuk: '5', depo: '',
@@ -9889,12 +9912,10 @@ function ruhsatOku(kaynak) {
      r31'i) araç kaydedilmez: plakasız kayıt, yanlış araca bağlanır. */
   var p = plakaBicim(rDeger('rPlaka'));
   var kaydedildi = false;
-  /* K-066: şase okunmadıysa YENİ araç kaydedilmez — "devam etmemeli".
-     Kayıtlı aracın boş alanları yine dolar (şasesiz kayıt eksik kalır,
-     yanlış olmaz). */
-  rSaseOkundu = saseGecerli(r.vin);
-  var yeniAracOlur = plakaGecerli(p) && (aracBul(p) || rSaseOkundu);
-  if (yeniAracOlur) {
+  /* K-068: şase okunmasa da araç kaydedilir (kayıt açmak ruhsata,
+     ruhsat şaseye bağlı değil); şasesiz araç parça sorarken seçtirilir. */
+  var saseOkundu = saseGecerli(r.vin);
+  if (plakaGecerli(p)) {
     var yeni = rAracVerisi(p);
     var a = aracBul(p);
     if (!a) { ARACLAR.push(yeni); a = yeni; kaydedildi = true; }
@@ -9903,7 +9924,7 @@ function ruhsatOku(kaynak) {
   }
 
   ruhsatDurum();
-  balon(!rSaseOkundu ? 'Şase no okunamadı — ruhsatı yeniden çek.'
+  balon(!saseOkundu && kaydedildi ? 'Ruhsat okundu, araç kaydedildi — şase okunamadı.'
     : kaydedildi ? 'Ruhsat okundu, araç kaydedildi — yanlış varsa aşağıdan düzelt.'
     : (rKaydedilen ? 'Ruhsat okundu — bu araç zaten kayıtlı.'
       : 'Plaka okunamadı — plakayı yaz, araç öyle kaydedilir.'), false, 3000);
@@ -9932,16 +9953,6 @@ document.addEventListener('click', function (e) {
       balon('Önce plakayı yaz — ör. 34 ABC 123.', false, 3000);
       var pe = document.getElementById('rPlaka');
       if (pe) { try { pe.focus(); } catch (x) {} }
-      return;
-    }
-
-    /* K-066: ŞASE KAPISI. Düğme bu durumda çizilmiyor ama kapı düğmeye
-       değil KURALA bağlı — başka bir yoldan (ses, eski bir düğme)
-       gelinse de geçilmez. */
-    if (!saseTamam(p)) {
-      ruhsatSekme('ruhsat');
-      balon(rOkundu ? 'Şase no okunamadı — ruhsatı yeniden çek.'
-        : 'Önce ruhsatı çek — şase no ruhsattan okunur.', false, 3000);
       return;
     }
 
@@ -10818,6 +10829,23 @@ function psCiz() {
   var a = aracBul(k.plaka);
   var parcalar = psParcaListesi(k);
 
+  /* K-068: şase yoksa araç SEÇTİRİLİR. Alanlar aracın kendisinden
+     dolar — usta bir kez seçince bir daha sorulmaz. */
+  var kart = document.getElementById('psAracKart');
+  var saseVar = !!(a && saseGecerli(a.vin));
+  kart.hidden = saseVar;
+  if (!saseVar && a) {
+    ['Marka', 'Model', 'Yil', 'Motor'].forEach(function (x) {
+      var e = document.getElementById('ps' + x);
+      if (e && document.activeElement !== e) e.value = a[x === 'Yil' ? 'yil' : x.toLowerCase()] || '';
+    });
+    var bas = function (s) { return s.charAt(0).toLocaleUpperCase('tr') + s.slice(1); };
+    document.getElementById('psMarkaListe').innerHTML = Object.keys(SOYLEYIS_MARKA)
+      .map(function (m) { return '<option value="' + bas(m) + '"></option>'; }).join('');
+    document.getElementById('psModelListe').innerHTML = Object.keys(SOYLEYIS_MODEL)
+      .map(function (m) { return '<option value="' + bas(m) + '"></option>'; }).join('');
+  }
+
   document.getElementById('psParcalar').innerHTML = parcalar.length
     ? parcalar.map(function (s) {
         return '<div class="kalem">' +
@@ -10837,6 +10865,8 @@ function psCiz() {
   var satirlar = parcalar.map(function (s) { return '· ' + (s.ad || '?'); }).join('\n');
   document.getElementById('psMesaj').textContent =
     (a ? a.marka + ' ' + a.model + ' ' + a.yil + ' · ' + a.motor + '\n' : '') +
+    /* Şase MESAJDA (K-068): parçanın araca uyumu şaseyle kurulur. */
+    (saseVar ? 'Şase: ' + a.vin + '\n' : '') +
     k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
     '\n\n📎 ruhsat fotoğrafı eklenecek';
 
@@ -10864,6 +10894,18 @@ Ekran.tanim('parca-sor', {
   ciz: function () { psSecililer = []; psCiz(); }
 });
 
+/* Seçilen araç bilgisi ARACIN KENDİSİNE yazılır — bir kez seçilir,
+   sonraki her parça sorusunda hazırdır (K-068). */
+document.addEventListener('input', function (e) {
+  if (!e.target || Ekran.adi() !== 'parca-sor') return;
+  var alan = { psMarka: 'marka', psModel: 'model', psYil: 'yil', psMotor: 'motor' }[e.target.id];
+  if (!alan) return;
+  var k = kayitBul(ACIK_KAYIT), a = k && aracBul(k.plaka);
+  if (a) a[alan] = e.target.value.trim();
+  /* Mesaj önizlemesi seçimle birlikte değişsin; alanlar odakta korunur. */
+  psCiz();
+});
+
 document.addEventListener('click', function (e) {
   var t = e.target.closest('button');
   if (!t) return;
@@ -10878,6 +10920,26 @@ document.addEventListener('click', function (e) {
   if (t.id === 'psGonder' && !parcalar_var()) {
     balon('Sorulacak parça yok — önce servis kaydına parça ekle.', false, 3000);
     return;
+  }
+  if (t.id === 'psRuhsatCek') {
+    /* Ruhsat ekranı plakayla açılır; okunan şase KAYITLI ARACIN boş
+       alanına yazılır (K-065), geri dönünce bu kart kendiliğinden kalkar. */
+    var kr = kayitBul(ACIK_KAYIT);
+    RUHSAT_ONDOLGU = { plaka: kr ? kr.plaka : '' };
+    Ekran.ac('ruhsat');
+    return;
+  }
+  /* K-068 KAPISI: araç tanınmadan soru GİTMEZ. Düğme konuşur (K-033.3). */
+  if (t.id === 'psGonder') {
+    var ka = kayitBul(ACIK_KAYIT);
+    if (ka && !aracKimligiTamam(aracBul(ka.plaka))) {
+      balon('Şase yok — önce aracı seç: marka, model, yıl ve motor. Ya da ruhsatı çek.', false, 3400);
+      var bos = ['psMarka', 'psModel', 'psYil', 'psMotor'].filter(function (id) {
+        return !document.getElementById(id).value.trim();
+      })[0];
+      if (bos) { try { document.getElementById(bos).focus(); } catch (x) {} }
+      return;
+    }
   }
   if (t.id === 'psGonder' && !psSecililer.length) {
     balon('Önce kime soracağını seç.', false, 2600);

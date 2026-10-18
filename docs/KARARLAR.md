@@ -10,6 +10,50 @@
 
 ---
 
+## K-068 · Ruhsat isteğe bağlı; PARÇA SORMAK için araç kimliği şart — K-066'yı düzeltir (18.10.2026)
+
+> **Cemil, 18.10:** *"Ruhsat adımını geç düğmesini kaldırdım […] Bu doğru
+> olmadı. Araç gelir ve ruhsatı vermek istemeyebilir. Bunu dememiştim. Parça
+> fiyat listesi isterse, ruhsat zorunlu olacak. Şase yoksa, model marka
+> hepsini seçtirmemiz gerekiyor. Yani aracın parça listesi bilinmez
+> olmayacak. […] belki de araç tamir olacak ve parça gerekli değil. Ruhsat
+> zorunlu olmamalı. b tamam."*
+
+**68.1 · Liderin hatası.** K-066'da *"şase okunmuyorsa devam etmemeli"*
+sözünü **kayıt açmaya** uyguladım. Cemil'in kastettiği **parça sormaktı**.
+Aracın parçası gerekmeyebilir; ruhsatı vermek istemeyen müşteri olabilir.
+Belirsizliği Cemil'e sormadan en katı okumayla uyguladım. Ders: bir sözü
+akışın hangi adımına bağladığımı karardan önce yazmalıyım.
+
+**68.2 · Kural:**
+- **Kayıt açmak:** ruhsat isteğe bağlı. *"Ruhsat adımını geç ve kaydı aç"*
+  geri geldi. Şasesi okunamayan ruhsatta da araç kaydedilir (K-065 eski
+  hâline döndü). Ekran yalnız *"parça sorarken araç seçimi gerekir"* der.
+- **Parça sormak:** araç ya **şaseyle** ya da **marka + model + yıl + motor**
+  ile tanınmalı (`aracKimligiTamam`, çekirdek). Şase yoksa parça sorma
+  ekranında dört alan çıkar; hepsi dolmadan soru gitmez, düğme bunu söyler.
+  Seçim araca yazılır, bir kez sorulur. Ekrandan ruhsat çekilebilir; okunan
+  şase kayıtlı aracın boş alanına yazılır.
+- **Şase mesajda:** varsa parçacıya giden mesajda *"Şase: …"* satırı olur.
+- **Seçenekler:** marka ve model listesi söyleyiş sözlüğünden geliyor (tek
+  kaynak). Gerçek katalog backend fazında (A-11-3).
+- **A-M52 kapandı:** *"yalnız parça sor"* diye ayrı bir yol yok. Parça
+  sorusu her zaman bir kayıttan gider ve araç kimliği ister.
+
+**68.3 · K-066.3 (b) onaylandı:** okumadan sonra plaka düzeltilirse kaydedilen
+aracın plakası da değişir. **(a)** artık geçersiz: kayıt açmak şaseye bağlı
+değil.
+
+**68.4 · Denetim:** 56. test yeniden yazıldı:
+- a) kayıtsız araçta ruhsatsız *"Kaydı aç"* VAR;
+- b) şasesiz okumada araç kaydedilir;
+- c) şasesiz, seçilmemiş araçta parça sorusu GİTMEZ, seçilince GİDER.
+
+Negatif doğrulandı: kimlik kapısı hep açık → bulgu; atla düğmesi kaldırıldı →
+bulgu. 320/375/430 px'te 0 bulgu.
+
+---
+
 ## K-067 · Fotoğraf okuma ölçüldü: ruhsat ve parça için Opus 5.5 aday (18.10.2026)
 
 > **Cemil, 18.10:** *"Gerçek doğruluğu ve maliyeti ölçelim."* (A-M35 → KAPANDI)
@@ -45,7 +89,7 @@ Liste: FOTO-OLCUM §4.
 
 ---
 
-## K-066 · Ruhsat ZORUNLU; şase okunmadan devam yok — "yalnız parça sor" yolu yok (18.10.2026)
+## K-066 · ~~Ruhsat ZORUNLU; şase okunmadan devam yok~~ — ⚠️ K-068 ile DÜZELTİLDİ (kayıt açmak ruhsata bağlı değil; kapı parça sormada) (18.10.2026)
 
 > **Cemil, 18.10:** *"Yalnız parça sor yok. Ruhsat okunmak zorunda. Servis
 > kaydı olmasa da ruhsatı çekmeli. Çünkü bize orada şase no gerekli. Hatta

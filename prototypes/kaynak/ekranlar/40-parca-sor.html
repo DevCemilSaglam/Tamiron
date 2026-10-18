@@ -22,6 +22,38 @@
     </span>
   </div>
 
+  <!-- ARACIN KİMLİĞİ (K-068 · Cemil, 18.10): *"Parça fiyat listesi
+       isterse, ruhsat zorunlu olacak. Şase yoksa, model marka hepsini
+       seçtirmemiz gerekiyor. Yani aracın parça listesi bilinmez
+       olmayacak."* Şase varsa bu kart görünmez; yoksa dört alan
+       SEÇTİRİLİR ve hepsi dolmadan soru gitmez. Seçenekler söyleyiş
+       sözlüğünden (tek kaynak); gerçek katalog backend fazında
+       (A-11-3 TecDoc araştırması). -->
+  <div class="card" id="psAracKart" hidden>
+    <div class="notice warn">
+      <span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>
+      <span class="n-body"><b>Şase no yok.</b> Parçacı doğru parçayı bulsun diye aracı seç —
+        ya da ruhsatı çek.</span>
+    </div>
+    <div class="field-2">
+      <div class="field"><label for="psMarka">Marka</label>
+        <input id="psMarka" list="psMarkaListe" autocomplete="off" /></div>
+      <div class="field"><label for="psModel">Model</label>
+        <input id="psModel" list="psModelListe" autocomplete="off" /></div>
+    </div>
+    <div class="field-2">
+      <div class="field"><label for="psYil">Yıl</label>
+        <input id="psYil" class="mono" data-giris="yil" inputmode="numeric" placeholder="2018" /></div>
+      <div class="field"><label for="psMotor">Motor</label>
+        <input id="psMotor" placeholder="1.5 dCi" autocomplete="off" /></div>
+    </div>
+    <datalist id="psMarkaListe"></datalist>
+    <datalist id="psModelListe"></datalist>
+    <button class="btn btn-ghost" id="psRuhsatCek">
+      <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+    </button>
+  </div>
+
   <div class="card">
     <div class="section-label">
       <svg class="ico ico-sm"><use href="#i-package"></use></svg> Sorulacak parçalar
@@ -81,6 +113,23 @@ function psCiz() {
   var a = aracBul(k.plaka);
   var parcalar = psParcaListesi(k);
 
+  /* K-068: şase yoksa araç SEÇTİRİLİR. Alanlar aracın kendisinden
+     dolar — usta bir kez seçince bir daha sorulmaz. */
+  var kart = document.getElementById('psAracKart');
+  var saseVar = !!(a && saseGecerli(a.vin));
+  kart.hidden = saseVar;
+  if (!saseVar && a) {
+    ['Marka', 'Model', 'Yil', 'Motor'].forEach(function (x) {
+      var e = document.getElementById('ps' + x);
+      if (e && document.activeElement !== e) e.value = a[x === 'Yil' ? 'yil' : x.toLowerCase()] || '';
+    });
+    var bas = function (s) { return s.charAt(0).toLocaleUpperCase('tr') + s.slice(1); };
+    document.getElementById('psMarkaListe').innerHTML = Object.keys(SOYLEYIS_MARKA)
+      .map(function (m) { return '<option value="' + bas(m) + '"></option>'; }).join('');
+    document.getElementById('psModelListe').innerHTML = Object.keys(SOYLEYIS_MODEL)
+      .map(function (m) { return '<option value="' + bas(m) + '"></option>'; }).join('');
+  }
+
   document.getElementById('psParcalar').innerHTML = parcalar.length
     ? parcalar.map(function (s) {
         return '<div class="kalem">' +
@@ -100,6 +149,8 @@ function psCiz() {
   var satirlar = parcalar.map(function (s) { return '· ' + (s.ad || '?'); }).join('\n');
   document.getElementById('psMesaj').textContent =
     (a ? a.marka + ' ' + a.model + ' ' + a.yil + ' · ' + a.motor + '\n' : '') +
+    /* Şase MESAJDA (K-068): parçanın araca uyumu şaseyle kurulur. */
+    (saseVar ? 'Şase: ' + a.vin + '\n' : '') +
     k.plaka + '\n\n' + (satirlar || '—') + '\n\nFiyat verebilir misiniz?' +
     '\n\n📎 ruhsat fotoğrafı eklenecek';
 
@@ -127,6 +178,18 @@ Ekran.tanim('parca-sor', {
   ciz: function () { psSecililer = []; psCiz(); }
 });
 
+/* Seçilen araç bilgisi ARACIN KENDİSİNE yazılır — bir kez seçilir,
+   sonraki her parça sorusunda hazırdır (K-068). */
+document.addEventListener('input', function (e) {
+  if (!e.target || Ekran.adi() !== 'parca-sor') return;
+  var alan = { psMarka: 'marka', psModel: 'model', psYil: 'yil', psMotor: 'motor' }[e.target.id];
+  if (!alan) return;
+  var k = kayitBul(ACIK_KAYIT), a = k && aracBul(k.plaka);
+  if (a) a[alan] = e.target.value.trim();
+  /* Mesaj önizlemesi seçimle birlikte değişsin; alanlar odakta korunur. */
+  psCiz();
+});
+
 document.addEventListener('click', function (e) {
   var t = e.target.closest('button');
   if (!t) return;
@@ -141,6 +204,26 @@ document.addEventListener('click', function (e) {
   if (t.id === 'psGonder' && !parcalar_var()) {
     balon('Sorulacak parça yok — önce servis kaydına parça ekle.', false, 3000);
     return;
+  }
+  if (t.id === 'psRuhsatCek') {
+    /* Ruhsat ekranı plakayla açılır; okunan şase KAYITLI ARACIN boş
+       alanına yazılır (K-065), geri dönünce bu kart kendiliğinden kalkar. */
+    var kr = kayitBul(ACIK_KAYIT);
+    RUHSAT_ONDOLGU = { plaka: kr ? kr.plaka : '' };
+    Ekran.ac('ruhsat');
+    return;
+  }
+  /* K-068 KAPISI: araç tanınmadan soru GİTMEZ. Düğme konuşur (K-033.3). */
+  if (t.id === 'psGonder') {
+    var ka = kayitBul(ACIK_KAYIT);
+    if (ka && !aracKimligiTamam(aracBul(ka.plaka))) {
+      balon('Şase yok — önce aracı seç: marka, model, yıl ve motor. Ya da ruhsatı çek.', false, 3400);
+      var bos = ['psMarka', 'psModel', 'psYil', 'psMotor'].filter(function (id) {
+        return !document.getElementById(id).value.trim();
+      })[0];
+      if (bos) { try { document.getElementById(bos).focus(); } catch (x) {} }
+      return;
+    }
   }
   if (t.id === 'psGonder' && !psSecililer.length) {
     balon('Önce kime soracağını seç.', false, 2600);

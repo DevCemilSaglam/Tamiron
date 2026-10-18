@@ -2530,42 +2530,65 @@ function stilMetni() {
         if (a.marka !== 'DENETIM-MARKA') ek('RUHSAT-ARAC', 'ruhsat', 'okumadan sonraki duzeltme kayitli araca yazilmadi: ' + a.marka);
       }
 
-      /* K-066 · SASE KAPISI (Cemil 18.10: "sase no okunmuyorsa devam
-         etmemeli"). Uc yuz:
-           a) kayitsiz plaka yazilinca "ruhsati gec ve kaydi ac" YOK;
-           b) sasesi okunmayan ruhsatta arac KAYDEDILMEZ;
-           c) "Kaydi ac" o durumda servis kaydi ACMAZ (dugme zorla
-              cizilse bile kapi kurala bagli).
-         NEGATIF DOGRULAMA (18.10): saseTamam her zaman true -> bulgu;
-         ruhsatOku'daki sase sarti kaldirildi -> bulgu; geri konunca 0. */
+      /* K-068 · ARAC KIMLIGI PARCA SORMANIN KAPISI (Cemil 18.10, K-066'yi
+         duzeltir: "ruhsat zorunlu olmamali; parca fiyati isterse ruhsat,
+         sase yoksa marka/model hepsini sectirmemiz gerekiyor"). Uc yuz:
+           a) kayitsiz plaka yazilinca "Ruhsat adimini gec ve kaydi ac"
+              VAR -- kayit acmak ruhsata bagli DEGIL;
+           b) sasesi okunmayan ruhsatta arac yine KAYDEDILIR (K-065);
+           c) sasesiz aracta parca sorusu GITMEZ; marka+model+yil+motor
+              secilince GIDER.
+         NEGATIF DOGRULAMA (18.10): aracKimligiTamam her zaman true ->
+         bulgu; atla dugmesi kaldirildi -> bulgu; geri konunca 0. */
       Ekran.ac('home'); Ekran.ac('ruhsat');  /* ayni ekran yeniden acilinca alanlar SIFIRLANMIYOR -- once ana ekran */
       var pe2 = document.getElementById('rPlaka');
       pe2.value = '34 ZZ 9911';
       pe2.dispatchEvent(new Event('input', { bubbles: true }));
-      if (document.getElementById('kaydiAc')) {
-        ek('RUHSAT-ARAC', 'ruhsat', 'kayitsiz aracta ruhsat okunmadan "Kaydi ac" cikiyor -- ruhsat zorunlu (K-066)');
+      if (!document.getElementById('kaydiAc')) {
+        ek('RUHSAT-ARAC', 'ruhsat', 'kayitsiz aracta ruhsatsiz "Kaydi ac" yok -- ruhsat zorunlu OLMAMALI (K-068)');
       }
       /* Sasesiz ornege gelene kadar oku (orneklerden biri silik). */
       var saseszi = null;
       for (var d = 0; d < 4 && !saseszi; d++) {
         Ekran.ac('home'); Ekran.ac('ruhsat');
         document.getElementById('sekRuhsat').click();
-        var arOnce = ARACLAR.length;
         document.getElementById('ruhsatCek').click();
         var vin = (document.getElementById('rVin') || {}).value || '';
-        if (!vin) saseszi = { p: plakaBicim(document.getElementById('rPlaka').value), eklendi: ARACLAR.length - arOnce };
+        if (!vin) saseszi = plakaBicim(document.getElementById('rPlaka').value);
       }
       if (!saseszi) {
-        ek('RUHSAT-ARAC', 'ruhsat', 'prototipte sasesi okunmayan ornek ruhsat yok -- sase kapisi olculemedi');
+        ek('RUHSAT-ARAC', 'ruhsat', 'prototipte sasesi okunmayan ornek ruhsat yok -- arac secimi olculemedi');
+      } else if (!aracBul(saseszi)) {
+        ek('RUHSAT-ARAC', 'ruhsat', 'sasesi okunmayan ruhsatta arac KAYDEDILMEDI (' + saseszi + ') -- kayit sasesiz de acilir (K-068)');
       } else {
-        if (saseszi.eklendi || aracBul(saseszi.p)) ek('RUHSAT-ARAC', 'ruhsat', 'sasesi okunmayan ruhsatta arac KAYDEDILDI (' + saseszi.p + ')');
-        var kayitOnce = KAYITLAR.length;
-        var zorla = document.createElement('button');
-        zorla.id = 'kaydiAc';
-        document.getElementById('rEylem').appendChild(zorla);
-        zorla.click();
-        if (KAYITLAR.length !== kayitOnce) ek('RUHSAT-ARAC', 'ruhsat', 'sase yokken "Kaydi ac" servis kaydi acti -- kapi kurala bagli degil');
-        if (zorla.parentNode) zorla.parentNode.removeChild(zorla);
+        var sa = aracBul(saseszi);
+        sa.marka = ''; sa.model = ''; sa.yil = ''; sa.motor = '';
+        var tk = { id: 99901, plaka: saseszi, tur: 'tamirat', sikayet: 'denetim', acilis: '18.10.2026',
+                   satirlar: [{ tip: 'parca', ad: 'Denetim parcasi', fiyat: 0, kimGetirdi: 'tamirci' }] };
+        KAYITLAR.push(tk);
+        var yk = window.ACIK_KAYIT;
+        window.ACIK_KAYIT = 99901;
+        Ekran.ac('home'); Ekran.ac('parca-sor');
+        var cip = document.querySelector('#psParcacilar [data-parcaci]');
+        if (cip) cip.click();
+        var gon = document.getElementById('psGonder');
+        if (!gon || !cip) {
+          ek('RUHSAT-ARAC', 'parca-sor', 'gonder dugmesi ya da parcaci yok -- olculemedi');
+        } else {
+          gon.click();
+          if (tk.satirlar[0].sorulan) ek('RUHSAT-ARAC', 'parca-sor', 'sasesiz, araci secilmemis aracta parca sorusu GITTI (K-068)');
+          if (document.getElementById('psAracKart').hidden) ek('RUHSAT-ARAC', 'parca-sor', 'sasesiz aracta arac secim karti GORUNMUYOR');
+          Ekran.ac('home'); Ekran.ac('parca-sor');
+          [['psMarka', 'Opel'], ['psModel', 'Astra'], ['psYil', '2009'], ['psMotor', '1.6']].forEach(function (x) {
+            var e = document.getElementById(x[0]);
+            e.value = x[1]; e.dispatchEvent(new Event('input', { bubbles: true }));
+          });
+          var cip2 = document.querySelector('#psParcacilar [data-parcaci]');
+          if (cip2) cip2.click();
+          document.getElementById('psGonder').click();
+          if (!tk.satirlar[0].sorulan) ek('RUHSAT-ARAC', 'parca-sor', 'arac secildikten sonra parca sorusu GITMEDI');
+        }
+        window.ACIK_KAYIT = yk;
       }
     } finally {
       /* Kalan veri yedegiGeriYukle ile doner; ekran alanlari da temizlensin. */

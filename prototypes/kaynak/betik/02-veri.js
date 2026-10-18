@@ -447,6 +447,21 @@ function aracBul(plaka) {
   for (var i = 0; i < ARACLAR.length; i++) if (ARACLAR[i].plaka === plaka) return ARACLAR[i];
   return null;
 }
+/* ---- ARACIN KİMLİĞİ — parça sormanın şartı (K-068 · Cemil, 18.10) ----
+   *"Parça fiyat listesi isterse, ruhsat zorunlu olacak. Şase yoksa,
+   model marka hepsini seçtirmemiz gerekiyor. Yani aracın parça listesi
+   bilinmez olmayacak."* Kayıt açmak için ruhsat GEREKMEZ; parçacıya
+   soru gitmesi için araç ya ŞASEYLE ya da marka+model+yıl+motorla
+   tanınmalı — yoksa parçacı yanlış parça gönderir.
+   Şase 17 harf/rakam; I/O/Q yasaklanmaz (ruhsatta "WOLO…" basılı belge
+   var, set r08 — kural belgede yazanı esas alır). İki ekran kullandığı
+   için ÇEKİRDEKTE (ortak nesne kuralı). */
+function saseGecerli(v) {
+  return String(v || '').toUpperCase().replace(/[^A-Z0-9]/g, '').length === 17;
+}
+function aracKimligiTamam(a) {
+  return !!a && (saseGecerli(a.vin) || !!(a.marka && a.model && a.yil && a.motor));
+}
 /* ---- YANLIŞ DUYULAN PLAKA (14.09 · A-M27) ----
    Cemil'in ses kaydı *"34 qbc 123 sahibine WhatsApp üzerinden selam
    mesajı gönder"* oldu: tanıma **A**'yı **Q** duydu ve akış
