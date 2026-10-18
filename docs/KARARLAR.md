@@ -10,6 +10,44 @@
 
 ---
 
+## K-064 · Sıra: ölçüt doğrulama → geniş ekran → muhasebe backend'de (18.10.2026)
+
+> **Cemil, 18.10:** *"Ölçüt doğrulama yapalım. Tasarımla ilgili bilgisayar,
+> tablet alanlarını da hızlıca yapmalıyız. Sonrasında otomix'e göre muhasebe
+> alanını hızlıca backend'de yaparız."*
+
+**64.1 · Ölçüt doğrulama (A-M34) — durum ölçüldü:**
+- **Parça listeleri bitti.** 27 listenin 27'si 16.09'da Cemil tarafından
+  "doğru" işaretlendi (kontrol sayfasının veritabanı).
+- **Ruhsatlar başlamadı.** 46 belgede işaret yok. Ruhsat sayfası yayınlanmadı,
+  çünkü içinde 46 kişinin TC numarası ve adresi var (16.09 güvenlik
+  denetimi). Doğrulama **yerel sayfadan** yapılır:
+  `Desktop\Tamiron\kontrol-ruhsat.html` (18.10'da yeniden üretildi; 73/73
+  fotoğraf bağlı). Fotoğraflar ve kişisel veri bilgisayardan çıkmaz.
+- **İş:** önce "Şüpheli alan var" süzgeciyle `guven` notlu 14 belge, sonra
+  kalan 32 belge. Düzeltmeler "Düzeltmeleri indir" ile tek dosya olarak çıkar.
+  Lider o dosyayı `ruhsat-seti.json`'a işler ve setten TASLAK damgasını
+  kaldırır.
+- **Sonra A-M35:** üç model aynı sette koşar (A-M30). Her koşu gerçek para
+  harcar, Cemil onaylamadan koşturulmaz.
+
+**64.2 · Geniş ekran — tablet ve bilgisayar.** MIMARI zaten "mobil · tablet ·
+bilgisayar" diyor. Bugünkü prototip yalnız telefonda ölçülüyor (320/375/430).
+Yeni özellik değil, **aynı ekranların geniş düzeni**. Kurallar:
+- Akış ve ekran sayısı değişmez (A-2 bütçesi).
+- Akış → düzen taslağı → tartış → ekran (CLAUDE.md tasarım-önce kuralı).
+- Denetim 768 ve 1280 px'e genişler. Telefon genişliklerinde 0 bulgu korunur.
+
+**64.3 · Muhasebe backend'de, OtoMix'e göre.** Referans:
+`arastirma/OTOMIX-HARITA.md`, `MUHASEBE-KAPSAMI.md`, `KDV.md`,
+`MALIYET-VE-KAR.md`. Bu madde **faz geçişidir** (CLAUDE.md: *"kod/backend
+YOK"*). Geçiş başladığı gün CLAUDE.md'nin faz satırı ve MIMARI ile birlikte
+güncellenir. Önce kapsam (OtoMix'in altı modülünden hangileri — T-18 ve
+"yeni özellik varsayılan HAYIR" süzgeciyle) Cemil'e tek sayfada sunulur.
+Kod ondan sonra.
+
+---
+
 ## K-063 · Ses ölçüm dönemi kapandı; söyleyiş sözlüğü üç yerde AKTİF (18.10.2026)
 
 > **Cemil, 18.10:** *"Bu kısmı artık bitirelim. … Hataları düzeltecek,
@@ -31,8 +69,10 @@ sıradaki veri yayındaki gerçek usta kayıtlarından gelir (K-060).
    düzelttiği her *"duyulan → doğrusu"* çifti sözlüğe **aday** olur
    (K-054 ① düzeltme birikimi).
 
-**63.3 · Cemil onayına açık — aday sözlüğe nasıl girer?** Varsayım:
-**onaylı giriş** — aday listesi biriktirilir, lider haftada bir gözden
+**63.3 · ~~Açık~~ KAPANDI — Cemil 18.10: *"Onaylı girişi kabul edelim. Ama
+bunu sistematik yapmak gerek."*** Süreç: **`docs/SOYLEYIS-BAKIM.md`** (üç
+kanal · eşik · haftalık döngü · regresyonda bozulan cümle SIFIR şartı · ret
+listesi · geri alma). Özü: aday listesi biriktirilir, lider haftada bir gözden
 geçirir, Cemil onaylar. Neden otomatik değil: yanlış bir eşleme o kelimeyi
 içeren HER cümleyi bozar (Tur 8.4'te bulanık eşleme "hava filtresi"ni
 "Yağ filtresi" yaptı). Dükkâna özgü sözcük (müşteri adı, takma ad)

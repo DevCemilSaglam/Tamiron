@@ -19,6 +19,20 @@
 
 ---
 
+## Tur 9 · 18.10.2026 · açık
+
+> **Cemil:** *"Ölçüt doğrulama yapalım. Tasarımla ilgili bilgisayar, tablet
+> alanlarını da hızlıca yapmalıyız. Sonrasında otomix'e göre muhasebe alanını
+> hızlıca backend'de yaparız."* (K-064)
+
+| # | İş | Durum |
+|---|---|---|
+| 9.1 | **Ölçüt doğrulama** = 8.5 | SÜRÜYOR — ruhsat Cemil'de |
+| 9.2 | **Geniş ekran (tablet · bilgisayar)** — aynı ekranların geniş düzeni; önce düzen taslağı, sonra prototip; denetim 768/1280 px | SIRADA |
+| 9.3 | **Muhasebe kapsamı (OtoMix'e göre)** — tek sayfa kapsam önerisi → Cemil seçer → backend fazı başlar | 9.2'den sonra |
+
+---
+
 ## Tur 8 · 12.10.2026 · açık · son commit `a50aad8`
 
 > **Cemil:** *"Servis detay sayfası kullanışlı olmadı gibi görüyorum.
@@ -34,7 +48,7 @@
 | 8.2 | **Ayarlar sayfası + alış alanı** (A-M43 · A-M33 · tema) | **BİTTİ** — 17. ekran (K-057). Bilinmeyen alış **satışıyla birlikte** kâr dışı ve ekran bunu söylüyor: bu yıl **7.410 → 5.310 ₺** (elle doğrulandı). Alış alanı ayara bağlı, boş = `null`. Bakım periyodu ve tema çekmeceden **taşındı**. Gizlilik: ayarlarda satır + ilk kullanımda bir kez. **52. test**, üç negatif testle |
 | 8.3 | **Ses → şema sistemi** — dal değil, bildirilen şema | **BİTTİ** — 12 şema, 7 ekranda, sahibinin dosyasında (K-056). Ses ekranında işe özgü dal **39 → 0**. Davranış değişmedi: eski/yeni yan yana 568 + 392 + 16 durum, **0 fark**, karne %93 → %93. Yolda iki hata sınıfı: derleyici `$'` ile betiği bozuyordu (7. denetim yanlış şeye bakıyordu), tanıyan/yapan yol ayrışabiliyordu (**51. test**). Kalıcı araç: `tools/ses-esdeger.js` |
 | 8.4 | **A-M48** — sesli komutun doğruluğu | **BİTTİ (18.10, K-063)**. 300 gerçek + 222 yapay şiveli kayıt. Chrome + motor sınavda %72; Speechmatics + ipucu %79; **kademe (b) %84, paralıya %25** (K-062). Sekiz yapay seste kademe %79 (paralıya %27); belirleyici HIZ, şive değil. Söyleyiş sözlüğü motorda aktif, backend'de ipucu + düzeltme birikimiyle büyüyecek (K-063). Ayrıntı `arastirma/SES-OLCUM.md` §11–17.3, `arastirma/PARALI-TANIMA.md`. **Açık:** sözlüğü ustaya doğrulatmak · aday giriş kuralı (63.3, Cemil onayına açık) |
-| 8.5 | **Ölçüt doğrulama + model koşusu** (A-M34 → A-M35) | **BEKLİYOR** — Cemil'in doğrulaması olmadan koşu karne değil tahmin üretir |
+| 8.5 | **Ölçüt doğrulama + model koşusu** (A-M34 → A-M35) | **SÜRÜYOR (18.10, K-064.1)** — parça 27/27 doğrulandı (16.09) · ruhsat 0/46: yerel sayfa yeniden üretildi (`Desktop\Tamiron\kontrol-ruhsat.html`), Cemil'de · sonra düzeltmeler sete işlenir, TASLAK kalkar, koşu Cemil onayıyla |
 
 ---
 
