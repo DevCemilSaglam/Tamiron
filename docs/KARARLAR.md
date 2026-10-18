@@ -77,6 +77,9 @@ geçirir, Cemil onaylar. Neden otomatik değil: yanlış bir eşleme o kelimeyi
 içeren HER cümleyi bozar (Tur 8.4'te bulanık eşleme "hava filtresi"ni
 "Yağ filtresi" yaptı). Dükkâna özgü sözcük (müşteri adı, takma ad)
 yalnız o dükkânın sözlüğüne girer.
+**Ek (Cemil 18.10): pilot döneminde GÜNLÜK, eşik ≥ 2.** Cemil sistemi birkaç
+tamirciye test için vermeyi düşünüyor; başta sözlük hızlı büyümeli. Sınavlar ve
+onay aynen kalır (SOYLEYIS-BAKIM §4.1). Normal döneme geçiş Cemil'in kararıdır.
 
 **63.4 · Ustaya doğrulatma duruyor:** `arastirma/SOYLEYIS-SOZLUGU.md`
 (üretilir: `node tools/soyleyis-liste.js`) Cemil/ustanın gözden geçirmesini
