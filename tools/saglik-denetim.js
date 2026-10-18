@@ -2596,6 +2596,42 @@ function stilMetni() {
     }
   })();
 
+  /* 58 · PLAKA-CATISMA (K-069). Hata sinifi (18.10, olcumden): ruhsattan
+     okunan plaka, ustanin YAZDIGI plakanin ustune SESSIZCE yaziliyordu;
+     Gemini 3.8 Flash 46 ruhsatta 5 plakayi yanlis okudu. Sinanan:
+       a) okuma ustanin yazdigi plakayi SILMEZ;
+       b) catisma karti cikar;
+       c) secilene kadar arac KAYDEDILMEZ (ne yazilanla ne okunanla);
+       d) "ruhsattaki" secilince arac okunan plakayla kaydedilir.
+     NEGATIF DOGRULAMA (18.10): catisma dali kaldirildi -> bulgu; geri -> 0. */
+  (function () {
+    if (typeof Ekran === 'undefined' || !Ekran.ac) return;
+    if (YEDEK.ARACLAR) window.ARACLAR = JSON.parse(JSON.stringify(YEDEK.ARACLAR));
+    try {
+      var yaz = '34 ZZ 7788';
+      Ekran.ac('home'); Ekran.ac('ruhsat');
+      var pe = document.getElementById('rPlaka');
+      pe.value = yaz; pe.dispatchEvent(new Event('input', { bubbles: true }));
+      document.getElementById('sekRuhsat').click();
+      document.getElementById('ruhsatCek').click();
+      var simdi = plakaBicim(document.getElementById('rPlaka').value);
+      var kart = document.getElementById('rPlakaCatisma');
+      if (simdi !== yaz) { ek('PLAKA-CATISMA', 'ruhsat', 'okuma ustanin yazdigi plakayi ezdi: ' + yaz + ' -> ' + simdi); return; }
+      if (!kart) { ek('PLAKA-CATISMA', 'ruhsat', 'plakalar farkli ama catisma karti yok'); return; }
+      var ruhsatDug = document.getElementById('rPlakaRuhsat');
+      var okunan = ruhsatDug ? plakaBicim(ruhsatDug.textContent) : '';
+      if (aracBul(yaz) || (okunan && aracBul(okunan))) ek('PLAKA-CATISMA', 'ruhsat', 'catisma cozulmeden arac KAYDEDILDI');
+      if (ruhsatDug) {
+        ruhsatDug.click();
+        if (plakaBicim(document.getElementById('rPlaka').value) !== okunan) ek('PLAKA-CATISMA', 'ruhsat', '"ruhsattaki" secildi ama alan degismedi');
+        if (!aracBul(okunan)) ek('PLAKA-CATISMA', 'ruhsat', 'secimden sonra arac kaydedilmedi (' + okunan + ')');
+        if (document.getElementById('rPlakaCatisma')) ek('PLAKA-CATISMA', 'ruhsat', 'secimden sonra catisma karti duruyor');
+      }
+    } finally {
+      Ekran.ac('home'); Ekran.ac('ruhsat');
+    }
+  })();
+
   /* 57 · GENIS-DUZEN — tablet ve bilgisayar yerlesimi (K-064.2 · 04-genis.css).
      Yalniz genislik >= 768 px iken olcer; telefonda bu dosyanin hicbir
      kurali calismaz. Hata sinifi (18.10): ortalama kurali (align-self:

@@ -359,6 +359,17 @@ function ruhsatDurum() {
   var a = plakaGecerli(p) ? aracBul(p) : null;
   /* Ruhsat okundu ama şase gelmediyse ekran bunun SONUCUNU söyler:
      kayıt açılır, ama parça sorarken araç seçtirilecek (K-068). */
+  /* K-069: çatışma varsa iki plaka yan yana; seçim iki düğmeyle. */
+  var catismaHtml = rPlakaCatisma
+    ? '<div class="notice warn" id="rPlakaCatisma" style="margin-top:12px">' +
+        '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
+        '<span class="n-body"><b>Plakalar farklı.</b> Sen <b>' + rPlakaCatisma.yazilan +
+          '</b> yazdın, ruhsatta <b>' + rPlakaCatisma.okunan + '</b> okundu. Hangisi doğru?' +
+          '<span class="btn-row" style="margin-top:10px">' +
+            '<button class="btn btn-ghost" id="rPlakaBenim">' + rPlakaCatisma.yazilan + '</button>' +
+            '<button class="btn btn-ghost" id="rPlakaRuhsat">' + rPlakaCatisma.okunan + '</button>' +
+          '</span></span></div>'
+    : '';
   var saseUyari = rOkundu && !saseGecerli(rDeger('rVin'))
     ? '<div class="notice warn" style="margin-top:12px">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>' +
@@ -423,6 +434,10 @@ function ruhsatDurum() {
       '</div>' + saseUyari;
     aracKart.hidden = false;
   }
+
+  /* K-069: plaka çatışması her dalda EN ÜSTTE — kararı verilmeden
+     başka bir şeye bakılmasın. */
+  if (catismaHtml) tanima.innerHTML = catismaHtml + tanima.innerHTML;
 
   /* ---- YIL ve TELEFON: yazarken değil, YAZILDIKTAN sonra denetlenir. */
   var yilEl = document.getElementById('rYil');
@@ -510,6 +525,7 @@ Ekran.tanim('ruhsat', {
     });
     rOkundu = false;
     rKaydedilen = null;
+    rPlakaCatisma = null;
     ruhsatSekme('plaka');
     gizlilikIlkAcilis('rGizlilik');
 
@@ -597,9 +613,20 @@ var ruhsatSira = 0;
 /* Kamera ve galeri AYNI SONUCU verir — ikisi de bir görüntüden alan
    doldurur. Ayrı davranmaları için bir sebep yok; ayrı davransalardı
    iki ayrı hata sınıfı doğardı. */
+/* ---- PLAKA ÇATIŞMASI (18.10 · K-069, Cemil onayına açık) ----
+   Ölçüm (FOTO-OLCUM §7): Gemini 3.8 Flash şaseyi 46/46 okudu ama 5 plakayı
+   yanlış okudu (silik F/E, R/B). Eskiden okunan plaka, ustanın aracın
+   önünde YAZDIĞI plakanın üstüne SESSİZCE yazılıyordu. Artık ikisi farklıysa
+   ustanınki alanda kalır, ekran sorar; usta seçene kadar araç KAYDEDİLMEZ
+   (yanlış plakayla kayıt açılmasın, başka aracın boş alanları dolmasın). */
+var rPlakaCatisma = null;
+
 function ruhsatOku(kaynak) {
   var r = RUHSAT_ORNEK[ruhsatSira % RUHSAT_ORNEK.length];
   ruhsatSira++;
+  /* Okumadan ÖNCE ustanın yazdığı plaka — karşılaştırma için. */
+  var yazilan = plakaBicim(rDeger('rPlaka'));
+  rPlakaCatisma = null;
   /* ⚠️ VERGİ DAİRESİ BU HARİTADA YOK ve olmayacak: ruhsatta yazmıyor.
      Okunamayan bir alanı doldurmak, uydurmaktır (K-050). */
   var esle = { rPlaka: 'plaka', rMarka: 'marka', rModel: 'model', rYil: 'yil',
@@ -639,11 +666,24 @@ function ruhsatOku(kaynak) {
      yalnız BOŞ alanları dolar — ustanın daha önce düzelttiği bilgi
      modelin yeni okumasına yenilmez. Plaka okunamadıysa (gerçek setin
      r31'i) araç kaydedilmez: plakasız kayıt, yanlış araca bağlanır. */
+  var okunan = plakaBicim(r.plaka || '');
+  if (plakaGecerli(yazilan) && plakaGecerli(okunan) && okunan !== yazilan) {
+    /* Ustanın yazdığı alanda KALIR; karar ustanın. */
+    document.getElementById('rPlaka').value = yazilan;
+    rPlakaCatisma = { yazilan: yazilan, okunan: okunan };
+    ruhsatDurum();
+    balon('Ruhsattaki plaka seninkinden farklı — hangisi doğru?', false, 3400);
+    return;
+  }
+  ruhsatKaydet(saseGecerli(r.vin));
+}
+
+/* Okunan aracı kaydeder (K-065). Çatışma çözülünce de buradan geçer. */
+function ruhsatKaydet(saseOkundu) {
   var p = plakaBicim(rDeger('rPlaka'));
   var kaydedildi = false;
   /* K-068: şase okunmasa da araç kaydedilir (kayıt açmak ruhsata,
      ruhsat şaseye bağlı değil); şasesiz araç parça sorarken seçtirilir. */
-  var saseOkundu = saseGecerli(r.vin);
   if (plakaGecerli(p)) {
     var yeni = rAracVerisi(p);
     var a = aracBul(p);
@@ -671,6 +711,24 @@ document.addEventListener('click', function (e) {
 
   /* Araç alanlarının mikrofonu: bağlam "servis-ekle". */
   if (t.id === 'rAracMik') { sesleAc('servis-ekle'); return; }
+
+  /* K-069: plaka çatışmasının iki cevabı. Seçilen plaka alana yazılır,
+     araç ANCAK ŞİMDİ kaydedilir. */
+  if (t.id === 'rPlakaBenim' || t.id === 'rPlakaRuhsat') {
+    if (!rPlakaCatisma) return;
+    document.getElementById('rPlaka').value =
+      t.id === 'rPlakaBenim' ? rPlakaCatisma.yazilan : rPlakaCatisma.okunan;
+    rPlakaCatisma = null;
+    ruhsatKaydet(saseGecerli(rDeger('rVin')));
+    return;
+  }
+
+  if (t.id === 'kaydiAc' && rPlakaCatisma) {
+    balon('Önce plakayı seç — sen yazdığın mı, ruhsattaki mi?', false, 3000);
+    var pc = document.getElementById('rPlakaCatisma');
+    if (pc) { try { pc.scrollIntoView({ block: 'center' }); } catch (x) {} }
+    return;
+  }
 
   if (t.id === 'kaydiAc') {
     var p = plakaBicim(document.getElementById('rPlaka').value);

@@ -10,6 +10,33 @@
 
 ---
 
+## K-069 · Ruhsattan okunan plaka ustanın yazdığını EZMEZ — çatışmada usta seçer (18.10.2026 · Cemil onayına açık)
+
+**Nereden çıktı:** fotoğraf ölçümü (FOTO-OLCUM §7). Gemini 3.8 Flash
+şaseyi 46/46 okudu ama **5 plakayı yanlış okudu**; silik basılmış F/E ve
+R/B harfleri. Prototipte okunan plaka, ustanın aracın önünde **yazdığı**
+plakanın üstüne **sessizce** yazılıyordu. Yani en ucuz okuyucunun tek
+zayıflığı, en kritik alana sessizce sızıyordu.
+
+**Kural (prototipte, `20-ruhsat.html`):**
+- Usta plakayı yazmışsa ve okunan plaka farklıysa **ustanınki alanda kalır**.
+- Ekran iki plakayı yan yana gösterip sorar: *"Sen X yazdın, ruhsatta Y
+  okundu. Hangisi doğru?"* İki düğme var.
+- **Seçim yapılana kadar araç kaydedilmez.** Yanlış plakayla kayıt açılmasın,
+  başka bir aracın boş alanları dolmasın. *"Kaydı aç"* da bekler ve
+  nedenini söyler.
+- Usta plaka yazmadan ruhsat okuttuysa davranış aynı: okunan plaka gelir.
+
+**Neden önemli:** bu kural, ruhsat okumayı Opus yerine **altıda bir fiyatına
+Gemini 3.8 Flash'a** bırakmayı mümkün kılan şey. Şase doğru (K-068'in kapısı),
+plaka ise ustanın sözüyle sınanıyor (K-067.2b).
+
+**Denetim:** 58. test `PLAKA-CATISMA`. Negatif doğrulandı: çatışma dalı
+kaldırılınca *"okuma ustanın yazdığı plakayı ezdi"*. 320/375/430/768/1280 px'te
+0 bulgu.
+
+---
+
 ## K-068 · Ruhsat isteğe bağlı; PARÇA SORMAK için araç kimliği şart — K-066'yı düzeltir (18.10.2026)
 
 > **Cemil, 18.10:** *"Ruhsat adımını geç düğmesini kaldırdım […] Bu doğru
