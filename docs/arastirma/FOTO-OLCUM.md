@@ -137,3 +137,67 @@ Opus'un sonuçlarına bakıldı:
   ve **kırpmada**: telefonda belgenin kenarını bulup yalnız belgeyi
   göndermek. Fotoğrafların çoğunda belgenin çevresi masa, el ve kılıf;
   kırpma girdiyi küçültmenin en temiz yolu.
+
+## 7 · Ödemesiz yol: Gemini (önceden yüklü kredi) ve yerel model (18.10)
+
+> Cemil: *"Şu an ödeme yapamam. Başka ücretsiz modeller yok mu?"*
+> ⚠️ **Ücretsiz bulut katmanları kullanılmadı**: ruhsatta gerçek kişilerin TC
+> numarası ve adresi var. Gemini, Cemil'in daha önce yüklediği kredinin
+> kalanıyla **ücretli katmanda** koşuldu; Google'ın fiyat sayfasına göre
+> ücretli katman verisi ürün geliştirmede kullanılmıyor. Yerel modelde
+> fotoğraf bilgisayardan çıkmadı.
+
+### Ruhsat — 46 belge, aynı cetvel
+
+| | şase | kritik yanlış (hepsi plaka) | uydurma | belge tam | belge başına | süre |
+|---|---|---|---|---|---|---|
+| **Opus 5.5** | **46/46** | **0** | 3 | %54 | 2,98 ¢ | — |
+| Sonnet 5.5 | 45 + 1 boş | 1 (r24 287→267) | 7 | %57 | 1,56 ¢ | — |
+| **Gemini 3.8 Flash** | **46/46** | 5 | 12 | %48 | **0,48 ¢**¹ | 8 sn |
+| Gemini 3.5 Flash-Lite | 44 · **2 yanlış** | 8 | 32 | %30 | 0,11 ¢ | 1,6 sn |
+| Haiku 5.5 | 44 · **2 yanlış** | 4 | 4 | %39 | 0,10 ¢ | — |
+| Gemma 4 12B (yerel) | koşuyor | | | | **0** | ~470 sn |
+
+¹ Gemini 3.8 Flash'ın fiyatı 01.01.2027'de iki katına çıkıyor (~0,96 ¢).
+
+**Okuma:**
+- **Gemini 3.8 Flash, Opus'un altıda biri fiyatına şaseyi 46/46 okudu.**
+  K-068'e göre parça sormanın kapısı şase, yani en önemli alanda Opus'a
+  eşit.
+- **Zayıflığı plakada.** 5 plakayı yanlış okudu:
+  - r39 "ER", r41 "BBH": 15.09'daki ilk okumamızın yaptığı hatanın aynısı;
+    silik basılmış F/E ve R/B harfleri.
+  - r11 477→677 (parlamanın altında).
+  - r44 "41 HH 036".
+  - r31 "NES 451".
+- **Ama ekranda plaka zaten ustadan geliyor.** "Plakayı yaz" varsayılan sekme
+  ve ses de plakayla başlıyor. Ruhsattan okunan plaka ustanın yazdığıyla
+  **karşılaştırılabilir**; tutmazsa ekran sorar. Böylece plaka hatası
+  sessizce geçmez, şase hatası ise geçerdi. Bu karşılaştırma **henüz
+  prototipte yok**; Cemil onayına açık bir öneri.
+- Flash-Lite ve Haiku şasede hata yaptı → elenir (K-066.4).
+
+### Ölçütte bir düzeltme daha: r31
+
+Sonnet "34 NE 6451", Gemini "34 NES 451" okudu. Ölçütte plaka boştu
+(*"sol sütun tamamen soluk"*). Fotoğraf büyütüldü: **silik ama okunuyor,
+34 NE 6451.** Ölçüt düzeltildi.
+**Sonnet'i K-067'de "plaka uydurdu" diye elemiştim. O gerekçe yanlıştı;
+Sonnet doğru okumuştu.** Sonnet'in gerçek kritik hatası 1: r24'te 287→267.
+Bu, ölçütte bulunan 4. plaka hatası. 46 belgenin 4'ünde plaka ölçütü
+yanlıştı ve hepsini, birden fazla bağımsız modelin aynı şeyi okuması
+gösterdi.
+
+### Yerel model (Gemma 4 12B)
+Ücretsiz ve veri dışarı çıkmıyor, ama bu dizüstünde **ruhsat başına ~8
+dakika**. İlk denemede (r27) şase doğruydu, 18 alanın 17'si tamdı. Tam koşu
+arka planda (~6 saat). Ürün için anlamı: hız ancak ekran kartlı bir
+sunucuda kabul edilebilir olur; o da ayrı bir maliyet.
+
+⚠️ **Olay (18.10, 17:30):** ilk yerel koşuda bellek tükendi; boş RAM 0,1 GB'a,
+C'deki boş yer sayfa dosyası yüzünden 4 GB'a indi. Sebep: model D'ye
+taşınırken durdurulan ilk Ollama'nın `llama-server` alt süreci kapanmamıştı;
+iki kopya 22 GB yer tutuyordu. Fazla süreçler kapatıldı, bağlam penceresi
+8.192'ye indirildi. Ayrıca bir **bellek bekçisi** kuruldu: boş RAM 2 GB'ın
+altına düşerse koşuyu durdurur. Model C'den `D:\Ollama\models`'e taşındı
+(`OLLAMA_MODELS`).

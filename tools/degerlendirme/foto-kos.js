@@ -45,7 +45,12 @@ const MODEL = arg('--model', 'claude-opus-5-5');
 const FIYAT = {
   'claude-opus-5-5': [4, 20, 0.20], 'claude-opus-5': [5, 25],
   'claude-sonnet-5-5': [2, 10, 0.20], 'claude-sonnet-5': [2, 10],
-  'claude-haiku-5-5': [0.10, 0.50], 'claude-haiku-4-5': [1, 5]
+  'claude-haiku-5-5': [0.10, 0.50], 'claude-haiku-4-5': [1, 5],
+  /* Gemini ücretli katman (ai.google.dev/gemini-api/docs/pricing, 18.10):
+     3.8 Flash 31.12.2026'ya kadar bu fiyat, 01.01.2027'den İKİ KATI
+     ($1,50 / $7,50). Çıktıya düşünme jetonları dahil. Önbellek yok. */
+  'gemini-3.8-flash': [0.75, 3.75, 0.75], 'gemini-3.5-flash-lite': [0.30, 2.50, 0.30]
+  /* ollama: yerel, ücret yok — FIYAT'ta yoksa maliyet basılmaz. */
 };
 
 /* FOTOĞRAF HARİTASI (18.10): fotoğraflar depoya kopyalanmaz — içlerinde
@@ -63,6 +68,15 @@ const SADECE = arg('--sadece', '');
 const EFOR = arg('--efor', null);
 const FOTO_KOK = arg('--foto-kok', null);
 const ETIKET = arg('--etiket', '');
+/* SAĞLAYICI (18.10): Cemil "şu an ödeme yapamam, başka ücretsiz model yok
+   mu?" dedi. Aynı istem, aynı şema, AYNI CETVEL — yalnız okuyan değişir:
+     claude  — Anthropic API (varsayılan)
+     gemini  — Google Gemini API, Cemil'in ÖNCEDEN YÜKLEDİĞİ kredi (ücretli
+               katman: içerik eğitimde kullanılmaz). ⚠️ Ücretsiz katmanla
+               KOŞULMAZ: ruhsatta gerçek kişilerin TC no'su ve adresi var.
+     ollama  — bilgisayardaki yerel açık model (Gemma 4); fotoğraf
+               bilgisayardan ÇIKMAZ, ücret yok, yavaş. */
+const SAGLAYICI = arg('--saglayici', 'claude');
 
 const AYAR = {
   ruhsat: {
@@ -199,19 +213,95 @@ function fiyatSayi(v) {
   return isNaN(n) ? null : n;
 }
 
+/* Gemini/Ollama şeması: JSON Schema'nın ortak alt kümesi. additionalProperties
+   Gemini'nin responseSchema'sında yok — çıkarılır. */
+function semaSade(o) {
+  if (Array.isArray(o)) return o.map(semaSade);
+  if (o && typeof o === 'object') {
+    const y = {};
+    Object.keys(o).forEach(k => { if (k !== 'additionalProperties') y[k] = semaSade(o[k]); });
+    return y;
+  }
+  return o;
+}
+const bekle = ms => new Promise(r => setTimeout(r, ms));
+class KaliciHata extends Error { constructor(st, m) { super(m); this.status = st; } }
+
 (async () => {
-  let Anthropic;
-  try { Anthropic = require('@anthropic-ai/sdk'); }
-  catch (e) { console.error('SDK yok. Önce: npm install @anthropic-ai/sdk'); process.exit(1); }
-  if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
-    console.error('ANTHROPIC_API_KEY yok. Anahtar bu depoda durmaz — ortamdan okunur.');
+  let client = null;
+  if (SAGLAYICI === 'claude') {
+    let Anthropic;
+    try { Anthropic = require('@anthropic-ai/sdk'); }
+    catch (e) { console.error('SDK yok. Önce: npm install @anthropic-ai/sdk'); process.exit(1); }
+    if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN) {
+      console.error('ANTHROPIC_API_KEY yok. Anahtar bu depoda durmaz — ortamdan okunur.');
+      process.exit(1);
+    }
+    const secenek = {};
+    if (process.env.ANTHROPIC_WORKSPACE_ID) {
+      secenek.defaultHeaders = { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID };
+    }
+    client = new (Anthropic.default || Anthropic)(secenek);
+  } else if (SAGLAYICI === 'gemini' && !process.env.GEMINI_API_KEY) {
+    console.error('GEMINI_API_KEY yok. Anahtar bu depoda durmaz — ortamdan okunur.');
     process.exit(1);
   }
-  const secenek = {};
-  if (process.env.ANTHROPIC_WORKSPACE_ID) {
-    secenek.defaultHeaders = { 'anthropic-workspace-id': process.env.ANTHROPIC_WORKSPACE_ID };
+
+  const ISTEM = TUR === 'ruhsat'
+    ? 'Bu ruhsatın alanlarını çıkar. Okuyamadığın alanı boş metin ("") bırak; uydurma.'
+    : 'Bu parça listesinin satırlarını çıkar. Ditto işaretlerini çöz, okuyamadığını işaretle. Boş alanlara "" yaz.';
+  const SEMA = TUR === 'ruhsat' ? RUHSAT_SEMA : PARCA_SEMA;
+
+  /* Tek okuma → { cevap, girdi, cikti }. Kalıcı hata KaliciHata atar. */
+  async function oku(veri, tur) {
+    if (SAGLAYICI === 'gemini') {
+      const govde = {
+        systemInstruction: { parts: [{ text: AYAR.sistem }] },
+        contents: [{ role: 'user', parts: [{ inlineData: { mimeType: 'image/' + tur, data: veri } }, { text: ISTEM }] }],
+        generationConfig: { responseMimeType: 'application/json', responseSchema: semaSade(SEMA), temperature: 0 }
+      };
+      for (let deneme = 0; ; deneme++) {
+        const y = await fetch('https://generativelanguage.googleapis.com/v1beta/models/' + MODEL + ':generateContent',
+          { method: 'POST', headers: { 'x-goog-api-key': process.env.GEMINI_API_KEY, 'content-type': 'application/json' }, body: JSON.stringify(govde) });
+        const metin = await y.text();
+        /* 429 dakikalık sınırsa bekle; ama "kredi bitti" 429'u da olabilir
+           (16.10 ses koşusu) — metinde kredi/ödeme geçiyorsa KALICI. */
+        const krediBitti = /credit|prepay|billing|quota exceeded for/i.test(metin);
+        if ((y.status === 429 || y.status === 503) && !krediBitti && deneme < 6) { await bekle(5000 * (deneme + 1)); continue; }
+        if (!y.ok) throw new KaliciHata(krediBitti ? 402 : y.status, y.status + ' — ' + metin.slice(0, 400));
+        const d = JSON.parse(metin);
+        const parca = (((d.candidates || [])[0] || {}).content || {}).parts || [];
+        const yazi = parca.filter(p => !p.thought).map(p => p.text || '').join('').trim();
+        if (!yazi) throw new Error('boş yanıt: ' + metin.slice(0, 200));
+        const u = d.usageMetadata || {};
+        return { cevap: JSON.parse(yazi), girdi: u.promptTokenCount || 0,
+                 cikti: (u.candidatesTokenCount || 0) + (u.thoughtsTokenCount || 0) };
+      }
+    }
+    if (SAGLAYICI === 'ollama') {
+      /* ⚠️ fetch DEĞİL http (18.10): Node'un fetch'i yanıt başlığını 300 sn
+         bekliyor; işlemcide çalışan yerel model bir ruhsata bundan uzun
+         sürebiliyor ve "fetch failed" "Ollama çalışmıyor" gibi görünüyordu.
+         Burada zaman aşımı YOK — yavaşlık ölçülen şeyin kendisi. */
+      /* num_ctx 8192 (18.10): varsayılan bağlam çok büyük — bellek 22 GB'lık
+         makinede tükendi, Windows sayfa dosyası C'yi doldurdu. Bir ruhsat
+         (görüntü + istem + 18 alan) ~3.000 jetonda kalıyor. */
+      const govde = JSON.stringify({ model: MODEL, stream: false, format: semaSade(SEMA), options: { temperature: 0, num_ctx: 8192 },
+        messages: [{ role: 'system', content: AYAR.sistem }, { role: 'user', content: ISTEM, images: [veri] }] });
+      const { durum, metin } = await new Promise((coz, red) => {
+        const r = require('http').request({ host: '127.0.0.1', port: 11434, path: '/api/chat', method: 'POST',
+          headers: { 'content-type': 'application/json', 'content-length': Buffer.byteLength(govde) } }, y => {
+          let m = ''; y.setEncoding('utf8'); y.on('data', c => { m += c; }); y.on('end', () => coz({ durum: y.statusCode, metin: m }));
+        });
+        r.on('error', e => red(new KaliciHata(503, 'Ollama çalışmıyor (127.0.0.1:11434): ' + e.message)));
+        r.end(govde);
+      });
+      if (durum !== 200) throw new KaliciHata(durum, durum + ' — ' + metin.slice(0, 400));
+      const d = JSON.parse(metin);
+      return { cevap: JSON.parse(((d.message || {}).content || '').trim()), girdi: d.prompt_eval_count || 0, cikti: d.eval_count || 0 };
+    }
+    return null; /* claude: aşağıdaki özgün yol */
   }
-  const client = new (Anthropic.default || Anthropic)(secenek);
 
   /* Boş metin ve gönderilmeyen alan = okunamadı (null). Ölçüt boşu null
      yazıyor; '' ile null ayrı sayılsaydı doğru davranış yanlış görünürdü. */
@@ -234,7 +324,7 @@ function fiyatSayi(v) {
   }
 
   const cevaplar = {};
-  let durdu = false;
+  let durdu = false, sure = 0;
   let girdi = 0, cikti = 0, onbellekOkunan = 0, onbellegeYazilan = 0, atlanan = 0;
 
   for (const k of kayitlar) {
@@ -252,6 +342,14 @@ function fiyatSayi(v) {
     const veri = fs.readFileSync(dosya).toString('base64');
 
     try {
+      if (SAGLAYICI !== 'claude') {
+        const t0 = Date.now();
+        const r = await oku(veri, tur);
+        girdi += r.girdi; cikti += r.cikti; sure += Date.now() - t0;
+        cevaplar[k.id] = sayilastir(bosuNullYap(r.cevap));
+        process.stdout.write('.');
+        continue;
+      }
       const istek = {
         model: MODEL,
         /* Yeni modellerde düşünme kapatılamıyor; düşük sınır cevabı keser. */
@@ -288,8 +386,9 @@ function fiyatSayi(v) {
         : blok ? sayilastir(bosuNullYap(blok.input)) : { hata: 'araç çağrısı gelmedi (' + yanit.stop_reason + ')' };
     } catch (e) {
       cevaplar[k.id] = { hata: e.message };
-      /* 400/401/403/404 kalıcıdır — ilk hatada dur (model-kos, 13.10). */
-      if ([400, 401, 403, 404].indexOf(e.status) >= 0) {
+      /* 400/401/402/403/404 kalıcıdır — ilk hatada dur (model-kos, 13.10).
+         402 = Gemini kredisi bitti; 503 burada yalnız Ollama çalışmıyorsa. */
+      if ([400, 401, 402, 403, 404].indexOf(e.status) >= 0 || (e instanceof KaliciHata)) {
         console.error('\nKOŞU DURDU — kalıcı API hatası (' + e.status + '): ' + e.message);
         process.exitCode = 2;
         /* 18.10: kredi bittiğinde 38 okuma YAZILMADAN kayboldu (~$0,7).
@@ -312,6 +411,8 @@ function fiyatSayi(v) {
   sonuc.tur = TUR;
   sonuc.jeton = { girdi, cikti, onbellek: onbellekOkunan, onbellegeYazilan };
   sonuc.atlanan = atlanan;
+  sonuc.saglayici = SAGLAYICI;
+  if (sure) sonuc.belgeBasinaSaniye = +(sure / 1000 / Math.max(1, kayitlar.length - atlanan)).toFixed(1);
   const f = FIYAT[MODEL];
   if (f) {
     const okuma = f[2] != null ? f[2] : f[0] / 10;
@@ -340,7 +441,7 @@ function fiyatSayi(v) {
     sonuc.sase = sase;
   }
 
-  const dosya = path.join(KOK, 'sonuc-' + TUR + '-' + MODEL + (ETIKET ? '-' + ETIKET : '') + (durdu ? '-YARIM' : '') + '.json');
+  const dosya = path.join(KOK, 'sonuc-' + TUR + '-' + MODEL.replace(/[^A-Za-z0-9.-]/g, '-') + (ETIKET ? '-' + ETIKET : '') + (durdu ? '-YARIM' : '') + '.json');
   fs.writeFileSync(dosya, JSON.stringify({ sonuc, cevaplar }, null, 2), 'utf8');
 
   console.log('\nMOTOR: ' + MODEL + ' · TÜR: ' + TUR);
@@ -352,6 +453,7 @@ function fiyatSayi(v) {
   console.log(sonuc.ozet);
   console.log('jeton: ' + girdi + ' girdi · ' + cikti + ' çıktı · ' + onbellekOkunan + ' önbellekten' +
               (sonuc.maliyetUsd != null ? ' · ~$' + sonuc.maliyetUsd + ' (belge başına ~$' + sonuc.belgeBasinaUsd + ')' : ''));
+  if (sonuc.belgeBasinaSaniye) console.log('süre: belge başına ~' + sonuc.belgeBasinaSaniye + ' sn');
   if (sonuc.sase) console.log('ŞASİ: ' + sonuc.sase.dogru + ' doğru · ' + sonuc.sase.bos + ' boş · ' +
               sonuc.sase.yanlis + ' YANLIŞ' + (sonuc.sase.yanlisListe.length ? '\n    ' + sonuc.sase.yanlisListe.join('\n    ') : ''));
   sonuc.satirlar.filter(s => s.sonuc !== 'TAM').forEach(s => {

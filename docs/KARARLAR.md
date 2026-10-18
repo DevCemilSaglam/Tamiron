@@ -73,7 +73,18 @@ Maliyet ruhsat başına ~3 cent, dükkân başına ~$6/ay. YAPAY-ZEKA §5'in
 *"karar maliyetle değil doğrulukla verilir"* kuralına göre seçim bu.
 Ürüne koyma backend fazında (K-055.4).
 
-**67.3 · Ölçütte üç plaka yanlıştı.** Üç model aynı şeyi okudu, fotoğraf
+**67.2b · GÜNCELLEME (18.10 akşam) — ödemesiz yol:** Gemini 3.8 Flash (Cemil'in
+önceden yüklediği kredi, ücretli katman) şaseyi **46/46** okudu, ruhsat başına
+**0,48 ¢**. Opus'un altıda biri fiyatına (2027'den ~0,96 ¢). Zayıflığı plaka:
+5 hata. Plaka ekranda zaten ustadan geliyor; ruhsattan okunanla
+karşılaştırılırsa plaka hatası sessiz kalmaz. **Öneri değişti, Cemil onayına
+açık:** ruhsat = **Gemini 3.8 Flash + plaka karşılaştırması**; Opus doğruluk
+yedeği. (FOTO-OLCUM §7)
+**Düzeltme:** Sonnet'i *"r31'de plaka uydurdu"* diye elemiştim; ölçüt
+yanlıştı, plaka okunuyordu (34 NE 6451). Sonnet doğru okumuştu. Gerçek kritik
+hatası 1 (r24).
+
+**67.3 · Ölçütte üç plaka yanlıştı.** (+ r31 = **dört**) Üç model aynı şeyi okudu, fotoğraf
 modelleri doğruladı. İnsan doğrulaması da yanılır; modellerin birleştiği
 ama ölçütten ayrıldığı yer ölçütü sınar. Düzeltildi.
 
