@@ -64,9 +64,29 @@ müşteri adı `[ad]` olarak maskelenir (K-060 gizlilik cümlesi).
 Eşiğin altındaki aday silinmez, beklemede kalır. 90 gün eşiğe ulaşmazsa
 düşer (K-060'ın saklama süresiyle aynı).
 
-## 5 · Haftalık döngü
+### 4.1 · Pilot dönemi — GÜNLÜK ve düşük eşik (Cemil, 18.10)
 
-**Her pazartesi, lider:**
+> *"Başlarda kelimeleri hergün kontrol edelim. Çünkü test için birkaç
+> tamirciye verme düşüncem var. Zamanla değişebilir fakat başlarda hızlıca
+> sözlüğü büyütelim."*
+
+Birkaç tamirciyle yapılan pilotta:
+
+- Döngü **haftalık değil GÜNLÜK** işler: her sabah bir önceki günün adayları.
+- Eşik **≥ 2 kez** olur. Genel kapsam için ikinci dükkân şartı aranmaz;
+  pilotta dükkân sayısı az olduğu için bu şart sözlüğü durdurur.
+- **Hız eşikten gelir, sınavdan gelmez.** Üç sınav (⚑ · çakışma · regresyonda
+  bozulan cümle SIFIR) ve Cemil onayı aynen kalır.
+- Pilotta genel kapsamla giren her aday **"pilot"** etiketi alır. Normal döneme
+  geçilirken bu adaylar ikinci dükkân şartıyla bir kez daha gözden geçirilir.
+  Tek dükkânın ağzına özgü olan dükkâna özel kapsama taşınır.
+
+**Normal döneme geçiş Cemil'in kararıdır.** Önerilen ölçüt: iki hafta üst
+üste günde 2'den az yeni aday çıkması (sözlük doyuyor demektir).
+
+## 5 · Döngü (normal dönemde haftalık, pilotta günlük — 4.1)
+
+**Her pazartesi (pilotta her sabah), lider:**
 
 1. **Listeyi üret.** Eşiği geçen adaylar, sayaca göre sıralı.
 2. **Her aday için üç sınav:**
