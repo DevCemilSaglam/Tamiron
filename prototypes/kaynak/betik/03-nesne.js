@@ -191,6 +191,10 @@ function kayitKartiHtml(k) {
   var motor = a.motor ? '<span class="ak-motor">' + a.motor + '</span>' : '';
   return '<div class="arac-kart' + (icerde ? ' icerde' : '') + '"' +
       ' data-kayit="' + k.id + '" role="button" tabindex="0"' +
+      /* Bilgisayarda liste açık kaydın YANINDA durur (K-064.2 · 04-genis.css);
+         hangisinin açık olduğu orada söylenir. Telefonda liste ve kayıt
+         aynı anda görünmez, işaret zararsız. */
+      (k.id === ACIK_KAYIT ? ' aria-current="true"' : '') +
       ' aria-label="' + k.plaka + ' — ' + TUR_AD[k.tur] + '">' +
     '<div class="ak-ust">' + plakaHtml(k.plaka, 'plate-lg') + '</div>' +
     '<div class="ak-arac">' +

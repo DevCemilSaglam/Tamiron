@@ -136,10 +136,36 @@ var Ekran = (function () {
     }
     el.scrollTop = 0;
     window.scrollTo(0, 0);
+    yanTazele();
     geriTazele();
     yerTazele();
     return true;
   }
+
+  /* ---- YAN PANEL (K-064.2 · Cemil 18.10: "4 evet") ----
+     Bilgisayarda (≥ 1200 px) servis kaydı açıkken kayıt LİSTESİ de yanında
+     durur — telefonda iki ekran arasında gidip gelmek yerine. Listeyi
+     İKİNCİ KEZ yazmak yerine listenin kendi ekranı `yan` işaretiyle
+     çizilir: tek çizim kodu, iki yer (K-042'nin dersi). `.active` ona
+     verilmez — "görünen ekran tek" sözleşmesi (v1, denetim) bozulmasın.
+     Yerleşim 04-genis.css'te; burada yalnız HANGİ ekranın yanda olduğu. */
+  var YAN = { kayit: 'kayitlar' };
+  var genisMi = window.matchMedia ? window.matchMedia('(min-width: 1200px)') : null;
+  function yanTazele() {
+    var yanAd = (genisMi && genisMi.matches) ? YAN[acik] : null;
+    var hepsi = document.querySelectorAll('.screen.yan');
+    for (var i = 0; i < hepsi.length; i++) {
+      if (hepsi[i].id !== 'screen-' + yanAd) hepsi[i].classList.remove('yan');
+    }
+    if (!yanAd) return;
+    var el = document.getElementById('screen-' + yanAd);
+    var k = kayit[yanAd];
+    if (!el || !k || typeof k.ciz !== 'function') return;
+    el.classList.add('yan');
+    try { k.ciz(el); } catch (e) { console.error('ciz(yan ' + yanAd + '):', e); }
+  }
+  /* Pencere 1200 px sınırını geçince yan panel açılır/kapanır. */
+  if (genisMi && genisMi.addEventListener) genisMi.addEventListener('change', function () { yanTazele(); });
 
   /* Acik ekrani yeniden cizer — KAYDIRMAYI VE ODAGI BOZMADAN.
      goster() sayfayi basa atar; arama kutusunda her tusta basa
@@ -154,6 +180,8 @@ var Ekran = (function () {
     /* Başlık çizimle değişebilir (kayıt ekranında iş türü) — alt
        şeritteki yazı da onunla birlikte tazelenir. */
     yerTazele();
+    /* Kayıtta tutar değişince yandaki listede de değişsin. */
+    yanTazele();
   }
 
   function ac(ad) {

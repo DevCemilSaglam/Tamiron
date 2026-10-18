@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-18 14:41
+  Üretim: 2026-10-18 16:49
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2344,7 +2344,7 @@ kirpilsin. */
      (K-042'nin dersi). */
   .device {
     display: grid;
-    grid-template-columns: 320px minmax(0, 1fr);
+    grid-template-columns: 300px minmax(0, 1fr);
     grid-template-rows: auto auto minmax(0, 1fr);
   }
   .device > .topbar { grid-column: 1 / -1; grid-row: 1; }
@@ -2378,6 +2378,48 @@ kirpilsin. */
   /* ALT GEZİNME GİZLİ: menü zaten görünür, geri/ileri üstte (topbar).
      Ana tuşunun "gidiş-dönüş" işi (K-047.1) sol menüyle gereksizleşir. */
   .device > .botbar { display: none; }
+
+  /* YAN PANEL — liste açık kaydın yanında (Cemil 18.10: "4 evet").
+     Hangi ekranın yanda durduğunu çekirdek söyler (`.screen.yan`,
+     Ekran.yanTazele); burada yalnız yerleşim. Üç sütun:
+       menü | kayıt listesi | açık kayıt */
+  .device:has(.screen.yan) {
+    grid-template-columns: 300px 380px minmax(0, 1fr);
+  }
+  .device > .screen.yan {
+    display: flex;
+    grid-column: 2; grid-row: 3;
+    overflow-y: auto;
+    border-right: 1px solid var(--line);
+    padding: 16px 14px 24px;
+  }
+  .device:has(.screen.yan) > .screen.active:not(#screen-home) { grid-column: 3; }
+  /* Yan listede kartlar tek sütun — sütun dar. */
+  .screen.yan #kytListe { grid-template-columns: minmax(0, 1fr); }
+  /* Açık kayıt listede işaretli (aria-current, 03-nesne). */
+  .arac-kart[aria-current="true"] {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary);
+  }
+  /* Kayıt sütunu yan panelle daralır: iç düzen TEK sütun, telefondaki
+     sırayla. 1.500 px'ten genişte yine iki sütun (aşağıda). */
+  .device:has(.screen.yan) #screen-kayit.active {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "bas" "kun" "yap" "isl" "sur" "aci" "cub";
+  }
+}
+
+@media (min-width: 1500px) {
+  .device:has(.screen.yan) #screen-kayit.active {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-areas:
+      "bas bas"
+      "kun kun"
+      "yap isl"
+      "yap sur"
+      "aci sur"
+      "cub cub";
+  }
 }
 
 
@@ -5015,10 +5057,36 @@ var Ekran = (function () {
     }
     el.scrollTop = 0;
     window.scrollTo(0, 0);
+    yanTazele();
     geriTazele();
     yerTazele();
     return true;
   }
+
+  /* ---- YAN PANEL (K-064.2 · Cemil 18.10: "4 evet") ----
+     Bilgisayarda (≥ 1200 px) servis kaydı açıkken kayıt LİSTESİ de yanında
+     durur — telefonda iki ekran arasında gidip gelmek yerine. Listeyi
+     İKİNCİ KEZ yazmak yerine listenin kendi ekranı `yan` işaretiyle
+     çizilir: tek çizim kodu, iki yer (K-042'nin dersi). `.active` ona
+     verilmez — "görünen ekran tek" sözleşmesi (v1, denetim) bozulmasın.
+     Yerleşim 04-genis.css'te; burada yalnız HANGİ ekranın yanda olduğu. */
+  var YAN = { kayit: 'kayitlar' };
+  var genisMi = window.matchMedia ? window.matchMedia('(min-width: 1200px)') : null;
+  function yanTazele() {
+    var yanAd = (genisMi && genisMi.matches) ? YAN[acik] : null;
+    var hepsi = document.querySelectorAll('.screen.yan');
+    for (var i = 0; i < hepsi.length; i++) {
+      if (hepsi[i].id !== 'screen-' + yanAd) hepsi[i].classList.remove('yan');
+    }
+    if (!yanAd) return;
+    var el = document.getElementById('screen-' + yanAd);
+    var k = kayit[yanAd];
+    if (!el || !k || typeof k.ciz !== 'function') return;
+    el.classList.add('yan');
+    try { k.ciz(el); } catch (e) { console.error('ciz(yan ' + yanAd + '):', e); }
+  }
+  /* Pencere 1200 px sınırını geçince yan panel açılır/kapanır. */
+  if (genisMi && genisMi.addEventListener) genisMi.addEventListener('change', function () { yanTazele(); });
 
   /* Acik ekrani yeniden cizer — KAYDIRMAYI VE ODAGI BOZMADAN.
      goster() sayfayi basa atar; arama kutusunda her tusta basa
@@ -5033,6 +5101,8 @@ var Ekran = (function () {
     /* Başlık çizimle değişebilir (kayıt ekranında iş türü) — alt
        şeritteki yazı da onunla birlikte tazelenir. */
     yerTazele();
+    /* Kayıtta tutar değişince yandaki listede de değişsin. */
+    yanTazele();
   }
 
   function ac(ad) {
@@ -7405,6 +7475,10 @@ function kayitKartiHtml(k) {
   var motor = a.motor ? '<span class="ak-motor">' + a.motor + '</span>' : '';
   return '<div class="arac-kart' + (icerde ? ' icerde' : '') + '"' +
       ' data-kayit="' + k.id + '" role="button" tabindex="0"' +
+      /* Bilgisayarda liste açık kaydın YANINDA durur (K-064.2 · 04-genis.css);
+         hangisinin açık olduğu orada söylenir. Telefonda liste ve kayıt
+         aynı anda görünmez, işaret zararsız. */
+      (k.id === ACIK_KAYIT ? ' aria-current="true"' : '') +
       ' aria-label="' + k.plaka + ' — ' + TUR_AD[k.tur] + '">' +
     '<div class="ak-ust">' + plakaHtml(k.plaka, 'plate-lg') + '</div>' +
     '<div class="ak-arac">' +
@@ -13505,7 +13579,7 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
                    : kurulu ? 'gerekmez (kurulu)'
                    : 'gelmedi';
     durum.innerHTML =
-      'Sürüm <b>4f28d628</b><br>' +
+      'Sürüm <b>50873fde</b><br>' +
       'Açılış: ' + (kurulu ? 'uygulama' : 'tarayıcı') + ' · ' +
       location.protocol.replace(':', '') + '<br>' +
       'Çevrimdışı servis: ' + servis + '<br>' +

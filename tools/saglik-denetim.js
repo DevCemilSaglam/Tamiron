@@ -2654,8 +2654,18 @@ function stilMetni() {
       ek('GENIS-DUZEN', 'kayit', 'k-yapilanlar ya da kIslemler yok -- olculemedi');
     } else {
       var by = y.getBoundingClientRect(), bi = i.getBoundingClientRect();
-      if (bi.left < by.right - 1) ek('GENIS-DUZEN', 'kayit', 'Yapilanlar ile Islemler yan yana degil (' + Math.round(by.right) + ' / ' + Math.round(bi.left) + ')');
-      else if (Math.abs(by.top - bi.top) > 2) ek('GENIS-DUZEN', 'kayit', 'yan yana kartlar ayni hizada degil: ' + Math.round(by.top) + ' / ' + Math.round(bi.top) + ' px');
+      var yanyana = bi.left >= by.right - 1;
+      /* 1200–1499 px: yan liste kayit sutununu daraltir, ic duzen TEK
+         sutun olur (04-genis.css). Digerlerinde iki sutun. */
+      var tekSutun = window.innerWidth >= 1200 && window.innerWidth < 1500;
+      if (tekSutun) {
+        if (yanyana) ek('GENIS-DUZEN', 'kayit', 'yan liste acikken kayit TEK sutun olmali (sutun dar)');
+        else if (bi.top < by.bottom - 1) ek('GENIS-DUZEN', 'kayit', 'tek sutunda kartlar ust uste biniyor');
+      } else if (!yanyana) {
+        ek('GENIS-DUZEN', 'kayit', 'Yapilanlar ile Islemler yan yana degil (' + Math.round(by.right) + ' / ' + Math.round(bi.left) + ')');
+      } else if (Math.abs(by.top - bi.top) > 2) {
+        ek('GENIS-DUZEN', 'kayit', 'yan yana kartlar ayni hizada degil: ' + Math.round(by.top) + ' / ' + Math.round(bi.top) + ' px');
+      }
     }
     if (window.innerWidth >= 1200) {
       var h = document.getElementById('screen-home'), s = document.getElementById('screen-kayit');
@@ -2664,6 +2674,21 @@ function stilMetni() {
       else if (bs.left < bh.right - 1) ek('GENIS-DUZEN', 'kayit', 'acik ekran menunun SAGINDA degil');
       var bb = document.querySelector('.device > .botbar');
       if (bb && getComputedStyle(bb).display !== 'none') ek('GENIS-DUZEN', 'kabuk', 'bilgisayarda alt gezinme gorunuyor -- menu zaten solda');
+      /* c) YAN PANEL (Cemil 18.10 "4 evet"): kayit acikken liste menu ile
+            kayit ARASINDA gorunur, acik kayit listede isaretli; listeye
+            .active VERILMEZ (tek gorunen ekran sozlesmesi). */
+      var l = document.getElementById('screen-kayitlar');
+      var bl = l.getBoundingClientRect();
+      if (!l.classList.contains('yan') || getComputedStyle(l).display === 'none' || bl.width < 200) {
+        ek('GENIS-DUZEN', 'kayitlar', 'bilgisayarda kayit acikken liste YANINDA gorunmuyor');
+      } else {
+        if (!(bl.left >= bh.right - 1 && bl.right <= bs.left + 1)) ek('GENIS-DUZEN', 'kayitlar', 'yan liste menu ile kayit arasinda degil');
+        if (l.classList.contains('active')) ek('GENIS-DUZEN', 'kayitlar', 'yan listeye .active verildi -- tek gorunen ekran sozlesmesi bozuldu');
+        var sec = l.querySelector('[data-kayit="' + ilk.id + '"]');
+        if (!sec || sec.getAttribute('aria-current') !== 'true') ek('GENIS-DUZEN', 'kayitlar', 'acik kayit yan listede isaretli degil');
+      }
+      Ekran.ac('home');
+      if (l.classList.contains('yan')) ek('GENIS-DUZEN', 'kayitlar', 'kayit kapaninca yan liste KALDI');
     }
     window.ACIK_KAYIT = yk;
   })();

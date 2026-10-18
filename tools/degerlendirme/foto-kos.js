@@ -286,7 +286,10 @@ class KaliciHata extends Error { constructor(st, m) { super(m); this.status = st
       /* num_ctx 8192 (18.10): varsayılan bağlam çok büyük — bellek 22 GB'lık
          makinede tükendi, Windows sayfa dosyası C'yi doldurdu. Bir ruhsat
          (görüntü + istem + 18 alan) ~3.000 jetonda kalıyor. */
-      const govde = JSON.stringify({ model: MODEL, stream: false, format: semaSade(SEMA), options: { temperature: 0, num_ctx: 8192 },
+      /* think:false (18.10): Gemma 4 koşusunda 9 ruhsatın 3'ünde içerik BOŞ
+         geldi ("Unexpected end of JSON input") — model çıktıyı düşünmeye
+         harcadı. Alan okumak düşünme istemiyor. */
+      const govde = JSON.stringify({ model: MODEL, stream: false, think: false, format: semaSade(SEMA), options: { temperature: 0, num_ctx: 8192 },
         messages: [{ role: 'system', content: AYAR.sistem }, { role: 'user', content: ISTEM, images: [veri] }] });
       const { durum, metin } = await new Promise((coz, red) => {
         const r = require('http').request({ host: '127.0.0.1', port: 11434, path: '/api/chat', method: 'POST',

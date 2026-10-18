@@ -253,6 +253,23 @@ Yeni özellik değil, **aynı ekranların geniş düzeni**. Kurallar:
   1280 px'te de koşuyor (57. test). **Ertelenen:** liste ile açık kaydı
   AYNI ANDA göstermek, çünkü ekran sistemi tek ekran gösteriyor; bu ayrı bir
   mimari adım ve Cemil onayına açık.
+- **Cemil 18.10 gece: *"4 evet"*** — yan panel kuruldu. Bilgisayarda kayıt
+  açıkken liste, menü ile kayıt arasında durur (300 | 380 | kalan). Liste
+  ikinci kez yazılmadı; listenin kendi ekranı çekirdekteki `yanTazele` ile
+  `yan` işaretiyle çizilir. `.active` tek kalır. Açık kayıt listede
+  işaretli (`aria-current`). 1.200–1.499 px'te kayıt sütunu daraldığı için
+  iç düzen tek sütun, 1.500 px üstünde iki sütun. 57. test genişledi,
+  negatif doğrulandı; 320/375/430/768/1280/1600 px'te 0 bulgu.
+
+**64.3b · Cemil 18.10 gece: *"Muhasebe soruları tamam."*** Öneri
+(`arastirma/MUHASEBE-KAPSAM-OTOMIX.md`) belgedeki varsayımlarla kabul edildi:
+- "OtoMix'e göre" = görünüm (modül tahtası), kapsam değil;
+- Faz 1 = prototipte çalışanı backend'e taşı (kasa · gider · alacak · iş
+  başına kâr · CSV; KDV/tevkifat için veri modelinde yer);
+- Faz 2 = gelen fatura fotoğrafı → alış + parçacıya borç;
+- Faz 3 = fatura kesmek, önce soru;
+- banka, çek, stok, tam cari ve POS dışarıda; tek rol.
+**Backend fazı bununla açılabilir** (CLAUDE.md faz satırı geçiş günü güncellenir).
 
 **64.3 · Muhasebe backend'de, OtoMix'e göre.** Referans:
 `arastirma/OTOMIX-HARITA.md`, `MUHASEBE-KAPSAMI.md`, `KDV.md`,

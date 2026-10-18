@@ -201,3 +201,16 @@ iki kopya 22 GB yer tutuyordu. Fazla süreçler kapatıldı, bağlam penceresi
 8.192'ye indirildi. Ayrıca bir **bellek bekçisi** kuruldu: boş RAM 2 GB'ın
 altına düşerse koşuyu durdurur. Model C'den `D:\Ollama\models`'e taşındı
 (`OLLAMA_MODELS`).
+
+### Yerel Gemma 4 12B — sonuç: ELENİR (18.10 gece)
+Koşu 9 ruhsattan sonra yarıda kaldı: yerel model sunucusu çöktü (500,
+"connection forcibly closed"). Koşucu yarım sonucu kaydetti. Okunan 9 belgede:
+- **şase 2 doğru, 4 YANLIŞ**, 3 belgede içerik boş geldi (model çıktıyı
+  düşünmeye harcadı; artık `think:false`);
+- belge tam 1/9;
+- ruhsat başına ~69 sn (ilk tek belgelik denemede 467 sn; bağlam
+  küçültülünce hızlandı).
+
+12B Gemma, 17 karakterlik şaseyi güvenilir okuyamıyor. Ruhsatta en kritik
+alan şase (K-068) olduğu için elenir. Sırada OCR'da güçlü bilinen
+**Qwen3-VL 8B** (yerel, 6,1 GB) var.
