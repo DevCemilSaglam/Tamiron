@@ -3,7 +3,7 @@
  "surum": 1,
  "tarih": "15.09.2026",
  "kaynak": "Cemil'in 14–15.09'da gönderdiği 46 gerçek ruhsat fotoğrafı",
- "dogrulama": {"dogrulandi": true, "kim": "Cemil", "tarih": "18.10.2026", "sonuc": "46/46 dogru, 0 duzeltme", "yol": "yerel kontrol sayfasi (kontrol-ruhsat.html, fotograf yaninda); kisisel veri yayinlanmadi", "not": "Alanlari fotograflardan Claude okudu (15.09); Cemil fotografla tek tek karsilastirip onayladi. TASLAK kalkti (K-064.1)."},
+ "dogrulama": {"dogrulandi": true, "kim": "Cemil", "tarih": "18.10.2026", "sonuc": "46/46 dogru, 0 duzeltme", "yol": "yerel kontrol sayfasi (kontrol-ruhsat.html, fotograf yaninda); kisisel veri yayinlanmadi", "not": "Alanlari fotograflardan Claude okudu (15.09); Cemil fotografla tek tek karsilastirip onayladi. TASLAK kalkti (K-064.1).", "duzeltme": "18.10 model kosusu (A-M35): uc modelin ucu de AYNI plakayi olcutten farkli okudu; fotografa bakildi, olcut YANLISTI: r26 16 LEC 87 -> 16 DEC 87, r39 41 ER 309 -> 41 FR 309, r41 41 BBH 883 -> 41 RRH 883. Insan dogrulamasi da yanilabilir; modellerin birlestigi yer olcutu sinar."},
  "kisiselAlanlar": {
   "⚠️ 15.09 KURAL DEĞİŞTİ": "Cemil: 'Bu alanlar da gerekli. Çünkü bu alanlara fatura kesilecek vb.' — RUHSAT-OKUMA Bulgu 2 bunları elemişti, gerekçesi doğruydu ama TEK BİR İŞE (araç kaydı) bakıyordu. Fatura TC/vergi numarasına ve adrese kesilir. Kural geri alındı (K-050).",
   "okunacak": [
@@ -786,7 +786,7 @@
     "parmak-kapatiyor"
    ],
    "beklenen": {
-    "plaka": "16 LEC 87",
+    "plaka": "16 DEC 87",
     "ilkTescil": "28/06/2011",
     "marka": "OPEL",
     "tip": "S-D",
@@ -1161,7 +1161,7 @@
     "tc-gorunur"
    ],
    "beklenen": {
-    "plaka": "41 ER 309",
+    "plaka": "41 FR 309",
     "ilkTescil": "19-11-2013",
     "marka": "VOLKSWAGEN",
     "tip": "2KN",
@@ -1211,7 +1211,7 @@
     "tc-gorunur"
    ],
    "beklenen": {
-    "plaka": "41 BBH 883",
+    "plaka": "41 RRH 883",
     "ilkTescil": "14/04/2021",
     "marka": "VOLKSWAGEN",
     "tip": "5N",

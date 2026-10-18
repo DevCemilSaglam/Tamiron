@@ -306,7 +306,11 @@ function fiyatSayi(v) {
      yeniden çeker) · YANLIŞ okudu (en pahalısı: parçacı yanlış parça
      gönderir). */
   if (TUR === 'ruhsat') {
-    const norm = v => (v == null ? '' : String(v).toUpperCase().replace(/[^A-Z0-9]/g, ''));
+    /* O→0, I→1, Q→0: şase standardında (ISO 3779) bu üç harf YOKTUR;
+       "WOLO…" ile "W0L0…" AYNI şasedir (18.10 Haiku koşusu: 3 "yanlışın"
+       2'si yalnız buydu). Uzunluk farkı ise gerçek hatadır. */
+    const norm = v => (v == null ? '' : String(v).toUpperCase().replace(/[^A-Z0-9]/g, '')
+      .replace(/O/g, '0').replace(/I/g, '1').replace(/Q/g, '0'));
     const sase = { dogru: 0, bos: 0, yanlis: 0, yanlisListe: [] };
     kayitlar.forEach(k => {
       const c = cevaplar[k.id]; if (!c || c.hata) return;

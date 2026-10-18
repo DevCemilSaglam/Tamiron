@@ -10,6 +10,41 @@
 
 ---
 
+## K-067 · Fotoğraf okuma ölçüldü: ruhsat ve parça için Opus 5.5 aday (18.10.2026)
+
+> **Cemil, 18.10:** *"Gerçek doğruluğu ve maliyeti ölçelim."* (A-M35 → KAPANDI)
+
+**67.1 · Sonuç** (`arastirma/FOTO-OLCUM.md`). 46 ruhsat ve 27 parça listesi,
+üç model:
+- **Ruhsat:**
+  - Opus 5.5: şase **46/46**, kritik alan yanlışı **0**, plaka uydurma yok.
+  - Sonnet 5.5 en önemli tuzakta plaka **uydurdu** → elenir (K-061.3c kuralı).
+  - Haiku 5.5 iki şaseyi yanlış okudu; biri 17 karakter, yani sessizce geçer
+    → elenir (K-066.4).
+- **Parça:** Opus ve Sonnet liste tamlığında eşit (%56). Opus ditto (%100)
+  ve fiyatta (%91) önde.
+
+**67.2 · Öneri — Cemil onayına açık: ruhsat ve parça listesi Opus 5.5.**
+Maliyet ruhsat başına ~3 cent, dükkân başına ~$6/ay. YAPAY-ZEKA §5'in
+*"karar maliyetle değil doğrulukla verilir"* kuralına göre seçim bu.
+Ürüne koyma backend fazında (K-055.4).
+
+**67.3 · Ölçütte üç plaka yanlıştı.** Üç model aynı şeyi okudu, fotoğraf
+modelleri doğruladı. İnsan doğrulaması da yanılır; modellerin birleştiği
+ama ölçütten ayrıldığı yer ölçütü sınar. Düzeltildi.
+
+**67.4 · Ölçüm aletinde 7 kusur bulundu ve düzeltildi.** Biri ağır: **parça
+listesinin cetveli hiç yoktu** ve her liste "TAM" görünüyordu.
+Liste: FOTO-OLCUM §4.
+
+**67.5 · Açık iyileştirmeler (ölçülmeden ürüne girmez):**
+- (a) Opus silik koltuk sayısına "5" yazıyor;
+- (b) parça listesinde ustanın yazdığını "düzeltiyor" ("Sibop kayıt" →
+  "Subap kayışı").
+İkisi de istem işi. Bir sonraki koşu bu iki sınıfı hedefler.
+
+---
+
 ## K-066 · Ruhsat ZORUNLU; şase okunmadan devam yok — "yalnız parça sor" yolu yok (18.10.2026)
 
 > **Cemil, 18.10:** *"Yalnız parça sor yok. Ruhsat okunmak zorunda. Servis

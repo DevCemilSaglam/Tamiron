@@ -127,11 +127,19 @@
           else { uydurmaAlanlar.push(alan + '="' + g + '"'); }
           return;
         }
+        /* 18.10 (A-M35 koşusu) iki düzeltme:
+           · alan karşılaştırması sadeAlan ile — "CİTROEN"/"CITROEN" büyük
+             harf yazımıdır, okuma hatası değil; şasede O/0, I/1 aynıdır
+             (ISO 3779'da O, I, Q yok).
+           · BOŞ bırakılan kritik alan KRİTİK-YANLIŞ değil EKSİK: boş şase
+             ustaya ruhsatı yeniden çektirir, YANLIŞ şase sessizce geçer
+             (K-066). İkisini aynı saymak temkinli modeli cezalandırır. */
+        var esit = sadeAlan(alan, g) === sadeAlan(alan, b);
         if (bosG) { yanlisAlanlar.push(alan + '=(bos)'); }
-        else if (sadeMetin(g) === sadeMetin(b)) { dogruSayisi++; }
+        else if (esit) { dogruSayisi++; }
         else { yanlisAlanlar.push(alan + '="' + g + '"'); }
 
-        if (kritik.indexOf(alan) >= 0 && sadeMetin(g) !== sadeMetin(b)) {
+        if (kritik.indexOf(alan) >= 0 && !bosG && !esit) {
           kritikYanlis.push(alan);
         }
       });
@@ -201,6 +209,13 @@
   function benzerlik(a, b) {
     a = sadeMetin(a); b = sadeMetin(b);
     if (a === b) return 1;
+    /* AD + NOT aynı satırdır (18.10 Opus koşusu): "Ön amortisör (Sağ-Sol)"
+       ile "Ön amortisör", "Buji kablo sağ-sol" ile "Buji kablo". Model
+       satıra kâğıttaki notu eklemiş; satırı kaçırmamış. Kısa olan uzunun
+       BAŞINDA geçmeli ve en az 4 harf olmalı — "Rot" gibi kısa bir ad her
+       satıra uymasın. */
+    var kisa = a.length <= b.length ? a : b, uzun = a.length <= b.length ? b : a;
+    if (kisa.length >= 4 && uzun.indexOf(kisa) === 0) return 0.9;
     var m = a.length, n = b.length;
     if (!m || !n) return 0;
     var d = [], i, j;
@@ -273,6 +288,16 @@
              ' · fiyat %' + yz(t.fiyatDogru, t.fiyat) + ' (' + t.fiyatDogru + '/' + t.fiyat + ')' +
              ' · iptal ' + t.iptalDogru + '/' + t.iptal + ' · işçilik ' + t.iscilikDogru + '/' + t.iscilik +
              ' · FAZLA satır: ' + t.fazla + (t.hata ? ' · HATA: ' + t.hata : '');
+    return t;
+  }
+
+  /* Belge alanı karşılaştırması: sadeMetin + ı/i katlama; şase ve motor
+     no'da O→0, I→1, Q→0 (yalnız alanPuanla — ses cetveli etkilenmez). */
+  function sadeAlan(alan, x) {
+    var t = sadeMetin(x).replace(/ı/g, 'i');
+    if (alan === 'sase' || alan === 'motorNo') {
+      t = t.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/O/g, '0').replace(/I/g, '1').replace(/Q/g, '0');
+    }
     return t;
   }
 
