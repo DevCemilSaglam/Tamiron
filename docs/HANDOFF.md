@@ -1,6 +1,6 @@
 # TAMIRON — DEVİR (HANDOFF.md)
 
-> **Son güncelleme:** 18.10.2026 *(K-063 · ses ölçüm dönemi kapandı · Tur 8 bitti; Tur 9: ölçüt → geniş ekran → muhasebe backend)*
+> **Son güncelleme:** 18.10.2026 akşam *(K-064…K-069 · 9.1 ölçüt bitti, 9.2 geniş ekran prototipte, 9.3 muhasebe önerisi Cemil'de · yerel Gemma koşusu arka planda)*
 > Bu belge *"yarın buraya oturan kişi ne bilmeli"* sorusunu cevaplar.
 > Belge listesi değil, **durum** belgesidir.
 
@@ -24,7 +24,7 @@ tıklanabilir prototip.
 | Derleme denetimi | **8** kontrol, bulursa `exit 1` (K-033.11). **7. kontrol artık ÜRETİLEN dosyadaki betiği ayrıştırıyor** — yerleştirmeden önceki betiğe bakıyordu ve `$'` bozulmasını görmedi (K-056.4). **`pwa-build` de enjekte ettiği betiği doğruluyor** (07.09) |
 | Kararlar | **K-001 … K-064** · A-M48 kapandı (K-063) · sözlük bakımı onaylı giriş (`SOYLEYIS-BAKIM.md`) · açık: **A-M34** (ruhsat doğrulaması Cemil'de) |
 | Ses | Cümle → **işlem nesnesi** → onay. **İşi ses tanımaz: sahibi olan ekran şemasını bildirir** (`Islem.tanim`, `betik/04-islem.js`; 12 şema · 7 ekran — K-056). Onay ekranı ve uygulama şemadan. `ISLEM_SEMALARI()` = modele araç tanımı. Bağlam dışı iş tanınıyor, bağlamın kendi işi **öneri** olur, iş bitince **"Kayda dön"** (Tur 7) |
-| Sıradaki | **Tur 9 (K-064):** 9.1 ölçüt doğrulama (parça bitti, ruhsat Cemil'de) → 9.2 tablet/bilgisayar düzeni → 9.3 muhasebe kapsamı (OtoMix) → backend fazı |
+| Sıradaki | **Cemil'in cevabını bekleyenler:** (1) K-067.2b ruhsat = Gemini 3.8 Flash + plaka karşılaştırması (K-069) · (2) 9.3 muhasebe kapsamı, dört soru (`arastirma/MUHASEBE-KAPSAM-OTOMIX.md`) · (3) araç kataloğu: TSB izni / TecDoc teklifi (`arastirma/ARAC-KATALOG.md`) · (4) bilgisayarda liste+kayıt aynı anda (mimari adım) · (5) Anthropic kredisi yüklenince Opus maliyet denemeleri. **Arka planda:** yerel Gemma 4 12B ruhsat koşusu (`D:\TamironGecici\gemma-ruhsat.log`, sonuç `tools/degerlendirme/sonuc-ruhsat-gemma4-12b.json`; bellek bekçisi açık) |
 | Değerlendirme | `tools/degerlendirme/` — **üç set, tek cetvel**: ses (40 cümle · bugünkü motor **%93**) · **ruhsat (46 belge · 14 teknik + 4 kişisel alan; kişisel set `.gitignore`'da)** · **parça listesi (27 liste · 258 satır)**. Fotoğraf setleri **TASLAK**: ölçütü model yazdı, doğrulanmadı (K-049.1, A-M34) |
 | Paket | `app/` — 9 dosya, çevrimdışı, düz yapı |
 
