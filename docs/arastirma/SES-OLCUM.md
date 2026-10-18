@@ -805,3 +805,39 @@ tasarlayamıyor ama tasarlanmış sesi okuyabiliyor; ayrı kota; klasör -lite).
 **Sonuç:** şive değil HIZ belirleyici. Saniyede ~2,5 kelimenin üstünde
 (heceler yutulunca) en iyi tanıyıcı bile %56–67'ye iniyor; sakin konuşmada
 %86–92. Chrome dökümleri gelince kademe (b) bu üç ses için de hesaplanır.
+
+### 17.3 · Sekiz sesin tam tablosu — kademe (b) (18.10)
+
+Chrome dökümleri üç lite sese de gelince (`parali-chrome-yapay2.json`, 225
+kayıt) kademe (b) hepsi için hesaplandı. Kural K-062 (b): Chrome + motor önce;
+`oneri` ya da `plakasiz` çıkarsa aynı ses Speechmatics + ipucuna gider.
+Kurmaca dükkânda (buyuk-set.json), Chrome'un hata verdiği kayıtlar düşülerek.
+
+| ses | n | konuşma hızı | Chrome | Speechmatics | **kademe (b)** | paralıya |
+|---|---|---|---|---|---|---|
+| kadın — sakin (lite) | 25 | 1,5 | %82 | %92 | **%90** | %24 |
+| İç Anadolu | 25 | — | %90 | %86 | **%90** | %8 |
+| Ege | 25 | — | %78 | %86 | **%86** | %32 |
+| Doğu | 25 | — | %84 | %76 | **%88** | %20 |
+| Karadeniz | 49 | 2,3 | %78 | %79 | **%84** | %20 |
+| İstanbul — hızlı | 24 | 2,7 | %56 | %67 | **%67** | %42 |
+| hızlı-2 — Rizeli (lite) | 25 | 2,7 | %66 | %58 | **%70** | %32 |
+| hızlı-1 — ağzında (lite) | 24 | 2,5 | %44 | %54 | **%54** | %50 |
+| **TOPLAM** | **222** | | **%73** | **%75** | **%79** | **%27** |
+
+(Hızlı-1'de bir kaydı Chrome hata verdi → n24; Speechmatics %56 yerine bu 24
+kayıtta %54.)
+
+**Okuma:**
+- **Kademe sekiz sesin yedisinde iki tanıyıcının iyisine eşit ya da üstünde.**
+  Tek istisna kadın sesi: %90, yalnız-Speechmatics %92 (bir cümle; Chrome'un
+  "emin" göründüğü ama yanlış anladığı bir kayıt paralıya gitmedi). Toplamda
+  kademe tek başına her iki tanıyıcıdan +4–6 puan iyi, paranın %27'siyle.
+- **Pay kendini ayarlıyor:** İç Anadolu %8 → hızlı-1 %50. Para zor konuşmaya
+  harcanıyor — tasarlandığı gibi.
+- **Hız tavanı:** saniyede ~2,5 kelimenin üstünde kademe bile %54–70. Burada
+  tanıyıcı değiştirmek çare değil (yutulan hece hiçbir dökümde yok); çare onay
+  ekranı + "tekrar söyle". Gerçek ustanın hızı yayında ölçülecek (K-060
+  kayıtları).
+- **Sınır:** yapay ses, aynı şablon cümleler, ses başına 25 cümle → sayılar
+  ±%8 civarı oynar. Sıralama ve yön güvenilir; mutlak yüzde değil.
