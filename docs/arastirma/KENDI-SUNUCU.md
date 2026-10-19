@@ -54,18 +54,52 @@ birlikte sığar, büyümeye yer kalır. 96 GB'lık RTX PRO 6000 daha rahat.
   (bugünkü kademe bunu zaten yapabilir).
 - **Bakım:** model güncelleme, izleme, güvenlik. Bunlar insan zamanı ister.
 
-## 4 · API ile karşılaştırma
+## 4 · API ile karşılaştırma — 100 ve 1.000 dükkân (19.10 düzeltildi)
 
-| | dükkân başına/ay | 100 dükkân | 1.000 dükkân |
-|---|---|---|---|
-| **API** (Gemini ruhsat ~0,5 ¢ × 150 + Speechmatics kademe ~$0,11) | **~$1** | **~$100** | ~$1.000 |
-| **Kendi sunucu** (1 ana + yedek) | — | ~$1.000–2.000 | ~$2.000–3.000 |
+> ⚠️ İlk yazımda 1.000 dükkân için kendi sunucuyu ~$2.000–3.000 demiştim ve
+> başa baş noktasını 1.000–2.000 dükkân diye yazmıştım. Hesap yükten yeniden
+> yapıldı; **ikisi de iyimserdi.**
 
-**Başa baş noktası kabaca 1.000–2.000 dükkân.** Daha önce kendi sunucunun
-gerekçesi **para değil**:
+**Varsayımlar:** ayda 26 iş günü, dükkân başına günde 5 ruhsat ve 20 sesli
+komut. Ruhsat sayısı **üst sınır**: K-065 gereği ruhsat yalnız **yeni araçta**
+çekiliyor, müdavim müşteri arttıkça düşer.
+
+**API (bugünkü yol):**
+
+| | 100 dükkân | 1.000 dükkân |
+|---|---|---|
+| Ruhsat, Gemini 3.8 Flash (0,48 ¢ · 2027'den 0,96 ¢) | $62 · $125 | **$624 · $1.248** |
+| Ses, Speechmatics kademe b (~$0,11/dükkân) | $11 | $110 |
+| **Toplam / ay** | **~$75–135** | **~$730–1.360** |
+| Dükkân başına | ~$0,75–1,35 | ~$0,73–1,36 |
+
+API **doğrusal** büyür: dükkân başına maliyet 10 dükkânda da 1.000'de de aynı.
+
+**Kendi sunucu, 1.000 dükkân:**
+- **Ruhsat:** günde 5.000 ruhsat × ~10 sn ≈ **14 GPU-saat/gün**. İş 10 saatlik
+  mesaiye, üstelik sabaha yığılıyor; zirvede **~3 ekran kartı** gerekir.
+- **Ses:** günde 20.000 komut ≈ 28 saat ses. Whisper için küçük bir yük, ama
+  1 saniyelik gecikme için ayrılmış kapasite ister.
+- **Toplam:** 3 sunucu + 1 yedek ≈ **~$4.000/ay**, artı bakım için insan zamanı.
+  Dükkân başına **~$4**.
+
+**Sonuç — 1.000 dükkânda kendi sunucu UCUZ DEĞİL:** API ~$0,7–1,4, kendi
+sunucu ~$4. Kendi sunucunun her ekran kartı ruhsat zirvesinde ~350 dükkân
+taşıyor, yani dükkân başına ~$2,9. Bu, API'nin her iki fiyatından da pahalı.
+
+**Hesabı ne değiştirir:** ruhsat modelinin hızı. Qwen3-VL 30B-A3B gibi her
+adımda yalnız ~3B parametre çalıştıran bir model ruhsatı ~2–3 sn'de okursa,
+bir kart ~1.500 dükkân taşır. O zaman dükkân başına ~$0,7, yani Gemini'nin
+2027 fiyatıyla **başa baş**. Bu hız ve o modelin doğruluğu **ölçülmedi**.
+
+**Kendi sunucunun gerekçesi yine para değil:**
 - **Veri Türkiye'de kalır** (KVKK, yurt dışına aktarım).
 - Hiçbir şirketin fiyat ya da koşul değişikliğine bağlı kalınmaz. Gemini 3.8
   Flash'ın fiyatı 2027'de ikiye katlanıyor.
+- Model, biriken düzeltmelerle ustanın ağzına alıştırılabilir (ince ayar).
+
+**Ölçek:** dükkân başına aylık yapay zekâ maliyeti ~$1. Bu, abonelik fiyatının
+yanında küçük; yani bu kararı maliyet değil gizlilik ve bağımsızlık belirler.
 
 ## 5 · Nasıl karar veririz — sıra
 
