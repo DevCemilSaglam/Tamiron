@@ -111,6 +111,13 @@ yedeği. (FOTO-OLCUM §7)
 yanlıştı, plaka okunuyordu (34 NE 6451). Sonnet doğru okumuştu. Gerçek kritik
 hatası 1 (r24).
 
+**67.2c · KARAR — Cemil 19.10: *"Şimdilik gemini kullanalım."*** Ruhsat okuma
+= **Gemini 3.8 Flash** (ücretli katman) + **plaka koruması (K-069)**. Yerel
+denemeler (Gemma 4 12B, Qwen3-VL 8B) bu dizüstünde yetmedi. Kendi sunucu
+seçeneği: `arastirma/KENDI-SUNUCU.md` (gerekçesi para değil gizlilik;
+başa baş ~1.000–2.000 dükkân; sıradaki adım saatlik kiralık ekran kartıyla
+~$5–10'luk ölçüm, Cemil onayıyla).
+
 **67.3 · Ölçütte üç plaka yanlıştı.** (+ r31 = **dört**) Üç model aynı şeyi okudu, fotoğraf
 modelleri doğruladı. İnsan doğrulaması da yanılır; modellerin birleştiği
 ama ölçütten ayrıldığı yer ölçütü sınar. Düzeltildi.
