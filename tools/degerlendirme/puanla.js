@@ -295,6 +295,8 @@
      no'da O→0, I→1, Q→0 (yalnız alanPuanla — ses cetveli etkilenmez). */
   function sadeAlan(alan, x) {
     var t = sadeMetin(x).replace(/ı/g, 'i');
+    /* Plakada boşluk yazım biçimidir (34BJV625 = 34 BJV 625) — 19.10 Qwen koşusu. */
+    if (alan === 'plaka') t = t.replace(/\s+/g, '');
     if (alan === 'sase' || alan === 'motorNo') {
       t = t.toUpperCase().replace(/[^A-Z0-9]/g, '').replace(/O/g, '0').replace(/I/g, '1').replace(/Q/g, '0');
     }

@@ -214,3 +214,23 @@ Koşu 9 ruhsattan sonra yarıda kaldı: yerel model sunucusu çöktü (500,
 12B Gemma, 17 karakterlik şaseyi güvenilir okuyamıyor. Ruhsatta en kritik
 alan şase (K-068) olduğu için elenir. Sırada OCR'da güçlü bilinen
 **Qwen3-VL 8B** (yerel, 6,1 GB) var.
+
+### Yerel Qwen3-VL 8B — deneme (19.10)
+3 ruhsat, tam çözünürlük, `think:false`:
+- **r27 (temiz):** şase doğru; 18 alanın 17'si (ilk tescil "Q2/07/2018").
+- **r02, r08 (silik):** içerik yarım kaldı ("Unexpected end of JSON
+  input"). Model büyük olasılıkla aynı şeyi tekrarlayıp bağlam sınırına
+  dayandı.
+- Süre: 3 belge 14,8 saat görünüyor, ama bilgisayar 22:50'den sabaha kadar
+  **uykudaydı**. Gerçek süre ruhsat başına birkaç dakika.
+- Model yüklüyken boş RAM 3,5 GB'a indi.
+
+**Sonuç — bu dizüstünde yerel model işe yaramıyor:** Gemma 4 12B şaseyi
+yanlış okudu, Qwen3-VL 8B silik belgede cevap üretemedi; ikisi de ruhsat
+başına dakikalar sürüyor. Yerel yolun ürün karşılığı, ekran kartlı kendi
+sunucumuz olurdu; bu ayrı bir maliyet ve bu ölçümler o yolu
+desteklemiyor.
+
+**Cetvel düzeltmesi:** plakada boşluk yazım biçimidir; "34BJV625" ile
+"34 BJV 625" artık eşit. Önceki koşuların sonuçları bundan etkilenmedi
+(hepsi boşluklu yazmıştı).
