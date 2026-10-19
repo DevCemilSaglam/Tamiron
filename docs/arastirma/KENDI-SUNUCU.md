@@ -54,6 +54,37 @@ birlikte sığar, büyümeye yer kalır. 96 GB'lık RTX PRO 6000 daha rahat.
   (bugünkü kademe bunu zaten yapabilir).
 - **Bakım:** model güncelleme, izleme, güvenlik. Bunlar insan zamanı ister.
 
+## 3b · Türkiye'de dedicated — ne var, ne kadar (19.10)
+
+| Seçenek | Ekran kartı | Fiyat | Not |
+|---|---|---|---|
+| [Edgevana — Türkiye](https://nodes.edgevana.com/gpu-servers/rtx-6000-ada/t-rkiye) | RTX 6000 Ada 48 GB, bare metal | **~$1.053/ay** (~$0,72/saat) | Tek net, doğrulanabilir Türkiye fiyatı |
+| [gpukiralama.com.tr](https://gpukiralama.com.tr/) — İstanbul Maslak | L40S 48 GB, RTX 4090/5090, A100… | **teklifle** | *"verileriniz yurt dışına aktarılmaz"*, saatlik kiralama (en az 1 saat) |
+| [CPUNow](https://cpunow.com/gpu-sunucu) — "Türkiye veri merkezi" (Bursa?) | RTX 4090 24 GB, bare metal | 5.499 ₺/ay *(listede)* | ⚠️ Liste tutarsız: 4×V100 de aynı fiyat → **teklif alınmadan güvenilmez** |
+| Turksat · Vargonen | — | teklifle | GPU hizmeti duyurulmuş, fiyat yok |
+
+Yurt dışı karşılaştırma: RTX 4090 tek kartlı sunucu ~€300–550/ay, L40S ~$0,63/saat.
+
+**Hangi kart:**
+- **24 GB (RTX 4090):** Whisper (~3–6 GB) ile 30B sınıfı görüntü modeli (4-bit,
+  ~17–20 GB) **aynı karta zor sığar**; iki kart ya da iki küçük sunucu gerekir.
+- **32 GB (RTX 5090):** sığar, ama payı az.
+- **48 GB (L40S / RTX 6000 Ada):** ikisi rahat sığar, büyümeye yer var.
+  **Önerilen.**
+
+**İşimizi görür mü?**
+- **Kapasite: evet.** Tek 48 GB kart ses için yüzlerce dükkân, ruhsat için
+  ~300–500 dükkân taşır (ruhsat ~10 sn varsayımıyla; hızlı MoE modelle daha
+  fazla).
+- **Doğruluk: BİLİNMİYOR — asıl soru bu.** Dizüstündeki başarısızlık hızla
+  ilgili değil, **model boyutuyla** ilgiliydi (8–12B). Ekran kartı yalnız hızı
+  çözer. 30B sınıfı modeller (Qwen3-VL 30B/32B, Gemma 4 31B) şaseyi Gemini
+  kadar okuyor mu, ölçülmedi. Whisper'ın atölye diline ve plakalara
+  uyumu da ölçülmedi.
+- **Ölçüm yolu:** gpukiralama.com.tr gibi bir Türkiye sağlayıcısından **saatlik**
+  L40S, 2–3 saat. Elimizdeki 522 ses kaydı ve 46 ruhsat aynı cetvelle ölçülür.
+  Tahmini maliyet birkaç yüz TL. Veri Türkiye'den çıkmaz.
+
 ## 4 · API ile karşılaştırma — 100 ve 1.000 dükkân (19.10 düzeltildi)
 
 > ⚠️ İlk yazımda 1.000 dükkân için kendi sunucuyu ~$2.000–3.000 demiştim ve
