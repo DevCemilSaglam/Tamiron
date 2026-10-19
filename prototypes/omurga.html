@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-18 16:49
+  Üretim: 2026-10-19 17:59
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2327,6 +2327,73 @@ kirpilsin. */
 
   /* Muhasebe modülleri dört sütun — kutular telefonda ikişer duruyordu. */
   .modul-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+  /* ---- FORM EKRANLARI DAR (19.10 · Cemil: "bilgisayar ve tablet
+     sayfalarını bitir") ----
+     Tek sütunlu form 1.000 px'e yayılınca satır göz yoruyor ve etiket ile
+     alan birbirinden kopuyor. 720 px: bir formun okunduğu genişlik.
+     Müşteriye özet de burada — müşteri onu telefonda okur, geniş ekran
+     önizlemesi de o genişlikte görünmeli. */
+  #screen-ruhsat.active > *, #screen-teslim.active > *,
+  #screen-parca-sor.active > *, #screen-ses.active > *,
+  #screen-ayarlar.active > *, #screen-ozet.active > *,
+  #screen-musteri.active > * { max-width: 720px; }
+
+  /* Mesaj şablonları ve mesaj geçmişi de liste — iki sütun. */
+  #msjListe, #msjlListe {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: start;
+  }
+
+  /* ---- MUHASEBE (basit kip) — taslaktaki gibi:
+       dönem · özet tam genişlik; Giderler | Alacak yan yana.
+     ⚠️ :not([hidden]) — kip değişince gövde `hidden` alıyor; id seçicisiyle
+     verilen display, tarayıcının [hidden] kuralını EZERDİ ve detaylı kipte
+     basit gövde görünmeye devam ederdi. */
+  #muhBasitGovde:not([hidden]) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    /* Alacak "gid" satırında başlar: gider formu gizliyken bile boş satırın
+       aralığı İKİ sütuna da eklenir, Giderler ile Alacak aynı hizada kalır
+       (eskiden 18 px kayıyordu — ölçüldü). */
+    grid-template-areas:
+      "don don"
+      "ozt ozt"
+      "gbs abs"
+      "gfm ."
+      "gid alc";
+    gap: 18px;
+    align-items: start;
+  }
+  #muhBasitGovde > #muhDonem { grid-area: don; }
+  #muhBasitGovde > .card:not(#muhGiderForm) { grid-area: ozt; }
+  #muhBasitGovde > .section-label.with-action { grid-area: gbs; }
+  #muhBasitGovde > #muhGiderForm { grid-area: gfm; }
+  #muhBasitGovde > #muhGiderler { grid-area: gid; }
+  #muhBasitGovde > .section-label:not(.with-action) { grid-area: abs; }
+  #muhBasitGovde > #muhAlacak { grid-area: alc; }
+
+}
+
+/* ---- ARAÇ DETAYI (≥ 1000 px): solda araç ve işleri, sağda servis geçmişi ----
+   Telefonda geçmiş en altta; usta geçmişe ulaşmak için bütün sayfayı
+   kaydırıyordu. 768 px'te iki sütun 356/323 px'e sıkışıyordu (ölçüldü),
+   o yüzden eşik 1.000. */
+@media (min-width: 1000px) {
+  #screen-arac.active {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+    column-gap: 18px;
+    align-content: start;
+  }
+  /* align-self: start — ortalama kuralı grid'de kartı dikey ortalıyordu
+     (57. testin yakaladığı hata sınıfı). */
+  #screen-arac.active > * { grid-column: 1; max-width: none; align-self: start; }
+  /* Başlık + liste TEK kutu (60-arac.html): başlık uzun künye kartıyla aynı
+     satıra düşüp aralarında 340 px boşluk açıyordu (ölçüldü). */
+  #screen-arac.active > .ar-gecmis-blok { grid-column: 2; grid-row: 1 / span 12; }
 }
 
 /* ---------------- BİLGİSAYAR (≥ 1200 px) ---------------- */
@@ -3660,10 +3727,15 @@ kirpilsin. */
     </div>
   </div>
 
-  <div class="section-label">
-    <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş
+  <!-- GEÇMİŞ BLOĞU (19.10 · 04-genis.css): başlık ve liste TEK kutuda —
+       geniş ekranda sağ sütuna birlikte gider. `.yigin`'in 18 px aralığı
+       ekranın aralığıyla aynı; telefonda görünüm değişmez. -->
+  <div class="yigin ar-gecmis-blok">
+    <div class="section-label">
+      <svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş
+    </div>
+    <div id="arGecmis"></div>
   </div>
-  <div id="arGecmis"></div>
 
 </section>
 

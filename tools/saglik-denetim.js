@@ -2667,6 +2667,31 @@ function stilMetni() {
         ek('GENIS-DUZEN', 'kayit', 'yan yana kartlar ayni hizada degil: ' + Math.round(by.top) + ' / ' + Math.round(bi.top) + ' px');
       }
     }
+    /* d) 19.10 — kalan ekranlar: muhasebe Giderler|Alacak ayni hizada
+          (gizli gider formu 18 px kaydiriyordu); form ekranlari <= 720 px;
+          >= 1000 px'te arac gecmisi kunyeyle ayni hizada (baslik uzun kartin
+          satirina dusup 340 px bosluk aciyordu). Uc hata da olculerek bulundu. */
+    Ekran.ac('muhasebe');
+    var mg = document.getElementById('muhGiderler'), ma = document.getElementById('muhAlacak');
+    if (mg && ma && Math.abs(mg.getBoundingClientRect().top - ma.getBoundingClientRect().top) > 2) {
+      ek('GENIS-DUZEN', 'muhasebe', 'Giderler ile Alacak ayni hizada degil: ' + Math.round(mg.getBoundingClientRect().top) + ' / ' + Math.round(ma.getBoundingClientRect().top));
+    }
+    Ekran.ac('teslim');
+    var tk = document.querySelector('#screen-teslim > .card');
+    if (tk && tk.getBoundingClientRect().width > 721) ek('GENIS-DUZEN', 'teslim', 'form ekrani 720 px\'ten genis: ' + Math.round(tk.getBoundingClientRect().width));
+    if (window.innerWidth >= 1000) {
+      var ilkArac = (window.ARACLAR || [])[0];
+      if (ilkArac) {
+        var ypl = window.ACIK_PLAKA;
+        window.ACIK_PLAKA = ilkArac.plaka; Ekran.ac('arac');
+        window.ACIK_PLAKA = ypl;
+        var ak = document.querySelector('#screen-arac > .card'), ag = document.querySelector('#screen-arac .ar-gecmis-blok');
+        if (!ak || !ag) ek('GENIS-DUZEN', 'arac', 'kunye ya da gecmis blogu yok -- olculemedi');
+        else if (Math.abs(ak.getBoundingClientRect().top - ag.getBoundingClientRect().top) > 2) ek('GENIS-DUZEN', 'arac', 'gecmis kunyeyle ayni hizada degil: ' + Math.round(ak.getBoundingClientRect().top) + ' / ' + Math.round(ag.getBoundingClientRect().top));
+      }
+    }
+    Ekran.ac('kayit');
+
     if (window.innerWidth >= 1200) {
       var h = document.getElementById('screen-home'), s = document.getElementById('screen-kayit');
       var bh = h.getBoundingClientRect(), bs = s.getBoundingClientRect();
