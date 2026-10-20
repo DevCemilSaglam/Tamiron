@@ -351,3 +351,103 @@ azaltılır: TC, ad ve adres maskelenir, kalanı için standart sözleşme yapı
 - **KVKK veri güvenliği:** makine verisiz olsa da fotoğraf ve ses bellekte
   işleniyor. Disk şifreleme, kilitli oda, erişim kaydı ve VPS ile şifreli
   tünel; kurulum bunlarla yapılır.
+
+
+## 8 · Gerçek araştırma: makine ve modeller (20.10)
+
+> Cemil: *"Mac mini 64 gb bulamadım. Gerçek bir araştırma yap. Yedeklemeyi uzak
+> sunucuya yaparız. Mac mini ve ups olarak yapılır. Ve kendi modellerimiz için
+> iyi bir araştırma yap. Bu aileleri sonuçta birileri kullanmış ve sonuçları
+> paylaşmıştır."*
+
+### 8.1 · Makine — Türkiye'de bugün satılanlar
+M4 Pro **satıştan kalkmış**; §7'deki makine bu yüzden bulunamadı.
+[Apple TR](https://www.apple.com/tr/shop/buy-mac/mac-mini)'nin güncel serisi
+M6 ve **M5 Pro**.
+
+| Makine | Bellek / bant genişliği | Fiyat (TR) | Not |
+|---|---|---|---|
+| **Mac mini M5 Pro** 18/20 çekirdek | **64 GB / 1 TB**, ~307 GB/s | eğitim indirimli **185.999 ₺** ([PT](https://www.pt.com.tr/mac-mini)); normal fiyat Apple yapılandırıcısında | Apple TR'de hazır yapılandırma |
+| **Mac Studio M5 Max** 18/40 çekirdek | **64 GB / 1 TB**, ~460–614 GB/s | M5 Max 167.999 ₺'den başlıyor ([teknoblog](https://www.teknoblog.com/m5-max-m5-ultra-mac-studio-turkiye/)); 64 GB'ın TR fiyatı yapılandırıcıda | Yurt dışında 64 GB mini ile **aynı fiyat** (~$3.200; [kingy](https://kingy.ai/blog/m5-pro-mac-mini-70b-llm-ai-video-mac-studio/)), ama bant genişliği 1,5–2 kat → model 1,5–2 kat hızlı |
+| Mac Studio M5 Max (temel) | 36 GB | 167.999 ₺ | Modeli 4-bit sıkıştırmaya zorlar → rakam okumada risk (aşağı). **Önerilmez** |
+
+**Neden 64 GB:** asıl model 8-bit (Q8, ~32 GB) çalışabilsin diye. 4-bit
+sıkıştırma ince rakam okumayı bozabilir; şase tam olarak bu iş. Whisper
+(~3 GB) yanına sığar.
+
+**Öneri:** TR fiyatı Mac mini'den en çok %10 fazlaysa **Mac Studio M5 Max
+64 GB**; değilse **Mac mini M5 Pro 64 GB**. Her ikisi de yükte ~60–150 W, sessiz.
+
+**UPS:** Mac az çektiği için 1.500–2.000 VA line-interactive yeter
+(~9,5 bin ₺, [vatan](https://www.vatanbilgisayar.com/tuncmatik-digitech-eco-2000va-line-interactive-siyah-ups.html)).
+Modem de UPS'e bağlanır.
+
+**Yedek:** makine verisiz; yalnız ayarlar ve model dosyaları uzak sunucuya
+yedeklenir (Cemil'in kararı).
+
+### 8.2 · Satın alma = ölçüm (Aşama 0 makinenin kendisinde)
+Apple Türkiye çevrimiçi mağazası **teslimden itibaren 14 gün** iade tanıyor
+(yasal 7 günün üstünde; [Apple TR iade](https://www.apple.com/tr-edu/shop/help/returns_refund)).
+- Makine **Apple'ın kendi mağazasından** alınır. Hazır yapılandırma (64 GB /
+  1 TB) özel sipariş değil. ⚠️ İade edilebilirliği satın almadan önce
+  Apple'a teyit ettirilmeli: 0800 448 829 873.
+- 14 gün içinde aşağıdaki ölçüm **bu makinede** yapılır: kiralık sunucu yok,
+  veri dışarı çıkmaz.
+- Geçme şartı sağlanmazsa makine iade edilir.
+
+### 8.3 · Ruhsat okuma — adaylar ve yayımlanmış sonuçlar
+
+| Aday | Yayımlanmış sonuç | Bizim için |
+|---|---|---|
+| **Qwen3-VL 30B-A3B** | DocVQA 92,9 · OCRBench 792 · CC-OCR 68,3 ([teknik rapor](https://arxiv.org/pdf/2511.21631)) | **Ana aday.** Her adımda ~3B çalışır → Mac'te hızlı |
+| **Qwen3-VL 32B** | DocVQA 93,3 · OCRBench 858 · CC-OCR 72,8 (aynı rapor) | OCR'da daha iyi; tam yoğun model, M5 Pro'da yavaş (32B ~16 jeton/sn) |
+| **Qwen2.5-VL 32B** | Türkçe metin tanıma çalışmasında GPT-4o ile **benzer** ([Springer 2026](https://link.springer.com/article/10.1007/s10032-026-00613-6)); bir kamu belge çalışmasında Qwen3-VL'den **biraz iyi** ([arXiv](https://arxiv.org/pdf/2608.18289)) | Yeni sürüm her zaman iyi değil → ikisi de ölçülür |
+| **PaddleOCR-VL** (0,9B, yalnız OCR) | OmniDocBench'te en üstte ([karşılaştırma](https://www.docsumo.com/blog/best-ocr-models)); 109 dil ([rapor](https://arxiv.org/pdf/2510.14528)), **Türkçe doğrulanmadı** | **İkinci okuyucu**: yalnız şaseyi ve plakayı bağımsız okur |
+
+**Yayımlanmış hata türleri:**
+1. **Türkçe karakterler** (ç ğ ı ö ş ü) GPT-4o dışındaki **bütün** modelleri
+   zorlamış (Springer 2026). Ad ve adresi etkiler; şase ve plaka ASCII, daha
+   az etkilenir.
+2. **Qwen3-VL alan uydurmaktan çok ATLIYOR** ve **benzer rakamları
+   karıştırıyor** (1/7) ([fiş çalışması](https://arxiv.org/pdf/2605.22413)).
+   Gemini ise daha çok uyduruyor. Atlama sessiz değil, usta görür. Rakam
+   karışıklığı ise şasede sessiz geçebilir → aşağıdaki korumalar.
+
+**Korumalar (sessiz hatayı soruya çevirir):**
+- **Şase kuralları:** 17 karakter.
+  - İlk üç karakter (üretici kodu) okunan **markayla tutmalı**: VF3 = Peugeot,
+    WVW/WV1/WV2 = VW, W0L = Opel, VF1 = Renault, TMB = Skoda, VSS = Seat…
+  - 10. karakter (model yılı kodu) **model yılıyla** tutmalı.
+- **İki okuyucu:** Qwen ve PaddleOCR şaseyi ayrı ayrı okur; farklıysa ekran
+  ustaya sorar.
+- **Plaka:** Türk plaka kuralları (K-059) ve ustanın yazdığıyla karşılaştırma
+  (K-069).
+
+### 8.4 · Ses — adaylar ve yayımlanmış sonuçlar
+
+| Aday | Yayımlanmış sonuç (Türkçe) | Bizim için |
+|---|---|---|
+| **Whisper large-v3** | Ek eğitimsiz CER **%2,4** (FLEURS), **%5,2** (Common Voice) ([BuzzASR kartı](https://huggingface.co/BuzzASR/turkish)) | **Ana aday** — Türkçede zaten güçlü |
+| **BuzzASR Türkçe** (Whisper-large-v3 ince ayarı, MIT) | WER %8,0 / %13,9, CER Whisper'dan ~%5 iyi | Küçük kazanç; denenir |
+| Whisper large-v3-turbo | Bazı dillerde large-v3'ten kötü ([BlasBench](https://arxiv.org/pdf/2604.10736)) | Hızlı; Türkçede **bizim kayıtlarımızla** ölçülür |
+| Qwen3-ASR | Türkçe desteklediği 30 dil arasında ([FLEURS-30](https://huggingface.co/datasets/FluidInference/fleurs-full/blob/main/README.md)); Türkçe sayısı **yayımlanmamış** | Ölçülür |
+
+- **Hız:** whisper.cpp + Metal ile M4 Pro'da large-v3 ~12× gerçek zaman
+  ([promptquorum](https://www.promptquorum.com/local-llms/apple-silicon-whisper-metal-benchmark)).
+  5 sn ses ≈ 0,4 sn; M5 Pro ve M5 Max daha hızlı.
+- **Kelime ipucu:** Whisper bir başlangıç metni (`initial_prompt`) kabul ediyor.
+  Dükkânın plakaları ve söyleyiş sözlüğü ipucu olarak verilebilir;
+  Speechmatics'teki ipucunun karşılığı.
+- **Uzun vade:** K-060 kayıtları ve K-063 düzeltmeleriyle Whisper'a **bizim
+  ağzımıza** ince ayar. Kendi donanımın asıl kazancı bu.
+
+### 8.5 · Aşama 0 ölçüm planı (makine gelince, 14 gün içinde)
+- **Ruhsat (46):** Qwen3-VL 30B-A3B (Q8 ve Q4), Qwen3-VL 32B (Q4), Qwen2.5-VL
+  32B; şasede PaddleOCR ikinci okuyucu.
+  - **Şart:** şase ≥ 45/46, kritik yanlış ≤ 1, plaka uydurma yok. İki okuyucu
+    ayrıştığında "ustaya sor" sayılır, yanlış sayılmaz.
+- **Ses (300 gerçek + 222 yapay):** Whisper large-v3, turbo, BuzzASR;
+  ipuçlu/ipucusuz.
+  - **Şart:** kademeli sonuç ≥ %84 (Speechmatics düzeyi), 5 sn ses < 1,5 sn.
+- **Araçlar:** `foto-kos.js` Ollama'yı zaten destekliyor. Ses koşucusuna
+  whisper.cpp sağlayıcısı makine gelince eklenir. Aynı cetvel.

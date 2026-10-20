@@ -41,6 +41,22 @@ alınmaz. Şimdiye dek ölçülen 8–12B yerel modeller bu şartı sağlamadı.
   TT sözleşmeleri) → kurumsal abonelik.
 - (b) İşyeri adresi ve KVKK güvenliği → avukat ve muhasebeci.
 
+**70.2b · Güncelleme (20.10, `KENDI-SUNUCU.md` §8) — Cemil: "Mac mini ve ups
+olarak yapılır", yedek uzak sunucuya.**
+- M4 Pro satıştan kalkmış. Güncel seçenek **Mac mini M5 Pro 64 GB / 1 TB**
+  (eğitim indirimli ~186 bin ₺).
+- Aynı fiyat bandında **Mac Studio M5 Max 64 GB** 1,5–2 kat bant genişliğiyle
+  daha hızlı. TR fiyatı en çok %10 fazlaysa o önerilir.
+- **Satın alma = ölçüm:** Apple TR çevrimiçi mağazası 14 gün iade tanıyor.
+  Aşama 0 bu makinede yapılır, şart sağlanmazsa iade edilir (iade
+  edilebilirliği Apple'a teyit ettirilecek).
+- **Modeller (yayımlanmış sonuçlara göre):**
+  - ruhsat: Qwen3-VL 30B-A3B ana aday, Qwen3-VL 32B ve Qwen2.5-VL 32B
+    karşılaştırma, PaddleOCR-VL şasede ikinci okuyucu;
+  - ses: Whisper large-v3 (Türkçe CER %2,4–5,2, ek eğitimsiz).
+- **Korumalar:** şasede üretici kodu = marka, yıl kodu = model yılı,
+  iki okuyucu uyuşmazsa ustaya sor.
+
 **70.5 · Geçiş dönemi:** Aşama 1'e kadar Gemini (K-067.2c) sürer. TC, ad ve
 adresin dışarı gitmemesi için maskeleme önerisi açık, Cemil onayına.
 
