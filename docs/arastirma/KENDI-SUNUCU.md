@@ -158,3 +158,75 @@ yanında küçük; yani bu kararı maliyet değil gizlilik ve bağımsızlık be
 - Whisper Türkçe: [BuzzASR model kartı](https://huggingface.co/BuzzASR/turkish).
   Sıfırdan large-v3, FLEURS'ta CER %2,4. Okunan metin üzerinde ölçülmüş;
   atölye ve plaka diline uymaz, **kendi kayıtlarımızla ölçülmeli.**
+
+## 6 · Evde kendi sunucumuz (20.10)
+
+> Cemil: *"Sunucuyu satın alıp evde kullanmak. Daha manuel olacaktır fakat
+> artık 1000mb internet alabiliyoruz evlere. Maliyet ne olur?"*
+
+### Donanım (tek seferlik, kabaca — fiyatlar doğrulanmalı)
+
+| Kalem | Tahmin | Not |
+|---|---|---|
+| RTX 5090 32 GB | **~110–150 bin ₺** | 2025 lansman piyasası 128–150 bin ₺ ([log](https://www.log.com.tr/?p=930842), [ntv](https://www.ntv.com.tr/teknoloji/nvidia-rtx-5000-serisini-tanitti-turkiye-fiyati-belli-oldu,w5yP2QLzG06Isy5TUqTcJg)); Ekim 2026 fiyatı bulunamadı |
+| Gövde: işlemci, 64 GB RAM, 1.200 W güç kaynağı, NVMe, kasa | ~50–70 bin ₺ | |
+| UPS (kesintisiz güç, ~1.500 VA) | ~10–15 bin ₺ | Elektrik kesilince düzgün kapanması için |
+| **Toplam** | **~170–235 bin ₺** | Bir kez |
+
+32 GB yeter mi: Whisper (~3–6 GB) ile 30B sınıfı görüntü modeli (4-bit,
+~17–20 GB) sığar; pay az. 48 GB'lık profesyonel kart (RTX 6000 Ada) bunun
+iki-üç katı fiyatta.
+
+### Aylık
+
+| Kalem | Tahmin | Not |
+|---|---|---|
+| Elektrik | **~600–1.200 ₺** | 24 saat açık, ortalama 200–400 W → 145–290 kWh. ~3,9 ₺/kWh üst kademe ([Nisan 2026 zammı](https://uzmanpara.milliyet.com.tr/uzmanpara/elektrik-zammi-2026-nisanda-ne-kadar-oldu-elektrige-ne-kadar-zam-geldi-iste-yeni-tarife-7565631)). ⚠️ Mesken desteği **yıllık 4.000 kWh** ile sınırlı; evin tüketimi + sunucu sınırı aşarsa fiyat sübvansiyonsuz tarifeye çıkar. |
+| İnternet | mevcut fiber | Yük küçük (bkz. aşağı) |
+| Türkiye'de küçük VPS (uygulama + veritabanı + bağlantı noktası) | ~300–600 ₺ | Ev sunucusu yalnız yapay zekâyı çalıştırır |
+
+### İnternet yeter mi — evet, rahat
+1.000 dükkânda bile günde ~5.000 ruhsat fotoğrafı (~1,5 GB) ve ~20.000
+sesli komut (~2 GB) **eve gelir**. Evden çıkan yalnız kısa metin cevaplar.
+1.000 Mbps'in küçük bir parçası. Asimetrik tarifelerdeki düşük upload da
+sorun değil.
+
+**Sabit IP gerekmez:** ev sunucusu, Türkiye'deki VPS'e **kendisi bağlanır**
+(WireGuard tüneli). Dışarıdan eve hiç kapı açılmaz. Bu, güvenlik için de
+daha iyi. ⚠️ Cloudflare Tunnel gibi yabancı aracılar **kullanılmaz**; veri
+yine yurt dışından geçer.
+
+### Karşılaştırma
+
+| | Bir kez | Aylık | 12 ay toplam |
+|---|---|---|---|
+| **Ev sunucusu** | ~170–235 bin ₺ | ~1–2 bin ₺ | ~185–260 bin ₺ |
+| Türkiye'de kiralık dedicated (48 GB) | — | ~$1.000 (~40–45 bin ₺) | ~480–540 bin ₺ |
+| API (Gemini + Speechmatics), 100 dükkân | — | ~$75–135 (~3–6 bin ₺) | ~40–70 bin ₺ |
+
+- **Kiralamaya göre** ev sunucusu ~5–6 ayda kendini öder.
+- **API'ye göre** küçük ölçekte pahalı. Gerekçesi yine para değil, **verinin
+  Türkiye'de ve elimizde kalması**.
+
+### Riskler — "manuel" kısmı
+1. **Tek nokta arıza:** elektrik, internet, ya da kartın kendisi gidince ses ve
+   ruhsat okuma durur. Gizlilik amaçsa yurt dışı API'ye düşmek seçenek
+   değil. Yedek yol **elle giriş**: usta plakayı ve işi yazar; ürün yine
+   çalışır, yalnız yavaşlar.
+2. **Ev aboneliği sözleşmesi:** bazı ev tarifeleri ticari kullanımı ya da
+   sunucu barındırmayı yasaklayabilir. Operatörün sözleşmesine bakılmalı;
+   gerekirse kurumsal tarife.
+3. **KVKK güvenliği:** müşteri verisinin işlendiği yer ev. Disk şifreleme,
+   kilitli oda, erişim kaydı ve yedekleme gerekir. Veritabanı evde değil
+   VPS'te durursa evdeki kutu **verisiz** kalır: fotoğraf ve sesi okur,
+   saklamaz. Bu riski büyük ölçüde azaltır.
+4. **Bakım:** güncelleme, izleme ve arıza müdahalesi senin zamanın.
+5. **Kapasite:** tek kart ruhsat için ~300–500 dükkân taşır; sonrası ikinci kart.
+
+### Önerilen sıra
+1. **Önce saatlik kiralık kartta ölçüm (birkaç yüz ₺).** 200 bin ₺'lik
+   donanımı, modellerin bizim ruhsatlarımızı ve seslerimizi doğru okuduğu
+   görülmeden almak riskli. Dizüstündeki 8–12B modeller başarısızdı.
+2. Ölçüm iyiyse ev sunucusu: **yalnız yapay zekâ, verisiz.** Uygulama ve
+   veritabanı Türkiye'deki VPS'te, aralarında WireGuard.
+3. Yedek yol elle giriş; ileride ikinci bir kart ya da kiralık sunucu.
