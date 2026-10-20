@@ -159,7 +159,7 @@ yanında küçük; yani bu kararı maliyet değil gizlilik ve bağımsızlık be
   Sıfırdan large-v3, FLEURS'ta CER %2,4. Okunan metin üzerinde ölçülmüş;
   atölye ve plaka diline uymaz, **kendi kayıtlarımızla ölçülmeli.**
 
-## 6 · Evde kendi sunucumuz (20.10)
+## 6 · Evde kendi sunucumuz (20.10) — ⚠️ fiyatları §7 düzeltir
 
 > Cemil: *"Sunucuyu satın alıp evde kullanmak. Daha manuel olacaktır fakat
 > artık 1000mb internet alabiliyoruz evlere. Maliyet ne olur?"*
@@ -230,3 +230,124 @@ yine yurt dışından geçer.
 2. Ölçüm iyiyse ev sunucusu: **yalnız yapay zekâ, verisiz.** Uygulama ve
    veritabanı Türkiye'deki VPS'te, aralarında WireGuard.
 3. Yedek yol elle giriş; ileride ikinci bir kart ya da kiralık sunucu.
+
+
+## 7 · KARAR ve kademeli ev planı — güncel fiyatlarla (20.10)
+
+> **Cemil:** *"Dış servislere bağımlı olmak istemiyorum. Yasal yükümlülük ve
+> gelecekte olası fiyat artışları nedeniyle. Baştan ev gibi bir ortamda
+> kurgulamak istiyorum. Fakat ilk başta makinenin düşük, giderek artan bir
+> şekilde olması düşünüyorum. [...] resim ses vb o sunucuda tutmaya gerek yok.
+> Yapay zeka için çalışacak. Ve evde internet, yüksek elektrik tüketimi vb gibi
+> konulara tam araştır."*
+
+### 7.1 · §6'daki düzeltme
+§6 RTX 5090'ı ~110–150 bin ₺ yazmıştı; bu **2025 lansman** fiyatıydı.
+**Ekim 2026'da ~270–390 bin ₺**
+([akakçe](https://www.akakce.com/ekran-karti/en-ucuz-asus-rtx-5090-tuf-rtx5090-32g-gaming-512-bit-gddr7-32-gb-fiyati,903116906.html),
+[cimri](https://www.cimri.com/ekran-kartlari/en-ucuz-asus-tuf-gaming-geforce-rtx-5090-oc-tuf-rtx5090-o32g-32gb-gddr7-ekran-karti-fiyatlari,2431811975),
+[itopya](https://www.itopya.com/ekran-karti_k11?gpumodel=geforce-rtx-5090-q7614)).
+Sıfır RTX 3090 105 bin ₺ ([vatan](https://www.vatanbilgisayar.com/msi-geforce-rtx-3090-gaming-x-trio-24g-24gb-gddr6x-384bit-nvidia-ekran-karti.html)).
+Bellek kıtlığı ekran kartlarını pahalandırmış.
+
+### 7.2 · Ev için doğru sınıf: birleşik bellekli küçük bilgisayar
+Ekran kartlı kasa yerine işlemci ve grafik belleği **ortak** olan makineler.
+30B sınıfı modeli az elektrikle, sessizce çalıştırırlar.
+
+| Makine | Bellek | Fiyat | Güç | Not |
+|---|---|---|---|---|
+| **Mac mini M4 Pro** | 64 GB | **~135 bin ₺** ([PT](https://www.pt.com.tr/mac-mini-m4-pro-14cpu-20gpu-64gb-1tb-10-gigabit-ethernet-z1jv000vg)) | boşta **3,7 W** ([ENERGY STAR](https://www.energystar.gov/productfinder/product/certified-computers/details/4513881)), yükte ~60–150 W | Türkiye'de garantili satılıyor, sessiz. M5 Pro'lu sürüm de var; fiyatı [Apple TR](https://www.apple.com/tr/shop/buy-mac/mac-mini)'de bakılmalı |
+| Ryzen AI Max+ 395 mini PC | 64 / 128 GB | ~$1.960–2.200 / ~$3.300–3.600 + gümrük, KDV ([karşılaştırma](https://computingforgeeks.com/ryzen-ai-max-395-mini-pc-comparison/)) | yükte ~120–140 W | Linux, sunucuya daha yakın. Türkiye'de satıcı bulunamadı → ithalat ve garanti sorunu |
+| RTX 5090 iş istasyonu | 32 GB | ~340–460 bin ₺ (kart + kasa) | yükte **~600–700 W** | En hızlı; ama pahalı, sıcak, gürültülü, elektriği ağır |
+
+**Hız (tahmin, ölçülmedi):**
+- Qwen3-VL 30B-A3B, M4 Pro'da ~33 jeton/sn
+  ([willitrunai](https://willitrunai.com/de/can-run/qwen-3-vl-30b-a3b-on-m4-pro-64gb)).
+- Strix Halo'da benzer metin modeli ~86 jeton/sn
+  ([strix-halo-llm-perf](https://github.com/visorcraft/strix-halo-llm-perf)).
+- Ruhsat ≈ **15–25 sn**, ses (Whisper, 5 sn) ≈ **1 sn**.
+
+### 7.3 · Elektrik — ayrıntı
+Ekim 2026 mesken tarifesi (ikincil kaynaklar, EPDK kararıyla teyit edilmeli:
+[akıllıtarife](https://akillitarife.com/enerji/rehber/tarife/elektrik),
+[verinokta](https://verinokta.com/fiyatlar/elektrik-tarifeleri/)):
+- **Kademe:** günde 8 kWh (ayda ~240 kWh) altı **düşük kademe ~3,1–3,2 ₺/kWh**
+  (vergili); üstü **yüksek kademe** (vergisiz ~4,32 ₺).
+- **Yıllık 4.000 kWh sınırı:** aşan abone son kaynak tarifesine geçer,
+  **~6,49 ₺/kWh** (tek kaynak).
+
+| Makine (7/24, ortalama) | Aylık kWh | Aylık maliyet | Etkisi |
+|---|---|---|---|
+| Mac mini (~20 W ortalama) | ~15 | **~50–100 ₺** | Kademeyi neredeyse oynatmaz |
+| Strix Halo (~40 W) | ~30 | ~100–200 ₺ | Küçük |
+| RTX 5090 kasası (~250 W) | ~180 | **~800–1.200 ₺** | Evi büyük olasılıkla **yüksek kademeye** ve **4.000 kWh sınırının üstüne** iter; o zaman evin TÜM tüketimi pahalanır |
+
+**Sonuç:** RTX 5090'ın asıl maliyeti kartın fiyatı kadar **evin elektrik
+tarifesini bozması**.
+
+### 7.4 · İnternet — ayrıntı
+- **⚠️ Bireysel abonelikte ticari kullanım YASAK.**
+  - [Superonline](https://superonlinetr.net/paket/fiber-taahhutsuz-tanisma-paketleri-18):
+    *"bireysel kullanım içindir, ticari amaçla kullanılamaz"*; tespit edilirse
+    hattı kapatma hakkı.
+  - [Türk Telekom](https://www.turktelekom.com.tr/tt-yardim/SozlesmeVeTaahhutnameler/abonelik_sozlesmesi_2015.pdf):
+    *"ticari ve başka bir amaçla kullanamaz, üçüncü şahıslara sunamaz."*
+
+  → **Kurumsal (iş) abonelik gerekir.**
+- **Fiyat:**
+  - TurkNet bireysel GigaFiber, 1.000 Mbps simetrik: **949,90 ₺/ay**
+    (19.06.2026'dan beri; [technopat](https://www.technopat.net/2026/06/20/turkiye-1000-mbps-internet-fiyatlari/)).
+  - TurkNet **İş GigaFiber**: eski bir listede 574,90 ₺
+    ([enuygunfinans](https://www.enuygunfinans.com/internet-baglantilari/turknet/1000-mbps-turknet-is-gigafiber-max-paketi-1000-dk-her-yone-telefon-hatti),
+    2024). Güncel fiyat ve **sabit IP** TurkNet iş satışına sorulmalı.
+- **Hız fazlasıyla yeter:** 1.000 dükkânda bile eve gelen günde ~3,5 GB.
+- **Sabit IP gerekmez:** ev makinesi Türkiye'deki VPS'e WireGuard ile
+  **kendisi bağlanır**. Dışarıdan eve kapı açılmaz; yabancı tünel
+  (Cloudflare vb.) kullanılmaz.
+- GigaFiber yalnız TurkNet'in kendi altyapısı olan adreste; önce adres
+  sorgusu yapılmalı.
+
+### 7.5 · Kesinti, ısı, gürültü
+- **UPS:** line-interactive 2.000 VA ~9,5 bin ₺
+  ([vatan](https://www.vatanbilgisayar.com/tuncmatik-digitech-eco-2000va-line-interactive-siyah-ups.html)).
+  Makineyle birlikte **modem de** UPS'e bağlanır; makinede "elektrik gelince
+  kendiliğinden aç" ayarı açılır.
+- **Mac mini:** sessiz, ısı sorunu yok, rafta durur.
+  **RTX 5090 kasası:** yükte yüksek ses ve oda ısısı.
+- **Yedek yol:** makine ya da internet giderse yurt dışı servise **düşülmez**.
+  Usta elle yazar; program yavaşlar ama çalışır.
+
+### 7.6 · Kademeli plan
+
+| Aşama | Ne zaman | Donanım | Bir kez | Aylık |
+|---|---|---|---|---|
+| **0 · Ölçüm** | şimdi | Türkiye'de saatlik kiralık kart, 2–3 saat | birkaç yüz ₺ | — |
+| **1 · Pilot** | 1 → ~100–150 dükkân | **Mac mini M4 Pro 64 GB** + UPS | **~145 bin ₺** | ~1,5–2,5 bin ₺ (iş interneti + VPS + elektrik) |
+| **2 · Büyüme** | ~150 → ~300 dükkân | **İkinci aynı makine.** Yük ikiye bölünür; biri giderse öteki çalışır (yedeklilik) | +~135 bin ₺ | +~100 ₺ |
+| **3 · Ölçek** | 300+ dükkân | Üçüncü makine, ya da kendi donanımımızı **Türkiye'de bir veri merkezine** taşımak (colocation): yine bizim makinemiz, ama elektrik ve internet profesyonel | teklifle | teklifle |
+
+**Neden "küçük makineler, çoğaltarak":**
+1. Her aşama bir öncekini çöpe atmaz.
+2. İki makine aynı zamanda **yedek** demek; tek büyük kart tek arıza
+   noktasıydı.
+3. Elektrik ve ısı evin sınırları içinde kalır.
+
+### 7.7 · Aşama 0'ın geçme şartı (ölçmeden alınmaz)
+Aynı cetvel, aynı setler:
+- **Ruhsat (46):** şase ≥ 45/46, kritik yanlış ≤ 1, plaka uydurma yok (Gemini
+  ve Opus düzeyi).
+- **Ses (300 gerçek + 222 yapay):** kademeli sonuç ≥ Speechmatics düzeyi
+  (%84 sınav).
+
+Model adayları: Qwen3-VL 30B-A3B (birleşik bellekli makinede hızlı),
+Qwen3-VL 32B, Gemma 4 31B; ses için Whisper large-v3-turbo.
+
+**Şartı geçemezse** ev planı ertelenir ve bağımlılık başka yoldan
+azaltılır: TC, ad ve adres maskelenir, kalanı için standart sözleşme yapılır.
+
+### 7.8 · Yasal ve idari — avukat ve muhasebeciyle netleşecekler
+- **İşyeri adresi:** şirket ev adresinde mi? Kurumsal internet ve gerekirse
+  elektrik aboneliğinin türü buna bağlı.
+- **KVKK veri güvenliği:** makine verisiz olsa da fotoğraf ve ses bellekte
+  işleniyor. Disk şifreleme, kilitli oda, erişim kaydı ve VPS ile şifreli
+  tünel; kurulum bunlarla yapılır.

@@ -10,6 +10,42 @@
 
 ---
 
+## K-070 · Hedef: dış servislere bağımlı olmayan yapay zekâ — evde, kademeli (20.10.2026)
+
+> **Cemil, 20.10:** *"Dış servislere bağımlı olmak istemiyorum. Yasal
+> yükümlülük ve gelecekte olası fiyat artışları nedeniyle. Baştan ev gibi bir
+> ortamda kurgulamak istiyorum. Fakat ilk başta makinenin düşük, giderek artan
+> bir şekilde olması düşünüyorum. [...] resim ses vb o sunucuda tutmaya gerek
+> yok. Yapay zeka için çalışacak."*
+
+**70.1 · Yön:** ses ve ruhsat okuma **kendi donanımımızda**, evde başlar.
+Makine **verisiz** çalışır: fotoğraf ve sesi okur, saklamaz. Uygulama ve
+veritabanı Türkiye'deki VPS'te durur; aradaki bağlantıyı makine kendisi
+kurar (WireGuard). Dış servise düşülmez; yedek yol elle giriş.
+
+**70.2 · Kademeli donanım (öneri, `arastirma/KENDI-SUNUCU.md` §7):**
+- **Aşama 0:** saatlik kiralık kartla ölçüm.
+- **Aşama 1:** Mac mini M4 Pro 64 GB + UPS, ~145 bin ₺.
+- **Aşama 2:** ikinci aynı makine (yük + yedek).
+- **Aşama 3:** Türkiye'de colocation.
+
+**RTX 5090 yolu önerilmez:** kart ~270–390 bin ₺ ve elektriği evi yüksek
+kademeye ve 4.000 kWh sınırının üstüne itiyor.
+
+**70.3 · Kapı:** Aşama 0'da şase ≥ 45/46 ve ses ≥ %84 sağlanmadan donanım
+alınmaz. Şimdiye dek ölçülen 8–12B yerel modeller bu şartı sağlamadı.
+Ölçülecek olan 30B sınıfı.
+
+**70.4 · Önce çözülecek iki engel:**
+- (a) **Bireysel internet aboneliğinde ticari kullanım yasak** (Superonline,
+  TT sözleşmeleri) → kurumsal abonelik.
+- (b) İşyeri adresi ve KVKK güvenliği → avukat ve muhasebeci.
+
+**70.5 · Geçiş dönemi:** Aşama 1'e kadar Gemini (K-067.2c) sürer. TC, ad ve
+adresin dışarı gitmemesi için maskeleme önerisi açık, Cemil onayına.
+
+---
+
 ## K-069 · Ruhsattan okunan plaka ustanın yazdığını EZMEZ — çatışmada usta seçer (18.10.2026 · Cemil onayına açık)
 
 **Nereden çıktı:** fotoğraf ölçümü (FOTO-OLCUM §7). Gemini 3.8 Flash
