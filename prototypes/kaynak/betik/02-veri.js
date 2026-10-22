@@ -1135,7 +1135,7 @@ function tahsilatToplami(donem) {
    Muhasebeciye giden dosya. TEK DÜZ TABLO, üç bölüm değil: "Tür"
    sütununa göre Excel'de süzülür ve toplanır — bölümlü dosyada her
    bölümün başlığı ayrı satır olur, süzgeç bozulur.
-     · BOM (﻿): yoksa Excel Türkçe harfleri bozuk açıyor.
+     · BOM (\uFEFF): yoksa Excel Türkçe harfleri bozuk açıyor.
      · ";" ayraç: Türkçe Excel'de virgül ondalık işareti.
      · HAM RAKAM: ekranın "3.450"si burada 3450. Biçimli rakam Excel'de
        metin olur ve toplanamaz — dışa aktarmanın tek amacı toplamak.
@@ -1166,5 +1166,5 @@ function muhasebeCsv(donem) {
     satirlar.push(['Alacak', k.teslimTarihi || '', k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
                    ODEME_ETIKET.almadim, kayitToplami(k)]);
   });
-  return '﻿' + satirlar.map(function (s) { return s.map(csvHucre).join(';'); }).join('\r\n') + '\r\n';
+  return '\uFEFF' + satirlar.map(function (s) { return s.map(csvHucre).join(';'); }).join('\r\n') + '\r\n';
 }

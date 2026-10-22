@@ -2691,7 +2691,7 @@ function stilMetni() {
     try {
       var csv = muhasebeCsv('yil');
       if (csv.charCodeAt(0) !== 0xFEFF) ek('DISA-AKTARMA', 'muhasebe', 'CSV BOM ile baslamiyor (Excel Turkce harfleri bozar)');
-      var sat = csv.replace(/^﻿/, '').replace(/\r\n$/, '').split('\r\n');
+      var sat = csv.replace(/^\uFEFF/, '').replace(/\r\n$/, '').split('\r\n');
       if (sat[0] !== 'Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar') ek('DISA-AKTARMA', 'muhasebe', 'baslik satiri beklenen degil: ' + sat[0]);
       var bek = 1 + donemTahsilatlari('yil').length +
         GIDERLER.filter(function (g) { return donemIcinde(g.tarih, 'yil'); }).length +

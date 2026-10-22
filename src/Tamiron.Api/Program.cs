@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Tamiron.Api;
 using Tamiron.Application;
+using Tamiron.Application.Accounting;
 using Tamiron.Application.Expenses;
 using Tamiron.Application.Lists;
 using Tamiron.Application.ServiceRecords;
@@ -38,6 +39,15 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
 {
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
+});
+
+// Alacak (B9): döneme tabi değil. CSV: BOM'lu UTF-8, indirilen dosya.
+api.MapGet("/receivables", (ISender s, CancellationToken ct) => s.Send(new ListReceivables(), ct));
+api.MapGet("/export/cash.csv", async (PeriodKind? period, ISender s, CancellationToken ct) =>
+{
+    var f = await s.Send(new ExportCashCsv(period ?? PeriodKind.Month), ct);
+    // BOM içerikte (Csv.Document); encoder ikinci bir BOM eklemesin diye ham baytlar.
+    return Results.File(new System.Text.UTF8Encoding(false).GetBytes(f.Content), "text/csv; charset=utf-8", f.FileName);
 });
 
 // Gider (B8): dönem listesi + toplam; sil/geri al dönemin güncel listesini döner.
