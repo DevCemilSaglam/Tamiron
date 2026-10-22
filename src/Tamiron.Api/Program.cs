@@ -27,6 +27,9 @@ builder.Services.AddScoped<ICurrentSession>(sp => sp.GetRequiredService<RequestC
 if (builder.Environment.IsDevelopment()) builder.Services.AddSingleton<ISmsSender, DevLogSmsSender>();
 else builder.Services.AddSingleton<ISmsSender, NotConfiguredSmsSender>();
 builder.Services.AddProblemDetails();
+// Okunamayan istek SESSİZ 400 yazmasın, istisna atsın: ErrorMiddleware onu Türkçe
+// Problem Details'e çevirir (C7). Varsayılan, geliştirme dışında gövdesiz 400'dü.
+builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteHandlerOptions>(o => o.ThrowOnBadRequest = true);
 // Enum'lar ad olarak gidip gelir ("Card", 3 değil): istemci kodu okunur kalsın.
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));

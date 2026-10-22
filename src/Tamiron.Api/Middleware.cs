@@ -72,5 +72,19 @@ public sealed class ErrorMiddleware(RequestDelegate next)
         {
             await Results.Problem(statusCode: 503, title: "SMS şu an gönderilemiyor. Dükkânın SMS hizmeti bağlanmadı.").ExecuteAsync(ctx);
         }
+        // C7 · Okunamayan istek (bozuk JSON, yanlış tür, bilinmeyen seçenek). ASP.NET varsayılanı
+        // GÖVDESİZ 400 dönüyordu — istemci ustaya bir şey gösteremezdi (ölçüldü, 22.10).
+        catch (BadHttpRequestException)
+        {
+            await Results.Problem(statusCode: 400, title: "İstek okunamadı. Uygulamayı güncelleyip tekrar dene.",
+                extensions: new Dictionary<string, object?> { ["code"] = "request.invalid" }).ExecuteAsync(ctx);
+        }
+        // C7 · Aynı kaydı iki cihaz değiştirdi (RowVersion). Telefon ve tablet artık aynı anda
+        // açık (K-074); sessizce son yazan kazanırsa ötekinin yazdığı kaybolurdu. Önceden 500'dü.
+        catch (Microsoft.EntityFrameworkCore.DbUpdateConcurrencyException)
+        {
+            await Results.Problem(statusCode: 409, title: "Bu kayıt başka bir cihazda değişti. Sayfayı yenileyip tekrar dene.",
+                extensions: new Dictionary<string, object?> { ["code"] = "record.changed" }).ExecuteAsync(ctx);
+        }
     }
 }
