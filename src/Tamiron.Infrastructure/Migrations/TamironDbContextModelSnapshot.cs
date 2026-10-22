@@ -244,6 +244,10 @@ namespace Tamiron.Infrastructure.Migrations
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<decimal?>("VatRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ServiceRecordId");
@@ -317,6 +321,10 @@ namespace Tamiron.Infrastructure.Migrations
 
                     b.Property<DateOnly?>("WaitingSince")
                         .HasColumnType("date");
+
+                    b.Property<decimal?>("WithholdingRate")
+                        .HasPrecision(5, 4)
+                        .HasColumnType("decimal(5,4)");
 
                     b.HasKey("Id");
 
@@ -406,6 +414,10 @@ namespace Tamiron.Infrastructure.Migrations
 
                     b.Property<int>("DefaultMaintenanceMonths")
                         .HasColumnType("int");
+
+                    b.Property<decimal>("DefaultVatRate")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -547,6 +559,9 @@ namespace Tamiron.Infrastructure.Migrations
                     b.Property<string>("OwnerPhone")
                         .HasMaxLength(30)
                         .HasColumnType("nvarchar(30)");
+
+                    b.Property<int?>("OwnerType")
+                        .HasColumnType("int");
 
                     b.Property<string>("PlateNo")
                         .IsRequired()

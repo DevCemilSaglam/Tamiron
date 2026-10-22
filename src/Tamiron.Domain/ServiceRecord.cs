@@ -24,6 +24,8 @@ public class ServiceRecord : TenantEntity
     public bool WaitingForPart { get; private set; }
     public DateOnly? WaitingSince { get; private set; }
     public bool ShowWaitingToCustomer { get; private set; }
+    /// <summary>KDV tevkifat oranı (ör. 0,7 = 7/10) — yalnız YER (C6, Faz 3). Boş = belirlenmedi. Hesap yok.</summary>
+    public decimal? WithholdingRate { get; private set; }
 
     private readonly List<ServiceLine> _lines = [];
     public IReadOnlyList<ServiceLine> Lines => _lines;

@@ -35,6 +35,8 @@ internal sealed class LineHandlers(ITamironDb db, ITenantContext tenant) :
             ? ServiceLine.Labor(b.Name, b.Price)
             : ServiceLine.Part(b.Name, b.Price, b.SuppliedBy ?? PartSupplier.Shop, b.Cost);
         r.AddLine(line);
+        // KDV oranı satırda DONAR (C6): eklendiği günün dükkân varsayılanı.
+        line.FreezeVatRate(await db.Shops.Select(s => s.DefaultVatRate).FirstAsync(ct));
         db.ServiceLines.Add(line);
         await db.SaveChangesAsync(ct);
         return await Map.LoadDto(db, r.Id, ct);

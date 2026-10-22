@@ -29,6 +29,8 @@ public class Shop : Entity
     /// <summary>Gizlilik notu (A-M33) BİR KEZ gösterilir: ilk gösterim anı korunur.</summary>
     public void MarkPrivacyNoticeShown(DateTime nowUtc) => PrivacyNoticeShownAt ??= nowUtc;
     public int DefaultMaintenanceKm { get; set; } = 10_000;
+    /// <summary>KDV varsayılanı, yüzde (C6, KDV.md). Yeni satır bunu alır ve dondurur. Ekranı yok — yalnız YER.</summary>
+    public decimal DefaultVatRate { get; set; } = 20m;
     /// <summary>Parça alış fiyatı sorulsun mu (A-M43). Varsayılan kapalı.</summary>
     public bool AskPartCost { get; set; }
     /// <summary>Gizlilik notu (A-M33) gösterildiği an.</summary>

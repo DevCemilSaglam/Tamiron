@@ -32,6 +32,9 @@ public class Vehicle : TenantEntity
     public string? TaxOffice { get; set; }
     public string? Note { get; set; }
 
+    /// <summary>Sahip tipi — yalnız YER (C6, Faz 3). Tevkifat yalnız şirket/kurum alıcıda. Boş = bilinmiyor.</summary>
+    public OwnerType? OwnerType { get; set; }
+
     /// <summary>Ticari ileti izninin verildiği gün (K-071.3). Null = izin yok.</summary>
     public DateOnly? MarketingConsentAt { get; set; }
 

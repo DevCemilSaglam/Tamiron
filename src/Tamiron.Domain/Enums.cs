@@ -11,5 +11,8 @@ public enum LineKind { Part = 1, Labor = 2 }
 /// <summary>K-005 sorumluluk anahtarı. Yalnız parça satırında anlamlı.</summary>
 public enum PartSupplier { Shop = 1, Customer = 2 }
 
+/// <summary>Sahip tipi (C6, KDV.md §2): tevkifat bireyselde YOK, şirket/kurumda var.</summary>
+public enum OwnerType { Individual = 1, Company = 2 }
+
 /// <summary>PARCA-TANIMLAMA.md §3.</summary>
 public enum MatchStatus { Unidentified = 0, Coded = 1, Matched = 2 }

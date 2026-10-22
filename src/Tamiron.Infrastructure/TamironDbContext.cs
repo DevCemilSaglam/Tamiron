@@ -34,6 +34,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.Name).HasMaxLength(200);
             e.Property(x => x.Address).HasMaxLength(500);
             e.Property(x => x.Phone).HasMaxLength(30);
+            e.Property(x => x.DefaultVatRate).HasPrecision(5, 2);
             // Dükkân kiracının KENDİSİ: kendi satırından başkasını görmez.
             e.HasQueryFilter(x => x.Id == CurrentTenant && x.DateTimeDeleted == null);
         });
@@ -67,6 +68,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.HasOne<Vehicle>().WithMany().HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(x => x.Lines).WithOne().HasForeignKey(l => l.ServiceRecordId).OnDelete(DeleteBehavior.Cascade);
             e.Navigation(x => x.Lines).UsePropertyAccessMode(PropertyAccessMode.Field);
+            e.Property(x => x.WithholdingRate).HasPrecision(5, 4);   // 0,7000 = 7/10; yalnız YER (C6)
             e.Ignore(x => x.Total);
             e.Ignore(x => x.CollectedOn);
             e.Ignore(x => x.IsMaintenance);
@@ -78,6 +80,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.Name).HasMaxLength(300);
             e.Property(x => x.Price).HasPrecision(18, 2);
             e.Property(x => x.Cost).HasPrecision(18, 2);   // nullable: null ≠ 0 (K-057)
+            e.Property(x => x.VatRate).HasPrecision(5, 2);  // yüzde; yalnız YER (C6)
             e.Property(x => x.PartBrand).HasMaxLength(100);
             e.Property(x => x.PartCode).HasMaxLength(100);
             e.Ignore(x => x.CountsInTotal);

@@ -17,6 +17,14 @@ public class ServiceLine : TenantEntity
     public string? PartBrand { get; set; }
     public string? PartCode { get; set; }
     public MatchStatus MatchStatus { get; set; }
+    /// <summary>KDV oranı, yüzde — yalnız YER (C6, Faz 3). Eklenirken dükkân varsayılanından yazılır ve DONAR.</summary>
+    public decimal? VatRate { get; private set; }
+
+    /// <summary>
+    /// Oran bir kez yazılır: devlet oranı değiştirse de geçmiş iş kendi oranıyla kalır
+    /// (KDV.md: "kaydedilince kdvOrani sabitlenir").
+    /// </summary>
+    public void FreezeVatRate(decimal rate) => VatRate ??= rate;
 
     private ServiceLine() { }   // EF
 

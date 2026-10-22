@@ -40,6 +40,7 @@ Akıştaki yeri: **Adım 1** · Ekran 2, 6
 | `TaxOffice` | **Vergi dairesi — RUHSATTA YOK.** Fatura için gerekiyor, belgede yazmıyor: okunamaz, **usta yazar**. Alan var, okuma yok. Bir alanı ruhsattan doldurulabilir sanmak, uydurmanın davetidir |
 | `Note` | Serbest — *"arka cam kolu kırık"* |
 | `Color` · `FuelType` · `EngineNo` · `Displacement` · `PowerKw` · `Seats` · `FirstRegistrationDate` · `FuelTankLiters` | **Ruhsatın teknik alanları** (K-033.2c). Araç ekranının "Ruhsat bilgileri" akordiyonunda gösterilir ve girilir. *"Gösterilen ama girilemeyen alan sonsuza kadar boş kalır."* Ruhsat okununca dolar (K-065). Hepsi boş olabilir |
+| `OwnerType` | **Sahip tipi — yalnız YER (C6, Faz 3).** `Individual` \| `Company`; boş = bilinmiyor. Tevkifat yalnız şirket/kurum alıcıda var, bireyselde YOK (KDV.md §2). Ekranda yok; ileride vergi no uzunluğundan (10/11 hane) önerilebilir |
 | `MarketingConsentAt` | **Ticari ileti izni — verildiği gün** (K-071.3, A-M21). Null = izin yok, varsayılan. Toplu mesaj (bayram, kampanya) yalnız dolu olana gider. **Tarih tutulur, bayrak değil:** ispat yükü dükkânda. Müşteri araçtan türetildiği için izin sahibin **bütün araçlarına birlikte** yazılır |
 
 > **Araç kimliği kuralı (K-068):** parça sormak için `Vin` (17 hane) **ya da**
@@ -74,6 +75,7 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 | `ReminderDate` | Bakımsa teslimde hesaplanır |
 | `ReminderSent` | Aynı hatırlatma iki kez gitmesin |
 | `WaitingForPart` | **Parça yolda.** Usta işaretler — K-033.5, K-034. Türetilemez: veride bunu söyleyen hiçbir şey yok |
+| `WithholdingRate` | **KDV tevkifat oranı — yalnız YER (C6, Faz 3).** Boş = belirlenmedi. Araç bakım-onarımında 7/10 (KDV.md §2) ama alıcıya ve tutara bağlı; hesap Faz 3'te, fatura kesme kararıyla. Ekranda yok |
 | `WaitingSince` | Bayrağın **ne zaman** konduğu — süreçte "Parça bekleniyor" adımının tarihi. Bayrak kalkınca boşalır |
 | `ShowWaitingToCustomer` | **Parça beklendiği müşteriye söylensin mi.** Bayrak açık olsa bile söylemek ayrı bir karar — A-M15, Cemil: *"İsterse, evet."* K-034'ün ölçüsünden geçiyor: kullanıcının yapabilecekleri değişmiyor |
 | `TypeSetManually` | **Türü usta elle seçti.**
@@ -106,6 +108,7 @@ Akıştaki yeri: **Adım 2, 4, 5, 6** · Ekran 3
 | `SuppliedBy` | `Shop` \| `Customer` — **K-005, sorumluluk anahtarı** |
 | `PartBrand` · `PartCode` | Ayrıştırılabildiyse (K-001). **Boş olabilir** |
 | `MatchStatus` | `Coded` \| `Matched` \| `Unidentified` — `PARCA-TANIMLAMA.md` §3 |
+| `VatRate` | **KDV oranı (yüzde) — yalnız YER (C6, Faz 3 için).** Satır eklenirken dükkânın varsayılanından (`Shop.DefaultVatRate`, 20) yazılır ve **donar**: oran devlet kararıyla değişir, geçmiş iş kendi oranıyla yeniden basılabilmeli (KDV.md §1, A-K1). Ekranda yok, hesapta yok |
 | `Position` | **Satırın sırası** — ustanın yazdığı sıra (prototipte dizinin sırası). Silinip geri alınan satır **yerine** döner (prototip: `splice(i, 0, silinen)`). Kimlik Guid olduğu ve aynı anda eklenen satırların oluşturulma anı eşit olabildiği için sıra ayrı tutulur (B3, 22.10) |
 | `SelectedReplyId` | **Kol B · hangi parçacının cevabı kullanıldı.** Birden fazla parçacıya sorulmuşsa usta birini seçiyor; seçmezse boş kalır ve akış durmaz (03.09) |
 
@@ -186,6 +189,7 @@ Akıştaki yeri: akışta **yok** — arkada birikir. `PARCA-TANIMLAMA.md` §4
 | `Name` · `Address` · `Phone` | Müşteriye giden özette (T-19) |
 | `DefaultMaintenanceMonths` | Hatırlatma periyodu — varsayılan **6** (A-3) |
 | `DefaultMaintenanceKm` | Aynı periyodun km yarısı — varsayılan **10.000**. Ay **veya** km, hangisi önce gelirse (Cemil, 03.09) |
+| `DefaultVatRate` | KDV varsayılanı, yüzde — **20** (KDV.md karar önerisi `AYAR.kdvVarsayilan`). Yeni satır bunu alır ve dondurur. Yalnız YER (C6); ayar ekranı yok |
 | `AskPartCost` | Ayarlar: parça alış fiyatı sorulsun mu (A-M43). Varsayılan **kapalı** — *"Zorunlu ya da beklenen alan olmamalı."* |
 | `PrivacyNoticeShownAt` | Gizlilik notu (A-M33) bir kez gösterildi mi — ilk ses ya da ruhsat çekiminde. Prototipte bayrak; backend'de tarih (kime, ne zaman gösterildi) |
 
