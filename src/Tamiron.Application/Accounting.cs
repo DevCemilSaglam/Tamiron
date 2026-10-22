@@ -24,9 +24,25 @@ public sealed record CsvFile(string FileName, string Content);
 /// </summary>
 public sealed record ExportCashCsv(PeriodKind Period) : IRequest<CsvFile>;
 
-internal sealed class AccountingHandlers(ITamironDb db, IClock clock) :
+public sealed record JobProfitItem(Guid RecordId, string PlateNo, ServiceType Type, string TypeLabel, string? Brand,
+                                   DateOnly DeliveredAt, decimal Received, decimal PartsCost, decimal Outside,
+                                   int UnknownCount, decimal Difference);
+
+/// <summary>
+/// İş başına fark (C1). Dönem TESLİM gününe göre (prototip donemKayitlari), en yeni üstte.
+/// <see cref="AskPartCost"/>: ekran bilinmeyen alış uyarısının çözümünü buna göre söyler
+/// (sorulmuyorsa ayarlara götürür — K-021).
+/// </summary>
+public sealed record JobProfitList(PeriodKind Period, DateOnly Start, DateOnly End, decimal Received, decimal PartsCost,
+                                   decimal Outside, int UnknownCount, decimal Difference, bool AskPartCost,
+                                   IReadOnlyList<JobProfitItem> Items);
+
+public sealed record ListJobProfits(PeriodKind Period) : IRequest<JobProfitList>;
+
+internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantContext tenant) :
     IRequestHandler<ListReceivables, ReceivableList>,
-    IRequestHandler<ExportCashCsv, CsvFile>
+    IRequestHandler<ExportCashCsv, CsvFile>,
+    IRequestHandler<ListJobProfits, JobProfitList>
 {
     private async Task<(List<ServiceRecord> delivered, Dictionary<Guid, Vehicle> vehicles)> Load(CancellationToken ct)
     {
@@ -47,6 +63,24 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock) :
                 return new ReceivableItem(r.Id, v?.PlateNo ?? "", v?.OwnerName, r.DeliveredAt, r.Total);
             }).ToList();
         return new ReceivableList(items.Sum(i => i.Total), items);
+    }
+
+    public async Task<JobProfitList> Handle(ListJobProfits q, CancellationToken ct)
+    {
+        var p = Period.Of(q.Period, clock.Today);
+        var (delivered, vehicles) = await Load(ct);
+        var items = delivered.Where(r => p.Contains(r.DeliveredAt!.Value))
+            .OrderByDescending(r => r.DeliveredAt).ThenByDescending(r => r.DateTimeCreated)
+            .Select(r =>
+            {
+                var jp = JobProfit.Of(r);
+                vehicles.TryGetValue(r.VehicleId, out var v);
+                return new JobProfitItem(r.Id, v?.PlateNo ?? "", r.Type, ServiceTypeGuess.Label(r.Type), v?.Brand,
+                    r.DeliveredAt!.Value, jp.Received, jp.PartsCost, jp.Outside, jp.UnknownCount, jp.Difference);
+            }).ToList();
+        var ask = await db.Shops.AsNoTracking().Where(s => s.Id == tenant.TenantId).Select(s => s.AskPartCost).FirstOrDefaultAsync(ct);
+        return new JobProfitList(q.Period, p.Start, p.End, items.Sum(i => i.Received), items.Sum(i => i.PartsCost),
+            items.Sum(i => i.Outside), items.Sum(i => i.UnknownCount), items.Sum(i => i.Difference), ask, items);
     }
 
     public async Task<CsvFile> Handle(ExportCashCsv q, CancellationToken ct)
