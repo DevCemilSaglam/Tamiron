@@ -41,6 +41,9 @@ public class ServiceRecord : TenantEntity
     {
         line.ServiceRecordId = Id;
         line.TenantId = TenantId;
+        // Silinmiş satırlar yüklenmez; yeni satır onların sırasını alabilir. Geri
+        // alınan satırla eşit sıra çıkarsa oluşturulma anı ayırır.
+        line.Position = _lines.Count == 0 ? 1 : _lines.Max(l => l.Position) + 1;
         _lines.Add(line);
     }
 

@@ -37,6 +37,16 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     return Results.Created($"/api/records/{r.Id}", r);
 });
 
+// Satırlar (B3). Her uç kaydın güncel hâlini döner.
+api.MapPost("/records/{id:guid}/lines", (Guid id, LineBody body, ISender s, CancellationToken ct) =>
+    s.Send(new AddLine(id, body), ct));
+api.MapPut("/records/{id:guid}/lines/{lineId:guid}", (Guid id, Guid lineId, LineBody body, ISender s, CancellationToken ct) =>
+    s.Send(new UpdateLine(id, lineId, body), ct));
+api.MapDelete("/records/{id:guid}/lines/{lineId:guid}", (Guid id, Guid lineId, ISender s, CancellationToken ct) =>
+    s.Send(new DeleteLine(id, lineId), ct));
+api.MapPost("/records/{id:guid}/lines/{lineId:guid}/restore", (Guid id, Guid lineId, ISender s, CancellationToken ct) =>
+    s.Send(new RestoreLine(id, lineId), ct));
+
 // Veresiyenin parası geldi (K-071.1). Gün SUNUCUDAN: istemci tarih göndermez.
 api.MapPost("/records/{id:guid}/collect", (Guid id, CollectBody body, ISender s, CancellationToken ct) =>
     s.Send(new CollectPayment(id, body.Method), ct));

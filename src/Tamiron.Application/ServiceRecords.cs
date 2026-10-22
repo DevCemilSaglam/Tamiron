@@ -19,7 +19,7 @@ internal static class Map
     public static ServiceRecordDto ToDto(this ServiceRecord r, string plateNo) => new(
         r.Id, r.VehicleId, plateNo, r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
         r.PaymentCollectedAt, r.CollectedOn, r.Total,
-        r.Lines.Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList());
+        r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList());
 
     public static async Task<ServiceRecordDto> LoadDto(ITamironDb db, Guid id, CancellationToken ct, bool tracking = false)
     {

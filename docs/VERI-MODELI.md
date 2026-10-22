@@ -106,6 +106,7 @@ Akıştaki yeri: **Adım 2, 4, 5, 6** · Ekran 3
 | `SuppliedBy` | `Shop` \| `Customer` — **K-005, sorumluluk anahtarı** |
 | `PartBrand` · `PartCode` | Ayrıştırılabildiyse (K-001). **Boş olabilir** |
 | `MatchStatus` | `Coded` \| `Matched` \| `Unidentified` — `PARCA-TANIMLAMA.md` §3 |
+| `Position` | **Satırın sırası** — ustanın yazdığı sıra (prototipte dizinin sırası). Silinip geri alınan satır **yerine** döner (prototip: `splice(i, 0, silinen)`). Kimlik Guid olduğu ve aynı anda eklenen satırların oluşturulma anı eşit olabildiği için sıra ayrı tutulur (B3, 22.10) |
 | `SelectedReplyId` | **Kol B · hangi parçacının cevabı kullanıldı.** Birden fazla parçacıya sorulmuşsa usta birini seçiyor; seçmezse boş kalır ve akış durmaz (03.09) |
 
 > `SuppliedBy` yalnız `Kind = Part` için anlamlı. İşçilikte boş.
