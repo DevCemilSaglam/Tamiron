@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Tamiron.Api;
 using Tamiron.Application;
 using Tamiron.Application.Accounting;
+using Tamiron.Application.Customers;
 using Tamiron.Application.Expenses;
 using Tamiron.Application.Lists;
 using Tamiron.Application.ServiceRecords;
@@ -40,6 +41,11 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+
+// Müşteriler (B10): araçtan türetilir; anahtar katlanmış ad + "|" + telefon.
+api.MapGet("/customers", (string? q, ISender s, CancellationToken ct) => s.Send(new ListCustomers(q), ct));
+api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) => s.Send(new GetCustomer(key), ct));
+api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
 // Alacak (B9): döneme tabi değil. CSV: BOM'lu UTF-8, indirilen dosya.
 api.MapGet("/receivables", (ISender s, CancellationToken ct) => s.Send(new ListReceivables(), ct));

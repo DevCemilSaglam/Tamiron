@@ -61,6 +61,18 @@ Hatırlatma, bakım ayını aşıp bir sonraki aya kaymamalı. Prototip ölçüt
 devam ediyor; bu tek fark burada yazılı. Yarım gün yuvarlaması ise prototiple
 aynı: JS `Math.round` gibi yukarı (testi var).
 
+**73.10 · Prototipten bilinçli sapma: izni geri almak (B10, 22.10) — Cemil onayına açık.**
+- **Prototipte:** izin kaldırılıp "Geri al" denince izin **eski tarihiyle** geri
+  geliyordu.
+- **API'de neden yapılmadı:** eski tarihi geri yazmanın tek yolu, tarihi
+  istemciden kabul etmek. İzin tarihi bir ispat kaydı; istemci geçmişe tarih
+  yazabilirse kaydın değeri kalmaz. Bu yüzden API tarihi yalnız sunucudan
+  yazıyor.
+- **Sonuç:** kaldırılıp yeniden verilen izin bugünün tarihini alır. Zaten
+  izni olana ikinci "evet" eski tarihi korur.
+- **Doğru çözüm:** izin geçmişi tablosu (kim, ne zaman, nasıl; İYS ile
+  birlikte, K-071.3). Kuyrukta `BEKLİYOR`.
+
 **73.8 · İlk dilim bitti — ölçüm.**
 - Domain'de 22 test, LocalDB üzerinde API'de 5 test; hepsi yeşil.
 - Üç kural bilerek bozuldu, üçünde de testler kırmızıya döndü:
