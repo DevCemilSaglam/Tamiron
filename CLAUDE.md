@@ -41,6 +41,7 @@ v1 (`github.com/DevCemilSaglam/Tamiron-v1`, 195 commit) bir prototipe kadar gitt
 - Derle ve test et: `dotnet build Tamiron.sln` · `dotnet test Tamiron.sln`.
 - Kuralı koruyan test var mı: `python tools/mutasyon.py <mutasyonlar.json>` — kuralı bozar, en az bir test kırmızı olmalı.
 - İş sırası ve çalışma döngüsü: `docs/BACKEND-KUYRUGU.md`.
+- Prototip ↔ API muhasebe eşdeğerliği: `node tools/muhasebe-esdeger.js` prototipin kendi fonksiyonlarıyla rakamları döker; `PrototypeEquivalenceTests` 0 fark ister. Prototipte muhasebe kuralı değişirse araç yeniden koşulur.
 
 ## Araçlar
 - `tools/saglik-denetim.js` — prototip sağlık denetimi. **Her testi gerçekten yaşanmış bir hata sınıfını** otomatikleştiriyor; ekranları değil hata türlerini test eder, o yüzden yeni prototipte de geçerli.

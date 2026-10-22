@@ -21,6 +21,11 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <!-- C10: prototipin rakamları (tools/muhasebe-esdeger.js üretir) testin yanına kopyalanır. -->
+  <ItemGroup>
+    <None Include="Esdeger\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Tamiron.Api\Tamiron.Api.csproj" />
     <ProjectReference Include="..\..\src\Tamiron.Infrastructure\Tamiron.Infrastructure.csproj" />

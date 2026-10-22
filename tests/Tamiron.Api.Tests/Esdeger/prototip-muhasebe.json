@@ -1,0 +1,1462 @@
+[
+  {
+    "ad": "tohum",
+    "bugun": "03.09.2026",
+    "araclar": [
+      {
+        "plaka": "34 ABC 123",
+        "marka": "Renault",
+        "model": "Mégane",
+        "yil": "2018",
+        "motor": "1.5 dCi",
+        "vin": "VF1RFB00858123456",
+        "renk": "Gri Metalik",
+        "yakit": "Dizel",
+        "motorNo": "K9K872C123456",
+        "silindir": "1461",
+        "guc": "110",
+        "koltuk": "5",
+        "ilkTescil": "14.06.2018",
+        "depo": "50",
+        "sahipAd": "Mehmet Kaya",
+        "sahipTel": "0532 215 30 00",
+        "tcVergiNo": "12345678901",
+        "adres": "Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli",
+        "vergiDairesi": "",
+        "not": "Arka cam kolu kırık — müşteri biliyor.",
+        "iletiIzni": {
+          "tarih": "14.06.2026"
+        }
+      },
+      {
+        "plaka": "06 TMR 07",
+        "marka": "Fiat",
+        "model": "Egea",
+        "yil": "2021",
+        "motor": "1.4 Fire",
+        "vin": "NM4358004ZT129041",
+        "renk": "Beyaz",
+        "yakit": "Benzin",
+        "motorNo": "843A1000098765",
+        "silindir": "1368",
+        "guc": "95",
+        "koltuk": "5",
+        "ilkTescil": "02.03.2021",
+        "depo": "45",
+        "sahipAd": "Demir Nakliyat Ltd. Şti.",
+        "sahipTel": "0312 395 12 00",
+        "iletisimAd": "Hasan Demir",
+        "iletisimTel": "0542 331 90 07",
+        "tcVergiNo": "2960412771",
+        "adres": "Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara",
+        "vergiDairesi": "Ostim",
+        "not": ""
+      },
+      {
+        "plaka": "35 KLM 45",
+        "marka": "Peugeot",
+        "model": "301",
+        "yil": "2019",
+        "motor": "1.6 BlueHDi",
+        "vin": "VF3DDBHYAKS012345",
+        "renk": "Lacivert",
+        "yakit": "Dizel",
+        "motorNo": "DV6FD10JBCE4455",
+        "silindir": "1560",
+        "guc": "100",
+        "koltuk": "5",
+        "ilkTescil": "21.11.2019",
+        "depo": "50",
+        "sahipAd": "Ayşe Kaya",
+        "sahipTel": "",
+        "tcVergiNo": "",
+        "adres": "",
+        "vergiDairesi": "",
+        "not": ""
+      },
+      {
+        "plaka": "16 SY 8890",
+        "marka": "Volkswagen",
+        "model": "Golf",
+        "yil": "2016",
+        "motor": "1.6 TDI",
+        "vin": "WVWZZZAUZGW123456",
+        "renk": "Siyah",
+        "yakit": "Dizel",
+        "motorNo": "CLH1234567",
+        "silindir": "1598",
+        "guc": "110",
+        "koltuk": "5",
+        "ilkTescil": "08.08.2016",
+        "depo": "50",
+        "sahipAd": "Selim Aydın",
+        "sahipTel": "0537 662 08 41",
+        "tcVergiNo": "45678901234",
+        "adres": "Cedit Mah. Hisar Geçidi Sk. No:1/9 İzmit / Kocaeli",
+        "vergiDairesi": "",
+        "not": ""
+      }
+    ],
+    "kayitlar": [
+      {
+        "id": 1,
+        "plaka": "34 ABC 123",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Triger seti değişecek",
+        "acilis": "03.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": true,
+        "bekliyorMusteriye": true,
+        "bekliyorTarihi": "03.09.2026",
+        "turElle": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Triger seti",
+            "fiyat": 0,
+            "alis": null,
+            "kimGetirdi": "tamirci",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi",
+            "sorulan": null
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "plaka": "06 TMR 07",
+        "tur": "bakim",
+        "km": "86.400",
+        "sikayet": "Periyodik bakım",
+        "acilis": "02.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1900,
+            "alis": 1450,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "parca",
+            "ad": "Yağ filtresi",
+            "fiyat": 260,
+            "alis": 180,
+            "kimGetirdi": "tamirci",
+            "marka": "Mann",
+            "kod": "W 71180",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "plaka": "35 KLM 45",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Ön balata değişimi",
+        "acilis": "01.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Ön fren balatası",
+            "fiyat": 0,
+            "alis": null,
+            "kimGetirdi": "musteri",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Balata değişimi",
+            "fiyat": 800,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "plaka": "34 ABC 123",
+        "tur": "bakim",
+        "km": "142.500",
+        "sikayet": "Periyodik bakım",
+        "acilis": "15.03.2026",
+        "teslimTarihi": "15.03.2026",
+        "odemeYolu": "nakit",
+        "hatirlatmaTarihi": "15.09.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1800,
+            "alis": 1400,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 850,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "plaka": "34 ABC 123",
+        "tur": "bakim",
+        "km": "151.200",
+        "sikayet": "Ara bakım",
+        "acilis": "20.06.2026",
+        "teslimTarihi": "20.06.2026",
+        "odemeYolu": "havale",
+        "hatirlatmaTarihi": "20.12.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1950,
+            "alis": 1500,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "plaka": "35 KLM 45",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Ön cam silecek motoru",
+        "acilis": "03.09.2026",
+        "teslimTarihi": "03.09.2026",
+        "odemeYolu": "nakit",
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Silecek motoru",
+            "fiyat": 2100,
+            "alis": null,
+            "kimGetirdi": "tamirci",
+            "marka": "Valeo",
+            "kod": "579713",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Söküm takım",
+            "fiyat": 700,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "plaka": "06 TMR 07",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Akü değişimi",
+        "acilis": "28.08.2026",
+        "teslimTarihi": "28.08.2026",
+        "odemeYolu": "almadim",
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "tahsilTarihi": null,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Akü 60 Ah",
+            "fiyat": 3200,
+            "alis": 2450,
+            "kimGetirdi": "tamirci",
+            "marka": "Mutlu",
+            "kod": "SFB 60",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Takma",
+            "fiyat": 250,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "plaka": "16 SY 8890",
+        "tur": "bakim",
+        "km": "88.000",
+        "sikayet": "Periyodik bakım",
+        "acilis": "20.02.2026",
+        "teslimTarihi": "20.02.2026",
+        "odemeYolu": "kart",
+        "hatirlatmaTarihi": "20.08.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Yağ filtresi",
+            "fiyat": 320,
+            "alis": 210,
+            "kimGetirdi": "tamirci",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      }
+    ],
+    "giderler": [
+      {
+        "id": 1,
+        "tarih": "01.09.2026",
+        "aciklama": "Elektrik faturası",
+        "tutar": 2400
+      },
+      {
+        "id": 2,
+        "tarih": "02.09.2026",
+        "aciklama": "Dükkân kirası",
+        "tutar": 12000
+      }
+    ],
+    "veresiye": 3450,
+    "bugunTahsilat": 2800,
+    "donemler": {
+      "bugun": {
+        "nakit": 2800,
+        "kart": 0,
+        "havale": 0,
+        "tahsilat": 2800,
+        "teslim": 1,
+        "gider": 0,
+        "parcaAlisi": 0,
+        "isKari": [
+          {
+            "alinan": 2800,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 700,
+            "id": 7
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;03.09.2026;Ön cam silecek motoru;35 KLM 45;Ayşe Kaya;Nakit;2800\r\nAlacak;28.08.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Alınmadı;3450\r\n"
+      },
+      "ay": {
+        "nakit": 2800,
+        "kart": 0,
+        "havale": 0,
+        "tahsilat": 2800,
+        "teslim": 1,
+        "gider": 14400,
+        "parcaAlisi": 0,
+        "isKari": [
+          {
+            "alinan": 2800,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 700,
+            "id": 7
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;03.09.2026;Ön cam silecek motoru;35 KLM 45;Ayşe Kaya;Nakit;2800\r\nGider;01.09.2026;Elektrik faturası;;;;2400\r\nGider;02.09.2026;Dükkân kirası;;;;12000\r\nAlacak;28.08.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Alınmadı;3450\r\n"
+      },
+      "yil": {
+        "nakit": 5450,
+        "kart": 1220,
+        "havale": 2850,
+        "tahsilat": 9520,
+        "teslim": 5,
+        "gider": 14400,
+        "parcaAlisi": 5560,
+        "isKari": [
+          {
+            "alinan": 2650,
+            "parca": 1400,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1250,
+            "id": 4
+          },
+          {
+            "alinan": 2850,
+            "parca": 1500,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1350,
+            "id": 6
+          },
+          {
+            "alinan": 2800,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 700,
+            "id": 7
+          },
+          {
+            "alinan": 3450,
+            "parca": 2450,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1000,
+            "id": 8
+          },
+          {
+            "alinan": 1220,
+            "parca": 210,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1010,
+            "id": 5
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;20.02.2026;Periyodik bakım;16 SY 8890;Selim Aydın;Kart;1220\r\nTahsilat;15.03.2026;Periyodik bakım;34 ABC 123;Mehmet Kaya;Nakit;2650\r\nTahsilat;20.06.2026;Ara bakım;34 ABC 123;Mehmet Kaya;Havale;2850\r\nTahsilat;03.09.2026;Ön cam silecek motoru;35 KLM 45;Ayşe Kaya;Nakit;2800\r\nGider;01.09.2026;Elektrik faturası;;;;2400\r\nGider;02.09.2026;Dükkân kirası;;;;12000\r\nAlacak;28.08.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Alınmadı;3450\r\n"
+      }
+    }
+  },
+  {
+    "ad": "veresiye-bugun-kart",
+    "bugun": "03.09.2026",
+    "araclar": [
+      {
+        "plaka": "34 ABC 123",
+        "marka": "Renault",
+        "model": "Mégane",
+        "yil": "2018",
+        "motor": "1.5 dCi",
+        "vin": "VF1RFB00858123456",
+        "renk": "Gri Metalik",
+        "yakit": "Dizel",
+        "motorNo": "K9K872C123456",
+        "silindir": "1461",
+        "guc": "110",
+        "koltuk": "5",
+        "ilkTescil": "14.06.2018",
+        "depo": "50",
+        "sahipAd": "Mehmet Kaya",
+        "sahipTel": "0532 215 30 00",
+        "tcVergiNo": "12345678901",
+        "adres": "Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli",
+        "vergiDairesi": "",
+        "not": "Arka cam kolu kırık — müşteri biliyor.",
+        "iletiIzni": {
+          "tarih": "14.06.2026"
+        }
+      },
+      {
+        "plaka": "06 TMR 07",
+        "marka": "Fiat",
+        "model": "Egea",
+        "yil": "2021",
+        "motor": "1.4 Fire",
+        "vin": "NM4358004ZT129041",
+        "renk": "Beyaz",
+        "yakit": "Benzin",
+        "motorNo": "843A1000098765",
+        "silindir": "1368",
+        "guc": "95",
+        "koltuk": "5",
+        "ilkTescil": "02.03.2021",
+        "depo": "45",
+        "sahipAd": "Demir Nakliyat Ltd. Şti.",
+        "sahipTel": "0312 395 12 00",
+        "iletisimAd": "Hasan Demir",
+        "iletisimTel": "0542 331 90 07",
+        "tcVergiNo": "2960412771",
+        "adres": "Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara",
+        "vergiDairesi": "Ostim",
+        "not": ""
+      },
+      {
+        "plaka": "35 KLM 45",
+        "marka": "Peugeot",
+        "model": "301",
+        "yil": "2019",
+        "motor": "1.6 BlueHDi",
+        "vin": "VF3DDBHYAKS012345",
+        "renk": "Lacivert",
+        "yakit": "Dizel",
+        "motorNo": "DV6FD10JBCE4455",
+        "silindir": "1560",
+        "guc": "100",
+        "koltuk": "5",
+        "ilkTescil": "21.11.2019",
+        "depo": "50",
+        "sahipAd": "Ayşe Kaya",
+        "sahipTel": "",
+        "tcVergiNo": "",
+        "adres": "",
+        "vergiDairesi": "",
+        "not": ""
+      },
+      {
+        "plaka": "16 SY 8890",
+        "marka": "Volkswagen",
+        "model": "Golf",
+        "yil": "2016",
+        "motor": "1.6 TDI",
+        "vin": "WVWZZZAUZGW123456",
+        "renk": "Siyah",
+        "yakit": "Dizel",
+        "motorNo": "CLH1234567",
+        "silindir": "1598",
+        "guc": "110",
+        "koltuk": "5",
+        "ilkTescil": "08.08.2016",
+        "depo": "50",
+        "sahipAd": "Selim Aydın",
+        "sahipTel": "0537 662 08 41",
+        "tcVergiNo": "45678901234",
+        "adres": "Cedit Mah. Hisar Geçidi Sk. No:1/9 İzmit / Kocaeli",
+        "vergiDairesi": "",
+        "not": ""
+      }
+    ],
+    "kayitlar": [
+      {
+        "id": 1,
+        "plaka": "34 ABC 123",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Triger seti değişecek",
+        "acilis": "03.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": true,
+        "bekliyorMusteriye": true,
+        "bekliyorTarihi": "03.09.2026",
+        "turElle": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Triger seti",
+            "fiyat": 0,
+            "alis": null,
+            "kimGetirdi": "tamirci",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi",
+            "sorulan": null
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "plaka": "06 TMR 07",
+        "tur": "bakim",
+        "km": "86.400",
+        "sikayet": "Periyodik bakım",
+        "acilis": "02.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1900,
+            "alis": 1450,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "parca",
+            "ad": "Yağ filtresi",
+            "fiyat": 260,
+            "alis": 180,
+            "kimGetirdi": "tamirci",
+            "marka": "Mann",
+            "kod": "W 71180",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "plaka": "35 KLM 45",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Ön balata değişimi",
+        "acilis": "01.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Ön fren balatası",
+            "fiyat": 0,
+            "alis": null,
+            "kimGetirdi": "musteri",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Balata değişimi",
+            "fiyat": 800,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "plaka": "34 ABC 123",
+        "tur": "bakim",
+        "km": "142.500",
+        "sikayet": "Periyodik bakım",
+        "acilis": "15.03.2026",
+        "teslimTarihi": "15.03.2026",
+        "odemeYolu": "nakit",
+        "hatirlatmaTarihi": "15.09.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1800,
+            "alis": 1400,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 850,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "plaka": "34 ABC 123",
+        "tur": "bakim",
+        "km": "151.200",
+        "sikayet": "Ara bakım",
+        "acilis": "20.06.2026",
+        "teslimTarihi": "20.06.2026",
+        "odemeYolu": "havale",
+        "hatirlatmaTarihi": "20.12.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1950,
+            "alis": 1500,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "plaka": "35 KLM 45",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Ön cam silecek motoru",
+        "acilis": "03.09.2026",
+        "teslimTarihi": "03.09.2026",
+        "odemeYolu": "nakit",
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Silecek motoru",
+            "fiyat": 2100,
+            "alis": null,
+            "kimGetirdi": "tamirci",
+            "marka": "Valeo",
+            "kod": "579713",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Söküm takım",
+            "fiyat": 700,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "plaka": "06 TMR 07",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Akü değişimi",
+        "acilis": "28.08.2026",
+        "teslimTarihi": "28.08.2026",
+        "odemeYolu": "kart",
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "tahsilTarihi": "03.09.2026",
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Akü 60 Ah",
+            "fiyat": 3200,
+            "alis": 2450,
+            "kimGetirdi": "tamirci",
+            "marka": "Mutlu",
+            "kod": "SFB 60",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Takma",
+            "fiyat": 250,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "plaka": "16 SY 8890",
+        "tur": "bakim",
+        "km": "88.000",
+        "sikayet": "Periyodik bakım",
+        "acilis": "20.02.2026",
+        "teslimTarihi": "20.02.2026",
+        "odemeYolu": "kart",
+        "hatirlatmaTarihi": "20.08.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Yağ filtresi",
+            "fiyat": 320,
+            "alis": 210,
+            "kimGetirdi": "tamirci",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      }
+    ],
+    "giderler": [
+      {
+        "id": 1,
+        "tarih": "01.09.2026",
+        "aciklama": "Elektrik faturası",
+        "tutar": 2400
+      },
+      {
+        "id": 2,
+        "tarih": "02.09.2026",
+        "aciklama": "Dükkân kirası",
+        "tutar": 12000
+      }
+    ],
+    "veresiye": 0,
+    "bugunTahsilat": 6250,
+    "donemler": {
+      "bugun": {
+        "nakit": 2800,
+        "kart": 3450,
+        "havale": 0,
+        "tahsilat": 6250,
+        "teslim": 1,
+        "gider": 0,
+        "parcaAlisi": 0,
+        "isKari": [
+          {
+            "alinan": 2800,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 700,
+            "id": 7
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;03.09.2026;Ön cam silecek motoru;35 KLM 45;Ayşe Kaya;Nakit;2800\r\nTahsilat;03.09.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Kart;3450\r\n"
+      },
+      "ay": {
+        "nakit": 2800,
+        "kart": 3450,
+        "havale": 0,
+        "tahsilat": 6250,
+        "teslim": 1,
+        "gider": 14400,
+        "parcaAlisi": 0,
+        "isKari": [
+          {
+            "alinan": 2800,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 700,
+            "id": 7
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;03.09.2026;Ön cam silecek motoru;35 KLM 45;Ayşe Kaya;Nakit;2800\r\nTahsilat;03.09.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Kart;3450\r\nGider;01.09.2026;Elektrik faturası;;;;2400\r\nGider;02.09.2026;Dükkân kirası;;;;12000\r\n"
+      },
+      "yil": {
+        "nakit": 5450,
+        "kart": 4670,
+        "havale": 2850,
+        "tahsilat": 12970,
+        "teslim": 5,
+        "gider": 14400,
+        "parcaAlisi": 5560,
+        "isKari": [
+          {
+            "alinan": 2650,
+            "parca": 1400,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1250,
+            "id": 4
+          },
+          {
+            "alinan": 2850,
+            "parca": 1500,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1350,
+            "id": 6
+          },
+          {
+            "alinan": 2800,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 700,
+            "id": 7
+          },
+          {
+            "alinan": 3450,
+            "parca": 2450,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1000,
+            "id": 8
+          },
+          {
+            "alinan": 1220,
+            "parca": 210,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1010,
+            "id": 5
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;20.02.2026;Periyodik bakım;16 SY 8890;Selim Aydın;Kart;1220\r\nTahsilat;15.03.2026;Periyodik bakım;34 ABC 123;Mehmet Kaya;Nakit;2650\r\nTahsilat;20.06.2026;Ara bakım;34 ABC 123;Mehmet Kaya;Havale;2850\r\nTahsilat;03.09.2026;Ön cam silecek motoru;35 KLM 45;Ayşe Kaya;Nakit;2800\r\nTahsilat;03.09.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Kart;3450\r\nGider;01.09.2026;Elektrik faturası;;;;2400\r\nGider;02.09.2026;Dükkân kirası;;;;12000\r\n"
+      }
+    }
+  },
+  {
+    "ad": "kenar-durumlar",
+    "bugun": "03.09.2026",
+    "araclar": [
+      {
+        "plaka": "34 ABC 123",
+        "marka": "Renault",
+        "model": "Mégane",
+        "yil": "2018",
+        "motor": "1.5 dCi",
+        "vin": "VF1RFB00858123456",
+        "renk": "Gri Metalik",
+        "yakit": "Dizel",
+        "motorNo": "K9K872C123456",
+        "silindir": "1461",
+        "guc": "110",
+        "koltuk": "5",
+        "ilkTescil": "14.06.2018",
+        "depo": "50",
+        "sahipAd": "Mehmet Kaya",
+        "sahipTel": "0532 215 30 00",
+        "tcVergiNo": "12345678901",
+        "adres": "Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli",
+        "vergiDairesi": "",
+        "not": "Arka cam kolu kırık — müşteri biliyor.",
+        "iletiIzni": {
+          "tarih": "14.06.2026"
+        }
+      },
+      {
+        "plaka": "06 TMR 07",
+        "marka": "Fiat",
+        "model": "Egea",
+        "yil": "2021",
+        "motor": "1.4 Fire",
+        "vin": "NM4358004ZT129041",
+        "renk": "Beyaz",
+        "yakit": "Benzin",
+        "motorNo": "843A1000098765",
+        "silindir": "1368",
+        "guc": "95",
+        "koltuk": "5",
+        "ilkTescil": "02.03.2021",
+        "depo": "45",
+        "sahipAd": "Demir Nakliyat Ltd. Şti.",
+        "sahipTel": "0312 395 12 00",
+        "iletisimAd": "Hasan Demir",
+        "iletisimTel": "0542 331 90 07",
+        "tcVergiNo": "2960412771",
+        "adres": "Ostim OSB 1234. Sk. No:7 Yenimahalle / Ankara",
+        "vergiDairesi": "Ostim",
+        "not": ""
+      },
+      {
+        "plaka": "35 KLM 45",
+        "marka": "Peugeot",
+        "model": "301",
+        "yil": "2019",
+        "motor": "1.6 BlueHDi",
+        "vin": "VF3DDBHYAKS012345",
+        "renk": "Lacivert",
+        "yakit": "Dizel",
+        "motorNo": "DV6FD10JBCE4455",
+        "silindir": "1560",
+        "guc": "100",
+        "koltuk": "5",
+        "ilkTescil": "21.11.2019",
+        "depo": "50",
+        "sahipAd": "Ayşe Kaya",
+        "sahipTel": "",
+        "tcVergiNo": "",
+        "adres": "",
+        "vergiDairesi": "",
+        "not": ""
+      },
+      {
+        "plaka": "16 SY 8890",
+        "marka": "Volkswagen",
+        "model": "Golf",
+        "yil": "2016",
+        "motor": "1.6 TDI",
+        "vin": "WVWZZZAUZGW123456",
+        "renk": "Siyah",
+        "yakit": "Dizel",
+        "motorNo": "CLH1234567",
+        "silindir": "1598",
+        "guc": "110",
+        "koltuk": "5",
+        "ilkTescil": "08.08.2016",
+        "depo": "50",
+        "sahipAd": "Selim Aydın",
+        "sahipTel": "0537 662 08 41",
+        "tcVergiNo": "45678901234",
+        "adres": "Cedit Mah. Hisar Geçidi Sk. No:1/9 İzmit / Kocaeli",
+        "vergiDairesi": "",
+        "not": ""
+      }
+    ],
+    "kayitlar": [
+      {
+        "id": 1,
+        "plaka": "34 ABC 123",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Triger seti değişecek",
+        "acilis": "03.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": true,
+        "bekliyorMusteriye": true,
+        "bekliyorTarihi": "03.09.2026",
+        "turElle": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Triger seti",
+            "fiyat": 0,
+            "alis": null,
+            "kimGetirdi": "tamirci",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi",
+            "sorulan": null
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "plaka": "06 TMR 07",
+        "tur": "bakim",
+        "km": "86.400",
+        "sikayet": "Periyodik bakım",
+        "acilis": "02.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1900,
+            "alis": 1450,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "parca",
+            "ad": "Yağ filtresi",
+            "fiyat": 260,
+            "alis": 180,
+            "kimGetirdi": "tamirci",
+            "marka": "Mann",
+            "kod": "W 71180",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "plaka": "35 KLM 45",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Ön balata değişimi",
+        "acilis": "01.09.2026",
+        "teslimTarihi": null,
+        "odemeYolu": null,
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Ön fren balatası",
+            "fiyat": 0,
+            "alis": null,
+            "kimGetirdi": "musteri",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Balata değişimi",
+            "fiyat": 800,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 4,
+        "plaka": "34 ABC 123",
+        "tur": "bakim",
+        "km": "142.500",
+        "sikayet": "Periyodik bakım",
+        "acilis": "15.03.2026",
+        "teslimTarihi": "15.03.2026",
+        "odemeYolu": "nakit",
+        "hatirlatmaTarihi": "15.09.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1800,
+            "alis": 1400,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 850,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 6,
+        "plaka": "34 ABC 123",
+        "tur": "bakim",
+        "km": "151.200",
+        "sikayet": "Ara bakım",
+        "acilis": "20.06.2026",
+        "teslimTarihi": "20.06.2026",
+        "odemeYolu": "havale",
+        "hatirlatmaTarihi": "20.12.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Motor yağı",
+            "fiyat": 1950,
+            "alis": 1500,
+            "kimGetirdi": "tamirci",
+            "marka": "Motul",
+            "kod": "8100 5W-30",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 7,
+        "plaka": "35 KLM 45",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "",
+        "acilis": "03.09.2026",
+        "teslimTarihi": "03.09.2026",
+        "odemeYolu": "nakit",
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Silecek motoru",
+            "fiyat": 2100,
+            "alis": null,
+            "kimGetirdi": "tamirci",
+            "marka": "Valeo",
+            "kod": "579713",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Söküm takım",
+            "fiyat": 700,
+            "alis": null,
+            "kimGetirdi": ""
+          },
+          {
+            "tip": "parca",
+            "ad": "Conta",
+            "fiyat": 50,
+            "alis": 0,
+            "kimGetirdi": "tamirci"
+          },
+          {
+            "tip": "parca",
+            "ad": "Silecek lastiği",
+            "fiyat": 300,
+            "alis": 120,
+            "kimGetirdi": "musteri"
+          }
+        ]
+      },
+      {
+        "id": 8,
+        "plaka": "06 TMR 07",
+        "tur": "tamirat",
+        "km": "",
+        "sikayet": "Akü değişimi",
+        "acilis": "28.08.2026",
+        "teslimTarihi": "28.08.2026",
+        "odemeYolu": "almadim",
+        "hatirlatmaTarihi": null,
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "tahsilTarihi": null,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Akü 60 Ah",
+            "fiyat": 3200,
+            "alis": 2450,
+            "kimGetirdi": "tamirci",
+            "marka": "Mutlu",
+            "kod": "SFB 60",
+            "tanim": "kodlu"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Takma",
+            "fiyat": 250,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "plaka": "16 SY 8890",
+        "tur": "bakim",
+        "km": "88.000",
+        "sikayet": "Periyodik bakım",
+        "acilis": "20.02.2026",
+        "teslimTarihi": "20.02.2026",
+        "odemeYolu": "kart",
+        "hatirlatmaTarihi": "20.08.2026",
+        "hatirlatmaGonderildi": false,
+        "parcaBekliyor": false,
+        "bekliyorMusteriye": false,
+        "satirlar": [
+          {
+            "tip": "parca",
+            "ad": "Yağ filtresi",
+            "fiyat": 320,
+            "alis": 210,
+            "kimGetirdi": "tamirci",
+            "marka": "",
+            "kod": "",
+            "tanim": "tanimlanamadi"
+          },
+          {
+            "tip": "iscilik",
+            "ad": "Bakım işçiliği",
+            "fiyat": 900,
+            "alis": null,
+            "kimGetirdi": ""
+          }
+        ]
+      }
+    ],
+    "giderler": [
+      {
+        "id": 1,
+        "tarih": "01.09.2026",
+        "aciklama": "Elektrik faturası",
+        "tutar": 2400
+      },
+      {
+        "id": 2,
+        "tarih": "02.09.2026",
+        "aciklama": "Dükkân kirası",
+        "tutar": 12000
+      }
+    ],
+    "veresiye": 3450,
+    "bugunTahsilat": 2850,
+    "donemler": {
+      "bugun": {
+        "nakit": 2850,
+        "kart": 0,
+        "havale": 0,
+        "tahsilat": 2850,
+        "teslim": 1,
+        "gider": 0,
+        "parcaAlisi": 0,
+        "isKari": [
+          {
+            "alinan": 2850,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 750,
+            "id": 7
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;03.09.2026;Servis kaydı;35 KLM 45;Ayşe Kaya;Nakit;2850\r\nAlacak;28.08.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Alınmadı;3450\r\n"
+      },
+      "ay": {
+        "nakit": 2850,
+        "kart": 0,
+        "havale": 0,
+        "tahsilat": 2850,
+        "teslim": 1,
+        "gider": 14400,
+        "parcaAlisi": 0,
+        "isKari": [
+          {
+            "alinan": 2850,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 750,
+            "id": 7
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;03.09.2026;Servis kaydı;35 KLM 45;Ayşe Kaya;Nakit;2850\r\nGider;01.09.2026;Elektrik faturası;;;;2400\r\nGider;02.09.2026;Dükkân kirası;;;;12000\r\nAlacak;28.08.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Alınmadı;3450\r\n"
+      },
+      "yil": {
+        "nakit": 5500,
+        "kart": 1220,
+        "havale": 2850,
+        "tahsilat": 9570,
+        "teslim": 5,
+        "gider": 14400,
+        "parcaAlisi": 5560,
+        "isKari": [
+          {
+            "alinan": 2650,
+            "parca": 1400,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1250,
+            "id": 4
+          },
+          {
+            "alinan": 2850,
+            "parca": 1500,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1350,
+            "id": 6
+          },
+          {
+            "alinan": 2850,
+            "parca": 0,
+            "disarida": 2100,
+            "bilinmeyen": 1,
+            "fark": 750,
+            "id": 7
+          },
+          {
+            "alinan": 3450,
+            "parca": 2450,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1000,
+            "id": 8
+          },
+          {
+            "alinan": 1220,
+            "parca": 210,
+            "disarida": 0,
+            "bilinmeyen": 0,
+            "fark": 1010,
+            "id": 5
+          }
+        ],
+        "csv": "﻿Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar\r\nTahsilat;20.02.2026;Periyodik bakım;16 SY 8890;Selim Aydın;Kart;1220\r\nTahsilat;15.03.2026;Periyodik bakım;34 ABC 123;Mehmet Kaya;Nakit;2650\r\nTahsilat;20.06.2026;Ara bakım;34 ABC 123;Mehmet Kaya;Havale;2850\r\nTahsilat;03.09.2026;Servis kaydı;35 KLM 45;Ayşe Kaya;Nakit;2850\r\nGider;01.09.2026;Elektrik faturası;;;;2400\r\nGider;02.09.2026;Dükkân kirası;;;;12000\r\nAlacak;28.08.2026;Akü değişimi;06 TMR 07;Demir Nakliyat Ltd. Şti.;Alınmadı;3450\r\n"
+      }
+    }
+  }
+]
