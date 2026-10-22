@@ -2715,6 +2715,58 @@ function stilMetni() {
     }
   })();
 
+  /* 62 · ILETI-IZNI (22.10 · A-M21). Hata sinifi: toplu mesaj telefonu
+     olan HERKESE gidiyordu; izinsiz ticari ileti cezali ve numarayi
+     engelletebilir (engellenen numaradan ozet/hatirlatma da gitmez).
+     Sinanan:
+       a) topluAlicilar'da izni olmayan YOK, izinsiz telefonlu musteri
+          topluIzinsizler'de;
+       b) musteri ekraninda izin cipi var; dokununca izin BUGUNUN tarihiyle
+          yazilir ve musteri alicilara girer;
+       c) "Geri al" izni kaldirir, musteri alicilardan cikar.
+     NEGATIF DOGRULAMA (22.10): topluAlicilar suzgecsiz -> bulgu; geri -> 0. */
+  (function () {
+    if (typeof topluAlicilar !== 'function' || typeof musteriIzni !== 'function') {
+      ek('ILETI-IZNI', 'mesaj', 'izin islevleri yok'); return;
+    }
+    var al = topluAlicilar(), izs = topluIzinsizler();
+    var ms = musteriler();
+    al.forEach(function (x) {
+      var m = ms.filter(function (y) { return y.araclar.some(function (a) { return a.plaka === x.plaka; }); })[0];
+      if (!musteriIzni(m)) ek('ILETI-IZNI', 'mesaj', x.ad + ' izni yok ama toplu mesaj alicisi');
+    });
+    var hedef = ms.filter(function (m) { return m.tel && !musteriIzni(m); })[0];
+    if (!hedef) { ek('ILETI-IZNI', 'musteri', 'izinsiz telefonlu musteri yok -- olculemedi'); return; }
+    if (!izs.some(function (x) { return x.ad === hedef.ad || hedef.araclar.some(function (a) { return a.plaka === x.plaka; }); }))
+      ek('ILETI-IZNI', 'mesaj', hedef.ad + ' izinsiz ama "gitmeyecek" listesinde yok');
+    if (typeof Ekran === 'undefined' || !Ekran.ac) return;
+    var ym = window.ACIK_MUSTERI;
+    function alicida() {
+      return topluAlicilar().some(function (x) { return hedef.araclar.some(function (a) { return a.plaka === x.plaka; }); });
+    }
+    try {
+      window.ACIK_MUSTERI = hedef.anahtar;
+      Ekran.ac('home'); Ekran.ac('musteri');
+      var cip = document.getElementById('mstIzin');
+      if (!cip) { ek('ILETI-IZNI', 'musteri', 'izin cipi yok'); return; }
+      if (cip.getAttribute('aria-pressed') !== 'false') ek('ILETI-IZNI', 'musteri', 'izinsiz musteride cip basili gorunuyor');
+      cip.click();
+      var iz = musteriIzni(musteriBul(hedef.anahtar));
+      if (!iz || iz.tarih !== bugunMetin()) ek('ILETI-IZNI', 'musteri', 'izin bugunun tarihiyle yazilmadi');
+      if (!alicida()) ek('ILETI-IZNI', 'mesaj', 'izin verilen musteri toplu alicilara girmedi');
+      var geri = document.querySelector('[data-geri-al]');
+      if (!geri) ek('ILETI-IZNI', 'musteri', '"Geri al" yok');
+      else {
+        geri.click();
+        if (musteriIzni(musteriBul(hedef.anahtar)) || alicida()) ek('ILETI-IZNI', 'musteri', '"Geri al" izni kaldirmadi');
+      }
+    } finally {
+      hedef.araclar.forEach(function (a) { delete a.iletiIzni; });
+      window.ACIK_MUSTERI = ym;
+      Ekran.ac('home');
+    }
+  })();
+
   /* 61 · GRID-ALANSIZ (22.10). Hata sinifi: adli alanlarla (grid-template-
      areas) dizilmis bir gövdeye yeni oge eklenip ALAN VERILMEYINCE grid onu
      ilk BOS hucreye koyuyor — disa aktarma dugmeleri gider formunun

@@ -26,7 +26,10 @@ var ARACLAR = [
     depo: '50',
     sahipAd: 'Mehmet Kaya', sahipTel: '0532 215 30 00',
     tcVergiNo: '12345678901', adres: 'Alikahya Mah. Sanayi Cad. No:14/3 İzmit / Kocaeli',
-    vergiDairesi: '', not: 'Arka cam kolu kırık — müşteri biliyor.' },
+    vergiDairesi: '', not: 'Arka cam kolu kırık — müşteri biliyor.',
+    /* TİCARİ İLETİ İZNİ (A-M21) — prototipte bir müşteride VAR ki toplu
+       mesajın "izni olan / olmayan" ayrımı görünsün. */
+    iletiIzni: { tarih: '14.06.2026' } },
   { plaka: '06 TMR 07', marka: 'Fiat', model: 'Egea', yil: '2021',
     motor: '1.4 Fire', vin: 'NM4358004ZT129041',
     renk: 'Beyaz', yakit: 'Benzin', motorNo: '843A1000098765',
@@ -282,14 +285,41 @@ HAZIR_METIN.forEach(function (h) { SABLON_AD[h.k] = h.ad; });
    Telefonu olan her müşteri, bir kez. Hangi numara: satırda görünen
    araç üzerinden mesajHedefi() — yani listede gördüğü kişi kim ise o
    (firma santrali değil, aracı getiren kişi · A-M2). */
-function topluAlicilar() {
+/* ⚠️ 22.10 — YALNIZ İZNİ OLANLAR (A-M21 · MUH sırasının son işi).
+   Bayram, kampanya, "yarın kapalıyız" — hepsi TİCARİ İLETİ sayılıyor ve
+   onaysız gönderimin cezası var; kendi numaradan toplu gönderim numarayı
+   da engelletebilir (TOPLU-MESAJ.md). Engellenen numaradan özet ve bakım
+   hatırlatması da gitmez: izinsiz bir bayram mesajı, ustanın asıl işini
+   durdurabilir.
+   İzin gerekmeyenler toplu DEĞİL, tek araca giden mesajlar: özet,
+   "aracınız hazır", bakım hatırlatması, parça bekliyor — yapılan işin
+   devamı. Onlar bu süzgeçten geçmez.
+   İzin MÜŞTERİNİN, aracın değil: müşteri araçtan türetiliyor (A-M1),
+   o yüzden izin onun bütün araçlarına birlikte yazılır (iletiIzniYaz). */
+function musteriIzni(m) {
+  var a = m && m.araclar.filter(function (x) { return x.iletiIzni; })[0];
+  return a ? a.iletiIzni : null;
+}
+function iletiIzniYaz(m, verdi) {
+  m.araclar.forEach(function (a) {
+    if (verdi) a.iletiIzni = { tarih: bugunMetin() };
+    else delete a.iletiIzni;
+  });
+}
+function topluAdaylar() {
   var liste = [];
   musteriler().forEach(function (m) {
     var a = musteriAraci(m);
     var h = a ? mesajHedefi(a.plaka) : null;
-    if (h && h.tel) liste.push({ ad: h.ad, tel: h.tel, plaka: a.plaka });
+    if (h && h.tel) liste.push({ ad: h.ad, tel: h.tel, plaka: a.plaka, izin: !!musteriIzni(m) });
   });
   return liste;
+}
+function topluAlicilar() {
+  return topluAdaylar().filter(function (x) { return x.izin; });
+}
+function topluIzinsizler() {
+  return topluAdaylar().filter(function (x) { return !x.izin; });
 }
 
 /* Mesaj kaydı TEK YERDEN düşer. İki gönderim yolu var (mesaj ekranı ve

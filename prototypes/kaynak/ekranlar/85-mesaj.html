@@ -747,11 +747,11 @@ Islem.tanim('toplu-mesaj', {
   /* ⚠️ RİSK ONAY EKRANINDA YAZILI (K-045.2). Kendi numaradan toplu
      gönderim Meta'nın şartlarına aykırı, numara engellenebilir —
      engellenirse özet ve bakım hatırlatması da durur. */
-  notice: 'Toplu mesaj, izin vermiş müşterilere gönderilmelidir. ' +
-          'Kendi numaranızdan toplu gönderim, numaranızın ' +
-          'engellenmesine yol açabilir.',
+  notice: 'Toplu mesaj yalnız izin vermiş müşterilere gider. İzin, ' +
+          'müşterinin sayfasından işaretlenir. Kendi numaranızdan toplu ' +
+          'gönderim, numaranızın engellenmesine yol açabilir.',
   eylem: function () {
-    return topluAlicilar().length ? 'Onayla ve gönder' : 'Telefonu olan müşteri yok';
+    return topluAlicilar().length ? 'Onayla ve gönder' : 'İzin vermiş müşteri yok';
   },
   alanlar: [
     /* KİMLERE GİDİYOR, ADLARIYLA. Toplu gönderim geri alınamaz; usta
@@ -761,9 +761,14 @@ Islem.tanim('toplu-mesaj', {
         return a.length
           ? a.slice(0, 3).map(function (x) { return x.ad; }).join(', ') +
             (a.length > 3 ? ' +' + (a.length - 3) : '')
-          : 'telefonu olan müşteri yok'; } },
+          : 'izin vermiş müşteri yok'; } },
     { ad: 'kac', etiket: 'Kaç kişi', turet: function () {
         return topluAlicilar().length + ' müşteri'; } },
+    /* GİTMEYENLER DE SAYILIR (A-M21): usta "herkese" dedi; kimin neden
+       atlandığını görmezse mesajın herkese gittiğini sanır. */
+    { ad: 'izinsiz', etiket: 'Gitmeyecek', turet: function () {
+        var n = topluIzinsizler().length;
+        return n ? n + ' müşteri — izni yok' : 'yok'; } },
     { ad: 'metinTuru', etiket: 'Ne', tip: 'secim', secenek: SABLON_AD,
       bos: 'Serbest mesaj' },
     { ad: 'kanal', etiket: 'Gönderim kanalı', soru: 'Nereden gitsin?',
@@ -789,7 +794,7 @@ Islem.tanim('toplu-mesaj', {
      kolaydı ama ispat yükü KİŞİ BAŞINA (K-045.3). */
   uygula: function (o) {
     var alicilar = topluAlicilar();
-    if (!alicilar.length) { balon('Telefonu olan müşteri yok.', false, 2800); return; }
+    if (!alicilar.length) { balon('İzin vermiş müşteri yok.', false, 2800); return; }
     alicilar.forEach(function (x) {
       mesajKaydet({ plaka: x.plaka, ad: x.ad, tel: x.tel, kanal: o.kanal,
                     sablon: o.metinTuru, toplu: true,

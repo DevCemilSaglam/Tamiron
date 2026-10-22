@@ -109,7 +109,7 @@ Ekran.tanim('musteri', {
         '<span class="ms-say">' + m.araclar.length + ' araç · ' +
           kayitlar.length + ' kayıt</span>' +
       '</div>' +
-      (m.tel ? telLinkHtml(m.tel, m.ad)
+      (m.tel ? telLinkHtml(m.tel, m.ad) + mstIzinHtml(m)
              : '<p class="plate-hint">Telefon yok — mesaj gönderilemez. ' +
                'Aracın kaydından eklenebilir.</p>');
 
@@ -175,6 +175,39 @@ Ekran.tanim('musteri', {
             ' Tüm mesajları (' + mesajSay + ')</button>'
         : '');
   }
+});
+
+/* ---- TİCARİ İLETİ İZNİ (22.10 · A-M21) ----
+   TEK ÇİP, künyenin içinde — ayrı bir "izinler" ekranı yok (A-2).
+   Varsayılan YOK: izin verilmiş sayılmaz, verilir. Verildiği gün
+   yazılır, çünkü ispat yükü dükkânda (TOPLU-MESAJ.md; kayıt 3 yıl
+   saklanır). Ne İÇİN olduğu çipin altında: usta "izin yoksa bakım
+   hatırlatması da gitmez mi?" diye çekinip izni boşuna sormasın. */
+function mstIzinHtml(m) {
+  var iz = musteriIzni(m);
+  return '<div class="cip-grup" style="margin-top:12px">' +
+      '<button class="cip" id="mstIzin" aria-pressed="' + !!iz + '">' +
+        'Bayram, kampanya mesajı izni</button>' +
+    '</div>' +
+    '<p class="plate-hint">' + (iz
+      ? 'İzin ' + iz.tarih + ' tarihinde kaydedildi. Toplu mesajlar bu müşteriye gider.'
+      : 'İzin yok: toplu mesajlar bu müşteriye gitmez. Özet, “aracınız hazır” ' +
+        've bakım hatırlatması için izin gerekmez.') + '</p>';
+}
+document.addEventListener('click', function (e) {
+  if (Ekran.adi() !== 'musteri' || !e.target.closest('#mstIzin')) return;
+  var m = musteriBul(ACIK_MUSTERI);
+  if (!m) return;
+  var onceki = musteriIzni(m);
+  iletiIzniYaz(m, !onceki);
+  Ekran.tazele();
+  balonGeriAl(onceki ? 'İzin kaldırıldı.' : 'İzin kaydedildi.', function () {
+    iletiIzniYaz(m, !!onceki);
+    /* Geri alınan izin ESKİ TARİHİYLE döner — bugünün tarihiyle dönerse
+       ispat kaydı değişmiş olur. */
+    if (onceki) m.araclar.forEach(function (a) { a.iletiIzni = { tarih: onceki.tarih }; });
+    Ekran.tazele();
+  });
 });
 
 /* Serviste olanlar üstte, sonra en yenisi — kayitlar ve araclar
