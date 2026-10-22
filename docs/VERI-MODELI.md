@@ -304,19 +304,26 @@ CLAUDE.md: *"İş mantığı/karar/yetki API'de — arayüz karar vermez."* Prot
 backend olmadığı için bu kurallar tarayıcıda yazıldı; **hepsi API'ye taşınır**,
 arayüz yalnız sonucu gösterir. Fonksiyon adları `prototypes/kaynak/betik/02-veri.js`.
 
-| Kural | Prototipte | Karar |
-|---|---|---|
-| Kayıt toplamı satırlardan; müşteri parçası toplama girmez | `kayitToplami` | K-037 |
-| Bilinmeyen alış (null) kâra girmez | iş başına fark | K-057 |
-| Tahsil günü: `PaymentCollectedAt ?? DeliveredAt`, `Unpaid` hariç | `tahsilTarihi` · `donemTahsilatlari` | K-071.1 |
-| Alacak bir bakiyedir, döneme tabi değil | muhasebe alacak tablosu | 05.09 |
-| Dönem: bugün · bu ay · bu yıl (1 Ocak'tan bugüne) | `donemBasi` · `donemIcinde` | 05.09 |
-| Hatırlatma: ay **veya** km, hangisi önce | teslim hesabı | 03.09 |
-| Parça sormak için araç kimliği: VIN ya da marka+model+yıl+motor | `aracKimligiTamam` | K-068 |
-| Ruhsattan okunan plaka yazılanı ezmez; çatışmada usta seçer | `ruhsatKaydet` | K-069 |
-| Toplu mesaj yalnız `MarketingConsentAt` dolu müşteriye | `topluAlicilar` | K-071.3 |
-| CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | K-071.2 |
-| Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | A-M1 |
+**22.10 (C11):** "Backend'de" sütunu eklendi — kuralın taşındığı yer. Muhasebe kurallarının
+prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ölçülüyor (C10).
+
+| Kural | Prototipte | Backend'de (`src/`) | Karar |
+|---|---|---|---|
+| Kayıt toplamı satırlardan; müşteri parçası toplama girmez | `kayitToplami` | `ServiceRecord.Total` · `ServiceLine.CountsInTotal` | K-037 |
+| İş başına fark: bilinmeyen alış (null) satışıyla hesap dışı, sayılır; 0 = bedava | `isKari` · `alisBilinmiyor` | `JobProfit.Of` | K-057 · K-055.2 |
+| Parça alışı: teslim edilmiş işte, tamircinin aldığı, alışı > 0 | `parcaAlislari` | `ServiceLine.IsShopPurchase` | 04.09 |
+| Tahsil günü: `PaymentCollectedAt ?? DeliveredAt`, `Unpaid` hariç | `tahsilTarihi` · `donemTahsilatlari` | `ServiceRecord.CollectedOn` + SQL biçimi `CollectedBetween` (eşitliği testli) | K-071.1 |
+| Alacak bir bakiyedir, döneme tabi değil | muhasebe alacak tablosu | `ListReceivables` (araç süzgeçli: `?vehicleId=`) | 05.09 |
+| Dönem: bugün · bu ay · bu yıl (1 Ocak'tan bugüne) | `donemBasi` · `donemIcinde` | `Period.Of` | 05.09 |
+| Hatırlatma: ay **veya** km, hangisi önce; km ancak iki ölçümle | `hatirlatmaHesapla` · `gunlukKm` | `MaintenanceReminder.Compute` | 03.09 · K-073.9 (ay sonu sapması) |
+| Hatırlatması gelen: bakım, tarihi geldi, gönderilmedi; "hatırlatma" mesajı (arama dahil) kapatır | `hatirlatmasiGelenler` | `ServiceRecord.IsReminderDue` · `MarkReminderSent` | 85-mesaj |
+| Teslim eksikleri söylenir, teslimi engellemez | `kEksikler` | `ServiceRecord.DeliveryWarnings` | 13.10 |
+| Parça sormak için araç kimliği: VIN ya da marka+model+yıl+motor | `aracKimligiTamam` | `Vehicle.HasPartIdentity` · `MissingForParts` (kapı, parça sorma uçlarıyla gelecek) | K-068 |
+| Ruhsattan okunan plaka yazılanı ezmez; çatışmada usta seçer | `ruhsatKaydet` | **henüz yok** — ruhsat okuma ucu yapay zekâ sağlayıcısını bekliyor (K-070, Cemil) | K-069 |
+| Toplu mesaj yalnız `MarketingConsentAt` dolu müşteriye | `topluAlicilar` | `SendBulk` · `GetBulkPreview` | K-071.3 |
+| CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | `Csv.Cell` · `Csv.Document` · `ExportCashCsv` (bayt bayt eşit) | K-071.2 |
+| Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |
+| KDV oranı satırda donar (yalnız yer) | — | `ServiceLine.FreezeVatRate` | C6 · KDV.md |
 
 ---
 

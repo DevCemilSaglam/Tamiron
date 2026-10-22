@@ -29,6 +29,46 @@ Content-Type: application/json
 
 { "method": "Card" }
 
+### ---- Muhasebe (C turu) ----
+
+### Ana ekran özeti: serviste · bugün tahsilat · veresiye · hatırlatma rozeti
+GET {{api}}/api/home
+Authorization: Bearer {{token}}
+
+### Muhasebe ekranı tek istekte (kasa + gider + alacak) — Today | Month | Year
+GET {{api}}/api/accounting?period=Month
+Authorization: Bearer {{token}}
+
+### İş başına fark (bilinmeyen alış hesap dışı ve sayılır)
+GET {{api}}/api/profit?period=Year
+Authorization: Bearer {{token}}
+
+### Parça alışları
+GET {{api}}/api/part-purchases?period=Month
+Authorization: Bearer {{token}}
+
+### Gider ekle (gün sunucudan)
+POST {{api}}/api/expenses
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "description": "Elektrik faturası", "amount": 2400 }
+
+### Alacak — bütün dükkân ya da bir araç (?vehicleId=)
+GET {{api}}/api/receivables
+Authorization: Bearer {{token}}
+
+### Muhasebeciye CSV (BOM'lu, ";" ayraçlı, ham rakam)
+GET {{api}}/api/export/cash.csv?period=Month
+Authorization: Bearer {{token}}
+
+### Dükkân ayarları — bakım periyodu yalnız 3 | 6 | 12 ay
+PATCH {{api}}/api/shop
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "maintenanceMonths": 6, "askPartCost": true }
+
 ### Açık oturumlar
 GET {{api}}/api/auth/sessions
 Authorization: Bearer {{token}}

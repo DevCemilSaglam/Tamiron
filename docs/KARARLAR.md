@@ -10,6 +10,52 @@
 
 ---
 
+## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
+
+**Cemil:** *"Bunlar beklesin. Muhasebeyi bitir. Yine kendine bir loop oluştur.
+10-15 farklı işlemi benden karar beklemeyen, bitir."*
+
+**Kapsam:** MUHASEBE-KAPSAM-OTOMIX Faz 1 (K-064.3b onaylı). Kuyrukta C1–C11 vardı,
+11'i de bitti.
+
+**Yapılanlar:**
+- **Hesaplar:** iş başına fark · parça alışları · ana ekran özeti · araç ödeme
+  durumu · dükkân ayarları · KDV/tevkifat için yer · hata sözleşmesi · tek
+  çağrıda muhasebe · sorgular SQL'de · prototip eşdeğerliği · belgeler.
+- **Daha önce bitenler (B turu):** kasa, gider, alacak, CSV, tahsil.
+
+**"Bitti" tanımı ölçüldü (§5):**
+- `PrototypeEquivalenceTests` prototipin KENDİ fonksiyonlarının rakamlarını
+  (`tools/muhasebe-esdeger.js`) API ile karşılaştırıyor. Üç senaryoda, üç
+  dönemde **0 fark**; CSV bayt bayt aynı.
+- "Bilinmeyen alış kâra girmez" testi API'de var (C1, C10).
+
+**Yol boyunca yakalananlar:**
+- **Göç hatası:** EF göçü eski dükkânlara KDV %0 yazacaktı (C6). Yeni hata
+  sınıfı için göç yükseltme testi eklendi.
+- **Hata cevapları:** okunamayan istek gövdesiz 400, eşzamanlı yazma 500
+  dönüyordu (C7).
+- **Kör noktalar:** dört mutasyon ilk koşuda kaçtı, çünkü tohumda o durum
+  yoktu:
+  - araç sayısı = müşteri sayısı;
+  - alış sorusu hep kapalıydı;
+  - boş şikâyet;
+  - bedava parça.
+
+  Her birine ayırt eden test eklendi.
+
+**Bilinçli küçük sapmalar:**
+- Parça alışları ve hatırlatmalar en yeni / en çok bekleyen üstte (prototipte
+  kayıt sırasıydı).
+- Dükkân adı ve telefonu **düzenlenmiyor**: prototipte yok, yeni özellik olur.
+
+**Açık (Cemil):**
+- Faz 2: gelen fatura fotoğrafı → alış; parçacıya borç.
+- Faz 3: fatura kesmek.
+- SMS sağlayıcısı · yeni dükkân kaydı · izin geçmişi.
+
+---
+
 ## K-074 · Giriş SMS koduyla; oturum çıkış yapılmadıkça düşmez (22.10.2026)
 
 **Cemil:** *"Sms ile. Ve programdan oturumu düşmeyecek. Tekrar tekrar girmek zorunda
