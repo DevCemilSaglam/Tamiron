@@ -2686,7 +2686,7 @@ function stilMetni() {
      NEGATIF DOGRULAMA (22.10): csvHucre kacissiz -> bulgu; geri -> 0. */
   (function () {
     if (typeof muhasebeCsv !== 'function') { ek('DISA-AKTARMA', 'muhasebe', 'muhasebeCsv yok'); return; }
-    var sahte = { id: 999001, tarih: bugunMetin(), aciklama: '=HAT; "deneme"', tutar: 1234, tur: 'elle' };
+    var sahte = { id: 999001, tarih: bugunMetin(), aciklama: '=HAT; "deneme"', tutar: 1234 };
     GIDERLER.push(sahte);
     try {
       var csv = muhasebeCsv('yil');
@@ -2763,6 +2763,34 @@ function stilMetni() {
     } finally {
       hedef.araclar.forEach(function (a) { delete a.iletiIzni; });
       window.ACIK_MUSTERI = ym;
+      Ekran.ac('home');
+    }
+  })();
+
+  /* 63 · GIDER-KIMLIK (22.10). Hata sinifi: AYNI tabloya iki yoldan kayit
+     giriyor ve iki yol kimligi FARKLI uretiyordu — sesli yol
+     `GIDERLER.length + 1`, elle yol en buyuk + 1. Bir gider silinince
+     sesli yol var olan kimligi yeniden veriyor; sola kaydirma kimlikle
+     sildigi icin YANLIS gider siliniyordu. Veri modeli uzlastirilirken
+     okunarak bulundu.
+     Sinanan: ilk gider silinir, sesli yoldan (Islem.sema('gider-ekle')
+     .uygula) gider eklenir, kimlikler tekil kalir.
+     NEGATIF DOGRULAMA (22.10): yeniGiderId length+1 dondurunce -> bulgu;
+     geri -> 0. */
+  (function () {
+    if (typeof Islem === 'undefined' || !Islem.sema || !Islem.sema('gider-ekle')) {
+      ek('GIDER-KIMLIK', 'muhasebe', 'gider-ekle semasi yok'); return;
+    }
+    var yedek = GIDERLER.slice();
+    try {
+      GIDERLER.splice(0, 1);
+      Islem.sema('gider-ekle').uygula({ tur: 'gider-ekle', aciklama: 'Denetim', tutar: 10 });
+      var idler = GIDERLER.map(function (g) { return g.id; });
+      if (idler.some(function (id, i) { return idler.indexOf(id) !== i; }))
+        ek('GIDER-KIMLIK', 'muhasebe', 'silmeden sonra sesli gider VAR OLAN kimligi aldi: ' + idler.join(','));
+    } finally {
+      GIDERLER.length = 0;
+      yedek.forEach(function (g) { GIDERLER.push(g); });
       Ekran.ac('home');
     }
   })();

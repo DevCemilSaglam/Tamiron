@@ -75,9 +75,13 @@ var KAYITLAR = [
     sikayet: 'Triger seti değişecek',
     acilis: '03.09.2026', teslimTarihi: null,
     odemeYolu: null, hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: true, bekliyorMusteriye: true,
+    /* TOHUM = ŞEMA (22.10). Sonradan yazılan alanlar da tohumda bir kez
+       görünür; derleme denetimi 9 bu alanları VERI-MODELI.md'de arıyor.
+       Kodda yazılıp tohumda olmayan alan, backend'e taşınırken unutulur. */
+    bekliyorTarihi: '03.09.2026', turElle: false,
     satirlar: [
       { tip: 'parca', ad: 'Triger seti', fiyat: 0, alis: null, kimGetirdi: 'tamirci',
-        marka: '', kod: '', tanim: 'tanimlanamadi' }
+        marka: '', kod: '', tanim: 'tanimlanamadi', sorulan: null }
     ] },
 
   { id: 2, plaka: '06 TMR 07', tur: 'bakim', km: '86.400',
@@ -165,6 +169,7 @@ var KAYITLAR = [
     sikayet: 'Akü değişimi',
     acilis: '28.08.2026', teslimTarihi: '28.08.2026',
     odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
+    tahsilTarihi: null,   /* ödenince "Ödeme alındı" yazar (K-071.1) */
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
@@ -868,10 +873,21 @@ function odemeDagilimi() {
    ekran onu gider olarak sayıyordu; oysa aynı para servis satırındaki
    `alis` alanında da duruyor ve iş başına farkta düşülüyor. Örnek
    verinin kendisi YANLIŞ ALIŞKANLIK öğretiyordu. */
+/* ⚠️ 22.10 — `tur` ALANI KALKTI. "elle/fatura/kira" yazılıyordu ama
+   hiçbir ekran, hiçbir hesap onu okumuyordu: veri modelinin kuralına
+   ("her alanın akışta karşılığı vardır") uymayan ölü alan. Veri modeli
+   prototiple uzlaştırılırken bulundu. */
 var GIDERLER = [
-  { id: 1, tarih: '01.09.2026', aciklama: 'Elektrik faturası', tutar: 2400, tur: 'fatura' },
-  { id: 2, tarih: '02.09.2026', aciklama: 'Dükkân kirası', tutar: 12000, tur: 'kira' }
+  { id: 1, tarih: '01.09.2026', aciklama: 'Elektrik faturası', tutar: 2400 },
+  { id: 2, tarih: '02.09.2026', aciklama: 'Dükkân kirası', tutar: 12000 }
 ];
+/* ⚠️ 22.10 — KİMLİK TEK YERDEN. Sesli yol `GIDERLER.length + 1`
+   veriyordu, elle yol en büyük kimlik + 1: bir gider silindikten sonra
+   sesli yol VAR OLAN bir kimliği yeniden verirdi ve sola kaydırma
+   (kimlikle siliyor) yanlış gideri silerdi. */
+function yeniGiderId() {
+  return GIDERLER.reduce(function (m, g) { return Math.max(m, g.id || 0); }, 0) + 1;
+}
 
 /* ---- KM GEÇMİŞİ ----
    Ayrı tablo YOK: kilometre zaten servis kaydında duruyor (K-002).

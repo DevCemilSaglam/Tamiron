@@ -270,6 +270,75 @@ betikler.forEach((b, i) => {
   }
 });
 
+/* ---- derleme denetimi 9: PROTOTİPİN ALANLARI VERİ MODELİNDE Mİ (22.10) ----
+   Hata sınıfı: VERI-MODELI.md 15.09'da kaldı, prototip beş hafta büyüdü —
+   tahsil tarihi, ileti izni, ruhsatın dokuz teknik alanı, iki tablo
+   (gider, mesaj) belgede yoktu. Backend bu belgeden kurulacak; belgede
+   olmayan alan taşınırken SESSİZCE kaybolur. Aynı uzlaştırmada iki şey
+   daha çıktı: hiçbir yerin okumadığı ölü bir alan (GIDERLER.tur) ve
+   sesli giderde yinelenen kimlik.
+   İki adım:
+     a) tohum verideki (02-veri.js) her `DİZİ.alan`, VERI-MODELI.md'nin
+        "Prototip eşlemesi" tablosunda yazılı mı;
+     b) ekranlarda kayda/araca/satıra/dükkâna YAZILAN her alan tohumda var
+        mı — yoksa (a) onu hiç görmez.
+   NEGATİF DOĞRULAMA (22.10): eşlemeden `KAYITLAR.tahsilTarihi` silindi →
+   bulgu; tohumdan `bekliyorTarihi` silindi → (b) bulgu; geri → temiz. */
+(function () {
+  const vm = require('vm');
+  const modelYol = path.join(KOK, 'docs', 'VERI-MODELI.md');
+  if (!fs.existsSync(modelYol)) { uyarilar.push('VERI-MODELI.md yok'); return; }
+  const model = oku(modelYol);
+  const ctx = { window: {}, document: { addEventListener() {} },
+                localStorage: { getItem() { return null; }, setItem() {} }, console };
+  vm.createContext(ctx);
+  try { vm.runInContext(oku(path.join(KAYNAK, 'betik', '02-veri.js')), ctx); }
+  catch (e) { uyarilar.push('02-veri.js tek başına çalışmıyor — veri modeli denetimi yapılamadı: ' + e.message); return; }
+
+  const TABLOLAR = ['ARACLAR', 'KAYITLAR', 'MESAJLAR', 'PARCACILAR', 'GIDERLER', 'DUKKAN'];
+  const tohum = {};                       /* 'KAYITLAR' -> Set(alan) */
+  const ekle = (ad, o) => { if (o && typeof o === 'object') Object.keys(o).forEach(k => (tohum[ad] = tohum[ad] || new Set()).add(k)); };
+  TABLOLAR.forEach(ad => {
+    const v = ctx[ad];
+    if (Array.isArray(v)) v.forEach(o => {
+      ekle(ad, o);
+      if (ad === 'KAYITLAR' && o && Array.isArray(o.satirlar)) o.satirlar.forEach(s => ekle('KAYITLAR.satirlar', s));
+    });
+    else ekle(ad, v);
+  });
+  Object.keys(tohum).forEach(ad => tohum[ad].forEach(alan => {
+    if (model.indexOf('`' + ad + '.' + alan + '`') < 0)
+      uyarilar.push(`VERİ MODELİ: \`${ad}.${alan}\` prototipte var, VERI-MODELI.md eşlemesinde yok (backend'e taşınırken kaybolur)`);
+  }));
+
+  /* (b) yazılan alanlar. DOM özellikleri aynı kalıba uyuyor (a.href,
+     k.hidden …) — onlar veri değil. Betik klasöründe `s` başka şeyler
+     (işlem şeması, iz sayacı) için kullanılıyor; satır yalnız ekranlarda. */
+  const DOM = new Set(['hidden', 'value', 'href', 'download', 'disabled', 'checked',
+    'textContent', 'innerHTML', 'className', 'index']);
+  const KALIP = [
+    [/\bk\.([a-zA-Z]+)\s*=(?!=)/g, 'KAYITLAR', true],
+    [/\b(?:a|arac)\.([a-zA-Z]+)\s*=(?!=)/g, 'ARACLAR', true],
+    [/\b(?:s|st|satir)\.([a-zA-Z]+)\s*=(?!=)/g, 'KAYITLAR.satirlar', false],
+    [/\bDUKKAN\.([a-zA-Z]+)\s*=(?!=)/g, 'DUKKAN', true]
+  ];
+  const dosyalar = [
+    ...siraliDosyalar(path.join(KAYNAK, 'betik'), '.js').map(d => ({ ...d, betik: true })),
+    ...siraliDosyalar(path.join(KAYNAK, 'ekranlar'), '.html').map(d => ({ ...d, betik: false }))
+  ];
+  dosyalar.forEach(d => {
+    const metin = oku(d.yol);
+    KALIP.forEach(([re, tablo, betiktede]) => {
+      if (d.betik && !betiktede) return;
+      for (const m of metin.matchAll(re)) {
+        if (DOM.has(m[1])) continue;
+        if (!tohum[tablo] || !tohum[tablo].has(m[1]))
+          uyarilar.push(`VERİ MODELİ: ${d.ad} \`${tablo}.${m[1]}\` alanını yazıyor ama tohum veride (02-veri.js) yok — eşleme onu göremez`);
+      }
+    });
+  });
+})();
+
 fs.writeFileSync(CIKTI, cikti, 'utf8');
 
 /* ---- rapor ---- */

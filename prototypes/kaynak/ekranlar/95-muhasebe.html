@@ -403,9 +403,7 @@ document.addEventListener('click', function (e) {
       balon('Gider için hem açıklama hem tutar gerekiyor.', false, 2600);
       return;
     }
-    GIDERLER.push({ id: (GIDERLER.length ? Math.max.apply(null,
-      GIDERLER.map(function (g) { return g.id; })) : 0) + 1,
-      tarih: bugunMetin(), aciklama: gAd, tutar: tut, tur: 'elle' });
+    GIDERLER.push({ id: yeniGiderId(), tarih: bugunMetin(), aciklama: gAd, tutar: tut });
     balon(gAd + ' — ' + tutar(tut) + ' ₺ eklendi.', false, 2600);
     muhFormGoster(false);
     Ekran.tazele();
@@ -514,8 +512,8 @@ Islem.tanim('gider-ekle', {
     return { tur: 'gider-ekle', tutar: t, aciklama: aciklama || 'Gider' };
   },
   uygula: function (o) {
-    GIDERLER.push({ id: GIDERLER.length + 1, tarih: bugunMetin(),
-      aciklama: o.aciklama, tutar: o.tutar, tur: 'fatura' });
+    GIDERLER.push({ id: yeniGiderId(), tarih: bugunMetin(),
+      aciklama: o.aciklama, tutar: o.tutar });
     balon(o.aciklama + ' — ' + tutar(o.tutar) + ' ₺ eklendi.', false, 3000);
     Ekran.ac('muhasebe');
   }
