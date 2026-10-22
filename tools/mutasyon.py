@@ -18,7 +18,8 @@ def kos():
     return r.returncode == 0, ozet
 
 def main(yol):
-    mutlar = json.load(io.open(yol, encoding='utf-8'))
+    # utf-8-sig: PowerShell'in Out-File'i dosya basina BOM koyar; json onu reddederdi.
+    mutlar = json.load(io.open(yol, encoding='utf-8-sig'))
     yakalanmayan = 0
     for m in mutlar:
         p = K + '/' + m['dosya']

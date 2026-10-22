@@ -75,6 +75,9 @@ api.MapGet("/customers", (string? q, ISender s, CancellationToken ct) => s.Send(
 api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) => s.Send(new GetCustomer(key), ct));
 api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
+// Ana ekran özeti (C3): menü alt yazıları + hatırlatma rozeti tek istekte.
+api.MapGet("/home", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Home.GetHomeSummary(), ct));
+
 // İş başına fark (C1): dönem teslim gününe göre; bilinmeyen alış hesap dışı ve sayılır.
 api.MapGet("/profit", (PeriodKind? period, ISender s, CancellationToken ct) =>
     s.Send(new ListJobProfits(period ?? PeriodKind.Month), ct));
