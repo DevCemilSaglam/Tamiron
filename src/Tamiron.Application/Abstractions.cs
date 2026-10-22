@@ -3,14 +3,30 @@ using Tamiron.Domain;
 
 namespace Tamiron.Application;
 
-/// <summary>
-/// İsteğin hangi dükkâna ait olduğu. Geliştirmede X-Tenant-Id başlığından
-/// okunuyor — GEÇİCİ (K-073.6); oturum açma yöntemi Cemil onayına açık.
-/// </summary>
+/// <summary>İsteğin hangi dükkâna ait olduğu — OTURUMDAN gelir (K-074.4).</summary>
 public interface ITenantContext
 {
     Guid TenantId { get; }
 }
+
+/// <summary>İsteği yapan kişi ve cihazı (oturum). Giriş öncesi uçlarda boştur.</summary>
+public interface ICurrentSession
+{
+    Guid UserId { get; }
+    Guid SessionId { get; }
+}
+
+/// <summary>
+/// SMS gönderimi (K-074). Sağlayıcı (Netgsm, İleti Merkezi …) Cemil'in kararı ve
+/// paralı; bağlanmadıkça gönderim <see cref="SmsNotConfiguredException"/> atar —
+/// "gönderildi" diye sessizce yalan söylenmez.
+/// </summary>
+public interface ISmsSender
+{
+    Task SendAsync(string phone, string text, CancellationToken ct);
+}
+
+public sealed class SmsNotConfiguredException() : Exception("SMS sağlayıcısı bağlanmadı.");
 
 /// <summary>
 /// "Bugün" — ustanın günü, Türkiye saatiyle. Testte sabitlenir (prototipte
@@ -33,6 +49,10 @@ public interface ITamironDb
     DbSet<ServiceLine> ServiceLines { get; }
     DbSet<Expense> Expenses { get; }
     DbSet<Message> Messages { get; }
+    // Giriş tabloları kiracı süzgecine TABİ DEĞİL (giriş öncesi aranır) — sorgu kiracıyı açıkça yazar.
+    DbSet<User> Users { get; }
+    DbSet<LoginCode> LoginCodes { get; }
+    DbSet<Session> Sessions { get; }
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }
 

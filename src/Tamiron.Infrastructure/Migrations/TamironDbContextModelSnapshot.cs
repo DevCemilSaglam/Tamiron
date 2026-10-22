@@ -66,6 +66,57 @@ namespace Tamiron.Infrastructure.Migrations
                     b.ToTable("Expenses");
                 });
 
+            modelBuilder.Entity("Tamiron.Domain.LoginCode", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Attempts")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<DateTime?>("ConsumedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Salt")
+                        .IsRequired()
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Phone", "DateTimeCreated");
+
+                    b.ToTable("LoginCodes");
+                });
+
             modelBuilder.Entity("Tamiron.Domain.Message", b =>
                 {
                     b.Property<Guid>("Id")
@@ -276,6 +327,59 @@ namespace Tamiron.Infrastructure.Migrations
                     b.ToTable("ServiceRecords");
                 });
 
+            modelBuilder.Entity("Tamiron.Domain.Session", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeviceName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("LastSeenAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("TokenHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TokenHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Sessions");
+                });
+
             modelBuilder.Entity("Tamiron.Domain.Shop", b =>
                 {
                     b.Property<Guid>("Id")
@@ -324,6 +428,48 @@ namespace Tamiron.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Shops");
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Phone")
+                        .IsUnique();
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Tamiron.Domain.Vehicle", b =>
@@ -506,6 +652,30 @@ namespace Tamiron.Infrastructure.Migrations
                     b.HasOne("Tamiron.Domain.Vehicle", null)
                         .WithMany()
                         .HasForeignKey("VehicleId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.Session", b =>
+                {
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tamiron.Domain.User", null)
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.User", b =>
+                {
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });

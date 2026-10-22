@@ -19,6 +19,9 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<User> Users => Set<User>();
+    public DbSet<LoginCode> LoginCodes => Set<LoginCode>();
+    public DbSet<Session> Sessions => Set<Session>();
 
     /// <summary>Süzgeçler bu özelliği her sorguda okur (EF bağlamın alanını parametre yapar).</summary>
     private Guid CurrentTenant => tenant.TenantId;
@@ -81,6 +84,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
         });
 
         ConfigureExpense(b);
+        ConfigureLogin(b);
 
         Tenant(b.Entity<Message>());
         b.Entity<Message>(e =>
@@ -92,6 +96,41 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.HasOne<Vehicle>().WithMany().HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
             e.HasOne<ServiceRecord>().WithMany().HasForeignKey(x => x.ServiceRecordId).OnDelete(DeleteBehavior.Restrict);
             e.HasIndex(x => new { x.TenantId, x.VehicleId, x.DateTimeCreated });   // aracın arşivi
+        });
+    }
+
+    /// <summary>
+    /// Giriş tabloları (K-074). Kiracı SÜZGECİ YOK: giriş öncesi telefonla ve anahtar
+    /// özetiyle aranırlar. Soft-delete de yok — oturum RevokedAt ile, kod ConsumedAt ile biter.
+    /// </summary>
+    private static void ConfigureLogin(ModelBuilder b)
+    {
+        Common(b.Entity<User>());
+        b.Entity<User>(e =>
+        {
+            e.Property(x => x.Phone).HasMaxLength(20);
+            e.HasIndex(x => x.Phone).IsUnique();   // telefon → kişi → dükkân
+            e.Property(x => x.Name).HasMaxLength(100);
+            e.HasOne<Shop>().WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
+        });
+        Common(b.Entity<LoginCode>());
+        b.Entity<LoginCode>(e =>
+        {
+            e.Property(x => x.Phone).HasMaxLength(20);
+            e.Property(x => x.Salt).HasMaxLength(32);
+            e.Property(x => x.CodeHash).HasMaxLength(64);
+            e.HasIndex(x => new { x.Phone, x.DateTimeCreated });
+        });
+        Common(b.Entity<Session>());
+        b.Entity<Session>(e =>
+        {
+            e.Property(x => x.TokenHash).HasMaxLength(64);
+            e.HasIndex(x => x.TokenHash).IsUnique();
+            e.HasIndex(x => x.UserId);
+            e.Property(x => x.DeviceName).HasMaxLength(100);
+            e.Ignore(x => x.IsActive);
+            e.HasOne<User>().WithMany().HasForeignKey(x => x.UserId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<Shop>().WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
         });
     }
 

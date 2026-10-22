@@ -1,23 +1,38 @@
 ### Tamiron API — geliştirme istekleri (VS Code REST Client / Visual Studio)
-### Dükkân kimliği DevSeed.ShopId; X-Tenant-Id GEÇİCİ (K-073.6).
+### Giriş (K-074): kod iste → kod konsola yazılır (geliştirmede SMS gitmez) → kodu gir → anahtar.
 @api = http://localhost:5080
-@shop = 7a3e0c1e-0000-4000-8000-000000000001
+
+### 1) Kod iste — dükkânın geliştirme telefonu (DevSeed.DevPhone)
+POST {{api}}/api/auth/code
+Content-Type: application/json
+
+{ "phone": "0532 000 00 00" }
+
+### 2) Konsoldaki 6 haneli kodu gir; dönen "token"ı aşağıya yaz
+POST {{api}}/api/auth/verify
+Content-Type: application/json
+
+{ "phone": "0532 000 00 00", "code": "{{code}}", "deviceName": "geliştirici" }
+
+### Kayıtlar (serviste olanlar üstte)
+GET {{api}}/api/records
+Authorization: Bearer {{token}}
 
 ### Kasa özeti — Today | Month | Year
 GET {{api}}/api/cash?period=Today
-X-Tenant-Id: {{shop}}
-
-### Tek kayıt (kimliği /api/cash'ten değil, veritabanından al)
-GET {{api}}/api/records/{{recordId}}
-X-Tenant-Id: {{shop}}
+Authorization: Bearer {{token}}
 
 ### Veresiyenin parası geldi — Cash | Card | Transfer
 POST {{api}}/api/records/{{recordId}}/collect
-X-Tenant-Id: {{shop}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 
 { "method": "Card" }
 
-### Geri al
-POST {{api}}/api/records/{{recordId}}/collect/undo
-X-Tenant-Id: {{shop}}
+### Açık oturumlar
+GET {{api}}/api/auth/sessions
+Authorization: Bearer {{token}}
+
+### Çıkış (yalnız bu cihaz) — oturum başka hiçbir yolla düşmez
+POST {{api}}/api/auth/logout
+Authorization: Bearer {{token}}

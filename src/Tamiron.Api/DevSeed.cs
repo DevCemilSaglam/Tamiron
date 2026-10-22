@@ -8,22 +8,28 @@ namespace Tamiron.Api;
 /// <summary>
 /// YALNIZ GELİŞTİRMEDE: göçleri uygular, veritabanı boşsa prototipin tohum
 /// verisinden bir dilim yazar (02-veri.js — aynı plakalar, aynı tutarlar),
-/// böylece API ile prototip yan yana karşılaştırılabilir. Dükkân kimliği
-/// sabit; Tamiron.Api.http bu kimlikle istek atar.
+/// böylece API ile prototip yan yana karşılaştırılabilir. Giriş: dükkânın
+/// telefonu (DevPhone) ile kod istenir, kod günlüğe yazılır (DevLogSmsSender).
 /// </summary>
 public static class DevSeed
 {
     public static readonly Guid ShopId = Guid.Parse("7a3e0c1e-0000-4000-8000-000000000001");
+    public const string DevPhone = "0532 000 00 00";
 
     public static async Task RunAsync(IServiceProvider sp)
     {
         using var scope = sp.CreateScope();
-        scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ShopId;
+        scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ShopId;
         var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
         var today = scope.ServiceProvider.GetRequiredService<IClock>().Today;
         await db.Database.MigrateAsync();
-        if (await db.Shops.IgnoreQueryFilters().AnyAsync()) return;
-        await SeedAsync(db, ShopId, today);
+        if (!await db.Shops.IgnoreQueryFilters().AnyAsync()) await SeedAsync(db, ShopId, today);
+        // Giriş tablosu sonradan geldi (K-074): eski geliştirme veritabanında kullanıcı yoksa eklenir.
+        if (!await db.Users.AnyAsync(u => u.Phone == DevPhone))
+        {
+            db.Users.Add(User.Create(ShopId, DevPhone, "Ahmet Usta"));
+            await db.SaveChangesAsync();
+        }
     }
 
     public static async Task SeedAsync(TamironDbContext db, Guid shopId, DateOnly today)

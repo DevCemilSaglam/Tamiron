@@ -10,6 +10,45 @@
 
 ---
 
+## K-074 · Giriş SMS koduyla; oturum çıkış yapılmadıkça düşmez (22.10.2026)
+
+**Cemil:** *"Sms ile. Ve programdan oturumu düşmeyecek. Tekrar tekrar girmek zorunda
+kalmasın çıkış yapmadığı sürece."* K-073.6 kapandı.
+
+**74.1 · Akış.**
+1. Usta telefonunu yazar.
+2. 6 haneli kod SMS ile gelir. Kod 5 dakika geçerli, 5 yanlış denemede ölür,
+   bir kez kullanılır.
+3. Kod doğruysa cihaza bir oturum anahtarı verilir.
+
+Parola yok.
+
+**74.2 · Oturum süresiz.** Oturum veritabanında tutuluyor; cihazda yalnız anahtarı
+duruyor (veritabanında anahtarın özeti). Oturum yalnız iki yolla biter:
+"çıkış" ya da "bütün cihazlardan çık". JWT seçilmedi: süresiz JWT geri alınamaz.
+**Bedeli:** kaybolan telefonda oturum açık kalır; karşılığı oturum listesi ve
+toplu çıkış.
+
+**74.3 · Kötüye kullanma önlemleri.**
+- Bir telefona 10 dakikada en çok 3 kod gider. SMS paralı; birinin ustanın
+  numarasına kod yağdırması hem fatura hem rahatsızlık olur.
+- Kod ve anahtar özetlenerek saklanır.
+- Kod karşılaştırması sabit sürede yapılır.
+
+**74.4 · Dükkân artık oturumdan gelir.** `X-Tenant-Id` başlığı kaldırıldı
+(K-073.6'nın geçici çözümüydü). Başlıkla gelen dükkân, herkesin her dükkânı
+okuyabilmesi demekti.
+
+**74.5 · Açık — Cemil:**
+- **SMS sağlayıcısı.** Para ve dış servis. Gönderim `ISmsSender` arayüzünün
+  arkasında. Geliştirmede kod günlüğe yazılıyor. Üretimde sağlayıcı
+  bağlanmadıkça kod gönderimi 503 döner; sessizce "gönderildi" denmez.
+- **Yeni dükkânın kaydı.** Şimdilik yalnız kayıtlı telefon girebilir. Kayıt
+  dışı numaraya "Bu numarayla kayıtlı dükkân yok." denir. Ürün akışı
+  kararlaşmadı.
+
+---
+
 ## K-073 · Backend fazı açıldı (22.10.2026)
 
 **Cemil:** *"1 ve devam"*. Önerilen üç adımın ilki aşamayı değiştirmekti,

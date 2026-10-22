@@ -231,6 +231,46 @@ Akıştaki yeri: Mesaj ekranı · Mesajlar (arşiv) · servis kaydının süreci
 
 ---
 
+## 11 · Giriş — `User` · `LoginCode` · `Session` (K-074, 22.10)
+
+Cemil: *"SMS ile. Ve programdan oturumu düşmeyecek. Tekrar tekrar girmek zorunda
+kalmasın çıkış yapmadığı sürece."* Parola YOK: unutulan parola teknolojiden uzak
+ustada dükkânı kilitler (T-18).
+
+**`User`** — dükkânda programı kullanan kişi.
+
+| Alan | Neden var |
+|---|---|
+| `TenantId` | Hangi dükkânın — oturum açılınca istek bu dükkâna bağlanır |
+| `Phone` | Giriş kimliği. **Bütün sistemde tekil:** telefon → kişi → dükkân. Biçim `0532 215 30 00` |
+| `Name` | Boş olabilir; "oturumlarım" listesinde ve izde |
+
+**`LoginCode`** — SMS ile giden tek kullanımlık kod. **Kiracısız** (giriş öncesi).
+
+| Alan | Neden var |
+|---|---|
+| `Phone` | Kime gitti |
+| `CodeHash` | Kodun kendisi SAKLANMAZ — veritabanı sızsa da kod okunmaz |
+| `ExpiresAt` | 5 dakika |
+| `Attempts` | Yanlış deneme sayısı — 5'te kod ölür (6 haneli kodu tahminle bulmak engellenir) |
+| `ConsumedAt` | Kod bir kez kullanılır |
+
+**`Session`** — açık oturum, cihaz başına bir tane.
+
+| Alan | Neden var |
+|---|---|
+| `TenantId` · `UserId` | Oturum kimin, hangi dükkânın |
+| `TokenHash` | Cihazdaki anahtarın özeti; anahtarın kendisi saklanmaz |
+| `DeviceName` | "Ahmet'in telefonu" — "bütün cihazlardan çık" listesinde tanınsın |
+| `LastSeenAt` | En son ne zaman kullanıldı |
+| `RevokedAt` | Çıkış yapıldı. **Süre dolması YOK** — oturum yalnız çıkışla biter (Cemil) |
+
+> **Bedeli:** telefon kaybolursa oturum açık kalır. Karşılığı "bütün cihazlardan çık"
+> ve oturum listesi. JWT yerine veritabanında oturum seçildi: süresiz bir JWT geri
+> alınamaz, veritabanındaki oturum tek satırla kapanır.
+
+---
+
 ## Model haritası
 
 ```

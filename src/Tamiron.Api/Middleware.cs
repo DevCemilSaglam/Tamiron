@@ -1,37 +1,58 @@
+using Microsoft.EntityFrameworkCore;
 using Tamiron.Application;
 using Tamiron.Domain;
+using Tamiron.Infrastructure;
 
 namespace Tamiron.Api;
 
 /// <summary>
-/// GEÇİCİ kiracı çözümü (K-073.6): X-Tenant-Id başlığı. Oturum açma
-/// yöntemi kararlaşınca kiracı oturumdan gelir ve bu sınıf silinir.
+/// İsteğin bağlamı: hangi dükkân, hangi kişi, hangi cihaz. OTURUMDAN doldurulur
+/// (K-074.4). Ayarlanabilir olması yalnız oturum ara katmanı, tohum ve testler için.
 /// </summary>
-public sealed class HeaderTenantContext : ITenantContext
+public sealed class RequestContext : ITenantContext, ICurrentSession
 {
     public Guid TenantId { get; set; }
+    public Guid UserId { get; set; }
+    public Guid SessionId { get; set; }
 }
 
-public sealed class TenantMiddleware(RequestDelegate next)
+/// <summary>
+/// "Authorization: Bearer &lt;anahtar&gt;" → oturum → dükkân. Giriş uçları dışında her
+/// /api isteği oturum ister. Eski X-Tenant-Id başlığı (K-073.6) KALDIRILDI: başlıkla
+/// gelen dükkân, herkesin her dükkânı okuyabilmesi demekti.
+/// </summary>
+public sealed class SessionMiddleware(RequestDelegate next)
 {
-    public async Task InvokeAsync(HttpContext ctx, HeaderTenantContext tenant)
+    private static readonly PathString[] Open = ["/api/auth/code", "/api/auth/verify"];
+
+    public async Task InvokeAsync(HttpContext ctx, RequestContext rc, TamironDbContext db, IClock clock)
     {
-        if (ctx.Request.Path.StartsWithSegments("/api"))
+        var path = ctx.Request.Path;
+        if (!path.StartsWithSegments("/api") || Open.Any(p => path.Equals(p, StringComparison.OrdinalIgnoreCase)))
         {
-            if (!Guid.TryParse(ctx.Request.Headers["X-Tenant-Id"], out var id) || id == Guid.Empty)
-            {
-                await Results.Problem(statusCode: 401, title: "Dükkân belirtilmedi.").ExecuteAsync(ctx);
-                return;
-            }
-            tenant.TenantId = id;
+            await next(ctx);
+            return;
         }
+        var header = ctx.Request.Headers.Authorization.ToString();
+        var token = header.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase) ? header[7..].Trim() : "";
+        var session = token.Length == 0 ? null
+            : await db.Sessions.FirstOrDefaultAsync(s => s.TokenHash == Session.HashToken(token) && s.RevokedAt == null);
+        if (session is null)
+        {
+            await Results.Problem(statusCode: 401, title: "Oturum açık değil. Telefonunla giriş yap.").ExecuteAsync(ctx);
+            return;
+        }
+        rc.TenantId = session.TenantId;
+        rc.UserId = session.UserId;
+        rc.SessionId = session.Id;
+        if (session.Touch(clock.UtcNow)) await db.SaveChangesAsync();
         await next(ctx);
     }
 }
 
 /// <summary>
 /// Kural ihlali 422 + makine kodu + Türkçe mesaj; bulunamadı 404.
-/// Başka dükkânın kaydı da 404'tür: varlığı bile sızmasın.
+/// Başka dükkânın kaydı da 404'tür: varlığı bile sızmasın. SMS sağlayıcısı yoksa 503.
 /// </summary>
 public sealed class ErrorMiddleware(RequestDelegate next)
 {
@@ -46,6 +67,10 @@ public sealed class ErrorMiddleware(RequestDelegate next)
         catch (NotFoundException e)
         {
             await Results.Problem(statusCode: 404, title: e.Message).ExecuteAsync(ctx);
+        }
+        catch (SmsNotConfiguredException)
+        {
+            await Results.Problem(statusCode: 503, title: "SMS şu an gönderilemiyor. Dükkânın SMS hizmeti bağlanmadı.").ExecuteAsync(ctx);
         }
     }
 }

@@ -23,7 +23,7 @@ public class CollectionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     async Task<Guid> UnpaidRecordOfA()
     {
         using var scope = f.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ApiFactory.ShopA;
+        scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ApiFactory.ShopA;
         var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
         return await db.ServiceRecords.Where(r => r.Complaint == "Akü değişimi").Select(r => r.Id).SingleAsync();
     }
@@ -64,7 +64,7 @@ public class CollectionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         Assert.True(cash!.Collected > 0);
 
         using var scope = f.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ApiFactory.ShopA;
+        scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ApiFactory.ShopA;
         var paidId = await scope.ServiceProvider.GetRequiredService<TamironDbContext>()
             .ServiceRecords.Where(r => r.Complaint == "Ara bakım").Select(r => r.Id).SingleAsync();
 
@@ -101,7 +101,7 @@ public class CollectionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         Guid id;
         using (var scope = f.Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ApiFactory.ShopB;
+            scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ApiFactory.ShopB;
             var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
             var v = new Vehicle { PlateNo = "34 SİL 01" };
             db.Vehicles.Add(v);
@@ -112,7 +112,7 @@ public class CollectionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         }
         using (var scope = f.Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ApiFactory.ShopB;
+            scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ApiFactory.ShopB;
             var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
             Assert.False(await db.Vehicles.AnyAsync(v => v.Id == id));
             var row = await db.Vehicles.IgnoreQueryFilters().SingleAsync(v => v.Id == id);

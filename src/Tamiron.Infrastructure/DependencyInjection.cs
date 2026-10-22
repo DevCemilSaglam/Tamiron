@@ -14,6 +14,22 @@ public sealed class TurkeyClock : IClock
         DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utc, DateTimeKind.Utc), Tz));
 }
 
+/// <summary>Üretimde sağlayıcı bağlanana kadar: gönderim YAPILMAZ ve bu açıkça söylenir (K-074.5).</summary>
+public sealed class NotConfiguredSmsSender : ISmsSender
+{
+    public Task SendAsync(string phone, string text, CancellationToken ct) => throw new SmsNotConfiguredException();
+}
+
+/// <summary>YALNIZ GELİŞTİRME: SMS gitmez, günlüğe yazılır — usta yok, geliştirici kodu konsoldan okur.</summary>
+public sealed class DevLogSmsSender(Microsoft.Extensions.Logging.ILogger<DevLogSmsSender> log) : ISmsSender
+{
+    public Task SendAsync(string phone, string text, CancellationToken ct)
+    {
+        Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(log, "SMS (geliştirme, gönderilmedi) → {Phone}: {Text}", phone, text);
+        return Task.CompletedTask;
+    }
+}
+
 public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Tamiron.Api;
 using Tamiron.Application;
 using Tamiron.Application.Accounting;
+using Tamiron.Application.Auth;
 using Tamiron.Application.Customers;
 using Tamiron.Application.Expenses;
 using Tamiron.Application.Lists;
@@ -18,8 +19,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication();
 builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Tamiron")
     ?? throw new InvalidOperationException("ConnectionStrings:Tamiron yok."));
-builder.Services.AddScoped<HeaderTenantContext>();
-builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<HeaderTenantContext>());
+builder.Services.AddScoped<RequestContext>();
+builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<RequestContext>());
+builder.Services.AddScoped<ICurrentSession>(sp => sp.GetRequiredService<RequestContext>());
+// SMS: geliştirmede günlüğe yazılır; başka her ortamda sağlayıcı bağlanana kadar
+// gönderim YAPILMAZ ve 503 döner (K-074.5 — sağlayıcı Cemil'in kararı, paralı).
+if (builder.Environment.IsDevelopment()) builder.Services.AddSingleton<ISmsSender, DevLogSmsSender>();
+else builder.Services.AddSingleton<ISmsSender, NotConfiguredSmsSender>();
 builder.Services.AddProblemDetails();
 // Enum'lar ad olarak gidip gelir ("Card", 3 değil): istemci kodu okunur kalsın.
 builder.Services.ConfigureHttpJsonOptions(o =>
@@ -28,12 +34,23 @@ builder.Services.ConfigureHttpJsonOptions(o =>
 var app = builder.Build();
 
 app.UseMiddleware<ErrorMiddleware>();
-app.UseMiddleware<TenantMiddleware>();
+app.UseMiddleware<SessionMiddleware>();
 
 if (app.Environment.IsDevelopment())
     await DevSeed.RunAsync(app.Services);
 
 var api = app.MapGroup("/api");
+
+// Giriş (K-074): kod iste → kodu gir → anahtar. Oturum yalnız çıkışla biter.
+api.MapPost("/auth/code", async (RequestLoginCode cmd, ISender s, CancellationToken ct) =>
+{
+    await s.Send(cmd, ct);
+    return Results.Accepted();
+});
+api.MapPost("/auth/verify", (VerifyLoginCode cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+api.MapPost("/auth/logout", async (ISender s, CancellationToken ct) => { await s.Send(new Logout(), ct); return Results.NoContent(); });
+api.MapPost("/auth/logout-all", async (ISender s, CancellationToken ct) => { await s.Send(new LogoutAll(), ct); return Results.NoContent(); });
+api.MapGet("/auth/sessions", (ISender s, CancellationToken ct) => s.Send(new ListSessions(), ct));
 
 api.MapGet("/records/{id:guid}", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new GetServiceRecord(id), ct));

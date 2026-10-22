@@ -1,7 +1,8 @@
+using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Tamiron.Api;
 using Tamiron.Application;
@@ -20,19 +21,31 @@ public sealed class FixedClock : IClock
     public DateOnly LocalDate(DateTime utc) => DateOnly.FromDateTime(utc.AddHours(3));   // Türkiye sabit UTC+3
 }
 
+/// <summary>SMS gitmez; testler kodu buradan okur (K-074: gerçek gönderim Cemil'in sağlayıcı kararında).</summary>
+public sealed class FakeSms : ISmsSender
+{
+    public readonly ConcurrentQueue<(string Phone, string Text)> Queue = new();
+    public IReadOnlyList<(string Phone, string Text)> Sent => Queue.ToList();
+    public Task SendAsync(string phone, string text, CancellationToken ct) { Queue.Enqueue((phone, text)); return Task.CompletedTask; }
+}
+
 /// <summary>
 /// Gerçek MSSQL (LocalDB) üzerinde, her koşu kendi veritabanında: kiracı süzgeci,
 /// rowversion ve süzgeçli tekil indeks SQLite'ta farklı davranır — ölçtüğümüz
 /// şey üretimde koşacak şey olsun. Göçler UYGULANIR (EnsureCreated değil):
 /// göçün kendisi de sınanır.
 /// İki dükkân: A (prototipin tohumu) ve B (tek araç) — kiracı yalıtımı için.
+/// K-074'ten beri dükkân OTURUMDAN gelir: For(dükkân) o dükkânın kullanıcısına
+/// gerçek bir oturum açar ve anahtarıyla istek atar.
 /// </summary>
 public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     public static readonly Guid ShopA = Guid.Parse("aaaaaaaa-0000-4000-8000-000000000001");
     public static readonly Guid ShopB = Guid.Parse("bbbbbbbb-0000-4000-8000-000000000002");
     public readonly FixedClock Clock = new();
+    public readonly FakeSms Sms = new();
     private readonly string _db = "TamironTest_" + Guid.NewGuid().ToString("N")[..12];
+    private readonly Dictionary<Guid, string> _tokens = [];
     public Guid ShopBRecordId { get; private set; }
 
     private string Cs => $@"Server=(localdb)\MSSQLLocalDB;Database={_db};Trusted_Connection=True;TrustServerCertificate=True";
@@ -47,13 +60,15 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         {
             s.RemoveAll<IClock>();
             s.AddSingleton<IClock>(Clock);
+            s.RemoveAll<ISmsSender>();
+            s.AddSingleton<ISmsSender>(Sms);
         });
     }
 
     public HttpClient For(Guid shop)
     {
         var c = CreateClient();
-        c.DefaultRequestHeaders.Add("X-Tenant-Id", shop.ToString());
+        c.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _tokens[shop]);
         return c;
     }
 
@@ -61,14 +76,14 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         using (var scope = Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ShopA;
+            scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ShopA;
             var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
             await db.Database.MigrateAsync();
             await DevSeed.SeedAsync(db, ShopA, Clock.Today);
         }
         using (var scope = Services.CreateScope())
         {
-            scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ShopB;
+            scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = ShopB;
             var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
             db.Shops.Add(new Shop(ShopB) { Name = "Öteki Dükkân" });
             var v = new Vehicle { TenantId = ShopB, PlateNo = "06 TMR 07" };   // aynı plaka, başka dükkân: serbest
@@ -80,15 +95,27 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             await db.SaveChangesAsync();
             ShopBRecordId = r.Id;
         }
+        using (var scope = Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
+            // Giriş testlerinin numaraları: 01 ve 05 A'nın, 02–04 B'nin.
+            var users = new[] { (ShopA, "05320000001"), (ShopB, "05320000002"), (ShopB, "05320000003"), (ShopB, "05320000004"), (ShopA, "05320000005") }
+                .Select(x => User.Create(x.Item1, x.Item2)).ToList();
+            db.Users.AddRange(users);
+            foreach (var shop in new[] { ShopA, ShopB })
+            {
+                var (s, token) = Session.Open(shop, users.First(u => u.TenantId == shop).Id, "test", Clock.UtcNow);
+                db.Sessions.Add(s);
+                _tokens[shop] = token;
+            }
+            await db.SaveChangesAsync();
+        }
     }
 
     async Task IAsyncLifetime.DisposeAsync()
     {
         using (var scope = Services.CreateScope())
-        {
-            scope.ServiceProvider.GetRequiredService<HeaderTenantContext>().TenantId = ShopA;
             await scope.ServiceProvider.GetRequiredService<TamironDbContext>().Database.EnsureDeletedAsync();
-        }
         await base.DisposeAsync();
     }
 }

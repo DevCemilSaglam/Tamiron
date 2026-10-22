@@ -21,7 +21,7 @@ public class OpenRecordApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     async Task<int> VehicleCount(string plate)
     {
         using var scope = f.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<Tamiron.Api.HeaderTenantContext>().TenantId = ApiFactory.ShopB;
+        scope.ServiceProvider.GetRequiredService<Tamiron.Api.RequestContext>().TenantId = ApiFactory.ShopB;
         return await scope.ServiceProvider.GetRequiredService<TamironDbContext>().Vehicles.CountAsync(v => v.PlateNo == plate);
     }
 
@@ -69,7 +69,7 @@ public class OpenRecordApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         var res = await f.For(ApiFactory.ShopA).PostAsJsonAsync("/api/records", new { plate = "06 TMR 07", complaint = "Fren" }, Json);
         var r = await res.Content.ReadFromJsonAsync<ServiceRecordDto>(Json);
         using var scope = f.Services.CreateScope();
-        scope.ServiceProvider.GetRequiredService<Tamiron.Api.HeaderTenantContext>().TenantId = ApiFactory.ShopA;
+        scope.ServiceProvider.GetRequiredService<Tamiron.Api.RequestContext>().TenantId = ApiFactory.ShopA;
         var v = await scope.ServiceProvider.GetRequiredService<TamironDbContext>().Vehicles.SingleAsync(x => x.Id == r!.VehicleId);
         Assert.Equal("Demir Nakliyat Ltd. Şti.", v.OwnerName);
     }
