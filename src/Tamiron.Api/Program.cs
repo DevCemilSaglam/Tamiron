@@ -87,7 +87,8 @@ api.MapGet("/part-purchases", (PeriodKind? period, ISender s, CancellationToken 
     s.Send(new ListPartPurchases(period ?? PeriodKind.Month), ct));
 
 // Alacak (B9): döneme tabi değil. CSV: BOM'lu UTF-8, indirilen dosya.
-api.MapGet("/receivables", (ISender s, CancellationToken ct) => s.Send(new ListReceivables(), ct));
+// ?vehicleId= → araç ekranının "Ödeme durumu" (C4): aynı liste, araca süzülmüş.
+api.MapGet("/receivables", (Guid? vehicleId, ISender s, CancellationToken ct) => s.Send(new ListReceivables(vehicleId), ct));
 api.MapGet("/export/cash.csv", async (PeriodKind? period, ISender s, CancellationToken ct) =>
 {
     var f = await s.Send(new ExportCashCsv(period ?? PeriodKind.Month), ct);

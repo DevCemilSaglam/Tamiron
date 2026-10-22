@@ -6,14 +6,18 @@ namespace Tamiron.Application.Accounting;
 
 // B9 · Alacak listesi ve muhasebe CSV'si (prototip 95-muhasebe, muhasebeCsv).
 
-public sealed record ReceivableItem(Guid RecordId, string PlateNo, string? OwnerName, DateOnly? DeliveredAt, decimal Total);
+/// <param name="Description">Şikâyet; boşsa tür adı (prototip 60-arac: <c>k.sikayet || TUR_AD[k.tur]</c>).</param>
+public sealed record ReceivableItem(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string Description,
+                                    DateOnly? DeliveredAt, decimal Total);
 public sealed record ReceivableList(decimal Total, IReadOnlyList<ReceivableItem> Items);
 
 /// <summary>
 /// Alacak bir BAKİYE, hareket değil: döneme tabi DEĞİL (Cemil, 05.09) — geçen aydan
 /// kalan alacak bu ay da alacaktır. Ustanın sorusu "KİMDEN alacağım": sahip adı önde.
+/// <paramref name="VehicleId"/> verilirse araç ekranının "Ödeme durumu" (C4): AYNI liste,
+/// araca süzülmüş — iki ayrı hesap olsaydı biri diğerini yalanlardı (prototip notu).
 /// </summary>
-public sealed record ListReceivables : IRequest<ReceivableList>;
+public sealed record ListReceivables(Guid? VehicleId = null) : IRequest<ReceivableList>;
 
 public sealed record CsvFile(string FileName, string Content);
 
@@ -78,12 +82,14 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
     public async Task<ReceivableList> Handle(ListReceivables q, CancellationToken ct)
     {
         var (delivered, vehicles) = await Load(ct);
-        var items = delivered.Where(r => r.PaymentMethod == PaymentMethod.Unpaid)
+        var items = delivered.Where(r => r.PaymentMethod == PaymentMethod.Unpaid && (q.VehicleId is null || r.VehicleId == q.VehicleId))
             .OrderByDescending(r => r.DeliveredAt).ThenByDescending(r => r.DateTimeCreated)
             .Select(r =>
             {
                 vehicles.TryGetValue(r.VehicleId, out var v);
-                return new ReceivableItem(r.Id, v?.PlateNo ?? "", v?.OwnerName, r.DeliveredAt, r.Total);
+                return new ReceivableItem(r.Id, r.VehicleId, v?.PlateNo ?? "", v?.OwnerName,
+                    string.IsNullOrWhiteSpace(r.Complaint) ? ServiceTypeGuess.Label(r.Type) : r.Complaint,
+                    r.DeliveredAt, r.Total);
             }).ToList();
         return new ReceivableList(items.Sum(i => i.Total), items);
     }
