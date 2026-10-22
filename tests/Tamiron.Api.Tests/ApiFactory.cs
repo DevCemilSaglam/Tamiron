@@ -14,6 +14,7 @@ public sealed class FixedClock : IClock
 {
     public DateOnly Today { get; set; } = new(2026, 10, 22);
     public DateTime UtcNow => Today.ToDateTime(new TimeOnly(9, 0));
+    public DateOnly LocalDate(DateTime utc) => DateOnly.FromDateTime(utc.AddHours(3));   // Türkiye sabit UTC+3
 }
 
 /// <summary>
@@ -71,7 +72,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             db.Vehicles.Add(v);
             var r = new ServiceRecord(ShopB, v.Id, "Gizli iş");
             r.AddLine(ServiceLine.Labor("İşçilik", 999));
-            r.Deliver(PaymentMethod.Unpaid, Clock.Today);
+            r.Deliver(PaymentMethod.Unpaid, Clock.Today, MaintenancePolicy.Default, []);
             db.ServiceRecords.Add(r);
             await db.SaveChangesAsync();
             ShopBRecordId = r.Id;

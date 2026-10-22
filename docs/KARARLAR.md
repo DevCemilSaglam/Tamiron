@@ -54,6 +54,13 @@ kayıt sunucuya sormadan oluşturulabilmeli. `int` kimlik sunucudan dönmeden
 bilinmez. (Prototipteki `length + 1` kimliğinin yinelenme hatası da (K-072.4)
 bu sınıfı tamamen kapatıyor.)
 
+**73.9 · Prototipten bilinçli sapma: ay sonu (B5, 22.10).** Bakım hatırlatmasının ay
+tarihi prototipte JS `setMonth` ile hesaplanıyordu. Bu yöntem ay sonunu taşırıyor:
+31 Ağustos + 6 ay → 3 Mart. Backend ay sonuna sabitliyor: 28 Şubat (`DateOnly.AddMonths`).
+Hatırlatma, bakım ayını aşıp bir sonraki aya kaymamalı. Prototip ölçüt olmaya
+devam ediyor; bu tek fark burada yazılı. Yarım gün yuvarlaması ise prototiple
+aynı: JS `Math.round` gibi yukarı (testi var).
+
 **73.8 · İlk dilim bitti — ölçüm.**
 - Domain'de 22 test, LocalDB üzerinde API'de 5 test; hepsi yeşil.
 - Üç kural bilerek bozuldu, üçünde de testler kırmızıya döndü:

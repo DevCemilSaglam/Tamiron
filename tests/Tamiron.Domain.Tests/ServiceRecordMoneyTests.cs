@@ -57,7 +57,7 @@ public class ServiceRecordMoneyTests
     public void Paid_at_delivery_is_collected_on_delivery_day()
     {
         var r = Record(Part(3200m));
-        r.Deliver(PaymentMethod.Cash, Aug28);
+        r.Deliver(PaymentMethod.Cash, Aug28, MaintenancePolicy.Default, []);
         Assert.Equal(Aug28, r.CollectedOn);
         Assert.Null(r.PaymentCollectedAt);   // teslimde ödendiyse ayrı tarih tutulmaz
     }
@@ -66,7 +66,7 @@ public class ServiceRecordMoneyTests
     public void Unpaid_has_no_collection_day()
     {
         var r = Record(Part(3200m));
-        r.Deliver(PaymentMethod.Unpaid, Aug28);
+        r.Deliver(PaymentMethod.Unpaid, Aug28, MaintenancePolicy.Default, []);
         Assert.Null(r.CollectedOn);
     }
 
@@ -75,7 +75,7 @@ public class ServiceRecordMoneyTests
     {
         // Ağustos'ta teslim, Ekim'de ödendi: Ekim'in kasası (prototipteki örnek, 06 TMR 07).
         var r = Record(Part(3450m));
-        r.Deliver(PaymentMethod.Unpaid, Aug28);
+        r.Deliver(PaymentMethod.Unpaid, Aug28, MaintenancePolicy.Default, []);
         r.CollectPayment(PaymentMethod.Card, Oct22);
         Assert.Equal(PaymentMethod.Card, r.PaymentMethod);
         Assert.Equal(Oct22, r.CollectedOn);
@@ -85,7 +85,7 @@ public class ServiceRecordMoneyTests
     public void Undo_collection_returns_to_unpaid()
     {
         var r = Record(Part(3450m));
-        r.Deliver(PaymentMethod.Unpaid, Aug28);
+        r.Deliver(PaymentMethod.Unpaid, Aug28, MaintenancePolicy.Default, []);
         r.CollectPayment(PaymentMethod.Cash, Oct22);
         r.UndoCollection();
         Assert.Equal(PaymentMethod.Unpaid, r.PaymentMethod);
@@ -97,7 +97,7 @@ public class ServiceRecordMoneyTests
     public void Cannot_collect_a_record_that_is_not_unpaid()
     {
         var r = Record(Part(3200m));
-        r.Deliver(PaymentMethod.Cash, Aug28);
+        r.Deliver(PaymentMethod.Cash, Aug28, MaintenancePolicy.Default, []);
         var e = Assert.Throws<DomainException>(() => r.CollectPayment(PaymentMethod.Card, Oct22));
         Assert.Equal("payment.not_unpaid", e.Code);
     }
@@ -106,7 +106,7 @@ public class ServiceRecordMoneyTests
     public void Cannot_collect_as_unpaid()
     {
         var r = Record(Part(3200m));
-        r.Deliver(PaymentMethod.Unpaid, Aug28);
+        r.Deliver(PaymentMethod.Unpaid, Aug28, MaintenancePolicy.Default, []);
         Assert.Throws<DomainException>(() => r.CollectPayment(PaymentMethod.Unpaid, Oct22));
     }
 
@@ -114,7 +114,7 @@ public class ServiceRecordMoneyTests
     public void Cannot_collect_before_delivery_day()
     {
         var r = Record(Part(3200m));
-        r.Deliver(PaymentMethod.Unpaid, Aug28);
+        r.Deliver(PaymentMethod.Unpaid, Aug28, MaintenancePolicy.Default, []);
         Assert.Throws<DomainException>(() => r.CollectPayment(PaymentMethod.Cash, Aug28.AddDays(-1)));
     }
 }

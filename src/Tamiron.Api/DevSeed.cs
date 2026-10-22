@@ -50,19 +50,19 @@ public static class DevSeed
         r6.SetKm("151.200");
         r6.AddLine(ServiceLine.Part("Motor yağı", 1950, cost: 1500));
         r6.AddLine(ServiceLine.Labor("Bakım işçiliği", 900));
-        r6.Deliver(PaymentMethod.Transfer, new DateOnly(today.Year, 6, 20));
+        r6.Deliver(PaymentMethod.Transfer, new DateOnly(today.Year, 6, 20), MaintenancePolicy.Default, []);
 
         // Bugün nakit; parçanın alışı BİLİNMİYOR (prototip id 7, K-055.2).
         var r7 = new ServiceRecord(shopId, ayse.Id, "Ön cam silecek motoru");
         r7.AddLine(ServiceLine.Part("Silecek motoru", 2100));
         r7.AddLine(ServiceLine.Labor("Söküm takım", 700));
-        r7.Deliver(PaymentMethod.Cash, today);
+        r7.Deliver(PaymentMethod.Cash, today, MaintenancePolicy.Default, []);
 
         // Veresiye (prototip id 8) — "Ödeme alındı"nın denendiği kayıt.
         var r8 = new ServiceRecord(shopId, demir.Id, "Akü değişimi");
         r8.AddLine(ServiceLine.Part("Akü 60 Ah", 3200, cost: 2450));
         r8.AddLine(ServiceLine.Labor("Takma", 250));
-        r8.Deliver(PaymentMethod.Unpaid, today.AddDays(-55));
+        r8.Deliver(PaymentMethod.Unpaid, today.AddDays(-55), MaintenancePolicy.Default, []);
 
         db.ServiceRecords.AddRange(r1, r6, r7, r8);
         await db.SaveChangesAsync();

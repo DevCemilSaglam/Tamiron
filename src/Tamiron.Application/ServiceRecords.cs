@@ -13,13 +13,15 @@ public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, S
                                       string Complaint, string? Km, DateOnly? DeliveredAt, PaymentMethod? PaymentMethod,
                                       DateOnly? PaymentCollectedAt, DateOnly? CollectedOn,
                                       bool WaitingForPart, DateOnly? WaitingSince, bool ShowWaitingToCustomer,
+                                      DateOnly? ReminderDate, bool ReminderSent,
                                       decimal Total, IReadOnlyList<ServiceLineDto> Lines);
 
 internal static class Map
 {
     public static ServiceRecordDto ToDto(this ServiceRecord r, string plateNo) => new(
         r.Id, r.VehicleId, plateNo, r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
-        r.PaymentCollectedAt, r.CollectedOn, r.WaitingForPart, r.WaitingSince, r.ShowWaitingToCustomer, r.Total,
+        r.PaymentCollectedAt, r.CollectedOn, r.WaitingForPart, r.WaitingSince, r.ShowWaitingToCustomer,
+        r.ReminderDate, r.ReminderSent, r.Total,
         r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList());
 
     public static async Task<ServiceRecordDto> LoadDto(ITamironDb db, Guid id, CancellationToken ct, bool tracking = false)

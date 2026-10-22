@@ -95,12 +95,30 @@ public class ServiceRecord : TenantEntity
 
     public bool IsMaintenance => Type is ServiceType.Maintenance or ServiceType.Both;
 
-    public void Deliver(PaymentMethod method, DateOnly on)
+    /// <summary>
+    /// Teslim (K-004'ün tek durum alanı). Bakımsa hatırlatma KURULUR — hesap tek
+    /// yerde (MaintenanceReminder). <paramref name="otherReadings"/>: aynı aracın
+    /// ÖTEKİ kayıtlarının km ölçümleri; bu kaydınki teslim günüyle eklenir.
+    /// Eksikler teslimi ENGELLEMEZ (prototip kEksikler: "yolu kapatmaz").
+    /// </summary>
+    public void Deliver(PaymentMethod method, DateOnly on, MaintenancePolicy policy, IEnumerable<KmReading> otherReadings)
     {
         if (DeliveredAt is not null)
             throw new DomainException("record.already_delivered", "Bu kayıt zaten teslim edildi.");
         DeliveredAt = on;
         PaymentMethod = method;
+        var plan = PlanReminder(on, policy, otherReadings);
+        ReminderDate = plan?.Date;
+        ReminderSent = false;
+    }
+
+    /// <summary>Teslim edilseydi kurulacak hatırlatma (teslim ekranının önizlemesi). Bakım değilse yok.</summary>
+    public ReminderPlan? PlanReminder(DateOnly on, MaintenancePolicy policy, IEnumerable<KmReading> otherReadings)
+    {
+        if (!IsMaintenance) return null;
+        var km = KmReading.Parse(Km);
+        var history = km is { } k ? otherReadings.Append(new KmReading(on, k)) : otherReadings;
+        return MaintenanceReminder.Compute(on, km, policy, history);
     }
 
     /// <summary>"Almadım" denmiş kaydın parası geldi (kayıt ekranındaki "Ödeme alındı").</summary>

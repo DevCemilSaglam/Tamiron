@@ -20,6 +20,8 @@ public interface IClock
 {
     DateTime UtcNow { get; }
     DateOnly Today { get; }
+    /// <summary>Saklanan UTC anın ustanın günündeki karşılığı (ör. açılış günü = DateTimeCreated).</summary>
+    DateOnly LocalDate(DateTime utc);
 }
 
 /// <summary>Uygulama katmanının gördüğü veritabanı. Kiracı ve soft-delete süzgeci altyapıda, zorunlu (MIMARI §4.2).</summary>

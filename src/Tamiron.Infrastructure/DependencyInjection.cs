@@ -9,7 +9,9 @@ public sealed class TurkeyClock : IClock
 {
     private static readonly TimeZoneInfo Tz = TimeZoneInfo.FindSystemTimeZoneById("Europe/Istanbul");
     public DateTime UtcNow => DateTime.UtcNow;
-    public DateOnly Today => DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, Tz));
+    public DateOnly Today => LocalDate(DateTime.UtcNow);
+    public DateOnly LocalDate(DateTime utc) =>
+        DateOnly.FromDateTime(TimeZoneInfo.ConvertTimeFromUtc(DateTime.SpecifyKind(utc, DateTimeKind.Utc), Tz));
 }
 
 public static class DependencyInjection

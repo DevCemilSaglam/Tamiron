@@ -41,6 +41,12 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
 api.MapPatch("/records/{id:guid}", (Guid id, RecordPatch p, ISender s, CancellationToken ct) =>
     s.Send(new UpdateRecord(id, p.Complaint, p.Type, p.Km, p.WaitingForPart, p.ShowWaitingToCustomer), ct));
 
+// Teslim (B5). Önizleme kaydetmez: teslim ekranı "hatırlatma şu güne kurulacak" der.
+api.MapGet("/records/{id:guid}/delivery-preview", (Guid id, ISender s, CancellationToken ct) =>
+    s.Send(new GetDeliveryPreview(id), ct));
+api.MapPost("/records/{id:guid}/deliver", (Guid id, CollectBody body, ISender s, CancellationToken ct) =>
+    s.Send(new DeliverRecord(id, body.Method), ct));
+
 // Satırlar (B3). Her uç kaydın güncel hâlini döner.
 api.MapPost("/records/{id:guid}/lines", (Guid id, LineBody body, ISender s, CancellationToken ct) =>
     s.Send(new AddLine(id, body), ct));
