@@ -10,6 +10,47 @@
 
 ---
 
+## K-073 · Backend fazı açıldı (22.10.2026)
+
+**Cemil:** *"1 ve devam"*. Önerilen üç adımın ilki aşamayı değiştirmekti,
+"devam" da kalan ikisinin onayıdır. Bundan önce: *"Tasarım / şablon bitince
+backend'e geçeceğiz."*
+
+**73.1 · Aşama değişti.** `CLAUDE.md` artık "backend" diyor. Prototip
+davranışın, `VERI-MODELI.md` v2 de şemanın şartnamesi. Prototip silinmez;
+backend'in ölçütüdür.
+
+**73.2 · Yığın — MIMARI §2–§3, değişiklik yok.** .NET 8 (makinedeki SDK
+8.0.202) · ASP.NET Core Web API · EF Core 8 + MSSQL · MediatR (CQRS-hafif) ·
+xUnit.
+- Gün-1'de yalnız dört proje var: Domain, Application, Infrastructure, Api.
+  Bunlara iki test projesi eşlik ediyor.
+- UI (Blazor RCL'leri) sonra gelir.
+
+**73.3 · MediatR 12'de sabit.** 13. sürümden sonra MediatR ticari lisansa
+geçti; 12.x MIT lisanslı. Yükseltme ayrı karar ister.
+
+**73.4 · Geliştirme veritabanı LocalDB** (`(localdb)\MSSQLLocalDB`, Windows
+kimliği).
+- Parola yok, dolayısıyla depoya gizli bilgi girmez.
+- Makinedeki `MSSQLSERVER` servisine dokunulmaz: Cemil'in başka işleri
+  olabilir.
+
+**73.5 · İlk dilim (Cemil'e önerildiği gibi).**
+- İlk dört tablo: `Shop`, `Vehicle`, `ServiceRecord`, `ServiceLine`.
+- Ortak alanlar MIMARI §4.6: `TenantId` filtresi, soft-delete, `RowVersion`.
+- İlk API kuralı tahsil günü (K-071.1), saf domain servisi olarak ve önce
+  testi yazılarak. Kayıt toplamı kuralı (K-037) aynı serviste.
+
+**73.6 · Kiracı (tenant) kimliği — Cemil onayına açık.**
+- Kimlik doğrulama henüz yok. Geliştirmede kiracı `X-Tenant-Id`
+  başlığından okunuyor (`ITenantContext`).
+- Bu geçici. Gerçek oturum açma ayrı bir karar: ustanın nasıl gireceği
+  (telefon + SMS kodu mu, parola mı) tamircinin kullanım alışkanlığına
+  bağlı.
+
+---
+
 ## K-072 · Veri modeli v2 — prototiple uzlaştırıldı, sapma derlemede yakalanır (22.10.2026)
 
 **Bağlam.** Cemil: *"Tasarım / şablon bitince backend'e geçeceğiz."* Backend'in
