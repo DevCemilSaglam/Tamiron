@@ -19,6 +19,12 @@ public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, S
 
 internal static class Map
 {
+    /// <summary>Açık veresiyelerin toplamı — kasa özeti ve ana ekran AYNI yerden okur (C9).</summary>
+    public static async Task<decimal> UnpaidTotal(ITamironDb db, CancellationToken ct)
+        => (await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)
+                .Where(r => r.DeliveredAt != null && r.PaymentMethod == PaymentMethod.Unpaid).ToListAsync(ct))
+           .Sum(r => r.Total);
+
     public static ServiceRecordDto ToDto(this ServiceRecord r, Vehicle? v) => new(
         r.Id, r.VehicleId, v?.PlateNo ?? "", r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
         r.PaymentCollectedAt, r.CollectedOn, r.WaitingForPart, r.WaitingSince, r.ShowWaitingToCustomer,
@@ -150,23 +156,22 @@ internal sealed class GetCashSummaryHandler(ITamironDb db, IClock clock) : IRequ
     public async Task<CashSummary> Handle(GetCashSummary q, CancellationToken ct)
     {
         var p = Period.Of(q.Period, clock.Today);
-        // Teslim edilmiş kayıtlar SQL'de süzülür; tahsil günü ve toplam DOMAIN'de
-        // hesaplanır (CollectedOn, Total). Kuralı burada LINQ'e ikinci kez yazmak,
-        // aynı kuralı iki yerde tutmak olurdu (K-019.1). Bir dükkânın teslim
-        // sayısı için bellekte hesap ucuz; büyürse SQL'e ifade olarak taşınır.
-        var delivered = await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)
-            .Where(r => r.DeliveredAt != null).ToListAsync(ct);
+        // C9 · Süzgeç SQL'de: yalnız dönemde tahsil edilenler ve açık veresiyeler yüklenir.
+        // Tahsil günü kuralının SQL biçimi ServiceRecord.CollectedBetween — bellekteki
+        // CollectedOn ile eşitliği testli (CollectedExpressionTests). Toplam DOMAIN'de
+        // (Total: müşteri parçası hariç) — o kural SQL'e İKİNCİ kez yazılmadı.
+        var collected = await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)
+            .Where(ServiceRecord.CollectedBetween(p.Start, p.End)).ToListAsync(ct);
 
-        decimal Sum(PaymentMethod m) => delivered
-            .Where(r => r.PaymentMethod == m && r.CollectedOn is { } d && p.Contains(d)).Sum(r => r.Total);
+        decimal Sum(PaymentMethod m) => collected.Where(r => r.PaymentMethod == m).Sum(r => r.Total);
 
         var cash = Sum(PaymentMethod.Cash);
         var card = Sum(PaymentMethod.Card);
         var transfer = Sum(PaymentMethod.Transfer);
         return new CashSummary(q.Period, p.Start, p.End,
-            DeliveredCount: delivered.Count(r => p.Contains(r.DeliveredAt!.Value)),
+            DeliveredCount: await db.ServiceRecords.CountAsync(r => r.DeliveredAt >= p.Start && r.DeliveredAt <= p.End, ct),
             cash, card, transfer, cash + card + transfer,
             // Alacak bir BAKİYE, döneme tabi değil (05.09).
-            Receivable: delivered.Where(r => r.PaymentMethod == PaymentMethod.Unpaid).Sum(r => r.Total));
+            Receivable: await Map.UnpaidTotal(db, ct));
     }
 }

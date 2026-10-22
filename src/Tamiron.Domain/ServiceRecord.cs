@@ -97,6 +97,16 @@ public class ServiceRecord : TenantEntity
 
     public bool IsMaintenance => Type is ServiceType.Maintenance or ServiceType.Both;
 
+    /// <summary>
+    /// Tahsil günü kuralının SQL'e çevrilebilen biçimi (C9): <see cref="CollectedOn"/> dönem
+    /// içinde mi. İki biçim AYNI kuraldır — CollectedExpressionTests her durumda eşitliği ölçer.
+    /// Kural değişirse ikisi BİRLİKTE değişir.
+    /// </summary>
+    public static System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> CollectedBetween(DateOnly start, DateOnly end)
+        => r => r.PaymentMethod != null && r.PaymentMethod != Domain.PaymentMethod.Unpaid
+                && (r.PaymentCollectedAt ?? r.DeliveredAt) >= start
+                && (r.PaymentCollectedAt ?? r.DeliveredAt) <= end;
+
     /// <summary>Hatırlatması geldi mi (prototip hatirlatmasiGelenler): bakım, tarihi geçmiş ya da bugün, gönderilmemiş.</summary>
     public bool IsReminderDue(DateOnly today)
         => IsMaintenance && ReminderDate is { } d && d <= today && !ReminderSent;
