@@ -113,6 +113,22 @@
     </div>
     <div id="muhAlacak"></div>
 
+    <!-- DIŞA AKTARMA (22.10 · MUH sırası · A-M22). Tamircinin
+         muhasebecisi Excel istiyor; girilen veri çıkabilmeli
+         (arastirma/DISA-AKTARMA.md §5). İki yol, ikisi de kütüphanesiz:
+         CSV (Excel açar) ve tarayıcının yazdırma penceresi ("PDF olarak
+         kaydet" oradan). Ekranın en altında: her gün kullanılan şey
+         değil, ayda bir muhasebeciye giden şey. -->
+    <div class="btn-row" id="muhDisa">
+      <button class="btn btn-ghost" id="muhCsv">
+        <svg class="ico"><use href="#i-download"></use></svg> Excel'e aktar
+      </button>
+      <button class="btn btn-ghost" id="muhYazdir">
+        <svg class="ico"><use href="#i-printer"></use></svg> Yazdır / PDF
+      </button>
+    </div>
+    <p class="plate-hint" id="muhDisaNot"></p>
+
   </div>
 
   <!-- ================= DETAYLI — MODÜL MENÜSÜ ================= -->
@@ -320,6 +336,10 @@ Ekran.tanim('muhasebe', {
           '</tbody></table></div></div>'
       : bosDurumHtml('i-circle-check', 'Alacak yok',
           'Teslim edilen her işin parası alınmış.');
+
+    document.getElementById('muhDisaNot').innerHTML =
+      '<b>' + ad + '</b> tahsilatı ve gideri, bugünkü alacakla birlikte. ' +
+      'Excel dosyası muhasebeciye gönderilebilir.';
   }
 });
 
@@ -352,6 +372,22 @@ document.addEventListener('click', function (e) {
     }
     return;
   }
+
+  /* İndirme Blob + <a download>: Android Chrome ve masaüstünde çalışıyor;
+     iOS'ta ana ekrana eklenmiş uygulamada GERÇEK CİHAZDA DENENMEDİ
+     (DISA-AKTARMA §4). Yazdırma yolu o riski taşımıyor. */
+  if (e.target.closest('#muhCsv')) {
+    var ad = 'tamiron-muhasebe-' + muhDonemSecili + '-' + bugunMetin().replace(/\./g, '-') + '.csv';
+    var url = URL.createObjectURL(new Blob([muhasebeCsv(muhDonemSecili)],
+                                           { type: 'text/csv;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = url; a.download = ad;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    balon('Dosya indirildi: ' + ad, false, 3200);
+    return;
+  }
+  if (e.target.closest('#muhYazdir')) { window.print(); return; }
 
   if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
   if (e.target.closest('#muhGiderEkle')) { muhFormGoster(true); return; }

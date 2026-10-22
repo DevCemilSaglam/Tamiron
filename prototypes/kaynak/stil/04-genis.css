@@ -107,7 +107,9 @@
       "ozt ozt"
       "gbs abs"
       "gfm ."
-      "gid alc";
+      "gid alc"
+      "dsa dsa"
+      "dsn dsn";
     gap: 18px;
     align-items: start;
   }
@@ -118,6 +120,11 @@
   #muhBasitGovde > #muhGiderler { grid-area: gid; }
   #muhBasitGovde > .section-label:not(.with-action) { grid-area: abs; }
   #muhBasitGovde > #muhAlacak { grid-area: alc; }
+  /* Dışa aktarma (22.10) en altta, iki sütunun ortak satırında. Alanı
+     olmayan öğeyi grid ilk BOŞ hücreye koyuyordu: düğmeler gider
+     formunun yanındaki "." hücresine, not Alacak'ın üstüne çıkmıştı. */
+  #muhBasitGovde > #muhDisa { grid-area: dsa; }
+  #muhBasitGovde > #muhDisaNot { grid-area: dsn; }
 
 }
 

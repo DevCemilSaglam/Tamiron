@@ -1,0 +1,30 @@
+/* ============ YAZDIRMA (22.10 · MUH sırası · A-M22) ============
+   "PDF olarak kaydet" tarayıcının yazdırma penceresinden: kütüphane yok,
+   Türkçe harf sorunu yok, her cihazda aynı (arastirma/DISA-AKTARMA.md §3).
+
+   Kâğıda YALNIZ AÇIK EKRAN çıkar. Gezinme, alt şerit, balon, katman ve
+   bilgisayardaki yan menü/yan liste kâğıtta işe yaramaz. Düğmeler de
+   çıkmaz: kâğıtta dokunulmaz — dönem çipi gizlenince dönemin ADI
+   başlıkta kalıyor (muhOzetBaslik).
+
+   Koyu tema kâğıda çıkmasın diye yazdırma anında tema açığa çekiliyor
+   (01-cekirdek, beforeprint) — burada ham renk yazılmıyor, token'lar
+   açık temanın değerlerini veriyor.
+
+   Kuralların hepsi @media print içinde: ekranda hiçbiri çalışmaz. */
+@media print {
+  @page { margin: 14mm; }
+
+  .topbar, .botbar, .toast, .katman, .katman-ortu,
+  .screen:not(.active), .screen.yan,
+  .screen.active button:not([role]), .screen.active .cip-grup,
+  .screen.active .tab-grup, .screen.active .plate-hint { display: none !important; }
+
+  body, .device { background: var(--surface); }
+  .device { display: block; height: auto; max-width: none; }
+  .device::after { content: none; }
+  .screen.active { overflow: visible; display: block; }
+
+  .card { box-shadow: none; break-inside: avoid; }
+  .tablo tr { break-inside: avoid; }
+}

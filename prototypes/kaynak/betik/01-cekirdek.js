@@ -719,6 +719,13 @@ var Tema = (function () {
       if (mq.addEventListener) mq.addEventListener('change', d);
       else if (mq.addListener) mq.addListener(d);
     }
+    /* KÂĞIT HEP AÇIK TEMA (22.10 · 05-yazdir.css). Koyu zemin kâğıtta
+       mürekkep yakar ve muhasebecinin elinde okunmaz. Yazdırma anında
+       kök açığa çekilir, bitince ustanın seçimi geri gelir. */
+    window.addEventListener('beforeprint', function () {
+      document.documentElement.setAttribute('data-theme', 'light');
+    });
+    window.addEventListener('afterprint', uygula);
   }
 
   return { baslat: baslat, dondur: dondur, secimi: function () { return secim; } };

@@ -2675,6 +2675,84 @@ function stilMetni() {
     }
   })();
 
+  /* 60 · DISA-AKTARMA (22.10 · A-M22). Hata siniflari — ikisi de dosya
+     ACILANA kadar gorunmez, ekranda hicbir sey bozuk durmaz:
+       · biçimli rakam ("3.450") Excel'de METIN olur, toplanamaz;
+       · ";" ya da tirnak iceren aciklama sutunlari kaydirir, "=" ile
+         baslayan aciklama Excel'de FORMUL olarak calisir;
+       · BOM yoksa Turkce harfler bozuk acilir.
+     Ayrica: satir sayisi = tahsilat + gider + alacak; iki dugme var;
+     yazdirma stili alt seridi gizliyor.
+     NEGATIF DOGRULAMA (22.10): csvHucre kacissiz -> bulgu; geri -> 0. */
+  (function () {
+    if (typeof muhasebeCsv !== 'function') { ek('DISA-AKTARMA', 'muhasebe', 'muhasebeCsv yok'); return; }
+    var sahte = { id: 999001, tarih: bugunMetin(), aciklama: '=HAT; "deneme"', tutar: 1234, tur: 'elle' };
+    GIDERLER.push(sahte);
+    try {
+      var csv = muhasebeCsv('yil');
+      if (csv.charCodeAt(0) !== 0xFEFF) ek('DISA-AKTARMA', 'muhasebe', 'CSV BOM ile baslamiyor (Excel Turkce harfleri bozar)');
+      var sat = csv.replace(/^﻿/, '').replace(/\r\n$/, '').split('\r\n');
+      if (sat[0] !== 'Tür;Tarih;Açıklama;Plaka;Müşteri;Ödeme;Tutar') ek('DISA-AKTARMA', 'muhasebe', 'baslik satiri beklenen degil: ' + sat[0]);
+      var bek = 1 + donemTahsilatlari('yil').length +
+        GIDERLER.filter(function (g) { return donemIcinde(g.tarih, 'yil'); }).length +
+        KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; }).length;
+      if (sat.length !== bek) ek('DISA-AKTARMA', 'muhasebe', 'satir sayisi ' + sat.length + ', beklenen ' + bek);
+      var gs = sat.filter(function (s) { return s.indexOf('HAT') >= 0; })[0] || '';
+      if (gs !== 'Gider;' + sahte.tarih + ';"\'=HAT; ""deneme""";;;;1234')
+        ek('DISA-AKTARMA', 'muhasebe', 'aciklama kacisi/formul korumasi yanlis: ' + gs);
+      sat.slice(1).forEach(function (s) {
+        var t = s.split(';').pop();
+        if (!/^\d+(,\d+)?$/.test(t)) ek('DISA-AKTARMA', 'muhasebe', 'Tutar ham rakam degil: ' + t);
+      });
+    } finally {
+      GIDERLER.splice(GIDERLER.indexOf(sahte), 1);
+    }
+    if (typeof Ekran !== 'undefined' && Ekran.ac) {
+      Ekran.ac('home'); Ekran.ac('muhasebe');
+      if (!document.getElementById('muhCsv') || !document.getElementById('muhYazdir'))
+        ek('DISA-AKTARMA', 'muhasebe', '"Excel\'e aktar" / "Yazdir" dugmesi yok');
+      Ekran.ac('home');
+    }
+  })();
+
+  /* 61 · GRID-ALANSIZ (22.10). Hata sinifi: adli alanlarla (grid-template-
+     areas) dizilmis bir gövdeye yeni oge eklenip ALAN VERILMEYINCE grid onu
+     ilk BOS hucreye koyuyor — disa aktarma dugmeleri gider formunun
+     yanina, notu Alacak'in ustune cikmisti. Ekranda "bozuk" gorunmuyor,
+     yalnizca yanlis yerde duruyor; hicbir test gormezdi.
+     Yalniz >= 768 px (adli alanlar 04-genis.css'te).
+     NEGATIF DOGRULAMA (22.10): #muhDisa'nin grid-area kurali kaldirildi
+     -> bulgu; geri -> 0. */
+  (function () {
+    if (window.innerWidth < 768 || typeof Ekran === 'undefined' || !Ekran.ac) return;
+    var yk = window.ACIK_KAYIT;
+    var acik = (window.KAYITLAR || []).filter(function (k) { return !k.teslimTarihi; })[0];
+    [['muhasebe', '#muhBasitGovde'], ['kayit', '#screen-kayit']].forEach(function (e) {
+      if (e[0] === 'kayit') { if (!acik) return; window.ACIK_KAYIT = acik.id; }
+      Ekran.ac('home'); Ekran.ac(e[0]);
+      var g = document.querySelector(e[1]);
+      if (!g) return;
+      var cs = getComputedStyle(g);
+      if (cs.display !== 'grid' || cs.gridTemplateAreas === 'none') return;
+      Array.prototype.forEach.call(g.children, function (c) {
+        if (!c.getClientRects().length || /^(SCRIPT|STYLE)$/.test(c.tagName)) return;
+        if (getComputedStyle(c).gridRowStart === 'auto')
+          ek('GRID-ALANSIZ', e[0], (c.id ? '#' + c.id : c.tagName.toLowerCase() + '.' + c.className) +
+             ' alan adi almamis -- grid onu ilk bos hucreye koyar');
+      });
+    });
+    window.ACIK_KAYIT = yk;
+    Ekran.ac('home');
+    var yazdir = false;
+    Array.prototype.forEach.call(document.styleSheets, function (ss) {
+      var kurallar; try { kurallar = ss.cssRules; } catch (e) { return; }
+      Array.prototype.forEach.call(kurallar || [], function (r) {
+        if (r.media && /print/.test(r.media.mediaText) && /\.botbar/.test(r.cssText)) yazdir = true;
+      });
+    });
+    if (!yazdir) ek('DISA-AKTARMA', 'yazdir', 'yazdirma stilinde alt serit gizlenmiyor (05-yazdir.css)');
+  })();
+
   /* 57 · GENIS-DUZEN — tablet ve bilgisayar yerlesimi (K-064.2 · 04-genis.css).
      Yalniz genislik >= 768 px iken olcer; telefonda bu dosyanin hicbir
      kurali calismaz. Hata sinifi (18.10): ortalama kurali (align-self:

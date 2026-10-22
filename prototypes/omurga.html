@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-22 07:59
+  Üretim: 2026-10-22 08:13
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -2363,7 +2363,9 @@ kirpilsin. */
       "ozt ozt"
       "gbs abs"
       "gfm ."
-      "gid alc";
+      "gid alc"
+      "dsa dsa"
+      "dsn dsn";
     gap: 18px;
     align-items: start;
   }
@@ -2374,6 +2376,11 @@ kirpilsin. */
   #muhBasitGovde > #muhGiderler { grid-area: gid; }
   #muhBasitGovde > .section-label:not(.with-action) { grid-area: abs; }
   #muhBasitGovde > #muhAlacak { grid-area: alc; }
+  /* Dışa aktarma (22.10) en altta, iki sütunun ortak satırında. Alanı
+     olmayan öğeyi grid ilk BOŞ hücreye koyuyordu: düğmeler gider
+     formunun yanındaki "." hücresine, not Alacak'ın üstüne çıkmıştı. */
+  #muhBasitGovde > #muhDisa { grid-area: dsa; }
+  #muhBasitGovde > #muhDisaNot { grid-area: dsn; }
 
 }
 
@@ -2480,6 +2487,39 @@ kirpilsin. */
       "aci sur"
       "cub cub";
   }
+}
+
+
+/* ===== stil/05-yazdir.css ===== */
+/* ============ YAZDIRMA (22.10 · MUH sırası · A-M22) ============
+   "PDF olarak kaydet" tarayıcının yazdırma penceresinden: kütüphane yok,
+   Türkçe harf sorunu yok, her cihazda aynı (arastirma/DISA-AKTARMA.md §3).
+
+   Kâğıda YALNIZ AÇIK EKRAN çıkar. Gezinme, alt şerit, balon, katman ve
+   bilgisayardaki yan menü/yan liste kâğıtta işe yaramaz. Düğmeler de
+   çıkmaz: kâğıtta dokunulmaz — dönem çipi gizlenince dönemin ADI
+   başlıkta kalıyor (muhOzetBaslik).
+
+   Koyu tema kâğıda çıkmasın diye yazdırma anında tema açığa çekiliyor
+   (01-cekirdek, beforeprint) — burada ham renk yazılmıyor, token'lar
+   açık temanın değerlerini veriyor.
+
+   Kuralların hepsi @media print içinde: ekranda hiçbiri çalışmaz. */
+@media print {
+  @page { margin: 14mm; }
+
+  .topbar, .botbar, .toast, .katman, .katman-ortu,
+  .screen:not(.active), .screen.yan,
+  .screen.active button:not([role]), .screen.active .cip-grup,
+  .screen.active .tab-grup, .screen.active .plate-hint { display: none !important; }
+
+  body, .device { background: var(--surface); }
+  .device { display: block; height: auto; max-width: none; }
+  .device::after { content: none; }
+  .screen.active { overflow: visible; display: block; }
+
+  .card { box-shadow: none; break-inside: avoid; }
+  .tablo tr { break-inside: avoid; }
 }
 
 
@@ -4302,6 +4342,22 @@ kirpilsin. */
     </div>
     <div id="muhAlacak"></div>
 
+    <!-- DIŞA AKTARMA (22.10 · MUH sırası · A-M22). Tamircinin
+         muhasebecisi Excel istiyor; girilen veri çıkabilmeli
+         (arastirma/DISA-AKTARMA.md §5). İki yol, ikisi de kütüphanesiz:
+         CSV (Excel açar) ve tarayıcının yazdırma penceresi ("PDF olarak
+         kaydet" oradan). Ekranın en altında: her gün kullanılan şey
+         değil, ayda bir muhasebeciye giden şey. -->
+    <div class="btn-row" id="muhDisa">
+      <button class="btn btn-ghost" id="muhCsv">
+        <svg class="ico"><use href="#i-download"></use></svg> Excel'e aktar
+      </button>
+      <button class="btn btn-ghost" id="muhYazdir">
+        <svg class="ico"><use href="#i-printer"></use></svg> Yazdır / PDF
+      </button>
+    </div>
+    <p class="plate-hint" id="muhDisaNot"></p>
+
   </div>
 
   <!-- ================= DETAYLI — MODÜL MENÜSÜ ================= -->
@@ -4698,6 +4754,9 @@ kirpilsin. */
   <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
   <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
   <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></symbol>
+  <!-- 22.10 · dışa aktarma için eklendi (Lucide, aynı çizgi dili) -->
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/></symbol>
+  <symbol id="i-printer" viewBox="0 0 24 24"><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6"/><rect x="6" y="14" width="12" height="8" rx="1"/></symbol>
   <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></symbol>
   <symbol id="i-triangle-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
   <symbol id="i-cog" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
@@ -5678,6 +5737,13 @@ var Tema = (function () {
       if (mq.addEventListener) mq.addEventListener('change', d);
       else if (mq.addListener) mq.addListener(d);
     }
+    /* KÂĞIT HEP AÇIK TEMA (22.10 · 05-yazdir.css). Koyu zemin kâğıtta
+       mürekkep yakar ve muhasebecinin elinde okunmaz. Yazdırma anında
+       kök açığa çekilir, bitince ustanın seçimi geri gelir. */
+    window.addEventListener('beforeprint', function () {
+      document.documentElement.setAttribute('data-theme', 'light');
+    });
+    window.addEventListener('afterprint', uygula);
   }
 
   return { baslat: baslat, dondur: dondur, secimi: function () { return secim; } };
@@ -7332,6 +7398,44 @@ function donemTahsilatlari(donem) {
 }
 function tahsilatToplami(donem) {
   return donemTahsilatlari(donem).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+}
+
+/* ---- MUHASEBE CSV (22.10 · MUH sırası · arastirma/DISA-AKTARMA.md §6) ----
+   Muhasebeciye giden dosya. TEK DÜZ TABLO, üç bölüm değil: "Tür"
+   sütununa göre Excel'de süzülür ve toplanır — bölümlü dosyada her
+   bölümün başlığı ayrı satır olur, süzgeç bozulur.
+     · BOM (﻿): yoksa Excel Türkçe harfleri bozuk açıyor.
+     · ";" ayraç: Türkçe Excel'de virgül ondalık işareti.
+     · HAM RAKAM: ekranın "3.450"si burada 3450. Biçimli rakam Excel'de
+       metin olur ve toplanamaz — dışa aktarmanın tek amacı toplamak.
+     · Hücre "=", "+", "-", "@" ile başlıyorsa başına ' konur: gider
+       açıklaması ustanın yazdığı metin; Excel onu formül diye ÇALIŞTIRIR.
+   Tahsilat ve gider seçili döneme, alacak BUGÜNE (muhasebe ekranıyla aynı
+   kural: alacak bir bakiye, hareket değil). */
+function csvHucre(v) {
+  if (typeof v === 'number') return String(v).replace('.', ',');
+  var s = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function muhasebeCsv(donem) {
+  var satirlar = [['Tür', 'Tarih', 'Açıklama', 'Plaka', 'Müşteri', 'Ödeme', 'Tutar']];
+  function sahip(k) { return (aracBul(k.plaka) || {}).sahipAd || ''; }
+  /* Tarih sırasıyla: kayıt sırası açılış sırasıdır, ödeme sırası değil. */
+  donemTahsilatlari(donem).slice().sort(function (a, b) {
+    return tariheCevir(tahsilTarihi(a)) - tariheCevir(tahsilTarihi(b));
+  }).forEach(function (k) {
+    satirlar.push(['Tahsilat', tahsilTarihi(k), k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
+                   ODEME_ETIKET[k.odemeYolu] || k.odemeYolu, kayitToplami(k)]);
+  });
+  GIDERLER.filter(function (g) { return donemIcinde(g.tarih, donem); }).forEach(function (g) {
+    satirlar.push(['Gider', g.tarih, g.aciklama, '', '', '', g.tutar || 0]);
+  });
+  KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; }).forEach(function (k) {
+    satirlar.push(['Alacak', k.teslimTarihi || '', k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
+                   ODEME_ETIKET.almadim, kayitToplami(k)]);
+  });
+  return '﻿' + satirlar.map(function (s) { return s.map(csvHucre).join(';'); }).join('\r\n') + '\r\n';
 }
 
 
@@ -13180,6 +13284,10 @@ Ekran.tanim('muhasebe', {
           '</tbody></table></div></div>'
       : bosDurumHtml('i-circle-check', 'Alacak yok',
           'Teslim edilen her işin parası alınmış.');
+
+    document.getElementById('muhDisaNot').innerHTML =
+      '<b>' + ad + '</b> tahsilatı ve gideri, bugünkü alacakla birlikte. ' +
+      'Excel dosyası muhasebeciye gönderilebilir.';
   }
 });
 
@@ -13212,6 +13320,22 @@ document.addEventListener('click', function (e) {
     }
     return;
   }
+
+  /* İndirme Blob + <a download>: Android Chrome ve masaüstünde çalışıyor;
+     iOS'ta ana ekrana eklenmiş uygulamada GERÇEK CİHAZDA DENENMEDİ
+     (DISA-AKTARMA §4). Yazdırma yolu o riski taşımıyor. */
+  if (e.target.closest('#muhCsv')) {
+    var ad = 'tamiron-muhasebe-' + muhDonemSecili + '-' + bugunMetin().replace(/\./g, '-') + '.csv';
+    var url = URL.createObjectURL(new Blob([muhasebeCsv(muhDonemSecili)],
+                                           { type: 'text/csv;charset=utf-8' }));
+    var a = document.createElement('a');
+    a.href = url; a.download = ad;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    balon('Dosya indirildi: ' + ad, false, 3200);
+    return;
+  }
+  if (e.target.closest('#muhYazdir')) { window.print(); return; }
 
   if (e.target.closest('#muhSesleGider')) { sesleAc('muhasebe'); return; }
   if (e.target.closest('#muhGiderEkle')) { muhFormGoster(true); return; }

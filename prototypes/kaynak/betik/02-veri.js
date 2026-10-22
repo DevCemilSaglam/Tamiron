@@ -1084,3 +1084,41 @@ function donemTahsilatlari(donem) {
 function tahsilatToplami(donem) {
   return donemTahsilatlari(donem).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
 }
+
+/* ---- MUHASEBE CSV (22.10 · MUH sırası · arastirma/DISA-AKTARMA.md §6) ----
+   Muhasebeciye giden dosya. TEK DÜZ TABLO, üç bölüm değil: "Tür"
+   sütununa göre Excel'de süzülür ve toplanır — bölümlü dosyada her
+   bölümün başlığı ayrı satır olur, süzgeç bozulur.
+     · BOM (﻿): yoksa Excel Türkçe harfleri bozuk açıyor.
+     · ";" ayraç: Türkçe Excel'de virgül ondalık işareti.
+     · HAM RAKAM: ekranın "3.450"si burada 3450. Biçimli rakam Excel'de
+       metin olur ve toplanamaz — dışa aktarmanın tek amacı toplamak.
+     · Hücre "=", "+", "-", "@" ile başlıyorsa başına ' konur: gider
+       açıklaması ustanın yazdığı metin; Excel onu formül diye ÇALIŞTIRIR.
+   Tahsilat ve gider seçili döneme, alacak BUGÜNE (muhasebe ekranıyla aynı
+   kural: alacak bir bakiye, hareket değil). */
+function csvHucre(v) {
+  if (typeof v === 'number') return String(v).replace('.', ',');
+  var s = String(v == null ? '' : v);
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;
+  return /[;"\r\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+}
+function muhasebeCsv(donem) {
+  var satirlar = [['Tür', 'Tarih', 'Açıklama', 'Plaka', 'Müşteri', 'Ödeme', 'Tutar']];
+  function sahip(k) { return (aracBul(k.plaka) || {}).sahipAd || ''; }
+  /* Tarih sırasıyla: kayıt sırası açılış sırasıdır, ödeme sırası değil. */
+  donemTahsilatlari(donem).slice().sort(function (a, b) {
+    return tariheCevir(tahsilTarihi(a)) - tariheCevir(tahsilTarihi(b));
+  }).forEach(function (k) {
+    satirlar.push(['Tahsilat', tahsilTarihi(k), k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
+                   ODEME_ETIKET[k.odemeYolu] || k.odemeYolu, kayitToplami(k)]);
+  });
+  GIDERLER.filter(function (g) { return donemIcinde(g.tarih, donem); }).forEach(function (g) {
+    satirlar.push(['Gider', g.tarih, g.aciklama, '', '', '', g.tutar || 0]);
+  });
+  KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; }).forEach(function (k) {
+    satirlar.push(['Alacak', k.teslimTarihi || '', k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
+                   ODEME_ETIKET.almadim, kayitToplami(k)]);
+  });
+  return '﻿' + satirlar.map(function (s) { return s.map(csvHucre).join(';'); }).join('\r\n') + '\r\n';
+}
