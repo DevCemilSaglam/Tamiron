@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Tamiron.Api;
 using Tamiron.Application;
 using Tamiron.Application.ServiceRecords;
+using Tamiron.Application.Vehicles;
 using Tamiron.Domain;
 using Tamiron.Infrastructure;
 
@@ -36,6 +37,12 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+
+// Araç (B6). PATCH: null = dokunma, "" = temizle.
+api.MapGet("/vehicles/{id:guid}", (Guid id, ISender s, CancellationToken ct) => s.Send(new GetVehicle(id), ct));
+api.MapGet("/vehicles", (string plate, ISender s, CancellationToken ct) => s.Send(new FindVehicleByPlate(plate), ct));
+api.MapPatch("/vehicles/{id:guid}", (Guid id, PatchVehicle body, ISender s, CancellationToken ct) =>
+    s.Send(body with { Id = id }, ct));
 
 // Kaydın bayrakları (B4): verilmeyen alana dokunulmaz.
 api.MapPatch("/records/{id:guid}", (Guid id, RecordPatch p, ISender s, CancellationToken ct) =>

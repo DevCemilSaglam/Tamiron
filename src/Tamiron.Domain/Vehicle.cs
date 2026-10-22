@@ -39,10 +39,18 @@ public class Vehicle : TenantEntity
     /// Parça sormak için araç kimliği (K-068): 17 haneli şase YA DA marka + model + yıl + motor.
     /// Kayıt açmak için gerekmez.
     /// </summary>
-    public bool HasPartIdentity =>
+    public bool HasPartIdentity => MissingForParts.Count == 0;
+
+    /// <summary>
+    /// Parça sormak için eksik olanlar — ekran "şunları doldur" diyebilsin (K-068).
+    /// Şase geçerliyse hiçbir şey eksik değildir.
+    /// </summary>
+    public IReadOnlyList<string> MissingForParts => VinValid ? [] :
+        new (string ad, string? v)[] { ("marka", Brand), ("model", Model), ("yıl", Year), ("motor", Engine) }
+            .Where(x => string.IsNullOrWhiteSpace(x.v)).Select(x => x.ad).ToList();
+
+    private bool VinValid =>
         // Prototipin saseGecerli'siyle aynı: büyük harfe çevir, yalnız A–Z ve 0–9 say.
         // char.IsLetterOrDigit "Ş" gibi harfleri de sayardı — şasede Türkçe harf yok.
-        (Vin is not null && Vin.ToUpperInvariant().Count(c => c is >= 'A' and <= 'Z' or >= '0' and <= '9') == 17) ||
-        (!string.IsNullOrWhiteSpace(Brand) && !string.IsNullOrWhiteSpace(Model) &&
-         !string.IsNullOrWhiteSpace(Year) && !string.IsNullOrWhiteSpace(Engine));
+        Vin is not null && Vin.ToUpperInvariant().Count(c => c is >= 'A' and <= 'Z' or >= '0' and <= '9') == 17;
 }
