@@ -45,7 +45,7 @@
 | B1 | Domain + tahsil + kasa özeti + kiracı + soft-delete | K-071.1 · K-073.5 | **BİTTİ** (`5219db6`) — 27 test, 3 mutasyon |
 | B2 | **Ana yol: kayıt aç** — plakayla araç bul ya da oluştur, kayıt aç; plaka biçimi | prototip `20-ruhsat` · `plakaBicim` · K-059 · K-068 (kayıt açmak kimlik istemez) | **BİTTİ** — `POST /api/records`; `Plate`, `ServiceTypeGuess` domain'de. 50 test, 4/4 mutasyon. Not: aynı aracın ikinci açık kaydı engellenmiyor (prototip de engellemiyor) |
 | B3 | **Satırlar** — ekle · düzenle · sil (soft) · kim getirdi · alış null≠0 | `30-kayit` · K-037 · K-057 | **BİTTİ** — ekle/güncelle (tür çevirme dahil)/sil/geri al uçları; `ServiceLine.Position` (VERI-MODELI'ne önce yazıldı) + göç. 59 test, 5/5 mutasyon |
-| B4 | **Kayıt bayrakları** — tür (elle), şikâyet, parça bekliyor (+tarih), müşteriye göster | `30-kayit` · K-034 · A-M15 | SIRADA |
+| B4 | **Kayıt bayrakları** — tür (elle), şikâyet, parça bekliyor (+tarih), müşteriye göster | `30-kayit` · K-034 · A-M15 | **BİTTİ** — `PATCH /api/records/{id}` (null = dokunma); tür tahmini domain'e taşındı (kurucu + `SetComplaint`), km biçimi domain'de. 72 test, 6/6 mutasyon |
 | B5 | **Teslim** — ödeme yolu + bakım hatırlatma tarihi (ay VEYA km, hangisi önce) | `50-teslim` · `hatirlatmaHesapla` · A-3 | SIRADA |
 | B6 | **Araç** — oku/güncelle (ruhsat alanları), plaka değişimi, parça-sor kimlik kapısı | `60-arac` · K-033.2c · K-068 | SIRADA |
 | B7 | **Listeler** — serviste olanlar, araçlar, kayıtlar (serviste üstte) | `70-araclar` · `80-kayitlar` | SIRADA |

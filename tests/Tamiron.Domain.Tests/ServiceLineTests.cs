@@ -8,7 +8,7 @@ namespace Tamiron.Domain.Tests;
 /// </summary>
 public class ServiceLineTests
 {
-    static ServiceRecord NewRecord() => new(Guid.NewGuid(), Guid.NewGuid(), ServiceType.Repair, "");
+    static ServiceRecord NewRecord() => new(Guid.NewGuid(), Guid.NewGuid(), "");
 
     [Fact]
     public void Name_is_required_with_turkish_hint()

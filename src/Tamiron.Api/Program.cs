@@ -37,6 +37,10 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     return Results.Created($"/api/records/{r.Id}", r);
 });
 
+// Kaydın bayrakları (B4): verilmeyen alana dokunulmaz.
+api.MapPatch("/records/{id:guid}", (Guid id, RecordPatch p, ISender s, CancellationToken ct) =>
+    s.Send(new UpdateRecord(id, p.Complaint, p.Type, p.Km, p.WaitingForPart, p.ShowWaitingToCustomer), ct));
+
 // Satırlar (B3). Her uç kaydın güncel hâlini döner.
 api.MapPost("/records/{id:guid}/lines", (Guid id, LineBody body, ISender s, CancellationToken ct) =>
     s.Send(new AddLine(id, body), ct));
@@ -60,5 +64,6 @@ api.MapGet("/cash", (PeriodKind period, ISender s, CancellationToken ct) =>
 app.Run();
 
 public sealed record CollectBody(PaymentMethod Method);
+public sealed record RecordPatch(string? Complaint, ServiceType? Type, string? Km, bool? WaitingForPart, bool? ShowWaitingToCustomer);
 
 public partial class Program;   // WebApplicationFactory için

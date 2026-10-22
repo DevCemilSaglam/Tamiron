@@ -41,24 +41,25 @@ public static class DevSeed
         db.Vehicles.AddRange(mehmet, demir, ayse);
 
         // Serviste, parça bekliyor (prototip id 1).
-        var r1 = new ServiceRecord(shopId, mehmet.Id, ServiceType.Repair, "Triger seti değişecek");
+        var r1 = new ServiceRecord(shopId, mehmet.Id, "Triger seti değişecek");
         r1.AddLine(ServiceLine.Part("Triger seti", 0));
         r1.SetWaitingForPart(true, today);
 
         // Havale, haziranda (prototip id 6).
-        var r6 = new ServiceRecord(shopId, mehmet.Id, ServiceType.Maintenance, "Ara bakım") { Km = "151.200" };
+        var r6 = new ServiceRecord(shopId, mehmet.Id, "Ara bakım");
+        r6.SetKm("151.200");
         r6.AddLine(ServiceLine.Part("Motor yağı", 1950, cost: 1500));
         r6.AddLine(ServiceLine.Labor("Bakım işçiliği", 900));
         r6.Deliver(PaymentMethod.Transfer, new DateOnly(today.Year, 6, 20));
 
         // Bugün nakit; parçanın alışı BİLİNMİYOR (prototip id 7, K-055.2).
-        var r7 = new ServiceRecord(shopId, ayse.Id, ServiceType.Repair, "Ön cam silecek motoru");
+        var r7 = new ServiceRecord(shopId, ayse.Id, "Ön cam silecek motoru");
         r7.AddLine(ServiceLine.Part("Silecek motoru", 2100));
         r7.AddLine(ServiceLine.Labor("Söküm takım", 700));
         r7.Deliver(PaymentMethod.Cash, today);
 
         // Veresiye (prototip id 8) — "Ödeme alındı"nın denendiği kayıt.
-        var r8 = new ServiceRecord(shopId, demir.Id, ServiceType.Repair, "Akü değişimi");
+        var r8 = new ServiceRecord(shopId, demir.Id, "Akü değişimi");
         r8.AddLine(ServiceLine.Part("Akü 60 Ah", 3200, cost: 2450));
         r8.AddLine(ServiceLine.Labor("Takma", 250));
         r8.Deliver(PaymentMethod.Unpaid, today.AddDays(-55));

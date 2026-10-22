@@ -14,7 +14,7 @@ public class ServiceRecordMoneyTests
 
     static ServiceRecord Record(params ServiceLine[] lines)
     {
-        var r = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), ServiceType.Repair, "Akü değişimi");
+        var r = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), "Akü değişimi");
         foreach (var l in lines) r.AddLine(l);
         return r;
     }

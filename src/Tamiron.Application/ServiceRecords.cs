@@ -12,13 +12,14 @@ public sealed record ServiceLineDto(Guid Id, LineKind Kind, string Name, decimal
 public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, ServiceType Type, bool TypeSetManually,
                                       string Complaint, string? Km, DateOnly? DeliveredAt, PaymentMethod? PaymentMethod,
                                       DateOnly? PaymentCollectedAt, DateOnly? CollectedOn,
+                                      bool WaitingForPart, DateOnly? WaitingSince, bool ShowWaitingToCustomer,
                                       decimal Total, IReadOnlyList<ServiceLineDto> Lines);
 
 internal static class Map
 {
     public static ServiceRecordDto ToDto(this ServiceRecord r, string plateNo) => new(
         r.Id, r.VehicleId, plateNo, r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
-        r.PaymentCollectedAt, r.CollectedOn, r.Total,
+        r.PaymentCollectedAt, r.CollectedOn, r.WaitingForPart, r.WaitingSince, r.ShowWaitingToCustomer, r.Total,
         r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList());
 
     public static async Task<ServiceRecordDto> LoadDto(ITamironDb db, Guid id, CancellationToken ct, bool tracking = false)
@@ -67,15 +68,38 @@ internal sealed class OpenServiceRecordHandler(ITamironDb db, ITenantContext ten
             db.Vehicles.Add(vehicle);
         }
 
-        var complaint = (c.Complaint ?? "").Trim();
-        var r = new ServiceRecord(tenant.TenantId, vehicle.Id, c.Type ?? ServiceTypeGuess.FromText(complaint), complaint)
-        {
-            TypeSetManually = c.Type is not null,
-            Km = string.IsNullOrWhiteSpace(c.Km) ? null : c.Km.Trim()
-        };
+        // Tür verilmediyse tahmin DOMAIN'de (kurucu); km biçimi de orada.
+        var r = new ServiceRecord(tenant.TenantId, vehicle.Id, c.Complaint ?? "", c.Type);
+        r.SetKm(c.Km);
         db.ServiceRecords.Add(r);
         await db.SaveChangesAsync(ct);
         return r.ToDto(vehicle.PlateNo);
+    }
+}
+
+// ---- Komut: kaydın bayrakları (B4) ----
+
+/// <summary>
+/// Kısmi güncelleme: null = DOKUNMA. Sıra önemli — önce şikâyet (tür onu takip
+/// eder), sonra tür (elle seçim tahmini yener); önce bekleme bayrağı, sonra
+/// müşteriye gösterme (bayrak kapalıyken gösterilemez).
+/// Bekleme günü SUNUCUDAN: istemci tarih göndermez.
+/// </summary>
+public sealed record UpdateRecord(Guid Id, string? Complaint = null, ServiceType? Type = null, string? Km = null,
+                                  bool? WaitingForPart = null, bool? ShowWaitingToCustomer = null) : IRequest<ServiceRecordDto>;
+
+internal sealed class UpdateRecordHandler(ITamironDb db, IClock clock) : IRequestHandler<UpdateRecord, ServiceRecordDto>
+{
+    public async Task<ServiceRecordDto> Handle(UpdateRecord c, CancellationToken ct)
+    {
+        var r = await db.ServiceRecords.FirstOrDefaultAsync(x => x.Id == c.Id, ct) ?? throw new NotFoundException("Servis kaydı");
+        if (c.Complaint is not null) r.SetComplaint(c.Complaint);
+        if (c.Type is { } t) r.SetType(t);
+        if (c.Km is not null) r.SetKm(c.Km);
+        if (c.WaitingForPart is { } w) r.SetWaitingForPart(w, clock.Today);
+        if (c.ShowWaitingToCustomer is { } s) r.SetShowWaitingToCustomer(s);
+        await db.SaveChangesAsync(ct);
+        return await Map.LoadDto(db, r.Id, ct);
     }
 }
 

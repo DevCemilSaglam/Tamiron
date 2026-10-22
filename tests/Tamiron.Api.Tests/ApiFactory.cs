@@ -69,7 +69,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             db.Shops.Add(new Shop(ShopB) { Name = "Öteki Dükkân" });
             var v = new Vehicle { TenantId = ShopB, PlateNo = "06 TMR 07" };   // aynı plaka, başka dükkân: serbest
             db.Vehicles.Add(v);
-            var r = new ServiceRecord(ShopB, v.Id, ServiceType.Repair, "Gizli iş");
+            var r = new ServiceRecord(ShopB, v.Id, "Gizli iş");
             r.AddLine(ServiceLine.Labor("İşçilik", 999));
             r.Deliver(PaymentMethod.Unpaid, Clock.Today);
             db.ServiceRecords.Add(r);

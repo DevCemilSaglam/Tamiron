@@ -8,10 +8,11 @@ namespace Tamiron.Domain;
 public class ServiceRecord : TenantEntity
 {
     public Guid VehicleId { get; private set; }
-    public ServiceType Type { get; set; }
-    public bool TypeSetManually { get; set; }
-    public string? Km { get; set; }
-    public string Complaint { get; set; } = "";
+    public ServiceType Type { get; private set; }
+    public bool TypeSetManually { get; private set; }
+    /// <summary>Binlik noktalı ("86.400"); yalnız bakımda istenir (K-002).</summary>
+    public string? Km { get; private set; }
+    public string Complaint { get; private set; } = "";
     // Açılış günü AYRI ALAN DEĞİL (VERI-MODELI §2: "OpenedAt YOK"): ortak
     // DateTimeCreated'tır. Türkiye saati sabit UTC+3, gün oradan kesin türer.
     public DateOnly? DeliveredAt { get; private set; }
@@ -22,19 +23,53 @@ public class ServiceRecord : TenantEntity
     public bool ReminderSent { get; set; }
     public bool WaitingForPart { get; private set; }
     public DateOnly? WaitingSince { get; private set; }
-    public bool ShowWaitingToCustomer { get; set; }
+    public bool ShowWaitingToCustomer { get; private set; }
 
     private readonly List<ServiceLine> _lines = [];
     public IReadOnlyList<ServiceLine> Lines => _lines;
 
     private ServiceRecord() { }   // EF
 
-    public ServiceRecord(Guid tenantId, Guid vehicleId, ServiceType type, string complaint)
+    /// <summary>
+    /// Tür ekranda sorulmaz (Cemil, 06.09): verildiyse (sesin çözdüğü ya da
+    /// ustanın seçtiği) "elle"dir; verilmediyse şikâyetten TAHMİN edilir.
+    /// </summary>
+    public ServiceRecord(Guid tenantId, Guid vehicleId, string complaint, ServiceType? manualType = null)
     {
         TenantId = tenantId;
         VehicleId = vehicleId;
+        SetComplaint(complaint);
+        if (manualType is { } t) SetType(t);
+    }
+
+    /// <summary>Şikâyet değişince tür onu TAKİP EDER — usta elle seçene kadar.</summary>
+    public void SetComplaint(string? text)
+    {
+        Complaint = (text ?? "").Trim();
+        if (!TypeSetManually) Type = ServiceTypeGuess.FromText(Complaint);
+    }
+
+    /// <summary>Elle seçim tahmini KALICI olarak yener.</summary>
+    public void SetType(ServiceType type)
+    {
         Type = type;
-        Complaint = complaint;
+        TypeSetManually = true;
+    }
+
+    /// <summary>Km: rakam dışı atılır, en çok 7 hane, binlik noktalı (prototip GIRIS_TEMIZ.km). Boşsa yok.</summary>
+    public void SetKm(string? raw)
+    {
+        var d = new string((raw ?? "").Where(char.IsAsciiDigit).ToArray()).TrimStart('0');
+        if (d.Length > 7) d = d[..7];
+        Km = d.Length == 0 ? null : long.Parse(d).ToString("#,0", System.Globalization.CultureInfo.GetCultureInfo("tr-TR"));
+    }
+
+    /// <summary>Parça beklendiği müşteriye söylensin mi — ustanın seçimi (A-M15); yalnız bayrak açıkken.</summary>
+    public void SetShowWaitingToCustomer(bool show)
+    {
+        if (show && !WaitingForPart)
+            throw new DomainException("record.not_waiting", "Önce \"parça bekliyor\" işaretle.");
+        ShowWaitingToCustomer = show;
     }
 
     public void AddLine(ServiceLine line)
@@ -92,7 +127,11 @@ public class ServiceRecord : TenantEntity
 
     public void SetWaitingForPart(bool waiting, DateOnly today)
     {
+        // Bayrak zaten açıksa tarih DEĞİŞMEZ: ikinci "evet" beklemenin başladığı günü silmesin.
+        if (waiting && WaitingForPart) return;
         WaitingForPart = waiting;
         WaitingSince = waiting ? today : null;
+        // Bayrak kapanınca müşteriye gösterme seçimi de anlamını yitirir (prototip kBekliyor).
+        if (!waiting) ShowWaitingToCustomer = false;
     }
 }
