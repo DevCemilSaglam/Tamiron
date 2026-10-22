@@ -75,6 +75,11 @@ api.MapGet("/customers", (string? q, ISender s, CancellationToken ct) => s.Send(
 api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) => s.Send(new GetCustomer(key), ct));
 api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
+// Dükkân ayarları (C5): bakım periyodu (3·6·12 ay) ve alış sorusu; gizlilik notu bir kez.
+api.MapGet("/shop", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Shops.GetShopSettings(), ct));
+api.MapPatch("/shop", (Tamiron.Application.Shops.PatchShopSettings cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+api.MapPost("/shop/privacy-notice-shown", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Shops.MarkPrivacyNoticeShown(), ct));
+
 // Ana ekran özeti (C3): menü alt yazıları + hatırlatma rozeti tek istekte.
 api.MapGet("/home", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Home.GetHomeSummary(), ct));
 
