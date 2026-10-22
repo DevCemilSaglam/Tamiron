@@ -86,6 +86,10 @@ api.MapPost("/shop/privacy-notice-shown", (ISender s, CancellationToken ct) => s
 // Ana ekran özeti (C3): menü alt yazıları + hatırlatma rozeti tek istekte.
 api.MapGet("/home", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Home.GetHomeSummary(), ct));
 
+// Muhasebe ekranı tek istekte (C8): kasa + gider + alacak; her parça kendi ucunun aynısı.
+api.MapGet("/accounting", (PeriodKind? period, ISender s, CancellationToken ct) =>
+    s.Send(new GetAccountingOverview(period ?? PeriodKind.Today), ct));
+
 // İş başına fark (C1): dönem teslim gününe göre; bilinmeyen alış hesap dışı ve sayılır.
 api.MapGet("/profit", (PeriodKind? period, ISender s, CancellationToken ct) =>
     s.Send(new ListJobProfits(period ?? PeriodKind.Month), ct));
