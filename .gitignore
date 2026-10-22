@@ -38,3 +38,10 @@ prototypes/_taban.html
 # depoya yalnız kaynak + lisans listesi girer.
 tools/degerlendirme/sesler/
 *.wav
+
+# .NET derleme ciktisi (K-073)
+bin/
+obj/
+.vs/
+*.user
+TestResults/

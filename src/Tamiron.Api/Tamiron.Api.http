@@ -1,0 +1,6 @@
+@Tamiron.Api_HostAddress = http://localhost:5112
+
+GET {{Tamiron.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

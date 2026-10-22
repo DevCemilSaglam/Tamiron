@@ -1,0 +1,12 @@
+<Project>
+  <!-- Bütün projelere ortak (K-073). Nullable açık: "bilinmiyor" ile "sıfır"
+       ayrımı bu üründe bir kural (alış null ≠ 0, K-057) — derleyici de
+       bu ayrımı zorlasın. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+  </PropertyGroup>
+</Project>
