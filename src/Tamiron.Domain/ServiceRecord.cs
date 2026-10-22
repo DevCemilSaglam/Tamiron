@@ -96,6 +96,25 @@ public class ServiceRecord : TenantEntity
     public bool IsMaintenance => Type is ServiceType.Maintenance or ServiceType.Both;
 
     /// <summary>
+    /// Teslimden önce eksik görünenler (prototip kEksikler). EKSİKLERİ SÖYLER, YOLU
+    /// KAPATMAZ: "fiyat bekleniyor" gerçek bir durum; teslimi engellemek gerçek işi
+    /// yazılıma uydurmak olurdu. Müşterinin getirdiği parçada tutar beklenmez.
+    /// Teslim edilmiş kayıtta liste boştur.
+    /// </summary>
+    public IReadOnlyList<string> DeliveryWarnings(bool hasPhone)
+    {
+        if (DeliveredAt is not null) return [];
+        var w = new List<string>();
+        var nameless = _lines.Count(l => string.IsNullOrWhiteSpace(l.Name));
+        if (nameless > 0) w.Add($"{nameless} satırın adı yazılmamış");
+        var priceless = _lines.Count(l => l.CountsInTotal && l.Price == 0);
+        if (priceless > 0) w.Add($"{priceless} satırın tutarı yazılmamış");
+        if (WaitingForPart) w.Add("parça hâlâ \"bekliyor\" işaretli");
+        if (!hasPhone) w.Add("telefon yok — özet gönderilemez");
+        return w;
+    }
+
+    /// <summary>
     /// Teslim (K-004'ün tek durum alanı). Bakımsa hatırlatma KURULUR — hesap tek
     /// yerde (MaintenanceReminder). <paramref name="otherReadings"/>: aynı aracın
     /// ÖTEKİ kayıtlarının km ölçümleri; bu kaydınki teslim günüyle eklenir.

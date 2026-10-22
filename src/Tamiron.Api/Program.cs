@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Tamiron.Api;
 using Tamiron.Application;
+using Tamiron.Application.Lists;
 using Tamiron.Application.ServiceRecords;
 using Tamiron.Application.Vehicles;
 using Tamiron.Domain;
@@ -37,6 +38,11 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+
+// Listeler (B7): serviste olanlar üstte; arama Türkçe katlamalı.
+api.MapGet("/records", (string? q, bool? inShop, ISender s, CancellationToken ct) =>
+    s.Send(new ListRecords(q, inShop ?? false), ct));
+api.MapGet("/vehicles/list", (string? q, ISender s, CancellationToken ct) => s.Send(new ListVehicles(q), ct));
 
 // Araç (B6). PATCH: null = dokunma, "" = temizle.
 api.MapGet("/vehicles/{id:guid}", (Guid id, ISender s, CancellationToken ct) => s.Send(new GetVehicle(id), ct));

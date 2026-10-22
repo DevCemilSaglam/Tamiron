@@ -14,23 +14,26 @@ public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, S
                                       DateOnly? PaymentCollectedAt, DateOnly? CollectedOn,
                                       bool WaitingForPart, DateOnly? WaitingSince, bool ShowWaitingToCustomer,
                                       DateOnly? ReminderDate, bool ReminderSent,
-                                      decimal Total, IReadOnlyList<ServiceLineDto> Lines);
+                                      decimal Total, IReadOnlyList<ServiceLineDto> Lines,
+                                      IReadOnlyList<string> Warnings);
 
 internal static class Map
 {
-    public static ServiceRecordDto ToDto(this ServiceRecord r, string plateNo) => new(
-        r.Id, r.VehicleId, plateNo, r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
+    public static ServiceRecordDto ToDto(this ServiceRecord r, Vehicle? v) => new(
+        r.Id, r.VehicleId, v?.PlateNo ?? "", r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
         r.PaymentCollectedAt, r.CollectedOn, r.WaitingForPart, r.WaitingSince, r.ShowWaitingToCustomer,
         r.ReminderDate, r.ReminderSent, r.Total,
-        r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList());
+        r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList(),
+        // Eksikler DOMAIN'de (kEksikler); arayüz yalnız gösterir.
+        r.DeliveryWarnings(v?.HasPhone ?? false));
 
     public static async Task<ServiceRecordDto> LoadDto(ITamironDb db, Guid id, CancellationToken ct, bool tracking = false)
     {
         var q = db.ServiceRecords.Include(r => r.Lines).AsQueryable();
         if (!tracking) q = q.AsNoTracking();
         var r = await q.FirstOrDefaultAsync(x => x.Id == id, ct) ?? throw new NotFoundException("Servis kaydı");
-        var plate = await db.Vehicles.AsNoTracking().Where(v => v.Id == r.VehicleId).Select(v => v.PlateNo).FirstOrDefaultAsync(ct) ?? "";
-        return r.ToDto(plate);
+        var v = await db.Vehicles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == r.VehicleId, ct);
+        return r.ToDto(v);
     }
 }
 
@@ -75,7 +78,7 @@ internal sealed class OpenServiceRecordHandler(ITamironDb db, ITenantContext ten
         r.SetKm(c.Km);
         db.ServiceRecords.Add(r);
         await db.SaveChangesAsync(ct);
-        return r.ToDto(vehicle.PlateNo);
+        return r.ToDto(vehicle);
     }
 }
 

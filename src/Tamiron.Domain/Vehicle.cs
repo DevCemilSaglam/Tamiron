@@ -41,6 +41,9 @@ public class Vehicle : TenantEntity
     /// </summary>
     public bool HasPartIdentity => MissingForParts.Count == 0;
 
+    /// <summary>Mesaj gidebilir mi: ikinci iletişimin ya da sahibin telefonu (prototip mesajHedefi).</summary>
+    public bool HasPhone => !string.IsNullOrWhiteSpace(ContactPhone) || !string.IsNullOrWhiteSpace(OwnerPhone);
+
     /// <summary>
     /// Parça sormak için eksik olanlar — ekran "şunları doldur" diyebilsin (K-068).
     /// Şase geçerliyse hiçbir şey eksik değildir.

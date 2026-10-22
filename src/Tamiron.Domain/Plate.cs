@@ -51,6 +51,14 @@ public static class ServiceTypeGuess
         return m && r ? ServiceType.Both : m ? ServiceType.Maintenance : ServiceType.Repair;
     }
 
+    /// <summary>Ekranda görünen ad (prototip TUR_AD) — liste araması bu adda da arar.</summary>
+    public static string Label(ServiceType t) => t switch
+    {
+        ServiceType.Maintenance => "Bakım",
+        ServiceType.Both => "Tamirat + Bakım",
+        _ => "Tamirat"
+    };
+
     /// <summary>Prototipin <c>norm</c>'u: Türkçe küçük harf + ı/ü/ö/ş/ç/ğ katlama.</summary>
     public static string Fold(string? s) => (s ?? "").ToLower(CultureInfo.GetCultureInfo("tr-TR"))
         .Replace('ı', 'i').Replace('ü', 'u').Replace('ö', 'o').Replace('ş', 's').Replace('ç', 'c').Replace('ğ', 'g');
