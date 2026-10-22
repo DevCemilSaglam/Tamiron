@@ -10,6 +10,39 @@
 
 ---
 
+## K-072 · Veri modeli v2 — prototiple uzlaştırıldı, sapma derlemede yakalanır (22.10.2026)
+
+**Bağlam.** Cemil: *"Tasarım / şablon bitince backend'e geçeceğiz."* Backend'in
+başlangıç belgesi `VERI-MODELI.md`'dir ve 15.09'da kalmıştı. Prototip beş
+haftada büyüdü; belgede olmayan alan backend'e taşınırken sessizce kaybolur.
+Commit: `6f5977b`.
+
+**72.1 · Belge v2.** Araca ruhsatın teknik alanları ve ileti izni; kayda tahsil
+ve bekleme tarihi; dükkâna km periyodu, alış sorusu, gizlilik notu girdi. İki
+tablo eklendi: `Expense`, `Message` (A-23 cevaplandı). On tablo.
+
+**72.2 · Tohum = şema; sapma derlemede yakalanır.** Prototipin tohum verisi
+(`02-veri.js`) şemanın kendisi sayılır. Kodda yazılan her alan tohumda bir kez
+görünür. Tohumdaki her alan belgenin "Prototip eşlemesi" tablosundadır.
+**Derleme denetimi 9** ikisini de arar ve uymayanı `exit 1` ile durdurur.
+Gerekçe: elle uzlaştırma bir kez yapılır, sonra yine kayar.
+
+**72.3 · İş kuralları listelendi.** Prototipte backend olmadığı için tarayıcıda
+duran 11 kural (toplam, tahsil günü, dönem, hatırlatma, araç kimliği, plaka
+çatışması, toplu alıcı süzgeci, CSV…) belgede tablo hâlinde. Hepsi **API'ye**
+taşınır (CLAUDE.md: arayüz karar vermez).
+
+**72.4 · Uzlaştırmanın bulduğu iki kusur.**
+- `GIDERLER.tur`'u hiçbir yer okumuyordu. Alan silindi, modele alınmadı.
+- Sesli gider `GIDERLER.length + 1` kimliği veriyordu. Bir gider silinince
+  var olan kimlik yeniden verilir ve sola kaydırma yanlış gideri silerdi.
+  Kimlik artık tek yerden üretiliyor (`yeniGiderId`); denetim testi 63.
+
+**72.5 · Açık, teknik:** A-24 — parça sorusunun satırla bağı için
+`PriceRequestLine` ara tablosu öneriliyor. Backend turunda kesinleşir.
+
+---
+
 ## K-071 · Muhasebe sırası (MUH-B) kapandı: alacak tahsili · dışa aktarma · ileti izni (22.10.2026)
 
 **Bağlam.** Cemil: *"Elimizde kalan işlere devam edelim. Tasarım / şablon
