@@ -45,6 +45,10 @@ internal sealed class MessageHandlers(ITamironDb db, ITenantContext tenant) :
         // Tek mesajın metni ustanın onayladığı hâliyle gelir (hitap dahil — mesaj ekranında düzenlenebilir).
         var m = Message.Record(tenant.TenantId, v, v.DefaultTarget(c.Target)!, c.Channel, c.Template, c.Body, isBulk: false, c.ServiceRecordId);
         db.Messages.Add(m);
+        // "Hatırlatma" gittiyse (arama dahil) aracın açık hatırlatmaları kapanır (B12, prototip 85-mesaj).
+        if (m.Template == "hatirlatma")
+            foreach (var r in await db.ServiceRecords.Where(r => r.VehicleId == v.Id && r.ReminderDate != null && !r.ReminderSent).ToListAsync(ct))
+                r.MarkReminderSent();
         await db.SaveChangesAsync(ct);
         return Dto(m);
     }

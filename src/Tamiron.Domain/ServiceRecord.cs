@@ -95,6 +95,19 @@ public class ServiceRecord : TenantEntity
 
     public bool IsMaintenance => Type is ServiceType.Maintenance or ServiceType.Both;
 
+    /// <summary>Hatırlatması geldi mi (prototip hatirlatmasiGelenler): bakım, tarihi geçmiş ya da bugün, gönderilmemiş.</summary>
+    public bool IsReminderDue(DateOnly today)
+        => IsMaintenance && ReminderDate is { } d && d <= today && !ReminderSent;
+
+    /// <summary>
+    /// "Hatırlatma" şablonlu mesaj (ARAMA DAHİL) gönderildi: yedinci işin döngüsü kapanır,
+    /// yoksa aynı uyarı her gün çıkardı.
+    /// </summary>
+    public void MarkReminderSent()
+    {
+        if (ReminderDate is not null) ReminderSent = true;
+    }
+
     /// <summary>
     /// Teslimden önce eksik görünenler (prototip kEksikler). EKSİKLERİ SÖYLER, YOLU
     /// KAPATMAZ: "fiyat bekleniyor" gerçek bir durum; teslimi engellemek gerçek işi

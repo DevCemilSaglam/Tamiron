@@ -7,6 +7,7 @@ using Tamiron.Application.Customers;
 using Tamiron.Application.Expenses;
 using Tamiron.Application.Lists;
 using Tamiron.Application.Messages;
+using Tamiron.Application.Reminders;
 using Tamiron.Application.ServiceRecords;
 using Tamiron.Application.Vehicles;
 using Tamiron.Domain;
@@ -42,6 +43,9 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+
+// Hatırlatması gelenler (B12): en çok bekleyen üstte.
+api.MapGet("/reminders/due", (ISender s, CancellationToken ct) => s.Send(new ListDueReminders(), ct));
 
 // Mesajlar (B11): GÖNDERİM YOK, kayıt. Toplu: yalnız izinli müşteriler.
 api.MapPost("/messages", (RecordMessage cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
