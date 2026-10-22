@@ -55,6 +55,18 @@
 | B11 | **Mesaj arşivi** (`Message`) + toplu alıcı süzgeci (izinliler) — gönderim YOK, kayıt | K-048.2 · K-071.3 | **BİTTİ** — `POST/GET /api/messages`, `GET /api/messages/bulk-preview`, `POST /api/messages/bulk` (yalnız izinliler, kişi başına kayıt, kendi hitabıyla); `Message` tablosu + göç; hedef/hitap/imza domain'de. **Gönderim yok, kayıt.** 165 test, 9/9 mutasyon. Test saati artık ilerliyor (sabit saat "en yeni üstte"yi sınanamaz yapıyordu) |
 | B12 | **Hatırlatması gelenler** sorgusu | `hatirlatmasiGelenler` | **BİTTİ** — `GET /api/reminders/due` (en çok bekleyen üstte, gecikme günü, aranacak telefon); "hatırlatma" şablonlu mesaj — **arama dahil** — aracın açık hatırlatmalarını kapatır. 168 test, 6/6 mutasyon |
 | B13 | **Oturum açma — SMS kodu, oturum çıkışla biter** | K-074 | **BİTTİ** — `POST /api/auth/code` · `/verify` · `/logout` · `/logout-all` · `GET /api/auth/sessions`; `User` · `LoginCode` · `Session` + göç; `X-Tenant-Id` kaldırıldı, dükkân oturumdan. 182 test, 9/9 mutasyon ("oturum 30 günde düşsün" mutasyonu da kırmızı → Cemil'in kararı testle korunuyor). Geliştirmede uçtan uca denendi |
+| — | *— Muhasebe turu (C) · 22.10 · Cemil: "Muhasebeyi bitir. … 10-15 farklı işlemi benden karar beklemeyen, bitir." Kapsam: MUHASEBE-KAPSAM-OTOMIX Faz 1 (K-064.3b onaylı) —* | | |
+| C1 | **İş başına fark** — satış − alış; alışı bilinmeyen parça SATIŞIYLA hesap dışı, sayısı söylenir; dönem toplamı | `isKari` · 96-is-basina · K-057 | SIRADA |
+| C2 | **Parça alışları** — dönemde teslim edilen işlerde tamircinin aldığı, alışı yazılı parçalar + toplam | `parcaAlislari` | SIRADA |
+| C3 | **Ana ekran özeti** — bugün tahsilat · veresiye toplamı · serviste · müşteri sayısı · hatırlatma rozeti | 10-home · çekmece | SIRADA |
+| C4 | **Araç ödeme durumu** — aracın ödenmemiş işleri ve toplamı | 60-arac `arOdeme` | SIRADA |
+| C5 | **Dükkân ayarları** — ad, adres, telefon, bakım ay/km, alış sorusu (oku/yaz, sınırlar) | 99-ayarlar · A-3 · A-M43 | SIRADA |
+| C6 | **KDV/tevkifat için YER** — kalemde KDV oranı (dükkân varsayılanından, kayıtta donar), araçta sahip tipi, kayıtta tevkifat oranı; ekran yok | MUHASEBE-KAPSAM Faz 1 · KDV.md | SIRADA |
+| C7 | **Hata sözleşmesi** — bozuk/eksik gövde ve geçersiz dönem 400; eşzamanlı değişiklik 409; hepsi Türkçe | — | SIRADA |
+| C8 | **Muhasebe ekranı tek çağrı** — özet + gider + alacak bir istekte | 95-muhasebe | SIRADA |
+| C9 | **Kasa sorguları SQL'de** — teslim edilmiş bütün kayıtları belleğe yüklemesin; sonuç birebir aynı | — | SIRADA |
+| C10 | **Eşdeğerlik:** prototipin muhasebe rakamları (02-veri.js, node'da) = API'nin rakamları, 0 fark | MUHASEBE-KAPSAM §5 "bitti" tanımı | SIRADA |
+| C11 | **Belge:** VERI-MODELI iş kuralları tablosuna backend karşılıkları; `.http` muhasebe istekleri | — | SIRADA |
 | — | **SMS sağlayıcısı** (Netgsm / İleti Merkezi …) — hesap, fiyat, gönderici adı | K-074.5 | **BEKLİYOR (Cemil)** — paralı dış servis; bağlanana kadar üretimde kod isteği 503 |
 | — | **Yeni dükkânın kaydı** — ilk usta sisteme nasıl girer | K-074.5 | **BEKLİYOR (Cemil)** — ürün akışı; şimdilik yalnız kayıtlı telefon girer |
 | — | İzin geçmişi (log) tablosu — kim, ne zaman, nasıl verdi/kaldırdı; İYS ile | K-071.3 · K-073.10 | **BEKLİYOR (Cemil)** — iznin nasıl alındığı (sözlü/yazılı/SMS onayı) ürün kararı |
