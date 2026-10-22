@@ -6,6 +6,10 @@ namespace Tamiron.Domain;
 /// </summary>
 public class Shop : Entity
 {
+    public Shop() { }
+    /// <summary>Kimliği belli dükkân (kiracı kimliği o olacağı için dışarıdan verilebilir).</summary>
+    public Shop(Guid id) { Id = id; }
+
     public string Name { get; set; } = "";
     public string? Address { get; set; }
     public string? Phone { get; set; }

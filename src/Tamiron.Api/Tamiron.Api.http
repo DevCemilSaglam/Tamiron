@@ -1,6 +1,23 @@
-@Tamiron.Api_HostAddress = http://localhost:5112
+### Tamiron API — geliştirme istekleri (VS Code REST Client / Visual Studio)
+### Dükkân kimliği DevSeed.ShopId; X-Tenant-Id GEÇİCİ (K-073.6).
+@api = http://localhost:5080
+@shop = 7a3e0c1e-0000-4000-8000-000000000001
 
-GET {{Tamiron.Api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Kasa özeti — Today | Month | Year
+GET {{api}}/api/cash?period=Today
+X-Tenant-Id: {{shop}}
 
-###
+### Tek kayıt (kimliği /api/cash'ten değil, veritabanından al)
+GET {{api}}/api/records/{{recordId}}
+X-Tenant-Id: {{shop}}
+
+### Veresiyenin parası geldi — Cash | Card | Transfer
+POST {{api}}/api/records/{{recordId}}/collect
+X-Tenant-Id: {{shop}}
+Content-Type: application/json
+
+{ "method": "Card" }
+
+### Geri al
+POST {{api}}/api/records/{{recordId}}/collect/undo
+X-Tenant-Id: {{shop}}

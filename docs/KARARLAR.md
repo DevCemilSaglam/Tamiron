@@ -49,6 +49,25 @@ kimliği).
   (telefon + SMS kodu mu, parola mı) tamircinin kullanım alışkanlığına
   bağlı.
 
+**73.7 · Kimlik `Guid`, istemcide doğar.** Uygulama çevrimdışı çalışan bir PWA;
+kayıt sunucuya sormadan oluşturulabilmeli. `int` kimlik sunucudan dönmeden
+bilinmez. (Prototipteki `length + 1` kimliğinin yinelenme hatası da (K-072.4)
+bu sınıfı tamamen kapatıyor.)
+
+**73.8 · İlk dilim bitti — ölçüm.**
+- Domain'de 22 test, LocalDB üzerinde API'de 5 test; hepsi yeşil.
+- Üç kural bilerek bozuldu, üçünde de testler kırmızıya döndü:
+  - kiracı süzgeci kaldırıldı → 2 API testi kırmızı;
+  - soft-delete kaldırıldı → 1 test kırmızı;
+  - tahsil günü = teslim günü yapıldı → domain'de 1, API'de 1 test kırmızı.
+- Geliştirme ortamında API ayağa kalktı; göç ve tohum uygulandı.
+  `GET /api/cash?period=Year` prototipin rakamlarını verdi: nakit 2.800 ·
+  havale 2.850 · alacak 3.450. Başlıksız istek 401.
+- Okuma kilitlenmesin diye `READ_COMMITTED_SNAPSHOT` göçle açıldı
+  (MIMARI §4.1).
+- Başka dükkânın kaydı **404** döner, 403 değil: 403 kaydın var olduğunu
+  söylerdi.
+
 ---
 
 ## K-072 · Veri modeli v2 — prototiple uzlaştırıldı, sapma derlemede yakalanır (22.10.2026)
