@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-19 17:59
+  Üretim: 2026-10-22 07:59
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -7054,8 +7054,10 @@ function musteriListesi(q) {
 function bugunTahsilat() {
   var b = ('0' + BUGUN.getDate()).slice(-2) + '.' +
           ('0' + (BUGUN.getMonth() + 1)).slice(-2) + '.' + BUGUN.getFullYear();
+  /* Tahsil gününe göre (tahsilTarihi): sonradan ödenen veresiye de
+     ödendiği günün tahsilatıdır. */
   return KAYITLAR.filter(function (k) {
-    return k.teslimTarihi === b && k.odemeYolu && k.odemeYolu !== 'almadim';
+    return tahsilTarihi(k) === b;
   }).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
 }
 function veresiyeToplami() {
@@ -7312,10 +7314,24 @@ function giderToplamiDonem(donem) {
     return t + (donemIcinde(g.tarih, donem) ? (g.tutar || 0) : 0);
   }, 0);
 }
+/* ---- TAHSİL TARİHİ (22.10 · MUH sırasının 3. işi, alacak takibi) ----
+   Para teslimde alındıysa tahsil = teslim günü. "Almadım" denip sonra
+   ödendiyse (kayıt ekranındaki "Ödeme alındı") tahsil = ÖDENDİĞİ gün.
+   Kasaya giren para girdiği güne yazılır: 28.08'de teslim edilip
+   22.10'da ödenen 3.450 ₺ Ağustos'un değil Ekim'in tahsilatıdır — teslim
+   tarihine göre sayılsaydı Ekim kasası eksik, Ağustos'unki fazla görünürdü. */
+function tahsilTarihi(k) {
+  if (!k.odemeYolu || k.odemeYolu === 'almadim') return null;
+  return k.tahsilTarihi || k.teslimTarihi || null;
+}
+function donemTahsilatlari(donem) {
+  return KAYITLAR.filter(function (k) {
+    var t = tahsilTarihi(k);
+    return t && donemIcinde(t, donem);
+  });
+}
 function tahsilatToplami(donem) {
-  return donemKayitlari(donem).reduce(function (t, k) {
-    return t + ((k.odemeYolu && k.odemeYolu !== 'almadim') ? kayitToplami(k) : 0);
-  }, 0);
+  return donemTahsilatlari(donem).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
 }
 
 
@@ -7755,6 +7771,14 @@ function surecAdimlari(k) {
                      ? (k.odemeYolu === 'almadim' ? 'Ödeme alınmadı'
                         : 'Ödeme: ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu))
                      : '' });
+    /* Sonradan ödenen veresiye kendi gününde ayrı bir adım: teslimde
+       "Nakit" yazsaydı usta parayı teslim günü aldığını sanırdı. */
+    if (k.tahsilTarihi && k.tahsilTarihi !== k.teslimTarihi) {
+      adimlar[adimlar.length - 1].alt = 'Ödeme alınmadı';
+      adimlar.push({ ad: 'Ödeme alındı', tarih: k.tahsilTarihi, saat: '',
+                     ikon: 'i-wallet', hal: 'tamam', sira: 6,
+                     alt: ODEME_ETIKET[k.odemeYolu] || k.odemeYolu });
+    }
   } else {
     /* SIRADAKİ ADIM DA SÜRECİN PARÇASI — ve henüz olmadığı için
        "bekliyor" hâlinde duruyor. Ekran ne olduğunu değil, NE
@@ -10660,7 +10684,22 @@ function kayitCiz() {
     ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
         '<use href="#i-circle-check"></use></svg></span>' +
         '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
-          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') + '</span></div>'
+          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') +
+          (k.tahsilTarihi ? ' · ödendi ' + k.tahsilTarihi : '') + '</span></div>' +
+      /* ---- ALACAK TAHSİLİ (22.10 · MUH sırası) ----
+         "Almadım" denip araç gittiyse para sonradan gelir. Usta bunu
+         kaydın İÇİNDE işaretler — muhasebenin alacak listesi de buraya
+         açılıyor, ikinci bir "tahsilat" ekranı yok (yeni ekran = A-2
+         bütçesi). Üç çip, teslimdeki ödeme sorusunun aynısı: bir soru,
+         bir görünüş. Ödendiği gün tahsil tarihi olur (02-veri). */
+      (k.odemeYolu === 'almadim'
+        ? '<p class="plate-hint" style="margin-top:10px">Para sonradan geldiyse nasıl ödendi?</p>' +
+          '<div class="cip-grup" id="kTahsil">' +
+            ['nakit', 'kart', 'havale'].map(function (y) {
+              return '<button class="cip" data-tahsil="' + y + '">' + ODEME_ETIKET[y] + '</button>';
+            }).join('') +
+          '</div>'
+        : '')
     : '<button class="btn btn-primary btn-lg" data-git="teslim">' +
         '<svg class="ico"><use href="#i-wallet"></use></svg> Teslim et</button>' +
       (eksik.length && satirlar.length
@@ -10745,6 +10784,21 @@ document.addEventListener('click', function (e) {
   if (!t) return;
 
   if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
+
+  /* Alacak tahsili — geri alınabilir: yanlış çipe dokunmak kasaya
+     olmayan parayı yazmasın. */
+  if (t.getAttribute('data-tahsil')) {
+    var yol = t.getAttribute('data-tahsil');
+    k.odemeYolu = yol;
+    k.tahsilTarihi = bugunMetin();
+    Ekran.tazele();
+    balonGeriAl(tutar(kayitToplami(k)) + ' ₺ alındı · ' + ODEME_ETIKET[yol] + '.', function () {
+      k.odemeYolu = 'almadim';
+      delete k.tahsilTarihi;
+      Ekran.tazele();
+    });
+    return;
+  }
 
   /* ---- EKLE PANELİ (13.10 · K-058) ----
      Cemil "C'deki gibi panel aç" dedi. Panel ORTAK katmanda (K-043 —
@@ -13032,8 +13086,11 @@ Ekran.tanim('muhasebe', {
        filtreye göre yap"). */
     var kayitlar = donemKayitlari(muhDonemSecili);
     var d = { nakit: 0, kart: 0, havale: 0 };
-    kayitlar.forEach(function (k) {
-      if (k.odemeYolu && d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k);
+    /* Tahsilat TAHSİL gününe göre (tahsilTarihi, 02-veri): sonradan ödenen
+       veresiye ödendiği dönemin kasasına girer. "Teslim edilen" ise teslim
+       gününe göre kalır — ikisi ayrı soru. */
+    donemTahsilatlari(muhDonemSecili).forEach(function (k) {
+      if (d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k);
     });
     var toplam = d.nakit + d.kart + d.havale;
 

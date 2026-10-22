@@ -2632,6 +2632,49 @@ function stilMetni() {
     }
   })();
 
+  /* 59 · ALACAK-TAHSIL (22.10 · MUH sirasi). Hata sinifi: tahsilat TESLIM
+     gunune gore sayiliyordu; sonradan odenen veresiye ya hic kasaya
+     girmiyordu ya da teslim edildigi (gecmis) doneme yaziliyordu.
+     Sinanan, "almadim" bir kayit kayit ekranindan odenince:
+       a) alacak listesinden (veresiyeToplami) dusar;
+       b) BUGUNUN tahsilatina (bugunTahsilat, "bugun" donemi) girer;
+       c) "Geri al" her seyi eski haline dondurur.
+     NEGATIF DOGRULAMA (22.10): tahsilTarihi() yalniz teslimTarihi'ni
+     dondurunce -> bulgu; geri -> 0. */
+  (function () {
+    if (typeof Ekran === 'undefined' || !Ekran.ac || typeof tahsilTarihi !== 'function') {
+      ek('ALACAK-TAHSIL', 'kayit', 'tahsilTarihi yok'); return;
+    }
+    var yk = window.ACIK_KAYIT;
+    var k = (window.KAYITLAR || []).filter(function (x) {
+      return x.teslimTarihi && x.odemeYolu === 'almadim' && x.teslimTarihi !== bugunMetin() && kayitToplami(x) > 0;
+    })[0];
+    if (!k) { ek('ALACAK-TAHSIL', 'kayit', 'gecmis gunde teslim edilmis veresiye kayit yok -- olculemedi'); return; }
+    var ver0 = veresiyeToplami(), bug0 = bugunTahsilat(), top = kayitToplami(k);
+    try {
+      window.ACIK_KAYIT = k.id;
+      Ekran.ac('home'); Ekran.ac('kayit');
+      var cip = document.querySelector('#kTahsil [data-tahsil="nakit"]');
+      if (!cip) { ek('ALACAK-TAHSIL', 'kayit', 'veresiye kayitta "odeme alindi" secenekleri yok'); return; }
+      cip.click();
+      if (veresiyeToplami() !== ver0 - top) ek('ALACAK-TAHSIL', 'kayit', 'odenen veresiye alacaktan dusmedi');
+      if (bugunTahsilat() !== bug0 + top) ek('ALACAK-TAHSIL', 'kayit', 'sonradan odenen para BUGUNUN tahsilatina girmedi');
+      if (tahsilatToplami('bugun') < top) ek('ALACAK-TAHSIL', 'muhasebe', '"bugun" doneminin tahsilatinda yok');
+      if (document.getElementById('kTahsil')) ek('ALACAK-TAHSIL', 'kayit', 'odendikten sonra secenekler duruyor');
+      var geri = document.querySelector('[data-geri-al]');
+      if (!geri) ek('ALACAK-TAHSIL', 'kayit', '"Geri al" yok');
+      else {
+        geri.click();
+        if (k.odemeYolu !== 'almadim' || k.tahsilTarihi || veresiyeToplami() !== ver0)
+          ek('ALACAK-TAHSIL', 'kayit', '"Geri al" kaydi eski haline dondurmedi');
+      }
+    } finally {
+      k.odemeYolu = 'almadim'; delete k.tahsilTarihi;
+      window.ACIK_KAYIT = yk;
+      Ekran.ac('home');
+    }
+  })();
+
   /* 57 · GENIS-DUZEN — tablet ve bilgisayar yerlesimi (K-064.2 · 04-genis.css).
      Yalniz genislik >= 768 px iken olcer; telefonda bu dosyanin hicbir
      kurali calismaz. Hata sinifi (18.10): ortalama kurali (align-self:

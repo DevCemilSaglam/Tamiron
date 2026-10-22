@@ -433,6 +433,14 @@ function surecAdimlari(k) {
                      ? (k.odemeYolu === 'almadim' ? 'Ödeme alınmadı'
                         : 'Ödeme: ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu))
                      : '' });
+    /* Sonradan ödenen veresiye kendi gününde ayrı bir adım: teslimde
+       "Nakit" yazsaydı usta parayı teslim günü aldığını sanırdı. */
+    if (k.tahsilTarihi && k.tahsilTarihi !== k.teslimTarihi) {
+      adimlar[adimlar.length - 1].alt = 'Ödeme alınmadı';
+      adimlar.push({ ad: 'Ödeme alındı', tarih: k.tahsilTarihi, saat: '',
+                     ikon: 'i-wallet', hal: 'tamam', sira: 6,
+                     alt: ODEME_ETIKET[k.odemeYolu] || k.odemeYolu });
+    }
   } else {
     /* SIRADAKİ ADIM DA SÜRECİN PARÇASI — ve henüz olmadığı için
        "bekliyor" hâlinde duruyor. Ekran ne olduğunu değil, NE

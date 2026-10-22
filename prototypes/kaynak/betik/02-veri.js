@@ -805,8 +805,10 @@ function musteriListesi(q) {
 function bugunTahsilat() {
   var b = ('0' + BUGUN.getDate()).slice(-2) + '.' +
           ('0' + (BUGUN.getMonth() + 1)).slice(-2) + '.' + BUGUN.getFullYear();
+  /* Tahsil gününe göre (tahsilTarihi): sonradan ödenen veresiye de
+     ödendiği günün tahsilatıdır. */
   return KAYITLAR.filter(function (k) {
-    return k.teslimTarihi === b && k.odemeYolu && k.odemeYolu !== 'almadim';
+    return tahsilTarihi(k) === b;
   }).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
 }
 function veresiyeToplami() {
@@ -1063,8 +1065,22 @@ function giderToplamiDonem(donem) {
     return t + (donemIcinde(g.tarih, donem) ? (g.tutar || 0) : 0);
   }, 0);
 }
+/* ---- TAHSİL TARİHİ (22.10 · MUH sırasının 3. işi, alacak takibi) ----
+   Para teslimde alındıysa tahsil = teslim günü. "Almadım" denip sonra
+   ödendiyse (kayıt ekranındaki "Ödeme alındı") tahsil = ÖDENDİĞİ gün.
+   Kasaya giren para girdiği güne yazılır: 28.08'de teslim edilip
+   22.10'da ödenen 3.450 ₺ Ağustos'un değil Ekim'in tahsilatıdır — teslim
+   tarihine göre sayılsaydı Ekim kasası eksik, Ağustos'unki fazla görünürdü. */
+function tahsilTarihi(k) {
+  if (!k.odemeYolu || k.odemeYolu === 'almadim') return null;
+  return k.tahsilTarihi || k.teslimTarihi || null;
+}
+function donemTahsilatlari(donem) {
+  return KAYITLAR.filter(function (k) {
+    var t = tahsilTarihi(k);
+    return t && donemIcinde(t, donem);
+  });
+}
 function tahsilatToplami(donem) {
-  return donemKayitlari(donem).reduce(function (t, k) {
-    return t + ((k.odemeYolu && k.odemeYolu !== 'almadim') ? kayitToplami(k) : 0);
-  }, 0);
+  return donemTahsilatlari(donem).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
 }

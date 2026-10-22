@@ -694,7 +694,22 @@ function kayitCiz() {
     ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
         '<use href="#i-circle-check"></use></svg></span>' +
         '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
-          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') + '</span></div>'
+          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') +
+          (k.tahsilTarihi ? ' · ödendi ' + k.tahsilTarihi : '') + '</span></div>' +
+      /* ---- ALACAK TAHSİLİ (22.10 · MUH sırası) ----
+         "Almadım" denip araç gittiyse para sonradan gelir. Usta bunu
+         kaydın İÇİNDE işaretler — muhasebenin alacak listesi de buraya
+         açılıyor, ikinci bir "tahsilat" ekranı yok (yeni ekran = A-2
+         bütçesi). Üç çip, teslimdeki ödeme sorusunun aynısı: bir soru,
+         bir görünüş. Ödendiği gün tahsil tarihi olur (02-veri). */
+      (k.odemeYolu === 'almadim'
+        ? '<p class="plate-hint" style="margin-top:10px">Para sonradan geldiyse nasıl ödendi?</p>' +
+          '<div class="cip-grup" id="kTahsil">' +
+            ['nakit', 'kart', 'havale'].map(function (y) {
+              return '<button class="cip" data-tahsil="' + y + '">' + ODEME_ETIKET[y] + '</button>';
+            }).join('') +
+          '</div>'
+        : '')
     : '<button class="btn btn-primary btn-lg" data-git="teslim">' +
         '<svg class="ico"><use href="#i-wallet"></use></svg> Teslim et</button>' +
       (eksik.length && satirlar.length
@@ -779,6 +794,21 @@ document.addEventListener('click', function (e) {
   if (!t) return;
 
   if (t.getAttribute('data-arac-ac')) { ACIK_PLAKA = k.plaka; Ekran.ac('arac'); return; }
+
+  /* Alacak tahsili — geri alınabilir: yanlış çipe dokunmak kasaya
+     olmayan parayı yazmasın. */
+  if (t.getAttribute('data-tahsil')) {
+    var yol = t.getAttribute('data-tahsil');
+    k.odemeYolu = yol;
+    k.tahsilTarihi = bugunMetin();
+    Ekran.tazele();
+    balonGeriAl(tutar(kayitToplami(k)) + ' ₺ alındı · ' + ODEME_ETIKET[yol] + '.', function () {
+      k.odemeYolu = 'almadim';
+      delete k.tahsilTarihi;
+      Ekran.tazele();
+    });
+    return;
+  }
 
   /* ---- EKLE PANELİ (13.10 · K-058) ----
      Cemil "C'deki gibi panel aç" dedi. Panel ORTAK katmanda (K-043 —

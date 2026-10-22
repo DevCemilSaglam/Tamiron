@@ -226,8 +226,11 @@ Ekran.tanim('muhasebe', {
        filtreye göre yap"). */
     var kayitlar = donemKayitlari(muhDonemSecili);
     var d = { nakit: 0, kart: 0, havale: 0 };
-    kayitlar.forEach(function (k) {
-      if (k.odemeYolu && d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k);
+    /* Tahsilat TAHSİL gününe göre (tahsilTarihi, 02-veri): sonradan ödenen
+       veresiye ödendiği dönemin kasasına girer. "Teslim edilen" ise teslim
+       gününe göre kalır — ikisi ayrı soru. */
+    donemTahsilatlari(muhDonemSecili).forEach(function (k) {
+      if (d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k);
     });
     var toplam = d.nakit + d.kart + d.havale;
 
