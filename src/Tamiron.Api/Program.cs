@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Tamiron.Api;
 using Tamiron.Application;
+using Tamiron.Application.Expenses;
 using Tamiron.Application.Lists;
 using Tamiron.Application.ServiceRecords;
 using Tamiron.Application.Vehicles;
@@ -38,6 +39,15 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+
+// Gider (B8): dönem listesi + toplam; sil/geri al dönemin güncel listesini döner.
+api.MapGet("/expenses", (PeriodKind? period, ISender s, CancellationToken ct) =>
+    s.Send(new ListExpenses(period ?? PeriodKind.Month), ct));
+api.MapPost("/expenses", (AddExpense cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+api.MapDelete("/expenses/{id:guid}", (Guid id, PeriodKind? period, ISender s, CancellationToken ct) =>
+    s.Send(new DeleteExpense(id, period ?? PeriodKind.Month), ct));
+api.MapPost("/expenses/{id:guid}/restore", (Guid id, PeriodKind? period, ISender s, CancellationToken ct) =>
+    s.Send(new RestoreExpense(id, period ?? PeriodKind.Month), ct));
 
 // Listeler (B7): serviste olanlar üstte; arama Türkçe katlamalı.
 api.MapGet("/records", (string? q, bool? inShop, ISender s, CancellationToken ct) =>

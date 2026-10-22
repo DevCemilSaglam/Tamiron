@@ -31,6 +31,7 @@ public interface ITamironDb
     DbSet<Vehicle> Vehicles { get; }
     DbSet<ServiceRecord> ServiceRecords { get; }
     DbSet<ServiceLine> ServiceLines { get; }
+    DbSet<Expense> Expenses { get; }
     Task<int> SaveChangesAsync(CancellationToken ct = default);
 }
 

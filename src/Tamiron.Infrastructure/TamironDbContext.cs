@@ -17,6 +17,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<ServiceRecord> ServiceRecords => Set<ServiceRecord>();
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
+    public DbSet<Expense> Expenses => Set<Expense>();
 
     /// <summary>Süzgeçler bu özelliği her sorguda okur (EF bağlamın alanını parametre yapar).</summary>
     private Guid CurrentTenant => tenant.TenantId;
@@ -76,6 +77,19 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.PartBrand).HasMaxLength(100);
             e.Property(x => x.PartCode).HasMaxLength(100);
             e.Ignore(x => x.CountsInTotal);
+        });
+
+        ConfigureExpense(b);
+    }
+
+    private void ConfigureExpense(ModelBuilder b)
+    {
+        Tenant(b.Entity<Expense>());
+        b.Entity<Expense>(e =>
+        {
+            e.Property(x => x.Description).HasMaxLength(300);
+            e.Property(x => x.Amount).HasPrecision(18, 2);
+            e.HasIndex(x => new { x.TenantId, x.Date });   // dönem süzgeci
         });
     }
 
