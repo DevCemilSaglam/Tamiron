@@ -10,6 +10,48 @@
 
 ---
 
+## K-071 · Muhasebe sırası (MUH-B) kapandı: alacak tahsili · dışa aktarma · ileti izni (22.10.2026)
+
+**Bağlam.** Cemil: *"Elimizde kalan işlere devam edelim. Tasarım / şablon
+bitince backend'e geçeceğiz."* MUH kararının (B — kasa + gider) açtığı dört
+işten biri (ay bazlı gider) zaten yazılıydı; kalan üçü bu turda bitti.
+Commit'ler: `7c129f4` · `51dc7fd` · `7f49167`.
+
+**71.1 · Alacak tahsili — tahsilat ÖDENDİĞİ GÜNE yazılır.**
+- Veresiye ("Almadım") kayıtta, teslim notunun altında Nakit/Kart/Havale
+  çipleri. Ayrı tahsilat ekranı yok (A-2).
+- Kayda `tahsilTarihi` geldi. Muhasebe tahsilatı bu güne göre sayar;
+  "teslim edilen" sayısı teslim gününde kalır.
+- Gerekçe: teslim gününe göre saysaydık Ağustos'ta teslim edilip Ekim'de
+  ödenen para Ekim kasasında görünmezdi.
+
+**71.2 · Dışa aktarma — A-M22 uygulandı.**
+- "Excel'e aktar": tek düz CSV (BOM + `;` + ham rakam). Formül koruması
+  var: `=` ile başlayan hücrenin başına `'` konur.
+- "Yazdır / PDF": `window.print()` + `stil/05-yazdir.css`. Kâğıt hep açık
+  tema.
+- Doğrulanmadı: yazdırma önizlemesi gözle; iOS ana ekran uygulamasında
+  indirme (gerçek cihaz).
+
+**71.3 · Ticari ileti izni — A-M21 uygulandı.**
+- Müşteri künyesinde tek çip, varsayılan YOK; izin tarihle yazılır.
+- Toplu mesaj yalnız izni olana gider; onay ekranı gitmeyenleri sayar.
+- Özet, "aracınız hazır", bakım hatırlatması izin istemez — tek araca
+  giden, yapılan işin devamı.
+- Prototipte izin "evet/yok" ve tarih. **İYS kaydı ve iznin NASIL
+  alındığı (sözlü/yazılı/SMS onayı) backend fazında** — dükkânın İYS'ye
+  kaydı ustanın işi (TOPLU-MESAJ.md).
+
+**71.4 · Yeni denetim testleri:** 59 ALACAK-TAHSIL · 60 DISA-AKTARMA ·
+61 GRID-ALANSIZ (yeni hata sınıfı: adlı ızgarada alansız öğe ilk boş
+hücreye kaçar — ölçerek bulundu) · 62 ILETI-IZNI. Hepsi negatif doğrulandı;
+altı genişlikte 0 bulgu.
+
+**Sonuç:** prototipte muhasebe işi kalmadı. Backend'e geçmeden önce kalan
+tasarım işi için `CALISMA-KUYRUGU.md` Tur 9'a bakılır.
+
+---
+
 ## K-070 · Hedef: dış servislere bağımlı olmayan yapay zekâ — evde, kademeli (20.10.2026)
 
 > **Cemil, 20.10:** *"Dış servislere bağımlı olmak istemiyorum. Yasal
