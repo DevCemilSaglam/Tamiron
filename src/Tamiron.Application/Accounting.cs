@@ -39,11 +39,34 @@ public sealed record JobProfitList(PeriodKind Period, DateOnly Start, DateOnly E
 
 public sealed record ListJobProfits(PeriodKind Period) : IRequest<JobProfitList>;
 
+public sealed record PartPurchaseItem(Guid RecordId, Guid LineId, string PlateNo, DateOnly DeliveredAt, string Name, decimal Cost);
+public sealed record PartPurchaseList(PeriodKind Period, DateOnly Start, DateOnly End, decimal Total, IReadOnlyList<PartPurchaseItem> Items);
+
+/// <summary>
+/// Parça alışları (C2) — dükkândan parçaya çıkan para. Yalnız TESLİM edilmiş işler:
+/// içerideki araçta parça henüz alınmamış olabilir. Dönem teslim gününe göre, en yeni üstte.
+/// </summary>
+public sealed record ListPartPurchases(PeriodKind Period) : IRequest<PartPurchaseList>;
+
 internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantContext tenant) :
     IRequestHandler<ListReceivables, ReceivableList>,
     IRequestHandler<ExportCashCsv, CsvFile>,
-    IRequestHandler<ListJobProfits, JobProfitList>
+    IRequestHandler<ListJobProfits, JobProfitList>,
+    IRequestHandler<ListPartPurchases, PartPurchaseList>
 {
+    public async Task<PartPurchaseList> Handle(ListPartPurchases q, CancellationToken ct)
+    {
+        var p = Period.Of(q.Period, clock.Today);
+        var (delivered, vehicles) = await Load(ct);
+        var items = delivered.Where(r => p.Contains(r.DeliveredAt!.Value))
+            .OrderByDescending(r => r.DeliveredAt).ThenByDescending(r => r.DateTimeCreated)
+            .SelectMany(r => r.Lines.Where(l => l.IsShopPurchase).OrderBy(l => l.Position)
+                .Select(l => new PartPurchaseItem(r.Id, l.Id, vehicles.TryGetValue(r.VehicleId, out var v) ? v.PlateNo : "",
+                                                  r.DeliveredAt!.Value, l.Name, l.Cost!.Value)))
+            .ToList();
+        return new PartPurchaseList(q.Period, p.Start, p.End, items.Sum(i => i.Cost), items);
+    }
+
     private async Task<(List<ServiceRecord> delivered, Dictionary<Guid, Vehicle> vehicles)> Load(CancellationToken ct)
     {
         var delivered = await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)

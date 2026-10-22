@@ -81,6 +81,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.PartBrand).HasMaxLength(100);
             e.Property(x => x.PartCode).HasMaxLength(100);
             e.Ignore(x => x.CountsInTotal);
+            e.Ignore(x => x.IsShopPurchase);
         });
 
         ConfigureExpense(b);

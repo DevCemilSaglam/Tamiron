@@ -35,6 +35,17 @@ public class JobProfitTests
     public void Free_part_is_known_zero_not_unknown()
         => Assert.Equal(0, JobProfit.Of(R(ServiceLine.Part("Conta", 50, cost: 0))).UnknownCount);   // 0 = bedava (K-057)
 
+    [Theory]
+    [InlineData(800, PartSupplier.Shop, true)]
+    [InlineData(0, PartSupplier.Shop, false)]          // bedava: dükkândan para çıkmadı
+    [InlineData(700, PartSupplier.Customer, false)]    // müşteri getirdi
+    public void Shop_purchase_rule(int cost, PartSupplier by, bool expected)
+        => Assert.Equal(expected, ServiceLine.Part("p", 1000, by, cost).IsShopPurchase);
+
+    [Fact]
+    public void Unknown_cost_is_not_a_purchase()
+        => Assert.False(ServiceLine.Part("p", 1000).IsShopPurchase);
+
     [Fact]
     public void Customer_part_and_unpriced_part_do_not_count()
     {

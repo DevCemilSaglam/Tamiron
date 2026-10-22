@@ -57,7 +57,7 @@
 | B13 | **Oturum açma — SMS kodu, oturum çıkışla biter** | K-074 | **BİTTİ** — `POST /api/auth/code` · `/verify` · `/logout` · `/logout-all` · `GET /api/auth/sessions`; `User` · `LoginCode` · `Session` + göç; `X-Tenant-Id` kaldırıldı, dükkân oturumdan. 182 test, 9/9 mutasyon ("oturum 30 günde düşsün" mutasyonu da kırmızı → Cemil'in kararı testle korunuyor). Geliştirmede uçtan uca denendi |
 | — | *— Muhasebe turu (C) · 22.10 · Cemil: "Muhasebeyi bitir. … 10-15 farklı işlemi benden karar beklemeyen, bitir." Kapsam: MUHASEBE-KAPSAM-OTOMIX Faz 1 (K-064.3b onaylı) —* | | |
 | C1 | **İş başına fark** — satış − alış; alışı bilinmeyen parça SATIŞIYLA hesap dışı, sayısı söylenir; dönem toplamı | `isKari` · 96-is-basina · K-057 | **BİTTİ** — `GET /api/profit?period=`; `JobProfit` domain'de (prototip örnekleri birebir: 700 ₺ + 1 bilinmeyen, 1.350 ₺). 188 test, 6/6 mutasyon |
-| C2 | **Parça alışları** — dönemde teslim edilen işlerde tamircinin aldığı, alışı yazılı parçalar + toplam | `parcaAlislari` | SIRADA |
+| C2 | **Parça alışları** — dönemde teslim edilen işlerde tamircinin aldığı, alışı yazılı parçalar + toplam | `parcaAlislari` | **BİTTİ** — `GET /api/part-purchases?period=`; kural `ServiceLine.IsShopPurchase` domain'de. 193 test, 4/4 mutasyon. Sıra: en yeni teslim üstte (prototipte kayıt sırasıydı) |
 | C3 | **Ana ekran özeti** — bugün tahsilat · veresiye toplamı · serviste · müşteri sayısı · hatırlatma rozeti | 10-home · çekmece | SIRADA |
 | C4 | **Araç ödeme durumu** — aracın ödenmemiş işleri ve toplamı | 60-arac `arOdeme` | SIRADA |
 | C5 | **Dükkân ayarları** — ad, adres, telefon, bakım ay/km, alış sorusu (oku/yaz, sınırlar) | 99-ayarlar · A-3 · A-M43 | SIRADA |

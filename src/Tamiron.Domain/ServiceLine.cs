@@ -62,6 +62,12 @@ public class ServiceLine : TenantEntity
         }
     }
 
+    /// <summary>
+    /// Dükkândan çıkan parça parası mı (prototip parcaAlislari): tamircinin aldığı parça,
+    /// alışı yazılı ve sıfırdan büyük. Müşteri getirdiyse para tamirciden çıkmamıştır (K-005).
+    /// </summary>
+    public bool IsShopPurchase => Kind == LineKind.Part && SuppliedBy == PartSupplier.Shop && Cost > 0;
+
     /// <summary>Toplama girer mi: müşterinin getirdiği parça girmez (K-037).</summary>
     public bool CountsInTotal => !(Kind == LineKind.Part && SuppliedBy == PartSupplier.Customer);
 }

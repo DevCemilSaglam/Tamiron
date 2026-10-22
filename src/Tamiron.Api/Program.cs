@@ -79,6 +79,10 @@ api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken c
 api.MapGet("/profit", (PeriodKind? period, ISender s, CancellationToken ct) =>
     s.Send(new ListJobProfits(period ?? PeriodKind.Month), ct));
 
+// Parça alışları (C2): yalnız teslim edilmiş işler, tamircinin aldığı, alışı yazılı.
+api.MapGet("/part-purchases", (PeriodKind? period, ISender s, CancellationToken ct) =>
+    s.Send(new ListPartPurchases(period ?? PeriodKind.Month), ct));
+
 // Alacak (B9): döneme tabi değil. CSV: BOM'lu UTF-8, indirilen dosya.
 api.MapGet("/receivables", (ISender s, CancellationToken ct) => s.Send(new ListReceivables(), ct));
 api.MapGet("/export/cash.csv", async (PeriodKind? period, ISender s, CancellationToken ct) =>
