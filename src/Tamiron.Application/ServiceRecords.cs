@@ -9,15 +9,15 @@ namespace Tamiron.Application.ServiceRecords;
 public sealed record ServiceLineDto(Guid Id, LineKind Kind, string Name, decimal Price, decimal? Cost,
                                     PartSupplier? SuppliedBy, bool CountsInTotal);
 
-public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, ServiceType Type, string Complaint,
-                                      DateOnly? DeliveredAt, PaymentMethod? PaymentMethod,
+public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, ServiceType Type, bool TypeSetManually,
+                                      string Complaint, string? Km, DateOnly? DeliveredAt, PaymentMethod? PaymentMethod,
                                       DateOnly? PaymentCollectedAt, DateOnly? CollectedOn,
                                       decimal Total, IReadOnlyList<ServiceLineDto> Lines);
 
 internal static class Map
 {
     public static ServiceRecordDto ToDto(this ServiceRecord r, string plateNo) => new(
-        r.Id, r.VehicleId, plateNo, r.Type, r.Complaint, r.DeliveredAt, r.PaymentMethod,
+        r.Id, r.VehicleId, plateNo, r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
         r.PaymentCollectedAt, r.CollectedOn, r.Total,
         r.Lines.Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList());
 
@@ -38,6 +38,45 @@ public sealed record GetServiceRecord(Guid Id) : IRequest<ServiceRecordDto>;
 internal sealed class GetServiceRecordHandler(ITamironDb db) : IRequestHandler<GetServiceRecord, ServiceRecordDto>
 {
     public Task<ServiceRecordDto> Handle(GetServiceRecord q, CancellationToken ct) => Map.LoadDto(db, q.Id, ct);
+}
+
+// ---- Komut: kayıt aç (B2 · ana yol) ----
+
+/// <summary>
+/// Plakayla araç bulunur; yoksa oluşturulur (prototip 20-ruhsat "Kaydı aç").
+/// Kayıt açmak araç kimliği İSTEMEZ — kapı parça sormada (K-068).
+/// Tür verilmediyse metinden TAHMİN edilir ve "elle" sayılmaz (sonra düzeltilebilir).
+/// ⚠️ Aynı aracın açık kaydı varken ikinci kayıt ENGELLENMEZ — prototip de
+/// engellemiyor; engellenmesi bir ürün kararı olur, sessizce eklenmez.
+/// </summary>
+public sealed record OpenServiceRecord(string Plate, string? Complaint, ServiceType? Type = null, string? Km = null)
+    : IRequest<ServiceRecordDto>;
+
+internal sealed class OpenServiceRecordHandler(ITamironDb db, ITenantContext tenant) : IRequestHandler<OpenServiceRecord, ServiceRecordDto>
+{
+    public async Task<ServiceRecordDto> Handle(OpenServiceRecord c, CancellationToken ct)
+    {
+        var plate = Domain.Plate.Normalize(c.Plate);
+        if (!Domain.Plate.IsValid(plate))
+            throw new DomainException("plate.invalid", "Önce plakayı yaz — ör. 34 ABC 123.");
+
+        var vehicle = await db.Vehicles.FirstOrDefaultAsync(v => v.PlateNo == plate, ct);
+        if (vehicle is null)
+        {
+            vehicle = new Vehicle { TenantId = tenant.TenantId, PlateNo = plate };
+            db.Vehicles.Add(vehicle);
+        }
+
+        var complaint = (c.Complaint ?? "").Trim();
+        var r = new ServiceRecord(tenant.TenantId, vehicle.Id, c.Type ?? ServiceTypeGuess.FromText(complaint), complaint)
+        {
+            TypeSetManually = c.Type is not null,
+            Km = string.IsNullOrWhiteSpace(c.Km) ? null : c.Km.Trim()
+        };
+        db.ServiceRecords.Add(r);
+        await db.SaveChangesAsync(ct);
+        return r.ToDto(vehicle.PlateNo);
+    }
 }
 
 // ---- Komut: veresiyenin parası geldi (K-071.1) ----

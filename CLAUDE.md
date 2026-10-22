@@ -39,6 +39,8 @@ v1 (`github.com/DevCemilSaglam/Tamiron-v1`, 195 commit) bir prototipe kadar gitt
 - **Gün-1'de kalabalık yok** (MIMARI §3): yalnız Domain · Application · Infrastructure · Api + testler. UI projeleri, Redis, Docker, Hangfire ihtiyaç anında.
 - Gizli bilgi (bağlantı dizgesi parolası, API anahtarı) **depoya girmez**: geliştirmede LocalDB + Windows kimliği; gerisi kullanıcı ortam değişkeni.
 - Derle ve test et: `dotnet build Tamiron.sln` · `dotnet test Tamiron.sln`.
+- Kuralı koruyan test var mı: `python tools/mutasyon.py <mutasyonlar.json>` — kuralı bozar, en az bir test kırmızı olmalı.
+- İş sırası ve çalışma döngüsü: `docs/BACKEND-KUYRUGU.md`.
 
 ## Araçlar
 - `tools/saglik-denetim.js` — prototip sağlık denetimi. **Her testi gerçekten yaşanmış bir hata sınıfını** otomatikleştiriyor; ekranları değil hata türlerini test eder, o yüzden yeni prototipte de geçerli.

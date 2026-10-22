@@ -31,6 +31,12 @@ var api = app.MapGroup("/api");
 api.MapGet("/records/{id:guid}", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new GetServiceRecord(id), ct));
 
+api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationToken ct) =>
+{
+    var r = await s.Send(cmd, ct);
+    return Results.Created($"/api/records/{r.Id}", r);
+});
+
 // Veresiyenin parası geldi (K-071.1). Gün SUNUCUDAN: istemci tarih göndermez.
 api.MapPost("/records/{id:guid}/collect", (Guid id, CollectBody body, ISender s, CancellationToken ct) =>
     s.Send(new CollectPayment(id, body.Method), ct));
