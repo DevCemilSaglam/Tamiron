@@ -18,6 +18,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<ServiceRecord> ServiceRecords => Set<ServiceRecord>();
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
     public DbSet<Expense> Expenses => Set<Expense>();
+    public DbSet<Message> Messages => Set<Message>();
 
     /// <summary>Süzgeçler bu özelliği her sorguda okur (EF bağlamın alanını parametre yapar).</summary>
     private Guid CurrentTenant => tenant.TenantId;
@@ -80,6 +81,18 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
         });
 
         ConfigureExpense(b);
+
+        Tenant(b.Entity<Message>());
+        b.Entity<Message>(e =>
+        {
+            e.Property(x => x.RecipientName).HasMaxLength(200);
+            e.Property(x => x.RecipientPhone).HasMaxLength(30);
+            e.Property(x => x.Template).HasMaxLength(40);
+            e.Property(x => x.Body).HasMaxLength(4000);
+            e.HasOne<Vehicle>().WithMany().HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<ServiceRecord>().WithMany().HasForeignKey(x => x.ServiceRecordId).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(x => new { x.TenantId, x.VehicleId, x.DateTimeCreated });   // aracın arşivi
+        });
     }
 
     private void ConfigureExpense(ModelBuilder b)

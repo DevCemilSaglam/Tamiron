@@ -13,7 +13,10 @@ namespace Tamiron.Api.Tests;
 public sealed class FixedClock : IClock
 {
     public DateOnly Today { get; set; } = new(2026, 10, 22);
-    public DateTime UtcNow => Today.ToDateTime(new TimeOnly(9, 0));
+    // Gerçek saat İLERLER: her okuma bir milisaniye sonrası. Sabit saat, aynı istekte
+    // ardışık yazılan kayıtları eşit anlı yapıyor ve "en yeni üstte" sınanamıyordu (B11).
+    private long _tick;
+    public DateTime UtcNow => Today.ToDateTime(new TimeOnly(9, 0)).AddMilliseconds(Interlocked.Increment(ref _tick));
     public DateOnly LocalDate(DateTime utc) => DateOnly.FromDateTime(utc.AddHours(3));   // Türkiye sabit UTC+3
 }
 

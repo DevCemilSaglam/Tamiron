@@ -6,6 +6,7 @@ using Tamiron.Application.Accounting;
 using Tamiron.Application.Customers;
 using Tamiron.Application.Expenses;
 using Tamiron.Application.Lists;
+using Tamiron.Application.Messages;
 using Tamiron.Application.ServiceRecords;
 using Tamiron.Application.Vehicles;
 using Tamiron.Domain;
@@ -41,6 +42,12 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+
+// Mesajlar (B11): GÖNDERİM YOK, kayıt. Toplu: yalnız izinli müşteriler.
+api.MapPost("/messages", (RecordMessage cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+api.MapGet("/messages", (Guid? vehicleId, ISender s, CancellationToken ct) => s.Send(new ListMessages(vehicleId), ct));
+api.MapGet("/messages/bulk-preview", (ISender s, CancellationToken ct) => s.Send(new GetBulkPreview(), ct));
+api.MapPost("/messages/bulk", (SendBulk cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
 // Müşteriler (B10): araçtan türetilir; anahtar katlanmış ad + "|" + telefon.
 api.MapGet("/customers", (string? q, ISender s, CancellationToken ct) => s.Send(new ListCustomers(q), ct));

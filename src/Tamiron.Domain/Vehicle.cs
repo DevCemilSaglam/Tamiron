@@ -45,6 +45,27 @@ public class Vehicle : TenantEntity
     public bool HasPhone => !string.IsNullOrWhiteSpace(ContactPhone) || !string.IsNullOrWhiteSpace(OwnerPhone);
 
     /// <summary>
+    /// Mesajın gidebileceği kişiler (prototip mesajHedefleri): önce İKİNCİ İLETİŞİM —
+    /// ruhsat firmanınsa firmanın numarası santraldir, aracı getiren başkasıdır (A-M2).
+    /// </summary>
+    public IReadOnlyList<MessageTarget> MessageTargets()
+    {
+        var list = new List<MessageTarget>();
+        if (!string.IsNullOrWhiteSpace(ContactPhone) || !string.IsNullOrWhiteSpace(ContactName))
+            list.Add(new(MessageTargetKind.Contact, ContactName ?? "iletişim", ContactPhone));
+        list.Add(new(MessageTargetKind.Owner, OwnerName ?? "", OwnerPhone));
+        return list;
+    }
+
+    /// <summary>Varsayılan hedef: telefonu OLAN ilk kişi; telefonsuz hedef ustayı "neden gönderemiyorum"a düşürürdü.</summary>
+    public MessageTarget? DefaultTarget(MessageTargetKind? kind = null)
+    {
+        var t = MessageTargets();
+        if (kind is { } k && t.FirstOrDefault(x => x.Kind == k) is { } chosen) return chosen;
+        return t.FirstOrDefault(x => !string.IsNullOrWhiteSpace(x.Phone)) ?? t[0];
+    }
+
+    /// <summary>
     /// Parça sormak için eksik olanlar — ekran "şunları doldur" diyebilsin (K-068).
     /// Şase geçerliyse hiçbir şey eksik değildir.
     /// </summary>
