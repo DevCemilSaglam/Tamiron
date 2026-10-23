@@ -80,6 +80,12 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.SummaryCode).HasMaxLength(32);
             // Kod bütün dükkânlarda tekil: link kiracısız açılır, kod kaydı tek başına bulur.
             e.HasIndex(x => x.SummaryCode).IsUnique().HasFilter("[SummaryCode] IS NOT NULL");
+            // D17 · Sıcak sorgular (K-076.16): kasa/teslim/alacak dönem süzgeci dükkân + teslim günü;
+            // sonradan tahsil edilenler tahsil günü; hatırlatması gelenler yalnız GÖNDERİLMEMİŞLER.
+            // Süzgeçli indeksler küçük kalır: tahsil ve hatırlatma kayıtların azında dolu.
+            e.HasIndex(x => new { x.TenantId, x.DeliveredAt });
+            e.HasIndex(x => new { x.TenantId, x.PaymentCollectedAt }).HasFilter("[PaymentCollectedAt] IS NOT NULL");
+            e.HasIndex(x => new { x.TenantId, x.ReminderDate }).HasFilter("[ReminderDate] IS NOT NULL AND [ReminderSent] = 0");
         });
 
         Tenant(b.Entity<ServiceLine>());

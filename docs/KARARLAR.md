@@ -231,6 +231,22 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   (`dotnet tool run dotnet-ef database drop --project src/Tamiron.Infrastructure --startup-project src/Tamiron.Infrastructure`).
   Koşturulmadı — Cemil'in veritabanı.
 
+**76.16 · İndeksler (D17) — ölçerek.**
+- **Üç indeks, yalnız `ServiceRecords`:** (dükkân, teslim günü) — kasa/teslim/alacak;
+  (dükkân, tahsil günü) süzgeçli — sonradan tahsil; (dükkân, hatırlatma günü) yalnız
+  gönderilmemişler — hatırlatması gelenler. Öteki tablolarda gereken indeksler zaten var
+  (yabancı anahtarlar, plaka tekil, mesaj arşivi, iz). Tahmine dayalı indeks eklenmedi.
+- **İndeks tek başına yetmedi:** tahsil günü kuralı `PaymentCollectedAt ?? DeliveredAt`
+  biçimindeydi; SQL'de COALESCE iki sütunu birleştirir, indeks kullanılamaz. Kural iki
+  dala yazıldı (tahsil günü varsa o, yoksa teslim günü) — anlam AYNI, `CollectedExpressionTests`
+  ve `CashQueryEquivalence` eşitliği ölçüyor.
+- **Ölçüm (5.000 kayıt, tahmini plan):** eski biçim Clustered Index **Scan** (bütün tablo),
+  yeni biçim iki Index **Seek** + birleştirme. Ölçüm testi geçiciydi, depoya girmedi.
+- **Mutasyondan ders:** indeksi modelden silmek hiçbir testi kırmızıya çevirmiyordu — testler
+  veritabanını göçlerden kurar, göçü olmayan model değişikliği görünmez. Yeni test
+  (`MigrationsUpToDateTests`): güncel model ↔ son göçün anlık görüntüsü farkı 0 olmalı.
+  Bu, bundan sonraki her şema değişikliğini de korur.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

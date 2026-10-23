@@ -117,9 +117,12 @@ public class ServiceRecord : TenantEntity
     /// Kural değişirse ikisi BİRLİKTE değişir.
     /// </summary>
     public static System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> CollectedBetween(DateOnly start, DateOnly end)
+        // COALESCE yerine iki dal (D17): "PaymentCollectedAt ?? DeliveredAt" iki sütunu birleştirir
+        // ve indeks kullanılamaz; dallar ayrı ayrı (TenantId, PaymentCollectedAt) ve
+        // (TenantId, DeliveredAt) indekslerine oturur. Anlam AYNI — eşitlik testli.
         => r => r.PaymentMethod != null && r.PaymentMethod != Domain.PaymentMethod.Unpaid
-                && (r.PaymentCollectedAt ?? r.DeliveredAt) >= start
-                && (r.PaymentCollectedAt ?? r.DeliveredAt) <= end;
+                && ((r.PaymentCollectedAt != null && r.PaymentCollectedAt >= start && r.PaymentCollectedAt <= end)
+                    || (r.PaymentCollectedAt == null && r.DeliveredAt >= start && r.DeliveredAt <= end));
 
     /// <summary>Hatırlatması geldi mi (prototip hatirlatmasiGelenler): bakım, tarihi geçmiş ya da bugün, gönderilmemiş.</summary>
     public bool IsReminderDue(DateOnly today)

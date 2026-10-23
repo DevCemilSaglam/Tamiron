@@ -509,6 +509,14 @@ namespace Tamiron.Infrastructure.Migrations
 
                     b.HasIndex("VehicleId");
 
+                    b.HasIndex("TenantId", "DeliveredAt");
+
+                    b.HasIndex("TenantId", "PaymentCollectedAt")
+                        .HasFilter("[PaymentCollectedAt] IS NOT NULL");
+
+                    b.HasIndex("TenantId", "ReminderDate")
+                        .HasFilter("[ReminderDate] IS NOT NULL AND [ReminderSent] = 0");
+
                     b.ToTable("ServiceRecords");
                 });
 
