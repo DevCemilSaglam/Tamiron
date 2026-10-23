@@ -137,6 +137,24 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **90 gün sonra GERÇEK silme** (`PurgeTrace`). Zamanlayıcı kurulmadı (Gün-1'de Hangfire
   yok, MIMARI §3): yedekleme betiğiyle (D19) aynı işletim adımında çağrılır.
 
+**76.10 · Güvenlik/işletim (D10).**
+- **Hız sınırı yalnız oturumsuz uçlarda, IP başına, dakikalık pencere:** giriş/kayıt
+  (kod iste, kodu gir, kayıt kodu, kayıt) **10**; müşteri özeti `/api/o/{kod}` **60**.
+  Gerekçe: giriş = SMS parası + kod tahmini; özet = kod tahmini. Numara başına sınır
+  (10 dk'da 3 kod) zaten var; bu, numara değiştirerek yağdırmayı keser. Değerler
+  yapılandırmadan (`RateLimit:AuthPerMinute`, `RateLimit:PublicPerMinute`).
+- **Oturumlu iş uçları sınırsız** — usta gün boyu çalışır; kötüye kullanımı oturum zaten
+  kişiye bağlıyor.
+- **Ret Türkçe:** 429 *"Çok sık denendi. Bir dakika sonra tekrar dene."* (`request.too_many`).
+- **⚠️ Ters vekil (reverse proxy) arkasında** bütün istekler vekilin IP'sinden gelir ve
+  sınır herkese ortak olur. Sunucu kurulurken `ForwardedHeaders` açılmalı — kurulum işi
+  (K-070 kendi sunucu / barındırma kararıyla), şimdi koşturulmadı.
+- **CORS:** yalnız `Cors:Origins`'teki kökenler (`;` ile). Boşsa çapraz köken YOK —
+  arayüz aynı kökenden sunulacak (D20). Çerez yok, Bearer başlık → kimlik bilgisi izni
+  açılmaz. Ön sorgu oturum denetiminden ÖNCE işlenir (yoksa 401'e takılırdı — testli).
+- **Sağlık ucu `/health`:** oturumsuz, yalnız "veritabanına ulaşılıyor mu"; 200 `ok` /
+  503 `down`, bağlantı ayrıntısı sızdırmaz.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

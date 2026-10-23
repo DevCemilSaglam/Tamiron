@@ -37,10 +37,42 @@ builder.Services.Configure<Microsoft.AspNetCore.Routing.RouteHandlerOptions>(o =
 builder.Services.ConfigureHttpJsonOptions(o =>
     o.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
 
+// D10 · Hız sınırı (K-076.10): oturumsuz uçlar IP başına. Giriş/kayıt = SMS parası ve kod
+// tahmini; özet = kod tahmini. Oturumlu iş uçları sınırsız — usta gün boyu çalışır.
+builder.Services.AddRateLimiter(o =>
+{
+    static string Ip(HttpContext c) => c.Connection.RemoteIpAddress?.ToString() ?? "-";
+    int Limit(string key, int def) => builder.Configuration.GetValue($"RateLimit:{key}", def);
+    o.AddPolicy("auth", c => System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(Ip(c),
+        _ => new() { PermitLimit = Limit("AuthPerMinute", 10), Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    o.AddPolicy("public", c => System.Threading.RateLimiting.RateLimitPartition.GetFixedWindowLimiter(Ip(c),
+        _ => new() { PermitLimit = Limit("PublicPerMinute", 60), Window = TimeSpan.FromMinutes(1), QueueLimit = 0 }));
+    o.OnRejected = (ctx, ct) => new ValueTask(Results.Problem(statusCode: 429, title: "Çok sık denendi. Bir dakika sonra tekrar dene.",
+        extensions: new Dictionary<string, object?> { ["code"] = "request.too_many" }).ExecuteAsync(ctx.HttpContext));
+});
+// D10 · CORS: yalnız yapılandırılan kökenler ("Cors:Origins", ";" ile). Boşsa çapraz köken YOK
+// (arayüz aynı kökenden sunulur). Anahtar Bearer başlıkta, çerez yok → kimlik bilgisi izni gerekmez.
+var origins = (builder.Configuration["Cors:Origins"] ?? "").Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
+{
+    if (origins.Length > 0) p.WithOrigins(origins).AllowAnyMethod().WithHeaders("authorization", "content-type");
+}));
+
 var app = builder.Build();
 
 app.UseMiddleware<ErrorMiddleware>();
+// CORS oturumdan ÖNCE: tarayıcının ön sorgusu (OPTIONS) anahtar taşımaz, 401'e takılmasın.
+app.UseCors();
+app.UseRateLimiter();
 app.UseMiddleware<SessionMiddleware>();
+
+// D10 · Sağlık: oturumsuz, yalnız "veritabanına ulaşılıyor mu". Ayrıntı sızdırmaz.
+app.MapGet("/health", async (Tamiron.Infrastructure.TamironDbContext db, CancellationToken ct) =>
+{
+    bool up;
+    try { up = await db.Database.CanConnectAsync(ct); } catch { up = false; }
+    return up ? Results.Ok(new { status = "ok" }) : Results.Json(new { status = "down" }, statusCode: 503);
+});
 
 if (app.Environment.IsDevelopment())
     await DevSeed.RunAsync(app.Services);
@@ -52,15 +84,15 @@ api.MapPost("/auth/code", async (RequestLoginCode cmd, ISender s, CancellationTo
 {
     await s.Send(cmd, ct);
     return Results.Accepted();
-});
-api.MapPost("/auth/verify", (VerifyLoginCode cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+}).RequireRateLimiting("auth");
+api.MapPost("/auth/verify", (VerifyLoginCode cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct)).RequireRateLimiting("auth");
 // D6 · Yeni dükkân: kayıtlı olmayan numaraya kod → kod + dükkân adı → oturum (K-076.6).
 api.MapPost("/auth/signup/code", async (RequestSignupCode cmd, ISender s, CancellationToken ct) =>
 {
     await s.Send(cmd, ct);
     return Results.Accepted();
-});
-api.MapPost("/auth/signup", (SignUp cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+}).RequireRateLimiting("auth");
+api.MapPost("/auth/signup", (SignUp cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct)).RequireRateLimiting("auth");
 api.MapPost("/auth/logout", async (ISender s, CancellationToken ct) => { await s.Send(new Logout(), ct); return Results.NoContent(); });
 api.MapPost("/auth/logout-all", async (ISender s, CancellationToken ct) => { await s.Send(new LogoutAll(), ct); return Results.NoContent(); });
 api.MapGet("/auth/sessions", (ISender s, CancellationToken ct) => s.Send(new ListSessions(), ct));
@@ -114,7 +146,7 @@ api.MapPost("/trace", (Tamiron.Application.Traces.SendTrace cmd, ISender s, Canc
 api.MapPost("/records/{id:guid}/summary-link", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.Summaries.GetSummaryLink(id), ct));
 api.MapGet("/o/{code}", (string code, ISender s, CancellationToken ct) =>
-    s.Send(new Tamiron.Application.Summaries.GetCustomerSummary(code), ct));
+    s.Send(new Tamiron.Application.Summaries.GetCustomerSummary(code), ct)).RequireRateLimiting("public");
 
 // D2 · Parça sorma: soru (parçacı başına bir kayıt) · liste · cevap (satıra işlenir).
 api.MapPost("/records/{id:guid}/price-requests", (Guid id, Tamiron.Application.PriceRequests.AskBody b, ISender s, CancellationToken ct) =>

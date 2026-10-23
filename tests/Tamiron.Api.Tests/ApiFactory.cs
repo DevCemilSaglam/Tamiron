@@ -76,6 +76,9 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         // UseSetting, ConfigureAppConfiguration DEĞİL: minimal hosting'te Program.cs
         // bağlantı dizgesini Build()'den önce okuyor; geç eklenen yapılandırmayı görmezdi.
         b.UseSetting("ConnectionStrings:Tamiron", Cs);
+        // Test sunucusunda bütün istekler aynı "IP"den: sınır yüksek, ölçümü OperationsApiTests düşük sınırla yapar.
+        b.UseSetting("RateLimit:AuthPerMinute", "100000");
+        b.UseSetting("RateLimit:PublicPerMinute", "100000");
         b.ConfigureServices(s =>
         {
             s.RemoveAll<IClock>();
