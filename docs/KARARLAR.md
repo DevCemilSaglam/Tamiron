@@ -259,6 +259,25 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - Paket: Swashbuckle 6.9.0 (sürüm sabit). .NET 8'de belge üretimi ayrı pakette; .NET 9'a
   geçilirse yerleşik `AddOpenApi` ile değişir.
 
+**76.18 · Yerel yedek (D19).**
+- **Betik, zamanlayıcı değil** (`tools/yedek.ps1`): Windows PowerShell 5.1, ek kurulum yok,
+  Windows kimliği (gizli bilgi yok). Görev zamanlayıcısına bağlamak makine ayarı → Cemil.
+- **Yedek doğrulanır:** COPY_ONLY (başka yedek zincirini bozmaz) + CHECKSUM, ardından
+  RESTORE VERIFYONLY. Doğrulanamayan yedek "alındı" sayılmaz, çıkış kodu 1.
+- **Temizlik dar:** yalnız betiğin adlandırdığı `<Veritabanı>_yyyyMMdd_HHmmss.bak` dosyaları,
+  varsayılan 14 günden eskiler; **en yeni 3 hep kalır** (makine uzun kapalı kaldıysa hepsi
+  silinmesin). Elle alınmış yedeğe dokunulmaz.
+- **İz temizliği burada** (D9'un 90 günü): süre betikte yazılı ama bir test onu
+  `Trace.RetentionDays`'e bağlar — ikisi ayrışırsa kırmızı.
+- **Varsayılan klasör D:\TamironYedek** (C: dolu). ⚠️ Aynı diskteki yedek diskle birlikte
+  ölür; uzak kopya (K-070.2b) ayrı adım ve Cemil'in kararı — betik dışarı hiçbir şey göndermez
+  (testli).
+- **Ölçüm:** geçici bir veritabanında koşturuldu (yedek → doğrula → geri yükle → say; sahte
+  eski yedeklerle temizlik; iz silme). Cemil'in veritabanında KOŞTURULMADI.
+- **Mutasyondan ders:** "betikte doğrulama var mı" testi, aranan söz baştaki açıklamada da
+  geçtiği için doğrulama satırı silinince de yeşil kalıyordu. Test artık yorumları ayıklayıp
+  yalnız kodda arıyor.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
