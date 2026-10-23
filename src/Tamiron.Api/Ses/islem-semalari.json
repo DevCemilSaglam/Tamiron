@@ -1,0 +1,345 @@
+[
+ {
+  "name": "ara",
+  "description": "Aranacak · ekran: araclar",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "hedef": {
+     "type": "string",
+     "enum": [
+      "araclar",
+      "kayitlar",
+      "musteriler"
+     ],
+     "description": "Nerede"
+    },
+    "terim": {
+     "type": "string",
+     "description": "Ne"
+    },
+    "suzgec": {
+     "type": "string",
+     "enum": [
+      "serviste"
+     ],
+     "description": "Süzgeç"
+    }
+   },
+   "required": [
+    "hedef"
+   ]
+  }
+ },
+ {
+  "name": "bilinmeyen-arac",
+  "description": "Bu araç kayıtlı değil · ekran: ruhsat",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "description": "Duyulan plaka"
+    }
+   },
+   "required": [
+    "plaka"
+   ]
+  }
+ },
+ {
+  "name": "fiyat-guncelle",
+  "description": "Satırın fiyatı değişecek · ekran: kayit",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "satir": {
+     "type": "string",
+     "description": "Ne — Açık kayıttaki satırın adı"
+    },
+    "fiyat": {
+     "type": "integer",
+     "description": "Yeni — Türk lirası, kuruşsuz"
+    }
+   },
+   "required": [
+    "satir",
+    "fiyat"
+   ]
+  }
+ },
+ {
+  "name": "gider-ekle",
+  "description": "Gider eklenecek · ekran: muhasebe",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "aciklama": {
+     "type": "string",
+     "description": "Açıklama"
+    },
+    "tutar": {
+     "type": "integer",
+     "description": "Tutar — Türk lirası, kuruşsuz"
+    }
+   },
+   "required": [
+    "aciklama",
+    "tutar"
+   ]
+  }
+ },
+ {
+  "name": "mesaj-gonder",
+  "description": "Mesaj gönderilecek · ekran: mesaj",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "description": "Araç"
+    },
+    "sablon": {
+     "type": "string",
+     "enum": [
+      "ozet",
+      "bekliyor",
+      "hazir",
+      "teslim",
+      "hatirlatma",
+      "serbest",
+      "bayram",
+      "selam",
+      "tesekkur"
+     ],
+     "description": "Ne"
+    },
+    "kanal": {
+     "type": "string",
+     "enum": [
+      "whatsapp",
+      "sms"
+     ],
+     "description": "Gönderim kanalı"
+    },
+    "govde": {
+     "type": "string",
+     "description": "Gidecek mesaj"
+    }
+   },
+   "required": [
+    "plaka",
+    "kanal"
+   ]
+  }
+ },
+ {
+  "name": "satir-ekle",
+  "description": "Açık kayda satır eklenecek · ekran: kayit",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "tip": {
+     "type": "string",
+     "enum": [
+      "parca",
+      "iscilik"
+     ],
+     "description": "Tür"
+    },
+    "ad": {
+     "type": "string",
+     "description": "Ne"
+    },
+    "fiyat": {
+     "type": "integer",
+     "description": "Tutar — Türk lirası, kuruşsuz"
+    }
+   },
+   "required": [
+    "tip",
+    "ad"
+   ]
+  }
+ },
+ {
+  "name": "servis-ac",
+  "description": "Servis kaydı açılacak · ekran: kayit",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "description": "Araç"
+    },
+    "isTuru": {
+     "type": "string",
+     "enum": [
+      "tamirat",
+      "bakim"
+     ],
+     "description": "İş türü"
+    },
+    "is": {
+     "type": "string",
+     "description": "Ne istiyor"
+    },
+    "km": {
+     "type": "string",
+     "description": "Kilometre — binlik noktalı: 88.000"
+    }
+   },
+   "required": [
+    "plaka"
+   ]
+  }
+ },
+ {
+  "name": "tahsilat-sor",
+  "description": "Tahsilat sorusu — cevap kayıtlı veriden · ekran: muhasebe",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "donem": {
+     "type": "string",
+     "enum": [
+      "bugun",
+      "ay",
+      "yil"
+     ],
+     "description": "Dönem"
+    }
+   },
+   "required": [
+    "donem"
+   ]
+  }
+ },
+ {
+  "name": "teslim",
+  "description": "Araç teslim edilecek · ekran: teslim",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "description": "Araç"
+    },
+    "odeme": {
+     "type": "string",
+     "enum": [
+      "nakit",
+      "kart",
+      "havale"
+     ],
+     "description": "Ödeme"
+    }
+   },
+   "required": [
+    "plaka"
+   ]
+  }
+ },
+ {
+  "name": "teslim-edilecek-kayit-yok",
+  "description": "Bu araç zaten serviste değil · ekran: arac",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "description": "Araç"
+    }
+   },
+   "required": [
+    "plaka"
+   ]
+  }
+ },
+ {
+  "name": "toplu-mesaj",
+  "description": "Telefonu olan bütün müşterilere mesaj · ekran: mesaj",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "metinTuru": {
+     "type": "string",
+     "enum": [
+      "ozet",
+      "bekliyor",
+      "hazir",
+      "teslim",
+      "hatirlatma",
+      "serbest",
+      "bayram",
+      "selam",
+      "tesekkur"
+     ],
+     "description": "Ne"
+    },
+    "kanal": {
+     "type": "string",
+     "enum": [
+      "whatsapp",
+      "sms"
+     ],
+     "description": "Gönderim kanalı"
+    },
+    "govde": {
+     "type": "string",
+     "description": "Gidecek mesaj"
+    }
+   },
+   "required": [
+    "kanal",
+    "govde"
+   ]
+  }
+ },
+ {
+  "name": "yeni-arac",
+  "description": "Yeni araç — önce ruhsat · ekran: ruhsat",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "description": "Plaka"
+    },
+    "sahip": {
+     "type": "string",
+     "description": "Sahibi"
+    },
+    "tel": {
+     "type": "string",
+     "description": "Telefon — 0 ile başlayan 11 hane"
+    },
+    "is": {
+     "type": "string",
+     "description": "Ne istiyor"
+    },
+    "isTuru": {
+     "type": "string",
+     "enum": [
+      "tamirat",
+      "bakim"
+     ],
+     "description": "İş türü"
+    },
+    "km": {
+     "type": "string",
+     "description": "Kilometre — binlik noktalı: 88.000"
+    }
+   },
+   "required": [
+    "plaka"
+   ]
+  }
+ }
+]

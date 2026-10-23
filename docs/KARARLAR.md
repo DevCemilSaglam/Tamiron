@@ -196,6 +196,27 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - `TAMIRCI-GERIBILDIRIM.md §4`'e yazılmadı: çelişki tamircinin sözüyle değil, bizim
   tasarım notumuzla — Cemil karar verince gerekirse yazılır.
 
+**76.14 · Sesli komut (D15) — kapsam DARALTILDI: çözümleme cihazda, şema ve sınama sunucuda.**
+- **Kuyrukta yazan:** "cümle → işlem nesnesi sunucuda". **Yapılan:** sezgisel çözümleyici
+  (04-islem.js 729 satır + söyleyiş sözlüğü + çekirdekteki okuyucular) C#'a TAŞINMADI.
+- **Neden:** (1) K-054 ve 04-islem.js'in köprü notu: model geldiğinde yalnız tanıyan
+  fonksiyon (`tani`) değişir — sezgiyi C#'a taşıyıp sonra modelle değiştirmek işi iki kez
+  yapmaktır; (2) cihazda çalışan çözümleyici internetsiz de çalışır (tamirhane bodrumu);
+  (3) 1.000+ satırı bir turda 0 farkla taşımak bu döngünün sığacağı iş değil, yarım
+  taşıma ise iki ayrı davranış demek.
+- **Sunucuya gelen — kalıcı olanlar:**
+  - **Şemalar** (`GET /api/voice/schemas`): tek kaynak prototip, `node tools/ses-sema-dok.js`
+    üretir. İstemci de dil modeli de aynı tanımı okur (araç tanımı biçiminde).
+  - **Sınama** (`POST /api/voice/check`, `ActionSchemas.Validate`): işlemi KİM doldurursa
+    doldursun uygulamadan önce zorunlu/tip/seçenek/biçim. Prototipin alan tipleriyle aynı
+    kural: para 0 = söylenmedi. Şemada olmayan türetilmiş alan (duyulanPlaka…) serbest.
+    İşlemin kendisi zaten var olan uçlardan uygulanır — onlar da kendi kuralını sınar.
+  - **Korpus** (`Esdeger/prototip-ses.json`, 273 durum): sunucu çözümleyicisi ya da dil
+    modeli geldiğinde **0 fark hedefi** hazır. Bugün şema ↔ çözümleyici tutarlılığını
+    sınıyor: prototipin 220 tanınan çıktısının hepsi kendi şemasına uyuyor.
+- **Cemil'e soru:** model kararı (K-054 · K-067) verilince bu korpusla ölçülür; sezgisel
+  çözümleyicinin sunucuya taşınması istenirse ayrı bir tur.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

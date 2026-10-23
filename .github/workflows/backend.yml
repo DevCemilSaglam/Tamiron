@@ -59,6 +59,15 @@ jobs:
           git diff --exit-code -- tests/Tamiron.Api.Tests/Esdeger/prototip-muhasebe.json
           if ($LASTEXITCODE -ne 0) { Write-Error "Prototip değişmiş: node tools/muhasebe-esdeger.js koşup dosyayı işle."; exit 1 }
 
+      # D15 · Sesli işlem şemaları ve korpus prototipten üretilir; ekranlarda bir şema değişip
+      # araç koşulmadıysa API eski şemayla doğrular — kırmızı.
+      - name: Sesli işlem şemaları güncel mi
+        shell: pwsh
+        run: |
+          node tools/ses-sema-dok.js
+          git diff --exit-code -- src/Tamiron.Api/Ses/islem-semalari.json tests/Tamiron.Api.Tests/Esdeger/prototip-ses.json
+          if ($LASTEXITCODE -ne 0) { Write-Error "Prototipte şema değişmiş: node tools/ses-sema-dok.js koşup dosyaları işle."; exit 1 }
+
       - name: Test sonuçları
         if: always()
         uses: actions/upload-artifact@v4

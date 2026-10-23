@@ -12,6 +12,11 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- D15 · Sesli işlem şemaları — prototipten üretilir (node tools/ses-sema-dok.js), elle düzenlenmez. -->
+    <Content Update="Ses\*.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>

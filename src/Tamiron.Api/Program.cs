@@ -58,6 +58,10 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
     if (origins.Length > 0) p.WithOrigins(origins).AllowAnyMethod().WithHeaders("authorization", "content-type");
 }));
 
+// D15 · Sesli işlem şemaları (K-076.14): tek kaynak prototip, açılışta bir kez okunur.
+var schemaJson = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Ses", "islem-semalari.json"));
+builder.Services.AddSingleton(Tamiron.Domain.ActionSchemas.Parse(schemaJson));
+
 var app = builder.Build();
 
 app.UseMiddleware<ErrorMiddleware>();
@@ -145,6 +149,15 @@ api.MapPost("/registrations/read", async (IFormFile photo, [Microsoft.AspNetCore
     return await s.Send(new Tamiron.Application.Registrations.ReadRegistration(ms.ToArray(), photo.ContentType, plate), ct);
 }).DisableAntiforgery();
 api.MapPost("/registrations/save", (Tamiron.Application.Registrations.SaveRegistration cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+
+// D15 · Sesli işlem: şemalar (istemci / dil modeli için) ve uygulamadan önce sınama.
+// Cümle → işlem ÇÖZÜMLEMESİ cihazda kalır (prototip 04-islem.js) — K-076.14.
+api.MapGet("/voice/schemas", () => Results.Text(schemaJson, "application/json; charset=utf-8"));
+api.MapPost("/voice/check", (System.Text.Json.JsonElement action, Tamiron.Domain.ActionSchemas schemas) =>
+{
+    var errors = schemas.Validate(action);
+    return Results.Ok(new { ok = errors.Count == 0, errors });
+});
 
 // D9 · İz kaydı: istemci olayları toplu gönderir. Okuma ucu YOK — ustaya görünmez (K-052).
 api.MapPost("/trace", (Tamiron.Application.Traces.SendTrace cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
