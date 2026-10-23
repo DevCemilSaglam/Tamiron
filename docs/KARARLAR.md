@@ -17,6 +17,10 @@ verebilirsin. … Sonrasında detaylı bir inceleme yapacağız."* Aşağıdaki 
 lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İnceleme rehberi
 (D12) hepsini tek listede toplar.
 
+> **İnceleme rehberi: `docs/INCELEME-TUR-D.md`** — önce oradaki §1 (prototiple çelişen ve
+> kapsamı değişen kararlar: **76.13** teslimi geri alma, **76.14** sesli komut) ve §2 (Cemil'in
+> yapacakları: Netgsm, ruhsat okuyucusu, CI, yedek zamanlaması …).
+
 **76.1 · Parçacı ekle/düzenle/sil (D1).**
 - Prototipte liste sabitti, ama tamircinin sözü açık: *"Yerel parçacının tel belli.
   Bunları eklememiz gerekecek."*
