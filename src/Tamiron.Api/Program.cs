@@ -62,9 +62,34 @@ builder.Services.AddCors(o => o.AddDefaultPolicy(p =>
 var schemaJson = File.ReadAllText(Path.Combine(AppContext.BaseDirectory, "Ses", "islem-semalari.json"));
 builder.Services.AddSingleton(Tamiron.Domain.ActionSchemas.Parse(schemaJson));
 
+// D18 · OpenAPI (K-076.17): yalnız geliştirme ve testte — üretimde uç haritası dışarı açılmaz.
+// Arayüz (Swagger UI) YOK: belge istemci yazana ve .http dosyasına yeter.
+var openApi = !builder.Environment.IsProduction();
+if (openApi)
+{
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(o =>
+    {
+        o.SwaggerDoc("v1", new() { Title = "Tamiron API", Version = "v1",
+            Description = "Tamirhane servis kaydı, parça sorma, ön muhasebe. Hata: Problem Details (code + Türkçe title)." });
+        o.AddSecurityDefinition("Bearer", new()
+        {
+            Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http, Scheme = "bearer",
+            Description = "Oturum anahtarı: POST /api/auth/verify yanıtındaki token (K-074)."
+        });
+        o.AddSecurityRequirement(new()
+        {
+            [new() { Reference = new() { Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme, Id = "Bearer" } }] = []
+        });
+        // Aynı adlı kayıt türleri farklı ad alanlarında: şema kimliği tam ad olsun, çakışmasın.
+        o.CustomSchemaIds(t => t.FullName!.Replace("Tamiron.", "").Replace('+', '.'));
+    });
+}
+
 var app = builder.Build();
 
 app.UseMiddleware<ErrorMiddleware>();
+if (openApi) app.UseSwagger(o => o.RouteTemplate = "openapi/{documentName}.json");
 // CORS oturumdan ÖNCE: tarayıcının ön sorgusu (OPTIONS) anahtar taşımaz, 401'e takılmasın.
 app.UseCors();
 app.UseRateLimiter();

@@ -247,6 +247,18 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   (`MigrationsUpToDateTests`): güncel model ↔ son göçün anlık görüntüsü farkı 0 olmalı.
   Bu, bundan sonraki her şema değişikliğini de korur.
 
+**76.17 · OpenAPI (D18).**
+- **Belge `/openapi/v1.json`, yalnız geliştirme ve testte.** Üretimde kapalı: uç haritasını
+  herkese açmanın ustaya faydası yok, saldırgana var. İstemci (D20) geliştirmede okur.
+- **Arayüz (Swagger UI) YOK** — Gün-1'de kalabalık yok (MIMARI §3); `.http` dosyası ve
+  belge yeter.
+- **Bearer anahtar tanımlı** (K-074 oturumu). Şema kimlikleri tam adla — aynı adlı kayıt
+  türleri çakışmasın.
+- **Test bütün `/api` uçlarının belgede olduğunu ölçer** (yönlendirme tablosuyla). Bir uç
+  belgeden düşerse kırmızı — istemci yazan onu bilemezdi.
+- Paket: Swashbuckle 6.9.0 (sürüm sabit). .NET 8'de belge üretimi ayrı pakette; .NET 9'a
+  geçilirse yerleşik `AddOpenApi` ile değişir.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
