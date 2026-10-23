@@ -40,6 +40,12 @@ public interface IRegistrationReader
 
 public sealed class ReaderNotConfiguredException() : Exception("Ruhsat okuyucusu bağlanmadı.");
 
+/// <summary>Okuyucu bağlı ama okuma olmadı (kredi bitti, anahtar geçersiz, servis hatası). Usta elle yazar.</summary>
+public sealed class ReaderFailedException(string code) : Exception("Ruhsat okunamadı: " + code)
+{
+    public string Code { get; } = code;
+}
+
 /// <summary>Sağlayıcı bağlı ama gönderim olmadı (hesap, başlık, ağ). Sessizce "gönderildi" denmez.</summary>
 public sealed class SmsSendFailedException(string code) : Exception("SMS gönderilemedi: " + code)
 {

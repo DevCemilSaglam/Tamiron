@@ -79,6 +79,12 @@ public sealed class ErrorMiddleware(RequestDelegate next)
             await Results.Problem(statusCode: 503, title: "Ruhsat okuma şu an kapalı. Bilgileri elle yaz.",
                 extensions: new Dictionary<string, object?> { ["code"] = "registration.reader_off" }).ExecuteAsync(ctx);
         }
+        // E2 · Okuyucu bağlı ama okuyamadı (kredi, anahtar, servis): yine elle yazmaya döner; ayrıntı kodda.
+        catch (ReaderFailedException e)
+        {
+            await Results.Problem(statusCode: 503, title: "Ruhsat şu an okunamadı. Bilgileri elle yaz ya da birazdan yeniden dene.",
+                extensions: new Dictionary<string, object?> { ["code"] = e.Code }).ExecuteAsync(ctx);
+        }
         // D7 · Sağlayıcı reddetti ya da ulaşılamadı: ustaya "tekrar dene", ayrıntı kodda (destek için).
         catch (SmsSendFailedException e)
         {

@@ -25,6 +25,11 @@ builder.Services.AddScoped<ICurrentSession>(sp => sp.GetRequiredService<RequestC
 // SMS (K-076.7): geliştirmede HEP günlüğe yazılır — hesap tanımlı olsa bile para harcanmaz.
 // Başka ortamda Netgsm hesabı (ortam değişkeni) tamamsa Netgsm; değilse gönderim YAPILMAZ, 503.
 var netgsm = NetgsmOptions.From(builder.Configuration);
+// E2 · Ruhsat okuyucusu (K-077.5): Gemini ancak anahtar + Gemini:Enabled=true İKİSİ BİRDEN varsa;
+// yoksa okuyucu kapalı (503 "elle yaz"). Her okuma para — geliştirmede de açıkça açılmadıkça kapalı.
+var gemini = GeminiOptions.From(builder.Configuration);
+if (gemini is not null)
+    builder.Services.AddSingleton<IRegistrationReader>(_ => new GeminiRegistrationReader(new HttpClient { Timeout = TimeSpan.FromSeconds(60) }, gemini));
 if (builder.Environment.IsDevelopment()) builder.Services.AddSingleton<ISmsSender, DevLogSmsSender>();
 else if (netgsm is not null)
     builder.Services.AddSingleton<ISmsSender>(_ => new NetgsmSmsSender(new HttpClient { Timeout = TimeSpan.FromSeconds(15) }, netgsm));

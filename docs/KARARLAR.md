@@ -37,6 +37,10 @@ Ustalar şimdilik kullanmıyor; kullanacakları zaman SMS paketi alınır (K-076
 anahtar ortam değişkeninde, depoya girmez; **ilk gerçek çağrı Cemil'in onayıyla.** Ücretsiz
 katman YOK (içerik Google'ın ürün geliştirmesinde kullanılabilir; ruhsatta TC/ad/adres var).
 
+  → **E2'de yazıldı:** istek ölçülenle birebir (testli); açmak için `Gemini__ApiKey` +
+  `Gemini__Enabled=true` (anahtar tek başına para harcatmaz); istek içinde yeniden deneme yok.
+  **İlk gerçek okuma Cemil'in onayıyla, bir ruhsatla** — sonucu ölçüm setindeki beklenenle karşılaştırılır.
+
 **77.6 · Yedek sonra.** Zamanlama ve uzak kopya gerçek müşteri verisi gelince (K-076.18).
 
 **77.7 · Geliştirme veritabanı silindi ve tam tohumla kuruldu** (Cemil: *"Sende."*) — 8 kayıt,
