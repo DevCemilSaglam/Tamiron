@@ -185,6 +185,109 @@ namespace Tamiron.Infrastructure.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("Tamiron.Domain.PriceReply", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ParsedBrand")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ParsedCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<decimal?>("ParsedPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("PriceRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("RawText")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<DateTime>("ReceivedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PriceRequestId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("PriceReplies");
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.PriceRequest", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("SentText")
+                        .IsRequired()
+                        .HasMaxLength(4000)
+                        .HasColumnType("nvarchar(4000)");
+
+                    b.Property<Guid>("ServiceRecordId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("SupplierId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceRecordId");
+
+                    b.HasIndex("SupplierId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("PriceRequests");
+                });
+
             modelBuilder.Entity("Tamiron.Domain.ServiceLine", b =>
                 {
                     b.Property<Guid>("Id")
@@ -235,6 +338,9 @@ namespace Tamiron.Infrastructure.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<Guid?>("SelectedReplyId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("ServiceRecordId")
                         .HasColumnType("uniqueidentifier");
 
@@ -249,6 +355,8 @@ namespace Tamiron.Infrastructure.Migrations
                         .HasColumnType("decimal(5,2)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SelectedReplyId");
 
                     b.HasIndex("ServiceRecordId");
 
@@ -685,8 +793,75 @@ namespace Tamiron.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Tamiron.Domain.PriceReply", b =>
+                {
+                    b.HasOne("Tamiron.Domain.PriceRequest", null)
+                        .WithMany()
+                        .HasForeignKey("PriceRequestId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.PriceRequest", b =>
+                {
+                    b.HasOne("Tamiron.Domain.ServiceRecord", null)
+                        .WithMany()
+                        .HasForeignKey("ServiceRecordId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tamiron.Domain.Supplier", null)
+                        .WithMany()
+                        .HasForeignKey("SupplierId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.OwnsMany("Tamiron.Domain.PriceRequestLine", "Lines", b1 =>
+                        {
+                            b1.Property<Guid>("PriceRequestId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.Property<Guid>("ServiceLineId")
+                                .HasColumnType("uniqueidentifier");
+
+                            b1.HasKey("PriceRequestId", "ServiceLineId");
+
+                            b1.HasIndex("ServiceLineId");
+
+                            b1.ToTable("PriceRequestLines", (string)null);
+
+                            b1.WithOwner()
+                                .HasForeignKey("PriceRequestId");
+
+                            b1.HasOne("Tamiron.Domain.ServiceLine", null)
+                                .WithMany()
+                                .HasForeignKey("ServiceLineId")
+                                .OnDelete(DeleteBehavior.NoAction)
+                                .IsRequired();
+                        });
+
+                    b.Navigation("Lines");
+                });
+
             modelBuilder.Entity("Tamiron.Domain.ServiceLine", b =>
                 {
+                    b.HasOne("Tamiron.Domain.PriceReply", null)
+                        .WithMany()
+                        .HasForeignKey("SelectedReplyId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
                     b.HasOne("Tamiron.Domain.ServiceRecord", null)
                         .WithMany("Lines")
                         .HasForeignKey("ServiceRecordId")

@@ -25,6 +25,22 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   gittiğini karıştırır. Başka dükkânda aynı numara serbest.
 - Silme soft: geçmiş sorular kime gittiğini kaybetmesin.
 
+**76.2 · Parça sorma (D2).**
+- **Parçacının verdiği fiyat ustanın ALIŞIDIR** (`PriceReply.ParsedPrice` → `ServiceLine.Cost`).
+  Müşteriye söylenen fiyatı usta ayrıca yazar: tamirci *"üstüne ekliyor"* (T-9). Prototip
+  bu ayrımı yapmıyordu (usta tek "fiyat" kutusuna yazıyordu); veri modeli `Cost`'u
+  *"parçacıdan gelen"* diye tanımlıyor — model kazandı.
+- **Cevap ayrıştırılmaz.** Usta rakamı kendi girer; ham metin (`RawText`) yanında saklanır.
+  Prototipin balonu aynısını söylüyor: *"Cevap gelince fiyatı sen yaz."*
+- **Cevap uygulanınca "kimden geldi" o cevap olur** (`SelectedReplyId`). Ayrı bir "seçim"
+  ucu yok: seçmek = o cevabı satıra yazmak. Gelmeyen alan (marka, kod, fiyat) satırda
+  olanı silmez.
+- **Sorulmamış satıra cevap yazılmaz** (`reply.line_not_asked`): yanlış satıra fiyat düşmesin.
+- **Mesaj metni:** kimlik tamamsa prototiple birebir. Prototip şase varken boş marka/model
+  alanlarını da basıyordu (`"  · "`); burada boş parça atlanır. *"📎 ruhsat fotoğrafı
+  eklenecek"* ekrandaki hatırlatmadır, mesaja girmez.
+- A-24 kesinleşti: `PriceRequestLine` ara tablosu.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

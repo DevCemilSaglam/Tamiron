@@ -20,6 +20,8 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
+    public DbSet<PriceRequest> PriceRequests => Set<PriceRequest>();
+    public DbSet<PriceReply> PriceReplies => Set<PriceReply>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LoginCode> LoginCodes => Set<LoginCode>();
     public DbSet<Session> Sessions => Set<Session>();
@@ -86,6 +88,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.PartCode).HasMaxLength(100);
             e.Ignore(x => x.CountsInTotal);
             e.Ignore(x => x.IsShopPurchase);
+            e.HasOne<PriceReply>().WithMany().HasForeignKey(x => x.SelectedReplyId).OnDelete(DeleteBehavior.NoAction);
         });
 
         ConfigureExpense(b);
@@ -99,6 +102,8 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             // Dükkân içinde numara tekil — silinen parçacı numarayı kilitlemez.
             e.HasIndex(x => new { x.TenantId, x.Phone }).IsUnique().HasFilter("[DateTimeDeleted] IS NULL");
         });
+
+        ConfigurePriceRequest(b);
 
         Tenant(b.Entity<Message>());
         b.Entity<Message>(e =>
@@ -164,6 +169,39 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
         e.HasKey(x => x.Id);
         e.Property(x => x.Id).ValueGeneratedNever();   // Guid istemcide doğar (K-073.7)
         e.Property(x => x.RowVersion).IsRowVersion();
+    }
+
+    /// <summary>D2 · Fiyat sorusu, soru↔satır bağı (A-24) ve cevap (VERI-MODELI §5–6).</summary>
+    private void ConfigurePriceRequest(ModelBuilder b)
+    {
+        Tenant(b.Entity<PriceRequest>());
+        b.Entity<PriceRequest>(e =>
+        {
+            e.Property(x => x.SentText).HasMaxLength(4000);
+            e.HasIndex(x => x.ServiceRecordId);
+            e.HasOne<ServiceRecord>().WithMany().HasForeignKey(x => x.ServiceRecordId).OnDelete(DeleteBehavior.Restrict);
+            e.HasOne<Supplier>().WithMany().HasForeignKey(x => x.SupplierId).OnDelete(DeleteBehavior.Restrict);
+            // Bağ tablosu kiracı taşımaz: sahibi olan soru taşır, soru üzerinden okunur.
+            e.OwnsMany(x => x.Lines, l =>
+            {
+                l.ToTable("PriceRequestLines");
+                l.WithOwner().HasForeignKey(x => x.PriceRequestId);
+                l.HasKey(x => new { x.PriceRequestId, x.ServiceLineId });
+                l.HasOne<ServiceLine>().WithMany().HasForeignKey(x => x.ServiceLineId).OnDelete(DeleteBehavior.NoAction);
+            });
+            e.Navigation(x => x.Lines).UsePropertyAccessMode(PropertyAccessMode.Field);
+        });
+
+        Tenant(b.Entity<PriceReply>());
+        b.Entity<PriceReply>(e =>
+        {
+            e.Property(x => x.RawText).HasMaxLength(4000);
+            e.Property(x => x.ParsedPrice).HasPrecision(18, 2);
+            e.Property(x => x.ParsedBrand).HasMaxLength(100);
+            e.Property(x => x.ParsedCode).HasMaxLength(100);
+            e.HasIndex(x => x.PriceRequestId);
+            e.HasOne<PriceRequest>().WithMany().HasForeignKey(x => x.PriceRequestId).OnDelete(DeleteBehavior.Restrict);
+        });
     }
 
     private void Tenant<T>(EntityTypeBuilder<T> e) where T : TenantEntity

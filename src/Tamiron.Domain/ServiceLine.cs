@@ -19,6 +19,25 @@ public class ServiceLine : TenantEntity
     public MatchStatus MatchStatus { get; set; }
     /// <summary>KDV oranı, yüzde — yalnız YER (C6, Faz 3). Eklenirken dükkân varsayılanından yazılır ve DONAR.</summary>
     public decimal? VatRate { get; private set; }
+    /// <summary>Kol B · hangi parçacının cevabı kullanıldı (prototip satirlar.kaynak). Boş = seçilmedi, akış durmaz.</summary>
+    public Guid? SelectedReplyId { get; private set; }
+
+    /// <summary>
+    /// Parçacının cevabını satıra yazar (D2): verdiği fiyat ALIŞ olur, marka/kod gelirse yazılır,
+    /// müşteri fiyatını usta söylerse o da. Gelmeyen alan satırda olanı SİLMEZ.
+    /// </summary>
+    public void ApplyReply(PriceReply reply, decimal? customerPrice)
+    {
+        if (Kind != LineKind.Part)
+            throw new DomainException("reply.not_a_part", "Parçacının cevabı yalnız parça satırına yazılır.");
+        if (customerPrice < 0)
+            throw new DomainException("line.negative_amount", "Tutar eksi olamaz.");
+        if (reply.ParsedPrice is { } cost) Cost = cost;
+        if (customerPrice is { } price) Price = price;
+        if (reply.ParsedBrand is not null) PartBrand = reply.ParsedBrand;
+        if (reply.ParsedCode is not null) PartCode = reply.ParsedCode;
+        SelectedReplyId = reply.Id;
+    }
 
     /// <summary>
     /// Oran bir kez yazılır: devlet oranı değiştirse de geçmiş iş kendi oranıyla kalır

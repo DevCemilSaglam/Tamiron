@@ -79,6 +79,14 @@ api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) =>
 api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
 // Parçacılar (D1): ad + telefon; aynı numara iki kez olmaz; silme soft.
+// D2 · Parça sorma: soru (parçacı başına bir kayıt) · liste · cevap (satıra işlenir).
+api.MapPost("/records/{id:guid}/price-requests", (Guid id, Tamiron.Application.PriceRequests.AskBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.PriceRequests.AskForPrices(id, b), ct));
+api.MapGet("/records/{id:guid}/price-requests", (Guid id, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.PriceRequests.ListPriceRequests(id), ct));
+api.MapPost("/price-requests/{id:guid}/replies", (Guid id, Tamiron.Application.PriceRequests.ReplyBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.PriceRequests.AddPriceReply(id, b), ct));
+
 api.MapGet("/suppliers", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Suppliers.ListSuppliers(), ct));
 api.MapPost("/suppliers", (Tamiron.Application.Suppliers.SupplierBody b, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.Suppliers.AddSupplier(b), ct));

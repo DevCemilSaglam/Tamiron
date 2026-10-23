@@ -110,7 +110,7 @@ Akıştaki yeri: **Adım 2, 4, 5, 6** · Ekran 3
 | `MatchStatus` | `Coded` \| `Matched` \| `Unidentified` — `PARCA-TANIMLAMA.md` §3 |
 | `VatRate` | **KDV oranı (yüzde) — yalnız YER (C6, Faz 3 için).** Satır eklenirken dükkânın varsayılanından (`Shop.DefaultVatRate`, 20) yazılır ve **donar**: oran devlet kararıyla değişir, geçmiş iş kendi oranıyla yeniden basılabilmeli (KDV.md §1, A-K1). Ekranda yok, hesapta yok |
 | `Position` | **Satırın sırası** — ustanın yazdığı sıra (prototipte dizinin sırası). Silinip geri alınan satır **yerine** döner (prototip: `splice(i, 0, silinen)`). Kimlik Guid olduğu ve aynı anda eklenen satırların oluşturulma anı eşit olabildiği için sıra ayrı tutulur (B3, 22.10) |
-| `SelectedReplyId` | **Kol B · hangi parçacının cevabı kullanıldı.** Birden fazla parçacıya sorulmuşsa usta birini seçiyor; seçmezse boş kalır ve akış durmaz (03.09) |
+| `SelectedReplyId` | **Kol B · hangi parçacının cevabı kullanıldı.** Birden fazla parçacıya sorulmuşsa usta birini seçiyor; seçmezse boş kalır ve akış durmaz (03.09). **Backend (D2):** cevap satıra işlenince dolar (`ServiceLine.ApplyReply`) |
 
 > `SuppliedBy` yalnız `Kind = Part` için anlamlı. İşçilikte boş.
 >
@@ -149,6 +149,10 @@ Birden fazla parçacıya sorulursa **her biri ayrı kayıt** (Kol B · büyük i
 > soruldu). Bir mesaj birden çok satırı sorar; satırla sorunun bağı için
 > `PriceRequestLine (PriceRequestId, ServiceLineId)` ara tablosu öneriliyor
 > (A-24). Ara tablo, mesaj metnini satır sayısı kadar çoğaltmaktan iyi.
+>
+> **Backend (D2, 23.10):** A-24 kesinleşti — `PriceRequestLines (PriceRequestId, ServiceLineId)`,
+> kiracı taşımaz (soru üzerinden okunur). Mesajı API **göndermez**: WhatsApp ustanın
+> telefonunda açılır; API metni, kime gittiğini ve hangi satırları sorduğunu saklar.
 
 ---
 
@@ -162,6 +166,11 @@ Akıştaki yeri: **Adım 4** · Ekran 4
 | `RawText` | **Parçacının yazdığı, olduğu gibi.** Ayrıştırma yanlışsa dönülecek tek yer |
 | `ParsedPrice` · `ParsedBrand` · `ParsedCode` | Çıkarılabildiyse |
 | `ReceivedAt` | Ne zaman geldi |
+
+> **`ParsedPrice` = parçacının verdiği fiyat = ustanın ALIŞI** (K-076.2). Cevap satıra
+> işlenince `ServiceLine.Cost` olur; müşteriye söylenen fiyatı usta ayrıca yazar (T-9:
+> *usta üstüne ekliyor*). Gelmeyen alan satırda olanı silmez. Ayrıştırma YOK: usta
+> rakamı kendi girer (prototip balonu: *"Cevap gelince fiyatı sen yaz"*).
 
 > **`RawText` en kritik alan.** v1 dersi: türetilmiş veriyi saklayıp kaynağı atmak, ayrıştırma hatasını **kalıcı** yapıyor.
 
@@ -318,7 +327,8 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Hatırlatma: ay **veya** km, hangisi önce; km ancak iki ölçümle | `hatirlatmaHesapla` · `gunlukKm` | `MaintenanceReminder.Compute` | 03.09 · K-073.9 (ay sonu sapması) |
 | Hatırlatması gelen: bakım, tarihi geldi, gönderilmedi; "hatırlatma" mesajı (arama dahil) kapatır | `hatirlatmasiGelenler` | `ServiceRecord.IsReminderDue` · `MarkReminderSent` | 85-mesaj |
 | Teslim eksikleri söylenir, teslimi engellemez | `kEksikler` | `ServiceRecord.DeliveryWarnings` | 13.10 |
-| Parça sormak için araç kimliği: VIN ya da marka+model+yıl+motor | `aracKimligiTamam` | `Vehicle.HasPartIdentity` · `MissingForParts` (kapı, parça sorma uçlarıyla gelecek) | K-068 |
+| Parça sormak için araç kimliği: VIN ya da marka+model+yıl+motor | `aracKimligiTamam` | `Vehicle.HasPartIdentity` · `MissingForParts` · kapı `PartQuestion.EnsureCanAsk` | K-068 |
+| Sorulacak parça: tamircinin aldığı, fiyatı belli olmayan; kapılar sırayla konuşur (parça · kimlik · parçacı) | `psParcaListesi` · `psGonder` | `PartQuestion.AskableLines` · `EnsureCanAsk` · `Compose` | K-033.3 · K-076.2 |
 | Ruhsattan okunan plaka yazılanı ezmez; çatışmada usta seçer | `ruhsatKaydet` | **henüz yok** — ruhsat okuma ucu yapay zekâ sağlayıcısını bekliyor (K-070, Cemil) | K-069 |
 | Toplu mesaj yalnız `MarketingConsentAt` dolu müşteriye | `topluAlicilar` | `SendBulk` · `GetBulkPreview` | K-071.3 |
 | CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | `Csv.Cell` · `Csv.Document` · `ExportCashCsv` (bayt bayt eşit) | K-071.2 |
@@ -351,7 +361,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | **A-21** | Bir müşterinin iki aracı — ad iki kez yazılıyor. Kabul mü? (A-17 ile bağlı) |
 | **A-22** | `PartMatch` ortak olsun dedik — **hangi dükkânın öğrettiği** tutulsun mu? Öneri: hayır, gereksiz |
 | ~~A-23~~ | **Cevaplandı (K-048.2):** gönderilen her mesaj saklanır → `Message` tablosu |
-| **A-24** | Parça sorusu ile satırın bağı: `PriceRequestLine` ara tablosu. Öneri: evet. Teknik bir karar; backend turunda kesinleşir |
+| ~~A-24~~ | **Kesinleşti (D2, K-076.2):** `PriceRequestLine` ara tablosu |
 
 ---
 
@@ -392,6 +402,7 @@ taşınırken sessizce kaybolur.
 | `KAYITLAR.satirlar.kimGetirdi` | `ServiceLine.SuppliedBy` | |
 | `KAYITLAR.satirlar.marka` · `KAYITLAR.satirlar.kod` · `KAYITLAR.satirlar.tanim` | `ServiceLine.PartBrand` · `PartCode` · `MatchStatus` | |
 | `KAYITLAR.satirlar.sorulan` | `PriceRequestLine` → `PriceRequest.SupplierId` | A-24 |
+| `KAYITLAR.satirlar.kaynak` | `ServiceLine.SelectedReplyId` → `PriceReply` → `PriceRequest.SupplierId` | Kol B · K-076.2 |
 | `MESAJLAR.id` | `Message.Id` | |
 | `MESAJLAR.tarih` · `MESAJLAR.saat` | `Message.DateTimeCreated` | ortak alan |
 | `MESAJLAR.plaka` · `MESAJLAR.kayit` | `Message.VehicleId` · `ServiceRecordId` | |

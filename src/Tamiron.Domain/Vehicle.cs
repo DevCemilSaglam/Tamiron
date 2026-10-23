@@ -72,11 +72,12 @@ public class Vehicle : TenantEntity
     /// Parça sormak için eksik olanlar — ekran "şunları doldur" diyebilsin (K-068).
     /// Şase geçerliyse hiçbir şey eksik değildir.
     /// </summary>
-    public IReadOnlyList<string> MissingForParts => VinValid ? [] :
+    public IReadOnlyList<string> MissingForParts => HasValidVin ? [] :
         new (string ad, string? v)[] { ("marka", Brand), ("model", Model), ("yıl", Year), ("motor", Engine) }
             .Where(x => string.IsNullOrWhiteSpace(x.v)).Select(x => x.ad).ToList();
 
-    private bool VinValid =>
+    /// <summary>17 haneli şase (prototip saseGecerli).</summary>
+    public bool HasValidVin =>
         // Prototipin saseGecerli'siyle aynı: büyük harfe çevir, yalnız A–Z ve 0–9 say.
         // char.IsLetterOrDigit "Ş" gibi harfleri de sayardı — şasede Türkçe harf yok.
         Vin is not null && Vin.ToUpperInvariant().Count(c => c is >= 'A' and <= 'Z' or >= '0' and <= '9') == 17;
