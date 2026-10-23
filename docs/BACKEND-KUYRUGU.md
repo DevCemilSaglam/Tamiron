@@ -79,6 +79,14 @@
 | D9 | **İz kaydı** — istemcinin olay iz'i (destek için, K-053) | `00-iz.js` · K-053 | SIRADA |
 | D10 | **Güvenlik/işletim** — giriş uçlarında IP hız sınırı, CORS (PWA), sağlık ucu | — | SIRADA |
 | D11 | **CI** — GitHub Actions: build + test (LocalDB'li Windows koşucusu) | — | SIRADA |
+| D13 | **Yanlış açılan kaydı silme** (soft, geri alınabilir) — karar; teslim edilmiş kayıt silinmez | — | SIRADA |
+| D14 | **Teslimi geri alma** (yanlış teslim, aynı gün) — karar; tahsil edilmişse önce tahsil geri alınır | 50-teslim | SIRADA |
+| D15 | **Sesli komut çözümleyici sunucuda** — cümle → işlem nesnesi (plaka bulma, tutar/km ayrıştırma, niyet); prototipin `04-islem.js` şemaları; ses tanıma YOK, yalnız metin | 04-islem · K-056 · SOYLEYIS | SIRADA |
+| D16 | **Geliştirme tohumunun tamamı** — prototipin 8 kaydı, 4 aracı, giderleri (şimdiki tohum bir dilim) | 02-veri.js | SIRADA |
+| D17 | **İndeksler** — sık süzülen sütunlar (teslim günü, ödeme yolu, hatırlatma günü, araç); göçle | — | SIRADA |
+| D18 | **API belgesi (OpenAPI)** — arayüzü yazacak kişi uçları bir yerden okusun | — | SIRADA |
+| D19 | **Yedekleme betiği** — veritabanı yedeği yerel klasöre (uzak yedek K-070 ile Cemil'de) | K-070 | SIRADA |
+| D20 | **Arayüz iskeleti** — `Tamiron.Ui.Core` (tokens.css) + `Tamiron.Tamirhane.Web` (Blazor WASM): giriş ekranı + kayıtlar listesi; MudBlazor YOK | MIMARI §2 · TASARIM-SISTEMI | SIRADA |
 | D12 | **İnceleme rehberi** — Cemil'in "detaylı inceleme"si için tek belge: ne yapıldı, hangi kararlar onayını bekliyor, nasıl denenir | — | SIRADA (en son) |
 | — | **SMS sağlayıcısı** (Netgsm / İleti Merkezi …) — hesap, fiyat, gönderici adı | K-074.5 | **BEKLİYOR (Cemil)** — paralı dış servis; bağlanana kadar üretimde kod isteği 503 |
 | — | **Yeni dükkânın kaydı** — ilk usta sisteme nasıl girer | K-074.5 | **BEKLİYOR (Cemil)** — ürün akışı; şimdilik yalnız kayıtlı telefon girer |
