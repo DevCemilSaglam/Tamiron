@@ -18,7 +18,7 @@ public sealed class RequestContext : ITenantContext, ICurrentSession
 
 /// <summary>
 /// "Authorization: Bearer &lt;anahtar&gt;" → oturum → dükkân. Giriş uçları dışında her
-/// /api isteği oturum ister. Eski X-Tenant-Id başlığı (K-073.6) KALDIRILDI: başlıkla
+/// /api isteği oturum ister — bir de müşterinin özet sayfası (/api/o/{kod}, K-023). Eski X-Tenant-Id başlığı (K-073.6) KALDIRILDI: başlıkla
 /// gelen dükkân, herkesin her dükkânı okuyabilmesi demekti.
 /// </summary>
 public sealed class SessionMiddleware(RequestDelegate next)
@@ -28,7 +28,8 @@ public sealed class SessionMiddleware(RequestDelegate next)
     public async Task InvokeAsync(HttpContext ctx, RequestContext rc, TamironDbContext db, IClock clock)
     {
         var path = ctx.Request.Path;
-        if (!path.StartsWithSegments("/api") || Open.Any(p => path.Equals(p, StringComparison.OrdinalIgnoreCase)))
+        if (!path.StartsWithSegments("/api") || Open.Any(p => path.Equals(p, StringComparison.OrdinalIgnoreCase))
+            || path.StartsWithSegments("/api/o", StringComparison.OrdinalIgnoreCase))
         {
             await next(ctx);
             return;

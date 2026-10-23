@@ -75,6 +75,9 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Ignore(x => x.Total);
             e.Ignore(x => x.CollectedOn);
             e.Ignore(x => x.IsMaintenance);
+            e.Property(x => x.SummaryCode).HasMaxLength(32);
+            // Kod bütün dükkânlarda tekil: link kiracısız açılır, kod kaydı tek başına bulur.
+            e.HasIndex(x => x.SummaryCode).IsUnique().HasFilter("[SummaryCode] IS NOT NULL");
         });
 
         Tenant(b.Entity<ServiceLine>());

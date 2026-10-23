@@ -26,6 +26,10 @@ public class ServiceRecord : TenantEntity
     public bool ShowWaitingToCustomer { get; private set; }
     /// <summary>KDV tevkifat oranı (ör. 0,7 = 7/10) — yalnız YER (C6, Faz 3). Boş = belirlenmedi. Hesap yok.</summary>
     public decimal? WithholdingRate { get; private set; }
+    /// <summary>Müşteri özet linkinin kodu (K-076.3). İlk istendiğinde üretilir, sonra değişmez: gönderilmiş link ölmesin.</summary>
+    public string? SummaryCode { get; private set; }
+
+    public string EnsureSummaryCode() => SummaryCode ??= CustomerSummary.NewCode();
 
     private readonly List<ServiceLine> _lines = [];
     public IReadOnlyList<ServiceLine> Lines => _lines;

@@ -41,6 +41,18 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   eklenecek"* ekrandaki hatırlatmadır, mesaja girmez.
 - A-24 kesinleşti: `PriceRequestLine` ara tablosu.
 
+**76.3 · Müşteri özet linki (D3) — A-M9'u kapatır.**
+- **Link = tahmin edilemez kod**, kimlik doğrulama yok. 16 karakter, 31 harflik
+  alfabe (0/o, 1/l/i yok), ≈79 bit. Prototipte kod plaka + kayıt numarasıydı: plakayı
+  bilen herkes sırayla deneyip başkasının faturasını okuyabilirdi.
+- **Neden giriş yok:** müşteri bir kez dokunur (K-023 "en ucuz hâli"). Linki olan görür;
+  link WhatsApp'la tek kişiye gidiyor. Sayfada alış, başka araç, geçmiş kayıt yok.
+- **Kod bir kez üretilir, değişmez.** Usta linki ilk istediğinde doğar; gönderilmiş link
+  iş sürerken canlı kalır (K-023.1). Kayıt silinirse link ölür (404).
+- **Linki iptal etmek yok** — tamirci istemedi; gerekirse "yeni kod üret" tek satır.
+- Adres `tamiron.app/o/{kod}` (prototipin biçimi). Alan adı alınmadı — **Cemil'in kararı**;
+  API yolu `/api/o/{kod}`, oturumsuz. Kaba kuvvet denemesine hız sınırı D10'da.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
@@ -4381,6 +4393,8 @@ edildi"*. Müşterinin ikinci sorusu bu.
 > görür. Link plaka + kayıt numarasından türüyor, yani **tahmin edilebilir**.
 > Gerçek kullanımda tahmin edilemez bir kod gerekir. Prototipte kabul;
 > backend fazında kapatılacak.
+>
+> **Kapandı (23.10, K-076.3):** kod artık rastgele 16 karakter; backend D3.
 
 ### 23.4 · Ekranlar arası devredilen değer çekirdekte durur
 

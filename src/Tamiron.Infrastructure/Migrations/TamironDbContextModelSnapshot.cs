@@ -412,6 +412,10 @@ namespace Tamiron.Infrastructure.Migrations
                     b.Property<bool>("ShowWaitingToCustomer")
                         .HasColumnType("bit");
 
+                    b.Property<string>("SummaryCode")
+                        .HasMaxLength(32)
+                        .HasColumnType("nvarchar(32)");
+
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
@@ -435,6 +439,10 @@ namespace Tamiron.Infrastructure.Migrations
                         .HasColumnType("decimal(5,4)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SummaryCode")
+                        .IsUnique()
+                        .HasFilter("[SummaryCode] IS NOT NULL");
 
                     b.HasIndex("TenantId");
 

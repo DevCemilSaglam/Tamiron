@@ -76,6 +76,7 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 | `ReminderSent` | Aynı hatırlatma iki kez gitmesin |
 | `WaitingForPart` | **Parça yolda.** Usta işaretler — K-033.5, K-034. Türetilemez: veride bunu söyleyen hiçbir şey yok |
 | `WithholdingRate` | **KDV tevkifat oranı — yalnız YER (C6, Faz 3).** Boş = belirlenmedi. Araç bakım-onarımında 7/10 (KDV.md §2) ama alıcıya ve tutara bağlı; hesap Faz 3'te, fatura kesme kararıyla. Ekranda yok |
+| `SummaryCode` | **Müşteri özet linkinin kodu (D3, K-076.3).** 16 karakter, rastgele, okunurken karışan harf yok; bütün dükkânlarda tekil. İlk istendiğinde üretilir, sonra **değişmez** — gönderilmiş link ölmesin. Prototipte plaka + kayıt numarasıydı (tahmin edilebilir, A-M9) |
 | `WaitingSince` | Bayrağın **ne zaman** konduğu — süreçte "Parça bekleniyor" adımının tarihi. Bayrak kalkınca boşalır |
 | `ShowWaitingToCustomer` | **Parça beklendiği müşteriye söylensin mi.** Bayrak açık olsa bile söylemek ayrı bir karar — A-M15, Cemil: *"İsterse, evet."* K-034'ün ölçüsünden geçiyor: kullanıcının yapabilecekleri değişmiyor |
 | `TypeSetManually` | **Türü usta elle seçti.**
@@ -333,6 +334,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Toplu mesaj yalnız `MarketingConsentAt` dolu müşteriye | `topluAlicilar` | `SendBulk` · `GetBulkPreview` | K-071.3 |
 | CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | `Csv.Cell` · `Csv.Document` · `ExportCashCsv` (bayt bayt eşit) | K-071.2 |
 | Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |
+| Müşteri özeti: tek durum cümlesi, müşteri parçasında rakam yok, alış yok, yarım satır yok | `ozetGovdeHtml` | `CustomerSummary.StatusText` · `Amount` · `GetCustomerSummary` | K-023 · K-037 · K-076.3 |
 | KDV oranı satırda donar (yalnız yer) | — | `ServiceLine.FreezeVatRate` | C6 · KDV.md |
 
 ---

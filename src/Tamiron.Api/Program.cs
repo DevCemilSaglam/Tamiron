@@ -79,6 +79,12 @@ api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) =>
 api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
 // Parçacılar (D1): ad + telefon; aynı numara iki kez olmaz; silme soft.
+// D3 · Müşteri özet linki: usta linki alır; müşteri OTURUMSUZ açar (K-023, K-076.3).
+api.MapPost("/records/{id:guid}/summary-link", (Guid id, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Summaries.GetSummaryLink(id), ct));
+api.MapGet("/o/{code}", (string code, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Summaries.GetCustomerSummary(code), ct));
+
 // D2 · Parça sorma: soru (parçacı başına bir kayıt) · liste · cevap (satıra işlenir).
 api.MapPost("/records/{id:guid}/price-requests", (Guid id, Tamiron.Application.PriceRequests.AskBody b, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.PriceRequests.AskForPrices(id, b), ct));
