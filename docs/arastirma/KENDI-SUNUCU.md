@@ -351,6 +351,13 @@ azaltılır: TC, ad ve adres maskelenir, kalanı için standart sözleşme yapı
 - **KVKK veri güvenliği:** makine verisiz olsa da fotoğraf ve ses bellekte
   işleniyor. Disk şifreleme, kilitli oda, erişim kaydı ve VPS ile şifreli
   tünel; kurulum bunlarla yapılır.
+- **SMS ve sorumluluk (23.10, K-077.8):** SMS gönderici adı (başlık) için şirket / şahıs
+  şirketi ve vergi levhası gerekiyor mu? Tamiron ustanın adına ticari ileti gönderirse İYS'de
+  "hizmet sağlayıcı" kim — dükkân mı, Tamiron mu? KVKK'da Tamiron veri sorumlusu mu, veri
+  işleyen mi (müşteri verisinin sahibi dükkân)? Ustanın gönderdiği mesajdan doğan şikâyette
+  Tamiron'un payı ne, kullanım koşullarına ne yazılmalı?
+- **Fatura ve abonelik:** ustalara ücretli kullanım başladığında fatura kesmek şirket ister —
+  hangi şirket türü (şahıs / limited) ve ne zaman kurulmalı?
 
 
 ## 8 · Gerçek araştırma: makine ve modeller (20.10)

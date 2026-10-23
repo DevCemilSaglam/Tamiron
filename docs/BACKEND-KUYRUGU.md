@@ -91,3 +91,10 @@
 | — | **SMS sağlayıcısı** (Netgsm / İleti Merkezi …) — hesap, fiyat, gönderici adı | K-074.5 | **Kod hazır (D7, K-076.7); hesap BEKLİYOR (Cemil)** — Netgsm hesabı + onaylı gönderici adı + sunucuda üç ortam değişkeni. Bağlanana kadar üretimde 503 |
 | — | **Yeni dükkânın kaydı** — ilk usta sisteme nasıl girer | K-074.5 | **D6'ya alındı ve BİTTİ** (23.10, K-076.6) |
 | — | İzin geçmişi (log) tablosu — kim, ne zaman, nasıl verdi/kaldırdı; İYS ile | K-071.3 · K-073.10 | **D5'e alındı ve BİTTİ** (23.10, K-076.5) — "nasıl alındı" alanı İYS'ye kaldı |
+| — | *— Tur E · 23.10 akşam · Cemil'in inceleme cevapları (K-077): "Çözümleyiciyi C#'a taşı" · ödeme düzeltme · Gemini ücretli katman · elden taksit. Kurallar tur D'ninkiyle aynı: önce test, mutasyon, para/dış çağrı yok —* | | |
+| E1 | **Ödeme yolunu düzelt** — teslimli kayıtta nakit ↔ kart ↔ havale; teslim ve tahsil günü korunur, değişiklik izde; arayüzde "Düzenle" altında (ön planda değil) | K-077.2 | SIRADA |
+| E2 | **Gemini ruhsat okuyucusu** — `IRegistrationReader` uygulaması (ücretli katman, ortam değişkeni, sahte HTTP ile test); **gerçek çağrı Cemil'in onayıyla** | K-077.5 · K-067.2c | SIRADA |
+| E3 | **Ses çözümleyicisi C#'a (1/2): okuyucular** — metin hazırlama (binlik, saat, harf-rakam ayırma), söyleyiş sözlüğü, plaka bulma + kayıtlıya bağlama, tutar, km, telefon, araç tarifi; `Tamiron.Ui.Core` (cihazda) | K-077.1 · 04-islem · 05-soyleyis | SIRADA |
+| E4 | **Ses çözümleyicisi C#'a (2/2): şemalar + çözümle** — 12 işlem türü, bağlam/öncelik/varsayılan kuralı; **273 durumda prototiple 0 fark** (`Esdeger/prototip-ses.json`) | K-077.1 · K-056 | SIRADA |
+| E5 | **Ses: "ödeme düzelt" işlemi** — "nakit değil kartla aldım" → E1'in ucu; prototipte YOK (yeni şema, K-077.2) | K-077.2 | SIRADA (E1 + E4'ten sonra) |
+| E6 | **Elden taksit = kısmi tahsilat** — önce TASARIM: akış, kasa/alacak/CSV etkisi, prototip eşdeğerliğine etkisi; Cemil onayından SONRA kod | K-077.3 · K-022 | SIRADA (tasarım) |

@@ -10,6 +10,65 @@
 
 ---
 
+## K-077 · Tur D incelemesi — Cemil'in cevapları (23.10.2026 akşam)
+
+**77.1 · Ses çözümleyicisi C#'a, CİHAZDA çalışacak şekilde — K-076.14'ü genişletir.**
+Cemil: *"Çözümleyiciyi C#'a taşı."* Yer `Tamiron.Ui.Core` (Blazor WASM'da telefonda
+koşar: internetsiz çalışır, MAUI ile paylaşılır). Ölçü: `Esdeger/prototip-ses.json`'daki
+273 durumda prototiple **0 fark**. Dil modeli bütçe olunca arkaya, zor cümleler için.
+
+**77.2 · Ödeme yolunu düzelt — evet; sesle ve dokunarak.** Cemil: *"İkisi de gerekli ama
+button ön planda olmasına gerek yok. Düzelt ya da düzenle diye bir button altında bu tür
+işlemler yapılabilir."* → kayıtta tek bir **"Düzenle"** girişi; altında ödeme yolu (ve
+ileride benzer düzeltmeler). Teslimi geri alma (K-076.13) "yanlış araç" için kalır.
+
+**77.3 · Taksit — iki biçim, ikisi de az veriyle.** Cemil: *"İkisi de olabilir. Ama kredi
+kartını taksitli söylemek zorunda değil. Ve elden taksit de x miktar aldım şeklinde olur."*
+- **Kredi kartı taksiti:** bilgi DEĞİL — "Kart" yeter; taksit sayısı sorulmaz.
+- **Elden taksit = "x lira aldım":** kayda **kısmi tahsilat** girilir; kalan veresiye
+  kalır. ⚠️ K-022 *"kısmi ödeme takibi yok"* demişti — bu karar onu **daraltır**: cari
+  hesap (ekstre, mutabakat, vade) yine YOK; yalnız kayıt başına "alınanlar" listesi ve
+  kalan. Muhasebe hesabını değiştirdiği için önce tasarım (akış → tartış), sonra kod.
+
+**77.4 · Davet kodu reddedildi.** Cemil: *"Bu gözükmüyor ya da yanlış."* Giriş SMS'le kalır.
+Ustalar şimdilik kullanmıyor; kullanacakları zaman SMS paketi alınır (K-076.7 adaptörü hazır).
+
+**77.5 · Ruhsat okuma: Gemini ÜCRETLİ katman — onaylı.** Cemil: *"Tamamdır."* Adaptör yazılır;
+anahtar ortam değişkeninde, depoya girmez; **ilk gerçek çağrı Cemil'in onayıyla.** Ücretsiz
+katman YOK (içerik Google'ın ürün geliştirmesinde kullanılabilir; ruhsatta TC/ad/adres var).
+
+**77.6 · Yedek sonra.** Zamanlama ve uzak kopya gerçek müşteri verisi gelince (K-076.18).
+
+**77.7 · Geliştirme veritabanı silindi ve tam tohumla kuruldu** (Cemil: *"Sende."*) — 8 kayıt,
+4 araç, 2 gider; tarayıcıda giriş → kayıtlar ölçüldü. Eski oturum anahtarı geçersiz kaldı ve
+uygulama kendiliğinden girişe döndü (401 yolu gerçek ortamda da doğru).
+
+**77.8 · Tamiron müşteriye SMS GÖNDERİRSE alınacak önlemler — NOT (bugün gönderim yok).**
+Bugün mesajı usta **kendi telefonundan** gönderir (WHATSAPP.md A yolu); Tamiron metni hazırlar
+ve kaydeder. Sorumluluk ustada. Tamiron'un kendisi göndermeye başlarsa (bakım hatırlatması SMS'i,
+T-17) sorumluluk bize de geçer; o gün şunlar ŞART:
+1. **Yalnız şablon:** serbest metin gitmez — ya hazır şablon (özet, hazır, teslim, hatırlatma,
+   bayram…) ya da süzgeçten geçen kısa ek (link YOK, küfür/hakaret listesi, büyük harf/ünlem
+   yağmuru yok, uzunluk sınırı).
+2. **Ticari ileti izni:** kampanya/bayram/toplu mesaj yalnız izni olana (bugün de var, K-071.3);
+   İYS kaydı Tamiron adına değil **dükkân adına** — gönderen dükkândır.
+3. **Ret yolu her ticari mesajda:** "Almak istemiyorsanız RET yazıp … gönderin."
+4. **Saat:** 21:00–09:00 arası gönderim yok (sıraya girer).
+5. **Sınır:** dükkân başına günlük/aylık tavan; ani artış (ör. bir saatte 200) durdurulur ve
+   Cemil'e haber verilir.
+6. **Gönderici adı dükkânın:** mesaj "TAMIRON" başlığıyla değil, dükkânın onaylı başlığıyla
+   gider — alıcı kimden geldiğini bilir, şikâyet doğru yere gider.
+7. **İspat:** her mesajın metni, alıcısı, zamanı ve izin durumu 3 yıl saklanır (bugün de var,
+   `Message`); şikâyette "ne gitti" tek sorguyla görülür.
+8. **Şikâyet = durdur:** bir numaradan şikâyet/ret gelirse o numaraya o dükkândan bir daha
+   ticari mesaj gitmez (otomatik).
+9. **Kullanım koşulları:** ustaya ilk açılışta "gönderdiğin mesajdan sen sorumlusun, şu
+   kurallar geçerli" — onay kaydıyla.
+→ Şirket/hukuk soruları (başlık için vergi levhası, İYS hizmet sağlayıcı kaydı, KVKK veri
+sorumlusu/işleyen ayrımı) muhasebeci + avukata — `arastirma/KENDI-SUNUCU.md` §7.8'e eklendi.
+
+---
+
 ## K-076 · Tur D'nin lider kararları — HEPSİ Cemil onayına açık (23.10.2026)
 
 **Cemil, 23.10:** *"Karar verilmesi gerekenler için en iyi, tercih ettiğin kararı
