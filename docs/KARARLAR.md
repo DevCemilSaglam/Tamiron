@@ -155,6 +155,19 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **Sağlık ucu `/health`:** oturumsuz, yalnız "veritabanına ulaşılıyor mu"; 200 `ok` /
   503 `down`, bağlantı ayrıntısı sızdırmaz.
 
+**76.11 · CI (D11) — yazıldı, otomatik KOŞMUYOR.**
+- **Yalnız elle tetiklenir** (`workflow_dispatch`). GitHub Actions özel depoda dakika
+  harcar, Windows dakikası iki kat sayılır; "push'ta koş" açmak para kararı → Cemil.
+  Açmak: `on:` altına `push: { branches: [main] }` + `pull_request:`.
+- **Windows + LocalDB**, çünkü testler gerçek MSSQL'de (SQLite farklı davranır). Koşucuda
+  LocalDB yoksa Chocolatey ile kurulur — bu adım gerçek koşucuda denenmedi; ilk elle
+  tetiklemede çıktısına bakılmalı.
+- **Prototip eşdeğerliği CI'da da:** `muhasebe-esdeger.js` yeniden koşar, dosya değiştiyse
+  kırmızı — "prototipte muhasebe kuralı değişti, araç koşulmadı" hatası yakalanır.
+- **Mutasyon ölçümü CI'da YOK** — her iş için elle seçilen mutasyonlar, uzun sürer; iş
+  döngüsünün parçası olarak kalır.
+- Gizli bilgi yok (Windows kimliği); izin `contents: read`.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

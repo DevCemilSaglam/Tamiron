@@ -1,0 +1,68 @@
+# D11 · Backend CI (K-076.11) — derle, test et, prototip eşdeğerliğini doğrula.
+#
+# ⚠️ YALNIZ ELLE TETİKLENİR (workflow_dispatch). Otomatik koşmaz: GitHub Actions özel depoda
+# dakika harcar (Windows dakikası 2 kat sayılır) — para Cemil'in kararı. Açmak için aşağıdaki
+# `on:` bloğuna `push: { branches: [main] }` ve `pull_request:` eklenir (K-076.11).
+#
+# Neden Windows: testler gerçek MSSQL (LocalDB) üzerinde koşar — kiracı süzgeci, rowversion ve
+# süzgeçli tekil indeks SQLite'ta farklı davranır (ApiFactory). LocalDB yalnız Windows'ta var.
+# Gizli bilgi YOK: LocalDB Windows kimliğiyle açılır, bağlantı dizgesinde parola yok.
+
+name: backend
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      # Koşucu görüntüsünde LocalDB varsa kullanılır, yoksa kurulur. ⚠️ Gerçek koşucuda
+      # HİÇ denenmedi — ilk elle tetiklemede bu adımın çıktısına bakılmalı.
+      - name: LocalDB
+        shell: pwsh
+        run: |
+          if (-not (Get-Command sqllocaldb -ErrorAction SilentlyContinue)) {
+            choco install sqllocaldb -y --no-progress
+            Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"; refreshenv
+          }
+          # Varsayılan (otomatik) örnek: yoksa start onu oluşturur, varsa yalnız başlatır.
+          sqllocaldb start MSSQLLocalDB
+          sqllocaldb info MSSQLLocalDB
+
+      - name: Derle
+        run: dotnet build Tamiron.sln -c Release
+
+      - name: Test
+        run: dotnet test Tamiron.sln -c Release --no-build --logger "trx;LogFileName=sonuc.trx"
+
+      # Prototipin muhasebe rakamları değiştiyse eşdeğerlik dosyası yeniden üretilmeli
+      # (CLAUDE.md: "Prototipte muhasebe kuralı değişirse araç yeniden koşulur"). Araç
+      # deterministik: değişmemiş prototipte dosya bayt bayt aynı çıkar.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Prototip eşdeğerliği güncel mi
+        shell: pwsh
+        run: |
+          node tools/muhasebe-esdeger.js
+          git diff --exit-code -- tests/Tamiron.Api.Tests/Esdeger/prototip-muhasebe.json
+          if ($LASTEXITCODE -ne 0) { Write-Error "Prototip değişmiş: node tools/muhasebe-esdeger.js koşup dosyayı işle."; exit 1 }
+
+      - name: Test sonuçları
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-sonuclari
+          path: tests/**/TestResults/*.trx
+          retention-days: 7
