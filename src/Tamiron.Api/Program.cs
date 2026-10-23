@@ -70,6 +70,11 @@ api.MapGet("/reminders/due", (ISender s, CancellationToken ct) => s.Send(new Lis
 // Mesajlar (B11): GÖNDERİM YOK, kayıt. Toplu: yalnız izinli müşteriler.
 api.MapPost("/messages", (RecordMessage cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 api.MapGet("/messages", (Guid? vehicleId, ISender s, CancellationToken ct) => s.Send(new ListMessages(vehicleId), ct));
+// D4 · Mesaj önerileri: bu işe uygun hazır mesajlar + metinleri; tek şablonun metni.
+api.MapGet("/vehicles/{id:guid}/message-suggestions", (Guid id, MessageTargetKind? target, ISender s, CancellationToken ct) =>
+    s.Send(new GetMessageSuggestions(id, target), ct));
+api.MapGet("/vehicles/{id:guid}/message-text", (Guid id, string template, MessageTargetKind? target, ISender s, CancellationToken ct) =>
+    s.Send(new GetMessageText(id, template, target), ct));
 api.MapGet("/messages/bulk-preview", (ISender s, CancellationToken ct) => s.Send(new GetBulkPreview(), ct));
 api.MapPost("/messages/bulk", (SendBulk cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 

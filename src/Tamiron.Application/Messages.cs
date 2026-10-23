@@ -94,3 +94,55 @@ internal sealed class MessageHandlers(ITamironDb db, ITenantContext tenant) :
         return new BulkResult(withConsent.Count, cands.Count - withConsent.Count);
     }
 }
+
+// ---- D4 · Mesaj önerileri: bu işe hangi hazır mesaj uygun ve metni ne ----
+
+public sealed record MessageSuggestion(string Template, string Name, string Text);
+public sealed record GetMessageSuggestions(Guid VehicleId, MessageTargetKind? Target = null) : IRequest<List<MessageSuggestion>>;
+public sealed record GetMessageText(Guid VehicleId, string Template, MessageTargetKind? Target = null) : IRequest<MessageSuggestion>;
+
+internal sealed class MessageSuggestionHandlers(ITamironDb db, ITenantContext tenant) :
+    IRequestHandler<GetMessageSuggestions, List<MessageSuggestion>>,
+    IRequestHandler<GetMessageText, MessageSuggestion>
+{
+    /// <summary>
+    /// Aracın şu anki işi (açık kayıt varsa en yenisi, yoksa son kayıt) üzerinden öneri.
+    /// Metin ÖNERİDİR — usta mesaj ekranında düzenler; gönderilen hâli POST /messages kaydeder.
+    /// </summary>
+    public async Task<List<MessageSuggestion>> Handle(GetMessageSuggestions q, CancellationToken ct)
+    {
+        var c = await Context(q.VehicleId, q.Target, ct);
+        var sent = c.CurrentJob is null ? [] : await db.Messages.AsNoTracking()
+            .Where(m => m.ServiceRecordId == c.CurrentJob.Id).Select(m => m.Template).ToListAsync(ct);
+        var list = MessageTemplates.Applicable(c.CurrentJob, sent)
+            .Select(k => new MessageSuggestion(k, MessageTemplates.Name(k), MessageTemplates.Text(k, c))).ToList();
+        await db.SaveChangesAsync(ct);   // linkli metin kaydın özet kodunu doğurmuş olabilir
+        return list;
+    }
+
+    /// <summary>Tek şablonun metni — hazır metinler (bayram/selam/teşekkür) dahil; sesli yol da bunu ister.</summary>
+    public async Task<MessageSuggestion> Handle(GetMessageText q, CancellationToken ct)
+    {
+        var key = (q.Template ?? "").Trim();
+        if (!MessageTemplates.IsKnown(key))
+            throw new DomainException("message.unknown_template", "Böyle bir hazır mesaj yok.");
+        var c = await Context(q.VehicleId, q.Target, ct);
+        var s = new MessageSuggestion(key, MessageTemplates.Name(key), MessageTemplates.Text(key, c));
+        await db.SaveChangesAsync(ct);
+        return s;
+    }
+
+    private async Task<MessageContext> Context(Guid vehicleId, MessageTargetKind? target, CancellationToken ct)
+    {
+        var v = await db.Vehicles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == vehicleId, ct) ?? throw new NotFoundException("Araç");
+        var shop = await db.Shops.AsNoTracking().FirstAsync(s => s.Id == tenant.TenantId, ct);
+        // İzlenen: özet kodu üretilirse kaydedilsin.
+        var recs = await db.ServiceRecords.Include(r => r.Lines).Where(r => r.VehicleId == v.Id)
+            .OrderBy(r => r.DateTimeCreated).ToListAsync(ct);
+        var last = recs.LastOrDefault();
+        var current = recs.LastOrDefault(r => r.DeliveredAt is null) ?? last;
+        var maint = recs.Where(r => r.IsMaintenance && r.DeliveredAt is not null)
+            .OrderBy(r => r.DeliveredAt).ThenBy(r => r.DateTimeCreated).LastOrDefault();
+        return new MessageContext(v, v.DefaultTarget(target), shop, current, last, maint);
+    }
+}

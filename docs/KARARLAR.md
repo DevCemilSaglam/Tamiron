@@ -53,6 +53,18 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - Adres `tamiron.app/o/{kod}` (prototipin biçimi). Alan adı alınmadı — **Cemil'in kararı**;
   API yolu `/api/o/{kod}`, oturumsuz. Kaba kuvvet denemesine hız sınırı D10'da.
 
+**76.4 · Mesaj önerileri (D4).**
+- **Öneri = metin, gönderim değil.** API "bu işe hangi mesaj uygun" ve "metni ne" der;
+  usta düzenler, gönderdiği hâli `POST /messages` kaydeder. Gönderim yok (WHATSAPP.md A yolu).
+- **Kurallar prototiple birebir**, tuhaf görüneni de: "teslim edildi" o işe *herhangi* bir
+  mesaj gittiyse önerilmez (Cemil: *"teslim edilmiş ve mesaj gönderilmemiş araca"*).
+  Boş "özet" cümlesi imzasız. Kalem sayısına müşteri parçası da girer.
+- **"Şu anki iş":** açık kayıt varsa EN YENİ açık kayıt, yoksa son kayıt. Prototip ilk
+  bulduğu açık kaydı alıyordu; sıra prototipte belirsizdi, en yeni daha doğal.
+- **Araç adı boşsa** prototip `" (34 ABC 123)"` basıyordu; burada yalnız plaka.
+- **Linkli metin istenince kaydın özet kodu doğar** ve kaydedilir — öneri ekranındaki
+  link ile müşterinin açtığı link aynı (testli).
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

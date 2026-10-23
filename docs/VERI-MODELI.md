@@ -334,6 +334,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Toplu mesaj yalnız `MarketingConsentAt` dolu müşteriye | `topluAlicilar` | `SendBulk` · `GetBulkPreview` | K-071.3 |
 | CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | `Csv.Cell` · `Csv.Document` · `ExportCashCsv` (bayt bayt eşit) | K-071.2 |
 | Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |
+| Mesaj önerisi: hangi şablon BU İŞE uygun (kayıt bazlı); metin = hitap + gövde + imza | `MESAJ_SABLONLARI.uygunKayit` · `mesajMetniUret` · `hazirMesajMetni` | `MessageTemplates.Applicable` · `Text` · `Name` | K-019.1 · A-M17 · K-076.4 |
 | Müşteri özeti: tek durum cümlesi, müşteri parçasında rakam yok, alış yok, yarım satır yok | `ozetGovdeHtml` | `CustomerSummary.StatusText` · `Amount` · `GetCustomerSummary` | K-023 · K-037 · K-076.3 |
 | KDV oranı satırda donar (yalnız yer) | — | `ServiceLine.FreezeVatRate` | C6 · KDV.md |
 
