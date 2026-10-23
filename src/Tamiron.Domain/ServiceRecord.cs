@@ -217,6 +217,23 @@ public class ServiceRecord : TenantEntity
         PaymentCollectedAt = on;
     }
 
+    /// <summary>
+    /// Ödeme yolunu düzelt (E1, K-077.2): "nakit aldım" dedi, kartla almıştı. Teslim günü ve (varsa)
+    /// sonraki tahsil günü KORUNUR — yalnız yol değişir, kasa dağılımı kendiliğinden düzelir.
+    /// Teslimde alınan ödeme dört yol arasında serbest; sonradan tahsil edilmişse yalnız tahsilin
+    /// yolu değişir — "almadım"a çevirmek tahsili geri almaktır (UndoCollection), o ayrı adım.
+    /// </summary>
+    public void CorrectPaymentMethod(PaymentMethod method)
+    {
+        if (DeliveredAt is null)
+            throw new DomainException("payment.not_delivered", "Kayıt teslim edilmedi — düzeltilecek ödeme yok.");
+        if (PaymentMethod == method)
+            throw new DomainException("payment.same_method", "Ödeme zaten böyle yazılı.");
+        if (PaymentCollectedAt is not null && method == Domain.PaymentMethod.Unpaid)
+            throw new DomainException("payment.use_undo_collection", "Sonradan alınan ödemeyi silmek için \"Ödemeyi geri al\"ı kullan.");
+        PaymentMethod = method;
+    }
+
     /// <summary>"Geri al" — yanlış çipe dokunmak kasaya olmayan parayı yazmasın.</summary>
     public void UndoCollection()
     {

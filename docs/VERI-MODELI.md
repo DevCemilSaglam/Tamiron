@@ -374,6 +374,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |
 | Mesaj önerisi: hangi şablon BU İŞE uygun (kayıt bazlı); metin = hitap + gövde + imza | `MESAJ_SABLONLARI.uygunKayit` · `mesajMetniUret` · `hazirMesajMetni` | `MessageTemplates.Applicable` · `Text` · `Name` | K-019.1 · A-M17 · K-076.4 |
 | İzin değişikliği izlenir; geri alma eski tarihi izden getirir (son eylem, aynı gün, bir kez) | `iletiIzniYaz` · `balonGeriAl` (91-musteri) | `Customer.SetConsent` · `UndoConsent` · `ConsentEvent` | K-071.3 · K-073.10 · K-076.5 |
+| Ödeme yolu düzeltilir; teslim/tahsil günü korunur; sonradan tahsilde "almadım" = tahsili geri al | — (prototipte yok) | `ServiceRecord.CorrectPaymentMethod` | K-077.2 |
 | Müşteri özeti: tek durum cümlesi, müşteri parçasında rakam yok, alış yok, yarım satır yok | `ozetGovdeHtml` | `CustomerSummary.StatusText` · `Amount` · `GetCustomerSummary` | K-023 · K-037 · K-076.3 |
 | KDV oranı satırda donar (yalnız yer) | — | `ServiceLine.FreezeVatRate` | C6 · KDV.md |
 

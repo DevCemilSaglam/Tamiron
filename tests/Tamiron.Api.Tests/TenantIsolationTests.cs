@@ -102,6 +102,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         ["GET /api/records/{id}/delivery-preview"] = _ => null,
         ["POST /api/records/{id}/deliver"] = _ => new { method = "Cash" },
         ["POST /api/records/{id}/deliver/undo"] = _ => null,
+        ["POST /api/records/{id}/payment"] = _ => new { method = "Card" },
         ["POST /api/records/{id}/collect"] = _ => new { method = "Cash" },
         ["POST /api/records/{id}/collect/undo"] = _ => null,
         ["POST /api/records/{id}/lines"] = _ => new { kind = "Labor", name = "A satırı", price = 1 },

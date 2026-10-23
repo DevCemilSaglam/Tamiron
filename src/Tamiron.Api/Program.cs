@@ -273,6 +273,8 @@ api.MapPost("/records/{id:guid}/deliver", (Guid id, CollectBody body, ISender s,
     s.Send(new DeliverRecord(id, body.Method), ct));
 // D14 · Yanlış teslimi geri al: aynı gün; tahsil edildiyse önce tahsil geri alınır (K-076.13).
 api.MapPost("/records/{id:guid}/deliver/undo", (Guid id, ISender s, CancellationToken ct) => s.Send(new UndoDelivery(id), ct));
+// E1 · Ödeme yolunu düzelt (K-077.2): nakit ↔ kart ↔ havale; teslim/tahsil günü korunur.
+api.MapPost("/records/{id:guid}/payment", (Guid id, CollectBody body, ISender s, CancellationToken ct) => s.Send(new CorrectPayment(id, body.Method), ct));
 
 // Satırlar (B3). Her uç kaydın güncel hâlini döner.
 api.MapPost("/records/{id:guid}/lines", (Guid id, LineBody body, ISender s, CancellationToken ct) =>
