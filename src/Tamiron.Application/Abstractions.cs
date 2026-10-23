@@ -28,6 +28,12 @@ public interface ISmsSender
 
 public sealed class SmsNotConfiguredException() : Exception("SMS sağlayıcısı bağlanmadı.");
 
+/// <summary>Sağlayıcı bağlı ama gönderim olmadı (hesap, başlık, ağ). Sessizce "gönderildi" denmez.</summary>
+public sealed class SmsSendFailedException(string code) : Exception("SMS gönderilemedi: " + code)
+{
+    public string Code { get; } = code;
+}
+
 /// <summary>
 /// "Bugün" — ustanın günü, Türkiye saatiyle. Testte sabitlenir (prototipte
 /// BUGUN tek kaynaktı; aynı ders: tarih tek yerden gelir).

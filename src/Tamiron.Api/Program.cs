@@ -22,9 +22,12 @@ builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("Ta
 builder.Services.AddScoped<RequestContext>();
 builder.Services.AddScoped<ITenantContext>(sp => sp.GetRequiredService<RequestContext>());
 builder.Services.AddScoped<ICurrentSession>(sp => sp.GetRequiredService<RequestContext>());
-// SMS: geliştirmede günlüğe yazılır; başka her ortamda sağlayıcı bağlanana kadar
-// gönderim YAPILMAZ ve 503 döner (K-074.5 — sağlayıcı Cemil'in kararı, paralı).
+// SMS (K-076.7): geliştirmede HEP günlüğe yazılır — hesap tanımlı olsa bile para harcanmaz.
+// Başka ortamda Netgsm hesabı (ortam değişkeni) tamamsa Netgsm; değilse gönderim YAPILMAZ, 503.
+var netgsm = NetgsmOptions.From(builder.Configuration);
 if (builder.Environment.IsDevelopment()) builder.Services.AddSingleton<ISmsSender, DevLogSmsSender>();
+else if (netgsm is not null)
+    builder.Services.AddSingleton<ISmsSender>(_ => new NetgsmSmsSender(new HttpClient { Timeout = TimeSpan.FromSeconds(15) }, netgsm));
 else builder.Services.AddSingleton<ISmsSender, NotConfiguredSmsSender>();
 builder.Services.AddProblemDetails();
 // Okunamayan istek SESSİZ 400 yazmasın, istisna atsın: ErrorMiddleware onu Türkçe

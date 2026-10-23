@@ -26,7 +26,14 @@ public sealed class FakeSms : ISmsSender
 {
     public readonly ConcurrentQueue<(string Phone, string Text)> Queue = new();
     public IReadOnlyList<(string Phone, string Text)> Sent => Queue.ToList();
-    public Task SendAsync(string phone, string text, CancellationToken ct) { Queue.Enqueue((phone, text)); return Task.CompletedTask; }
+    /// <summary>Doluysa gönderim bu kodla BAŞARISIZ olur (sağlayıcı reddi, D7).</summary>
+    public string? FailWith;
+    public Task SendAsync(string phone, string text, CancellationToken ct)
+    {
+        if (FailWith is { } code) throw new SmsSendFailedException(code);
+        Queue.Enqueue((phone, text));
+        return Task.CompletedTask;
+    }
 }
 
 /// <summary>

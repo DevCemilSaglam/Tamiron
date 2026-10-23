@@ -73,6 +73,12 @@ public sealed class ErrorMiddleware(RequestDelegate next)
         {
             await Results.Problem(statusCode: 503, title: "SMS şu an gönderilemiyor. Dükkânın SMS hizmeti bağlanmadı.").ExecuteAsync(ctx);
         }
+        // D7 · Sağlayıcı reddetti ya da ulaşılamadı: ustaya "tekrar dene", ayrıntı kodda (destek için).
+        catch (SmsSendFailedException e)
+        {
+            await Results.Problem(statusCode: 503, title: "SMS şu an gönderilemedi. Birazdan tekrar dene.",
+                extensions: new Dictionary<string, object?> { ["code"] = e.Code }).ExecuteAsync(ctx);
+        }
         // C7 · Okunamayan istek (bozuk JSON, yanlış tür, bilinmeyen seçenek). ASP.NET varsayılanı
         // GÖVDESİZ 400 dönüyordu — istemci ustaya bir şey gösteremezdi (ölçüldü, 22.10).
         catch (BadHttpRequestException)

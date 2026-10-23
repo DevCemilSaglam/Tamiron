@@ -89,6 +89,27 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **Bedeli:** herkes kayıt kodu isteyebilir = SMS parası. Numara başına sınır (10 dk'da 3)
   var; IP başına sınır D10'da. Davetiye/onay kodu istenirse tek satırlık kapı.
 
+**76.7 · SMS sağlayıcısı: Netgsm (D7) — kod hazır, hesap Cemil'de.**
+- **Neden Netgsm:** araştırmada (SMS-VE-IYS.md) zaten aday; yerli, OTP ve İYS
+  entegrasyonu aynı hesapta, fiyatı piyasa aralığında. İleti Merkezi de olurdu — adaptör
+  `ISmsSender` arkasında, değiştirmek bir sınıf.
+- **Biçim belgeden:** Netgsm'in resmi PHP örneği (github.com/netgsm1/sms, SmsSend.php) —
+  `POST https://api.netgsm.com.tr/sms/send/xml`, yanıt `KOD bulkid`, `00/01/02` kabul.
+  Belge sayfası (netgsm.com.tr/dokuman) JavaScript'le çizildiği için okunamadı.
+- **Gerçek hesapla HİÇ koşturulmadı.** İlk gönderimden önce Netgsm panelindeki güncel
+  belgeyle bir kez karşılaştırılmalı (XML alanları, hata kodları).
+- **İYS süzgeci kapalı (`filter=0`):** bu yoldan yalnız giriş/kayıt kodu gidiyor — ticari
+  ileti değil. Toplu kampanya SMS'i bu yoldan GİTMEZ; o gün İYS'li ayrı yol konuşulur.
+- **Gizli bilgi depoya girmez:** üç ortam değişkeni (`Sms__Netgsm__UserCode`,
+  `Sms__Netgsm__Password`, `Sms__Netgsm__Header`). Biri eksikse hesap yok sayılır → 503.
+  Parola `ToString`'de yıldızlı (testli).
+- **Geliştirmede hesap tanımlı olsa bile SMS GİTMEZ**, günlüğe yazılır: yanlışlıkla para
+  harcanmasın.
+- **Sağlayıcı reddederse** usta "SMS şu an gönderilemedi. Birazdan tekrar dene." görür;
+  ayrıntı (`sms.provider_auth` / `_header` / `_rejected` / `_unreachable`) yanıtta, destek için.
+- **Cemil'in yapacağı:** Netgsm hesabı, gönderici adı onayı (belge ister), sunucuda üç
+  ortam değişkeni. Para burada başlar.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
