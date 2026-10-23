@@ -49,9 +49,9 @@ public class CustomerTests
         var a = V("34 A 1", "Ali"); var b = V("34 A 2", "Ali");
         var c = Assert.Single(Customers.From([a, b]));
         Assert.Null(c.ConsentAt);                                   // varsayılan YOK
-        c.SetConsent(true, new DateOnly(2026, 10, 22));
+        c.SetConsent(true, new DateOnly(2026, 10, 22), Guid.Empty);
         Assert.Equal((new DateOnly(2026, 10, 22), new DateOnly(2026, 10, 22)), (a.MarketingConsentAt, b.MarketingConsentAt));
-        c.SetConsent(false, new DateOnly(2026, 10, 23));
+        c.SetConsent(false, new DateOnly(2026, 10, 23), Guid.Empty);
         Assert.Null(a.MarketingConsentAt); Assert.Null(b.MarketingConsentAt);
     }
 
@@ -61,8 +61,8 @@ public class CustomerTests
         // İspat: izin verildiği GÜN. Zaten izni olana ikinci "evet" tarihi ezmez.
         var a = V("34 A 1", "Ali");
         var c = Assert.Single(Customers.From([a]));
-        c.SetConsent(true, new DateOnly(2026, 6, 14));
-        c.SetConsent(true, new DateOnly(2026, 10, 22));
+        c.SetConsent(true, new DateOnly(2026, 6, 14), Guid.Empty);
+        c.SetConsent(true, new DateOnly(2026, 10, 22), Guid.Empty);
         Assert.Equal(new DateOnly(2026, 6, 14), a.MarketingConsentAt);
     }
 }

@@ -285,6 +285,27 @@ ustada dükkânı kilitler (T-18).
 
 ---
 
+## 12 · `ConsentEvent` — Ticari ileti izninin izi (D5, 23.10)
+
+Akıştaki yeri: müşteri künyesindeki izin çipi (91-musteri) — ekran yok, iz arkada birikir.
+
+| Alan | Neden var |
+|---|---|
+| `VehicleId` | İzin müşterinin bütün araçlarına birlikte yazılır (K-071.3); iz **araç başına** — ispat numara başınadır |
+| `ActionId` | Aynı dokunuşla yazılan satırlar **tek eylem**; "geri al" eylemi bütün olarak geri alır |
+| `Granted` | Olaydan sonra izin var mı |
+| `PreviousDate` · `ConsentDate` | Olaydan önceki ve sonraki izin tarihi. **"Geri al" eski tarihi buradan alır** — istemciden değil (K-073.10 kapandı) |
+| `Phone` | İznin ait olduğu numara, **o anki hâliyle** — araçtaki telefon sonradan değişebilir |
+| `UserId` | Kim işaretledi |
+| `RecordedOn` | Ustanın günü. Geri alma yalnız aynı gün, yalnız son eylem, bir kez (prototipte balonun "Geri al"ı saniyeler sürer) |
+| `IsUndo` | Bu satır bir geri almadır — geri alma geri alınmaz |
+
+> **Yalnız eklenir.** İz ispat kaydıdır; düzeltme, silme yok. Değişmeyen araç (zaten
+> izni olana ikinci "evet") iz bırakmaz. **İznin NASIL alındığı** (sözlü/yazılı/SMS onayı)
+> alanı YOK: bugün tek yol "usta işaretledi"; İYS bağlanınca eklenir (K-071.3, K-076.5).
+
+---
+
 ## Model haritası
 
 ```
@@ -335,6 +356,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | `Csv.Cell` · `Csv.Document` · `ExportCashCsv` (bayt bayt eşit) | K-071.2 |
 | Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |
 | Mesaj önerisi: hangi şablon BU İŞE uygun (kayıt bazlı); metin = hitap + gövde + imza | `MESAJ_SABLONLARI.uygunKayit` · `mesajMetniUret` · `hazirMesajMetni` | `MessageTemplates.Applicable` · `Text` · `Name` | K-019.1 · A-M17 · K-076.4 |
+| İzin değişikliği izlenir; geri alma eski tarihi izden getirir (son eylem, aynı gün, bir kez) | `iletiIzniYaz` · `balonGeriAl` (91-musteri) | `Customer.SetConsent` · `UndoConsent` · `ConsentEvent` | K-071.3 · K-073.10 · K-076.5 |
 | Müşteri özeti: tek durum cümlesi, müşteri parçasında rakam yok, alış yok, yarım satır yok | `ozetGovdeHtml` | `CustomerSummary.StatusText` · `Amount` · `GetCustomerSummary` | K-023 · K-037 · K-076.3 |
 | KDV oranı satırda donar (yalnız yer) | — | `ServiceLine.FreezeVatRate` | C6 · KDV.md |
 

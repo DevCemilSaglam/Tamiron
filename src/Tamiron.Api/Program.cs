@@ -82,6 +82,9 @@ api.MapPost("/messages/bulk", (SendBulk cmd, ISender s, CancellationToken ct) =>
 api.MapGet("/customers", (string? q, ISender s, CancellationToken ct) => s.Send(new ListCustomers(q), ct));
 api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) => s.Send(new GetCustomer(key), ct));
 api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+// D5 · İzin geçmişi ve "geri al" (eski tarih izden gelir).
+api.MapPost("/customers/consent/undo", (UndoConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+api.MapGet("/customers/consent-history", (string key, ISender s, CancellationToken ct) => s.Send(new GetConsentHistory(key), ct));
 
 // Parçacılar (D1): ad + telefon; aynı numara iki kez olmaz; silme soft.
 // D3 · Müşteri özet linki: usta linki alır; müşteri OTURUMSUZ açar (K-023, K-076.3).

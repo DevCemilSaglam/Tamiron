@@ -65,6 +65,17 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **Linkli metin istenince kaydın özet kodu doğar** ve kaydedilir — öneri ekranındaki
   link ile müşterinin açtığı link aynı (testli).
 
+**76.5 · İzin geçmişi (D5) — K-073.10'u kapatır.**
+- Her izin değişikliği **araç başına bir iz** bırakır: önceki ve sonraki tarih, numara
+  (o anki), kim, gün. Yalnız eklenir.
+- **"Geri al" prototiple birebir:** kaldırılan izin ESKİ TARİHİYLE döner. Tarih izden
+  gelir; istemci tarih göndermez — K-073.10'daki sapma kapandı.
+- **Sınır:** yalnız son eylem, yalnız aynı gün, bir kez. Prototipte "Geri al" balonun
+  ömrü kadar (saniyeler); sınırsız geri alma ispatı oynatılabilir yapardı.
+- **"Kim":** kullanıcının adı, yoksa telefonu.
+- **"Nasıl alındı" alanı YOK** (sözlü/yazılı/SMS onayı). Bugün tek yol "usta işaretledi";
+  alan İYS bağlanınca anlam kazanır — *"ileride lazım olur"* gerekçe değil.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
@@ -214,6 +225,7 @@ aynı: JS `Math.round` gibi yukarı (testi var).
   izni olana ikinci "evet" eski tarihi korur.
 - **Doğru çözüm:** izin geçmişi tablosu (kim, ne zaman, nasıl; İYS ile
   birlikte, K-071.3). Kuyrukta `BEKLİYOR`.
+- **Kapandı (23.10, K-076.5):** izin izi tablosu geldi; geri alma eski tarihi izden getiriyor.
 
 **73.8 · İlk dilim bitti — ölçüm.**
 - Domain'de 22 test, LocalDB üzerinde API'de 5 test; hepsi yeşil.

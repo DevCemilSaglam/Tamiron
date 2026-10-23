@@ -52,6 +52,7 @@ public interface ITamironDb
     DbSet<Supplier> Suppliers { get; }
     DbSet<PriceRequest> PriceRequests { get; }
     DbSet<PriceReply> PriceReplies { get; }
+    DbSet<ConsentEvent> ConsentEvents { get; }
     // Giriş tabloları kiracı süzgecine TABİ DEĞİL (giriş öncesi aranır) — sorgu kiracıyı açıkça yazar.
     DbSet<User> Users { get; }
     DbSet<LoginCode> LoginCodes { get; }

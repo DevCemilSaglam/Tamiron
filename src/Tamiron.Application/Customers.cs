@@ -19,16 +19,27 @@ public sealed record GetCustomer(string Key) : IRequest<CustomerDetail>;
 
 /// <summary>
 /// İzni ver / kaldır. Gün SUNUCUDAN; istemci tarih göndermez (izin tarihi ispattır).
-/// ⚠️ Prototipten sapma (K-073.10): prototipte "geri al" kaldırılan izni ESKİ tarihiyle
-/// geri getiriyordu. Bunu API'de yapmak eski tarihi istemciden kabul etmek demek —
-/// ispatı istemciye bırakmak. Doğru çözüm izin geçmişi (log) tablosu: BEKLİYOR.
+/// Her değişiklik izine yazılır (D5).
 /// </summary>
 public sealed record SetConsent(string Key, bool Granted) : IRequest<CustomerDetail>;
 
-internal sealed class CustomerHandlers(ITamironDb db, IClock clock) :
+/// <summary>
+/// "Geri al" — prototip gibi kaldırılan izin ESKİ TARİHİYLE döner; tarih izden gelir,
+/// istemciden değil (D5 · K-073.10'u kapatır).
+/// </summary>
+public sealed record UndoConsent(string Key) : IRequest<CustomerDetail>;
+
+public sealed record ConsentEventDto(DateTime At, string PlateNo, string Phone, bool Granted,
+                                     DateOnly? PreviousDate, DateOnly? ConsentDate, bool IsUndo, string? By);
+/// <summary>İzin geçmişi — en yeni üstte. "Bu numaraya ne zaman izin verildi" sorusunun ispatı.</summary>
+public sealed record GetConsentHistory(string Key) : IRequest<List<ConsentEventDto>>;
+
+internal sealed class CustomerHandlers(ITamironDb db, IClock clock, ICurrentSession session) :
     IRequestHandler<ListCustomers, CustomerList>,
     IRequestHandler<GetCustomer, CustomerDetail>,
-    IRequestHandler<SetConsent, CustomerDetail>
+    IRequestHandler<SetConsent, CustomerDetail>,
+    IRequestHandler<UndoConsent, CustomerDetail>,
+    IRequestHandler<GetConsentHistory, List<ConsentEventDto>>
 {
     private async Task<(List<Customer> all, HashSet<Guid> inShop)> Load(bool tracking, CancellationToken ct)
     {
@@ -69,8 +80,37 @@ internal sealed class CustomerHandlers(ITamironDb db, IClock clock) :
     {
         var (all, inShop) = await Load(true, ct);
         var cust = all.FirstOrDefault(x => x.Key == c.Key) ?? throw new NotFoundException("Müşteri");
-        cust.SetConsent(c.Granted, clock.Today);
+        db.ConsentEvents.AddRange(cust.SetConsent(c.Granted, clock.Today, session.UserId));
         await db.SaveChangesAsync(ct);
         return Detail(cust, inShop);
+    }
+
+    public async Task<CustomerDetail> Handle(UndoConsent c, CancellationToken ct)
+    {
+        var (all, inShop) = await Load(true, ct);
+        var cust = all.FirstOrDefault(x => x.Key == c.Key) ?? throw new NotFoundException("Müşteri");
+        db.ConsentEvents.AddRange(cust.UndoConsent(await History(cust, ct), clock.Today, session.UserId));
+        await db.SaveChangesAsync(ct);
+        return Detail(cust, inShop);
+    }
+
+    public async Task<List<ConsentEventDto>> Handle(GetConsentHistory q, CancellationToken ct)
+    {
+        var (all, _) = await Load(false, ct);
+        var cust = all.FirstOrDefault(x => x.Key == q.Key) ?? throw new NotFoundException("Müşteri");
+        var plates = cust.Vehicles.ToDictionary(v => v.Id, v => v.PlateNo);
+        var events = await History(cust, ct);
+        var userIds = events.Select(e => e.UserId).Distinct().ToList();
+        var names = await db.Users.AsNoTracking().Where(u => userIds.Contains(u.Id)).ToDictionaryAsync(u => u.Id, u => u.Name ?? u.Phone, ct);   // adı yazılmamışsa telefonu
+        return events.AsEnumerable().Reverse().Select(e => new ConsentEventDto(e.DateTimeCreated, plates[e.VehicleId], e.Phone,
+            e.Granted, e.PreviousDate, e.ConsentDate, e.IsUndo, names.GetValueOrDefault(e.UserId))).ToList();
+    }
+
+    /// <summary>Müşterinin araçlarının izleri, eskiden yeniye (aynı anda yazılanlar eklenme sırasıyla).</summary>
+    private async Task<List<ConsentEvent>> History(Customer cust, CancellationToken ct)
+    {
+        var ids = cust.Vehicles.Select(v => v.Id).ToList();
+        return await db.ConsentEvents.AsNoTracking().Where(e => ids.Contains(e.VehicleId))
+            .OrderBy(e => e.DateTimeCreated).ToListAsync(ct);
     }
 }

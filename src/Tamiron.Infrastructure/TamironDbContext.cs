@@ -22,6 +22,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<PriceRequest> PriceRequests => Set<PriceRequest>();
     public DbSet<PriceReply> PriceReplies => Set<PriceReply>();
+    public DbSet<ConsentEvent> ConsentEvents => Set<ConsentEvent>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LoginCode> LoginCodes => Set<LoginCode>();
     public DbSet<Session> Sessions => Set<Session>();
@@ -107,6 +108,15 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
         });
 
         ConfigurePriceRequest(b);
+
+        // D5 · İzin izi: yalnız eklenir. Araç silinse de iz kalır (ispat).
+        Tenant(b.Entity<ConsentEvent>());
+        b.Entity<ConsentEvent>(e =>
+        {
+            e.Property(x => x.Phone).HasMaxLength(30);
+            e.HasIndex(x => new { x.VehicleId, x.DateTimeCreated });
+            e.HasOne<Vehicle>().WithMany().HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
+        });
 
         Tenant(b.Entity<Message>());
         b.Entity<Message>(e =>

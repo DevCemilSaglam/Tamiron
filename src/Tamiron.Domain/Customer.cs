@@ -28,11 +28,43 @@ public sealed class Customer
     /// İzin bütün araçlara BİRLİKTE yazılır. Tarih ispattır: zaten izni olana ikinci
     /// "evet" eski tarihi EZMEZ; kaldırınca hepsi boşalır (K-071.3).
     /// </summary>
-    public void SetConsent(bool granted, DateOnly today)
+    /// <returns>Değişen her araç için bir iz (D5). Değişmeyen araç iz bırakmaz.</returns>
+    public IReadOnlyList<ConsentEvent> SetConsent(bool granted, DateOnly today, Guid userId)
     {
         var existing = ConsentAt;
+        var action = Guid.NewGuid();
+        var log = new List<ConsentEvent>();
         foreach (var v in Vehicles)
+        {
+            var before = v.MarketingConsentAt;
             v.MarketingConsentAt = granted ? existing ?? today : null;
+            if (before != v.MarketingConsentAt)
+                log.Add(ConsentEvent.Of(v, action, before, today, userId, isUndo: false));
+        }
+        return log;
+    }
+
+    /// <summary>
+    /// "Geri al" (prototip balonGeriAl): SON eylem, aynı gün, bir kez. Her araç eylemden
+    /// önceki tarihine döner — tarih İZDEN gelir, istemciden değil (K-073.10'u kapatır).
+    /// <paramref name="history"/>: bu müşterinin araçlarının izleri, eskiden yeniye.
+    /// </summary>
+    public IReadOnlyList<ConsentEvent> UndoConsent(IReadOnlyList<ConsentEvent> history, DateOnly today, Guid userId)
+    {
+        var last = history.Count > 0 ? history[^1] : null;
+        if (last is null || last.IsUndo || last.RecordedOn != today)
+            throw new DomainException("consent.nothing_to_undo", "Geri alınacak bir izin değişikliği yok.");
+        var action = Guid.NewGuid();
+        var log = new List<ConsentEvent>();
+        foreach (var e in history.Where(x => x.ActionId == last.ActionId))
+        {
+            var v = Vehicles.FirstOrDefault(x => x.Id == e.VehicleId);
+            if (v is null) continue;   // araç bu müşteriden çıkmış (ad/telefon değişti): ona dokunulmaz
+            var before = v.MarketingConsentAt;
+            v.MarketingConsentAt = e.PreviousDate;
+            log.Add(ConsentEvent.Of(v, action, before, today, userId, isUndo: true));
+        }
+        return log;
     }
 }
 
