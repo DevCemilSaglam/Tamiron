@@ -23,7 +23,7 @@ public sealed class RequestContext : ITenantContext, ICurrentSession
 /// </summary>
 public sealed class SessionMiddleware(RequestDelegate next)
 {
-    private static readonly PathString[] Open = ["/api/auth/code", "/api/auth/verify"];
+    private static readonly PathString[] Open = ["/api/auth/code", "/api/auth/verify", "/api/auth/signup/code", "/api/auth/signup"];
 
     public async Task InvokeAsync(HttpContext ctx, RequestContext rc, TamironDbContext db, IClock clock)
     {

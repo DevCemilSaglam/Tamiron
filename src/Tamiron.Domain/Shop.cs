@@ -10,6 +10,17 @@ public class Shop : Entity
     /// <summary>Kimliği belli dükkân (kiracı kimliği o olacağı için dışarıdan verilebilir).</summary>
     public Shop(Guid id) { Id = id; }
 
+    /// <summary>
+    /// Kendi kendine kayıt (D6): ad zorunlu, telefon ustanın numarası — mesaj imzası ilk
+    /// günden doğru çıksın (sonra ayarlardan değişir). Gerisi varsayılan.
+    /// </summary>
+    public static Shop Register(string? name, string phone)
+    {
+        name = (name ?? "").Trim();
+        if (name.Length == 0) throw new DomainException("shop.name_required", "Dükkânının adını yaz — mesajların altında bu ad görünür.");
+        return new Shop { Name = name, Phone = phone };
+    }
+
     public string Name { get; set; } = "";
     public string? Address { get; set; }
     public string? Phone { get; set; }

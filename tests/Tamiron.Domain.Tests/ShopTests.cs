@@ -29,4 +29,12 @@ public class ShopTests
         s.MarkPrivacyNoticeShown(t.AddDays(1));
         Assert.Equal(t, s.PrivacyNoticeShownAt);
     }
+
+    [Fact]
+    public void Register_trims_name_and_needs_one()
+    {
+        var s = Shop.Register("  Yıldız Oto ", "0544 123 00 01");
+        Assert.Equal(("Yıldız Oto", "0544 123 00 01", 6), (s.Name, s.Phone, s.DefaultMaintenanceMonths));
+        Assert.Equal("shop.name_required", Assert.Throws<DomainException>(() => Shop.Register("  ", "0544 123 00 01")).Code);
+    }
 }

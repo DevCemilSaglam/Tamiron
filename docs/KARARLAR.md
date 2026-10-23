@@ -76,6 +76,19 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **"Nasıl alındı" alanı YOK** (sözlü/yazılı/SMS onayı). Bugün tek yol "usta işaretledi";
   alan İYS bağlanınca anlam kazanır — *"ileride lazım olur"* gerekçe değil.
 
+**76.6 · Yeni dükkân kaydı (D6) — K-074.5'in yarısını kapatır.**
+- **Kendi kendine kayıt, iki adım:** numara → SMS kodu → kod + dükkân adı. Dükkân, ilk
+  kullanıcı ve süresiz oturum tek işlemde doğar; usta kayıt biter bitmez içeridedir.
+  Ayrı "kayıt ekranı + giriş ekranı" yok: girişin aynı iki adımı, artı bir ad kutusu.
+- **Sorulan tek şey dükkânın adı** (mesaj imzası). Adres, vergi no, yetkili adı sorulmaz;
+  ustanın adı isteğe bağlı. Dükkân telefonu = ustanın numarası (imza ilk günden doğru),
+  ayarlardan değişir.
+- **Kayıtlı numara kayıt olamaz** ("giriş yap" denir); kayıtsız numaraya giriş kodu
+  gitmez (değişmedi). Bir numara bir dükkânda — çalışan ekleme yok (tamirci istemedi).
+- **Eksik ad deneme hakkı yakmaz:** ad koddan önce denetlenir.
+- **Bedeli:** herkes kayıt kodu isteyebilir = SMS parası. Numara başına sınır (10 dk'da 3)
+  var; IP başına sınır D10'da. Davetiye/onay kodu istenirse tek satırlık kapı.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
@@ -159,7 +172,7 @@ okuyabilmesi demekti.
   bağlanmadıkça kod gönderimi 503 döner; sessizce "gönderildi" denmez.
 - **Yeni dükkânın kaydı.** Şimdilik yalnız kayıtlı telefon girebilir. Kayıt
   dışı numaraya "Bu numarayla kayıtlı dükkân yok." denir. Ürün akışı
-  kararlaşmadı.
+  kararlaşmadı. **→ Kapandı (23.10, K-076.6): kendi kendine kayıt.**
 
 ---
 

@@ -51,6 +51,13 @@ api.MapPost("/auth/code", async (RequestLoginCode cmd, ISender s, CancellationTo
     return Results.Accepted();
 });
 api.MapPost("/auth/verify", (VerifyLoginCode cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+// D6 · Yeni dükkân: kayıtlı olmayan numaraya kod → kod + dükkân adı → oturum (K-076.6).
+api.MapPost("/auth/signup/code", async (RequestSignupCode cmd, ISender s, CancellationToken ct) =>
+{
+    await s.Send(cmd, ct);
+    return Results.Accepted();
+});
+api.MapPost("/auth/signup", (SignUp cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 api.MapPost("/auth/logout", async (ISender s, CancellationToken ct) => { await s.Send(new Logout(), ct); return Results.NoContent(); });
 api.MapPost("/auth/logout-all", async (ISender s, CancellationToken ct) => { await s.Send(new LogoutAll(), ct); return Results.NoContent(); });
 api.MapGet("/auth/sessions", (ISender s, CancellationToken ct) => s.Send(new ListSessions(), ct));
