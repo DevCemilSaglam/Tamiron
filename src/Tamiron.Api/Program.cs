@@ -78,6 +78,18 @@ api.MapGet("/customers", (string? q, ISender s, CancellationToken ct) => s.Send(
 api.MapGet("/customers/detail", (string key, ISender s, CancellationToken ct) => s.Send(new GetCustomer(key), ct));
 api.MapPut("/customers/consent", (SetConsent cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
+// Parçacılar (D1): ad + telefon; aynı numara iki kez olmaz; silme soft.
+api.MapGet("/suppliers", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Suppliers.ListSuppliers(), ct));
+api.MapPost("/suppliers", (Tamiron.Application.Suppliers.SupplierBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Suppliers.AddSupplier(b), ct));
+api.MapPut("/suppliers/{id:guid}", (Guid id, Tamiron.Application.Suppliers.SupplierBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Suppliers.UpdateSupplier(id, b), ct));
+api.MapDelete("/suppliers/{id:guid}", async (Guid id, ISender s, CancellationToken ct) =>
+{
+    await s.Send(new Tamiron.Application.Suppliers.DeleteSupplier(id), ct);
+    return Results.NoContent();
+});
+
 // Dükkân ayarları (C5): bakım periyodu (3·6·12 ay) ve alış sorusu; gizlilik notu bir kez.
 api.MapGet("/shop", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Shops.GetShopSettings(), ct));
 api.MapPatch("/shop", (Tamiron.Application.Shops.PatchShopSettings cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));

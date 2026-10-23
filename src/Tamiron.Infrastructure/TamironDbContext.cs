@@ -19,6 +19,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
+    public DbSet<Supplier> Suppliers => Set<Supplier>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LoginCode> LoginCodes => Set<LoginCode>();
     public DbSet<Session> Sessions => Set<Session>();
@@ -89,6 +90,15 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
 
         ConfigureExpense(b);
         ConfigureLogin(b);
+
+        Tenant(b.Entity<Supplier>());
+        b.Entity<Supplier>(e =>
+        {
+            e.Property(x => x.Name).HasMaxLength(200);
+            e.Property(x => x.Phone).HasMaxLength(20);
+            // Dükkân içinde numara tekil — silinen parçacı numarayı kilitlemez.
+            e.HasIndex(x => new { x.TenantId, x.Phone }).IsUnique().HasFilter("[DateTimeDeleted] IS NULL");
+        });
 
         Tenant(b.Entity<Message>());
         b.Entity<Message>(e =>

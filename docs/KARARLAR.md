@@ -10,6 +10,23 @@
 
 ---
 
+## K-076 · Tur D'nin lider kararları — HEPSİ Cemil onayına açık (23.10.2026)
+
+**Cemil, 23.10:** *"Karar verilmesi gerekenler için en iyi, tercih ettiğin kararı
+verebilirsin. … Sonrasında detaylı bir inceleme yapacağız."* Aşağıdaki her madde bir
+lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İnceleme rehberi
+(D12) hepsini tek listede toplar.
+
+**76.1 · Parçacı ekle/düzenle/sil (D1).**
+- Prototipte liste sabitti, ama tamircinin sözü açık: *"Yerel parçacının tel belli.
+  Bunları eklememiz gerekecek."*
+- Ad ve telefon zorunlu. Telefon zorunlu, çünkü soru WhatsApp'la gidiyor (T-12b).
+- Aynı dükkânda bir numara tek parçacıda olur: iki ada aynı numara, sorunun kime
+  gittiğini karıştırır. Başka dükkânda aynı numara serbest.
+- Silme soft: geçmiş sorular kime gittiğini kaybetmesin.
+
+---
+
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)
 
 **Cemil:** *"Bunlar beklesin. Muhasebeyi bitir. Yine kendine bir loop oluştur.

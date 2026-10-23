@@ -49,6 +49,7 @@ public interface ITamironDb
     DbSet<ServiceLine> ServiceLines { get; }
     DbSet<Expense> Expenses { get; }
     DbSet<Message> Messages { get; }
+    DbSet<Supplier> Suppliers { get; }
     // Giriş tabloları kiracı süzgecine TABİ DEĞİL (giriş öncesi aranır) — sorgu kiracıyı açıkça yazar.
     DbSet<User> Users { get; }
     DbSet<LoginCode> LoginCodes { get; }
