@@ -47,39 +47,7 @@
    "baglam": "genel",
    "islem": {
     "arac": "35 KLM 45",
-    "kayit": {
-     "acilis": "01.09.2026",
-     "bekliyorMusteriye": false,
-     "hatirlatmaGonderildi": false,
-     "hatirlatmaTarihi": null,
-     "id": 3,
-     "km": "",
-     "odemeYolu": null,
-     "parcaBekliyor": false,
-     "plaka": "35 KLM 45",
-     "satirlar": [
-      {
-       "tip": "parca",
-       "ad": "Ön fren balatası",
-       "fiyat": 0,
-       "alis": null,
-       "kimGetirdi": "musteri",
-       "marka": "",
-       "kod": "",
-       "tanim": "tanimlanamadi"
-      },
-      {
-       "tip": "iscilik",
-       "ad": "Balata değişimi",
-       "fiyat": 800,
-       "alis": null,
-       "kimGetirdi": ""
-      }
-     ],
-     "sikayet": "Ön balata değişimi",
-     "teslimTarihi": null,
-     "tur": "tamirat"
-    },
+    "kayit": 3,
     "odeme": "nakit",
     "plaka": "35 KLM 45",
     "tur": "teslim"
@@ -91,39 +59,7 @@
    "baglam": "genel",
    "islem": {
     "arac": "35 KLM 45",
-    "kayit": {
-     "acilis": "01.09.2026",
-     "bekliyorMusteriye": false,
-     "hatirlatmaGonderildi": false,
-     "hatirlatmaTarihi": null,
-     "id": 3,
-     "km": "",
-     "odemeYolu": null,
-     "parcaBekliyor": false,
-     "plaka": "35 KLM 45",
-     "satirlar": [
-      {
-       "tip": "parca",
-       "ad": "Ön fren balatası",
-       "fiyat": 0,
-       "alis": null,
-       "kimGetirdi": "musteri",
-       "marka": "",
-       "kod": "",
-       "tanim": "tanimlanamadi"
-      },
-      {
-       "tip": "iscilik",
-       "ad": "Balata değişimi",
-       "fiyat": 800,
-       "alis": null,
-       "kimGetirdi": ""
-      }
-     ],
-     "sikayet": "Ön balata değişimi",
-     "teslimTarihi": null,
-     "tur": "tamirat"
-    },
+    "kayit": 3,
     "odeme": null,
     "plaka": "35 KLM 45",
     "tur": "teslim"
@@ -269,35 +205,7 @@
    "baglam": "kayit-icinde",
    "islem": {
     "arac": "34 ABC 123",
-    "kayit": {
-     "acilis": "03.09.2026",
-     "bekliyorMusteriye": true,
-     "bekliyorTarihi": "03.09.2026",
-     "hatirlatmaGonderildi": false,
-     "hatirlatmaTarihi": null,
-     "id": 1,
-     "km": "",
-     "odemeYolu": null,
-     "parcaBekliyor": true,
-     "plaka": "34 ABC 123",
-     "satirlar": [
-      {
-       "tip": "parca",
-       "ad": "Triger seti",
-       "fiyat": 0,
-       "alis": null,
-       "kimGetirdi": "tamirci",
-       "marka": "",
-       "kod": "",
-       "tanim": "tanimlanamadi",
-       "sorulan": null
-      }
-     ],
-     "sikayet": "Triger seti değişecek",
-     "teslimTarihi": null,
-     "tur": "tamirat",
-     "turElle": false
-    },
+    "kayit": 1,
     "odeme": "kart",
     "plaka": "34 ABC 123",
     "tur": "teslim"
@@ -879,35 +787,7 @@
    "baglam": "kayit-icinde",
    "islem": {
     "arac": "34 ABC 123",
-    "kayit": {
-     "acilis": "03.09.2026",
-     "bekliyorMusteriye": true,
-     "bekliyorTarihi": "03.09.2026",
-     "hatirlatmaGonderildi": false,
-     "hatirlatmaTarihi": null,
-     "id": 1,
-     "km": "",
-     "odemeYolu": null,
-     "parcaBekliyor": true,
-     "plaka": "34 ABC 123",
-     "satirlar": [
-      {
-       "tip": "parca",
-       "ad": "Triger seti",
-       "fiyat": 0,
-       "alis": null,
-       "kimGetirdi": "tamirci",
-       "marka": "",
-       "kod": "",
-       "tanim": "tanimlanamadi",
-       "sorulan": null
-      }
-     ],
-     "sikayet": "Triger seti değişecek",
-     "teslimTarihi": null,
-     "tur": "tamirat",
-     "turElle": false
-    },
+    "kayit": 1,
     "odeme": "nakit",
     "plaka": "34 ABC 123",
     "tur": "teslim"
@@ -985,35 +865,7 @@
    "baglam": "kayit-icinde",
    "islem": {
     "arac": "34 ABC 123",
-    "kayit": {
-     "acilis": "03.09.2026",
-     "bekliyorMusteriye": true,
-     "bekliyorTarihi": "03.09.2026",
-     "hatirlatmaGonderildi": false,
-     "hatirlatmaTarihi": null,
-     "id": 1,
-     "km": "",
-     "odemeYolu": null,
-     "parcaBekliyor": true,
-     "plaka": "34 ABC 123",
-     "satirlar": [
-      {
-       "tip": "parca",
-       "ad": "Triger seti",
-       "fiyat": 0,
-       "alis": null,
-       "kimGetirdi": "tamirci",
-       "marka": "",
-       "kod": "",
-       "tanim": "tanimlanamadi",
-       "sorulan": null
-      }
-     ],
-     "sikayet": "Triger seti değişecek",
-     "teslimTarihi": null,
-     "tur": "tamirat",
-     "turElle": false
-    },
+    "kayit": 1,
     "odeme": "kart",
     "plaka": "34 ABC 123",
     "tur": "teslim"
@@ -2242,35 +2094,7 @@
    "baglam": "kayit-icinde",
    "islem": {
     "arac": "34 ABC 123",
-    "kayit": {
-     "acilis": "03.09.2026",
-     "bekliyorMusteriye": true,
-     "bekliyorTarihi": "03.09.2026",
-     "hatirlatmaGonderildi": false,
-     "hatirlatmaTarihi": null,
-     "id": 1,
-     "km": "",
-     "odemeYolu": null,
-     "parcaBekliyor": true,
-     "plaka": "34 ABC 123",
-     "satirlar": [
-      {
-       "tip": "parca",
-       "ad": "Triger seti",
-       "fiyat": 0,
-       "alis": null,
-       "kimGetirdi": "tamirci",
-       "marka": "",
-       "kod": "",
-       "tanim": "tanimlanamadi",
-       "sorulan": null
-      }
-     ],
-     "sikayet": "Triger seti değişecek",
-     "teslimTarihi": null,
-     "tur": "tamirat",
-     "turElle": false
-    },
+    "kayit": 1,
     "odeme": null,
     "plaka": "34 ABC 123",
     "tur": "teslim"
@@ -3181,6 +3005,4925 @@
    "islem": {
     "ad": "Parça",
     "fiyat": 500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "genel",
+   "islem": {
+    "metin": "triger seti 4500 lira olsun",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "triger seti 4500 lira olsun",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "triger seti 4500 lira olsun",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "triger seti 4500 lira olsun",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "triger seti 4500 lira olsun",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "triger seti 4500 lira olsun",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "muhasebe",
+   "islem": {
+    "aciklama": "triger seti olsun",
+    "tur": "gider-ekle",
+    "tutar": 4500
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti 4500 lira olsun",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "fiyat": 4500,
+    "indeks": 0,
+    "kayit": 1,
+    "satir": "Triger seti",
+    "tur": "fiyat-guncelle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "genel",
+   "islem": {
+    "metin": "triger 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "triger 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "triger 4500",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "triger 4500",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "triger 4500",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "triger 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "triger 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger 4500",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "fiyat": 4500,
+    "indeks": 0,
+    "kayit": 1,
+    "satir": "Triger seti",
+    "tur": "fiyat-guncelle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "genel",
+   "islem": {
+    "metin": "Driver seti 4500 lira",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "Driver seti 4500 lira",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Driver seti 4500 lira",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Driver seti 4500 lira",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Driver seti 4500 lira",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "Driver seti 4500 lira",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "muhasebe",
+   "islem": {
+    "aciklama": "Driver seti",
+    "tur": "gider-ekle",
+    "tutar": 4500
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Driver seti 4500 lira",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "fiyat": 4500,
+    "indeks": 0,
+    "kayit": 1,
+    "satir": "Triger seti",
+    "tur": "fiyat-guncelle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "genel",
+   "islem": {
+    "metin": "triger seti fiyati 4500 yap",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "triger seti fiyati 4500 yap",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "triger seti fiyati 4500 yap",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "triger seti fiyati 4500 yap",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "triger seti fiyati 4500 yap",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "triger seti fiyati 4500 yap",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "triger seti fiyati 4500 yap",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "triger seti fiyati 4500 yap",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "triger seti 4500",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 teslim ettim nakit",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 teslim ettim nakit",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 teslim ettim nakit",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 teslim ettim nakit",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "genel",
+   "islem": {
+    "arac": "16 SY 8890",
+    "plaka": "16 SY 8890",
+    "tur": "teslim-edilecek-kayit-yok"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "16 SY 8890",
+    "plaka": "16 SY 8890",
+    "tur": "teslim-edilecek-kayit-yok"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "16 SY 8890 teslim ettim",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "16 SY 8890 teslim ettim",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "16 SY 8890 teslim ettim",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "16 SY 8890",
+    "plaka": "16 SY 8890",
+    "tur": "teslim-edilecek-kayit-yok"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "16 SY 8890",
+    "plaka": "16 SY 8890",
+    "tur": "teslim-edilecek-kayit-yok"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teslim ettim",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": null,
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 2,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 2,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "06 TMR 07 teslim ettim kk ile",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "06 TMR 07 teslim ettim kk ile",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "06 TMR 07 teslim ettim kk ile",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 2,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 2,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim ettim kk ile",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "kart",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "genel",
+   "islem": {
+    "metin": "teslim ettim eft yaptı",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "teslim ettim eft yaptı",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "teslim ettim eft yaptı",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "teslim ettim eft yaptı",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "teslim ettim eft yaptı",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "teslim ettim eft yaptı",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "teslim ettim eft yaptı",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "teslim ettim eft yaptı",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "havale",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "genel",
+   "islem": {
+    "metin": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "99 ZZZ 999 sahibine mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "99 ZZZ 999 sahibine mesaj gönder",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "99 ZZZ 999 sahibine mesaj gönder",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "genel",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "servis-ekle",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "araclar",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "kayitlar",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "musteriler",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "mesaj",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "muhasebe",
+   "islem": {
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 08 sahibine selam yaz",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "06 TMR 08 sahibine selam",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "oneri": null,
+    "plaka": "06 TMR 08",
+    "tur": "bilinmeyen-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine hazır mesajı gönder",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 sahibine hazır mesajı gönder",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) hazır, teslim alabilirsiniz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "hazir",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 sahibine bekliyor mesajı sms ile",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "sms",
+    "plaka": "06 TMR 07",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "genel",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "35 KLM 45",
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 KLM 45 hatırlatma mesajı gönder",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "35 KLM 45",
+    "baskaIslem": {
+     "ad": "35 KLM 45 hatırlatma mesajı gönder",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Ayşe Kaya Bey/Hanım, Peugeot 301 (35 KLM 45) için bakım zamanı geldi. Uygun olduğunuzda bekleriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "35 KLM 45",
+    "sablon": "hatirlatma",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibine bayram mesajı",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 sahibine bayram mesajı",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Mehmet Kaya Bey/Hanım, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bayram",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "genel",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "16 SY 8890",
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 8890 teşekkür mesajı yaz",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "16 SY 8890",
+    "baskaIslem": {
+     "ad": "16 SY 8890 teşekkür mesajı",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Selim Aydın Bey/Hanım, Bizi tercih ettiğiniz için teşekkür ederiz. İyi günlerde kullanın.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "16 SY 8890",
+    "sablon": "tesekkur",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "sahibinden parça aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "sahibinden parça aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "sahibinden parça aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "sahibinden parça aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden parça aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 sahibinden aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "sahibinden parça aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 sahibinden bekliyor mesajı",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 sahibinden bekliyor mesajı",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Mehmet Kaya Bey/Hanım, Renault Mégane (34 ABC 123) için parça bekliyoruz. Parça gelir gelmez işe başlayıp size haber vereceğiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "34 ABC 123",
+    "sablon": "bekliyor",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "govde": "Hasan Demir Bey/Hanım, Fiat Egea (06 TMR 07) teslim edildi.\nToplam: 3.450 ₺\nAyrıntılı özet: tamiron.app/o/06tmr07-8\n\nBizi tercih ettiğiniz için teşekkür ederiz.\n\nAhmet Usta Oto Servis\n0532 000 00 00",
+    "kanal": "whatsapp",
+    "plaka": "06 TMR 07",
+    "sablon": "teslim",
+    "tur": "mesaj-gonder"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 teslim mesajı gönder",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": null,
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "genel",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "servis-ekle",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "araclar",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "kayitlar",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "musteriler",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "mesaj",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "muhasebe",
+   "islem": {
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bütün müşterilere bayram mesajı gönder",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "bütün müşterilere bayram mesajı gönder",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.",
+    "kanal": "whatsapp",
+    "metinTuru": "bayram",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "genel",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "servis-ekle",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "araclar",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "kayitlar",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "musteriler",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "mesaj",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "muhasebe",
+   "islem": {
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "herkese yarın kapalıyız yaz",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "herkese yarın kapalıyız",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "govde": "yarın kapalıyız",
+    "kanal": "whatsapp",
+    "metinTuru": "serbest",
+    "tur": "toplu-mesaj"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "genel",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "araclar",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "kayitlar",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "musteriler",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "tüm müşterilere mesaj gönder",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "tüm müşterilere mesaj gönder",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "tüm müşterilere mesaj gönder",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "genel",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "servis-ekle",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "mesaj",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "muhasebe",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya ara",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "Mehmet Kaya ara",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "06 TMR 07",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "06 TMR 07",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "06 TMR 07",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "genel",
+   "islem": {
+    "metin": "serviste ne var",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "serviste ne var",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "kayitlar",
+    "suzgec": "serviste",
+    "terim": "",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "suzgec": "serviste",
+    "terim": "",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "kayitlar",
+    "suzgec": "serviste",
+    "terim": "",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "serviste ne var",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "serviste ne var",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "serviste ne var",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "serviste ne var",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "genel",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "servis-ekle",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "mesaj",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "muhasebe",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Renault ara",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "Renault ara",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "hedef": "araclar",
+    "terim": "Renault",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "genel",
+   "islem": {
+    "metin": "içerideki araçlar",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "içerideki araçlar",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "kayitlar",
+    "suzgec": "serviste",
+    "terim": "",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "suzgec": "serviste",
+    "terim": "",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "kayitlar",
+    "suzgec": "serviste",
+    "terim": "",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "içerideki araçlar",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "içerideki araçlar",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "içerideki araçlar",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "içerideki araçlar",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "genel",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "servis-ekle",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "araclar",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "kayitlar",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "musteriler",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "mesaj",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "muhasebe",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "elektrik faturası 2.400",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "aciklama": "elektrik faturası",
+    "baskaIslem": {
+     "ad": "elektrik faturası",
+     "fiyat": 2400,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "genel",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "servis-ekle",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "araclar",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "kayitlar",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "musteriler",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "mesaj",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "muhasebe",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu yıl ne kadar kasa",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "bu yıl ne kadar kasa",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "genel",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "servis-ekle",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "araclar",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "kayitlar",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "musteriler",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "mesaj",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "muhasebe",
+   "islem": {
+    "aciklama": "kira",
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira 15000",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "aciklama": "kira",
+    "baskaIslem": {
+     "ad": "kira",
+     "fiyat": 15000,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "tur": "gider-ekle",
+    "tutar": 15000
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "genel",
+   "islem": {
+    "metin": "bu ay 3 fatura geldi",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "bu ay 3 fatura geldi",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "bu ay 3 fatura geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "bu ay 3 fatura geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "bu ay 3 fatura geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "bu ay 3 fatura geldi",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "bu ay 3 fatura geldi",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "bu ay 3 fatura geldi",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "bu ay 3 fatura geldi",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "genel",
+   "islem": {
+    "metin": "kira gideri 0532 111 22 33",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "kira gideri 0532 111 22 33",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "kira gideri 0532 111 22 33",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "kira gideri 0532 111 22 33",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "kira gideri 0532 111 22 33",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "kira gideri 0532 111 22 33",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "kira gideri 0532 111 22 33",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kira gideri 0532 111 22 33",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "kira gideri 0532 111 22 33",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "genel",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "servis-ekle",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "araclar",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "kayitlar",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "musteriler",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "mesaj",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "muhasebe",
+   "islem": {
+    "aciklama": "su faturası",
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "su faturası 2 bin 400",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "aciklama": "su faturası",
+    "baskaIslem": {
+     "ad": "su faturası",
+     "fiyat": 2400,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "tur": "gider-ekle",
+    "tutar": 2400
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "genel",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "servis-ekle",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "araclar",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "kayitlar",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "musteriler",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "mesaj",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "muhasebe",
+   "islem": {
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "kasada ne var",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "kasada ne var",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "donem": "bugun",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "genel",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "servis-ekle",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "araclar",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "kayitlar",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "musteriler",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "mesaj",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "muhasebe",
+   "islem": {
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "ne kadar tahsil ettim bu sene",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "ne kadar tahsil ettim bu sene",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "donem": "yil",
+    "tur": "tahsilat-sor"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "geldi yağ değişimi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "geldi yağ değişimi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "Mehmet Kaya'nın arabası geldi yağ değişimi",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "triger seti değişecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "triger seti değişecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mégane'ın triger seti değişecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Mégane'ın triger seti değişecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mégane'ın triger seti değişecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "Mégane'ın triger seti değişecek",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "Mégane'ın triger seti değişecek",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Mégane'ın triger seti değişecek",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "Mégane'ın triger seti değişecek",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Fiat Egea balata",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Fiat Egea balata",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Fiat Egea balata",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "Fiat Egea balata",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "Fiat Egea balata",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "Fiat Egea balata",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "Fiat Egea balata",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "35 KLM 45",
+    "duyulanPlaka": "35 KELİME 45",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "35 KLM 45",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "35 KLM 45",
+    "duyulanPlaka": "35 KELİME 45",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "35 KLM 45",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "35 kelime 45 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "35 kelime 45 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "35 kelime 45 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "35 KLM 45",
+    "duyulanPlaka": "35 KELİME 45",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "35 KLM 45",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "35 KLM 45",
+    "duyulanPlaka": "35 KELİME 45",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "35 KLM 45",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "35 kelime 45 bakım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "35 KLM 45",
+    "baskaIslem": {
+     "ad": "35 kelime 45 bakım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "duyulanPlaka": "35 KELİME 45",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "35 KLM 45",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "duyulanPlaka": "34 QBC 123",
+    "is": "bakıma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "duyulanPlaka": "34 QBC 123",
+    "is": "bakıma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 QBC 123 bakıma geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 QBC 123 bakıma geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 QBC 123 bakıma geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "duyulanPlaka": "34 QBC 123",
+    "is": "bakıma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "duyulanPlaka": "34 QBC 123",
+    "is": "bakıma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 QBC 123 bakıma geldi",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 QBC 123 bakıma geldi",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "duyulanPlaka": "34 QBC 123",
+    "is": "bakıma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "genel",
+   "islem": {
+    "is": "fren balatası",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": "06 TMR 07",
+    "plaka": "06 PVR 07",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "servis-ekle",
+   "islem": {
+    "is": "fren balatası",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": "06 TMR 07",
+    "plaka": "06 PVR 07",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "06 PVR 07 fren balatası",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "06 PVR 07 fren balatası",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "06 PVR 07 fren balatası",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "mesaj",
+   "islem": {
+    "is": "fren balatası",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": "06 TMR 07",
+    "plaka": "06 PVR 07",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "muhasebe",
+   "islem": {
+    "is": "fren balatası",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": "06 TMR 07",
+    "plaka": "06 PVR 07",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 PVR 07 fren balatası",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "06 PVR 07 fren balatası",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "fren balatası",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": "06 TMR 07",
+    "plaka": "06 PVR 07",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "genel",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "16 SY 88 90 geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "16 SY 88 90 geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "16 SY 88 90 geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "16 SY 88 90 geldi",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "16 SY 8890",
+    "baskaIslem": {
+     "ad": "16 SY 88 90 geldi",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "genel",
+   "islem": {
+    "arac": "16 SY 8890",
+    "duyulanPlaka": "8890",
+    "is": "okulda geldi debriyaj",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "16 SY 8890",
+    "duyulanPlaka": "8890",
+    "is": "okulda geldi debriyaj",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "okulda 8890 geldi debriyaj",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "okulda 8890 geldi debriyaj",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "okulda 8890 geldi debriyaj",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "16 SY 8890",
+    "duyulanPlaka": "8890",
+    "is": "okulda geldi debriyaj",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "16 SY 8890",
+    "duyulanPlaka": "8890",
+    "is": "okulda geldi debriyaj",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "okulda 8890 geldi debriyaj",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "16 SY 8890",
+    "baskaIslem": {
+     "ad": "okulda 8890 geldi debriyaj",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "duyulanPlaka": "8890",
+    "is": "okulda geldi debriyaj",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "88.900",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "88.900",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 kilometre 88900 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 kilometre 88900 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 kilometre 88900 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "88.900",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "88.900",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 kilometre 88 bin 900 bakım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 kilometre 88900 bakım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "88.900",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "egzoz patladı",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "egzoz patladı",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 egzoz patladı",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 egzoz patladı",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 egzoz patladı",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "egzoz patladı",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "egzoz patladı",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34ABC123 eksoz patladı",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 egzoz patladı",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "egzoz patladı",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "23.000",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "23.000",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 23000 km bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 23000 km bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 23000 km bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "23.000",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "23.000",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 ABC 123 33 yok 23 bin km bakım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 23000 km bakım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "bakım",
+    "isTuru": "bakim",
+    "km": "23.000",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "saat 10 30 da gelecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "saat 10 30 da gelecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "saat 10 30 da 06 TMR 07 gelecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "saat 10 30 da 06 TMR 07 gelecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "saat 10 30 da 06 TMR 07 gelecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "saat 10 30 da gelecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "saat 10 30 da gelecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "saat 10:30 da 06 TMR 07 gelecek",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "saat 10 30 06 TMR 07 gelecek",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "saat 10 30 da gelecek",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "genel",
+   "islem": {
+    "is": "ön takım",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": null,
+    "plaka": "41 KV 5588",
+    "sahip": "İsmail Özdemir",
+    "tel": "0532 111 22 33",
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "is": "ön takım",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": null,
+    "plaka": "41 KV 5588",
+    "sahip": "İsmail Özdemir",
+    "tel": "0532 111 22 33",
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "mesaj",
+   "islem": {
+    "is": "ön takım",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": null,
+    "plaka": "41 KV 5588",
+    "sahip": "İsmail Özdemir",
+    "tel": "0532 111 22 33",
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "muhasebe",
+   "islem": {
+    "is": "ön takım",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": null,
+    "plaka": "41 KV 5588",
+    "sahip": "İsmail Özdemir",
+    "tel": "0532 111 22 33",
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "41 KV 5588 İsmail Özdemir 05321112233 ön takım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "ön takım",
+    "isTuru": "tamirat",
+    "km": "",
+    "oneri": null,
+    "plaka": "41 KV 5588",
+    "sahip": "İsmail Özdemir",
+    "tel": "0532 111 22 33",
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "genel",
+   "islem": {
+    "is": "periyodik bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "oneri": null,
+    "plaka": "34 M 49109",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "is": "periyodik bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "oneri": null,
+    "plaka": "34 M 49109",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 M 49109 periyodik bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 M 49109 periyodik bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 M 49109 periyodik bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "mesaj",
+   "islem": {
+    "is": "periyodik bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "oneri": null,
+    "plaka": "34 M 49109",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "muhasebe",
+   "islem": {
+    "is": "periyodik bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "oneri": null,
+    "plaka": "34 M 49109",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "34 M 49109 periyodik bakım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "baskaIslem": {
+     "ad": "34 M 49109 periyodik bakım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "periyodik bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "oneri": null,
+    "plaka": "34 M 49109",
+    "sahip": "",
+    "tel": null,
+    "tur": "yeni-arac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "bakuma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "bakuma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "06 TMR 07 bakuma geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "06 TMR 07 bakuma geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "06 TMR 07 bakuma geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "bakuma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "bakuma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "06 TMR 07 bakuma geldi",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 bakuma geldi",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "bakuma geldi",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "genel",
+   "islem": {
+    "metin": "işçiliği 600 lira yaz",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "işçiliği 600 lira yaz",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "işçiliği 600 lira yaz",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "işçiliği 600 lira yaz",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "işçiliği 600 lira yaz",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "işçiliği 600 lira yaz",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "muhasebe",
+   "islem": {
+    "aciklama": "işçiliği yaz",
+    "tur": "gider-ekle",
+    "tutar": 600
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "işçiliği 600 lira yaz",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "İşçilik",
+    "fiyat": 600,
+    "tip": "iscilik",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "genel",
+   "islem": {
+    "metin": "motor yağı 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "motor yağı 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "motor yağı 4500",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "motor yağı 4500",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "motor yağı 4500",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "motor yağı 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "motor yağı 4500",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "motor yağı 4500",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "motor yağı",
+    "fiyat": 4500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "genel",
+   "islem": {
+    "metin": "buji 4",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "buji 4",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "buji 4",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "buji 4",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "buji 4",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "buji 4",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "buji 4",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "buji 4",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "buji 4",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "genel",
+   "islem": {
+    "metin": "yarın 123 tane balata gelecek",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "yarın 123 tane balata gelecek",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "yarın 123 tane balata gelecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "yarın 123 tane balata gelecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "yarın 123 tane balata gelecek",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "yarın 123 tane balata gelecek",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "yarın 123 tane balata gelecek",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "yarın 123 tane balata gelecek",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "yarın 123 tane balata gelecek",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "genel",
+   "islem": {
+    "metin": "amortisör 2750",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "amortisör 2750",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "amortisör 2750",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "amortisör 2750",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "amortisör 2750",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "amortisör 2750",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "amortisör 2750",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek2",
+   "cumle": "amortisor 2.750",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "amortisör",
+    "fiyat": 2750,
     "tip": "parca",
     "tur": "satir-ekle"
    }

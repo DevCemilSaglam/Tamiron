@@ -63,10 +63,40 @@ const EK = ['balata da degisecek', 'iscilik 750 lira', 'yag filtresi 300 lira',
   'merhaba', '', 'balata 450 lira', 'parca 300 lira', 'fren hidroligi 120 lira parca',
   '34 ABC 123 ara', 'Mehmet ara', '34 ABC 123 sahibini ara', '500 lira'];
 
+/* E3/E4 (K-077.1) — C#'a taşınan çözümleyicinin 0-fark hedefi için EKSİK DALLAR ve prototipin
+   kendi notlarındaki tuzaklar. Beklenen değer yine prototipin çıktısı; burada yalnız cümle seçilir. */
+const EK2 = [
+  // fiyat-guncelle (kayıt içi, 1 numaralı kaydın satırı "Triger seti") — tam, kısmi, bozuk söyleyiş
+  'triger seti 4500 lira olsun', 'triger 4500', 'Driver seti 4500 lira', 'triger seti fiyati 4500 yap',
+  // teslim / teslim-edilecek-kayit-yok / bilinmeyen-arac
+  '34 ABC 123 teslim ettim nakit', '16 SY 8890 teslim ettim', '06 TMR 07 teslim ettim kk ile', 'teslim ettim eft yaptı',
+  '99 ZZZ 999 sahibine mesaj gönder', '06 TMR 08 sahibine selam yaz',
+  // mesaj şablonları ve tuzaklar
+  '34 ABC 123 sahibine hazır mesajı gönder', '06 TMR 07 sahibine bekliyor mesajı sms ile',
+  '35 KLM 45 hatırlatma mesajı gönder', '34 ABC 123 sahibine bayram mesajı', '16 SY 8890 teşekkür mesajı yaz',
+  '34 ABC 123 sahibinden parça aldım', '34 ABC 123 sahibinden bekliyor mesajı', '06 TMR 07 teslim mesajı gönder',
+  // toplu
+  'bütün müşterilere bayram mesajı gönder', 'herkese yarın kapalıyız yaz', 'tüm müşterilere mesaj gönder',
+  // ara
+  'Mehmet Kaya ara', '06 TMR 07', 'serviste ne var', 'Renault ara', 'içerideki araçlar',
+  // gider / tahsilat
+  'elektrik faturası 2.400', 'bu yıl ne kadar kasa', 'kira 15000', 'bu ay 3 fatura geldi', 'kira gideri 0532 111 22 33',
+  'su faturası 2 bin 400', 'kasada ne var', 'ne kadar tahsil ettim bu sene',
+  // servis-ac / yeni-arac / tarif / bağlama
+  "Mehmet Kaya'nın arabası geldi yağ değişimi", "Mégane'ın triger seti değişecek", 'Fiat Egea balata',
+  '35 kelime 45 bakım', '34 QBC 123 bakıma geldi', '06 PVR 07 fren balatası', '16 SY 88 90 geldi',
+  'okulda 8890 geldi debriyaj', '34 ABC 123 kilometre 88 bin 900 bakım', '34ABC123 eksoz patladı',
+  '34 ABC 123 33 yok 23 bin km bakım', 'saat 10:30 da 06 TMR 07 gelecek', '41 KV 5588 İsmail Özdemir 05321112233 ön takım',
+  '34 M 49109 periyodik bakım', '06 TMR 07 bakuma geldi',
+  // kayıt içi satır
+  'işçiliği 600 lira yaz', 'motor yağı 4500', 'buji 4', 'yarın 123 tane balata gelecek', 'amortisor 2.750',
+];
+
 const set = JSON.parse(fs.readFileSync(path.join(KOK, 'tools', 'degerlendirme', 'ses-seti.json'), 'utf8'));
 const durumlar = [];
 for (const c of set.cumleler) durumlar.push({ kaynak: 'ses-seti#' + c.id, cumle: c.cumle, baglam: c.baglam });
 for (const cumle of EK) for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek', cumle, baglam });
+for (const cumle of EK2) for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek2', cumle, baglam });
 
 /* Açık kayıt: kayıt içi bağlamda prototipin 1 numaralı kaydı (tohum). Araç nesnesi (`arac`)
    tohumdan gelir ve sunucuda aracın KENDİSİ okunur — korpusta yalnız plakası tutulur. */
@@ -77,6 +107,8 @@ const sade = (o) => {
     const v = o[k];
     if (k === 'arac') r[k] = v && v.plaka ? v.plaka : v;
     else if (k === 'satir' && v && typeof v === 'object') r[k] = v.ad || null;
+    // Kayıt nesnesinin tamamı değil KİMLİĞİ: hangi kayıt olduğu ölçülür, kaydın içeriği tohumdur.
+    else if (k === 'kayit' && v && typeof v === 'object') r[k] = v.id;
     else if (v && typeof v === 'object' && !Array.isArray(v)) r[k] = sade(v);
     else r[k] = v;
   }

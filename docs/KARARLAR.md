@@ -47,6 +47,17 @@ katman YOK (içerik Google'ın ürün geliştirmesinde kullanılabilir; ruhsatta
 4 araç, 2 gider; tarayıcıda giriş → kayıtlar ölçüldü. Eski oturum anahtarı geçersiz kaldı ve
 uygulama kendiliğinden girişe döndü (401 yolu gerçek ortamda da doğru).
 
+**77.9 · ⚠️ BULGU — plaka kuralı prototipte kendi içinde tutarsız (Cemil'e soru).**
+Ses korpusu genişletilince (E3 hazırlığı) ölçüldü. Türk plakasında harf sayısı rakam sayısını
+sınırlar: **1 harf → 4–5 rakam · 2 harf → 3–4 · 3 harf → 2–3.** Prototipin ses çözümleyicisi bu
+kuralı biliyor (04-islem.js `sinir`, 14.10 — Cemil: *"Plakaların bazı kuralları var"*). Ama plaka
+GİRİŞİ (`plakaGecerli`) ve onu taşıyan sunucu (`Plate.IsValid`) yalnız "1–3 harf · 2–4 rakam" der:
+- **gerçek plaka reddedilir:** "34 A 12345" (tek harf, 5 rakam) kaydedilemez;
+- **olmayan plaka kabul edilir:** "34 ABC 1234" (üç harf, 4 rakam).
+Öneri: girişte ve sunucuda harf sayısına bağlı kural (ses çözümleyicisinin kuralı). Prototip
+şartnamesini değiştirdiği için Cemil'in onayıyla. O güne kadar `VoiceSchemaTests` bu tek durumu
+adıyla dışarıda tutar; düzeltilince istisna kaldırılır (test bunu kendisi söyler).
+
 **77.8 · Tamiron müşteriye SMS GÖNDERİRSE alınacak önlemler — NOT (bugün gönderim yok).**
 Bugün mesajı usta **kendi telefonundan** gönderir (WHATSAPP.md A yolu); Tamiron metni hazırlar
 ve kaydeder. Sorumluluk ustada. Tamiron'un kendisi göndermeye başlarsa (bakım hatırlatması SMS'i,
