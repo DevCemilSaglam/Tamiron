@@ -175,3 +175,33 @@ internal sealed class GetCashSummaryHandler(ITamironDb db, IClock clock) : IRequ
             Receivable: await Map.UnpaidTotal(db, ct));
     }
 }
+
+// ---- D13 · Yanlış açılan kaydı sil / geri al (K-076.12) ----
+
+public sealed record DeleteServiceRecord(Guid Id) : IRequest;
+public sealed record RestoreServiceRecord(Guid Id) : IRequest<ServiceRecordDto>;
+
+internal sealed class DeleteServiceRecordHandlers(ITamironDb db, ITenantContext tenant) :
+    IRequestHandler<DeleteServiceRecord>,
+    IRequestHandler<RestoreServiceRecord, ServiceRecordDto>
+{
+    /// <summary>Silme = soft-delete; satırlar yerinde kalır, kayıt geri gelince onlarla döner.</summary>
+    public async Task Handle(DeleteServiceRecord c, CancellationToken ct)
+    {
+        var r = await db.ServiceRecords.FirstOrDefaultAsync(x => x.Id == c.Id, ct) ?? throw new NotFoundException("Servis kaydı");
+        r.EnsureDeletable();
+        db.ServiceRecords.Remove(r);
+        await db.SaveChangesAsync(ct);
+    }
+
+    public async Task<ServiceRecordDto> Handle(RestoreServiceRecord c, CancellationToken ct)
+    {
+        // Silinmişi görmek için süzgeç kapanır — kiracı AÇIKÇA yeniden yazılır (RestoreLine'daki ders).
+        var r = await db.ServiceRecords.IgnoreQueryFilters().FirstOrDefaultAsync(x =>
+                    x.Id == c.Id && x.TenantId == tenant.TenantId && x.DateTimeDeleted != null, ct)
+                ?? throw new NotFoundException("Silinmiş kayıt");
+        r.DateTimeDeleted = null;
+        await db.SaveChangesAsync(ct);
+        return await Map.LoadDto(db, r.Id, ct);
+    }
+}

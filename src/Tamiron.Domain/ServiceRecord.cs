@@ -31,6 +31,16 @@ public class ServiceRecord : TenantEntity
 
     public string EnsureSummaryCode() => SummaryCode ??= CustomerSummary.NewCode();
 
+    /// <summary>
+    /// Yanlış açılan kayıt silinebilir (D13, K-076.12). Teslim edilmiş kayıt SİLİNMEZ: kasada,
+    /// hatırlatmada ve müşterinin elindeki linkte izi var — silmek parayı yok etmek olur.
+    /// </summary>
+    public void EnsureDeletable()
+    {
+        if (DeliveredAt is not null)
+            throw new DomainException("record.delivered_cannot_delete", "Teslim edilmiş kayıt silinmez. Yanlışsa düzelt.");
+    }
+
     private readonly List<ServiceLine> _lines = [];
     public IReadOnlyList<ServiceLine> Lines => _lines;
 

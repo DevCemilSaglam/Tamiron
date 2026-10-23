@@ -168,6 +168,18 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   döngüsünün parçası olarak kalır.
 - Gizli bilgi yok (Windows kimliği); izin `contents: read`.
 
+**76.12 · Yanlış açılan kaydı silme (D13) — prototipte YOKTU.**
+- **Neden giriyor** ("yeni özellik varsayılan olarak HAYIR"a rağmen): yedi işin birincisi
+  servis kaydı; yanlış plakayla açılan kayıt silinemezse "serviste" sayısında ve listede
+  sonsuza dek yalan olarak durur. Ekran eklemiyor — kayıtta bir "sil" ve balonda "geri al".
+- **Soft-delete, geri alınabilir;** satırlar yerinde kalır, kayıt geri gelince onlarla döner.
+- **Teslim edilmiş kayıt SİLİNMEZ:** kasada, hatırlatmada ve müşterinin linkinde izi var.
+  Yanlış teslim D14'ün işi (teslimi geri al), silme değil.
+- Silinen kaydın müşteri linki ölür (404, D3); gönderilmiş mesajlar arşivde kalır.
+- **Ölçümden ders:** başka dükkânın silinmiş kaydını geri getirme denemesi 404 döndüğü
+  hâlde, kiracı kontrolü olmasa kayıt GERİ GELİYORDU — yanıt doğru, yan etki yanlış. Test
+  artık yan etkiye bakıyor.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

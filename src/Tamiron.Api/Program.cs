@@ -105,6 +105,13 @@ api.MapPost("/records", async (OpenServiceRecord cmd, ISender s, CancellationTok
     var r = await s.Send(cmd, ct);
     return Results.Created($"/api/records/{r.Id}", r);
 });
+// D13 · Yanlış açılan kaydı sil (soft) / geri al. Teslim edilmiş kayıt silinmez (K-076.12).
+api.MapDelete("/records/{id:guid}", async (Guid id, ISender s, CancellationToken ct) =>
+{
+    await s.Send(new DeleteServiceRecord(id), ct);
+    return Results.NoContent();
+});
+api.MapPost("/records/{id:guid}/restore", (Guid id, ISender s, CancellationToken ct) => s.Send(new RestoreServiceRecord(id), ct));
 
 // Hatırlatması gelenler (B12): en çok bekleyen üstte.
 api.MapGet("/reminders/due", (ISender s, CancellationToken ct) => s.Send(new ListDueReminders(), ct));
