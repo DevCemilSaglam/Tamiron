@@ -1,0 +1,7 @@
+@* Plaka — prototip plakaHtml (03-nesne.js): TR şeridi + numara. *@
+<span class="plate @Size"><span class="plate-tr">TR</span><span class="plate-no">@No</span></span>
+
+@code {
+    [Parameter, EditorRequired] public string No { get; set; } = "";
+    [Parameter] public string Size { get; set; } = "plate-sm";
+}

@@ -1,0 +1,63 @@
+/* ============ TABAN ============
+   Renk, yazı ve ölçü TOKEN'DAN gelir (docs/tokens.css, K-023).
+   Burada ham hex YOK. */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: var(--tip-md);
+  line-height: var(--satir-nor);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* TABAN KURAL — iki kez yaşanan hata (TASARIM-SISTEMI):
+   .field dışında kalan alanlar tema almıyordu. Renk DAİMA
+   kapsayıcıdan gelir. */
+input, textarea, select, button {
+  color: inherit;
+  font-family: var(--font-body);
+  font-size: inherit;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: var(--satir-siki);
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+/* Dokunma hedefi: GÖRSEL AĞIRLIK ≠ DOKUNMA ALANI.
+   Hedefi büyütmek için yazıyı büyütmek gerekmez. */
+button { min-height: var(--dokun); cursor: pointer; }
+
+:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; transition-duration: .001ms !important; }
+}
+
+/* Rakam kolonları hizalı — plaka, tutar, km, yıl */
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+/* İkon kuralı 03-bilesen.css'te (Lucide tabanı, tam hâli). Burada bir
+   alt kümesi daha duruyordu — iki yerde duran kural iki ayrı cevaptır;
+   13.10'da sınıf çakışması testi düzelince çıktı, silindi. */
+
+/* ⚠️ 05.09 — GİZLİ OLAN GERÇEKTEN GİZLİ KALIR.
+   `hidden` özniteliği tarayıcının kendi stilinde `display: none`
+   demektir — ama bu, YAZDIĞIMIZ HER `display` KURALINA YENİLİR.
+   Bugün `.card { display: flex }` eklendi ve gider formu KAPALIYKEN
+   EKRANDA DURDU: `hidden` duruyordu, form görünüyordu.
+
+   Hiçbir test görmedi (hiçbiri "gizli olan görünüyor mu" diye
+   bakmıyordu) ve derleme de görmedi — ekran görüntüsünde yakalandı.
+   Kural tek satır ve bir daha hangi bileşene display verilirse
+   verilsin geçerli. */
+[hidden] { display: none !important; }

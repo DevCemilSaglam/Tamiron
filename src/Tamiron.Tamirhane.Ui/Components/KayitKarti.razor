@@ -1,0 +1,35 @@
+@*
+  Servis kaydı kartı — prototip kayitKartiHtml (03-nesne.js). Üst yarısı ARAÇ, alt yarısı İŞ.
+  Durum yazıyla: "Serviste" / "Teslim edildi" (Cemil, 07.09). Tarih: teslimse teslim günü,
+  değilse açılış. Tutar 0 ise "—".
+  ⚠️ İskelette YOK (yanıtta alanı yok): motor, renk kutusu, aranacak telefon, "fiyat bekleniyor".
+*@
+<div class="arac-kart @(Item.DeliveredAt is null ? "icerde" : "")" role="button" tabindex="0"
+     aria-label="@Item.PlateNo — @Item.TypeLabel">
+  <div class="ak-ust"><Plate No="@Item.PlateNo" Size="plate-lg" /></div>
+  <div class="ak-arac"><span>@($"{Item.Brand} {Item.Model}".Trim())</span></div>
+  @if (!string.IsNullOrWhiteSpace(Item.OwnerName))
+  {
+    <div class="ak-sahip"><b>@Item.OwnerName</b></div>
+  }
+  <div class="ak-is">
+    <span class="pill @(Item.Type is "Maintenance" or "Both" ? "accent" : "info")">@Item.TypeLabel</span>
+    @if (Item.DeliveredAt is null && Item.WaitingForPart)
+    {
+      <span class="pill warn">parça bekliyor</span>
+    }
+    <span class="ak-durum">
+      @if (Item.DeliveredAt is not null) { <span class="pill ok">Teslim edildi</span> }
+      else { <span class="pill accent">Serviste</span> }
+    </span>
+  </div>
+  <div class="ak-is-ne">@(string.IsNullOrWhiteSpace(Item.Complaint) ? "ne yapılacağı yazılmamış" : Item.Complaint)</div>
+  <div class="ak-alt">
+    <span class="tl-date">@Format.Date(Item.DeliveredAt ?? Item.OpenedOn)</span>
+    <span class="ak-tutar">@(Item.Total != 0 ? Format.Money(Item.Total) + " ₺" : "—")</span>
+  </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public RecordListItem Item { get; set; } = default!;
+}

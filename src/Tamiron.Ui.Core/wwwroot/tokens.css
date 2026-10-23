@@ -1,0 +1,195 @@
+/* ============================================================
+   TAMIRON — Tasarım Tokenları (TEK KAYNAK)
+   ------------------------------------------------------------
+   Renkleri değiştirmek istersen: SADECE aşağıdaki
+   "MARKA PALETİ" bölümündeki hex kodlarını düzenle.
+   Işık/koyu tema ve tüm arayüz renkleri bu paletten türer.
+
+   Kullanım:
+     <html data-theme="light">  ->  açık tema (varsayılan)
+     <html data-theme="dark">   ->  koyu tema
+   Tema seçimi yoksa işletim sistemi tercihini izler.
+   ============================================================ */
+
+:root {
+  /* ---------- MARKA PALETİ (burayı değiştir) ---------- */
+  --brand-navy:          #1C4E86;  /* ana mavi — açık tema birincil */
+  --brand-navy-strong:   #163F6D;  /* koyu ton (hover) */
+  --brand-blue:          #5B8DEF;  /* parlak mavi — koyu tema birincil */
+  --brand-blue-strong:   #78A2F2;  /* açık ton (koyu tema hover) */
+  --brand-teal:          #279689;  /* teal aksan — açık tema */
+  --brand-teal-bright:   #34C1AF;  /* teal aksan — koyu tema */
+  --brand-orange:        #E8641C;  /* turuncu vurgu — açık tema */
+  --brand-orange-bright: #F2843E;  /* turuncu vurgu — koyu tema */
+
+  /* ---------- SEMANTİK / DURUM RENKLERİ ---------- */
+  --sem-crit:   #C4432E;  --sem-crit-dark:   #F0785F;   /* zorunlu / hata */
+  --sem-warn:   #9C6B12;  --sem-warn-dark:   #E0A64B;   /* yapılabilir / uyarı */
+  --sem-ok:     #1F8A5B;  --sem-ok-dark:     #4FC98A;   /* iyi olur / başarılı */
+
+  /* ---------- TİPOGRAFİ ---------- */
+  --font-display: "Sora", system-ui, sans-serif;         /* başlıklar */
+  --font-body:    "Instrument Sans", system-ui, sans-serif; /* metin/arayüz */
+  --font-mono:    "IBM Plex Mono", ui-monospace, monospace; /* plaka, tutar, kod */
+
+  /* ---------- LOGO (marka varlığı) ----------
+     Logo SVG'si artık TEK blok; tema farkı yalnız wordmark renginde.
+     ⚠️ --logo-nut (#269689) ile --brand-teal (#279689) BİR HANE farklı —
+     logonun kendi değeri korundu, görünüm değişmesin diye. Bkz. A-D5. */
+  --logo-nut:       #269689;   /* somun ana yüz */
+  --logo-nut-shade: #22766E;   /* somun gölge */
+  --logo-nut-tint:  #5AA79F;   /* somun üst yüz */
+
+  /* ---------- YARIÇAP / GÖLGE ---------- */
+  --radius-sm: 8px;  --radius-md: 12px;  --radius-lg: 16px;  --radius-pill: 999px;
+
+  /* ---- TIPOGRAFI OLCEGI (v2, 03.09.2026) ----
+     v1'de boyutlar bilesen CSS'ine gomuluydu; "hepsini buyut" demek
+     yuzlerce satir dokunmak demekti. Kullanicimiz teknolojiden uzak ve
+     yasli olabilir (T-18) — taban boyut TEK YERDEN degisebilmeli.
+     Taban 17px (v1'de 16). Olcek 1.15 civari, yuvarlatilmis. */
+  --tip-xs:   13px;   /* rozet, kucuk etiket — asgari, bundan kucuk YOK */
+  --tip-sm:   15px;   /* alt bilgi, ikincil satir */
+  --tip-md:   17px;   /* TABAN — govde metni, buton, alan */
+  --tip-lg:   20px;   /* bolum basligi */
+  --tip-xl:   26px;   /* ekran basligi */
+  --tip-2xl:  34px;   /* toplam tutar — tek bakista okunacak rakam */
+
+  --satir-siki: 1.25;  /* baslik */
+  --satir-nor:  1.55;  /* govde */
+
+  /* Dokunma hedefi — 44px asgari (v1'de kural yaziliydi ama token
+     degildi, her bilesende elle yaziliyordu). */
+  --dokun: 48px;
+
+  /* ---- ARAÇ RENGİ (04.09.2026 — Cemil: "renk yazmak yerine
+     kutucuk içerisinde rengi olsun") ----
+     ⚠️ BUNLAR TEMA RENGİ DEĞİL, BOYA RENGİDİR. Ruhsatta yazan fiziksel
+     renk; açık temada da koyu temada da AYNI kalır. Tema bloklarında
+     yeniden tanımlanmazlar — "beyaz araç" koyu temada da beyazdır.
+     O yüzden burada, tema bloklarının DIŞINDA duruyorlar.
+
+     Doygunlukları kasten kırık: gerçek araç boyası ekran kırmızısı
+     kadar parlak değildir ve parlak kutucuk, yanındaki plakadan daha
+     çok bakış çekiyordu. */
+  --renk-beyaz:      #F4F5F3;
+  --renk-siyah:      #17191D;
+  --renk-gri:        #8B9098;
+  --renk-gumus:      #C4C9CF;
+  --renk-lacivert:   #1E2C52;
+  --renk-mavi:       #2C63C0;
+  --renk-kirmizi:    #B22B31;
+  --renk-bordo:      #6D2029;
+  --renk-yesil:      #256B49;
+  --renk-sari:       #DDB431;
+  --renk-turuncu:    #DC7020;
+  --renk-kahverengi: #6A4A30;
+  --renk-bej:        #D6C6A7;
+  --renk-mor:        #57307E;
+  /* Ruhsatta okunamayan / listede olmayan renk. Boş kutucuk
+     göstermek "rengi beyaz" diye okunuyordu — bu yüzden kendi
+     değeri var ve üstüne çapraz çizgi düşüyor (.r-bilinmeyen). */
+  --renk-bilinmeyen: #9AA3AE;
+}
+
+/* ============================================================
+   IŞIK TEMA  (varsayılan)
+   ============================================================ */
+:root,
+[data-theme="light"] {
+  --bg:            #EDF2F9;   /* uygulama zemini */
+  --surface:       #FFFFFF;   /* kartlar */
+  --surface-2:     #E2EBF5;   /* ikincil yüzey / hafif dolgu */
+  --line:          #D3DEEB;   /* kenarlık / ayraç */
+  --text:          #0F1E30;   /* ana metin */
+  --muted:         #44556F;   /* ikincil metin */
+  /* T-18 (yasli goz) icin OLCULDU ve DUZELTILDI (03.09.2026).
+     Eski deger #7E8FA5: surface 3.30 · bg 2.94 · surface-2 2.79 —
+     ucu de AA'nin altinda, en soluk metnimiz okunmuyordu.
+     Yeni deger UC ZEMINDE de AA gecer: 5.53 / 4.92 / 4.59. */
+  --faint:         #596A80;
+  --field-bg:      #F6FAFE;   /* metin alanlarinin zemini — notr gri degil */
+  --hint:          #4B6183;   /* ipucu metni — muted'dan mavimsi */   /* en soluk (placeholder, ikon) */
+
+  --primary:        var(--brand-navy);
+  --primary-strong: var(--brand-navy-strong);
+  --on-primary:     #FFFFFF;
+  --accent:         var(--brand-teal);
+  --accent-soft:    #DCF2EF;   /* aksan yumuşak zemin (rozet) */
+  --on-accent:      #FFFFFF;
+  --highlight:            var(--brand-orange);   /* üçüncü vurgu (turuncu) */
+
+  /* Dokunulan yüzeyin geri bildirimi (icon-btn, çekmece satırı, ghost buton).
+     03.09: bu token KULLANILIYORDU ama TANIMSIZDI — tanımsız var()
+     geçersizdir, hover hiçbir şey yapmıyordu ve kimse fark etmemişti.
+     Derlemeye "tanımsız token" denetimi eklendi. */
+  --nav-hover:   color-mix(in srgb, var(--text) 6%, transparent);
+  --nav-on-bg:   color-mix(in srgb, var(--primary) 12%, transparent); /* SEÇİLİ öğe dolgusu (.cip) */
+  --info:        var(--primary);   /* bilgi / nötr — İŞÇİLİK rozeti */
+  --info-bg:     #E4EBF7;
+
+  --crit: var(--sem-crit);  --crit-bg: #FBE7E2;
+  --warn: var(--sem-warn);  --warn-bg: #F6EDD9;
+  --ok:   var(--sem-ok);    --ok-bg:   #E3F2EA;
+
+  --logo-word: #142230;   /* wordmark — açık tema */
+  --shadow-sm: 0 1px 2px rgba(8,20,32,.06), 0 4px 10px -6px rgba(8,20,32,.25);
+  --shadow: 0 1px 2px rgba(8,20,32,.05), 0 20px 44px -30px rgba(8,20,32,.45);
+  --scrim: rgba(8,20,32,.48);   /* drawer / modal karartma */
+}
+
+/* ============================================================
+   KOYU TEMA
+   ============================================================ */
+[data-theme="dark"] {
+  --bg:            #0A1220;
+  --surface:       #14202F;
+  --surface-2:     #172436;
+  --line:          #2A3B51;
+  --text:          #E7EEF6;
+  --muted:         #A9B8CB;
+  --faint:         #8496AB;
+  --field-bg:      #101B2B;
+  --hint:          #9DB2CB;
+
+  --primary:        var(--brand-blue);
+  --primary-strong: var(--brand-blue-strong);
+  --on-primary:     #FFFFFF;
+  --accent:         var(--brand-teal-bright);
+  --accent-soft:    #0F2A28;
+  --on-accent:      #04201C;
+  --highlight:            var(--brand-orange-bright);
+  --nav-hover:   color-mix(in srgb, #fff 6%, transparent);
+  --nav-on-bg:   color-mix(in srgb, var(--primary) 22%, transparent);
+  --info:        var(--primary);
+  --info-bg:     #111E33;
+
+  --crit: var(--sem-crit-dark);  --crit-bg: #2A1512;
+  --warn: var(--sem-warn-dark);  --warn-bg: #241C0E;
+  --ok:   var(--sem-ok-dark);    --ok-bg:   #102420;
+
+  --logo-word: #E7EEF6;   /* wordmark — koyu tema */
+  --shadow-sm: 0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
+  --shadow: 0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
+  --scrim: rgba(0,0,0,.62);
+}
+
+/* Tema seçilmemişse (data-theme yok) işletim sistemi koyuysa koyu uygula */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg:#0A1220; --surface:#14202F; --surface-2:#172436; --line:#2A3B51;
+    --text:#E7EEF6; --muted:#A9B8CB; --faint:#8496AB;
+    --field-bg:#101B2B; --hint:#9DB2CB;
+    --primary:var(--brand-blue); --primary-strong:var(--brand-blue-strong); --on-primary:#FFFFFF;
+    --accent:var(--brand-teal-bright); --accent-soft:#0F2A28; --on-accent:#04201C;
+    --highlight:var(--brand-orange-bright);
+    --crit:var(--sem-crit-dark); --crit-bg:#2A1512; --warn:var(--sem-warn-dark); --warn-bg:#241C0E; --ok:var(--sem-ok-dark); --ok-bg:#102420;
+    --logo-word:#E7EEF6;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.45), 0 6px 14px -8px rgba(0,0,0,.6);
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 24px 50px -30px rgba(0,0,0,.72);
+    --scrim: rgba(0,0,0,.62);
+    --nav-hover: color-mix(in srgb, #fff 6%, transparent);
+    --nav-on-bg: color-mix(in srgb, var(--primary) 22%, transparent);
+    --info: var(--primary); --info-bg: #111E33;
+  }
+}

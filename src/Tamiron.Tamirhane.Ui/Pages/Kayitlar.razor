@@ -1,0 +1,51 @@
+@page "/"
+@page "/kayitlar"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  D20 · Servis kayıtları — prototip 80-kayitlar'ın listesi (arama ve süzgeç sonraki iş).
+  Sıra ve süzgeç API'de (ListRecords): serviste olanlar üstte, sonra en yenisi.
+*@
+<section class="screen active" id="screen-kayitlar">
+  <div class="screen-head">
+    <span class="eyebrow">Servis kayıtları
+      @if (liste is not null) { <span class="eb-say" id="kytSay">@liste.Count</span> }
+    </span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert"><span class="n-body">@hata</span></div>
+  }
+  else if (liste is null)
+  {
+    <p class="plate-hint">Yükleniyor…</p>
+  }
+  else if (liste.Items.Count == 0)
+  {
+    <div class="bos-durum">
+      <b>Henüz servis kaydı yok</b>
+      <span>Araç geldiğinde plakasını yazarak ya da söyleyerek kayıt açarsın.</span>
+    </div>
+  }
+  else
+  {
+    @foreach (var k in liste.Items)
+    {
+      <KayitKarti Item="k" @key="k.Id" />
+    }
+  }
+</section>
+
+@code {
+    RecordList? liste;
+    string? hata;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        try { liste = await Api.RecordsAsync(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+    }
+}

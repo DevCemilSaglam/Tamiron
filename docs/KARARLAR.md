@@ -278,6 +278,28 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   geçtiği için doğrulama satırı silinince de yeşil kalıyordu. Test artık yorumları ayıklayıp
   yalnız kodda arıyor.
 
+**76.19 · Arayüz iskeleti (D20).**
+- **Üç proje, MIMARI §2'deki adlarla:** `Ui.Core` (API istemcisi, oturum deposu, ortak
+  bileşen, stiller) · `Tamirhane.Ui` (ekranlar) · `Tamirhane.Web` (Blazor WASM kabuğu).
+  Ekran host'ta DEĞİL (K-015: web ≡ mobil — MAUI geldiğinde aynı ekranları kullanır).
+- **İki ekran:** Giriş (telefon → SMS kodu → içeride, süresiz) ve Servis kayıtları (prototip
+  `kayitKartiHtml`'in yapısı: üst yarısı araç, alt yarısı iş; "Serviste"/"Teslim edildi").
+  Arama, süzgeç, kayıt ekranı ve ötesi sonraki turlar.
+- **Görünüm prototipin kendisi:** `docs/tokens.css` + prototipin `01-taban`, `02-kabuk`,
+  `03-bilesen` stilleri Ui.Core'a KOPYALANIR; test kopyaların kaynakla bayt bayt aynı
+  olduğunu ölçer (ayrışırsa kırmızı — iki tasarım sistemi olmasın). Ham hex YOK, MudBlazor YOK.
+- **Karar arayüzde değil:** istemci API'nin dediğini gösterir; hata metni API'nin Türkçe
+  başlığı. Arayüzün kendi sözü yalnız "boş alan" konuşan düğmesi (K-033.3).
+- **İstemci DTO'ları küçük kopyalar:** Application'a başvurmak tarayıcıya EF Core taşırdı.
+- **API adresi:** üretimde AYNI köken (CORS yok); geliştirmede `ApiBase` (5080) ve API'nin
+  CORS izni yalnız geliştirme yapılandırmasında (5213).
+- **Tarayıcıda ölçüldü** (`.claude/launch.json`'a `api` ve `tamirhane-web`): giriş → kayıtlar →
+  yenileyince oturum kalıyor; 375 px'te taşma yok. **Tarayıcıda bulunan hata:** İngilizce
+  tarayıcıda tutar "3,450 ₺" çıkıyordu — Blazor WASM yalnız tarayıcı dilinin kültür verisini
+  yüklüyor. Biçim artık ayırıcıları açıkça yazıyor. Sunucudaki testler bunu göremezdi.
+- **Kartta henüz olmayan** (API yanıtında alanı yok): motor, renk, aranacak telefon,
+  "fiyat bekleniyor" rozeti — `ListRecords` genişleyince gelir.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

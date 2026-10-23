@@ -6,6 +6,18 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8123", "--directory", "."],
       "port": 8123
+    },
+    {
+      "name": "api",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/Tamiron.Api", "--launch-profile", "http"],
+      "port": 5080
+    },
+    {
+      "name": "tamirhane-web",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "src/Tamiron.Tamirhane.Web", "--launch-profile", "http"],
+      "port": 5213
     }
   ]
 }

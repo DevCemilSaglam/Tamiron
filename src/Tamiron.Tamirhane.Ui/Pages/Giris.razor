@@ -1,0 +1,69 @@
+@page "/giris"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  D20 · Giriş (K-074): telefon → SMS kodu → içeride, SÜRESİZ. Prototipte giriş ekranı yoktu;
+  dil prototipinki: konuşan düğme (K-033.3) — düğme kapanmaz, eksik olanı SÖYLER.
+  Hata metni API'nin Türkçe başlığı; ekran kendi cümlesini uydurmaz.
+*@
+<section class="screen active" id="screen-giris">
+  <div class="screen-head">
+    <span class="eyebrow">Tamiron'a giriş</span>
+  </div>
+
+  <div class="card">
+    @if (!kodGitti)
+    {
+      <div class="field">
+        <label for="grTel">Telefonun</label>
+        <input id="grTel" type="tel" inputmode="tel" autocomplete="tel" placeholder="0532 215 30 00"
+               @bind="telefon" @bind:event="oninput" />
+      </div>
+      <button class="btn btn-primary btn-lg" id="grKodIste" @onclick="KodIste" disabled="@calisiyor">Kod gönder</button>
+    }
+    else
+    {
+      <p class="plate-hint">@telefon numarasına gelen 6 haneli kodu yaz.</p>
+      <div class="field">
+        <label for="grKod">Kod</label>
+        <input id="grKod" inputmode="numeric" autocomplete="one-time-code" maxlength="6"
+               @bind="kod" @bind:event="oninput" />
+      </div>
+      <button class="btn btn-primary btn-lg" id="grGiris" @onclick="GirisYap" disabled="@calisiyor">Giriş yap</button>
+      <button class="btn" id="grGeri" @onclick="NumarayiDegistir">Numarayı değiştir</button>
+    }
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="grHata"><span class="n-body">@hata</span></div>
+  }
+</section>
+
+@code {
+    string telefon = "", kod = "";
+    bool kodGitti, calisiyor;
+    string? hata;
+
+    async Task KodIste()
+    {
+        if (string.IsNullOrWhiteSpace(telefon)) { hata = "Telefonunu yaz."; return; }
+        await Calis(async () => { await Api.RequestCodeAsync(telefon); kodGitti = true; });
+    }
+
+    async Task GirisYap()
+    {
+        if (kod.Trim().Length != 6) { hata = "Telefonuna gelen 6 haneli kodu yaz."; return; }
+        await Calis(async () => { await Api.VerifyAsync(telefon, kod.Trim(), "tarayıcı"); Nav.NavigateTo("/"); });
+    }
+
+    void NumarayiDegistir() { kodGitti = false; kod = ""; hata = null; }
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}
