@@ -97,6 +97,16 @@ api.MapPost("/customers/consent/undo", (UndoConsent cmd, ISender s, Cancellation
 api.MapGet("/customers/consent-history", (string key, ISender s, CancellationToken ct) => s.Send(new GetConsentHistory(key), ct));
 
 // Parçacılar (D1): ad + telefon; aynı numara iki kez olmaz; silme soft.
+// D8 · Ruhsat okuma: fotoğraf (çok parçalı form, "photo") + isteğe bağlı yazılan plaka.
+// Bearer anahtarla çalışan API'de çerez yok → CSRF yok; antiforgery bu uçta kapalı.
+api.MapPost("/registrations/read", async (IFormFile photo, [Microsoft.AspNetCore.Mvc.FromForm] string? plate, ISender s, CancellationToken ct) =>
+{
+    using var ms = new MemoryStream();
+    await photo.CopyToAsync(ms, ct);
+    return await s.Send(new Tamiron.Application.Registrations.ReadRegistration(ms.ToArray(), photo.ContentType, plate), ct);
+}).DisableAntiforgery();
+api.MapPost("/registrations/save", (Tamiron.Application.Registrations.SaveRegistration cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+
 // D3 · Müşteri özet linki: usta linki alır; müşteri OTURUMSUZ açar (K-023, K-076.3).
 api.MapPost("/records/{id:guid}/summary-link", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.Summaries.GetSummaryLink(id), ct));

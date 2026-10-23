@@ -20,6 +20,13 @@ public sealed class NotConfiguredSmsSender : ISmsSender
     public Task SendAsync(string phone, string text, CancellationToken ct) => throw new SmsNotConfiguredException();
 }
 
+/// <summary>Okuyucu bağlanana kadar: fotoğraf hiçbir yere GİTMEZ, usta elle yazar (D8).</summary>
+public sealed class NotConfiguredRegistrationReader : IRegistrationReader
+{
+    public Task<Domain.RegistrationRead> ReadAsync(byte[] image, string mediaType, CancellationToken ct)
+        => throw new ReaderNotConfiguredException();
+}
+
 /// <summary>YALNIZ GELİŞTİRME: SMS gitmez, günlüğe yazılır — usta yok, geliştirici kodu konsoldan okur.</summary>
 public sealed class DevLogSmsSender(Microsoft.Extensions.Logging.ILogger<DevLogSmsSender> log) : ISmsSender
 {
@@ -37,6 +44,7 @@ public static class DependencyInjection
         services.AddDbContext<TamironDbContext>(o => o.UseSqlServer(connectionString));
         services.AddScoped<ITamironDb>(sp => sp.GetRequiredService<TamironDbContext>());
         services.AddSingleton<IClock, TurkeyClock>();
+        services.AddSingleton<IRegistrationReader, NotConfiguredRegistrationReader>();
         return services;
     }
 }

@@ -110,6 +110,21 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **Cemil'in yapacağı:** Netgsm hesabı, gönderici adı onayı (belge ister), sunucuda üç
   ortam değişkeni. Para burada başlar.
 
+**76.8 · Ruhsat okuma ucu (D8) — kural hazır, okuyucu bağlı değil.**
+- **Okuyucu bir arayüz** (`IRegistrationReader`). Gemini (K-067.2c) ya da kendi sunucu
+  (K-070) Cemil'in kararıyla bağlanır; bağlanmadıkça uç 503 + *"Ruhsat okuma şu an kapalı.
+  Bilgileri elle yaz."* döner. Hiçbir yere fotoğraf gitmedi.
+- **Kurallar prototiple birebir:** okununca araç kaydedilir (K-065); kayıtlıda yalnız boş
+  alan dolar; okunan plaka ustanın yazdığından farklıysa HİÇBİR ŞEY kaydedilmez, usta seçer
+  (K-069); plaka ne okunmuş ne yazılmışsa araç kaydedilmez.
+- **Çatışma çözümü fotoğrafı yeniden okutmaz** (`/registrations/save`): okunanlar
+  istemcide durur, usta düzeltmiş olabilir — kaydedilen ustanın son hâlidir (K-065.1).
+- **Fotoğraf saklanmaz**, yalnız okuyucuya gider. JPEG/PNG/WebP/HEIC, en çok 10 MB;
+  geçersiz fotoğraf okuyucuya hiç gitmez (para).
+- **Okunan biçimsiz değer düşer** (imkânsız yıl gibi) — hata verip okumayı çöpe atmak yerine.
+- **Okuma sahip adını/telefonunu doldurmaz** — prototipin okuma eşlemesinde yok. K-070.5'teki
+  TC/ad/adres maskeleme sorusu okuyucu bağlanırken konuşulur.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

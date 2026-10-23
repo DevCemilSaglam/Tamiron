@@ -28,6 +28,18 @@ public interface ISmsSender
 
 public sealed class SmsNotConfiguredException() : Exception("SMS sağlayıcısı bağlanmadı.");
 
+/// <summary>
+/// Ruhsat fotoğrafını alanlara çevirir (D8). Okuyucu (K-067.2c Gemini, sonra kendi sunucu
+/// K-070) Cemil'in kararı ve paralı; bağlanmadıkça <see cref="ReaderNotConfiguredException"/>.
+/// Fotoğraf okuyucuya gider, SAKLANMAZ.
+/// </summary>
+public interface IRegistrationReader
+{
+    Task<Domain.RegistrationRead> ReadAsync(byte[] image, string mediaType, CancellationToken ct);
+}
+
+public sealed class ReaderNotConfiguredException() : Exception("Ruhsat okuyucusu bağlanmadı.");
+
 /// <summary>Sağlayıcı bağlı ama gönderim olmadı (hesap, başlık, ağ). Sessizce "gönderildi" denmez.</summary>
 public sealed class SmsSendFailedException(string code) : Exception("SMS gönderilemedi: " + code)
 {

@@ -36,6 +36,18 @@ public sealed class FakeSms : ISmsSender
     }
 }
 
+/// <summary>Ruhsat okuyucusu yerine: fotoğraf hiçbir yere gitmez, test ne okunacağını verir (D8).</summary>
+public sealed class FakeRegistrationReader : IRegistrationReader
+{
+    public RegistrationRead? Next;
+    public int Calls;
+    public Task<RegistrationRead> ReadAsync(byte[] image, string mediaType, CancellationToken ct)
+    {
+        Interlocked.Increment(ref Calls);
+        return Next is { } r ? Task.FromResult(r) : throw new ReaderNotConfiguredException();
+    }
+}
+
 /// <summary>
 /// Gerçek MSSQL (LocalDB) üzerinde, her koşu kendi veritabanında: kiracı süzgeci,
 /// rowversion ve süzgeçli tekil indeks SQLite'ta farklı davranır — ölçtüğümüz
@@ -51,6 +63,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
     public static readonly Guid ShopB = Guid.Parse("bbbbbbbb-0000-4000-8000-000000000002");
     public readonly FixedClock Clock = new();
     public readonly FakeSms Sms = new();
+    public readonly FakeRegistrationReader Reader = new();
     private readonly string _db = "TamironTest_" + Guid.NewGuid().ToString("N")[..12];
     private readonly Dictionary<Guid, string> _tokens = [];
     public Guid ShopBRecordId { get; private set; }
@@ -69,6 +82,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             s.AddSingleton<IClock>(Clock);
             s.RemoveAll<ISmsSender>();
             s.AddSingleton<ISmsSender>(Sms);
+            s.RemoveAll<IRegistrationReader>();
+            s.AddSingleton<IRegistrationReader>(Reader);
         });
     }
 

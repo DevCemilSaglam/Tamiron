@@ -351,7 +351,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Teslim eksikleri söylenir, teslimi engellemez | `kEksikler` | `ServiceRecord.DeliveryWarnings` | 13.10 |
 | Parça sormak için araç kimliği: VIN ya da marka+model+yıl+motor | `aracKimligiTamam` | `Vehicle.HasPartIdentity` · `MissingForParts` · kapı `PartQuestion.EnsureCanAsk` | K-068 |
 | Sorulacak parça: tamircinin aldığı, fiyatı belli olmayan; kapılar sırayla konuşur (parça · kimlik · parçacı) | `psParcaListesi` · `psGonder` | `PartQuestion.AskableLines` · `EnsureCanAsk` · `Compose` | K-033.3 · K-076.2 |
-| Ruhsattan okunan plaka yazılanı ezmez; çatışmada usta seçer | `ruhsatKaydet` | **henüz yok** — ruhsat okuma ucu yapay zekâ sağlayıcısını bekliyor (K-070, Cemil) | K-069 |
+| Ruhsattan okunan plaka yazılanı ezmez; çatışmada usta seçer; okununca araç kaydedilir, kayıtlıda yalnız boş alan dolar | `ruhsatOku` · `ruhsatKaydet` | `RegistrationIntake.Decide` · `NewVehicle` · `FillEmpty` (okuyucu arayüzü bağlanmadı — K-076.8) | K-065 · K-069 |
 | Toplu mesaj yalnız `MarketingConsentAt` dolu müşteriye | `topluAlicilar` | `SendBulk` · `GetBulkPreview` | K-071.3 |
 | CSV: BOM + `;` + ham rakam + formül koruması | `muhasebeCsv` · `csvHucre` | `Csv.Cell` · `Csv.Document` · `ExportCashCsv` (bayt bayt eşit) | K-071.2 |
 | Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |

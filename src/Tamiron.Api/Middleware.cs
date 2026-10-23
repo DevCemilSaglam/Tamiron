@@ -73,6 +73,12 @@ public sealed class ErrorMiddleware(RequestDelegate next)
         {
             await Results.Problem(statusCode: 503, title: "SMS şu an gönderilemiyor. Dükkânın SMS hizmeti bağlanmadı.").ExecuteAsync(ctx);
         }
+        // D8 · Ruhsat okuyucusu bağlı değil: ekran elle yazmaya döner.
+        catch (ReaderNotConfiguredException)
+        {
+            await Results.Problem(statusCode: 503, title: "Ruhsat okuma şu an kapalı. Bilgileri elle yaz.",
+                extensions: new Dictionary<string, object?> { ["code"] = "registration.reader_off" }).ExecuteAsync(ctx);
+        }
         // D7 · Sağlayıcı reddetti ya da ulaşılamadı: ustaya "tekrar dene", ayrıntı kodda (destek için).
         catch (SmsSendFailedException e)
         {
