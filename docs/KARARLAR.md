@@ -217,6 +217,20 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **Cemil'e soru:** model kararı (K-054 · K-067) verilince bu korpusla ölçülür; sezgisel
   çözümleyicinin sunucuya taşınması istenirse ayrı bir tur.
 
+**76.15 · Tam geliştirme tohumu (D16).**
+- **Tek eşleyici** (`PrototypeSeed`): prototip tohumu → varlıklar. Eşdeğerlik testi de onu
+  kullanır; yani "prototiple 0 fark" ölçüsü geliştirme tohumunu da kapsar. Kaynak
+  `02-veri.js`'in kendisi (muhasebe aracı `Seed/prototip-tohum.json`'u döker).
+- **Tarihler kaydırılır:** prototipin "bugün"ü (03.09.2026) gerçek bugüne denk gelir —
+  yoksa geliştirmede "bugünkü kasa", "serviste kaç gündür", hatırlatmalar hep boş/yanlış
+  görünürdü. İzin tarihi ve parça bekleme günü de kayar. Açılış günleri korunur.
+- **Hatırlatma tarihi tohumdan yazılır** (hesaplanmaz) — prototiptekiyle aynı görünsün.
+- **Testlerin A dükkânı DEĞİŞMEDİ** (`SeedAsync`, elle yazılmış dilim): onlarca test ona bağlı.
+- **Mevcut geliştirme veritabanı kendiliğinden değişmez** — tohum yalnız BOŞ veritabanına
+  yazılır. Tam tohumu görmek için geliştirme veritabanı silinip API yeniden başlatılır
+  (`dotnet tool run dotnet-ef database drop --project src/Tamiron.Infrastructure --startup-project src/Tamiron.Infrastructure`).
+  Koşturulmadı — Cemil'in veritabanı.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

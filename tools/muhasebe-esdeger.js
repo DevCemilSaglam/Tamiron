@@ -101,3 +101,12 @@ for (const s of out) {
   console.log(`${s.ad}: bugün=${s.bugun} · yıl tahsilat ${y.tahsilat} (nakit ${y.nakit}/kart ${y.kart}/havale ${y.havale}) · teslim ${y.teslim} · gider ${y.gider} · parça alışı ${y.parcaAlisi} · veresiye ${s.veresiye}`);
 }
 console.log('yazıldı: ' + path.relative(KOK, CIKTI));
+
+/* D16 · Geliştirme tohumu: aynı "tohum" senaryosu API'nin yanına (DevSeed okur, PrototypeSeed yazar).
+   Tek kaynak prototip: 02-veri.js değişince tohum da değişir — CI farkı yakalar. */
+const TOHUM = path.join(KOK, 'src', 'Tamiron.Api', 'Seed', 'prototip-tohum.json');
+const t = out[0];
+const EOL = String.fromCharCode(10);
+fs.mkdirSync(path.dirname(TOHUM), { recursive: true });
+fs.writeFileSync(TOHUM, JSON.stringify({ bugun: t.bugun, araclar: t.araclar, kayitlar: t.kayitlar, giderler: t.giderler }, null, 2) + EOL, 'utf8');
+console.log('yazıldı: ' + path.relative(KOK, TOHUM));

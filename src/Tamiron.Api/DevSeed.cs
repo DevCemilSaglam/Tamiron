@@ -6,10 +6,12 @@ using Tamiron.Infrastructure;
 namespace Tamiron.Api;
 
 /// <summary>
-/// YALNIZ GELİŞTİRMEDE: göçleri uygular, veritabanı boşsa prototipin tohum
-/// verisinden bir dilim yazar (02-veri.js — aynı plakalar, aynı tutarlar),
-/// böylece API ile prototip yan yana karşılaştırılabilir. Giriş: dükkânın
+/// YALNIZ GELİŞTİRMEDE: göçleri uygular, veritabanı boşsa prototipin TAM tohumunu yazar
+/// (D16: 4 araç, 8 kayıt, 2 gider — 02-veri.js'in kendisi, Seed/prototip-tohum.json), tarihler
+/// prototipin "bugün"ü gerçek bugüne denk gelecek şekilde kaydırılır. Giriş: dükkânın
 /// telefonu (DevPhone) ile kod istenir, kod günlüğe yazılır (DevLogSmsSender).
+/// <see cref="SeedAsync"/> testlerin A dükkânı içindir — küçük, elle yazılmış bir dilim;
+/// onlarca test ona bağlı, dokunulmaz.
 /// </summary>
 public static class DevSeed
 {
@@ -23,7 +25,7 @@ public static class DevSeed
         var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
         var today = scope.ServiceProvider.GetRequiredService<IClock>().Today;
         await db.Database.MigrateAsync();
-        if (!await db.Shops.IgnoreQueryFilters().AnyAsync()) await SeedAsync(db, ShopId, today);
+        if (!await db.Shops.IgnoreQueryFilters().AnyAsync()) await FullAsync(db, ShopId, today);
         // Giriş tablosu sonradan geldi (K-074): eski geliştirme veritabanında kullanıcı yoksa eklenir.
         if (!await db.Users.AnyAsync(u => u.Phone == DevPhone))
         {
@@ -32,6 +34,17 @@ public static class DevSeed
         }
     }
 
+    /// <summary>Prototipin tam tohumu, "bugün"ü <paramref name="today"/>'e kaydırılmış (D16, K-076.15).</summary>
+    public static async Task FullAsync(TamironDbContext db, Guid shopId, DateOnly today)
+    {
+        db.Shops.Add(new Shop(shopId) { Name = "Ahmet Usta Oto Servis", Address = "Ostim OSB, Ankara", Phone = "0532 000 00 00" });
+        await db.SaveChangesAsync();
+        var seed = System.Text.Json.JsonDocument.Parse(
+            await File.ReadAllTextAsync(Path.Combine(AppContext.BaseDirectory, "Seed", "prototip-tohum.json"))).RootElement;
+        await PrototypeSeed.WriteAsync(db, shopId, seed, PrototypeSeed.ShiftTo(seed, today), keepOpenedOn: true);
+    }
+
+    /// <summary>Testlerin A dükkânı: elle yazılmış küçük dilim (prototip id 1, 6, 7, 8).</summary>
     public static async Task SeedAsync(TamironDbContext db, Guid shopId, DateOnly today)
     {
         db.Shops.Add(new Shop(shopId) { Name = "Ahmet Usta Oto Servis", Address = "Ostim OSB, Ankara", Phone = "0532 000 00 00" });

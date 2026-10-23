@@ -51,7 +51,7 @@ public class PrototypeEquivalenceTests(ApiFactory f) : IClassFixture<ApiFactory>
     async Task<(HttpClient api, Dictionary<int, Guid> ids)> Seed(JsonElement s)
     {
         var shop = Guid.NewGuid();
-        var ids = new Dictionary<int, Guid>();
+        Dictionary<int, Guid> ids;
         string token;
         using (var scope = f.Services.CreateScope())
         {
@@ -60,54 +60,8 @@ public class PrototypeEquivalenceTests(ApiFactory f) : IClassFixture<ApiFactory>
             db.Shops.Add(new Shop(shop) { Name = "Eşdeğerlik " + s.GetProperty("ad").GetString() });
             await db.SaveChangesAsync();
 
-            var vehicles = new Dictionary<string, Guid>();
-            foreach (var a in s.GetProperty("araclar").EnumerateArray())
-            {
-                var v = new Vehicle
-                {
-                    TenantId = shop, PlateNo = a.GetProperty("plaka").GetString()!, Brand = Str(a, "marka"), Model = Str(a, "model"),
-                    Year = Str(a, "yil"), Engine = Str(a, "motor"), OwnerName = Str(a, "sahipAd"), OwnerPhone = Str(a, "sahipTel"),
-                    ContactName = Str(a, "iletisimAd"), ContactPhone = Str(a, "iletisimTel")
-                };
-                db.Vehicles.Add(v);
-                await db.SaveChangesAsync();
-                vehicles[v.PlateNo] = v.Id;
-            }
-
-            // Kayıtlar prototipteki SIRAYLA, tek tek: oluşturulma anı sırayı taşır (CSV'de eşit günlerin sırası).
-            foreach (var k in s.GetProperty("kayitlar").EnumerateArray())
-            {
-                var r = new ServiceRecord(shop, vehicles[k.GetProperty("plaka").GetString()!], Str(k, "sikayet") ?? "", Tur(k.GetProperty("tur").GetString()!));
-                r.SetKm(Str(k, "km"));
-                foreach (var l in k.GetProperty("satirlar").EnumerateArray())
-                {
-                    var ad = l.GetProperty("ad").GetString()!;
-                    var fiyat = l.GetProperty("fiyat").GetDecimal();
-                    decimal? alis = l.TryGetProperty("alis", out var al) && al.ValueKind == JsonValueKind.Number ? al.GetDecimal() : null;
-                    r.AddLine(l.GetProperty("tip").GetString() == "parca"
-                        ? ServiceLine.Part(ad, fiyat, Str(l, "kimGetirdi") == "musteri" ? PartSupplier.Customer : PartSupplier.Shop, alis)
-                        : ServiceLine.Labor(ad, fiyat));
-                }
-                if (Str(k, "teslimTarihi") is { } teslim)
-                {
-                    var yol = Yol(k.GetProperty("odemeYolu").GetString()!);
-                    if (Str(k, "tahsilTarihi") is { } tahsil)
-                    {
-                        r.Deliver(PaymentMethod.Unpaid, Tarih(teslim), MaintenancePolicy.Default, []);
-                        r.CollectPayment(yol, Tarih(tahsil));
-                    }
-                    else r.Deliver(yol, Tarih(teslim), MaintenancePolicy.Default, []);
-                }
-                db.ServiceRecords.Add(r);
-                await db.SaveChangesAsync();
-                ids[k.GetProperty("id").GetInt32()] = r.Id;
-            }
-
-            foreach (var g in s.GetProperty("giderler").EnumerateArray())
-            {
-                db.Expenses.Add(Expense.Create(shop, g.GetProperty("aciklama").GetString()!, g.GetProperty("tutar").GetDecimal(), Tarih(g.GetProperty("tarih").GetString()!)));
-                await db.SaveChangesAsync();
-            }
+            // Tek eşleyici (D16): geliştirme tohumu da bunu kullanır — bu test onu da ölçer.
+            ids = await PrototypeSeed.WriteAsync(db, shop, s);
 
             var user = User.Create(shop, "0532 999 " + Random.Shared.Next(10, 99) + " " + Random.Shared.Next(10, 99));
             db.Users.Add(user);
