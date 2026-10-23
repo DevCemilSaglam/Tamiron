@@ -71,11 +71,14 @@ public interface ITamironDb
     DbSet<PriceRequest> PriceRequests { get; }
     DbSet<PriceReply> PriceReplies { get; }
     DbSet<ConsentEvent> ConsentEvents { get; }
+    DbSet<TraceEvent> TraceEvents { get; }
     // Giriş tabloları kiracı süzgecine TABİ DEĞİL (giriş öncesi aranır) — sorgu kiracıyı açıkça yazar.
     DbSet<User> Users { get; }
     DbSet<LoginCode> LoginCodes { get; }
     DbSet<Session> Sessions { get; }
     Task<int> SaveChangesAsync(CancellationToken ct = default);
+    /// <summary>Süresi dolan izi GERÇEKTEN siler (soft-delete değil, bütün dükkânlarda) — K-053.4.</summary>
+    Task<int> PurgeTraceBefore(DateTime utc, CancellationToken ct);
 }
 
 /// <summary>Bulunamadı — kayıt yok YA DA başka dükkânın (süzgeç ikisini ayırt ettirmez, bilerek).</summary>

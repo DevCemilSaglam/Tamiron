@@ -23,6 +23,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<PriceRequest> PriceRequests => Set<PriceRequest>();
     public DbSet<PriceReply> PriceReplies => Set<PriceReply>();
     public DbSet<ConsentEvent> ConsentEvents => Set<ConsentEvent>();
+    public DbSet<TraceEvent> TraceEvents => Set<TraceEvent>();
     public DbSet<User> Users => Set<User>();
     public DbSet<LoginCode> LoginCodes => Set<LoginCode>();
     public DbSet<Session> Sessions => Set<Session>();
@@ -108,6 +109,17 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
         });
 
         ConfigurePriceRequest(b);
+
+        // D9 · İz kaydı: bol satır, az okuma. Silme süreyle (90 gün), dükkân/oturum sorusu için iki indeks.
+        Tenant(b.Entity<TraceEvent>());
+        b.Entity<TraceEvent>(e =>
+        {
+            e.Property(x => x.Kind).HasMaxLength(16);
+            e.Property(x => x.Name).HasMaxLength(100);
+            e.Property(x => x.Data).HasMaxLength(4000);
+            e.HasIndex(x => x.DateTimeCreated);
+            e.HasIndex(x => new { x.SessionId, x.DateTimeCreated });
+        });
 
         // D5 · İzin izi: yalnız eklenir. Araç silinse de iz kalır (ispat).
         Tenant(b.Entity<ConsentEvent>());
@@ -224,6 +236,9 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
         e.HasOne<Shop>().WithMany().HasForeignKey(x => x.TenantId).OnDelete(DeleteBehavior.Restrict);
         e.HasQueryFilter(x => x.TenantId == CurrentTenant && x.DateTimeDeleted == null);
     }
+
+    public Task<int> PurgeTraceBefore(DateTime utc, CancellationToken ct)
+        => TraceEvents.IgnoreQueryFilters().Where(e => e.DateTimeCreated < utc).ExecuteDeleteAsync(ct);
 
     public override Task<int> SaveChangesAsync(CancellationToken ct = default)
     {

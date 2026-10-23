@@ -125,6 +125,18 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
 - **Okuma sahip adını/telefonunu doldurmaz** — prototipin okuma eşlemesinde yok. K-070.5'teki
   TC/ad/adres maskeleme sorusu okuyucu bağlanırken konuşulur.
 
+**76.9 · İz kaydı sunucuda (D9).**
+- **İstemci toplar, toplu gönderir** (`POST /api/trace`, oturumlu; en çok 300 = prototipin
+  halka tamponu). Dükkân, kişi ve cihaz OTURUMDAN — istemci kimlik söylemez.
+- **Temizlik sunucuda da yapılır** (prototip `guvenli`/`temizle` birebir): değer yazılır
+  (K-053), 80 harfte kırpılır, sayı iki basamak, boş düşer. Ek en çok 12 anahtar — tek olay
+  depoyu şişirmesin. Türkçe harf kaçışsız saklanır (okunur kalsın).
+- **Tanınmayan tür reddedilmez, düşer ve sayılır** (`{accepted, dropped}`): eski istemci
+  yeni sunucuya, yeni istemci eski sunucuya iz gönderebilsin; kayıp görünür kalsın.
+- **Okuma ucu YOK** — iz ustaya görünmez (K-052). Bizim taraftaki özet (A-M42) ayrı iş.
+- **90 gün sonra GERÇEK silme** (`PurgeTrace`). Zamanlayıcı kurulmadı (Gün-1'de Hangfire
+  yok, MIMARI §3): yedekleme betiğiyle (D19) aynı işletim adımında çağrılır.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

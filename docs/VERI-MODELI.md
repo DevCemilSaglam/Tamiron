@@ -306,6 +306,23 @@ Akıştaki yeri: müşteri künyesindeki izin çipi (91-musteri) — ekran yok, 
 
 ---
 
+## 13 · `TraceEvent` — İz kaydı (D9, 23.10 · K-052 · K-053)
+
+Akıştaki yeri: **yok** — ustaya görünmez, bizim tarafa ait (destek · vazgeçme · zorlanma).
+
+| Alan | Neden var |
+|---|---|
+| `UserId` · `SessionId` | Kim, hangi cihazda — **oturumdan**, istemci söylemez |
+| `ClientAt` | İstemcinin saati: olaylar arası süre buradan; geliş anı `DateTimeCreated` |
+| `Kind` | Prototipin türleri: `ekran` · `sure` · `dokunus` · `alan` · `okuma` · `duzeltme` · `hata` · `suphe` |
+| `Name` | Ekran adı, alan adı, şüphe kodu… (80 harf) |
+| `Data` | Ek, JSON — **değerler yazılır** (K-053); her değer 80 harfte kırpılır, en çok 12 anahtar |
+
+> **Saklama (K-053.4):** ayrıntı **90 gün**, sonra **gerçekten silinir** (soft-delete değil —
+> süresi dolan ayrıntı geri alınmaz). İstatistik (süresiz) henüz yok; A-M42 özetiyle gelir.
+
+---
+
 ## Model haritası
 
 ```

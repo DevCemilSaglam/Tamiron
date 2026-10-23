@@ -107,6 +107,9 @@ api.MapPost("/registrations/read", async (IFormFile photo, [Microsoft.AspNetCore
 }).DisableAntiforgery();
 api.MapPost("/registrations/save", (Tamiron.Application.Registrations.SaveRegistration cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 
+// D9 · İz kaydı: istemci olayları toplu gönderir. Okuma ucu YOK — ustaya görünmez (K-052).
+api.MapPost("/trace", (Tamiron.Application.Traces.SendTrace cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
+
 // D3 · Müşteri özet linki: usta linki alır; müşteri OTURUMSUZ açar (K-023, K-076.3).
 api.MapPost("/records/{id:guid}/summary-link", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.Summaries.GetSummaryLink(id), ct));
