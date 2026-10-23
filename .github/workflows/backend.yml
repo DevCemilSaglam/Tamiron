@@ -65,7 +65,7 @@ jobs:
         shell: pwsh
         run: |
           node tools/ses-sema-dok.js
-          git diff --exit-code -- src/Tamiron.Api/Ses/islem-semalari.json tests/Tamiron.Api.Tests/Esdeger/prototip-ses.json
+          git diff --exit-code -- src/Tamiron.Api/Ses/islem-semalari.json tests/Tamiron.Api.Tests/Esdeger/prototip-ses.json src/Tamiron.Ui.Core/Ses/soyleyis.json
           if ($LASTEXITCODE -ne 0) { Write-Error "Prototipte şema değişmiş: node tools/ses-sema-dok.js koşup dosyaları işle."; exit 1 }
 
       - name: Test sonuçları

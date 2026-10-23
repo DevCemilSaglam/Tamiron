@@ -12,6 +12,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- E3 · Ses çözümleyicisinin verisi (söyleyiş sözlüğü, hazır metinler) — prototipten üretilir
+         (node tools/ses-sema-dok.js), elle düzenlenmez; gömülü: telefonda internetsiz okunur. -->
+    <EmbeddedResource Include="Ses\soyleyis.json" LogicalName="Tamiron.Ui.Core.Ses.soyleyis.json" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.11" />
   </ItemGroup>
 

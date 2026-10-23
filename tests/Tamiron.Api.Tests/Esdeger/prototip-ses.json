@@ -7927,6 +7927,373 @@
     "tip": "parca",
     "tur": "satir-ekle"
    }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "balata 900 lira olsun",
+   "baglam": "kayit-icinde",
+   "kayit": 3,
+   "islem": {
+    "ad": "balata",
+    "fiyat": 900,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "ön fren balatası 900 lira",
+   "baglam": "kayit-icinde",
+   "kayit": 3,
+   "islem": {
+    "fiyat": 900,
+    "indeks": 0,
+    "kayit": 3,
+    "satir": "Ön fren balatası",
+    "tur": "fiyat-guncelle"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "balata değişimi 850",
+   "baglam": "kayit-icinde",
+   "kayit": 3,
+   "islem": {
+    "fiyat": 850,
+    "indeks": 1,
+    "kayit": 3,
+    "satir": "Balata değişimi",
+    "tur": "fiyat-guncelle"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "fren 700 lira",
+   "baglam": "kayit-icinde",
+   "kayit": 3,
+   "islem": {
+    "fiyat": 700,
+    "indeks": 0,
+    "kayit": 3,
+    "satir": "Ön fren balatası",
+    "tur": "fiyat-guncelle"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "teslim ettim havale",
+   "baglam": "kayit-icinde",
+   "kayit": 3,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 3,
+    "odeme": "havale",
+    "plaka": "35 KLM 45",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "Mégane geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "Mégane geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Mégane 34 ABC 123 geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Mégane 34 ABC 123 geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Mégane 34 ABC 123 geldi",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "Mégane geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "Mégane geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Mégane34 ABC 123 geldi",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "Mégane 34 ABC 123 geldi",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "Mégane geldi",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "Clio bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "Clio bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "Clio 16 SY 8890 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "Clio 16 SY 8890 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "Clio 16 SY 8890 bakım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "Clio bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "16 SY 8890",
+    "is": "Clio bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "Clio16 SY 8890 bakım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "16 SY 8890",
+    "baskaIslem": {
+     "ad": "Clio 16 SY 8890 bakım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "Clio bakım",
+    "isTuru": "bakim",
+    "km": "",
+    "plaka": "16 SY 8890",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "café balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "café balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "café06 TMR 07 balata",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "café06 TMR 07 balata",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "café06 TMR 07 balata",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "café balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "café balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek3",
+   "cumle": "café06 TMR 07 balata",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "café06 TMR 07 balata",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "café balata",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
   }
  ]
 }

@@ -17,6 +17,11 @@ Cemil: *"Çözümleyiciyi C#'a taşı."* Yer `Tamiron.Ui.Core` (Blazor WASM'da t
 koşar: internetsiz çalışır, MAUI ile paylaşılır). Ölçü: `Esdeger/prototip-ses.json`'daki
 273 durumda prototiple **0 fark**. Dil modeli bütçe olunca arkaya, zor cümleler için.
 
+  → **E3/E4'te yapıldı:** `Tamiron.Ui.Core/Ses` — 734 durumda prototiple 0 fark, 20/20 mutasyon.
+  Türkçe büyük/küçük harf kültür verisinden okunmaz (WASM'da tr-TR olmayabilir); JS'in ASCII ``'si
+  ve `/i` eşlemesi taklit edilir. Söyleyiş sözlüğü prototipten üretilir. Mesaj gövdesi sunucudan.
+  Kalan: ses ekranının kendisi (tanıyıcı → metin → bu çözümleyici → onay) arayüzle gelir.
+
 **77.2 · Ödeme yolunu düzelt — evet; sesle ve dokunarak.** Cemil: *"İkisi de gerekli ama
 button ön planda olmasına gerek yok. Düzelt ya da düzenle diye bir button altında bu tür
 işlemler yapılabilir."* → kayıtta tek bir **"Düzenle"** girişi; altında ödeme yolu (ve

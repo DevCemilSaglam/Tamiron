@@ -97,6 +97,14 @@ const durumlar = [];
 for (const c of set.cumleler) durumlar.push({ kaynak: 'ses-seti#' + c.id, cumle: c.cumle, baglam: c.baglam });
 for (const cumle of EK) for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek', cumle, baglam });
 for (const cumle of EK2) for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek2', cumle, baglam });
+/* Mutasyonla bulunan iki kör nokta (E3/E4):
+   - TEK ADAY kuralı (A-M27): 1 numaralı kaydın tek satırı var, "iki satır uyuyor" hiç oluşmuyordu.
+     3 numaralı kayıtta "Ön fren balatası" ve "Balata değişimi" — "balata" ikisine birden uyar.
+   - JS \b ASCII'dir: hazırlık Türkçe harfle rakamı ayırıyor ama "é"yi ayırmıyor ("Mégane34 …"). */
+const EK3 = ['balata 900 lira olsun', 'ön fren balatası 900 lira', 'balata değişimi 850', 'fren 700 lira', 'teslim ettim havale'];
+for (const cumle of EK3) durumlar.push({ kaynak: 'ek3', cumle, baglam: 'kayit-icinde', kayit: 3 });
+for (const cumle of ['Mégane34 ABC 123 geldi', 'Clio16 SY 8890 bakım', 'café06 TMR 07 balata'])
+  for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek3', cumle, baglam });
 
 /* Açık kayıt: kayıt içi bağlamda prototipin 1 numaralı kaydı (tohum). Araç nesnesi (`arac`)
    tohumdan gelir ve sunucuda aracın KENDİSİ okunur — korpusta yalnız plakası tutulur. */
@@ -116,8 +124,17 @@ const sade = (o) => {
 };
 const korpus = durumlar.map(d => ({
   ...d,
-  islem: sade(run(`Islem.cozumle(${JSON.stringify(d.cumle)}, ${JSON.stringify(d.baglam)}, ${d.baglam === 'kayit-icinde' ? 1 : 'null'})`))
+  islem: sade(run(`Islem.cozumle(${JSON.stringify(d.cumle)}, ${JSON.stringify(d.baglam)}, ${d.baglam === 'kayit-icinde' ? (d.kayit || 1) : 'null'})`))
 }));
+
+/* E3 (K-077.1) · Cihazdaki C# çözümleyicinin VERİSİ — söyleyiş sözlüğü ve hazır metinler. Kural
+   değil veri; tek kaynak prototip (05-soyleyis.js, 02-veri.js HAZIR_METIN). */
+const SOZLUK_CIKTI = path.join(KOK, 'src', 'Tamiron.Ui.Core', 'Ses', 'soyleyis.json');
+fs.mkdirSync(path.dirname(SOZLUK_CIKTI), { recursive: true });
+fs.writeFileSync(SOZLUK_CIKTI, JSON.stringify(run(`({
+  terim: SOYLEYIS_TERIM, marka: SOYLEYIS_MARKA, model: SOYLEYIS_MODEL,
+  hazir: HAZIR_METIN.map(function (h) { return { k: h.k, kokler: h.kokler, metin: h.metin }; })
+})`), null, 1) + '\n');
 
 const semalar = run('Islem.json()');
 fs.mkdirSync(path.dirname(SEMA_CIKTI), { recursive: true });
