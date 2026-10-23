@@ -170,6 +170,28 @@ public class ServiceRecord : TenantEntity
         ReminderSent = false;
     }
 
+    /// <summary>
+    /// Yanlış teslimi geri al (D14, K-076.13) — kayıt teslim öncesi hâline döner. Dar tutuldu:
+    /// yalnız AYNI GÜN (ertesi gün kasa kapanmış, müşteriye mesaj gitmiş olabilir); sonradan
+    /// tahsil edildiyse önce tahsil geri alınır (UndoCollection) — para iki adımda, görünerek
+    /// çıkar; hatırlatma gönderildiyse geri alınmaz (müşteriye söz verilmiş).
+    /// </summary>
+    public void UndoDelivery(DateOnly today)
+    {
+        if (DeliveredAt is null)
+            throw new DomainException("delivery.nothing_to_undo", "Bu kayıt teslim edilmemiş.");
+        if (DeliveredAt != today)
+            throw new DomainException("delivery.undo_too_late", "Teslim yalnız aynı gün geri alınır. Yanlışsa kaydı düzelt.");
+        if (PaymentCollectedAt is not null)
+            throw new DomainException("delivery.undo_collection_first", "Önce ödemeyi geri al, sonra teslimi.");
+        if (ReminderSent)
+            throw new DomainException("delivery.undo_reminder_sent", "Bakım hatırlatması gönderildi — teslim geri alınamaz.");
+        DeliveredAt = null;
+        PaymentMethod = null;
+        ReminderDate = null;
+        ReminderSent = false;
+    }
+
     /// <summary>Teslim edilseydi kurulacak hatırlatma (teslim ekranının önizlemesi). Bakım değilse yok.</summary>
     public ReminderPlan? PlanReminder(DateOnly on, MaintenancePolicy policy, IEnumerable<KmReading> otherReadings)
     {

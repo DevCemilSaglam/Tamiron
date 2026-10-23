@@ -180,6 +180,22 @@ lider kararıdır. Gerekçesi yazılı; tek cümleyle geri alınabilir. İncelem
   hâlde, kiracı kontrolü olmasa kayıt GERİ GELİYORDU — yanıt doğru, yan etki yanlış. Test
   artık yan etkiye bakıyor.
 
+**76.13 · Teslimi geri alma (D14) — ⚠️ prototiple ÇELİŞİR, Cemil'in özellikle bakması gerek.**
+- **Prototip:** 50-teslim'in başı *"Ayrı ekran, çünkü ayrı an. Servis kaydıyla
+  birleştirilirse yanlışlıkla teslim edilir ve **teslim geri alınamaz**."* Yani tasarım
+  geri almayı hiç düşünmedi; korumayı ayrı ekranla yaptı.
+- **Lider kararı:** koruma (ayrı ekran) KALIR; arkasına dar bir emniyet eklenir. Yanlış
+  araca "Nakit" basmak kasaya olmayan para yazar ve kayıt kilitlenir (D13 teslimliyi
+  silmez) — usta bunu düzeltecek hiçbir yol bulamazdı.
+- **Dar sınır:** yalnız **aynı gün** (ertesi gün kasa kapanmış olabilir); sonradan tahsil
+  edildiyse **önce tahsil** geri alınır (para iki adımda, görünerek çıkar); **hatırlatma
+  gönderildiyse** geri alınmaz (müşteriye söz verilmiş). Geri alınca ödeme ve kurulan
+  hatırlatma da silinir, kayıt teslim öncesi hâline döner.
+- **Ekran eklemiyor:** teslimden sonra çıkan balonda "Geri al" (satır silmedeki gibi).
+- **Geri alınacaksa tek cümle:** uç ve domain yöntemi silinir, prototipin sözü geçerli kalır.
+- `TAMIRCI-GERIBILDIRIM.md §4`'e yazılmadı: çelişki tamircinin sözüyle değil, bizim
+  tasarım notumuzla — Cemil karar verince gerekirse yazılır.
+
 ---
 
 ## K-075 · Muhasebe Faz 1 backend'de BİTTİ — prototiple 0 fark (22.10.2026)

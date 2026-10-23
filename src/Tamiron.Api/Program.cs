@@ -233,6 +233,8 @@ api.MapGet("/records/{id:guid}/delivery-preview", (Guid id, ISender s, Cancellat
     s.Send(new GetDeliveryPreview(id), ct));
 api.MapPost("/records/{id:guid}/deliver", (Guid id, CollectBody body, ISender s, CancellationToken ct) =>
     s.Send(new DeliverRecord(id, body.Method), ct));
+// D14 · Yanlış teslimi geri al: aynı gün; tahsil edildiyse önce tahsil geri alınır (K-076.13).
+api.MapPost("/records/{id:guid}/deliver/undo", (Guid id, ISender s, CancellationToken ct) => s.Send(new UndoDelivery(id), ct));
 
 // Satırlar (B3). Her uç kaydın güncel hâlini döner.
 api.MapPost("/records/{id:guid}/lines", (Guid id, LineBody body, ISender s, CancellationToken ct) =>

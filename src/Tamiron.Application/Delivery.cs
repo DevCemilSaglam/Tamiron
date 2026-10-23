@@ -12,10 +12,13 @@ public sealed record DeliveryPreview(Guid RecordId, ReminderPlan? Reminder);
 
 public sealed record GetDeliveryPreview(Guid RecordId) : IRequest<DeliveryPreview>;
 public sealed record DeliverRecord(Guid RecordId, PaymentMethod Method) : IRequest<ServiceRecordDto>;
+/// <summary>D14 · Yanlış teslimi geri al — aynı gün (K-076.13).</summary>
+public sealed record UndoDelivery(Guid RecordId) : IRequest<ServiceRecordDto>;
 
 internal sealed class DeliveryHandlers(ITamironDb db, IClock clock, ITenantContext tenant) :
     IRequestHandler<GetDeliveryPreview, DeliveryPreview>,
-    IRequestHandler<DeliverRecord, ServiceRecordDto>
+    IRequestHandler<DeliverRecord, ServiceRecordDto>,
+    IRequestHandler<UndoDelivery, ServiceRecordDto>
 {
     private async Task<(ServiceRecord, MaintenancePolicy, List<KmReading>)> Inputs(Guid id, bool tracking, CancellationToken ct)
     {
@@ -46,6 +49,14 @@ internal sealed class DeliveryHandlers(ITamironDb db, IClock clock, ITenantConte
     {
         var (r, policy, readings) = await Inputs(c.RecordId, tracking: true, ct);
         r.Deliver(c.Method, clock.Today, policy, readings);   // gün sunucudan
+        await db.SaveChangesAsync(ct);
+        return await Map.LoadDto(db, r.Id, ct);
+    }
+
+    public async Task<ServiceRecordDto> Handle(UndoDelivery c, CancellationToken ct)
+    {
+        var r = await db.ServiceRecords.FirstOrDefaultAsync(x => x.Id == c.RecordId, ct) ?? throw new NotFoundException("Servis kaydı");
+        r.UndoDelivery(clock.Today);
         await db.SaveChangesAsync(ct);
         return await Map.LoadDto(db, r.Id, ct);
     }
