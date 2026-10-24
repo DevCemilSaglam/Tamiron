@@ -491,6 +491,31 @@ public sealed partial class SesCozumleyici(SesDunya dunya, SesSozluk? sozluk = n
         return en;
     }
 
+    /// <summary>
+    /// Prototip sesOdemeAl (50-teslim, K-078 · F7): yalnız KALANI OLAN iş; "aldım/ödedi/verdi/yatırdı" fiili;
+    /// tutar lirası söylenmiş ya da fiilden hemen önce çıplak sayı; "kalanını/hepsini" = kalanın tamamı.
+    /// Ödeme yolu söylenmezse boş — onay ekranı sorar.
+    /// </summary>
+    private JsonObject? OdemeAl(string d, SesKayit? k)
+    {
+        if (k is null || k.Kalan <= 0 || !AlmaFiiliRe().IsMatch(d)) return null;
+        var tutar = KalaniRe().IsMatch(d) ? k.Kalan : AlinanTutar(d);
+        if (tutar == 0) return null;
+        return O(("tur", "odeme-al"), ("plaka", k.Plaka), ("arac", dunya.AracBul(k.Plaka)?.Plaka), ("kayit", k.Id),
+                 ("tutar", tutar), ("odeme", TeslimOdemesi(d)));
+    }
+
+    /// <summary>Prototip sesAlinanTutar: lira'lı tutar, yoksa fiilden önceki çıplak sayı (≥ 2 hane, 0 ile başlamaz).</summary>
+    private static decimal AlinanTutar(string d)
+    {
+        var t = TutarBul(d);
+        if (t != 0) return t;
+        var m = AlinanTutarRe().Match(d);
+        if (!m.Success) return 0;
+        var rakam = m.Groups[2].Value.Replace(".", "");
+        return rakam.Length >= 2 && rakam.Length < 10 && rakam[0] != '0' ? long.Parse(rakam, System.Globalization.CultureInfo.InvariantCulture) : 0;
+    }
+
     /// <summary>Teslimde ödeme: "değil" geçen cümlede düzeltmenin kuralı ("nakit değil kartla" → kart).</summary>
     private static string? TeslimOdemesi(string d) => d.Contains("degil") ? DuzeltilenYol(d) : OdemeYolu(d);
 
@@ -561,16 +586,21 @@ public sealed partial class SesCozumleyici(SesDunya dunya, SesSozluk? sozluk = n
             Tani: c =>
             {
                 if (c.P is null || c.Arac is null || !OdemeDuzeltmeMi(c.Dk) || DuzeltilenYol(c.Dk) is not { } yol) return null;
-                var k = dunya.Kayitlar.LastOrDefault(k => k.Plaka == c.P.Plaka && k.Teslim && k.OdemeYolu != "almadim");
+                var k = dunya.Kayitlar.LastOrDefault(k => k.Plaka == c.P.Plaka && k.Teslim && k.OdemeSayisi > 0);
                 if (k is null) return null;
                 return O(("tur", "odeme-duzelt"), ("plaka", c.P.Plaka), ("arac", c.Arac.Plaka), ("kayit", k.Id), ("odeme", yol));
             },
             Baglamda: c =>
             {
                 var k = c.Kayit;
-                if (k is null || !k.Teslim || k.OdemeYolu == "almadim" || DuzeltilenYol(c.D) is not { } yol || !OdemeDuzeltmeMi(c.D)) return null;
+                if (k is null || !k.Teslim || k.OdemeSayisi == 0 || DuzeltilenYol(c.D) is not { } yol || !OdemeDuzeltmeMi(c.D)) return null;
                 return O(("tur", "odeme-duzelt"), ("plaka", k.Plaka), ("arac", dunya.AracBul(k.Plaka)?.Plaka), ("kayit", k.Id), ("odeme", yol));
             }),
+        // K-078 · F7 · "2 bin aldım" — elden taksit. Öncelik 15: gider-ekle'den (20) önce; tetik dar.
+        new("odeme-al", ["kayit-icinde"], 15,
+            Tani: c => c.P is null || c.Arac is null ? null
+                       : OdemeAl(c.Dk, dunya.Kayitlar.LastOrDefault(k => k.Plaka == c.P.Plaka && k.Kalan > 0)),
+            Baglamda: c => OdemeAl(c.D, c.Kayit)),
         new("teslim-edilecek-kayit-yok", [], null, Guclu: false),
         new("ara", ["araclar", "kayitlar", "musteriler"], 50, Tani: c =>
         {
@@ -711,6 +741,9 @@ public sealed partial class SesCozumleyici(SesDunya dunya, SesSozluk? sozluk = n
     // ===================== DÜZENLİ İFADELER (JS'ten; \b ve \w ASCII, $ = metnin sonu) =====================
 
     [GeneratedRegex(@"(^|\s)kk(\s|\z)")] private static partial Regex KkRe();
+    [GeneratedRegex(@"(^|\s)(aldim|aldik|odedi|verdi|yatirdi)(\s|\z)")] private static partial Regex AlmaFiiliRe();
+    [GeneratedRegex(@"(^|\s)(kalanini|kalani|hepsini|tamamini)(\s|\z)")] private static partial Regex KalaniRe();
+    [GeneratedRegex(@"(^|\s)([0-9][0-9.]*)\s+(aldim|aldik|odedi|verdi|yatirdi)(\s|\z)")] private static partial Regex AlinanTutarRe();
     [GeneratedRegex(@"(^|\s)eft(\s|\z)")] private static partial Regex EftRe();
     [GeneratedRegex(@"(?<![A-Za-z0-9_])([0-9]{2})\s*([A-ZÇĞİÖŞÜ](?: ?[A-ZÇĞİÖŞÜ]){0,2})\s*([0-9]{2,5})(?![A-Za-z0-9_])")] private static partial Regex PlakaAdayRe();
     [GeneratedRegex(@"^\s+([0-9]{1,3})(?![0-9])")] private static partial Regex EkRakamRe();

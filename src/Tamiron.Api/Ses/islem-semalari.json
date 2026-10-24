@@ -136,6 +136,37 @@
   }
  },
  {
+  "name": "odeme-al",
+  "description": "Ödeme alınacak · ekran: kayit",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
+     "description": "Araç"
+    },
+    "tutar": {
+     "type": "integer",
+     "description": "Alınan — Türk lirası, kuruşsuz"
+    },
+    "odeme": {
+     "type": "string",
+     "enum": [
+      "nakit",
+      "kart",
+      "havale"
+     ],
+     "description": "Nasıl"
+    }
+   },
+   "required": [
+    "plaka",
+    "tutar"
+   ]
+  }
+ },
+ {
   "name": "odeme-duzelt",
   "description": "Ödeme yolu düzeltilecek · ekran: kayit",
   "input_schema": {

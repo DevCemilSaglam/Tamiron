@@ -6,6 +6,7 @@
   "fiyat-guncelle",
   "gider-ekle",
   "mesaj-gonder",
+  "odeme-al",
   "odeme-duzelt",
   "satir-ekle",
   "servis-ac",
@@ -9267,6 +9268,1281 @@
     "fiyat": 0,
     "tip": "parca",
     "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "2 bin aldım nakit",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "2 bin aldım nakit",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "2000 aldım nakit",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "2 bin aldım nakit",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "2000 aldım nakit",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "hepsini aldım havale",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "havale",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "hepsini aldım havale",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "hepsini aldım havale",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "hepsini aldım havale",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "hepsini aldım havale",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "kalanını kartla aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "kalanını kartla aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "kalanını kartla aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "kalanını kartla aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "kalanını kartla aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "500 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 500
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "500 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "500 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "500 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "500 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "1500 lira ödedi kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 1500
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "1500 lira ödedi kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "ödedi kartla",
+    "fiyat": 1500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "1500 lira ödedi kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "ödedi kartla",
+    "fiyat": 1500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "balata aldım 500",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "balata aldım",
+    "fiyat": 500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "balata aldım 500",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "balata aldım",
+    "fiyat": 500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "balata aldım 500",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "balata aldım",
+    "fiyat": 500,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "nakit değil kartla 2 bin aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "nakit değil kartla 2 bin aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "nakit değil kartla 2 bin aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "nakit değil kartla 2000 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "5 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "5 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "5 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "5 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "5 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "5 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "müşteri 750 verdi",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 750
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "müşteri 750 verdi",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "müşteri 750 verdi",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "müşteri 750 verdi",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "müşteri 750 verdi",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "eft ile 1000 yatırdı",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "havale",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 1000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "eft ile 1000 yatırdı",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "eft ile 1000 yatırdı",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "eft ile 1000 yatırdı",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "eft ile 1000 yatırdı",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "aldım 2000",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "aldım",
+    "fiyat": 2000,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "aldım 2000",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "aldım",
+    "fiyat": 2000,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "aldım 2000",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "aldım",
+    "fiyat": 2000,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "iki bin lira aldım kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "iki bin lira aldım kartla",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "iki bin lira aldım kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "iki bin lira aldım kartla",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "iki bin lira aldım kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "iki bin lira aldım kartla",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "2000 lira nakit",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "nakit",
+    "fiyat": 2000,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "2000 lira nakit",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "nakit",
+    "fiyat": 2000,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "2000 lira nakit",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "nakit",
+    "fiyat": 2000,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "500 verdikten sonra 300 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 300
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "500 verdikten sonra 300 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "500 verdikten sonra 300 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "500 verdikten sonra 300 aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "500 verdikten sonra 300 aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2 bin aldım nakit",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 için 2000 aldım nakit",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 8,
+    "odeme": "nakit",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 için 2000 lira aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 için aldım",
+     "fiyat": 2000,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 2000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 kalanını kartla aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 kalanını kartla aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 8,
+    "odeme": "kart",
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 5000 aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 5000 aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 5000
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "için 2000 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "için 2000 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 için 2000 aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 için 2000 aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 için 2000 aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "için 2000 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "için 2000 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "34 ABC 123 için 2 bin aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 için 2000 aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "için 2000 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "araclar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 hepsini aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 hepsini aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 8,
+    "odeme": null,
+    "plaka": "06 TMR 07",
+    "tur": "odeme-al",
+    "tutar": 3450
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "07 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "07 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "06 TMR 07 07 aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "06 TMR 07 07 aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "06 TMR 07 07 aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "07 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "07 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek5",
+   "cumle": "06 TMR 07 07 aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 07 aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "07 aldım",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
    }
   }
  ]

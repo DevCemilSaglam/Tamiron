@@ -23,6 +23,21 @@ public class SesEsdegerlikTests
 
     static JsonElement Json(params string[] yol) => JsonDocument.Parse(File.ReadAllText(Path.Combine([Root(), .. yol]))).RootElement;
 
+    /// <summary>
+    /// Prototip kalanTutar / kayitOdemeleri'nin tohumdaki karşılığı (uygulamada bunlar sunucudan gelir:
+    /// Remaining, Payments). Tohumda kısmi ödeme yok: veresiyenin kalanı toplamı, ödenmişin ödemesi tek.
+    /// </summary>
+    static decimal Kalan(JsonElement k)
+        => k.TryGetProperty("teslimTarihi", out var t) && t.ValueKind == JsonValueKind.String && k.GetProperty("odemeYolu").GetString() == "almadim"
+            ? k.GetProperty("satirlar").EnumerateArray()
+                .Where(s => !(s.GetProperty("tip").GetString() == "parca" && s.TryGetProperty("kimGetirdi", out var g) && g.GetString() == "musteri"))
+                .Sum(s => s.GetProperty("fiyat").GetDecimal())
+            : 0m;
+
+    static int OdemeSayisi(JsonElement k)
+        => k.TryGetProperty("teslimTarihi", out var t) && t.ValueKind == JsonValueKind.String
+           && k.GetProperty("odemeYolu").GetString() is { } y && y != "almadim" ? 1 : 0;
+
     /// <summary>Korpusu üreten prototip tohumu: ARACLAR ve KAYITLAR, prototipteki sırayla.</summary>
     public static SesDunya Dunya()
     {
@@ -32,7 +47,8 @@ public class SesEsdegerlikTests
             .Select(a => new SesArac(S(a, "plaka")!, S(a, "marka"), S(a, "model"), S(a, "sahipAd"))).ToList();
         var kayitlar = t.GetProperty("kayitlar").EnumerateArray()
             .Select(k => new SesKayit(k.GetProperty("id").GetInt32().ToString(), S(k, "plaka")!, S(k, "teslimTarihi") is not null,
-                k.GetProperty("satirlar").EnumerateArray().Select(s => S(s, "ad") ?? "").ToList(), S(k, "odemeYolu"))).ToList();
+                k.GetProperty("satirlar").EnumerateArray().Select(s => S(s, "ad") ?? "").ToList(), S(k, "odemeYolu"),
+                Kalan(k), OdemeSayisi(k))).ToList();
         return new SesDunya(araclar, kayitlar, (plaka, sablon) => $"<<{plaka}|{sablon}>>");
     }
 

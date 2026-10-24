@@ -118,6 +118,20 @@ for (const cumle of ['35 KLM 45 ödemesi nakit değil kart', '06 TMR 07 ödemeyi
   '16 SY 8890 nakit değil eft', '34 ABC 123 ödeme yanlış', '99 ZZZ 999 nakit değil kart'])
   for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek4', cumle, baglam });
 
+/* EK5 · "2 bin aldım" — elden taksit (K-078 · F7). Kayıt içinde: 8 veresiye (hedef), 7 ödenmiş ve
+   1 açık (hedef DEĞİL — açık kayıtta "aldım" parçadır). Plakayla her bağlamda: 06 TMR 07'nin veresiyesi
+   var, 34 ABC 123'ün yok. Tuzaklar: lirasız sayı fiilden önce değilse tutar değil; "değil" kuralı;
+   "kalanını/hepsini"; tek haneli sayı; plaka rakamı tutar sanılmasın. */
+const EK5 = ['2 bin aldım nakit', 'hepsini aldım havale', 'kalanını kartla aldım', '500 aldım', '1500 lira ödedi kartla',
+  'balata aldım 500', 'nakit değil kartla 2 bin aldım', '5 aldım', 'müşteri 750 verdi', 'eft ile 1000 yatırdı',
+  'aldım 2000', 'iki bin lira aldım kartla',
+  // F7 mutasyonla bulunan iki kör nokta: fiilsiz tutar ödeme DEĞİL; "verdikten" fiil değil (sınır).
+  '2000 lira nakit', '500 verdikten sonra 300 aldım'];
+for (const cumle of EK5) for (const kayit of [8, 7, 1]) durumlar.push({ kaynak: 'ek5', cumle, baglam: 'kayit-icinde', kayit });
+for (const cumle of ['06 TMR 07 için 2 bin aldım nakit', '06 TMR 07 için 2000 lira aldım', '06 TMR 07 kalanını kartla aldım',
+  '06 TMR 07 5000 aldım', '34 ABC 123 için 2 bin aldım', '06 TMR 07 hepsini aldım', '06 TMR 07 07 aldım'])
+  for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek5', cumle, baglam });
+
 /* Açık kayıt: kayıt içi bağlamda prototipin 1 numaralı kaydı (tohum). Araç nesnesi (`arac`)
    tohumdan gelir ve sunucuda aracın KENDİSİ okunur — korpusta yalnız plakası tutulur. */
 const sade = (o) => {

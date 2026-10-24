@@ -55,6 +55,24 @@ gelmez (kimliğe göre), domain'in "son ödeme"si rastgeleydi. Aynı hata ödeme
 KAYITLAR dizisinin sırasıyla yazıyordu (rastgele); sunucu teslim günüyle (C-turunda seçilmişti). İki
 alacak ilk kez bir senaryoda yan yana gelince (teslimde kısmi ödeme) ayrıştı. Muhasebeci tarih
 sırasıyla okur; tahsilat satırları da öyle → prototip sunucuya çekildi.
+
+**78.7 · Sesle "2 bin aldım" (`odeme-al`, F7 — Cemil: "Her yerde olabilir").** Kurallar:
+- **Hedef yalnız KALANI OLAN iş.** Kayıt açıkken o kayıt; plakayla her bağlamda aracın kalanı olan
+  son işi. Teslimsiz kayıtta "balata aldım 500" parçadır → satır ekleme, burada tanınmaz.
+- **Tetik:** aldım · aldık · ödedi · verdi · yatırdı **ve** tutar ("lira"lı ya da fiilden hemen önce
+  çıplak sayı); "kalanını / hepsini" = kalanın tamamı. 0 ile başlayan ya da tek haneli sayı tutar
+  değil ("06 TMR 07 07 aldım" plakanın sonu iki kez duyulmuş — korpus tuzağı yakaladı).
+- **Öncelik 15** (gider-ekle'den önce): muhasebe ekranında "06 TMR 07 için 2000 lira aldım" gider
+  sanılıyordu. Kayıtlı aracın plakası geçen cümle dükkân gideri olamaz.
+- **Yol söylenmezse onay ekranı SORAR** (çip); "değil" geçen cümlede düzeltmenin kuralı. Tarayıcıda
+  denerken bulundu: şemadaki `zorunlu` onay ekranında sorulmuyordu — yol seçilmeden "Kaydet" yolsuz
+  ödeme yazardı. Artık soru + `uygula` reddeder. Şemada zorunlu değil (model söylenmeyeni uyduramaz).
+- `odeme-duzelt` taksitli kayıtta SON ödemenin yolunu düzeltir (sunucuyla aynı); hedefi "ödemesi
+  olan" teslimli iş.
+
+**78.8 · Mutasyon aracı tabanı önce ölçer.** F7'nin ilk koşusu 11/11 "yakalandı" dedi — taban zaten
+kırmızıydı (VoiceSchemaTests), her mutasyon o yüzden kırmızı göründü. `tools/mutasyon.py` artık
+önce tabanı koşturur; kırmızıysa mutasyon koşmaz. Ders: "yakalandı" ancak yeşil tabana göre bir şey söyler.
  · Tur D incelemesi — Cemil'in cevapları (23.10.2026 akşam)
 
 **77.1 · Ses çözümleyicisi C#'a, CİHAZDA çalışacak şekilde — K-076.14'ü genişletir.**

@@ -9,8 +9,12 @@ public sealed record SesArac(string Plaka, string? Marka = null, string? Model =
 /// <summary>
 /// Çözümleyicinin tanıdığı kayıt — açık iş (teslim), satır adları (fiyat güncelleme), ödeme yolu
 /// (düzeltme: "almadim" = veresiye, düzeltilmez — E5). Ödeme yolu prototipin adıyla: nakit · kart · havale · almadim.
+/// <paramref name="Kalan"/>: alacak — "2 bin aldım" yalnız kalanı olan işi hedefler (K-078 · F7);
+/// <paramref name="OdemeSayisi"/>: alınmış ödeme var mı — düzeltme ancak onu hedefler. İkisi de sunucudan
+/// (kayıt cevabındaki Remaining ve Payments); çözümleyici hesaplamaz.
 /// </summary>
-public sealed record SesKayit(string Id, string Plaka, bool Teslim, IReadOnlyList<string> Satirlar, string? OdemeYolu = null);
+public sealed record SesKayit(string Id, string Plaka, bool Teslim, IReadOnlyList<string> Satirlar, string? OdemeYolu = null,
+                              decimal Kalan = 0, int OdemeSayisi = 0);
 
 /// <summary>
 /// Çözümleyicinin dünyası: dükkânın araçları ve kayıtları (prototipte ARACLAR / KAYITLAR), kayıtlar

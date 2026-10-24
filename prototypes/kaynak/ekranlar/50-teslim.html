@@ -381,7 +381,7 @@ Islem.tanim('odeme-duzelt', {
     var k = c.kayit, yol = sesDuzeltilenYol(c.d);
     /* VERESİYE düzeltilmez: "almadım" yazılı kayıtta "havaleye çevir" geriye dönük kasaya para
        yazardı — ustanın kastı "şimdi aldım"dır, o TAHSİLATTIR (E6 "x aldım"). */
-    if (!k || !k.teslimTarihi || k.odemeYolu === 'almadim' || !yol || !sesOdemeDuzeltmeMi(c.d)) return null;
+    if (!k || !k.teslimTarihi || !kayitOdemeleri(k).length || !yol || !sesOdemeDuzeltmeMi(c.d)) return null;
     return { tur: 'odeme-duzelt', plaka: k.plaka, arac: aracBul(k.plaka), kayit: k, odeme: yol };
   },
   /* Plakayla her yerden: aracın teslim edilmiş SON kaydı. */
@@ -389,19 +389,91 @@ Islem.tanim('odeme-duzelt', {
     if (!c.p || !c.arac || !sesOdemeDuzeltmeMi(c.dk)) return null;
     var yol = sesDuzeltilenYol(c.dk);
     if (!yol) return null;
-    var teslimli = aracKayitlari(c.p.plaka).filter(function (k) { return k.teslimTarihi && k.odemeYolu !== 'almadim'; });
+    var teslimli = aracKayitlari(c.p.plaka).filter(function (k) { return k.teslimTarihi && kayitOdemeleri(k).length; });
     var k = teslimli[teslimli.length - 1];
     if (!k) return null;
     return { tur: 'odeme-duzelt', plaka: c.p.plaka, arac: c.arac, kayit: k, odeme: yol };
   },
   uygula: function (o) {
     ACIK_KAYIT = o.kayit.id;
-    if (o.kayit.odemeYolu === o.odeme) {
+    /* K-078: taksitli kayıtta düzeltilen SON ödemenin yoludur (sunucu
+       CorrectPaymentMethod'un aynısı); tutarı ve günü korunur. */
+    var son = o.kayit.odemeler && o.kayit.odemeler[o.kayit.odemeler.length - 1];
+    var simdiki = son ? son.yol : o.kayit.odemeYolu;
+    if (simdiki === o.odeme) {
       balon('Ödeme zaten "' + SES_ODEME[o.odeme] + '" yazılı.', false, 2800);
     } else {
-      o.kayit.odemeYolu = o.odeme;
+      if (son) { son.yol = o.odeme; odemeDurumu(o.kayit); } else o.kayit.odemeYolu = o.odeme;
       balon('Ödeme "' + SES_ODEME[o.odeme] + '" olarak düzeltildi — teslim günü değişmedi.', false, 3200);
     }
+    Ekran.ac('kayit');
+  }
+});
+
+/* ================= "2 BİN ALDIM" — ELDEN TAKSİT (24.10 · K-078 · F7) =================
+   Cemil: *"elden taksit de x miktar aldım şeklinde olur"* · ses nerede: *"Her yerde
+   olabilir."* Kayıt açıkken plakasız ("2 bin aldım nakit"), başka her yerde plakayla
+   ("06 TMR 07 için 2 bin aldım"). "Kalanını / hepsini aldım" = kalanın tamamı.
+   HEDEF yalnız KALANI OLAN iş: açık (teslimsiz) kayıtta "aldım" para değil parçadır
+   ("balata aldım 500") — o satır eklemedir, burada tanınmaz.
+   Ödeme yolu söylenmezse BOŞ kalır, onay ekranı sorar — nakit varsayılmaz (teslimle aynı). */
+function sesAlmaFiili(d) {
+  return /(^|\s)(aldim|aldik|odedi|verdi|yatirdi)(\s|$)/.test(d);
+}
+function sesKalaniMi(d) {
+  return /(^|\s)(kalanini|kalani|hepsini|tamamini)(\s|$)/.test(d);
+}
+/* Tutar: "lira/TL"li ya da FİİLDEN HEMEN ÖNCE çıplak sayı ("2000 aldım"). Çağıran plakayı
+   önceden ayıklar (c.dk) — plakanın rakamı tutar sanılmasın. */
+function sesAlinanTutar(d) {
+  var t = sesTutarBul(d);
+  if (t) return t;
+  var m = d.match(/(^|\s)(\d[\d.]*)\s+(aldim|aldik|odedi|verdi|yatirdi)(\s|$)/);
+  if (!m) return 0;
+  var rakam = m[2].replace(/\./g, '');
+  /* 0 ile başlayan sayı tutar değil: "06 TMR 07 07 aldım" — plakanın sonu iki kez duyuldu
+     (korpus tuzağı, 24.10). Tek hane de değil (sesCiplakTutar'ın kuralı). */
+  return rakam.length >= 2 && rakam.length < 10 && rakam[0] !== '0' ? parseInt(rakam, 10) : 0;
+}
+function sesOdemeAl(d, k) {
+  if (!k || !veresiyeMi(k) || !sesAlmaFiili(d)) return null;
+  var tutarS = sesKalaniMi(d) ? kalanTutar(k) : sesAlinanTutar(d);
+  if (!tutarS) return null;
+  return { tur: 'odeme-al', plaka: k.plaka, arac: aracBul(k.plaka), kayit: k,
+           tutar: tutarS, odeme: sesTeslimOdemesi(d) };
+}
+
+Islem.tanim('odeme-al', {
+  /* ÖNCELİK 15 — gider-ekle'den (20) ÖNCE: muhasebe ekranında "06 TMR 07 için 2000 lira
+     aldım" gider sanılıyordu. Tetik çok dar (kayıtlı araç + kalanı olan iş + "aldım" +
+     tutar), erken bakmak başka bir işi çalmaz; kayıtlı aracın plakası geçen cümle dükkân
+     gideri olamaz (gider araca bağlı değil). */
+  ekran: 'kayit', baglam: ['kayit-icinde'], oncelik: 15,
+  baslik: 'Ödeme alınacak', eylem: 'Kaydet',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true },
+    { ad: 'kalan', etiket: 'Kalan', turet: function (o) { return tutar(kalanTutar(o.kayit)) + ' ₺'; } },
+    { ad: 'tutar', etiket: 'Alınan', tip: 'para', zorunlu: true },
+    /* SORULUR (çip): söylenmediyse hiçbiri seçili gelmez, usta seçer; söylendiyse seçili
+       gelir, tek dokunuşla değişir. `zorunlu` onay ekranında sorulmuyordu — yol söylenmeden
+       "Kaydet"e basılınca yolsuz ödeme yazılırdı (tarayıcıda denerken bulundu, 24.10).
+       Şemada ZORUNLU DEĞİL (teslimdeki gibi): söylenmeyen yolu model uyduramaz; zorunluluk
+       onayda — uygula yolsuz ödemeyi reddeder. VoiceSchemaTests "500 aldım"da yakaladı. */
+    { ad: 'odeme', etiket: 'Nasıl', soru: 'Nasıl alındı?', tip: 'secim', secenek: SES_ODEME, sor: true }
+  ],
+  baglamda: function (c) { return sesOdemeAl(c.d, c.kayit); },
+  tani: function (c) {
+    if (!c.p || !c.arac) return null;
+    var borclu = aracKayitlari(c.p.plaka).filter(veresiyeMi);
+    return sesOdemeAl(c.dk, borclu[borclu.length - 1]);
+  },
+  uygula: function (o) {
+    if (!o.odeme) { balon('Nasıl alındığını seç: nakit, kart ya da havale.', false, 3000); return; }
+    ACIK_KAYIT = o.kayit.id;
+    var hata = odemeEkle(o.kayit, o.tutar, o.odeme, bugunMetin());
+    if (hata) { balon(hata, false, 3200); Ekran.ac('kayit'); return; }
+    balon(tutar(o.tutar) + ' ₺ alındı · ' + SES_ODEME[o.odeme] +
+          (kalanTutar(o.kayit) > 0 ? ' · kalan ' + tutar(kalanTutar(o.kayit)) + ' ₺' : '') + '.', false, 3200);
     Ekran.ac('kayit');
   }
 });
