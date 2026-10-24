@@ -21,9 +21,30 @@ cevabı bu varsayımla: "önce kısmi, avans sonra"). Avans kısmi tahsilatı bo
 Prototip önce değişir (şartname), tam ödemeli işte bütün rakamlar aynı kalmak ZORUNDA (eşdeğerlik
 0 fark); prototip Netlify'a Cemil'in kararıyla.
 
----
+**78.1 · `Payment.AtDelivery` — teslimde mi alındı (F3, lider).** VERI-MODELI'nin ilk taslağında
+yoktu. Gerekçe: bugünkü kural *"sonradan tahsil edildiyse teslimi geri almadan önce tahsil geri
+alınır"* (D14) kısmi tahsilatta ancak bu bilgiyle korunur — aynı gün teslim + aynı gün taksit
+tarihten ayırt edilemez. Teslimdeki para teslimle gider; sonradan gelen "ödemeyi geri al"la.
 
-## K-077 · Tur D incelemesi — Cemil'in cevapları (23.10.2026 akşam)
+**78.2 · Satırlar ve ödemeler her yüklemede gelir (AutoInclude) — ölçümün bulduğu hata.** Tahsil,
+düzeltme ve **teslim** uçları kaydı satırsız yüklüyordu. Eskiden zararsızdı; artık kalan ve
+teslimdeki ödeme toplamdan hesaplandığı için toplam 0 görünür → "alınmamış ödemesi yok" (422) ve
+— daha kötüsü — **teslimde ödeme satırı yazılmaz, hiçbir test kırmızı olmaz** (kasa o an hâlâ eski
+alanlardan okunuyordu). Tek tek Include yerine kural: para kuralı satırsız ÇALIŞAMAZ. Yan etki:
+kayıt silme satırları da yükleyip silmeyi onlara yaydı → silme o sorguda otomatik yüklemeyi kapatır
+(silinebilen kayıt teslimsiz, ödemesiz). Teslimdeki ödeme satırını tablonun kendisinden ölçen test eklendi.
+
+**78.3 · 0 ₺'lik işte tahsil edilecek kalan yok.** Eskiden toplamı 0 olan "almadım" kaydı
+"tahsil" edilebiliyordu (kasaya 0 yazılırdı). Prototip `veresiyeMi` = kalan > 0 — o kayıtta tahsil
+düğmesi hiç çıkmaz. Backend prototipe uydu; üç eski test bu durumu kullandığı için satır eklendi.
+
+**78.4 · ⚠️ BULGU — teslimden sonra satır değişince prototip ile backend ayrışır (Cemil onayına açık).**
+Tasarım (TASARIM-E6 §3): *"alınan para değişmez, kalan yeniden hesaplanır."* Backend böyle: 3.450
+nakit alınmış işe 500'lük satır eklenirse kalan 500 olur. Prototip tam ödemede ödemeyi TÜRETTİĞİ
+için alınan da 3.950'ye çıkar (kalan 0) — kendi tasarım kuralını çiğner. Eşdeğerlik senaryolarında bu
+durum yok, fark testlere yansımıyor. Öneri: prototipte tam ödeme de teslim anında `odemeler`e
+yazılsın (türetme kalksın). Küçük iş ama prototipin veri biçimini değiştirir → Cemil'e soru.
+ · Tur D incelemesi — Cemil'in cevapları (23.10.2026 akşam)
 
 **77.1 · Ses çözümleyicisi C#'a, CİHAZDA çalışacak şekilde — K-076.14'ü genişletir.**
 Cemil: *"Çözümleyiciyi C#'a taşı."* Yer `Tamiron.Ui.Core` (Blazor WASM'da telefonda

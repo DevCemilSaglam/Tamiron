@@ -17,6 +17,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<Vehicle> Vehicles => Set<Vehicle>();
     public DbSet<ServiceRecord> ServiceRecords => Set<ServiceRecord>();
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
+    public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -72,7 +73,16 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.Km).HasMaxLength(20);
             e.HasOne<Vehicle>().WithMany().HasForeignKey(x => x.VehicleId).OnDelete(DeleteBehavior.Restrict);
             e.HasMany(x => x.Lines).WithOne().HasForeignKey(l => l.ServiceRecordId).OnDelete(DeleteBehavior.Cascade);
-            e.Navigation(x => x.Lines).UsePropertyAccessMode(PropertyAccessMode.Field);
+            // K-078 · Satırlar ve ödemeler kaydın parçası: HER YÜKLEMEDE gelir (AutoInclude). Toplam,
+            // kalan, teslimdeki ödeme ve düzeltme kuralları ikisini de okur — bir sorguda Include
+            // unutulsa kural boş listeyle çalışır ve SESSİZCE yanlış söylerdi. Bu oldu: tahsil,
+            // düzeltme ve teslim uçları kaydı satırsız yüklüyordu (toplam 0 → "alınmamış ödemesi yok",
+            // teslimde ödeme satırı yazılmaz); F3'te API testleri yakaladı.
+            e.Navigation(x => x.Lines).UsePropertyAccessMode(PropertyAccessMode.Field).AutoInclude();
+            e.HasMany(x => x.Payments).WithOne().HasForeignKey(p => p.ServiceRecordId).OnDelete(DeleteBehavior.Cascade);
+            e.Navigation(x => x.Payments).UsePropertyAccessMode(PropertyAccessMode.Field).AutoInclude();
+            e.Ignore(x => x.Paid);
+            e.Ignore(x => x.Remaining);
             e.Property(x => x.WithholdingRate).HasPrecision(5, 4);   // 0,7000 = 7/10; yalnız YER (C6)
             e.Ignore(x => x.Total);
             e.Ignore(x => x.CollectedOn);
@@ -86,6 +96,14 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.HasIndex(x => new { x.TenantId, x.DeliveredAt });
             e.HasIndex(x => new { x.TenantId, x.PaymentCollectedAt }).HasFilter("[PaymentCollectedAt] IS NOT NULL");
             e.HasIndex(x => new { x.TenantId, x.ReminderDate }).HasFilter("[ReminderDate] IS NOT NULL AND [ReminderSent] = 0");
+        });
+
+        Tenant(b.Entity<Payment>());
+        b.Entity<Payment>(e =>
+        {
+            e.Property(x => x.Amount).HasPrecision(18, 2);
+            // Kasa dönem süzgeci (F5): dükkân + ödeme günü.
+            e.HasIndex(x => new { x.TenantId, x.PaidOn });
         });
 
         Tenant(b.Entity<ServiceLine>());

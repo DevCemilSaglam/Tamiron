@@ -106,6 +106,7 @@ taksit de x miktar aldım şeklinde olur."* Bir işin parası birden çok parça
 | `Amount` | Alınan tutar. **> 0, kalandan fazla olamaz** (Cemil: *"Kalandan fazla ödeme olmaz"*) |
 | `Method` | `Cash` \| `Card` \| `Transfer` — `Unpaid` olamaz: alınmayan para ödeme değildir |
 | `PaidOn` | Paranın geldiği gün — **kasaya bu güne yazılır**, CSV'de ayrı satır (Cemil: *"Ayrı satır"*) |
+| `AtDelivery` | **Teslimde mi alındı** (K-078.1). Teslimdeki para teslimle gider (teslimi geri al); sonradan gelen "ödemeyi geri al"la — yanlış teslimi geri alan usta sonraki tahsilatı farkında olmadan silmesin |
 
 > **Kalan** saklanmaz: `ServiceRecord.Total − Σ Amount` (en az 0). Saklanan kalan, satır
 > değişince yalan söylerdi (`Total` alanının olmamasıyla aynı gerekçe). Teslimden sonra satır
@@ -391,10 +392,11 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Parça alışı: teslim edilmiş işte, tamircinin aldığı, alışı > 0 | `parcaAlislari` | `ServiceLine.IsShopPurchase` | 04.09 |
 | Tahsil günü: `PaymentCollectedAt ?? DeliveredAt`, `Unpaid` hariç | `tahsilTarihi` · `donemTahsilatlari` | `ServiceRecord.CollectedOn` + SQL biçimi `CollectedBetween` (eşitliği testli) | K-071.1 |
 | Kasa = o dönemde ALINAN ödemeler (yola göre); kısmi ödemenin her parçası kendi gününde | `kayitOdemeleri` · `donemOdemeleri` · `tahsilatToplami` · `bugunTahsilat` | F5 | K-078 |
-| Alacak = kalan (toplam − alınanlar, en az 0); kısmi ödenmiş iş kalanıyla | `kalanTutar` · `veresiyeMi` · `veresiyeToplami` | F3/F5 | K-078 |
-| Ödeme > 0 ve kalandan fazla değil; teslimsiz işe ödeme yok | `odemeHatasi` · `odemeEkle` | F3 | K-078 · Cemil 24.10 |
-| Kalan varken durum `Unpaid`; kapanınca son ödemenin yolu/günü | `odemeDurumu` | F3 | K-078 |
-| Son ödeme geri alınır (yanlış çip / tutar) | `sonOdemeyiGeriAl` | F3 | K-078 |
+| Alacak = kalan (toplam − alınanlar, en az 0); kısmi ödenmiş iş kalanıyla | `kalanTutar` · `veresiyeMi` · `veresiyeToplami` | `ServiceRecord.Remaining` (sorgular F5) | K-078 |
+| Ödeme > 0 ve kalandan fazla değil; teslimsiz işe ödeme yok; teslimde kısmi toplamdan fazla değil | `odemeHatasi` · `odemeEkle` · teslim ekranı | `ServiceRecord.CollectPayment(amount, …)` · `DeliverPartly` | K-078 · Cemil 24.10 |
+| Kalan varken durum `Unpaid`; kapanınca son ödemenin yolu/günü | `odemeDurumu` | `ServiceRecord.RefreshPaymentStatus` | K-078 |
+| Son (sonradan alınan) ödeme geri alınır; teslimdeki teslimle gider | `sonOdemeyiGeriAl` | `ServiceRecord.UndoCollection` · `UndoDelivery` | K-078 · K-078.1 |
+| Göç: var olan teslimli kayda ödeme satırı; kasa önce/sonra aynı | — | `Payments` göçü + `MigrationUpgradeTests` | K-078 |
 | Alacak bir bakiyedir, döneme tabi değil | muhasebe alacak tablosu | `ListReceivables` (araç süzgeçli: `?vehicleId=`) | 05.09 |
 | Dönem: bugün · bu ay · bu yıl (1 Ocak'tan bugüne) | `donemBasi` · `donemIcinde` | `Period.Of` | 05.09 |
 | Hatırlatma: ay **veya** km, hangisi önce; km ancak iki ölçümle | `hatirlatmaHesapla` · `gunlukKm` | `MaintenanceReminder.Compute` | 03.09 · K-073.9 (ay sonu sapması) |
@@ -408,7 +410,7 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Müşteri ayrı tablo değil, araçtan türetilir (ad + telefon) | `musteriler` | `Customers.From` | A-M1 |
 | Mesaj önerisi: hangi şablon BU İŞE uygun (kayıt bazlı); metin = hitap + gövde + imza | `MESAJ_SABLONLARI.uygunKayit` · `mesajMetniUret` · `hazirMesajMetni` | `MessageTemplates.Applicable` · `Text` · `Name` | K-019.1 · A-M17 · K-076.4 |
 | İzin değişikliği izlenir; geri alma eski tarihi izden getirir (son eylem, aynı gün, bir kez) | `iletiIzniYaz` · `balonGeriAl` (91-musteri) | `Customer.SetConsent` · `UndoConsent` · `ConsentEvent` | K-071.3 · K-073.10 · K-076.5 |
-| Ödeme yolu düzeltilir; teslim/tahsil günü korunur; sonradan tahsilde "almadım" = tahsili geri al | — (prototipte yok) | `ServiceRecord.CorrectPaymentMethod` | K-077.2 |
+| Ödeme yolu düzeltilir (SON ödeme satırının yolu); tutar/gün korunur; sonradan tahsilde "almadım" = tahsili geri al | `odeme-duzelt` (ses, E5) | `ServiceRecord.CorrectPaymentMethod` | K-077.2 · K-078 |
 | Müşteri özeti: tek durum cümlesi, müşteri parçasında rakam yok, alış yok, yarım satır yok | `ozetGovdeHtml` | `CustomerSummary.StatusText` · `Amount` · `GetCustomerSummary` | K-023 · K-037 · K-076.3 |
 | KDV oranı satırda donar (yalnız yer) | — | `ServiceLine.FreezeVatRate` | C6 · KDV.md |
 

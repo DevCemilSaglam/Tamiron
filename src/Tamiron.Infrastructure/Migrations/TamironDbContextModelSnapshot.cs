@@ -246,6 +246,56 @@ namespace Tamiron.Infrastructure.Migrations
                     b.ToTable("Messages");
                 });
 
+            modelBuilder.Entity("Tamiron.Domain.Payment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("AtDelivery")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("PaidOn")
+                        .HasColumnType("date");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("ServiceRecordId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServiceRecordId");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "PaidOn");
+
+                    b.ToTable("Payments");
+                });
+
             modelBuilder.Entity("Tamiron.Domain.PriceReply", b =>
                 {
                     b.Property<Guid>("Id")
@@ -941,6 +991,21 @@ namespace Tamiron.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Tamiron.Domain.Payment", b =>
+                {
+                    b.HasOne("Tamiron.Domain.ServiceRecord", null)
+                        .WithMany("Payments")
+                        .HasForeignKey("ServiceRecordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Tamiron.Domain.PriceReply", b =>
                 {
                     b.HasOne("Tamiron.Domain.PriceRequest", null)
@@ -1092,6 +1157,8 @@ namespace Tamiron.Infrastructure.Migrations
             modelBuilder.Entity("Tamiron.Domain.ServiceRecord", b =>
                 {
                     b.Navigation("Lines");
+
+                    b.Navigation("Payments");
                 });
 #pragma warning restore 612, 618
         }

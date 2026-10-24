@@ -13,6 +13,7 @@ public class PaymentCorrectionTests
     static ServiceRecord Delivered(PaymentMethod m)
     {
         var r = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), "Fren");
+        r.AddLine(ServiceLine.Labor("İşçilik", 100m));   // 0 ₺'lik işte tahsil edilecek kalan yok (K-078)
         r.Deliver(m, Day, MaintenancePolicy.Default, []);
         return r;
     }

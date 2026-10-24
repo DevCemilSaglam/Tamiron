@@ -2,8 +2,11 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Tamiron.Application.ServiceRecords;
 using Tamiron.Domain;
+using Tamiron.Infrastructure;
 
 namespace Tamiron.Api.Tests;
 
@@ -54,5 +57,26 @@ public class DeliveryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         var done = await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Card" }, Json));
         Assert.Null(done.ReminderDate);
         Assert.Equal(f.Clock.Today, done.CollectedOn);
+    }
+
+    /// <summary>
+    /// K-078 · Teslimde alınan para bir ÖDEME SATIRI olur (toplam, yol, teslim günü). Hata sınıfı:
+    /// teslim ucu kaydı satırsız yüklüyordu — domain toplamı 0 gördü, satır yazılmadı ve hiçbir test
+    /// kırmızı olmadı (kasa o gün hâlâ eski alanlardan okunuyordu). Ödeme tablosunun KENDİSİNE bakılır.
+    /// </summary>
+    [Fact]
+    public async Task Paid_delivery_writes_a_payment_row_of_the_total()
+    {
+        var api = f.For(ApiFactory.ShopB);
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 TES 03", complaint = "fren" }, Json));
+        await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/lines", new { kind = "Part", name = "Balata", price = 1200 }, Json));
+        await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/lines", new { kind = "Labor", name = "İşçilik", price = 300 }, Json));
+        await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Card" }, Json));
+
+        using var scope = f.Services.CreateScope();
+        scope.ServiceProvider.GetRequiredService<Tamiron.Api.RequestContext>().TenantId = ApiFactory.ShopB;
+        var p = await scope.ServiceProvider.GetRequiredService<TamironDbContext>().Payments.AsNoTracking()
+            .SingleAsync(x => x.ServiceRecordId == r.Id);
+        Assert.Equal((1500m, PaymentMethod.Card, f.Clock.Today, true), (p.Amount, p.Method, p.PaidOn, p.AtDelivery));
     }
 }

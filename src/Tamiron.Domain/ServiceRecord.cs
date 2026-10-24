@@ -44,6 +44,22 @@ public class ServiceRecord : TenantEntity
     private readonly List<ServiceLine> _lines = [];
     public IReadOnlyList<ServiceLine> Lines => _lines;
 
+    /// <summary>
+    /// Alınan ödemeler (K-078 · elden taksit). Kasa bunlardan okunur; <see cref="PaymentMethod"/> ve
+    /// <see cref="PaymentCollectedAt"/> bunların ÖZETİDİR (prototip odemeDurumu): kalan varken
+    /// "almadım", kapanınca son ödemenin yolu ve (sonradan alındıysa) günü.
+    /// </summary>
+    private readonly List<Payment> _payments = [];
+    public IReadOnlyList<Payment> Payments => _payments;
+
+    public decimal Paid => _payments.Sum(p => p.Amount);
+
+    /// <summary>
+    /// Kalan = toplam − alınanlar, en az 0 (prototip kalanTutar). Saklanmaz: teslimden sonra satır
+    /// değişirse kalan yeniden hesaplanır, alınan para değişmez — para bir olgudur. Teslimsiz kayıtta 0.
+    /// </summary>
+    public decimal Remaining => DeliveredAt is null ? 0m : Math.Max(0m, Total - Paid);
+
     private ServiceRecord() { }   // EF
 
     /// <summary>
@@ -168,9 +184,32 @@ public class ServiceRecord : TenantEntity
             throw new DomainException("record.already_delivered", "Bu kayıt zaten teslim edildi.");
         DeliveredAt = on;
         PaymentMethod = method;
+        // Tam ödeme = toplamın tek ödeme satırı, teslim günü. Toplam 0'sa satır yok (ödeme > 0).
+        if (method != Domain.PaymentMethod.Unpaid && Total > 0)
+            _payments.Add(new Payment(this, Total, method, on, atDelivery: true));
         var plan = PlanReminder(on, policy, otherReadings);
         ReminderDate = plan?.Date;
         ReminderSent = false;
+    }
+
+    /// <summary>
+    /// Teslimde bir kısmını aldı (K-078 · "Bir kısmını aldım"): o kadarı teslim günü kasaya, kalanı
+    /// veresiye. Kurallar teslimden ÖNCE sınanır — yanlış girişte araç teslim edilmiş görünmez
+    /// (prototip 50-teslim). Tamamı yazıldıysa bu kısmi değil, tam ödemedir.
+    /// </summary>
+    public void DeliverPartly(decimal amount, PaymentMethod method, DateOnly on, MaintenancePolicy policy, IEnumerable<KmReading> otherReadings)
+    {
+        if (DeliveredAt is not null)
+            throw new DomainException("record.already_delivered", "Bu kayıt zaten teslim edildi.");
+        if (amount <= 0)
+            throw new DomainException("payment.amount_required", "Ne kadar aldığını yaz.");
+        if (method == Domain.PaymentMethod.Unpaid)
+            throw new DomainException("payment.method_required", "Paranın nasıl alındığını seç: nakit, kart ya da havale.");
+        if (amount > Total)
+            throw new DomainException("payment.over_remaining", $"Toplam {MessageTemplates.Money(Total)} ₺ — fazlası girilemez.");
+        if (amount == Total) { Deliver(method, on, policy, otherReadings); return; }
+        Deliver(Domain.PaymentMethod.Unpaid, on, policy, otherReadings);
+        _payments.Add(new Payment(this, amount, method, on, atDelivery: true));
     }
 
     /// <summary>
@@ -185,12 +224,14 @@ public class ServiceRecord : TenantEntity
             throw new DomainException("delivery.nothing_to_undo", "Bu kayıt teslim edilmemiş.");
         if (DeliveredAt != today)
             throw new DomainException("delivery.undo_too_late", "Teslim yalnız aynı gün geri alınır. Yanlışsa kaydı düzelt.");
-        if (PaymentCollectedAt is not null)
+        // Sonradan alınan HER ödeme (kısmi taksit dahil) önce görünerek geri alınır.
+        if (_payments.Any(p => !p.AtDelivery))
             throw new DomainException("delivery.undo_collection_first", "Önce ödemeyi geri al, sonra teslimi.");
         if (ReminderSent)
             throw new DomainException("delivery.undo_reminder_sent", "Bakım hatırlatması gönderildi — teslim geri alınamaz.");
         DeliveredAt = null;
         PaymentMethod = null;
+        _payments.Clear();   // yalnız teslimde alınanlar kalmıştı; teslimle giderler
         ReminderDate = null;
         ReminderSent = false;
     }
@@ -204,17 +245,40 @@ public class ServiceRecord : TenantEntity
         return MaintenanceReminder.Compute(on, km, policy, history);
     }
 
-    /// <summary>"Almadım" denmiş kaydın parası geldi (kayıt ekranındaki "Ödeme alındı").</summary>
-    public void CollectPayment(PaymentMethod method, DateOnly on)
+    /// <summary>"Almadım" denmiş kaydın parası geldi — KALANIN TAMAMI (kayıt ekranındaki "Ödeme alındı").</summary>
+    public void CollectPayment(PaymentMethod method, DateOnly on) => CollectPayment(Remaining, method, on);
+
+    /// <summary>
+    /// "x lira aldım" (K-078 · elden taksit). Kalandan fazlası girilemez (Cemil: "Kalandan fazla
+    /// ödeme olmaz") — önceden verilen para (avans) ayrı kavram, sonra. Prototip odemeHatasi + odemeEkle.
+    /// </summary>
+    public void CollectPayment(decimal amount, PaymentMethod method, DateOnly on)
     {
-        if (PaymentMethod != Domain.PaymentMethod.Unpaid || DeliveredAt is null)
+        if (DeliveredAt is null || Remaining <= 0)
             throw new DomainException("payment.not_unpaid", "Bu kaydın alınmamış ödemesi yok.");
         if (method == Domain.PaymentMethod.Unpaid)
             throw new DomainException("payment.method_required", "Paranın nasıl alındığını seç: nakit, kart ya da havale.");
         if (on < DeliveredAt.Value)
             throw new DomainException("payment.before_delivery", "Ödeme teslimden önceki bir güne yazılamaz.");
-        PaymentMethod = method;
-        PaymentCollectedAt = on;
+        if (amount <= 0)
+            throw new DomainException("payment.amount_required", "Ne kadar aldığını yaz.");
+        if (amount > Remaining)
+            throw new DomainException("payment.over_remaining", $"Kalan {MessageTemplates.Money(Remaining)} ₺ — fazlası girilemez.");
+        _payments.Add(new Payment(this, amount, method, on, atDelivery: false));
+        RefreshPaymentStatus();
+    }
+
+    /// <summary>
+    /// Durum özeti ödemelerden (prototip odemeDurumu): kalan varken "almadım"; kapanınca son ödemenin
+    /// yolu, sonradan alındıysa günü (teslimde alındıysa tahsil günü teslim günüdür, ayrı tutulmaz).
+    /// Ödemesi olmayan kapalı kayıtta (toplam 0) durum olduğu gibi kalır.
+    /// </summary>
+    private void RefreshPaymentStatus()
+    {
+        if (Remaining > 0) { PaymentMethod = Domain.PaymentMethod.Unpaid; PaymentCollectedAt = null; return; }
+        if (_payments.LastOrDefault() is not { } last) return;
+        PaymentMethod = last.Method;
+        PaymentCollectedAt = last.AtDelivery ? null : last.PaidOn;
     }
 
     /// <summary>
@@ -223,24 +287,44 @@ public class ServiceRecord : TenantEntity
     /// Teslimde alınan ödeme dört yol arasında serbest; sonradan tahsil edilmişse yalnız tahsilin
     /// yolu değişir — "almadım"a çevirmek tahsili geri almaktır (UndoCollection), o ayrı adım.
     /// </summary>
+    /// <remarks>
+    /// K-078'den sonra düzeltilen, SON ÖDEME SATIRININ yoludur (tutarı ve günü korunur). Ödemesi
+    /// olmayan veresiyeyi "aslında teslimde almıştım"a çevirmek kalanı teslim gününe yazar; teslimde
+    /// alınanı "almadım"a çevirmek o ödemeyi siler.
+    /// </remarks>
     public void CorrectPaymentMethod(PaymentMethod method)
     {
         if (DeliveredAt is null)
             throw new DomainException("payment.not_delivered", "Kayıt teslim edilmedi — düzeltilecek ödeme yok.");
-        if (PaymentMethod == method)
+        if (_payments.LastOrDefault() is not { } last)
+        {
+            if (PaymentMethod == method)
+                throw new DomainException("payment.same_method", "Ödeme zaten böyle yazılı.");
+            PaymentMethod = method;
+            if (method != Domain.PaymentMethod.Unpaid && Remaining > 0)
+                _payments.Add(new Payment(this, Remaining, method, DeliveredAt.Value, atDelivery: true));
+            return;
+        }
+        if (last.Method == method)
             throw new DomainException("payment.same_method", "Ödeme zaten böyle yazılı.");
-        if (PaymentCollectedAt is not null && method == Domain.PaymentMethod.Unpaid)
-            throw new DomainException("payment.use_undo_collection", "Sonradan alınan ödemeyi silmek için \"Ödemeyi geri al\"ı kullan.");
-        PaymentMethod = method;
+        if (method == Domain.PaymentMethod.Unpaid)
+        {
+            if (!last.AtDelivery)
+                throw new DomainException("payment.use_undo_collection", "Sonradan alınan ödemeyi silmek için \"Ödemeyi geri al\"ı kullan.");
+            _payments.Remove(last);
+        }
+        else last.Correct(method);
+        RefreshPaymentStatus();
     }
 
     /// <summary>"Geri al" — yanlış çipe dokunmak kasaya olmayan parayı yazmasın.</summary>
+    /// <remarks>K-078: SON sonradan-alınan ödeme silinir (prototip sonOdemeyiGeriAl); teslimdeki para teslimle gider.</remarks>
     public void UndoCollection()
     {
-        if (PaymentCollectedAt is null)
+        if (_payments.LastOrDefault(p => !p.AtDelivery) is not { } p)
             throw new DomainException("payment.nothing_to_undo", "Geri alınacak bir tahsilat yok.");
-        PaymentMethod = Domain.PaymentMethod.Unpaid;
-        PaymentCollectedAt = null;
+        _payments.Remove(p);
+        RefreshPaymentStatus();
     }
 
     public void SetWaitingForPart(bool waiting, DateOnly today)

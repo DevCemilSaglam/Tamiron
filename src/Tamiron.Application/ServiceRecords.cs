@@ -188,7 +188,10 @@ internal sealed class DeleteServiceRecordHandlers(ITamironDb db, ITenantContext 
     /// <summary>Silme = soft-delete; satırlar yerinde kalır, kayıt geri gelince onlarla döner.</summary>
     public async Task Handle(DeleteServiceRecord c, CancellationToken ct)
     {
-        var r = await db.ServiceRecords.FirstOrDefaultAsync(x => x.Id == c.Id, ct) ?? throw new NotFoundException("Servis kaydı");
+        // Satırlar YÜKLENMEZ (IgnoreAutoIncludes): yüklenselerdi silme onlara da yayılır ve geri
+        // gelen kayıt satırsız dönerdi (K-078'de satırlar AutoInclude olunca test yakaladı).
+        // Silinebilen kayıt teslimsizdir — ödemesi de yoktur.
+        var r = await db.ServiceRecords.IgnoreAutoIncludes().FirstOrDefaultAsync(x => x.Id == c.Id, ct) ?? throw new NotFoundException("Servis kaydı");
         r.EnsureDeletable();
         db.ServiceRecords.Remove(r);
         await db.SaveChangesAsync(ct);

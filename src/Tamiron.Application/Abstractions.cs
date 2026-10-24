@@ -71,6 +71,7 @@ public interface ITamironDb
     DbSet<Vehicle> Vehicles { get; }
     DbSet<ServiceRecord> ServiceRecords { get; }
     DbSet<ServiceLine> ServiceLines { get; }
+    DbSet<Payment> Payments { get; }
     DbSet<Expense> Expenses { get; }
     DbSet<Message> Messages { get; }
     DbSet<Supplier> Suppliers { get; }

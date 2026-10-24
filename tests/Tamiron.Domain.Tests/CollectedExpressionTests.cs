@@ -14,7 +14,8 @@ public class CollectedExpressionTests
 
     static IEnumerable<ServiceRecord> States()
     {
-        ServiceRecord New() => new(Guid.NewGuid(), Guid.NewGuid(), "iş");
+        // Tutarlı iş: 0 ₺'lik işte tahsil edilecek kalan yoktur (K-078, prototip veresiyeMi).
+        ServiceRecord New() { var r = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), "iş"); r.AddLine(ServiceLine.Labor("İşçilik", 100m)); return r; }
         yield return New();                                                              // serviste
         foreach (var on in new[] { D1, D2, D3, D4 })
         {

@@ -14,6 +14,7 @@ public class UndoDeliveryTests
     {
         var r = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), complaint);
         r.SetKm("86400");
+        r.AddLine(ServiceLine.Labor("İşçilik", 100m));   // 0 ₺'lik işte tahsil edilecek kalan yok (K-078)
         r.Deliver(m, Today, MaintenancePolicy.Default, []);
         return r;
     }
