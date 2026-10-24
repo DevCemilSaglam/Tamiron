@@ -62,7 +62,32 @@ seçilince görünür.
   Göçten önce ve sonra kasa rakamları aynı olmalı (`MigrationUpgradeTests` gibi ölçülür).
 - E1'deki "ödeme yolunu düzelt" ödeme satırının yolunu düzeltmeye dönüşür.
 
-## 5 · Cemil'e sorular
+## 5b · Cemil'in cevapları (24.10)
+
+| Soru | Cevap | Tasarıma etkisi |
+|---|---|---|
+| Teslimde kısmi ödeme? | *"Olabilir."* | Teslim ekranında "Bir kısmını aldım" çipi (§2) — onaylandı |
+| Fazla ödeme? | *"Kalandan fazla ödeme olmaz. Fakat hesabına önceden para verebilir. Muhasebe işlemi yani."* | Kayda kalandan fazlası girilemez (422). **YENİ KAVRAM: müşteri avansı** — §6 |
+| CSV? | *"Ayrı satır."* | Her ödeme ayrı satır (kasaya giriş günü) |
+| Ses nerede? | *"Her yerde olabilir."* | "06 TMR 07 için 2 bin aldım" plakayla her bağlamda; kayıt açıkken plakasız da |
+
+## 6 · Müşteri avansı ("hesabına önceden para verebilir") — AÇIK SORULAR
+
+Avans bir **kayda değil müşteriye** ait para: iş henüz açılmamış ya da tutarı belli değilken
+alınır. Bu, K-022'nin dışarıda bıraktığı **cari hesabın en küçük parçası** — bakiye. Kapsamı dar
+tutmak için öneri:
+
+- Avans **aracın sahibine** yazılır (müşteri ayrı tablo değil, araçtan türetiliyor — A-M1);
+  kasaya **alındığı gün** girer (para o gün geldi).
+- Sonraki işin ödemesinde **"avanstan düş"** seçeneği çıkar; kasaya İKİNCİ kez girmez.
+- Ekstre, vade, faiz, mutabakat YOK.
+
+**Sorular:** (a) Avans kişiye mi, araca mı bağlı (iki aracı olan müşteri)? (b) İş kapanınca
+avans **kendiliğinden** mi düşsün, usta mı seçsin? (c) Kullanılmayan avans iade edilirse
+kasadan çıkış olarak mı yazılsın? (d) Bunu kısmi tahsilatla **aynı turda** mı istiyorsun, yoksa
+önce kısmi tahsilat, avans sonra mı?
+
+## 5 · Cemil'e sorular (ilk tur — cevaplar §5b'de)
 
 1. **Teslimde kısmi ödeme** olur mu ("işi aldı, 2.000 verdi, kalanı sonra"), yoksa kısmi tahsilat
    yalnız sonradan mı (veresiyeye ara ödeme)?
