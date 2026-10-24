@@ -6,8 +6,11 @@ namespace Tamiron.Ui.Core.Ses;
 /// <summary>Çözümleyicinin tanıdığı araç — plaka bağlama, tarif ("Mehmet Kaya'nın arabası") ve öneri için.</summary>
 public sealed record SesArac(string Plaka, string? Marka = null, string? Model = null, string? SahipAd = null);
 
-/// <summary>Çözümleyicinin tanıdığı kayıt — açık iş (teslim), satır adları (fiyat güncelleme).</summary>
-public sealed record SesKayit(string Id, string Plaka, bool Teslim, IReadOnlyList<string> Satirlar);
+/// <summary>
+/// Çözümleyicinin tanıdığı kayıt — açık iş (teslim), satır adları (fiyat güncelleme), ödeme yolu
+/// (düzeltme: "almadim" = veresiye, düzeltilmez — E5). Ödeme yolu prototipin adıyla: nakit · kart · havale · almadim.
+/// </summary>
+public sealed record SesKayit(string Id, string Plaka, bool Teslim, IReadOnlyList<string> Satirlar, string? OdemeYolu = null);
 
 /// <summary>
 /// Çözümleyicinin dünyası: dükkânın araçları ve kayıtları (prototipte ARACLAR / KAYITLAR), kayıtlar

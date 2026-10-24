@@ -240,6 +240,13 @@ function sesOdemeYolu(d) {
        : (d.indexOf('havale') >= 0 || kelimeVarMi(d, ['eft']) || d.indexOf('hesaba') >= 0) ? 'havale' : null;
 }
 
+/* "nakit DEĞİL kartla" (24.10 · E5): ilk geçen yolu almak yanlıştı — "değil" geçen cümlede
+   düzeltmenin kuralı (değilden SONRAKİ yol) geçerli. sesDuzeltilenYol aşağıda tanımlı; çağrı
+   anında yüklü. */
+function sesTeslimOdemesi(d) {
+  return d.indexOf('degil') >= 0 ? sesDuzeltilenYol(d) : sesOdemeYolu(d);
+}
+
 Islem.tanim('teslim', {
   ekran: 'teslim', baglam: ['kayit-icinde'], oncelik: 60,
   baslik: 'Araç teslim edilecek',
@@ -255,7 +262,7 @@ Islem.tanim('teslim', {
     var k = c.kayit;
     if (!k || c.d.indexOf('teslim') < 0 || k.teslimTarihi) return null;
     return { tur: 'teslim', plaka: k.plaka, arac: aracBul(k.plaka),
-             kayit: k, odeme: sesOdemeYolu(c.d) };
+             kayit: k, odeme: sesTeslimOdemesi(c.d) };
   },
   tani: function (c) {
     if (!c.p || !c.arac || c.dk.indexOf('teslim') < 0) return null;
@@ -263,7 +270,7 @@ Islem.tanim('teslim', {
     var acik = icerideki().filter(function (k) { return k.plaka === plaka; })[0];
     if (!acik) return { tur: 'teslim-edilecek-kayit-yok', plaka: plaka, arac: c.arac };
     return { tur: 'teslim', plaka: plaka, arac: c.arac, kayit: acik,
-             odeme: sesOdemeYolu(c.dk) };
+             odeme: sesTeslimOdemesi(c.dk) };
   },
   /* Ödeme söylendiyse SEÇİLİ gelir ama teslimi usta onaylar: para
      işinde son dokunuş ustanın. Seçim ekranın kendi durumuna yazılıyor
@@ -276,6 +283,72 @@ Islem.tanim('teslim', {
       tsCiz();
       balon('Ödeme "' + SES_ODEME[o.odeme] + '" seçildi — teslimi sen onayla.', false, 3200);
     }
+  }
+});
+
+/* ---- ÖDEME YOLUNU DÜZELT (24.10 · K-077.2 · E5) ----
+   Cemil: *"Nakit aldım dedi, karta döndürmek istedi. Tekrar sesle, nakit almadım, kredi kartı
+   ile aldım diyebilir. Düzenle diyebilir ya da buttonla yapabilir."* API'de E1
+   (`POST /records/{id}/payment`): teslim ve tahsil günü KORUNUR, yalnız yol değişir.
+
+   SÖZ: "değil", "yanlış", "düzelt", "çevir", "değiştir" + bir ödeme yolu.
+   HEDEF YOL: "değil"den SONRA söylenen ("nakit değil kartla" → kart, "kartla değil nakit" →
+   nakit); "değil" yoksa EN SON söylenen ("nakit yanlış, kart olacak" → kart).
+   ⚠️ "ALMADIM" SESLE DÜZELTİLMEZ: teslim ekranının tuzağı (değerlendirme setinin 4. cümlesi) —
+   sesle veresiye yazılmaz; "almadım"a çevirmek düğmeyle. */
+function sesOdemeDuzeltmeMi(d) {
+  return d.indexOf('degil') >= 0 || d.indexOf('yanlis') >= 0 || d.indexOf('duzelt') >= 0 ||
+         d.indexOf('cevir') >= 0 || d.indexOf('degistir') >= 0;
+}
+function sesDuzeltilenYol(d) {
+  var i = d.indexOf('degil');
+  var s = i >= 0 ? d.slice(i + 5) : d;
+  /* En son söylenen yol: her yolun SON geçtiği yer; en sağdaki kazanır. */
+  var yer = { nakit: Math.max(s.lastIndexOf('nakit'), s.lastIndexOf('pesin')),
+              kart: Math.max(s.lastIndexOf('kart'), s.search(/(^|\s)kk(\s|$)/)),
+              havale: Math.max(s.lastIndexOf('havale'), s.search(/(^|\s)eft(\s|$)/), s.lastIndexOf('hesaba')) };
+  var en = null;
+  Object.keys(yer).forEach(function (k) { if (yer[k] >= 0 && (en === null || yer[k] > yer[en])) en = k; });
+  return en;
+}
+
+Islem.tanim('odeme-duzelt', {
+  ekran: 'kayit', baglam: ['kayit-icinde'], oncelik: 55,
+  baslik: 'Ödeme yolu düzeltilecek',
+  eylem: 'Düzelt',
+  alanlar: [
+    { ad: 'plaka', etiket: 'Araç', tip: 'plaka', aracla: true, zorunlu: true },
+    { ad: 'eski', etiket: 'Şimdiki', turet: function (o) { return ODEME_ETIKET[o.kayit.odemeYolu] || '—'; } },
+    { ad: 'odeme', etiket: 'Doğrusu', tip: 'secim', secenek: SES_ODEME, zorunlu: true }
+  ],
+  /* Kayıt açıkken: o kayıt — ama yalnız TESLİM EDİLMİŞSE (teslim edilmemiş kayıtta ödeme yok;
+     orada "nakit" teslim işidir). */
+  baglamda: function (c) {
+    var k = c.kayit, yol = sesDuzeltilenYol(c.d);
+    /* VERESİYE düzeltilmez: "almadım" yazılı kayıtta "havaleye çevir" geriye dönük kasaya para
+       yazardı — ustanın kastı "şimdi aldım"dır, o TAHSİLATTIR (E6 "x aldım"). */
+    if (!k || !k.teslimTarihi || k.odemeYolu === 'almadim' || !yol || !sesOdemeDuzeltmeMi(c.d)) return null;
+    return { tur: 'odeme-duzelt', plaka: k.plaka, arac: aracBul(k.plaka), kayit: k, odeme: yol };
+  },
+  /* Plakayla her yerden: aracın teslim edilmiş SON kaydı. */
+  tani: function (c) {
+    if (!c.p || !c.arac || !sesOdemeDuzeltmeMi(c.dk)) return null;
+    var yol = sesDuzeltilenYol(c.dk);
+    if (!yol) return null;
+    var teslimli = aracKayitlari(c.p.plaka).filter(function (k) { return k.teslimTarihi && k.odemeYolu !== 'almadim'; });
+    var k = teslimli[teslimli.length - 1];
+    if (!k) return null;
+    return { tur: 'odeme-duzelt', plaka: c.p.plaka, arac: c.arac, kayit: k, odeme: yol };
+  },
+  uygula: function (o) {
+    ACIK_KAYIT = o.kayit.id;
+    if (o.kayit.odemeYolu === o.odeme) {
+      balon('Ödeme zaten "' + SES_ODEME[o.odeme] + '" yazılı.', false, 2800);
+    } else {
+      o.kayit.odemeYolu = o.odeme;
+      balon('Ödeme "' + SES_ODEME[o.odeme] + '" olarak düzeltildi — teslim günü değişmedi.', false, 3200);
+    }
+    Ekran.ac('kayit');
   }
 });
 </script>

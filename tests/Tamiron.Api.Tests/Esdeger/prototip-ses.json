@@ -6,6 +6,7 @@
   "fiyat-guncelle",
   "gider-ekle",
   "mesaj-gonder",
+  "odeme-duzelt",
   "satir-ekle",
   "servis-ac",
   "tahsilat-sor",
@@ -8293,6 +8294,979 @@
     "km": "",
     "plaka": "06 TMR 07",
     "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit değil kartla aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit değil kartla aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "nakit değil kartla aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit değil kartla aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "nakit değil kartla aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "kartla değil nakit aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "nakit",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "kartla değil nakit aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "kartla değil nakit aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "kartla değil nakit aldım",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "kartla değil nakit aldım",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "yanlış yazdım havale olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "havale",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "yanlış yazdım havale olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "yanlış yazdım havale olacak",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "yanlış yazdım havale olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "yanlış yazdım havale olacak",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödeme yanlış kk olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödeme yanlış kk olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "ödeme yanlış kk olacak",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödeme yanlış kk olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "ödeme yanlış kk olacak",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit yanlış kart olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit yanlış kart olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "nakit yanlış kart olacak",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit yanlış kart olacak",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "nakit yanlış kart olacak",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödemeyi karta çevir",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödemeyi karta çevir",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "ödemeyi karta çevir",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödemeyi karta çevir",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "ödemeyi karta çevir",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit değil eft",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "havale",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit değil eft",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "nakit değil eft",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "nakit değil eft",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "nakit değil eft",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "parayı almadım nakit değil",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "parayı almadım nakit değil",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "parayı almadım nakit değil",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "parayı almadım nakit değil",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "parayı almadım nakit değil",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "parayı almadım nakit değil",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödemeyi değiştir",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "ad": "ödemeyi değiştir",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödemeyi değiştir",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "ödemeyi değiştir",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "ödemeyi değiştir",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "ödemeyi değiştir",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "teslim ettim nakit değil kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "teslim ettim nakit değil kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 1,
+    "odeme": "kart",
+    "plaka": "34 ABC 123",
+    "tur": "teslim"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "teslim ettim nakit değil kartla",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "teslim ettim nakit değil kartla",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "kart değil nakit hakkını verdim",
+   "baglam": "kayit-icinde",
+   "kayit": 7,
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "nakit",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "kart değil nakit hakkını verdim",
+   "baglam": "kayit-icinde",
+   "kayit": 1,
+   "islem": {
+    "ad": "kart değil nakit hakkını verdim",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "kart değil nakit hakkını verdim",
+   "baglam": "kayit-icinde",
+   "kayit": 8,
+   "islem": {
+    "ad": "kart değil nakit hakkını verdim",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "genel",
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "35 KLM 45 ödemesi nakit değil kart",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "35 KLM 45 ödemesi nakit değil kart",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "35 KLM 45 ödemesi nakit değil kart",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "35 KLM 45",
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "35 KLM 45 ödemesi nakit değil kart",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "35 KLM 45",
+    "baskaIslem": {
+     "ad": "35 KLM 45 ödemesi nakit değil kart",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 7,
+    "odeme": "kart",
+    "plaka": "35 KLM 45",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "genel",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "ödemeyi havaleye çevir",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "ödemeyi havaleye çevir",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "06 TMR 07 ödemeyi havaleye çevir",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "06 TMR 07 ödemeyi havaleye çevir",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "06 TMR 07 ödemeyi havaleye çevir",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "ödemeyi havaleye çevir",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "06 TMR 07",
+    "is": "ödemeyi havaleye çevir",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "06 TMR 07 ödemeyi havaleye çevir",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "06 TMR 07",
+    "baskaIslem": {
+     "ad": "06 TMR 07 ödemeyi havaleye çevir",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "ödemeyi havaleye çevir",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "06 TMR 07",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 6,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 6,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 kartla değil nakit aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 kartla değil nakit aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 kartla değil nakit aldım",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 6,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "kayit": 6,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 kartla değil nakit aldım",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 kartla değil nakit aldım",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 6,
+    "odeme": "nakit",
+    "plaka": "34 ABC 123",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "genel",
+   "islem": {
+    "arac": "16 SY 8890",
+    "kayit": 5,
+    "odeme": "havale",
+    "plaka": "16 SY 8890",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "16 SY 8890",
+    "kayit": 5,
+    "odeme": "havale",
+    "plaka": "16 SY 8890",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "16 SY 8890 nakit değil eft",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "16 SY 8890 nakit değil eft",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "16 SY 8890 nakit değil eft",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "16 SY 8890",
+    "kayit": 5,
+    "odeme": "havale",
+    "plaka": "16 SY 8890",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "16 SY 8890",
+    "kayit": 5,
+    "odeme": "havale",
+    "plaka": "16 SY 8890",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "16 SY 8890 nakit değil eft",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "16 SY 8890",
+    "baskaIslem": {
+     "ad": "16 SY 8890 nakit değil eft",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "kayit": 5,
+    "odeme": "havale",
+    "plaka": "16 SY 8890",
+    "tur": "odeme-duzelt"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "genel",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "ödeme yanlış",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "servis-ekle",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "ödeme yanlış",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "34 ABC 123 ödeme yanlış",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "34 ABC 123 ödeme yanlış",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "34 ABC 123 ödeme yanlış",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "mesaj",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "ödeme yanlış",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "muhasebe",
+   "islem": {
+    "arac": "34 ABC 123",
+    "is": "ödeme yanlış",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "34 ABC 123 ödeme yanlış",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "arac": "34 ABC 123",
+    "baskaIslem": {
+     "ad": "34 ABC 123 ödeme yanlış",
+     "fiyat": 0,
+     "tip": "parca",
+     "tur": "satir-ekle"
+    },
+    "is": "ödeme yanlış",
+    "isTuru": "tamirat",
+    "km": "",
+    "plaka": "34 ABC 123",
+    "tur": "servis-ac"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "genel",
+   "islem": {
+    "metin": "99 ZZZ 999 nakit değil kart",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "servis-ekle",
+   "islem": {
+    "metin": "99 ZZZ 999 nakit değil kart",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "araclar",
+   "islem": {
+    "hedef": "araclar",
+    "terim": "99 ZZZ 999 nakit değil kart",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "kayitlar",
+   "islem": {
+    "hedef": "kayitlar",
+    "terim": "99 ZZZ 999 nakit değil kart",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "musteriler",
+   "islem": {
+    "hedef": "musteriler",
+    "terim": "99 ZZZ 999 nakit değil kart",
+    "tur": "ara"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "mesaj",
+   "islem": {
+    "metin": "99 ZZZ 999 nakit değil kart",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "muhasebe",
+   "islem": {
+    "metin": "99 ZZZ 999 nakit değil kart",
+    "tur": "plakasiz"
+   }
+  },
+  {
+   "kaynak": "ek4",
+   "cumle": "99 ZZZ 999 nakit değil kart",
+   "baglam": "kayit-icinde",
+   "islem": {
+    "ad": "99 ZZZ 999 nakit değil kart",
+    "fiyat": 0,
+    "tip": "parca",
+    "tur": "satir-ekle"
    }
   }
  ]

@@ -105,6 +105,18 @@ const EK3 = ['balata 900 lira olsun', 'ön fren balatası 900 lira', 'balata de�
 for (const cumle of EK3) durumlar.push({ kaynak: 'ek3', cumle, baglam: 'kayit-icinde', kayit: 3 });
 for (const cumle of ['Mégane34 ABC 123 geldi', 'Clio16 SY 8890 bakım', 'café06 TMR 07 balata'])
   for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek3', cumle, baglam });
+/* E5 (K-077.2) · Ödeme yolunu düzelt — "değil"den sonraki yol, en son söylenen yol, "almadım"
+   sesle düzeltilmez. Kayıt içi: 7 (teslim, nakit) ve 1 (AÇIK — düzeltme yok, teslim işi). */
+const EK4 = ['nakit değil kartla aldım', 'kartla değil nakit aldım', 'yanlış yazdım havale olacak',
+  'ödeme yanlış kk olacak', 'nakit yanlış kart olacak', 'ödemeyi karta çevir', 'nakit değil eft',
+  'parayı almadım nakit değil', 'ödemeyi değiştir', 'teslim ettim nakit değil kartla',
+  // "kk" kelime olarak aranır: "hakkını" içindeki kk KART değildir (mutasyonla bulundu, E5)
+  'kart değil nakit hakkını verdim'];
+// 8 = veresiye ("almadım"): düzeltme hedefi DEĞİL — kayıt açıkken de (mutasyonla bulundu, E5)
+for (const cumle of EK4) for (const kayit of [7, 1, 8]) durumlar.push({ kaynak: 'ek4', cumle, baglam: 'kayit-icinde', kayit });
+for (const cumle of ['35 KLM 45 ödemesi nakit değil kart', '06 TMR 07 ödemeyi havaleye çevir', '34 ABC 123 kartla değil nakit aldım',
+  '16 SY 8890 nakit değil eft', '34 ABC 123 ödeme yanlış', '99 ZZZ 999 nakit değil kart'])
+  for (const baglam of BAGLAMLAR) durumlar.push({ kaynak: 'ek4', cumle, baglam });
 
 /* Açık kayıt: kayıt içi bağlamda prototipin 1 numaralı kaydı (tohum). Araç nesnesi (`arac`)
    tohumdan gelir ve sunucuda aracın KENDİSİ okunur — korpusta yalnız plakası tutulur. */

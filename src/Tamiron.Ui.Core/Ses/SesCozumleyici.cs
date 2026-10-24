@@ -466,6 +466,34 @@ public sealed partial class SesCozumleyici(SesDunya dunya, SesSozluk? sozluk = n
         : d.Contains("kart") || KelimeVarMi(d, "kk") ? "kart"
         : d.Contains("havale") || KelimeVarMi(d, "eft") || d.Contains("hesaba") ? "havale" : null;
 
+    /// <summary>Prototip sesOdemeDuzeltmeMi (50-teslim, E5).</summary>
+    private static bool OdemeDuzeltmeMi(string d) =>
+        d.Contains("degil") || d.Contains("yanlis") || d.Contains("duzelt") || d.Contains("cevir") || d.Contains("degistir");
+
+    /// <summary>
+    /// Prototip sesDuzeltilenYol: "değil"den SONRA geçen, yoksa cümlede EN SON geçen yol — "nakit değil
+    /// kartla" kart, "kartla değil nakit" nakit. Eşitlikte ilk sayılan (nakit · kart · havale) kalır.
+    /// </summary>
+    private static string? DuzeltilenYol(string d)
+    {
+        var i = d.IndexOf("degil", StringComparison.Ordinal);
+        var s = i >= 0 ? d[(i + 5)..] : d;
+        static int Son(string s, params string[] k) => k.Max(x => s.LastIndexOf(x, StringComparison.Ordinal));
+        static int Ara(string s, Regex re) { var m = re.Match(s); return m.Success ? m.Index : -1; }
+        (string Yol, int Yer)[] yer =
+        [
+            ("nakit", Son(s, "nakit", "pesin")),
+            ("kart", Math.Max(Son(s, "kart"), Ara(s, KkRe()))),
+            ("havale", Math.Max(Son(s, "havale", "hesaba"), Ara(s, EftRe()))),
+        ];
+        string? en = null; var enYer = -1;
+        foreach (var (yol, y) in yer) if (y >= 0 && (en is null || y > enYer)) { en = yol; enYer = y; }
+        return en;
+    }
+
+    /// <summary>Teslimde ödeme: "değil" geçen cümlede düzeltmenin kuralı ("nakit değil kartla" → kart).</summary>
+    private static string? TeslimOdemesi(string d) => d.Contains("degil") ? DuzeltilenYol(d) : OdemeYolu(d);
+
     private (string K, IReadOnlyList<string> Kokler, string Metin)? HazirMetinBul(string cumle)
     {
         foreach (var h in soz.Hazir) if (KokleBasliyorMu(cumle, h.Kokler)) return h;
@@ -519,13 +547,29 @@ public sealed partial class SesCozumleyici(SesDunya dunya, SesSozluk? sozluk = n
                 var plaka = c.P.Plaka;
                 var acik = dunya.Icerideki().FirstOrDefault(k => k.Plaka == plaka);
                 if (acik is null) return O(("tur", "teslim-edilecek-kayit-yok"), ("plaka", plaka), ("arac", c.Arac.Plaka));
-                return O(("tur", "teslim"), ("plaka", plaka), ("arac", c.Arac.Plaka), ("kayit", acik.Id), ("odeme", OdemeYolu(c.Dk)));
+                return O(("tur", "teslim"), ("plaka", plaka), ("arac", c.Arac.Plaka), ("kayit", acik.Id), ("odeme", TeslimOdemesi(c.Dk)));
             },
             Baglamda: c =>
             {
                 var k = c.Kayit;
                 if (k is null || !c.D.Contains("teslim") || k.Teslim) return null;
-                return O(("tur", "teslim"), ("plaka", k.Plaka), ("arac", dunya.AracBul(k.Plaka)?.Plaka), ("kayit", k.Id), ("odeme", OdemeYolu(c.D)));
+                return O(("tur", "teslim"), ("plaka", k.Plaka), ("arac", dunya.AracBul(k.Plaka)?.Plaka), ("kayit", k.Id), ("odeme", TeslimOdemesi(c.D)));
+            }),
+        // E5 · teslim edilmiş işin ödeme yolu düzeltmesi. Veresiye ("almadim") hedef DEĞİL: oradaki
+        // "havaleye çevir" geriye dönük kasaya para yazardı — o tahsilattır (E6).
+        new("odeme-duzelt", ["kayit-icinde"], 55,
+            Tani: c =>
+            {
+                if (c.P is null || c.Arac is null || !OdemeDuzeltmeMi(c.Dk) || DuzeltilenYol(c.Dk) is not { } yol) return null;
+                var k = dunya.Kayitlar.LastOrDefault(k => k.Plaka == c.P.Plaka && k.Teslim && k.OdemeYolu != "almadim");
+                if (k is null) return null;
+                return O(("tur", "odeme-duzelt"), ("plaka", c.P.Plaka), ("arac", c.Arac.Plaka), ("kayit", k.Id), ("odeme", yol));
+            },
+            Baglamda: c =>
+            {
+                var k = c.Kayit;
+                if (k is null || !k.Teslim || k.OdemeYolu == "almadim" || DuzeltilenYol(c.D) is not { } yol || !OdemeDuzeltmeMi(c.D)) return null;
+                return O(("tur", "odeme-duzelt"), ("plaka", k.Plaka), ("arac", dunya.AracBul(k.Plaka)?.Plaka), ("kayit", k.Id), ("odeme", yol));
             }),
         new("teslim-edilecek-kayit-yok", [], null, Guclu: false),
         new("ara", ["araclar", "kayitlar", "musteriler"], 50, Tani: c =>
@@ -666,6 +710,8 @@ public sealed partial class SesCozumleyici(SesDunya dunya, SesSozluk? sozluk = n
 
     // ===================== DÜZENLİ İFADELER (JS'ten; \b ve \w ASCII, $ = metnin sonu) =====================
 
+    [GeneratedRegex(@"(^|\s)kk(\s|\z)")] private static partial Regex KkRe();
+    [GeneratedRegex(@"(^|\s)eft(\s|\z)")] private static partial Regex EftRe();
     [GeneratedRegex(@"(?<![A-Za-z0-9_])([0-9]{2})\s*([A-ZÇĞİÖŞÜ](?: ?[A-ZÇĞİÖŞÜ]){0,2})\s*([0-9]{2,5})(?![A-Za-z0-9_])")] private static partial Regex PlakaAdayRe();
     [GeneratedRegex(@"^\s+([0-9]{1,3})(?![0-9])")] private static partial Regex EkRakamRe();
     [GeneratedRegex(@"(^|\s)([0-9]{2})\s+([A-ZÇĞİÖŞÜ]{4,9})\s+([0-9]{2,4})(?![0-9])")] private static partial Regex KelimePlakaRe();

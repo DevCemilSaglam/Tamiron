@@ -32,7 +32,7 @@ public class SesEsdegerlikTests
             .Select(a => new SesArac(S(a, "plaka")!, S(a, "marka"), S(a, "model"), S(a, "sahipAd"))).ToList();
         var kayitlar = t.GetProperty("kayitlar").EnumerateArray()
             .Select(k => new SesKayit(k.GetProperty("id").GetInt32().ToString(), S(k, "plaka")!, S(k, "teslimTarihi") is not null,
-                k.GetProperty("satirlar").EnumerateArray().Select(s => S(s, "ad") ?? "").ToList())).ToList();
+                k.GetProperty("satirlar").EnumerateArray().Select(s => S(s, "ad") ?? "").ToList(), S(k, "odemeYolu"))).ToList();
         return new SesDunya(araclar, kayitlar, (plaka, sablon) => $"<<{plaka}|{sablon}>>");
     }
 

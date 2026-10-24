@@ -136,6 +136,33 @@
   }
  },
  {
+  "name": "odeme-duzelt",
+  "description": "Ödeme yolu düzeltilecek · ekran: kayit",
+  "input_schema": {
+   "type": "object",
+   "properties": {
+    "plaka": {
+     "type": "string",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
+     "description": "Araç"
+    },
+    "odeme": {
+     "type": "string",
+     "enum": [
+      "nakit",
+      "kart",
+      "havale"
+     ],
+     "description": "Doğrusu"
+    }
+   },
+   "required": [
+    "plaka",
+    "odeme"
+   ]
+  }
+ },
+ {
   "name": "satir-ekle",
   "description": "Açık kayda satır eklenecek · ekran: kayit",
   "input_schema": {

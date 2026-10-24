@@ -27,6 +27,18 @@ button ön planda olmasına gerek yok. Düzelt ya da düzenle diye bir button al
 işlemler yapılabilir."* → kayıtta tek bir **"Düzenle"** girişi; altında ödeme yolu (ve
 ileride benzer düzeltmeler). Teslimi geri alma (K-076.13) "yanlış araç" için kalır.
 
+  → **E1 (dokunarak) ve E5 (sesle) yapıldı.** Ses şeması `odeme-duzelt` önce prototipe yazıldı
+  (50-teslim, şartname), sonra C#'a taşındı — 815 durumda 0 fark, 9/9 mutasyon. Kurallar:
+  - Tetik: cümlede *değil · yanlış · düzelt · çevir · değiştir* **ve** bir ödeme yolu. Hedef yol
+    "değil"den SONRA geçen, yoksa EN SON geçen ("nakit değil kartla" → kart; "kartla değil nakit" → nakit).
+  - Hedef kayıt: kayıt açıkken o kayıt; plakayla söylenince aracın **son teslim edilmiş** kaydı.
+  - **Veresiye ("almadım") düzeltilmez:** "havaleye çevir" orada geriye dönük kasaya para yazardı —
+    ustanın kastı "şimdi aldım"dır, o tahsilattır (E6). Böyle cümle şimdilik servis açma önerisine
+    düşer; onay ekranı yakalar, E6 gelince "x aldım" karşılar.
+  - **Teslimde de aynı kural:** "teslim ettim nakit değil kartla" eskiden **nakit** öneriyordu (ilk
+    geçen yol) — prototip hatası, düzeltildi; "değil" geçen cümlede teslim de düzeltmenin kuralını kullanır.
+  Prototip değişti, Netlify'a yayınlanmadı (Cemil'in kararı).
+
 **77.3 · Taksit — iki biçim, ikisi de az veriyle.** Cemil: *"İkisi de olabilir. Ama kredi
 kartını taksitli söylemek zorunda değil. Ve elden taksit de x miktar aldım şeklinde olur."*
 - **Kredi kartı taksiti:** bilgi DEĞİL — "Kart" yeter; taksit sayısı sorulmaz.
