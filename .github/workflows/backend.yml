@@ -21,9 +21,9 @@ jobs:
     runs-on: windows-2022
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
 
@@ -49,9 +49,9 @@ jobs:
       # Prototipin muhasebe rakamları değiştiyse eşdeğerlik dosyası yeniden üretilmeli
       # (CLAUDE.md: "Prototipte muhasebe kuralı değişirse araç yeniden koşulur"). Araç
       # deterministik: değişmemiş prototipte dosya bayt bayt aynı çıkar.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
+          node-version: 22
       - name: Prototip eşdeğerliği güncel mi
         shell: pwsh
         run: |
@@ -70,7 +70,7 @@ jobs:
 
       - name: Test sonuçları
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-sonuclari
           path: tests/**/TestResults/*.trx
