@@ -20,6 +20,11 @@ def kos():
 def main(yol):
     # utf-8-sig: PowerShell'in Out-File'i dosya basina BOM koyar; json onu reddederdi.
     mutlar = json.load(io.open(yol, encoding='utf-8-sig'))
+    # TABAN ÖNCE (24.10): taban kırmızıyken her mutasyon "yakalandı" görünür — ölçüm yalan
+    # söyler. F7'de oldu: VoiceSchemaTests zaten kırmızıydı, 11/11 "yakalandı" çıktı.
+    gecti, ozet = kos()
+    if not gecti:
+        print('TABAN KIRMIZI — mutasyon koşulmadı:', ' | '.join(ozet)); sys.exit(2)
     yakalanmayan = 0
     for m in mutlar:
         p = K + '/' + m['dosya']
