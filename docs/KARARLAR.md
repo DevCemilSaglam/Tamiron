@@ -10,6 +10,19 @@
 
 ---
 
+## K-078 · Kısmi tahsilat koda geçiyor; müşteri avansı ayrı ve sonra (24.10.2026 — lider, Cemil onayına açık)
+
+Cemil kısmi tahsilat tasarımının dört sorusunu cevapladı (TASARIM-E6 §5b: teslimde kısmi
+olabilir · kalandan fazlası olmaz · CSV'de ayrı satır · ses her yerde) ve *"başka yapacakların
+varsa döngüyle yap"* dedi. Akış ve kurallar böylece belli → **kısmi tahsilat tur F'de kodlanır.**
+**Müşteri avansı** (§6) yeni bir kavram ve dört sorusu açık → **ayrı, sonra** (öneri (d)'nin
+cevabı bu varsayımla: "önce kısmi, avans sonra"). Avans kısmi tahsilatı bozmaz: avans geldiğinde
+"avanstan düş" bir ödeme yolu olarak aynı ödemeler listesine eklenir — bugünkü tasarım onu kapatmaz.
+Prototip önce değişir (şartname), tam ödemeli işte bütün rakamlar aynı kalmak ZORUNDA (eşdeğerlik
+0 fark); prototip Netlify'a Cemil'in kararıyla.
+
+---
+
 ## K-077 · Tur D incelemesi — Cemil'in cevapları (23.10.2026 akşam)
 
 **77.1 · Ses çözümleyicisi C#'a, CİHAZDA çalışacak şekilde — K-076.14'ü genişletir.**
