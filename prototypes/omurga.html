@@ -3,7 +3,7 @@
   ⚠️  BU DOSYA ÜRETİLMİŞTİR — ELLE DÜZENLEME.
   Kaynak: prototypes/kaynak/**
   Üretmek için: node tools/prototip-derle.js
-  Üretim: 2026-10-24 08:15
+  Üretim: 2026-10-24 09:30
 -->
 
 <!-- data-theme YOK: seçim yapılmamışken tema İŞLETİM SİSTEMİNİ izler
@@ -3641,8 +3641,10 @@ kirpilsin. */
      .tv · .cip-grup .cip · .btn .btn-primary .btn-lg · .notice.
      Yeni bileşen yazılmadı.
 
-     ÜZERİNDE YOK: kısmi ödeme takibi · taksit planı · cari hesap
-     · borç yaşlandırma · teslim alan kişi seçimi · fatura. -->
+     ÜZERİNDE YOK: taksit planı · cari hesap · borç yaşlandırma ·
+     teslim alan kişi seçimi · fatura. Kısmi ödeme 24.10'da girdi
+     (K-078 — Cemil: "elden taksit de x miktar aldım şeklinde olur");
+     tek yeni çip, yeni ekran yok. -->
 <section class="screen" id="screen-teslim">
 
   <div class="screen-head">
@@ -3660,6 +3662,7 @@ kirpilsin. */
     <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme nasıl alındı?
   </div>
   <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu"></div>
+  <div id="tsKismi"></div>
 
   <button class="btn btn-primary btn-lg" id="tsTeslim">
     <svg class="ico"><use href="#i-check"></use></svg> Teslim et
@@ -6491,6 +6494,7 @@ var KAYITLAR = [
     acilis: '28.08.2026', teslimTarihi: '28.08.2026',
     odemeYolu: 'almadim', hatirlatmaTarihi: null, hatirlatmaGonderildi: false, parcaBekliyor: false, bekliyorMusteriye: false,
     tahsilTarihi: null,   /* ödenince "Ödeme alındı" yazar (K-071.1) */
+    odemeler: null,       /* bir kısmı ödenince [{ tutar, yol, tarih }] (K-078) */
     satirlar: [
       { tip: 'parca', ad: 'Akü 60 Ah', fiyat: 3200, alis: 2450, kimGetirdi: 'tamirci',
         marka: 'Mutlu', kod: 'SFB 60', tanim: 'kodlu' },
@@ -7163,20 +7167,22 @@ function bugunTahsilat() {
           ('0' + (BUGUN.getMonth() + 1)).slice(-2) + '.' + BUGUN.getFullYear();
   /* Tahsil gününe göre (tahsilTarihi): sonradan ödenen veresiye de
      ödendiği günün tahsilatıdır. */
-  return KAYITLAR.filter(function (k) {
-    return tahsilTarihi(k) === b;
-  }).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+  /* 24.10 · K-078: kayıt değil ÖDEME sayılır — kısmi ödemenin bugün
+     alınan parçası bugünün kasasıdır, kaydın tamamı değil. */
+  return tumOdemeler().filter(function (o) { return o.tarih === b; })
+    .reduce(function (t, o) { return t + o.tutar; }, 0);
 }
+/* Veresiye = KALAN (K-078): 5.000'lik işin 2.000'i alındıysa alacak 3.000. */
 function veresiyeToplami() {
-  return KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; })
-    .reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+  return KAYITLAR.filter(veresiyeMi)
+    .reduce(function (t, k) { return t + kalanTutar(k); }, 0);
 }
 function odemeDagilimi() {
   var d = { nakit: 0, kart: 0, havale: 0, almadim: 0 };
   KAYITLAR.forEach(function (k) {
-    if (k.teslimTarihi && k.odemeYolu && d[k.odemeYolu] !== undefined) {
-      d[k.odemeYolu] += kayitToplami(k);
-    }
+    if (!k.teslimTarihi) return;
+    kayitOdemeleri(k).forEach(function (o) { if (d[o.yol] !== undefined) d[o.yol] += o.tutar; });
+    d.almadim += kalanTutar(k);
   });
   return d;
 }
@@ -7442,14 +7448,99 @@ function tahsilTarihi(k) {
   if (!k.odemeYolu || k.odemeYolu === 'almadim') return null;
   return k.tahsilTarihi || k.teslimTarihi || null;
 }
+
+/* ---- ÖDEMELER (24.10 · K-078 · E6 elden taksit = kısmi tahsilat) ----
+   Cemil: *"elden taksit de x miktar aldım şeklinde olur."* Kaydın parası
+   artık TEK PARÇA olmak zorunda değil: `odemeler` = [{ tutar, yol, tarih }].
+
+   İKİ BİÇİM, TEK OKUYUCU. Tam ödemeli kayıtta `odemeler` YOK — ödeme
+   `odemeYolu` + `tahsilTarihi`'nden türetilir (bugünkü veri olduğu gibi
+   okunur, tam ödemede hiçbir rakam değişmez). Kısmi ödeme girilince
+   `odemeler` yazılır ve tek kaynak o olur. Bütün hesaplar yalnız
+   kayitOdemeleri()'ni okur; iki biçimi bilen tek yer burası.
+
+   Kısmi ödemeli kayıtta `odemeYolu` kalan varken 'almadim' kalır (veresiye
+   listeleri onu tanır), kalan sıfırlanınca SON ödemenin yolu ve günü olur.
+   Cari hesap (ekstre, vade, mutabakat) YOK — kayıt başına alınanlar ve kalan. */
+function kayitOdemeleri(k) {
+  if (!k.teslimTarihi) return [];
+  if (k.odemeler) return k.odemeler;
+  var t = tahsilTarihi(k);
+  return t ? [{ tutar: kayitToplami(k), yol: k.odemeYolu, tarih: t }] : [];
+}
+function alinanTutar(k) {
+  return kayitOdemeleri(k).reduce(function (t, o) { return t + o.tutar; }, 0);
+}
+/* Teslimden sonra satır değişirse kalan yeniden hesaplanır; alınan para
+   değişmez (para bir olgudur). Satır silinip alınan toplamı aşarsa kalan 0. */
+function kalanTutar(k) {
+  if (!k.teslimTarihi) return 0;
+  return Math.max(0, kayitToplami(k) - alinanTutar(k));
+}
+function veresiyeMi(k) { return kalanTutar(k) > 0; }
+function tumOdemeler() {
+  var r = [];
+  KAYITLAR.forEach(function (k) {
+    kayitOdemeleri(k).forEach(function (o) {
+      r.push({ kayit: k, tutar: o.tutar, yol: o.yol, tarih: o.tarih });
+    });
+  });
+  return r;
+}
+/* Kalandan fazlası girilemez (Cemil: "Kalandan fazla ödeme olmaz").
+   Önceden verilen para (avans) AYRI bir kavram — K-078, sonra. */
+function odemeHatasi(k, tutarSayi) {
+  if (!k.teslimTarihi) return 'Önce teslim et.';
+  if (!(tutarSayi > 0)) return 'Tutarı yaz.';
+  var kalan = kalanTutar(k);
+  if (tutarSayi > kalan) return 'Kalan ' + tutar(kalan) + ' ₺ — fazlası girilemez.';
+  return null;
+}
+/* Ödeme ekler. Teslimdeki kısmi ödeme de sonradan gelen taksit de buradan
+   geçer. İlk kısmi ödemede türetilmiş tek ödeme listeye dönüşür. */
+function odemeEkle(k, tutarSayi, yol, tarih) {
+  var hata = odemeHatasi(k, tutarSayi);
+  if (hata) return hata;
+  if (!k.odemeler) k.odemeler = kayitOdemeleri(k).slice();
+  k.odemeler.push({ tutar: tutarSayi, yol: yol, tarih: tarih });
+  odemeDurumu(k);
+  return null;
+}
+/* Son ödemeyi geri alır (yanlış çip / yanlış tutar). */
+function sonOdemeyiGeriAl(k) {
+  if (!k.odemeler || !k.odemeler.length) return;
+  k.odemeler.pop();
+  odemeDurumu(k);
+  if (!k.odemeler.length) delete k.odemeler;   /* boş liste = hiç ödeme yok */
+}
+/* `odemeYolu` / `tahsilTarihi` ödemelerden okunur: kalan varken veresiye,
+   kapanınca son ödemenin yolu ve günü. */
+function odemeDurumu(k) {
+  var son = k.odemeler[k.odemeler.length - 1];
+  if (kalanTutar(k) > 0 || !son) { k.odemeYolu = 'almadim'; delete k.tahsilTarihi; return; }
+  k.odemeYolu = son.yol;
+  k.tahsilTarihi = son.tarih;
+}
+/* Kısmi ödemesi olan kaydın kısa durumu: "2.000 ₺ alındı · kalan 3.000 ₺". */
+function odemeOzeti(k) {
+  if (!k.odemeler || !k.odemeler.length) return '';
+  return tutar(alinanTutar(k)) + ' ₺ alındı' +
+    (kalanTutar(k) > 0 ? ' · kalan ' + tutar(kalanTutar(k)) + ' ₺' : '');
+}
+
 function donemTahsilatlari(donem) {
   return KAYITLAR.filter(function (k) {
     var t = tahsilTarihi(k);
     return t && donemIcinde(t, donem);
   });
 }
+/* Dönemin kasası = o dönemde ALINAN ödemeler (K-078). Tam ödemede kayıt
+   başına bir ödeme olduğundan eski hesapla aynı rakam. */
+function donemOdemeleri(donem) {
+  return tumOdemeler().filter(function (o) { return o.tarih && donemIcinde(o.tarih, donem); });
+}
 function tahsilatToplami(donem) {
-  return donemTahsilatlari(donem).reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+  return donemOdemeleri(donem).reduce(function (t, o) { return t + o.tutar; }, 0);
 }
 
 /* ---- MUHASEBE CSV (22.10 · MUH sırası · arastirma/DISA-AKTARMA.md §6) ----
@@ -7473,19 +7564,24 @@ function csvHucre(v) {
 function muhasebeCsv(donem) {
   var satirlar = [['Tür', 'Tarih', 'Açıklama', 'Plaka', 'Müşteri', 'Ödeme', 'Tutar']];
   function sahip(k) { return (aracBul(k.plaka) || {}).sahipAd || ''; }
-  /* Tarih sırasıyla: kayıt sırası açılış sırasıdır, ödeme sırası değil. */
-  donemTahsilatlari(donem).slice().sort(function (a, b) {
-    return tariheCevir(tahsilTarihi(a)) - tariheCevir(tahsilTarihi(b));
-  }).forEach(function (k) {
-    satirlar.push(['Tahsilat', tahsilTarihi(k), k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
-                   ODEME_ETIKET[k.odemeYolu] || k.odemeYolu, kayitToplami(k)]);
+  /* Tarih sırasıyla: kayıt sırası açılış sırasıdır, ödeme sırası değil.
+     HER ÖDEME AYRI SATIR (Cemil, 24.10: "Ayrı satır") — kasaya giriş
+     günüyle; muhasebeci taksiti günü gününe görür. Sıralama kararlı:
+     aynı gün iki ödeme yazılış sırasıyla kalır. */
+  donemOdemeleri(donem).map(function (o, i) { return { o: o, i: i }; }).sort(function (a, b) {
+    return (tariheCevir(a.o.tarih) - tariheCevir(b.o.tarih)) || (a.i - b.i);
+  }).forEach(function (x) {
+    var o = x.o, k = o.kayit;
+    satirlar.push(['Tahsilat', o.tarih, k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
+                   ODEME_ETIKET[o.yol] || o.yol, o.tutar]);
   });
   GIDERLER.filter(function (g) { return donemIcinde(g.tarih, donem); }).forEach(function (g) {
     satirlar.push(['Gider', g.tarih, g.aciklama, '', '', '', g.tutar || 0]);
   });
-  KAYITLAR.filter(function (k) { return k.odemeYolu === 'almadim'; }).forEach(function (k) {
+  /* Alacak = KALAN (K-078): kısmen ödenmiş işin yalnız kalanı alacaktır. */
+  KAYITLAR.filter(veresiyeMi).forEach(function (k) {
     satirlar.push(['Alacak', k.teslimTarihi || '', k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
-                   ODEME_ETIKET.almadim, kayitToplami(k)]);
+                   ODEME_ETIKET.almadim, kalanTutar(k)]);
   });
   return '\uFEFF' + satirlar.map(function (s) { return s.map(csvHucre).join(';'); }).join('\r\n') + '\r\n';
 }
@@ -7929,7 +8025,21 @@ function surecAdimlari(k) {
                      : '' });
     /* Sonradan ödenen veresiye kendi gününde ayrı bir adım: teslimde
        "Nakit" yazsaydı usta parayı teslim günü aldığını sanırdı. */
-    if (k.tahsilTarihi && k.tahsilTarihi !== k.teslimTarihi) {
+    if (k.odemeler) {
+      /* K-078 · kısmi ödeme: teslim günü alınan kısım teslim adımında,
+         sonra gelen her taksit kendi gününde ayrı adım. */
+      var teslimde = k.odemeler.filter(function (o) { return o.tarih === k.teslimTarihi; });
+      adimlar[adimlar.length - 1].alt = teslimde.length
+        ? teslimde.map(function (o) { return tutar(o.tutar) + ' ₺ ' + ODEME_ETIKET[o.yol]; }).join(' · ') +
+          (kalanTutar(k) > 0 || k.odemeler.length > teslimde.length ? ' · kalan sonra' : '')
+        : 'Ödeme alınmadı';
+      k.odemeler.forEach(function (o) {
+        if (o.tarih === k.teslimTarihi) return;
+        adimlar.push({ ad: 'Ödeme alındı', tarih: o.tarih, saat: '',
+                       ikon: 'i-wallet', hal: 'tamam', sira: 6,
+                       alt: tutar(o.tutar) + ' ₺ · ' + ODEME_ETIKET[o.yol] });
+      });
+    } else if (k.tahsilTarihi && k.tahsilTarihi !== k.teslimTarihi) {
       adimlar[adimlar.length - 1].alt = 'Ödeme alınmadı';
       adimlar.push({ ad: 'Ödeme alındı', tarih: k.tahsilTarihi, saat: '',
                      ikon: 'i-wallet', hal: 'tamam', sira: 6,
@@ -8186,7 +8296,9 @@ function ozetGovdeHtml(k) {
       '<span class="n-body">' +
         (k.teslimTarihi
           ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
-            (k.odemeYolu === 'almadim'
+            (k.odemeler
+              ? ' Ödeme: <b>' + odemeOzeti(k) + '</b>.'
+              : k.odemeYolu === 'almadim'
               ? ' Ödeme <b>alınmadı</b>.'
               : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
                   k.odemeYolu) + '</b>.' : ''))
@@ -10841,16 +10953,25 @@ function kayitCiz() {
     ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
         '<use href="#i-circle-check"></use></svg></span>' +
         '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
-          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') +
-          (k.tahsilTarihi ? ' · ödendi ' + k.tahsilTarihi : '') + '</span></div>' +
+          (k.odemeler
+            ? ' · ' + odemeOzeti(k)
+            : (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') +
+              (k.tahsilTarihi ? ' · ödendi ' + k.tahsilTarihi : '')) + '</span></div>' +
       /* ---- ALACAK TAHSİLİ (22.10 · MUH sırası) ----
          "Almadım" denip araç gittiyse para sonradan gelir. Usta bunu
          kaydın İÇİNDE işaretler — muhasebenin alacak listesi de buraya
          açılıyor, ikinci bir "tahsilat" ekranı yok (yeni ekran = A-2
          bütçesi). Üç çip, teslimdeki ödeme sorusunun aynısı: bir soru,
          bir görünüş. Ödendiği gün tahsil tarihi olur (02-veri). */
-      (k.odemeYolu === 'almadim'
-        ? '<p class="plate-hint" style="margin-top:10px">Para sonradan geldiyse nasıl ödendi?</p>' +
+      /* ---- ELDEN TAKSİT (24.10 · K-078) ----
+         Cemil: *"elden taksit de x miktar aldım şeklinde olur."* Tutar
+         alanı KALANLA dolu gelir: tamamını alan usta bugünkü gibi yalnız
+         çipe dokunur; bir kısmını alan rakamı değiştirir. Yeni ekran yok. */
+      (veresiyeMi(k)
+        ? '<p class="plate-hint" style="margin-top:10px">Para sonradan geldiyse ne kadar, nasıl ödendi?</p>' +
+          '<div class="field"><label for="kTahsilTutar">Alınan</label>' +
+            '<input id="kTahsilTutar" class="mono" data-giris="tutar" inputmode="numeric"' +
+              ' autocomplete="off" value="' + tutar(kalanTutar(k)) + '" /></div>' +
           '<div class="cip-grup" id="kTahsil">' +
             ['nakit', 'kart', 'havale'].map(function (y) {
               return '<button class="cip" data-tahsil="' + y + '">' + ODEME_ETIKET[y] + '</button>';
@@ -10946,12 +11067,31 @@ document.addEventListener('click', function (e) {
      olmayan parayı yazmasın. */
   if (t.getAttribute('data-tahsil')) {
     var yol = t.getAttribute('data-tahsil');
-    k.odemeYolu = yol;
-    k.tahsilTarihi = bugunMetin();
+    var tEl = document.getElementById('kTahsilTutar');
+    var rakamT = ((tEl && tEl.value) || '').replace(/[^0-9]/g, '');
+    var alinan = rakamT === '' ? 0 : parseInt(rakamT, 10);
+    var kalan = kalanTutar(k);
+    /* TAMAMI, KISMİ YOKKEN: bugünkü tek parça ödeme — veri eskisi gibi
+       kalır (odemeYolu + tahsilTarihi), hiçbir hesap fark görmez. */
+    if (alinan === kalan && !k.odemeler) {
+      k.odemeYolu = yol;
+      k.tahsilTarihi = bugunMetin();
+      Ekran.tazele();
+      balonGeriAl(tutar(alinan) + ' ₺ alındı · ' + ODEME_ETIKET[yol] + '.', function () {
+        k.odemeYolu = 'almadim';
+        delete k.tahsilTarihi;
+        Ekran.tazele();
+      });
+      return;
+    }
+    /* KISMİ (ya da önceden kısmi alınmış işin kalanı): ödeme listesine.
+       Fazlası girilemez — söylenir, sessizce kırpılmaz. */
+    var hataT = odemeEkle(k, alinan, yol, bugunMetin());
+    if (hataT) { balon(hataT, false, 3200); return; }
     Ekran.tazele();
-    balonGeriAl(tutar(kayitToplami(k)) + ' ₺ alındı · ' + ODEME_ETIKET[yol] + '.', function () {
-      k.odemeYolu = 'almadim';
-      delete k.tahsilTarihi;
+    balonGeriAl(tutar(alinan) + ' ₺ alındı · ' + ODEME_ETIKET[yol] +
+                (kalanTutar(k) > 0 ? ' · kalan ' + tutar(kalanTutar(k)) + ' ₺' : '') + '.', function () {
+      sonOdemeyiGeriAl(k);
       Ekran.tazele();
     });
     return;
@@ -11519,7 +11659,10 @@ var ODEME_YOLLARI = [
   { k: 'nakit', ad: 'Nakit' },
   { k: 'kart', ad: 'Kart' },
   { k: 'havale', ad: 'Havale' },
-  { k: 'almadim', ad: 'Almadım' }
+  { k: 'almadim', ad: 'Almadım' },
+  /* K-078 · elden taksit: bir kısmı bugün, kalanı veresiye. Seçilince
+     tutar ve yol sorulur; seçilmezse ekran bugünkünün aynısı. */
+  { k: 'kismi', ad: 'Bir kısmını aldım' }
 ];
 var tsSecili = null;
 /* Teslim EDİLDİ mi — edildikten sonra ekran kapanmıyor, bir adım daha
@@ -11575,6 +11718,25 @@ function tsCiz() {
   document.getElementById('tsTeslim').hidden = tsBitti;
   document.getElementById('tsOdeme').hidden = tsBitti;
 
+  /* KISMİ: tutar + yol. Alan YALNIZ İLK KEZ çizilir — her tazelemede
+     yeniden çizilseydi ustanın yazdığı rakam silinirdi (K-033.12'nin
+     dersi); yol çipleri DOM'da aria-pressed ile tutulur. */
+  var kis = document.getElementById('tsKismi');
+  if (tsSecili !== 'kismi' || tsBitti) kis.innerHTML = '';
+  else if (!kis.innerHTML) {
+    kis.innerHTML =
+      '<div class="field"><label for="tsKismiTutar">Alınan</label>' +
+        '<input id="tsKismiTutar" class="mono" data-giris="tutar" inputmode="numeric"' +
+          ' autocomplete="off" placeholder="ör. 2.000" /></div>' +
+      '<div class="cip-grup" role="group" aria-label="Nasıl alındı">' +
+        ['nakit', 'kart', 'havale'].map(function (y) {
+          return '<button class="cip" data-kismi-yol="' + y + '" aria-pressed="false">' +
+                 ODEME_ETIKET[y] + '</button>';
+        }).join('') +
+      '</div>' +
+      '<p class="plate-hint">Kalanı kayıtta "Ödeme alındı" ile yazarsın.</p>';
+  }
+
   /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın.
      Hangi tarihin kurulacağını da söylüyor: "6 ay sonra" demek yetmez,
      km'den gelen tarih daha erken olabilir. */
@@ -11596,7 +11758,7 @@ function tsCiz() {
       '<div class="notice ok">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>' +
         '<span class="n-body"><b>' + k.plaka + ' teslim edildi.</b> ' +
-          'Ödeme: ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) + '.' +
+          'Ödeme: ' + (k.odemeler ? odemeOzeti(k) : (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu)) + '.' +
           (k.hatirlatmaTarihi
             ? '<br>Bakım hatırlatması <b>' + k.hatirlatmaTarihi + '</b> için kuruldu.'
             : '') +
@@ -11639,7 +11801,11 @@ Ekran.tanim('teslim', {
      açılışta temiz başlar. Bunlar `ciz`de dururken her tazeleme
      ustanın seçtiği ödeme yolunu siliyordu — bugün ulaşılabilir bir
      yol yoktu ama olması an meselesiydi (K-040). */
-  ac: function () { tsSecili = null; tsBitti = false; },
+  ac: function () {
+    tsSecili = null; tsBitti = false;
+    var kis = document.getElementById('tsKismi');
+    if (kis) kis.innerHTML = '';
+  },
   ciz: tsCiz
 });
 
@@ -11650,14 +11816,39 @@ document.addEventListener('click', function (e) {
   var o = t.getAttribute('data-odeme');
   if (o) { tsSecili = o; tsCiz(); }
 
+  var ky = t.getAttribute('data-kismi-yol');
+  if (ky) {
+    document.querySelectorAll('[data-kismi-yol]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b === t));
+    });
+    return;
+  }
+
   if (t.id === 'tsTeslim' && !tsSecili) {
     balon('Ödemeyi nasıl aldığını seç — almadıysan "Almadım" de.', false, 3000);
     return;
   }
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
+    /* KISMİ — teslimden ÖNCE sınanır: yanlış girişte araç teslim
+       edilmiş görünmesin. Tamamı yazıldıysa bu kısmi değil, tam ödeme. */
+    var kTutar = 0, kYol = null;
+    if (tsSecili === 'kismi') {
+      var kEl = document.getElementById('tsKismiTutar');
+      var kR = ((kEl && kEl.value) || '').replace(/[^0-9]/g, '');
+      kTutar = kR === '' ? 0 : parseInt(kR, 10);
+      var kSec = document.querySelector('[data-kismi-yol][aria-pressed="true"]');
+      kYol = kSec ? kSec.getAttribute('data-kismi-yol') : null;
+      if (!(kTutar > 0)) { balon('Ne kadar aldığını yaz.', false, 3000); return; }
+      if (!kYol) { balon('Nasıl aldığını seç: nakit, kart ya da havale.', false, 3000); return; }
+      if (kTutar > kayitToplami(k)) {
+        balon('Toplam ' + tutar(kayitToplami(k)) + ' ₺ — fazlası girilemez.', false, 3200); return;
+      }
+    }
     k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */
-    k.odemeYolu = tsSecili;
+    if (tsSecili !== 'kismi') k.odemeYolu = tsSecili;
+    else if (kTutar === kayitToplami(k)) k.odemeYolu = kYol;
+    else { k.odemeYolu = 'almadim'; odemeEkle(k, kTutar, kYol, k.teslimTarihi); }
 
     /* Bakımsa hatırlatma KURULUR — AY **VEYA** KM, hangisi önce
        gelirse (K-002, 04.09 güncellemesi).
@@ -11907,10 +12098,8 @@ Ekran.tanim('arac', {
        toplamı. Uydurma bir alan değil, var olan verinin okunması —
        muhasebedeki "Alacak" listesiyle AYNI kaynaktan. İki yerde iki
        ayrı hesap olsaydı, biri diğerini yalanlardı. */
-    var borclular = aracKayitlari(a.plaka).filter(function (k) {
-      return k.teslimTarihi && k.odemeYolu === 'almadim';
-    });
-    var borc = borclular.reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+    var borclular = aracKayitlari(a.plaka).filter(veresiyeMi);
+    var borc = borclular.reduce(function (t, k) { return t + kalanTutar(k); }, 0);
     document.getElementById('arOdeme').innerHTML = borc
       ? '<div class="card">' +
           '<div class="section-label">' +
@@ -11920,7 +12109,7 @@ Ekran.tanim('arac', {
             borclular.map(function (k) {
               return '<div class="tutar-sat" data-kayit="' + k.id + '" role="button" tabindex="0">' +
                 '<span>' + (k.sikayet || TUR_AD[k.tur]) + ' · ' + k.teslimTarihi + '</span>' +
-                '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
+                '<span class="tv">' + tutar(kalanTutar(k)) + ' ₺</span></div>';
             }).join('') +
             '<div class="tutar-sat genel"><span>Alacak</span>' +
               '<span class="tv">' + tutar(borc) + ' ₺</span></div>' +
@@ -13357,8 +13546,10 @@ Ekran.tanim('muhasebe', {
     /* Tahsilat TAHSİL gününe göre (tahsilTarihi, 02-veri): sonradan ödenen
        veresiye ödendiği dönemin kasasına girer. "Teslim edilen" ise teslim
        gününe göre kalır — ikisi ayrı soru. */
-    donemTahsilatlari(muhDonemSecili).forEach(function (k) {
-      if (d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k);
+    /* K-078: ödeme ödeme sayılır — kısmi ödemenin her parçası kendi
+       gününün ve kendi yolunun kasasıdır. */
+    donemOdemeleri(muhDonemSecili).forEach(function (o) {
+      if (d[o.yol] !== undefined) d[o.yol] += o.tutar;
     });
     var toplam = d.nakit + d.kart + d.havale;
 
@@ -13419,9 +13610,8 @@ Ekran.tanim('muhasebe', {
        bu ay da alacaktır. Dönem süzgecine sokunca "Bugün" seçiliyken
        alacak GİZLENİYORDU — ustanın en çok sorduğu şey ekrandan
        kayboluyordu. Tahsilat ve gider döneme tabi, alacak değil. */
-    var borclu = KAYITLAR.filter(function (k) {
-      return k.odemeYolu === 'almadim';
-    });
+    /* Alacak = KALAN (K-078): kısmen ödenmiş iş kalanıyla görünür. */
+    var borclu = KAYITLAR.filter(veresiyeMi);
     /* İKİ SÜTUN. Plaka ve teslim tarihi müşterinin ALTINDA — dört
        sütun 375 px'e sığmıyordu. Başlık "Kim" değil MÜŞTERİ
        (Cemil, 05.09): ustanın kelimesi bu. */
@@ -13440,11 +13630,12 @@ Ekran.tanim('muhasebe', {
                 '<span class="t-alt">' + plakaHtml(k.plaka) +
                 (k.teslimTarihi ? ' <span class="t-tarih">' + k.teslimTarihi +
                   '</span>' : '') + '</span></td>' +
-              '<td class="sayi">' + tutar(kayitToplami(k)) + ' ₺</td></tr>';
+              '<td class="sayi">' + tutar(kalanTutar(k)) + ' ₺' +
+                (k.odemeler ? '<span class="t-alt">' + tutar(alinanTutar(k)) + ' ₺ alındı</span>' : '') +
+              '</td></tr>';
           }).join('') +
           '<tr class="genel"><td>Toplam alacak</td>' +
-            '<td class="sayi">' + tutar(borclu.reduce(function (t, k) {
-              return t + kayitToplami(k); }, 0)) + ' ₺</td></tr>' +
+            '<td class="sayi">' + tutar(veresiyeToplami()) + ' ₺</td></tr>' +
           '</tbody></table></div></div>'
       : bosDurumHtml('i-circle-check', 'Alacak yok',
           'Teslim edilen her işin parası alınmış.');

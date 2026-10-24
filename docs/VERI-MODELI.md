@@ -71,7 +71,7 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 | `Complaint` | *"Ne istiyor"* — Adım 2. Serbest metin, tek alan (şikâyet/tespit ayrımı yok) |
 | `DeliveredAt` | **Tek durum alanı** — **K-004.** Null ise araç içeride |
 | `PaymentMethod` | `Cash` \| `Card` \| `Transfer` \| `Unpaid` — Adım 7. `Unpaid` sonradan ödenirse ödeme yoluna döner |
-| `PaymentCollectedAt` | **Veresiye sonradan ödendiyse ödendiği gün** (K-071.1). Teslimde ödendiyse BOŞ kalır — tahsil günü `DeliveredAt`'tır. Tahsilat bu güne sayılır: Ağustos'ta teslim edilip Ekim'de ödenen para Ekim'in kasasıdır |
+| `PaymentCollectedAt` | **Veresiye sonradan ödendiyse ödendiği gün** (K-071.1). Teslimde ödendiyse BOŞ kalır — tahsil günü `DeliveredAt`'tır. Tahsilat bu güne sayılır: Ağustos'ta teslim edilip Ekim'de ödenen para Ekim'in kasasıdır. **K-078'den sonra:** kasa `Payment` satırlarından okunur; bu iki alan kaydın **ödeme durumunun özeti** olarak kalır (kalan varken `Unpaid`, kapanınca son ödemenin yolu/günü) — prototipteki `odemeYolu`/`tahsilTarihi`'nin aynısı |
 | `ReminderDate` | Bakımsa teslimde hesaplanır |
 | `ReminderSent` | Aynı hatırlatma iki kez gitmesin |
 | `WaitingForPart` | **Parça yolda.** Usta işaretler — K-033.5, K-034. Türetilemez: veride bunu söyleyen hiçbir şey yok |
@@ -92,6 +92,35 @@ Akıştaki yeri: **Adım 1–7** · Ekran 3, 5. **Ürünün merkezi.**
 > **`ApprovalStatus` YOK** (K-003). **`DiscountAmount` YOK** — toplam elle değiştirilebilir (A-15).
 >
 > `Total` alanı **yok**: satırlardan hesaplanır. Saklanan toplam, satır değişince yalan söyler.
+
+---
+
+## 2b · `Payment` — Alınan ödeme (K-078 · 24.10)
+
+Akıştaki yeri: **Adım 7** (teslim) ve sonrası (kayıtta "Ödeme alındı"). Cemil: *"elden
+taksit de x miktar aldım şeklinde olur."* Bir işin parası birden çok parçada gelebilir.
+
+| Alan | Neden var |
+|---|---|
+| `ServiceRecordId` | Ödeme bir işe aittir (müşteriye değil — cari hesap YOK, K-022) |
+| `Amount` | Alınan tutar. **> 0, kalandan fazla olamaz** (Cemil: *"Kalandan fazla ödeme olmaz"*) |
+| `Method` | `Cash` \| `Card` \| `Transfer` — `Unpaid` olamaz: alınmayan para ödeme değildir |
+| `PaidOn` | Paranın geldiği gün — **kasaya bu güne yazılır**, CSV'de ayrı satır (Cemil: *"Ayrı satır"*) |
+
+> **Kalan** saklanmaz: `ServiceRecord.Total − Σ Amount` (en az 0). Saklanan kalan, satır
+> değişince yalan söylerdi (`Total` alanının olmamasıyla aynı gerekçe). Teslimden sonra satır
+> değişirse kalan yeniden hesaplanır; **alınan para değişmez** — para bir olgudur.
+>
+> **Göç:** var olan teslimli kayıtlara satır üretilir — teslimde ödenmiş: (toplam, yol, teslim
+> günü); sonradan: (toplam, yol, tahsil günü); veresiye: satır yok. Göçten önce ve sonra kasa aynı.
+>
+> **Prototipte iki biçim, backend'de bir:** prototip tam ödemeli kayıtta `odemeler` yazmaz,
+> ödemeyi `odemeYolu`/`tahsilTarihi`'nden türetir (`kayitOdemeleri` — eski veri olduğu gibi
+> okunsun); backend her alınan parayı `Payment` satırı olarak tutar. Hesaplar ikisinde de
+> yalnız ödemeleri okur, bu yüzden rakamlar aynıdır (`PrototypeEquivalenceTests`).
+>
+> **Müşteri avansı** (önceden verilen para) bu tabloya **henüz** girmez — ayrı kavram, Cemil'in
+> cevabı bekleniyor (TASARIM-E6 §6, K-078).
 
 ---
 
@@ -361,6 +390,11 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | İş başına fark: bilinmeyen alış (null) satışıyla hesap dışı, sayılır; 0 = bedava | `isKari` · `alisBilinmiyor` | `JobProfit.Of` | K-057 · K-055.2 |
 | Parça alışı: teslim edilmiş işte, tamircinin aldığı, alışı > 0 | `parcaAlislari` | `ServiceLine.IsShopPurchase` | 04.09 |
 | Tahsil günü: `PaymentCollectedAt ?? DeliveredAt`, `Unpaid` hariç | `tahsilTarihi` · `donemTahsilatlari` | `ServiceRecord.CollectedOn` + SQL biçimi `CollectedBetween` (eşitliği testli) | K-071.1 |
+| Kasa = o dönemde ALINAN ödemeler (yola göre); kısmi ödemenin her parçası kendi gününde | `kayitOdemeleri` · `donemOdemeleri` · `tahsilatToplami` · `bugunTahsilat` | F5 | K-078 |
+| Alacak = kalan (toplam − alınanlar, en az 0); kısmi ödenmiş iş kalanıyla | `kalanTutar` · `veresiyeMi` · `veresiyeToplami` | F3/F5 | K-078 |
+| Ödeme > 0 ve kalandan fazla değil; teslimsiz işe ödeme yok | `odemeHatasi` · `odemeEkle` | F3 | K-078 · Cemil 24.10 |
+| Kalan varken durum `Unpaid`; kapanınca son ödemenin yolu/günü | `odemeDurumu` | F3 | K-078 |
+| Son ödeme geri alınır (yanlış çip / tutar) | `sonOdemeyiGeriAl` | F3 | K-078 |
 | Alacak bir bakiyedir, döneme tabi değil | muhasebe alacak tablosu | `ListReceivables` (araç süzgeçli: `?vehicleId=`) | 05.09 |
 | Dönem: bugün · bu ay · bu yıl (1 Ocak'tan bugüne) | `donemBasi` · `donemIcinde` | `Period.Of` | 05.09 |
 | Hatırlatma: ay **veya** km, hangisi önce; km ancak iki ölçümle | `hatirlatmaHesapla` · `gunlukKm` | `MaintenanceReminder.Compute` | 03.09 · K-073.9 (ay sonu sapması) |
@@ -437,6 +471,7 @@ taşınırken sessizce kaybolur.
 | `KAYITLAR.km` · `KAYITLAR.sikayet` | `ServiceRecord.Km` · `Complaint` | |
 | `KAYITLAR.acilis` | `ServiceRecord.DateTimeCreated` | ortak alan |
 | `KAYITLAR.teslimTarihi` · `KAYITLAR.odemeYolu` · `KAYITLAR.tahsilTarihi` | `ServiceRecord.DeliveredAt` · `PaymentMethod` · `PaymentCollectedAt` | |
+| `KAYITLAR.odemeler` | `Payment` (ServiceRecordId) — `tutar` · `yol` · `tarih` → `Amount` · `Method` · `PaidOn` | yalnız kısmi ödemeli kayıtta dolu (K-078) |
 | `KAYITLAR.hatirlatmaTarihi` · `KAYITLAR.hatirlatmaGonderildi` | `ServiceRecord.ReminderDate` · `ReminderSent` | |
 | `KAYITLAR.parcaBekliyor` · `KAYITLAR.bekliyorTarihi` · `KAYITLAR.bekliyorMusteriye` | `ServiceRecord.WaitingForPart` · `WaitingSince` · `ShowWaitingToCustomer` | |
 | `KAYITLAR.satirlar` | `ServiceLine` (ServiceRecordId) | |

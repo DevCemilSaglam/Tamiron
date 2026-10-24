@@ -435,7 +435,21 @@ function surecAdimlari(k) {
                      : '' });
     /* Sonradan ödenen veresiye kendi gününde ayrı bir adım: teslimde
        "Nakit" yazsaydı usta parayı teslim günü aldığını sanırdı. */
-    if (k.tahsilTarihi && k.tahsilTarihi !== k.teslimTarihi) {
+    if (k.odemeler) {
+      /* K-078 · kısmi ödeme: teslim günü alınan kısım teslim adımında,
+         sonra gelen her taksit kendi gününde ayrı adım. */
+      var teslimde = k.odemeler.filter(function (o) { return o.tarih === k.teslimTarihi; });
+      adimlar[adimlar.length - 1].alt = teslimde.length
+        ? teslimde.map(function (o) { return tutar(o.tutar) + ' ₺ ' + ODEME_ETIKET[o.yol]; }).join(' · ') +
+          (kalanTutar(k) > 0 || k.odemeler.length > teslimde.length ? ' · kalan sonra' : '')
+        : 'Ödeme alınmadı';
+      k.odemeler.forEach(function (o) {
+        if (o.tarih === k.teslimTarihi) return;
+        adimlar.push({ ad: 'Ödeme alındı', tarih: o.tarih, saat: '',
+                       ikon: 'i-wallet', hal: 'tamam', sira: 6,
+                       alt: tutar(o.tutar) + ' ₺ · ' + ODEME_ETIKET[o.yol] });
+      });
+    } else if (k.tahsilTarihi && k.tahsilTarihi !== k.teslimTarihi) {
       adimlar[adimlar.length - 1].alt = 'Ödeme alınmadı';
       adimlar.push({ ad: 'Ödeme alındı', tarih: k.tahsilTarihi, saat: '',
                      ikon: 'i-wallet', hal: 'tamam', sira: 6,
@@ -692,7 +706,9 @@ function ozetGovdeHtml(k) {
       '<span class="n-body">' +
         (k.teslimTarihi
           ? 'Aracınız <b>' + k.teslimTarihi + '</b> tarihinde teslim edildi.' +
-            (k.odemeYolu === 'almadim'
+            (k.odemeler
+              ? ' Ödeme: <b>' + odemeOzeti(k) + '</b>.'
+              : k.odemeYolu === 'almadim'
               ? ' Ödeme <b>alınmadı</b>.'
               : (k.odemeYolu ? ' Ödeme: <b>' + (ODEME_ETIKET[k.odemeYolu] ||
                   k.odemeYolu) + '</b>.' : ''))

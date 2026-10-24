@@ -10,8 +10,10 @@
      .tv · .cip-grup .cip · .btn .btn-primary .btn-lg · .notice.
      Yeni bileşen yazılmadı.
 
-     ÜZERİNDE YOK: kısmi ödeme takibi · taksit planı · cari hesap
-     · borç yaşlandırma · teslim alan kişi seçimi · fatura. -->
+     ÜZERİNDE YOK: taksit planı · cari hesap · borç yaşlandırma ·
+     teslim alan kişi seçimi · fatura. Kısmi ödeme 24.10'da girdi
+     (K-078 — Cemil: "elden taksit de x miktar aldım şeklinde olur");
+     tek yeni çip, yeni ekran yok. -->
 <section class="screen" id="screen-teslim">
 
   <div class="screen-head">
@@ -29,6 +31,7 @@
     <svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme nasıl alındı?
   </div>
   <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu"></div>
+  <div id="tsKismi"></div>
 
   <button class="btn btn-primary btn-lg" id="tsTeslim">
     <svg class="ico"><use href="#i-check"></use></svg> Teslim et
@@ -45,7 +48,10 @@ var ODEME_YOLLARI = [
   { k: 'nakit', ad: 'Nakit' },
   { k: 'kart', ad: 'Kart' },
   { k: 'havale', ad: 'Havale' },
-  { k: 'almadim', ad: 'Almadım' }
+  { k: 'almadim', ad: 'Almadım' },
+  /* K-078 · elden taksit: bir kısmı bugün, kalanı veresiye. Seçilince
+     tutar ve yol sorulur; seçilmezse ekran bugünkünün aynısı. */
+  { k: 'kismi', ad: 'Bir kısmını aldım' }
 ];
 var tsSecili = null;
 /* Teslim EDİLDİ mi — edildikten sonra ekran kapanmıyor, bir adım daha
@@ -101,6 +107,25 @@ function tsCiz() {
   document.getElementById('tsTeslim').hidden = tsBitti;
   document.getElementById('tsOdeme').hidden = tsBitti;
 
+  /* KISMİ: tutar + yol. Alan YALNIZ İLK KEZ çizilir — her tazelemede
+     yeniden çizilseydi ustanın yazdığı rakam silinirdi (K-033.12'nin
+     dersi); yol çipleri DOM'da aria-pressed ile tutulur. */
+  var kis = document.getElementById('tsKismi');
+  if (tsSecili !== 'kismi' || tsBitti) kis.innerHTML = '';
+  else if (!kis.innerHTML) {
+    kis.innerHTML =
+      '<div class="field"><label for="tsKismiTutar">Alınan</label>' +
+        '<input id="tsKismiTutar" class="mono" data-giris="tutar" inputmode="numeric"' +
+          ' autocomplete="off" placeholder="ör. 2.000" /></div>' +
+      '<div class="cip-grup" role="group" aria-label="Nasıl alındı">' +
+        ['nakit', 'kart', 'havale'].map(function (y) {
+          return '<button class="cip" data-kismi-yol="' + y + '" aria-pressed="false">' +
+                 ODEME_ETIKET[y] + '</button>';
+        }).join('') +
+      '</div>' +
+      '<p class="plate-hint">Kalanı kayıtta "Ödeme alındı" ile yazarsın.</p>';
+  }
+
   /* Bakımsa hatırlatmanın kurulacağını ÖNCEDEN söyle — sürpriz olmasın.
      Hangi tarihin kurulacağını da söylüyor: "6 ay sonra" demek yetmez,
      km'den gelen tarih daha erken olabilir. */
@@ -122,7 +147,7 @@ function tsCiz() {
       '<div class="notice ok">' +
         '<span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>' +
         '<span class="n-body"><b>' + k.plaka + ' teslim edildi.</b> ' +
-          'Ödeme: ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) + '.' +
+          'Ödeme: ' + (k.odemeler ? odemeOzeti(k) : (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu)) + '.' +
           (k.hatirlatmaTarihi
             ? '<br>Bakım hatırlatması <b>' + k.hatirlatmaTarihi + '</b> için kuruldu.'
             : '') +
@@ -165,7 +190,11 @@ Ekran.tanim('teslim', {
      açılışta temiz başlar. Bunlar `ciz`de dururken her tazeleme
      ustanın seçtiği ödeme yolunu siliyordu — bugün ulaşılabilir bir
      yol yoktu ama olması an meselesiydi (K-040). */
-  ac: function () { tsSecili = null; tsBitti = false; },
+  ac: function () {
+    tsSecili = null; tsBitti = false;
+    var kis = document.getElementById('tsKismi');
+    if (kis) kis.innerHTML = '';
+  },
   ciz: tsCiz
 });
 
@@ -176,14 +205,39 @@ document.addEventListener('click', function (e) {
   var o = t.getAttribute('data-odeme');
   if (o) { tsSecili = o; tsCiz(); }
 
+  var ky = t.getAttribute('data-kismi-yol');
+  if (ky) {
+    document.querySelectorAll('[data-kismi-yol]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String(b === t));
+    });
+    return;
+  }
+
   if (t.id === 'tsTeslim' && !tsSecili) {
     balon('Ödemeyi nasıl aldığını seç — almadıysan "Almadım" de.', false, 3000);
     return;
   }
   if (t.id === 'tsTeslim' && tsSecili) {
     var k = kayitBul(ACIK_KAYIT);
+    /* KISMİ — teslimden ÖNCE sınanır: yanlış girişte araç teslim
+       edilmiş görünmesin. Tamamı yazıldıysa bu kısmi değil, tam ödeme. */
+    var kTutar = 0, kYol = null;
+    if (tsSecili === 'kismi') {
+      var kEl = document.getElementById('tsKismiTutar');
+      var kR = ((kEl && kEl.value) || '').replace(/[^0-9]/g, '');
+      kTutar = kR === '' ? 0 : parseInt(kR, 10);
+      var kSec = document.querySelector('[data-kismi-yol][aria-pressed="true"]');
+      kYol = kSec ? kSec.getAttribute('data-kismi-yol') : null;
+      if (!(kTutar > 0)) { balon('Ne kadar aldığını yaz.', false, 3000); return; }
+      if (!kYol) { balon('Nasıl aldığını seç: nakit, kart ya da havale.', false, 3000); return; }
+      if (kTutar > kayitToplami(k)) {
+        balon('Toplam ' + tutar(kayitToplami(k)) + ' ₺ — fazlası girilemez.', false, 3200); return;
+      }
+    }
     k.teslimTarihi = bugunMetin();        /* TEK DURUM ALANI — K-004 */
-    k.odemeYolu = tsSecili;
+    if (tsSecili !== 'kismi') k.odemeYolu = tsSecili;
+    else if (kTutar === kayitToplami(k)) k.odemeYolu = kYol;
+    else { k.odemeYolu = 'almadim'; odemeEkle(k, kTutar, kYol, k.teslimTarihi); }
 
     /* Bakımsa hatırlatma KURULUR — AY **VEYA** KM, hangisi önce
        gelirse (K-002, 04.09 güncellemesi).

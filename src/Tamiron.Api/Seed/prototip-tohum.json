@@ -314,6 +314,7 @@
       "parcaBekliyor": false,
       "bekliyorMusteriye": false,
       "tahsilTarihi": null,
+      "odemeler": null,
       "satirlar": [
         {
           "tip": "parca",

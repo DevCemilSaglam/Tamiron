@@ -245,8 +245,10 @@ Ekran.tanim('muhasebe', {
     /* Tahsilat TAHSİL gününe göre (tahsilTarihi, 02-veri): sonradan ödenen
        veresiye ödendiği dönemin kasasına girer. "Teslim edilen" ise teslim
        gününe göre kalır — ikisi ayrı soru. */
-    donemTahsilatlari(muhDonemSecili).forEach(function (k) {
-      if (d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k);
+    /* K-078: ödeme ödeme sayılır — kısmi ödemenin her parçası kendi
+       gününün ve kendi yolunun kasasıdır. */
+    donemOdemeleri(muhDonemSecili).forEach(function (o) {
+      if (d[o.yol] !== undefined) d[o.yol] += o.tutar;
     });
     var toplam = d.nakit + d.kart + d.havale;
 
@@ -307,9 +309,8 @@ Ekran.tanim('muhasebe', {
        bu ay da alacaktır. Dönem süzgecine sokunca "Bugün" seçiliyken
        alacak GİZLENİYORDU — ustanın en çok sorduğu şey ekrandan
        kayboluyordu. Tahsilat ve gider döneme tabi, alacak değil. */
-    var borclu = KAYITLAR.filter(function (k) {
-      return k.odemeYolu === 'almadim';
-    });
+    /* Alacak = KALAN (K-078): kısmen ödenmiş iş kalanıyla görünür. */
+    var borclu = KAYITLAR.filter(veresiyeMi);
     /* İKİ SÜTUN. Plaka ve teslim tarihi müşterinin ALTINDA — dört
        sütun 375 px'e sığmıyordu. Başlık "Kim" değil MÜŞTERİ
        (Cemil, 05.09): ustanın kelimesi bu. */
@@ -328,11 +329,12 @@ Ekran.tanim('muhasebe', {
                 '<span class="t-alt">' + plakaHtml(k.plaka) +
                 (k.teslimTarihi ? ' <span class="t-tarih">' + k.teslimTarihi +
                   '</span>' : '') + '</span></td>' +
-              '<td class="sayi">' + tutar(kayitToplami(k)) + ' ₺</td></tr>';
+              '<td class="sayi">' + tutar(kalanTutar(k)) + ' ₺' +
+                (k.odemeler ? '<span class="t-alt">' + tutar(alinanTutar(k)) + ' ₺ alındı</span>' : '') +
+              '</td></tr>';
           }).join('') +
           '<tr class="genel"><td>Toplam alacak</td>' +
-            '<td class="sayi">' + tutar(borclu.reduce(function (t, k) {
-              return t + kayitToplami(k); }, 0)) + ' ₺</td></tr>' +
+            '<td class="sayi">' + tutar(veresiyeToplami()) + ' ₺</td></tr>' +
           '</tbody></table></div></div>'
       : bosDurumHtml('i-circle-check', 'Alacak yok',
           'Teslim edilen her işin parası alınmış.');

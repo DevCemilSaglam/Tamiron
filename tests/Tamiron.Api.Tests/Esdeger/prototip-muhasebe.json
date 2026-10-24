@@ -316,6 +316,7 @@
         "parcaBekliyor": false,
         "bekliyorMusteriye": false,
         "tahsilTarihi": null,
+        "odemeler": null,
         "satirlar": [
           {
             "tip": "parca",
@@ -798,6 +799,7 @@
         "parcaBekliyor": false,
         "bekliyorMusteriye": false,
         "tahsilTarihi": "03.09.2026",
+        "odemeler": null,
         "satirlar": [
           {
             "tip": "parca",
@@ -1294,6 +1296,7 @@
         "parcaBekliyor": false,
         "bekliyorMusteriye": false,
         "tahsilTarihi": null,
+        "odemeler": null,
         "satirlar": [
           {
             "tip": "parca",

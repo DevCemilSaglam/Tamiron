@@ -694,16 +694,25 @@ function kayitCiz() {
     ? '<div class="notice ok"><span class="n-ic"><svg class="ico ico-sm">' +
         '<use href="#i-circle-check"></use></svg></span>' +
         '<span class="n-body"><b>Teslim edildi</b> · ' + k.teslimTarihi +
-          (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') +
-          (k.tahsilTarihi ? ' · ödendi ' + k.tahsilTarihi : '') + '</span></div>' +
+          (k.odemeler
+            ? ' · ' + odemeOzeti(k)
+            : (k.odemeYolu ? ' · ' + (ODEME_ETIKET[k.odemeYolu] || k.odemeYolu) : '') +
+              (k.tahsilTarihi ? ' · ödendi ' + k.tahsilTarihi : '')) + '</span></div>' +
       /* ---- ALACAK TAHSİLİ (22.10 · MUH sırası) ----
          "Almadım" denip araç gittiyse para sonradan gelir. Usta bunu
          kaydın İÇİNDE işaretler — muhasebenin alacak listesi de buraya
          açılıyor, ikinci bir "tahsilat" ekranı yok (yeni ekran = A-2
          bütçesi). Üç çip, teslimdeki ödeme sorusunun aynısı: bir soru,
          bir görünüş. Ödendiği gün tahsil tarihi olur (02-veri). */
-      (k.odemeYolu === 'almadim'
-        ? '<p class="plate-hint" style="margin-top:10px">Para sonradan geldiyse nasıl ödendi?</p>' +
+      /* ---- ELDEN TAKSİT (24.10 · K-078) ----
+         Cemil: *"elden taksit de x miktar aldım şeklinde olur."* Tutar
+         alanı KALANLA dolu gelir: tamamını alan usta bugünkü gibi yalnız
+         çipe dokunur; bir kısmını alan rakamı değiştirir. Yeni ekran yok. */
+      (veresiyeMi(k)
+        ? '<p class="plate-hint" style="margin-top:10px">Para sonradan geldiyse ne kadar, nasıl ödendi?</p>' +
+          '<div class="field"><label for="kTahsilTutar">Alınan</label>' +
+            '<input id="kTahsilTutar" class="mono" data-giris="tutar" inputmode="numeric"' +
+              ' autocomplete="off" value="' + tutar(kalanTutar(k)) + '" /></div>' +
           '<div class="cip-grup" id="kTahsil">' +
             ['nakit', 'kart', 'havale'].map(function (y) {
               return '<button class="cip" data-tahsil="' + y + '">' + ODEME_ETIKET[y] + '</button>';
@@ -799,12 +808,31 @@ document.addEventListener('click', function (e) {
      olmayan parayı yazmasın. */
   if (t.getAttribute('data-tahsil')) {
     var yol = t.getAttribute('data-tahsil');
-    k.odemeYolu = yol;
-    k.tahsilTarihi = bugunMetin();
+    var tEl = document.getElementById('kTahsilTutar');
+    var rakamT = ((tEl && tEl.value) || '').replace(/[^0-9]/g, '');
+    var alinan = rakamT === '' ? 0 : parseInt(rakamT, 10);
+    var kalan = kalanTutar(k);
+    /* TAMAMI, KISMİ YOKKEN: bugünkü tek parça ödeme — veri eskisi gibi
+       kalır (odemeYolu + tahsilTarihi), hiçbir hesap fark görmez. */
+    if (alinan === kalan && !k.odemeler) {
+      k.odemeYolu = yol;
+      k.tahsilTarihi = bugunMetin();
+      Ekran.tazele();
+      balonGeriAl(tutar(alinan) + ' ₺ alındı · ' + ODEME_ETIKET[yol] + '.', function () {
+        k.odemeYolu = 'almadim';
+        delete k.tahsilTarihi;
+        Ekran.tazele();
+      });
+      return;
+    }
+    /* KISMİ (ya da önceden kısmi alınmış işin kalanı): ödeme listesine.
+       Fazlası girilemez — söylenir, sessizce kırpılmaz. */
+    var hataT = odemeEkle(k, alinan, yol, bugunMetin());
+    if (hataT) { balon(hataT, false, 3200); return; }
     Ekran.tazele();
-    balonGeriAl(tutar(kayitToplami(k)) + ' ₺ alındı · ' + ODEME_ETIKET[yol] + '.', function () {
-      k.odemeYolu = 'almadim';
-      delete k.tahsilTarihi;
+    balonGeriAl(tutar(alinan) + ' ₺ alındı · ' + ODEME_ETIKET[yol] +
+                (kalanTutar(k) > 0 ? ' · kalan ' + tutar(kalanTutar(k)) + ' ₺' : '') + '.', function () {
+      sonOdemeyiGeriAl(k);
       Ekran.tazele();
     });
     return;

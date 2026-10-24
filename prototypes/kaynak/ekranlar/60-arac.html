@@ -187,10 +187,8 @@ Ekran.tanim('arac', {
        toplamı. Uydurma bir alan değil, var olan verinin okunması —
        muhasebedeki "Alacak" listesiyle AYNI kaynaktan. İki yerde iki
        ayrı hesap olsaydı, biri diğerini yalanlardı. */
-    var borclular = aracKayitlari(a.plaka).filter(function (k) {
-      return k.teslimTarihi && k.odemeYolu === 'almadim';
-    });
-    var borc = borclular.reduce(function (t, k) { return t + kayitToplami(k); }, 0);
+    var borclular = aracKayitlari(a.plaka).filter(veresiyeMi);
+    var borc = borclular.reduce(function (t, k) { return t + kalanTutar(k); }, 0);
     document.getElementById('arOdeme').innerHTML = borc
       ? '<div class="card">' +
           '<div class="section-label">' +
@@ -200,7 +198,7 @@ Ekran.tanim('arac', {
             borclular.map(function (k) {
               return '<div class="tutar-sat" data-kayit="' + k.id + '" role="button" tabindex="0">' +
                 '<span>' + (k.sikayet || TUR_AD[k.tur]) + ' · ' + k.teslimTarihi + '</span>' +
-                '<span class="tv">' + tutar(kayitToplami(k)) + ' ₺</span></div>';
+                '<span class="tv">' + tutar(kalanTutar(k)) + ' ₺</span></div>';
             }).join('') +
             '<div class="tutar-sat genel"><span>Alacak</span>' +
               '<span class="tv">' + tutar(borc) + ' ₺</span></div>' +

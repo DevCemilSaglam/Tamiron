@@ -64,7 +64,8 @@ function senaryo(ad, degistir) {
   for (const d of donemler) {
     sonuc.donemler[d] = run(`(function () {
       var d = { nakit: 0, kart: 0, havale: 0 };
-      donemTahsilatlari('${d}').forEach(function (k) { if (d[k.odemeYolu] !== undefined) d[k.odemeYolu] += kayitToplami(k); });
+      // K-078: kasa ÖDEMELERDEN — kısmi ödemenin her parçası kendi gününde, kendi yolunda.
+      donemOdemeleri('${d}').forEach(function (o) { if (d[o.yol] !== undefined) d[o.yol] += o.tutar; });
       var kar = donemKayitlari('${d}').map(function (k) { var r = isKari(k); r.id = k.id; return r; });
       return {
         nakit: d.nakit, kart: d.kart, havale: d.havale,
