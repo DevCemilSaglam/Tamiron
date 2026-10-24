@@ -36,7 +36,7 @@ public class CustomerSummaryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Usta_gets_a_stable_link_and_customer_opens_it_without_login()
     {
-        var (api, r) = await Record("34 OZ 01");
+        var (api, r) = await Record("34 OZ 010");
         var link = await Read<SummaryLinkDto>(await api.PostAsync($"/api/records/{r.Id}/summary-link", null));
         Assert.Equal(link, await Read<SummaryLinkDto>(await api.PostAsync($"/api/records/{r.Id}/summary-link", null)));   // aynı link
         Assert.Equal("tamiron.app/o/" + link.Code, link.Url);
@@ -49,7 +49,7 @@ public class CustomerSummaryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         Assert.DoesNotContain("cost", raw, StringComparison.OrdinalIgnoreCase);
 
         var s = JsonSerializer.Deserialize<CustomerSummaryDto>(raw, Json)!;
-        Assert.Equal(("Öteki Dükkân", "34 OZ 01", "Tamirat"), (s.ShopName, s.PlateNo, s.TypeLabel));
+        Assert.Equal(("Öteki Dükkân", "34 OZ 010", "Tamirat"), (s.ShopName, s.PlateNo, s.TypeLabel));
         Assert.Equal("Fren sesi\nSilecek", s.Complaint);   // satır sonu korunur (K-038.1)
         Assert.Equal(new[] { "Balata", "Yağ", "İşçilik" }, s.Lines.Select(l => l.Label));
         Assert.Equal(new decimal?[] { 1200, null, 500 }, s.Lines.Select(l => l.Amount));
@@ -61,7 +61,7 @@ public class CustomerSummaryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Summary_is_live_deleted_lines_vanish_and_delivery_shows()
     {
-        var (api, r) = await Record("34 OZ 02");
+        var (api, r) = await Record("34 OZ 020");
         var link = await Read<SummaryLinkDto>(await api.PostAsync($"/api/records/{r.Id}/summary-link", null));
         await api.DeleteAsync($"/api/records/{r.Id}/lines/{r.Lines[0].Id}");
         (await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Card" }, Json)).EnsureSuccessStatusCode();
@@ -82,7 +82,7 @@ public class CustomerSummaryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Deleted_record_link_is_dead()
     {
-        var (api, r) = await Record("34 OZ 03");
+        var (api, r) = await Record("34 OZ 030");
         var link = await Read<SummaryLinkDto>(await api.PostAsync($"/api/records/{r.Id}/summary-link", null));
         // Kayıt silme ucu D13'te; burada doğrudan soft-delete.
         using (var scope = f.Services.CreateScope())

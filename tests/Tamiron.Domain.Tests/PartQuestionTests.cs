@@ -34,8 +34,8 @@ public class PartQuestionTests
     [Fact]
     public void Vin_goes_into_the_message_and_empty_identity_parts_are_skipped()
     {
-        var v = new Vehicle { PlateNo = "06 XY 42", Brand = "Renault", Vin = "VF1RFB00858123456" };
-        Assert.Equal("Renault\nŞase: VF1RFB00858123456\n06 XY 42\n\n· Balata\n\nFiyat verebilir misiniz?",
+        var v = new Vehicle { PlateNo = "06 XY 420", Brand = "Renault", Vin = "VF1RFB00858123456" };
+        Assert.Equal("Renault\nŞase: VF1RFB00858123456\n06 XY 420\n\n· Balata\n\nFiyat verebilir misiniz?",
             PartQuestion.Compose(v, [ServiceLine.Part("Balata", 0)]));
     }
 

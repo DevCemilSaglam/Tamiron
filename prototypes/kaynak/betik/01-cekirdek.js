@@ -953,10 +953,16 @@ function plakaBicim(ham) {
   var il = t.slice(0, 2).replace(/[^0-9]/g, '');
   var kalan = t.slice(il.length);
   var harf = kalan.replace(/[^A-ZÇĞİÖŞÜ]/g, '').slice(0, 3);
-  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, 4);
+  /* HARF SAYISI RAKAM SAYISINI SINIRLAR (24.10 · K-077.9): 1 harf → 4–5 rakam, 2 harf → 3–4,
+     3 harf → 2–3. Eskiden hep "en çok 4" yazıyordu: gerçek plaka "34 A 12345" giremiyordu,
+     olmayan "34 ABC 1234" giriyordu. Kural ses çözümleyicisinde (04-islem.js `sinir`, 14.10)
+     zaten vardı — girişte yoktu; bulgu ses korpusu genişletilirken ölçüldü. */
+  var rakam = kalan.slice(harf.length).replace(/[^0-9]/g, '').slice(0, harf.length === 1 ? 5 : harf.length === 3 ? 3 : 4);
   return [il, harf, rakam].filter(Boolean).join(' ');
 }
-function plakaGecerli(p) { return /^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$/.test(p); }
+function plakaGecerli(p) {
+  return /^\d{2} (?:[A-ZÇĞİÖŞÜ] \d{4,5}|[A-ZÇĞİÖŞÜ]{2} \d{3,4}|[A-ZÇĞİÖŞÜ]{3} \d{2,3})$/.test(p);
+}
 
 /* Rakamları binlik nokta ile ayırır: 12345 -> 12.345 (Türkçe biçim). */
 function binlikAyir(rakamlar) {

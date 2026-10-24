@@ -62,6 +62,10 @@ GİRİŞİ (`plakaGecerli`) ve onu taşıyan sunucu (`Plate.IsValid`) yalnız "1
 Öneri: girişte ve sunucuda harf sayısına bağlı kural (ses çözümleyicisinin kuralı). Prototip
 şartnamesini değiştirdiği için Cemil'in onayıyla. O güne kadar `VoiceSchemaTests` bu tek durumu
 adıyla dışarıda tutar; düzeltilince istisna kaldırılır (test bunu kendisi söyler).
+→ **Cemil, 24.10: "Evet." — UYGULANDI:** prototip (`plakaBicim` yazarken fazlasını keser,
+`plakaGecerli`, işlem şemasının deseni) ve sunucu (`Plate.Normalize` / `IsValid`) harf sayısına
+bağlı kurala geçti; `VoiceSchemaTests`'in istisnası kaldırıldı (test kendisi söyledi). Harf kümesi
+DEĞİŞMEDİ (Ç Ğ İ Ö Ş Ü hâlâ kabul) — ayrı konu. Netlify'a yayınlanmadı (Cemil'in kararı).
 
 **77.8 · Tamiron müşteriye SMS GÖNDERİRSE alınacak önlemler — NOT (bugün gönderim yok).**
 Bugün mesajı usta **kendi telefonundan** gönderir (WHATSAPP.md A yolu); Tamiron metni hazırlar

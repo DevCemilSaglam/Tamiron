@@ -24,7 +24,7 @@ public class UndoDeliveryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Undo_takes_the_money_out_of_todays_cash_and_reopens()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 TG 01", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 TG 010", complaint = "Fren" }, Json));
         r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/lines", new { kind = "Labor", name = "İşçilik", price = 750 }, Json));
         var before = await CashToday(api);
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Cash" }, Json));
@@ -39,7 +39,7 @@ public class UndoDeliveryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Next_day_undo_is_refused()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 TG 02", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 TG 020", complaint = "Fren" }, Json));
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Cash" }, Json));
         var today = f.Clock.Today;
         HttpResponseMessage res;

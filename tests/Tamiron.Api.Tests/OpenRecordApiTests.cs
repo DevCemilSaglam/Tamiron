@@ -46,7 +46,7 @@ public class OpenRecordApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Explicit_type_wins_and_is_marked_manual()
     {
         var res = await f.For(ApiFactory.ShopB).PostAsJsonAsync("/api/records",
-            new { plate = "35 ZZ 99", complaint = "Yağ bakımı", type = "Repair" }, Json);
+            new { plate = "35 ZZ 990", complaint = "Yağ bakımı", type = "Repair" }, Json);
         var r = await res.Content.ReadFromJsonAsync<ServiceRecordDto>(Json);
         Assert.Equal(ServiceType.Repair, r!.Type);
         Assert.True(r.TypeSetManually);

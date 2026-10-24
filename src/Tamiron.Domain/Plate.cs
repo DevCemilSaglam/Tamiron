@@ -5,7 +5,8 @@ namespace Tamiron.Domain;
 
 /// <summary>
 /// Plaka biçimi — prototipin <c>plakaBicim</c> / <c>plakaGecerli</c>'si (K-059).
-/// "34abc123" → "34 ABC 123": il (2 rakam) · harf (en çok 3) · rakam (en çok 4).
+/// "34abc123" → "34 ABC 123": il (2 rakam) · harf (en çok 3) · rakam — HARF SAYISI RAKAM
+/// SAYISINI SINIRLAR (K-077.9): 1 harf → 4–5 rakam, 2 harf → 3–4, 3 harf → 2–3.
 /// Türkçe büyük harf: "i" → "İ" (tr-TR), prototipte toLocaleUpperCase('tr').
 /// </summary>
 public static partial class Plate
@@ -21,13 +22,13 @@ public static partial class Plate
         var harf = new string(rest.Where(c => Letters.Contains(c)).Take(3).ToArray());
         // Prototip: harfler kalan metnin BAŞINDAN değil, içinden toplanır; rakam,
         // harf sayısı kadar atlandıktan sonraki rakamlardır.
-        var rakam = new string(rest[harf.Length..].Where(char.IsAsciiDigit).Take(4).ToArray());
+        var rakam = new string(rest[harf.Length..].Where(char.IsAsciiDigit).Take(harf.Length switch { 1 => 5, 3 => 3, _ => 4 }).ToArray());
         return string.Join(' ', new[] { il, harf, rakam }.Where(s => s.Length > 0));
     }
 
     public static bool IsValid(string? plate) => plate is not null && Pattern().IsMatch(plate);
 
-    [GeneratedRegex(@"^\d{2} [A-ZÇĞİÖŞÜ]{1,3} \d{2,4}$")]
+    [GeneratedRegex(@"^[0-9]{2} (?:[A-ZÇĞİÖŞÜ] [0-9]{4,5}|[A-ZÇĞİÖŞÜ]{2} [0-9]{3,4}|[A-ZÇĞİÖŞÜ]{3} [0-9]{2,3})\z")]
     private static partial Regex Pattern();
 }
 

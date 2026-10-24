@@ -22,7 +22,7 @@ public class RecordDeleteApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Delete_hides_the_record_everywhere_and_restore_brings_it_back_with_lines()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 SL 01", complaint = "Yanlış plaka" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 SL 010", complaint = "Yanlış plaka" }, Json));
         r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/lines", new { kind = "Labor", name = "İşçilik", price = 500 }, Json));
         var before = await Read<RecordList>(await api.GetAsync("/api/records?inShop=true"));
 
@@ -33,7 +33,7 @@ public class RecordDeleteApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         Assert.DoesNotContain(after.Items, i => i.Id == r.Id);
 
         var back = await Read<ServiceRecordDto>(await api.PostAsync($"/api/records/{r.Id}/restore", null));
-        Assert.Equal(("34 SL 01", 500m), (back.PlateNo, back.Total));   // satırlarıyla döner
+        Assert.Equal(("34 SL 010", 500m), (back.PlateNo, back.Total));   // satırlarıyla döner
         Assert.Equal(before.InShopCount, (await Read<RecordList>(await api.GetAsync("/api/records?inShop=true"))).InShopCount);
     }
 
@@ -41,7 +41,7 @@ public class RecordDeleteApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Delivered_record_is_not_deleted()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 SL 02", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 SL 020", complaint = "Fren" }, Json));
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Cash" }, Json));
         var res = await api.DeleteAsync($"/api/records/{r.Id}");
         Assert.Equal(HttpStatusCode.UnprocessableEntity, res.StatusCode);
@@ -54,7 +54,7 @@ public class RecordDeleteApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     {
         var a = f.For(ApiFactory.ShopA);
         var b = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await b.PostAsJsonAsync("/api/records", new { plate = "34 SL 03", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await b.PostAsJsonAsync("/api/records", new { plate = "34 SL 030", complaint = "Fren" }, Json));
         Assert.Equal(HttpStatusCode.NotFound, (await a.DeleteAsync($"/api/records/{r.Id}")).StatusCode);
         await b.DeleteAsync($"/api/records/{r.Id}");
         Assert.Equal(HttpStatusCode.NotFound, (await a.PostAsync($"/api/records/{r.Id}/restore", null)).StatusCode);   // silinmişi de göremez

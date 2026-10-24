@@ -482,7 +482,8 @@ var Islem = (function () {
     metin:   { json: { type: 'string' } },
     /* `aracla: true` → kayıtlı aracın marka/modeli yanına yazılır:
        usta plakadan çok aracı tanır. */
-    plaka:   { json: { type: 'string', pattern: '^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$' },
+    /* Desen plakaGecerli'nin aynısı (K-077.9): harf sayısı rakam sayısını sınırlar. */
+    plaka:   { json: { type: 'string', pattern: '^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$' },
                goster: function (v, a, o) {
                  return a.aracla && o.arac ? v + ' · ' + o.arac.marka + ' ' + o.arac.model : v;
                } },

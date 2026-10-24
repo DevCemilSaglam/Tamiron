@@ -39,7 +39,7 @@
    "properties": {
     "plaka": {
      "type": "string",
-     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
      "description": "Duyulan plaka"
     }
    },
@@ -98,7 +98,7 @@
    "properties": {
     "plaka": {
      "type": "string",
-     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
      "description": "Araç"
     },
     "sablon": {
@@ -172,7 +172,7 @@
    "properties": {
     "plaka": {
      "type": "string",
-     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
      "description": "Araç"
     },
     "isTuru": {
@@ -226,7 +226,7 @@
    "properties": {
     "plaka": {
      "type": "string",
-     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
      "description": "Araç"
     },
     "odeme": {
@@ -252,7 +252,7 @@
    "properties": {
     "plaka": {
      "type": "string",
-     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
      "description": "Araç"
     }
    },
@@ -309,7 +309,7 @@
    "properties": {
     "plaka": {
      "type": "string",
-     "pattern": "^\\d{2} [A-ZÇĞİÖŞÜ]{1,3} \\d{2,4}$",
+     "pattern": "^\\d{2} (?:[A-ZÇĞİÖŞÜ] \\d{4,5}|[A-ZÇĞİÖŞÜ]{2} \\d{3,4}|[A-ZÇĞİÖŞÜ]{3} \\d{2,3})$",
      "description": "Plaka"
     },
     "sahip": {

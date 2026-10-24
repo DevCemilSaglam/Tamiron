@@ -45,7 +45,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Asking_two_suppliers_makes_two_requests_with_the_same_text()
     {
-        var (api, r) = await RecordWithParts("34 PS 01");
+        var (api, r) = await RecordWithParts("34 PS 010");
         var oz = await Supplier(api, "Öz Parça", "05331000001");
         var can = await Supplier(api, "Can Oto", "05331000002");
 
@@ -54,7 +54,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
 
         Assert.Equal(new[] { "Öz Parça", "Can Oto" }, sent.Select(s => s.SupplierName));
         Assert.Equal("0533 100 00 01", sent[0].SupplierPhone);   // WhatsApp bu numaraya açılır
-        Assert.All(sent, s => Assert.Equal("Fiat Egea 2021 · 1.4 Fire\n34 PS 01\n\n· Balata\n· Disk\n\nFiyat verebilir misiniz?", s.SentText));
+        Assert.All(sent, s => Assert.Equal("Fiat Egea 2021 · 1.4 Fire\n34 PS 010\n\n· Balata\n· Disk\n\nFiyat verebilir misiniz?", s.SentText));
         Assert.All(sent, s => Assert.Equal(new[] { "Balata", "Disk" }, s.Lines.Select(l => l.Name)));   // işçilik sorulmaz
 
         var list = await Read<List<PriceRequestDto>>(await api.GetAsync($"/api/records/{r.Id}/price-requests"));
@@ -64,7 +64,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Without_vehicle_identity_nothing_is_sent()
     {
-        var (api, r) = await RecordWithParts("34 PS 02", identity: false);
+        var (api, r) = await RecordWithParts("34 PS 020", identity: false);
         var p = await Supplier(api, "Kimliksiz", "05331000003");
         var res = await api.PostAsJsonAsync($"/api/records/{r.Id}/price-requests", new { supplierIds = new[] { p.Id } }, Json);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, res.StatusCode);
@@ -75,7 +75,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task No_supplier_chosen_is_a_speaking_error()
     {
-        var (api, r) = await RecordWithParts("34 PS 03");
+        var (api, r) = await RecordWithParts("34 PS 030");
         var res = await api.PostAsJsonAsync($"/api/records/{r.Id}/price-requests", new { supplierIds = Array.Empty<Guid>() }, Json);
         Assert.Equal("price_request.no_supplier", await Code(res));
     }
@@ -83,7 +83,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Reply_is_kept_raw_and_applied_to_the_line()
     {
-        var (api, r) = await RecordWithParts("34 PS 04");
+        var (api, r) = await RecordWithParts("34 PS 040");
         var oz = await Supplier(api, "Öz Cevap", "05331000004");
         var can = await Supplier(api, "Can Cevap", "05331000005");
         var sent = await Read<List<PriceRequestDto>>(await api.PostAsJsonAsync($"/api/records/{r.Id}/price-requests",
@@ -106,7 +106,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Reply_to_a_line_that_was_not_asked_is_rejected()
     {
-        var (api, r) = await RecordWithParts("34 PS 05");
+        var (api, r) = await RecordWithParts("34 PS 050");
         var p = await Supplier(api, "Sorulmayan", "05331000006");
         var sent = await Read<List<PriceRequestDto>>(await api.PostAsJsonAsync($"/api/records/{r.Id}/price-requests",
             new { supplierIds = new[] { p.Id } }, Json));
@@ -118,7 +118,7 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Another_shops_supplier_and_request_are_invisible()
     {
-        var (api, r) = await RecordWithParts("34 PS 06");
+        var (api, r) = await RecordWithParts("34 PS 060");
         var a = f.For(ApiFactory.ShopA);
         var yabanci = await Read<SupplierDto>(await a.PostAsJsonAsync("/api/suppliers", new { name = "A'nın parçacısı", phone = "05331000007" }, Json));
         var res = await api.PostAsJsonAsync($"/api/records/{r.Id}/price-requests", new { supplierIds = new[] { yabanci.Id } }, Json);

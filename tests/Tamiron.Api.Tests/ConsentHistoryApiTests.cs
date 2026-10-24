@@ -29,7 +29,7 @@ public class ConsentHistoryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     [Fact]
     public async Task Revoke_then_undo_brings_back_the_original_date()
     {
-        var (api, key) = await Customer("34 IZ 01", "Zeynep Ak", "05339991101");
+        var (api, key) = await Customer("34 IZ 010", "Zeynep Ak", "05339991101");
         var today = f.Clock.Today;
         f.Clock.Today = new DateOnly(2026, 6, 14);   // izin haziranda verildi
         try { await Read<CustomerDetail>(await api.PutAsJsonAsync("/api/customers/consent", new { key, granted = true }, Json)); }
@@ -42,14 +42,14 @@ public class ConsentHistoryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
 
         var h = await Read<List<ConsentEventDto>>(await api.GetAsync($"/api/customers/consent-history?key={Uri.EscapeDataString(key)}"));
         Assert.Equal(new[] { (true, true), (false, false), (true, false) }, h.Select(e => (e.Granted, e.IsUndo)));   // en yeni üstte
-        Assert.All(h, e => Assert.Equal(("34 IZ 01", "0533 999 11 01"), (e.PlateNo, e.Phone)));
+        Assert.All(h, e => Assert.Equal(("34 IZ 010", "0533 999 11 01"), (e.PlateNo, e.Phone)));
         Assert.All(h, e => Assert.Equal("0532 000 00 02", e.By));   // kim yaptı (adı yok: telefonu)
     }
 
     [Fact]
     public async Task Undo_twice_is_a_speaking_error()
     {
-        var (api, key) = await Customer("34 IZ 02", "Mert Su", "05339991102");
+        var (api, key) = await Customer("34 IZ 020", "Mert Su", "05339991102");
         await Read<CustomerDetail>(await api.PutAsJsonAsync("/api/customers/consent", new { key, granted = true }, Json));
         await Read<CustomerDetail>(await api.PostAsJsonAsync("/api/customers/consent/undo", new { key }, Json));
         var res = await api.PostAsJsonAsync("/api/customers/consent/undo", new { key }, Json);

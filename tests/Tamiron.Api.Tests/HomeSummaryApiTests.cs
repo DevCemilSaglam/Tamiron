@@ -51,7 +51,7 @@ public class HomeSummaryApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     {
         var api = f.For(ApiFactory.ShopB);
         f.Clock.Today = new DateOnly(2026, 2, 1);
-        var r = await (await api.PostAsJsonAsync("/api/records", new { plate = "34 EV 01", complaint = "bakım" }, Json))
+        var r = await (await api.PostAsJsonAsync("/api/records", new { plate = "34 EV 010", complaint = "bakım" }, Json))
             .Content.ReadFromJsonAsync<Tamiron.Application.ServiceRecords.ServiceRecordDto>(Json);
         (await api.PostAsJsonAsync($"/api/records/{r!.Id}/deliver", new { method = "Cash" }, Json)).EnsureSuccessStatusCode();
         f.Clock.Today = new DateOnly(2026, 10, 22);

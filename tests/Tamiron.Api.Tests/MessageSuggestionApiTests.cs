@@ -22,7 +22,7 @@ public class MessageSuggestionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Suggestions_follow_the_job_from_open_to_delivered()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 01", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 010", complaint = "Fren" }, Json));
         await Read<JsonElement>(await api.PatchAsJsonAsync($"/api/vehicles/{r.VehicleId}",
             new { brand = "Fiat", model = "Egea", ownerName = "Ayşe Yılmaz", ownerPhone = "05337770011" }, Json));
         r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/lines", new { kind = "Labor", name = "İşçilik", price = 1500 }, Json));
@@ -30,7 +30,7 @@ public class MessageSuggestionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         var acik = await Read<List<MessageSuggestion>>(await api.GetAsync($"/api/vehicles/{r.VehicleId}/message-suggestions"));
         Assert.Equal(new[] { "ozet", "hazir", "serbest" }, acik.Select(s => s.Template));
         var link = await Read<SummaryLinkDto>(await api.PostAsync($"/api/records/{r.Id}/summary-link", null));
-        Assert.Equal("Ayşe Yılmaz Bey/Hanım, Fiat Egea (34 MS 01) için 1 kalem işlem yapıldı.\nToplam: 1.500 ₺\n\n" +
+        Assert.Equal("Ayşe Yılmaz Bey/Hanım, Fiat Egea (34 MS 010) için 1 kalem işlem yapıldı.\nToplam: 1.500 ₺\n\n" +
                      "Ayrıntılı özet: " + link.Url + "\n\nÖteki Dükkân\n", acik[0].Text);   // aynı kod: öneri kodu KAYDETTİ
 
         // Özet gönderildi → bir daha önerilmez.
@@ -49,7 +49,7 @@ public class MessageSuggestionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Delivered_job_without_message_suggests_delivered()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 02", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 020", complaint = "Fren" }, Json));
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Cash" }, Json));
         var s = await Read<List<MessageSuggestion>>(await api.GetAsync($"/api/vehicles/{r.VehicleId}/message-suggestions"));
         Assert.Equal(new[] { "teslim", "serbest" }, s.Select(x => x.Template));
@@ -62,18 +62,18 @@ public class MessageSuggestionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     {
         var api = f.For(ApiFactory.ShopB);
         // Eski iş: özeti gitti, teslim edildi. Yeni iş açık → özet YİNE önerilir.
-        var a = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 04", complaint = "Fren" }, Json));
+        var a = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 040", complaint = "Fren" }, Json));
         await Read<JsonElement>(await api.PatchAsJsonAsync($"/api/vehicles/{a.VehicleId}", new { ownerPhone = "05337770044" }, Json));
         await Read<MessageDto>(await api.PostAsJsonAsync("/api/messages",
             new { vehicleId = a.VehicleId, serviceRecordId = a.Id, channel = "WhatsApp", template = "ozet", body = "x" }, Json));
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{a.Id}/deliver", new { method = "Cash" }, Json));
-        await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 04", complaint = "Debriyaj" }, Json));
+        await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 040", complaint = "Debriyaj" }, Json));
         Assert.Equal(new[] { "ozet", "hazir", "serbest" },
             (await Read<List<MessageSuggestion>>(await api.GetAsync($"/api/vehicles/{a.VehicleId}/message-suggestions"))).Select(s => s.Template));
 
         // Açık iş, sonradan açılıp teslim edilmiş bir işten ÖNCE gelir: şu anki iş açık olandır.
-        var c = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 05", complaint = "Fren" }, Json));
-        var d = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 05", complaint = "Lastik" }, Json));
+        var c = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 050", complaint = "Fren" }, Json));
+        var d = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 050", complaint = "Lastik" }, Json));
         Assert.NotEqual(c.Id, d.Id);
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{d.Id}/deliver", new { method = "Cash" }, Json));
         Assert.Equal(new[] { "ozet", "hazir", "serbest" },
@@ -84,7 +84,7 @@ public class MessageSuggestionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Ready_made_text_by_name_and_unknown_is_422()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 03", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 MS 030", complaint = "Fren" }, Json));
         var b = await Read<MessageSuggestion>(await api.GetAsync($"/api/vehicles/{r.VehicleId}/message-text?template=bayram"));
         Assert.Equal(("Bayram mesajı", "Merhaba, Bayramınız mübarek olsun. Sağlıklı, huzurlu ve kazasız günler dileriz.\n\nÖteki Dükkân\n"), (b.Name, b.Text));
         var res = await api.GetAsync($"/api/vehicles/{r.VehicleId}/message-text?template=yok");

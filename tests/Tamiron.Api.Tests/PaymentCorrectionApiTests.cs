@@ -27,7 +27,7 @@ public class PaymentCorrectionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Cash_corrected_to_card_moves_money_between_columns()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 OD 01", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 OD 010", complaint = "Fren" }, Json));
         r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/lines", new { kind = "Labor", name = "İşçilik", price = 640 }, Json));
         await Read<ServiceRecordDto>(await api.PostAsJsonAsync($"/api/records/{r.Id}/deliver", new { method = "Cash" }, Json));
         var before = await Today(api);
@@ -42,7 +42,7 @@ public class PaymentCorrectionApiTests(ApiFactory f) : IClassFixture<ApiFactory>
     public async Task Open_record_is_a_speaking_error()
     {
         var api = f.For(ApiFactory.ShopB);
-        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 OD 02", complaint = "Fren" }, Json));
+        var r = await Read<ServiceRecordDto>(await api.PostAsJsonAsync("/api/records", new { plate = "34 OD 020", complaint = "Fren" }, Json));
         var res = await api.PostAsJsonAsync($"/api/records/{r.Id}/payment", new { method = "Card" }, Json);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, res.StatusCode);
         Assert.Equal("payment.not_delivered", (await res.Content.ReadFromJsonAsync<JsonElement>()).GetProperty("code").GetString());
