@@ -107,8 +107,9 @@ public class MigrationUpgradeTests : IAsyncLifetime
         Assert.Equal(before, after);
 
         // Teslimde alınan teslimle gider, sonradan alınan "ödemeyi geri al"la — bayrak doğru kurulmalı.
-        var flags = await Cash($"SELECT CONCAT(CONVERT(char(10), PaidOn, 23), '|', AtDelivery) AS Value FROM Payments WHERE TenantId = '{shop}'");
-        Assert.Equal(["2026-08-28|1", "2026-10-22|0", "2026-10-22|1", "2026-10-22|1"], flags);
+        // Sıra (K-078.5): kayıt başına tek satır → 1.
+        var flags = await Cash($"SELECT CONCAT(CONVERT(char(10), PaidOn, 23), '|', AtDelivery, '|', Sequence) AS Value FROM Payments WHERE TenantId = '{shop}'");
+        Assert.Equal(["2026-08-28|1|1", "2026-10-22|0|1", "2026-10-22|1|1", "2026-10-22|1|1"], flags);
     }
 
     private async Task<List<string>> Cash(string sql)

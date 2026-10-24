@@ -44,6 +44,17 @@ nakit alınmış işe 500'lük satır eklenirse kalan 500 olur. Prototip tam öd
 için alınan da 3.950'ye çıkar (kalan 0) — kendi tasarım kuralını çiğner. Eşdeğerlik senaryolarında bu
 durum yok, fark testlere yansımıyor. Öneri: prototipte tam ödeme de teslim anında `odemeler`e
 yazılsın (türetme kalksın). Küçük iş ama prototipin veri biçimini değiştirir → Cemil'e soru.
+
+**78.5 · `Payment.Sequence` — yazılış sırası (F5, ölçümün bulduğu hata).** API testi "son taksiti
+geri al"da YANLIŞ taksitin silindiğini gösterdi: veritabanından yüklenen ödemeler yazılış sırasında
+gelmez (kimliğe göre), domain'in "son ödeme"si rastgeleydi. Aynı hata ödeme düzeltmesinde ve durum
+özetinde de vardı. Domain testleri göremezdi — bellekte liste hep yazılış sırasında. Satırdaki
+`Position`'ın aynısı: kayıt içinde 1, 2, 3…; var olan ödemelere göçte gün + oluşturma anıyla verilir.
+
+**78.6 · CSV'de alacak satırları teslim günü sırasıyla — prototip düzeltildi.** Prototip alacakları
+KAYITLAR dizisinin sırasıyla yazıyordu (rastgele); sunucu teslim günüyle (C-turunda seçilmişti). İki
+alacak ilk kez bir senaryoda yan yana gelince (teslimde kısmi ödeme) ayrıştı. Muhasebeci tarih
+sırasıyla okur; tahsilat satırları da öyle → prototip sunucuya çekildi.
  · Tur D incelemesi — Cemil'in cevapları (23.10.2026 akşam)
 
 **77.1 · Ses çözümleyicisi C#'a, CİHAZDA çalışacak şekilde — K-076.14'ü genişletir.**

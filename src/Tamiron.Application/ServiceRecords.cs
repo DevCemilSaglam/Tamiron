@@ -9,21 +9,34 @@ namespace Tamiron.Application.ServiceRecords;
 public sealed record ServiceLineDto(Guid Id, LineKind Kind, string Name, decimal Price, decimal? Cost,
                                     PartSupplier? SuppliedBy, bool CountsInTotal);
 
+/// <summary>Alınan ödeme (K-078). <paramref name="AtDelivery"/>: teslimde alındı — teslimle gider, "geri al"la değil.</summary>
+public sealed record PaymentDto(Guid Id, decimal Amount, PaymentMethod Method, DateOnly PaidOn, bool AtDelivery);
+
 public sealed record ServiceRecordDto(Guid Id, Guid VehicleId, string PlateNo, ServiceType Type, bool TypeSetManually,
                                       string Complaint, string? Km, DateOnly? DeliveredAt, PaymentMethod? PaymentMethod,
                                       DateOnly? PaymentCollectedAt, DateOnly? CollectedOn,
                                       bool WaitingForPart, DateOnly? WaitingSince, bool ShowWaitingToCustomer,
                                       DateOnly? ReminderDate, bool ReminderSent,
                                       decimal Total, IReadOnlyList<ServiceLineDto> Lines,
-                                      IReadOnlyList<string> Warnings);
+                                      IReadOnlyList<string> Warnings,
+                                      decimal Paid, decimal Remaining, IReadOnlyList<PaymentDto> Payments);
 
 internal static class Map
 {
     /// <summary>Açık veresiyelerin toplamı — kasa özeti ve ana ekran AYNI yerden okur (C9).</summary>
+    /// <remarks>K-078: alacak = KALAN (toplam − alınanlar) — kısmen ödenmiş iş kalanıyla girer.</remarks>
     public static async Task<decimal> UnpaidTotal(ITamironDb db, CancellationToken ct)
-        => (await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)
-                .Where(r => r.DeliveredAt != null && r.PaymentMethod == PaymentMethod.Unpaid).ToListAsync(ct))
-           .Sum(r => r.Total);
+        => (await db.ServiceRecords.AsNoTracking().Where(ServiceRecord.HasRemaining).ToListAsync(ct))
+           .Sum(r => r.Remaining);
+
+    /// <summary>
+    /// Dönemde ALINAN para, yola göre (K-078): kasa ödemelerden okunur — kısmi ödemenin her parçası
+    /// kendi gününde. Kasa özeti, ana ekran ve CSV aynı süzgeçten.
+    /// </summary>
+    public static async Task<Dictionary<PaymentMethod, decimal>> CollectedBetween(ITamironDb db, DateOnly start, DateOnly end, CancellationToken ct)
+        => (await db.Payments.AsNoTracking().Where(p => p.PaidOn >= start && p.PaidOn <= end)
+                .GroupBy(p => p.Method).Select(g => new { g.Key, Sum = g.Sum(p => p.Amount) }).ToListAsync(ct))
+           .ToDictionary(x => x.Key, x => x.Sum);
 
     public static ServiceRecordDto ToDto(this ServiceRecord r, Vehicle? v) => new(
         r.Id, r.VehicleId, v?.PlateNo ?? "", r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
@@ -31,7 +44,11 @@ internal static class Map
         r.ReminderDate, r.ReminderSent, r.Total,
         r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList(),
         // Eksikler DOMAIN'de (kEksikler); arayüz yalnız gösterir.
-        r.DeliveryWarnings(v?.HasPhone ?? false));
+        r.DeliveryWarnings(v?.HasPhone ?? false),
+        // K-078 · Kalan DOMAIN'de hesaplanır; arayüz "x alındı · kalan y" yazar, hesaplamaz.
+        r.Paid, r.Remaining,
+        r.Payments.OrderBy(p => p.Sequence)
+            .Select(p => new PaymentDto(p.Id, p.Amount, p.Method, p.PaidOn, p.AtDelivery)).ToList());
 
     public static async Task<ServiceRecordDto> LoadDto(ITamironDb db, Guid id, CancellationToken ct, bool tracking = false)
     {
@@ -116,7 +133,8 @@ internal sealed class UpdateRecordHandler(ITamironDb db, IClock clock) : IReques
 
 // ---- Komut: veresiyenin parası geldi (K-071.1) ----
 
-public sealed record CollectPayment(Guid RecordId, PaymentMethod Method) : IRequest<ServiceRecordDto>;
+/// <param name="Amount">Boş = kalanın tamamı (bugünkü "Ödeme alındı"); dolu = "x lira aldım" (K-078).</param>
+public sealed record CollectPayment(Guid RecordId, PaymentMethod Method, decimal? Amount = null) : IRequest<ServiceRecordDto>;
 
 internal sealed class CollectPaymentHandler(ITamironDb db, IClock clock) : IRequestHandler<CollectPayment, ServiceRecordDto>
 {
@@ -124,7 +142,9 @@ internal sealed class CollectPaymentHandler(ITamironDb db, IClock clock) : IRequ
     {
         var r = await db.ServiceRecords.FirstOrDefaultAsync(x => x.Id == c.RecordId, ct)
                 ?? throw new NotFoundException("Servis kaydı");
-        r.CollectPayment(c.Method, clock.Today);   // kural domain'de; gün sunucudan, istemciden değil
+        // Kural domain'de; gün sunucudan, istemciden değil.
+        if (c.Amount is { } amount) r.CollectPayment(amount, c.Method, clock.Today);
+        else r.CollectPayment(c.Method, clock.Today);
         await db.SaveChangesAsync(ct);
         return await Map.LoadDto(db, r.Id, ct);
     }
@@ -156,14 +176,10 @@ internal sealed class GetCashSummaryHandler(ITamironDb db, IClock clock) : IRequ
     public async Task<CashSummary> Handle(GetCashSummary q, CancellationToken ct)
     {
         var p = Period.Of(q.Period, clock.Today);
-        // C9 · Süzgeç SQL'de: yalnız dönemde tahsil edilenler ve açık veresiyeler yüklenir.
-        // Tahsil günü kuralının SQL biçimi ServiceRecord.CollectedBetween — bellekteki
-        // CollectedOn ile eşitliği testli (CollectedExpressionTests). Toplam DOMAIN'de
-        // (Total: müşteri parçası hariç) — o kural SQL'e İKİNCİ kez yazılmadı.
-        var collected = await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)
-            .Where(ServiceRecord.CollectedBetween(p.Start, p.End)).ToListAsync(ct);
-
-        decimal Sum(PaymentMethod m) => collected.Where(r => r.PaymentMethod == m).Sum(r => r.Total);
+        // K-078 · Kasa ÖDEMELERDEN, SQL'de toplanır (gün + yol). Ödeme tutarı alındığı an yazıldı;
+        // toplam kuralı (müşteri parçası hariç) ödemeyi yazan domain'de kaldı.
+        var collected = await Map.CollectedBetween(db, p.Start, p.End, ct);
+        decimal Sum(PaymentMethod m) => collected.GetValueOrDefault(m);
 
         var cash = Sum(PaymentMethod.Cash);
         var card = Sum(PaymentMethod.Card);

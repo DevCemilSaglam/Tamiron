@@ -68,7 +68,18 @@ public static class PrototypeSeed
             if (Dn(k, "teslimTarihi") is { } teslim)
             {
                 var yol = Method(k.GetProperty("odemeYolu").GetString()!);
-                if (Dn(k, "tahsilTarihi") is { } tahsil)
+                // K-078 · Kısmi ödemeli kayıt: ödemeler TEK KAYNAK. Teslim günü alınan ilk ödeme
+                // teslimde alınmıştır ("Bir kısmını aldım"); gerisi sonradan gelen taksitler.
+                if (k.TryGetProperty("odemeler", out var od) && od.ValueKind == JsonValueKind.Array && od.GetArrayLength() > 0)
+                {
+                    var list = od.EnumerateArray().Select(o => (Tutar: o.GetProperty("tutar").GetDecimal(),
+                        Yol: Method(o.GetProperty("yol").GetString()!), Tarih: D(o.GetProperty("tarih").GetString()!))).ToList();
+                    var first = 0;
+                    if (list[0].Tarih == teslim) { r.DeliverPartly(list[0].Tutar, list[0].Yol, teslim, MaintenancePolicy.Default, []); first = 1; }
+                    else r.Deliver(PaymentMethod.Unpaid, teslim, MaintenancePolicy.Default, []);
+                    foreach (var o in list.Skip(first)) r.CollectPayment(o.Tutar, o.Yol, o.Tarih);
+                }
+                else if (Dn(k, "tahsilTarihi") is { } tahsil)
                 {
                     r.Deliver(PaymentMethod.Unpaid, teslim, MaintenancePolicy.Default, []);
                     r.CollectPayment(yol, tahsil);

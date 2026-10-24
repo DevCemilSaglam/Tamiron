@@ -8,7 +8,7 @@ namespace Tamiron.Application.Home;
 // C3 · Ana ekran özeti (prototip 10-home menü alt yazıları + çekmece rozeti).
 // Tek istek: ana ekran açılışta altı ayrı liste çekmesin. Her rakam ötekilerin
 // KURALIYLA hesaplanır (aynı soruyu iki yerde cevaplamak iki cevap demektir, K-019.1):
-// tahsil günü CollectedBetween/CollectedOn, alacak Map.UnpaidTotal, rozet IsReminderDue,
+// kasa Map.CollectedBetween (ödemelerden, K-078), alacak Map.UnpaidTotal, rozet IsReminderDue,
 // müşteri Customers.From.
 // C9 · Sayımlar ve süzgeçler SQL'de; bütün kayıtlar belleğe yüklenmez.
 
@@ -22,8 +22,8 @@ internal sealed class HomeHandler(ITamironDb db, IClock clock) : IRequestHandler
     public async Task<HomeSummary> Handle(GetHomeSummary q, CancellationToken ct)
     {
         var today = clock.Today;
-        var collectedToday = await db.ServiceRecords.AsNoTracking().Include(r => r.Lines)
-            .Where(ServiceRecord.CollectedBetween(today, today)).ToListAsync(ct);
+        // K-078: bugün ALINAN para — kısmi ödemenin bugünkü parçası (prototip bugunTahsilat).
+        var collectedToday = await Map.CollectedBetween(db, today, today, ct);
         // Rozet: SQL'de kaba süzgeç (tarihi gelmiş, gönderilmemiş), kural domain'de.
         var maybeDue = await db.ServiceRecords.AsNoTracking()
             .Where(r => r.ReminderDate != null && r.ReminderDate <= today && !r.ReminderSent).ToListAsync(ct);
@@ -34,7 +34,7 @@ internal sealed class HomeHandler(ITamironDb db, IClock clock) : IRequestHandler
             RecordCount: await db.ServiceRecords.CountAsync(ct),
             VehicleCount: await db.Vehicles.CountAsync(ct),
             CustomerCount: Domain.Customers.From(owners).Count,
-            CollectedToday: collectedToday.Sum(r => r.Total),
+            CollectedToday: collectedToday.Values.Sum(),
             Receivable: await Map.UnpaidTotal(db, ct),
             DueReminderCount: maybeDue.Count(r => r.IsReminderDue(today)));
     }

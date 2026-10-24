@@ -279,6 +279,9 @@ namespace Tamiron.Infrastructure.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<int>("Sequence")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("ServiceRecordId")
                         .HasColumnType("uniqueidentifier");
 

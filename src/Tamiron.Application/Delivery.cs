@@ -11,7 +11,8 @@ namespace Tamiron.Application.ServiceRecords;
 public sealed record DeliveryPreview(Guid RecordId, ReminderPlan? Reminder);
 
 public sealed record GetDeliveryPreview(Guid RecordId) : IRequest<DeliveryPreview>;
-public sealed record DeliverRecord(Guid RecordId, PaymentMethod Method) : IRequest<ServiceRecordDto>;
+/// <param name="Amount">Dolu = "Bir kısmını aldım" (K-078): o kadarı teslimde, kalanı veresiye.</param>
+public sealed record DeliverRecord(Guid RecordId, PaymentMethod Method, decimal? Amount = null) : IRequest<ServiceRecordDto>;
 /// <summary>D14 · Yanlış teslimi geri al — aynı gün (K-076.13).</summary>
 public sealed record UndoDelivery(Guid RecordId) : IRequest<ServiceRecordDto>;
 /// <summary>E1 · Ödeme yolunu düzelt — teslim/tahsil günü korunur (K-077.2).</summary>
@@ -51,7 +52,8 @@ internal sealed class DeliveryHandlers(ITamironDb db, IClock clock, ITenantConte
     public async Task<ServiceRecordDto> Handle(DeliverRecord c, CancellationToken ct)
     {
         var (r, policy, readings) = await Inputs(c.RecordId, tracking: true, ct);
-        r.Deliver(c.Method, clock.Today, policy, readings);   // gün sunucudan
+        if (c.Amount is { } amount) r.DeliverPartly(amount, c.Method, clock.Today, policy, readings);   // gün sunucudan
+        else r.Deliver(c.Method, clock.Today, policy, readings);
         await db.SaveChangesAsync(ct);
         return await Map.LoadDto(db, r.Id, ct);
     }

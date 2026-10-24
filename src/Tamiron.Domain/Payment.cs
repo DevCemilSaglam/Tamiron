@@ -19,11 +19,17 @@ public class Payment : TenantEntity
     /// "ödemeyi geri al"la — yanlış teslimi geri alan usta sonraki tahsilatı farkında olmadan silmesin.
     /// </summary>
     public bool AtDelivery { get; private set; }
+    /// <summary>
+    /// Kayıt içinde yazılış sırası (K-078.5). "Son ödeme" buna göre bulunur: veritabanından
+    /// yüklenen liste yazılış sırasında GELMEZ — sırasız listede "geri al" yanlış taksiti siliyordu.
+    /// </summary>
+    public int Sequence { get; private set; }
 
     private Payment() { }   // EF
 
-    internal Payment(ServiceRecord r, decimal amount, PaymentMethod method, DateOnly paidOn, bool atDelivery)
+    internal Payment(ServiceRecord r, decimal amount, PaymentMethod method, DateOnly paidOn, bool atDelivery, int sequence)
     {
+        Sequence = sequence;
         ServiceRecordId = r.Id;
         TenantId = r.TenantId;
         Amount = amount;

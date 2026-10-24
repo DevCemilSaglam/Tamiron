@@ -54,11 +54,30 @@ public class ServiceRecord : TenantEntity
 
     public decimal Paid => _payments.Sum(p => p.Amount);
 
+    /// <summary>Yazılış sırasıyla son ödeme (K-078.5) — liste sırasına güvenilmez.</summary>
+    private Payment? LastPayment(Func<Payment, bool>? where = null)
+        => _payments.Where(where ?? (_ => true)).MaxBy(p => p.Sequence);
+
+    private Payment NewPayment(decimal amount, PaymentMethod method, DateOnly on, bool atDelivery)
+        => new(this, amount, method, on, atDelivery, _payments.Count == 0 ? 1 : _payments.Max(p => p.Sequence) + 1);
+
     /// <summary>
     /// Kalan = toplam − alınanlar, en az 0 (prototip kalanTutar). Saklanmaz: teslimden sonra satır
     /// değişirse kalan yeniden hesaplanır, alınan para değişmez — para bir olgudur. Teslimsiz kayıtta 0.
     /// </summary>
     public decimal Remaining => DeliveredAt is null ? 0m : Math.Max(0m, Total - Paid);
+
+    /// <summary>
+    /// "Kalanı var mı" (<see cref="Remaining"/> &gt; 0) kuralının SQL'e çevrilen biçimi — alacak listesi,
+    /// kasa özeti ve CSV yalnız bunları yükler. Toplam <see cref="Total"/>'ın aynısı (müşteri parçası
+    /// girmez; silinmiş satır/ödeme sorgu süzgeciyle düşer). Boş toplam SQL'de NULL'dır, 0'a çevrilir:
+    /// "x &gt; NULL" yanlış döner ve ödemesiz veresiye listeden SESSİZCE kaybolurdu. İki biçimin
+    /// eşitliği <c>CollectedExpressionTests</c>'te her durumda ölçülür.
+    /// </summary>
+    public static System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> HasRemaining
+        => r => r.DeliveredAt != null
+                && (r.Lines.Where(l => !(l.Kind == LineKind.Part && l.SuppliedBy == PartSupplier.Customer)).Sum(l => (decimal?)l.Price) ?? 0m)
+                   > (r.Payments.Sum(p => (decimal?)p.Amount) ?? 0m);
 
     private ServiceRecord() { }   // EF
 
@@ -186,7 +205,7 @@ public class ServiceRecord : TenantEntity
         PaymentMethod = method;
         // Tam ödeme = toplamın tek ödeme satırı, teslim günü. Toplam 0'sa satır yok (ödeme > 0).
         if (method != Domain.PaymentMethod.Unpaid && Total > 0)
-            _payments.Add(new Payment(this, Total, method, on, atDelivery: true));
+            _payments.Add(NewPayment(Total, method, on, atDelivery: true));
         var plan = PlanReminder(on, policy, otherReadings);
         ReminderDate = plan?.Date;
         ReminderSent = false;
@@ -209,7 +228,7 @@ public class ServiceRecord : TenantEntity
             throw new DomainException("payment.over_remaining", $"Toplam {MessageTemplates.Money(Total)} ₺ — fazlası girilemez.");
         if (amount == Total) { Deliver(method, on, policy, otherReadings); return; }
         Deliver(Domain.PaymentMethod.Unpaid, on, policy, otherReadings);
-        _payments.Add(new Payment(this, amount, method, on, atDelivery: true));
+        _payments.Add(NewPayment(amount, method, on, atDelivery: true));
     }
 
     /// <summary>
@@ -264,7 +283,7 @@ public class ServiceRecord : TenantEntity
             throw new DomainException("payment.amount_required", "Ne kadar aldığını yaz.");
         if (amount > Remaining)
             throw new DomainException("payment.over_remaining", $"Kalan {MessageTemplates.Money(Remaining)} ₺ — fazlası girilemez.");
-        _payments.Add(new Payment(this, amount, method, on, atDelivery: false));
+        _payments.Add(NewPayment(amount, method, on, atDelivery: false));
         RefreshPaymentStatus();
     }
 
@@ -276,7 +295,7 @@ public class ServiceRecord : TenantEntity
     private void RefreshPaymentStatus()
     {
         if (Remaining > 0) { PaymentMethod = Domain.PaymentMethod.Unpaid; PaymentCollectedAt = null; return; }
-        if (_payments.LastOrDefault() is not { } last) return;
+        if (LastPayment() is not { } last) return;
         PaymentMethod = last.Method;
         PaymentCollectedAt = last.AtDelivery ? null : last.PaidOn;
     }
@@ -296,13 +315,13 @@ public class ServiceRecord : TenantEntity
     {
         if (DeliveredAt is null)
             throw new DomainException("payment.not_delivered", "Kayıt teslim edilmedi — düzeltilecek ödeme yok.");
-        if (_payments.LastOrDefault() is not { } last)
+        if (LastPayment() is not { } last)
         {
             if (PaymentMethod == method)
                 throw new DomainException("payment.same_method", "Ödeme zaten böyle yazılı.");
             PaymentMethod = method;
             if (method != Domain.PaymentMethod.Unpaid && Remaining > 0)
-                _payments.Add(new Payment(this, Remaining, method, DeliveredAt.Value, atDelivery: true));
+                _payments.Add(NewPayment(Remaining, method, DeliveredAt.Value, atDelivery: true));
             return;
         }
         if (last.Method == method)
@@ -321,7 +340,7 @@ public class ServiceRecord : TenantEntity
     /// <remarks>K-078: SON sonradan-alınan ödeme silinir (prototip sonOdemeyiGeriAl); teslimdeki para teslimle gider.</remarks>
     public void UndoCollection()
     {
-        if (_payments.LastOrDefault(p => !p.AtDelivery) is not { } p)
+        if (LastPayment(p => !p.AtDelivery) is not { } p)
             throw new DomainException("payment.nothing_to_undo", "Geri alınacak bir tahsilat yok.");
         _payments.Remove(p);
         RefreshPaymentStatus();

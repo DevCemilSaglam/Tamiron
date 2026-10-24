@@ -7,8 +7,11 @@ namespace Tamiron.Application.Accounting;
 // B9 · Alacak listesi ve muhasebe CSV'si (prototip 95-muhasebe, muhasebeCsv).
 
 /// <param name="Description">Şikâyet; boşsa tür adı (prototip 60-arac: <c>k.sikayet || TUR_AD[k.tur]</c>).</param>
+/// <param name="Total">İşin toplamı. <paramref name="Paid"/>: o güne kadar alınan (elden taksit, K-078);
+/// <paramref name="Remaining"/>: alacak — listenin toplamı bunların toplamıdır (prototip kalanTutar).</param>
 public sealed record ReceivableItem(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string Description,
-                                    DateOnly? DeliveredAt, decimal Total);
+                                    DateOnly? DeliveredAt, decimal Total, decimal Paid, decimal Remaining);
+/// <param name="Total">Alacak = kalanların toplamı (K-078).</param>
 public sealed record ReceivableList(decimal Total, IReadOnlyList<ReceivableItem> Items);
 
 /// <summary>
@@ -76,9 +79,11 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
     /// BÜTÜN kayıtlar belleğe geliyordu). Araçlar plaka/sahip için; sayısı kayıtlardan çok azdır.
     /// </summary>
     private async Task<(List<ServiceRecord> records, Dictionary<Guid, Vehicle> vehicles)> Load(
-        System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> where, CancellationToken ct)
+        System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> where, CancellationToken ct, Guid? vehicleId = null)
     {
-        var records = await db.ServiceRecords.AsNoTracking().Include(r => r.Lines).Where(where).ToListAsync(ct);
+        var q = db.ServiceRecords.AsNoTracking().Where(where);
+        if (vehicleId is { } vid) q = q.Where(r => r.VehicleId == vid);
+        var records = await q.ToListAsync(ct);   // satırlar ve ödemeler AutoInclude (K-078.2)
         var vehicles = await db.Vehicles.AsNoTracking().ToDictionaryAsync(v => v.Id, ct);
         return (records, vehicles);
     }
@@ -86,12 +91,10 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
     private static System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> DeliveredIn(Period p)
         => r => r.DeliveredAt >= p.Start && r.DeliveredAt <= p.End;
 
-    private static System.Linq.Expressions.Expression<Func<ServiceRecord, bool>> OpenReceivable(Guid? vehicleId)
-        => r => r.DeliveredAt != null && r.PaymentMethod == PaymentMethod.Unpaid && (vehicleId == null || r.VehicleId == vehicleId);
-
     public async Task<ReceivableList> Handle(ListReceivables q, CancellationToken ct)
     {
-        var (delivered, vehicles) = await Load(OpenReceivable(q.VehicleId), ct);
+        // K-078: alacak = KALANI OLAN iş ("almadım" durumu değil) — kısmen ödenmiş iş kalanıyla girer.
+        var (delivered, vehicles) = await Load(ServiceRecord.HasRemaining, ct, q.VehicleId);
         var items = delivered
             .OrderByDescending(r => r.DeliveredAt).ThenByDescending(r => r.DateTimeCreated)
             .Select(r =>
@@ -99,9 +102,9 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
                 vehicles.TryGetValue(r.VehicleId, out var v);
                 return new ReceivableItem(r.Id, r.VehicleId, v?.PlateNo ?? "", v?.OwnerName,
                     string.IsNullOrWhiteSpace(r.Complaint) ? ServiceTypeGuess.Label(r.Type) : r.Complaint,
-                    r.DeliveredAt, r.Total);
+                    r.DeliveredAt, r.Total, r.Paid, r.Remaining);
             }).ToList();
-        return new ReceivableList(items.Sum(i => i.Total), items);
+        return new ReceivableList(items.Sum(i => i.Remaining), items);
     }
 
     public async Task<JobProfitList> Handle(ListJobProfits q, CancellationToken ct)
@@ -125,18 +128,24 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
     public async Task<CsvFile> Handle(ExportCashCsv q, CancellationToken ct)
     {
         var p = Period.Of(q.Period, clock.Today);
-        var (collected, vehicles) = await Load(ServiceRecord.CollectedBetween(p.Start, p.End), ct);
-        var (unpaid, _) = await Load(OpenReceivable(null), ct);
+        var (unpaid, vehicles) = await Load(ServiceRecord.HasRemaining, ct);
+        // K-078 · Kasa ÖDEMELERDEN: dönemde alınan her ödeme kendi satırı (Cemil: "Ayrı satır").
+        var payments = await db.Payments.AsNoTracking().Where(x => x.PaidOn >= p.Start && x.PaidOn <= p.End).ToListAsync(ct);
+        var recIds = payments.Select(x => x.ServiceRecordId).Distinct().ToList();
+        var paidRecords = await db.ServiceRecords.AsNoTracking().IgnoreAutoIncludes()
+            .Where(r => recIds.Contains(r.Id)).ToDictionaryAsync(r => r.Id, ct);
         string Plate(ServiceRecord r) => vehicles.TryGetValue(r.VehicleId, out var v) ? v.PlateNo : "";
         string Owner(ServiceRecord r) => vehicles.TryGetValue(r.VehicleId, out var v) ? v.OwnerName ?? "" : "";
         string What(ServiceRecord r) => string.IsNullOrWhiteSpace(r.Complaint) ? "Servis kaydı" : r.Complaint;
 
         var rows = new List<object?[]> { new object?[] { "Tür", "Tarih", "Açıklama", "Plaka", "Müşteri", "Ödeme", "Tutar" } };
 
-        // Tahsilat: tahsil GÜNÜNE göre (K-071.1), tarih sırasıyla — kayıt sırası açılış sırasıdır, ödeme sırası değil.
-        rows.AddRange(collected
-            .OrderBy(r => r.CollectedOn).ThenBy(r => r.DateTimeCreated)
-            .Select(r => new object?[] { "Tahsilat", r.CollectedOn, What(r), Plate(r), Owner(r), Csv.PaymentLabel(r.PaymentMethod), r.Total }));
+        // Tahsilat: ödeme GÜNÜNE göre (K-071.1 · K-078), tarih sırasıyla — kayıt sırası açılış sırasıdır,
+        // ödeme sırası değil; aynı gün: kaydın sırası, sonra ödemenin yazılış sırası (prototip donemOdemeleri).
+        rows.AddRange(payments
+            .OrderBy(x => x.PaidOn).ThenBy(x => paidRecords[x.ServiceRecordId].DateTimeCreated).ThenBy(x => x.Sequence)
+            .Select(x => { var r = paidRecords[x.ServiceRecordId];
+                           return new object?[] { "Tahsilat", x.PaidOn, What(r), Plate(r), Owner(r), Csv.PaymentLabel(x.Method), x.Amount }; }));
 
         rows.AddRange((await db.Expenses.AsNoTracking().Where(e => e.Date >= p.Start && e.Date <= p.End)
                 .OrderBy(e => e.Date).ThenBy(e => e.DateTimeCreated).ToListAsync(ct))
@@ -144,7 +153,7 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
 
         rows.AddRange(unpaid
             .OrderBy(r => r.DeliveredAt).ThenBy(r => r.DateTimeCreated)
-            .Select(r => new object?[] { "Alacak", r.DeliveredAt, What(r), Plate(r), Owner(r), Csv.PaymentLabel(r.PaymentMethod), r.Total }));
+            .Select(r => new object?[] { "Alacak", r.DeliveredAt, What(r), Plate(r), Owner(r), Csv.PaymentLabel(PaymentMethod.Unpaid), r.Remaining }));
 
         var name = $"tamiron-muhasebe-{q.Period.ToString().ToLowerInvariant()}-{clock.Today:dd-MM-yyyy}.csv";
         return new CsvFile(name, Csv.Document(rows));

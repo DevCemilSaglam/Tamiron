@@ -93,7 +93,29 @@ const out = [
   senaryo('kenar-durumlar',
     "var k7 = KAYITLAR.filter(function (k) { return k.id === 7; })[0]; k7.sikayet = '';" +
     "k7.satirlar.push({ tip: 'parca', ad: 'Conta', fiyat: 50, alis: 0, kimGetirdi: 'tamirci' });" +
-    "k7.satirlar.push({ tip: 'parca', ad: 'Silecek lastiği', fiyat: 300, alis: 120, kimGetirdi: 'musteri' });")
+    "k7.satirlar.push({ tip: 'parca', ad: 'Silecek lastiği', fiyat: 300, alis: 120, kimGetirdi: 'musteri' });"),
+  // K-078 · ELDEN TAKSİT — prototipin kendi odemeEkle'siyle (kuralları da o sınar).
+  //  · veresiye (id 8, 3.450, teslim 28.08): 30.08'de 1.000 nakit, bugün 1.500 kart → kalan 950;
+  //    kasa iki ayrı günde iki yolda, CSV'de iki satır, alacak = 950.
+  senaryo('kismi-taksit',
+    "var k8 = KAYITLAR.filter(function (k) { return k.id === 8; })[0];" +
+    "if (odemeEkle(k8, 1000, 'nakit', '30.08.2026') || odemeEkle(k8, 1500, 'kart', bugunMetin())) throw new Error('kural');"),
+  //  · aynı veresiye teslim günü 1.000 havale + bugün kalanı (2.450) nakit → kapanır: alacak 0,
+  //    bugün kasası 2.450 nakit, ağustos 1.000 havale.
+  senaryo('kismi-kapanis',
+    "var k8 = KAYITLAR.filter(function (k) { return k.id === 8; })[0];" +
+    "if (odemeEkle(k8, 1000, 'havale', '28.08.2026') || odemeEkle(k8, 2450, 'nakit', bugunMetin())) throw new Error('kural');"),
+  //  · AYNI GÜN İKİ TAKSİT (aynı kayıt): CSV'de yazılış sırasıyla iki satır — önce nakit, sonra kart
+  //    (F5'te mutasyonla bulundu: sıra tersine dönse hiçbir senaryo görmüyordu).
+  senaryo('kismi-ayni-gun',
+    "var k8 = KAYITLAR.filter(function (k) { return k.id === 8; })[0];" +
+    "if (odemeEkle(k8, 1000, 'nakit', bugunMetin()) || odemeEkle(k8, 500, 'kart', bugunMetin())) throw new Error('kural');"),
+  //  · serviste duran iş (id 2, bakım) BUGÜN teslim, bir kısmı (500 kart) teslimde → kalan veresiye
+  //    (teslim ekranındaki "Bir kısmını aldım" ile aynı veri).
+  senaryo('kismi-teslimde',
+    "var k1 = KAYITLAR.filter(function (k) { return k.id === 2; })[0];" +
+    "k1.teslimTarihi = bugunMetin(); k1.odemeYolu = 'almadim';" +
+    "if (odemeEkle(k1, 500, 'kart', k1.teslimTarihi)) throw new Error('kural');")
 ];
 fs.mkdirSync(path.dirname(CIKTI), { recursive: true });
 fs.writeFileSync(CIKTI, JSON.stringify(out, null, 2) + '\n', 'utf8');

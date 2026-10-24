@@ -275,7 +275,7 @@ api.MapPatch("/records/{id:guid}", (Guid id, RecordPatch p, ISender s, Cancellat
 api.MapGet("/records/{id:guid}/delivery-preview", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new GetDeliveryPreview(id), ct));
 api.MapPost("/records/{id:guid}/deliver", (Guid id, CollectBody body, ISender s, CancellationToken ct) =>
-    s.Send(new DeliverRecord(id, body.Method), ct));
+    s.Send(new DeliverRecord(id, body.Method, body.Amount), ct));
 // D14 · Yanlış teslimi geri al: aynı gün; tahsil edildiyse önce tahsil geri alınır (K-076.13).
 api.MapPost("/records/{id:guid}/deliver/undo", (Guid id, ISender s, CancellationToken ct) => s.Send(new UndoDelivery(id), ct));
 // E1 · Ödeme yolunu düzelt (K-077.2): nakit ↔ kart ↔ havale; teslim/tahsil günü korunur.
@@ -293,7 +293,7 @@ api.MapPost("/records/{id:guid}/lines/{lineId:guid}/restore", (Guid id, Guid lin
 
 // Veresiyenin parası geldi (K-071.1). Gün SUNUCUDAN: istemci tarih göndermez.
 api.MapPost("/records/{id:guid}/collect", (Guid id, CollectBody body, ISender s, CancellationToken ct) =>
-    s.Send(new CollectPayment(id, body.Method), ct));
+    s.Send(new CollectPayment(id, body.Method, body.Amount), ct));
 
 api.MapPost("/records/{id:guid}/collect/undo", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new UndoCollection(id), ct));
@@ -303,7 +303,8 @@ api.MapGet("/cash", (PeriodKind period, ISender s, CancellationToken ct) =>
 
 app.Run();
 
-public sealed record CollectBody(PaymentMethod Method);
+/// <param name="Amount">Yalnız teslim ve tahsilde: boş = tamamı; dolu = elden taksit (K-078). Düzeltmede yok sayılır.</param>
+public sealed record CollectBody(PaymentMethod Method, decimal? Amount = null);
 public sealed record RecordPatch(string? Complaint, ServiceType? Type, string? Km, bool? WaitingForPart, bool? ShowWaitingToCustomer);
 
 public partial class Program;   // WebApplicationFactory için

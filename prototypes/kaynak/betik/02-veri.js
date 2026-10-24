@@ -1254,8 +1254,13 @@ function muhasebeCsv(donem) {
   GIDERLER.filter(function (g) { return donemIcinde(g.tarih, donem); }).forEach(function (g) {
     satirlar.push(['Gider', g.tarih, g.aciklama, '', '', '', g.tutar || 0]);
   });
-  /* Alacak = KALAN (K-078): kısmen ödenmiş işin yalnız kalanı alacaktır. */
-  KAYITLAR.filter(veresiyeMi).forEach(function (k) {
+  /* Alacak = KALAN (K-078): kısmen ödenmiş işin yalnız kalanı alacaktır.
+     TESLİM GÜNÜ SIRASIYLA (24.10, F5): eskiden KAYITLAR dizisinin sırasıydı —
+     rastgele bir sıra; iki alacak ilk kez yan yana gelince sunucuyla ayrıştı.
+     Tahsilat satırlarıyla aynı kural: muhasebeci tarih sırasıyla okur. */
+  KAYITLAR.filter(veresiyeMi).map(function (k, i) { return { k: k, i: i }; }).sort(function (a, b) {
+    return (tariheCevir(a.k.teslimTarihi) - tariheCevir(b.k.teslimTarihi)) || (a.i - b.i);
+  }).map(function (x) { return x.k; }).forEach(function (k) {
     satirlar.push(['Alacak', k.teslimTarihi || '', k.sikayet || 'Servis kaydı', k.plaka, sahip(k),
                    ODEME_ETIKET.almadim, kalanTutar(k)]);
   });

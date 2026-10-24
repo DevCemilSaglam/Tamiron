@@ -106,6 +106,7 @@ taksit de x miktar aldım şeklinde olur."* Bir işin parası birden çok parça
 | `Amount` | Alınan tutar. **> 0, kalandan fazla olamaz** (Cemil: *"Kalandan fazla ödeme olmaz"*) |
 | `Method` | `Cash` \| `Card` \| `Transfer` — `Unpaid` olamaz: alınmayan para ödeme değildir |
 | `PaidOn` | Paranın geldiği gün — **kasaya bu güne yazılır**, CSV'de ayrı satır (Cemil: *"Ayrı satır"*) |
+| `Sequence` | **Yazılış sırası** (kayıt içinde 1, 2, 3…) — K-078.5. "Son ödemeyi geri al", "son ödemenin yolunu düzelt" ve durum özeti SON ödemeyi bilmek zorunda; veritabanından gelen sıra yazılış sırası değildir (aynı gün iki taksit tarihten de ayrılmaz). `ServiceLine.Position`'ın aynısı |
 | `AtDelivery` | **Teslimde mi alındı** (K-078.1). Teslimdeki para teslimle gider (teslimi geri al); sonradan gelen "ödemeyi geri al"la — yanlış teslimi geri alan usta sonraki tahsilatı farkında olmadan silmesin |
 
 > **Kalan** saklanmaz: `ServiceRecord.Total − Σ Amount` (en az 0). Saklanan kalan, satır
@@ -391,8 +392,8 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | İş başına fark: bilinmeyen alış (null) satışıyla hesap dışı, sayılır; 0 = bedava | `isKari` · `alisBilinmiyor` | `JobProfit.Of` | K-057 · K-055.2 |
 | Parça alışı: teslim edilmiş işte, tamircinin aldığı, alışı > 0 | `parcaAlislari` | `ServiceLine.IsShopPurchase` | 04.09 |
 | Tahsil günü: `PaymentCollectedAt ?? DeliveredAt`, `Unpaid` hariç | `tahsilTarihi` · `donemTahsilatlari` | `ServiceRecord.CollectedOn` + SQL biçimi `CollectedBetween` (eşitliği testli) | K-071.1 |
-| Kasa = o dönemde ALINAN ödemeler (yola göre); kısmi ödemenin her parçası kendi gününde | `kayitOdemeleri` · `donemOdemeleri` · `tahsilatToplami` · `bugunTahsilat` | F5 | K-078 |
-| Alacak = kalan (toplam − alınanlar, en az 0); kısmi ödenmiş iş kalanıyla | `kalanTutar` · `veresiyeMi` · `veresiyeToplami` | `ServiceRecord.Remaining` (sorgular F5) | K-078 |
+| Kasa = o dönemde ALINAN ödemeler (yola göre); kısmi ödemenin her parçası kendi gününde; CSV'de her ödeme ayrı satır | `kayitOdemeleri` · `donemOdemeleri` · `tahsilatToplami` · `bugunTahsilat` · `muhasebeCsv` | `Map.CollectedBetween` (SQL'de gün + yol) · `ExportCashCsv` | K-078 |
+| Alacak = kalan (toplam − alınanlar, en az 0); kısmi ödenmiş iş kalanıyla; CSV alacak satırları teslim günü sırasıyla | `kalanTutar` · `veresiyeMi` · `veresiyeToplami` | `ServiceRecord.Remaining` + SQL biçimi `HasRemaining` (eşitliği testli) · `ListReceivables` · `Map.UnpaidTotal` | K-078 · K-078.6 |
 | Ödeme > 0 ve kalandan fazla değil; teslimsiz işe ödeme yok; teslimde kısmi toplamdan fazla değil | `odemeHatasi` · `odemeEkle` · teslim ekranı | `ServiceRecord.CollectPayment(amount, …)` · `DeliverPartly` | K-078 · Cemil 24.10 |
 | Kalan varken durum `Unpaid`; kapanınca son ödemenin yolu/günü | `odemeDurumu` | `ServiceRecord.RefreshPaymentStatus` | K-078 |
 | Son (sonradan alınan) ödeme geri alınır; teslimdeki teslimle gider | `sonOdemeyiGeriAl` | `ServiceRecord.UndoCollection` · `UndoDelivery` | K-078 · K-078.1 |

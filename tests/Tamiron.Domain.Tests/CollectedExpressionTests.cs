@@ -35,6 +35,30 @@ public class CollectedExpressionTests
         }
     }
 
+    /// <summary>K-078 · "Kalanı var mı"nın SQL biçimi bellekteki Remaining &gt; 0 ile her durumda aynı.</summary>
+    [Fact]
+    public void Remaining_sql_form_agrees_with_memory_form()
+    {
+        var has = ServiceRecord.HasRemaining.Compile();
+        var states = States().ToList();
+        // Kısmi ödemeli, müşteri parçalı, 0 ₺'lik ve kapanmış durumlar da.
+        ServiceRecord Partial(decimal paid)
+        {
+            var r = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), "iş");
+            r.AddLine(ServiceLine.Part("Akü", 3200m)); r.AddLine(ServiceLine.Part("Getirdiği", 900m, PartSupplier.Customer));
+            r.Deliver(PaymentMethod.Unpaid, D1, MaintenancePolicy.Default, []);
+            if (paid > 0) r.CollectPayment(paid, PaymentMethod.Cash, D2);
+            return r;
+        }
+        states.AddRange([Partial(0), Partial(1000m), Partial(3200m)]);
+        var zero = new ServiceRecord(Guid.NewGuid(), Guid.NewGuid(), "iş");
+        zero.Deliver(PaymentMethod.Unpaid, D1, MaintenancePolicy.Default, []);
+        states.Add(zero);
+        Assert.Contains(states, r => r.Remaining > 0);       // ölçü boş kalmasın
+        Assert.Contains(states, r => r.DeliveredAt is not null && r.Remaining == 0);
+        foreach (var r in states) Assert.Equal(r.Remaining > 0, has(r));
+    }
+
     [Theory]
     [InlineData(2026, 10, 1, 2026, 10, 22)]    // bu ay
     [InlineData(2026, 10, 22, 2026, 10, 22)]   // bugün
