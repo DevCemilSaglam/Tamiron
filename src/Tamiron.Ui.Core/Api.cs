@@ -31,6 +31,20 @@ public sealed record NewVehicleInfo(string? Brand, string? Model, string? Year, 
 
 public sealed record OpenedRecord(Guid Id, Guid VehicleId, string PlateNo);
 
+/// <summary>G3 · Servis kaydı (API ServiceRecordDto'nun ekranın okuduğu kısmı).</summary>
+public sealed record RecordDetail(Guid Id, Guid VehicleId, string PlateNo, string Type, string Complaint,
+                                  DateOnly? DeliveredAt, bool WaitingForPart, bool ShowWaitingToCustomer,
+                                  decimal Total, IReadOnlyList<LineItem> Lines, IReadOnlyList<string> Warnings,
+                                  decimal Paid, decimal Remaining);
+
+public sealed record LineItem(Guid Id, string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy, bool CountsInTotal);
+
+/// <summary>API'ye giden satır (LineBody). Kind: "Part" | "Labor"; SuppliedBy: null | "Shop" | "Customer".</summary>
+public sealed record LineInput(string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy);
+
+public sealed record VehicleCard(Guid Id, string PlateNo, string? Brand, string? Model, string? OwnerName, string? OwnerPhone,
+                                 string? ContactName, string? ContactPhone);
+
 public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
                                  decimal CollectedToday, decimal Receivable, int DueReminderCount);
 
@@ -86,6 +100,17 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     public async Task<OpenedRecord> OpenRecordAsync(string plate, NewVehicleInfo? vehicle)
         => await Read<OpenedRecord>(await Send(HttpMethod.Post, "api/records", new { plate, complaint = "", vehicle }, auth: true));
 
+    public async Task<RecordDetail> RecordAsync(Guid id) => await Read<RecordDetail>(await Send(HttpMethod.Get, $"api/records/{id}", null, auth: true));
+    public async Task<VehicleCard> VehicleAsync(Guid id) => await Read<VehicleCard>(await Send(HttpMethod.Get, $"api/vehicles/{id}", null, auth: true));
+    public async Task<RecordDetail> AddLineAsync(Guid id, LineInput l) => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/lines", l, auth: true));
+    public async Task<RecordDetail> UpdateLineAsync(Guid id, Guid lineId, LineInput l) => await Read<RecordDetail>(await Send(HttpMethod.Put, $"api/records/{id}/lines/{lineId}", l, auth: true));
+    public async Task<RecordDetail> DeleteLineAsync(Guid id, Guid lineId) => await Read<RecordDetail>(await Send(HttpMethod.Delete, $"api/records/{id}/lines/{lineId}", null, auth: true));
+    public async Task<RecordDetail> RestoreLineAsync(Guid id, Guid lineId) => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/lines/{lineId}/restore", null, auth: true));
+
+    /// <summary>Kısmi güncelleme (API RecordPatch): null = dokunma.</summary>
+    public async Task<RecordDetail> PatchRecordAsync(Guid id, string? complaint = null, string? type = null, bool? waitingForPart = null, bool? showWaitingToCustomer = null)
+        => await Read<RecordDetail>(await Send(HttpMethod.Patch, $"api/records/{id}", new { complaint, type, waitingForPart, showWaitingToCustomer }, auth: true));
+
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
     public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
@@ -134,5 +159,12 @@ public static class Format
     private static readonly NumberFormatInfo Tr = new() { NumberGroupSeparator = ".", NumberDecimalSeparator = ",", NegativeSign = "-" };
     /// <summary>JS toLocaleString('tr-TR'): binlik nokta, gereksiz ondalık yok.</summary>
     public static string Money(decimal n) => n.ToString("#,0.###", Tr);
+    /// <summary>Ustanın yazdığı tutar: "1.200" · "1200" · "1.234,5" · "" (boş = 0). Okunamazsa null.</summary>
+    public static decimal? ParseMoney(string? s)
+    {
+        var t = (s ?? "").Replace("₺", "").Replace(" ", "").Replace(".", "").Replace(',', '.');
+        if (t.Length == 0) return 0;
+        return decimal.TryParse(t, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var d) && d >= 0 ? d : null;
+    }
     public static string Date(DateOnly d) => d.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 }

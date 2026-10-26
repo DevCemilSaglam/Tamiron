@@ -51,6 +51,19 @@ sınıfı). İkonlar prototipin `ikonlar.svg`'sinden gömülür — kopya yok.
   yanlıştı. Backend temel (K-079.2).
 - Ruhsatı çek sekmesi ayrı iş (**G2b**); km ve tür burada sorulmaz (prototip 07.09, K-033.1).
 
+**80.7 · Servis kaydı ekranı (G3) ve ekran stilleri.**
+- **Ekranın kendi stilleri prototipten ÜRETİLİR:** prototipte her ekranın `<style>`'ı var (`k-tip`
+  noktası, tablo hücreleri …). `tools/ekran-stil.js` hepsini `04-ekranlar.css`'e çıkarır; arayüz testi
+  aynı çıkarmayı yapıp karşılaştırır. Elle kopya yok — prototipte stil değişirse test kırmızı.
+- **Satır silme: çöp yerine `×` düğmesi + "Geri al".** Prototip sola kaydırarak siliyordu (dokunmatik
+  hareket); fareyle de çalışan açık bir düğme gerekti. İkon kümesinde çöp kutusu yok → `i-x`.
+- **⚠️ Ölçümün bulduğu: ikon testi `href="#i-…"`yi GÖRMÜYORDU** (desen tırnaktan hemen sonra `i-`
+  bekliyordu). G1'de "her ikon kümede" dedik, oysa yalnız menünün kayıt içindeki adlarını sınıyordu;
+  `i-trash-2` tarayıcıda boş daire olarak görüldü. Desen düzeltildi.
+- **Henüz yok** (kuyrukta): "Ne oldu" süreci, eylem çubuğunda Sesle/Kamera/Parça sor/Mesaj, alış
+  sorusu (dükkân ayarı), ödeme ve "Düzenle" (G5). Eylem çubuğunda yalnız çalışan "Ekle" var.
+- **G2b (ruhsat sekmesi) G3'ün arkasına alındı:** kayıt açılınca gidilecek sayfa yoktu — ana yol önce.
+
 **80.5 · `Microsoft.AspNetCore.Components.WebAssembly.Server` 8.0.33.** 8.0.11'in yüksek önemli bir
 açığı var (NuGet uyarısı NU1903); arayüzü sunan paket en son 8.0 yamasıyla girdi.
 

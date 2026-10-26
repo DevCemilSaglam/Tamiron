@@ -15,7 +15,7 @@ public class IconTests
         var d = new DirectoryInfo(AppContext.BaseDirectory);
         while (!File.Exists(Path.Combine(d!.FullName, "Tamiron.sln"))) d = d.Parent;
         var used = Directory.GetFiles(Path.Combine(d.FullName, "src"), "*.razor", SearchOption.AllDirectories)
-            .SelectMany(f => Regex.Matches(File.ReadAllText(f), "\"(i-[a-z0-9-]+)\"").Select(m => (File: Path.GetFileName(f), Icon: m.Groups[1].Value)))
+            .SelectMany(f => Regex.Matches(File.ReadAllText(f), "\"#?(i-[a-z0-9-]+)\"").Select(m => (File: Path.GetFileName(f), Icon: m.Groups[1].Value)))
             .ToList();
         Assert.NotEmpty(used);
         Assert.Empty(used.Where(u => !Ikonlar.Adlar.Contains(u.Icon)).Select(u => $"{u.File}: {u.Icon}"));

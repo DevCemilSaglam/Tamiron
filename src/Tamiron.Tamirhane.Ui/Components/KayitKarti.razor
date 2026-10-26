@@ -4,7 +4,9 @@
   değilse açılış. Tutar 0 ise "—".
   ⚠️ İskelette YOK (yanıtta alanı yok): motor, renk kutusu, aranacak telefon, "fiyat bekleniyor".
 *@
+@inject NavigationManager Nav
 <div class="arac-kart @(Item.DeliveredAt is null ? "icerde" : "")" role="button" tabindex="0"
+     @onclick='() => Nav.NavigateTo($"/kayit/{Item.Id}")' 
      aria-label="@Item.PlateNo — @Item.TypeLabel">
   <div class="ak-ust"><Plate No="@Item.PlateNo" Size="plate-lg" /></div>
   <div class="ak-arac"><span>@($"{Item.Brand} {Item.Model}".Trim())</span></div>

@@ -1,0 +1,292 @@
+/* ÜRETİLDİ: node tools/ekran-stil.js — elle düzenleme. Kaynak: prototypes/kaynak/ekranlar/*.html <style> */
+/* ---- 20-ruhsat.html ---- */
+/* Plaka alanının içindeki mikrofon — alan zaten çerçeveli, düğme
+   içeride duruyor ve kutuyu şişirmiyor. */
+.plate-field .daire-btn { width: 44px; height: 44px; align-self: center; margin-right: 2px; }
+.plate-field .daire-btn .ico { width: 20px; height: 20px; }
+
+/* ---- 30-kayit.html ---- */
+/* Künye DOKUNULABİLİR bir hedef (araç geçmişini açıyor), o yüzden
+   içi henüz doldurulmamışken bile dokunma hedefinden küçük olamaz. */
+#kayitKunye { min-height: var(--dokun); }
+
+/* Kişi satırı: rol küçük ve soluk, ad büyük ve koyu; aradaki boşluk
+   `gap` ile — metnin içindeki tek boşluk yeterli değildi (A8). */
+#screen-kayit .k-kisi {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+  margin-top: 8px;
+}
+#screen-kayit .k-kisi-rol {
+  font-size: var(--tip-sm); color: var(--muted); flex: none;
+}
+#screen-kayit .k-kisi-ad {
+  font-size: var(--tip-md); font-weight: 700; color: var(--text);
+  min-width: 0; overflow-wrap: anywhere;
+}
+
+/* Müşteri bloğu künyeden ayraçla ayrılır: üstü araç, altı kişi. */
+#kayitMusteri {
+  margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+/* ---- YAPILANLAR TABLOSU ----
+   Tablo hücresinin içindeki alanlar çerçevesiz duruyor: her satırda
+   iki kutu çizmek, on satırda yirmi kutu demek. Alt çizgi "buraya
+   yazılır" demeye yetiyor, kutu gürültü yapıyordu. */
+/* ⚠️ 48 px DOKUNMA HEDEFİ — çerçevesiz ama KÜÇÜK DEĞİL (06.09).
+   İlk yazımda `padding: 2px 0` vardı ve alanlar 28 px ölçüldü;
+   denetim on iki kez üst üste söyledi. Görsel ağırlık ≠ dokunma alanı
+   (K-024): alan hâlâ çerçevesiz görünüyor, yalnız dikey dolgusu
+   parmağa yetiyor. */
+/* ⚠️ HÜCRELER TEPEDEN HİZALI + ROZET ADIN YANINDA (06.09, ölçüm).
+   Ekran görüntüsünde işçilik satırının tutarı adından 12 px YUKARIDA
+   duruyordu: parça satırlarında adın altında ikinci bir satır (parçacı
+   fiyatı) var, hücre uzuyor ve tarayıcı tutarı o uzun hücrenin
+   ORTASINA yerleştiriyordu. Aynı tabloda satırdan satıra kayan bir
+   hiza, tablonun tek işini — rakamları karşılaştırılabilir kılmayı —
+   bozar.
+
+   İki değişiklik: hücreler tepeden hizalanıyor, rozet de adın ÜSTÜNE
+   değil YANINA geçiyor. Böylece her satırın ilk satırı aynı yükseklikte
+   başlıyor. */
+#screen-kayit .tablo td { vertical-align: top; }
+#screen-kayit .k-satir {
+  display: flex; align-items: center; gap: 8px;
+}
+/* ⚠️ 13.10 — PARÇA / İŞÇİLİK YAZISI KALKTI, RENK KALDI (Cemil: "Parça /
+   İşçilik belirtmeye gerek. Renkleri farklı olsun, yeter.").
+   Her satırda bir kelime, on satırda on kelime: ad alanından yer
+   yiyordu (320 px'te rozet 52–65 px idi). Artık bir NOKTA:
+     parça   → --primary   (mavi)
+     işçilik → --highlight (turuncu — "üçüncü vurgu"; uyarı rengi DEĞİL,
+                            uyarı başka bir şey söyler)
+   Nokta hâlâ DÜĞME (7.1): dokununca tür değişir, ad ve tutar korunur.
+   Görünüşü 14 px, dokunma alanı 44 × 48 (K-024). Rengin anlamı Ekle
+   panelinde öğreniliyor — oradaki çiplerde aynı noktalar var.
+   Ekran okuyucu için anlam `aria-label`da (renk tek başına söylemez).
+   Sınıf ekranın <style>'ında ve kapsamsız: Ekle paneli katmanda,
+   ekranın dışında çiziliyor. */
+.k-tip {
+  flex: none; position: relative;
+  width: 44px; min-height: var(--dokun); padding: 0; margin-left: -10px;
+  background: transparent; border: 0; cursor: pointer;
+}
+.k-tip::after {
+  content: ""; position: absolute; left: 50%; top: 50%;
+  width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+}
+.k-tip-parca::after { background: var(--primary); }
+.k-tip-iscilik::after { background: var(--highlight); }
+/* Ekle panelindeki çiplerde: nokta yazının yanında, aynı renk. */
+.k-tip-renk {
+  display: inline-block; width: 12px; height: 12px; border-radius: 50%;
+  margin-right: 6px; vertical-align: -1px;
+}
+.k-tip-renk.k-tip-parca { background: var(--primary); }
+.k-tip-renk.k-tip-iscilik { background: var(--highlight); }
+.k-tip-renk::after { content: none; }
+#screen-kayit .tablo input {
+  width: 100%; background: transparent; border: 0;
+  border-bottom: 1px dashed var(--line);
+  color: var(--text); font: inherit;
+  padding: 12px 0; min-height: var(--dokun);
+}
+#screen-kayit .tablo input:focus {
+  outline: none; border-bottom-color: var(--primary);
+}
+#screen-kayit .tablo td.sayi input {
+  text-align: right;
+  font-family: var(--font-mono); font-variant-numeric: tabular-nums;
+}
+/* Satırın ikincil bilgisi: "kim getirdi" slotu + parçacı fiyatı.
+
+   ⚠️ 08.09 — BU SATIRIN TARİHİ, AYNI HATANIN İKİ UCU:
+     06.09  her parça satırına 26 px'lik iki çip koydum → denetim
+            beşini birden ölçtü, çok küçüktü.
+     07.09  tek çipe indi, 44 px oldu — ama HER SATIRDA duruyordu ve
+            basılı değilken *"tamirci getirdi"* yazıyordu.
+     08.09  Cemil: *"Bu konuyu abartmışsin sanki?"*
+
+   Küçültmek de büyütmek de çözüm değildi; asıl soru **her satırda
+   görünmesi gerekip gerekmediğiydi.** Gerekmiyor: slot yalnız
+   sorulacak bir şey varsa (fiyat yazılmamışsa) ya da söylenecek bir
+   şey varsa (müşteri getirmişse) doluyor. */
+#screen-kayit .k-ikincil {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  margin-top: 6px;
+}
+/* ⚠️ 320 px'TE AD ALANI SESSIZCE KIRPILIYORDU (06.09, kuyruk 9).
+   Ölçüldü: ad alanı 65 px görünüyor, "Bakım işçiliği" 88 px istiyor —
+   usta ekranda "Bakım işç" görüyor ve **eksik olduğunu anlamıyor.**
+   `<input>` taşan metni ne sarar ne üç nokta koyar; sessizce keser.
+   K-025'in kuralı: kesilen metin, taşan metinden tehlikelidir.
+
+   İki yerden yer açıldı, ikisi de yalnız dar ekranda:
+   · tutar sütunu 96 → 74 px ("1.900 ₺" 50 px'e sığıyor)
+   · tip rozeti küçülüyor (65 → ~52 px) — 13.10'da rozet NOKTA oldu
+     (34 px, her genişlikte), bu kural kalktı.
+
+   375 px ve üstünde hiçbir şey değişmiyor — dar ekranın çözümü geniş
+   ekrana bulaşmaz. */
+@media (max-width: 359px) {
+  #screen-kayit .tablo td.sayi { width: 74px; }
+}
+
+/* ---- EYLEM ÇUBUĞU (12.10 · K-058) ----
+   Ekranın altında YAPIŞKAN: `.screen` kaydırma kabı, `sticky` onun
+   görünen alt kenarına yapışır. Negatif kenar boşluğu ekranın yan ve
+   alt dolgusunu yer — çubuk kenardan kenara durur, içerikle hizalı
+   bir kart gibi değil, ekranın tabanı gibi.
+
+   Beş düğme 320 px'te ~58 px; ikon üstte, kısa ad altta. Yazı küçük
+   ama DOKUNMA ALANI TAM (K-024): yükseklik 60 px, genişlik sütunun
+   tamamı. "Ekle" birincil renkte — en sık yapılan iş. */
+/* ⚠️ ÇUBUK DİBE DEĞMİYORDU (12.10, ölçüm): `sticky` kabın İÇ
+   dolgusunu da hesaba katıyor — ekranın 26 px'lik alt dolgusu çubuğu
+   dipten 26 px yukarıda tutuyordu ve altından içerik görünüyordu.
+   Bu ekranda alt dolguyu çubuğun kendisi üstleniyor. */
+#screen-kayit.screen { padding-bottom: 0; }
+#screen-kayit .k-cubuk {
+  position: sticky; bottom: 0; z-index: 5;
+  display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px;
+  margin: 0 -16px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px));
+  background: var(--surface); border-top: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+#screen-kayit .k-cubuk button {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px;
+  min-width: 0; min-height: 60px; padding: 4px 2px;
+  border: 1px solid var(--line); border-radius: var(--radius-md);
+  background: var(--surface); color: var(--text);
+  font-size: var(--tip-xs); font-weight: 600; line-height: 1.15;
+  /* ⚠️ 13.10 — KELİME ORTADAN BÖLÜNMEZ. `overflow-wrap: anywhere` idi ve
+     320 px'te "Fotoğraf" → "Fotoğr / af" oldu (ekran görüntüsünde
+     görüldü; taşma ya da kırpma testi görmez, çünkü hiçbir şey taşmıyor).
+     Etiket Cemil'in kelimesiyle "Kamera" oldu ve kelimeler bütün kalır. */
+  overflow-wrap: normal; word-break: keep-all; text-align: center;
+}
+#screen-kayit .k-cubuk button:hover { background: var(--nav-hover); }
+#screen-kayit .k-cubuk #kParcaEkle {
+  background: var(--primary); color: var(--on-primary); border-color: var(--primary);
+}
+#screen-kayit .k-cubuk .ico { width: 20px; height: 20px; }
+/* Sıradaki mesaj yoksa kap boş — boş çocuk da kartın gap'ini alır (K-029). */
+#kMesajOneri:empty { display: none; }
+
+/* ⚠️ 08.09 — ÜSTÜ ÇİZİLİ TUTAR KALKTI (.tutar-disi).
+   Cemil: *"Değişen parça fiyatı yerine bilgi olarak sadece
+   yazılabilir."* Üstü çizili bir rakam hâlâ bir rakamdır: göz onu
+   toplamda arar, bulamaz ve tabloya güveni azalır. Müşteri parçasının
+   tutar hücresinde artık rakam değil, bir tire var. */
+#screen-kayit .k-tutar-yok {
+  color: var(--faint); font-family: var(--font-mono);
+}
+
+/* ---- "MÜŞTERİ GETİRDİ" — TEKLİF ve BİLGİ ----
+   İkisi de DÜĞME, ikisi de 48 px (K-024: görsel ağırlık ≠ dokunma
+   alanı — 06.09'da bu satıra 26 px'lik bir çip koymuştum ve denetim
+   beşini birden ölçtü).
+
+   TEKLİF soluk ve noktalı altı çizili: bir bağlantı gibi okunuyor,
+   "istersen" diyor. BİLGİ vurgu renginde ve kalın: artık bir durum,
+   ve dokunulunca geri alınıyor. */
+#screen-kayit .k-getiren-sor,
+#screen-kayit .k-getiren-bilgi {
+  display: inline-flex; align-items: center;
+  min-height: var(--dokun);
+  padding: 0; border: 0; background: transparent;
+  font-family: var(--font-body); font-size: var(--tip-xs);
+  cursor: pointer;
+}
+#screen-kayit .k-getiren-sor {
+  color: var(--muted); text-decoration: underline dotted;
+}
+#screen-kayit .k-getiren-sor:hover { color: var(--text); }
+#screen-kayit .k-getiren-bilgi { color: var(--accent); font-weight: 700; }
+/* Fiyat yazılınca teklif düşer — `hidden` tek başına yetmez, çünkü
+   display açıkça verilmiş. */
+#screen-kayit .k-getiren-sor[hidden] { display: none; }
+#screen-kayit .k-alis {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: var(--tip-xs); color: var(--muted);
+  font-family: var(--font-mono);
+}
+/* Alış alanı küçük ama dokunma hedefi TAM (K-024): görsel ağırlık
+   ikincil, parmak için alan değil. */
+#screen-kayit .k-alis input {
+  width: 84px; min-height: var(--dokun);
+  padding: 0 8px; text-align: right;
+  border: 1px solid var(--line); border-radius: var(--radius-sm);
+  background: var(--surface); font-size: var(--tip-sm);
+}
+
+/* ---- 40-parca-sor.html ---- */
+/* Mesaj METNİN KENDİSİ — satır sonları korunmalı, yoksa parça listesi
+   tek satıra yapışıp okunmaz olur. v1'in .notice'ına takılan tek delta. */
+.notice .n-body.ps-mesaj { white-space: pre-wrap; }
+
+/* ---- 91-musteri.html ---- */
+/* ⚠️ 08.09 — .ms-* SINIFLARI 90-musteriler.html'DEN BURAYA TAŞINDI.
+   Liste satıra indi (Cemil: "Müşteriler sayfası neden çok boşluklu"),
+   ayrıntı bu ekrana geldi; sınıflar da kullanıldıkları yere geldi.
+   İkisinde birden tanımlı kalsaydı derleme denetiminin "aynı sınıf iki
+   ekranda" testi haklı olarak bağırırdı. */
+.ms-bas {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+}
+.ms-ad { font-size: var(--tip-lg); font-weight: 700; color: var(--text); }
+.ms-say { margin-left: auto; font-size: var(--tip-xs); color: var(--muted); }
+
+.ms-araclar { display: flex; flex-direction: column; gap: 8px; }
+.ms-arac {
+  display: flex; align-items: center; gap: 10px;
+  width: 100%; min-height: var(--dokun);
+  padding: 6px 8px; border: 1px solid transparent; border-radius: var(--radius-md);
+  background: transparent; color: var(--text); font: inherit;
+  text-align: left; cursor: pointer;
+}
+.ms-arac:hover, .ms-arac:focus-visible {
+  border-color: var(--line); background: var(--surface-2);
+}
+.ms-arac-ad {
+  flex: 1; min-width: 0; font-size: var(--tip-sm); color: var(--muted);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.ms-arac .ico { color: var(--faint); flex: none; }
+
+/* Geçmiş, araç araç bölünüyor — başlık bir SATIR DEĞİL, ayraç. */
+.mst-grup-bas {
+  display: flex; align-items: center; gap: 10px;
+  margin: 16px 0 8px;
+}
+.mst-grup-bas:first-child { margin-top: 0; }
+
+/* ---- 98-ozet.html ---- */
+/* Müşteri sayfasının başlığı — dükkânın adı. Ustanın ekranlarında
+   böyle bir başlık yok: orada dükkân zaten belli, burada ilk soru
+   "bu kimden geldi". */
+.ozet-bas .oz-ad {
+  font-family: var(--font-display);
+  font-size: var(--tip-lg);
+  font-weight: 700;
+  color: var(--text);
+}
+.ozet-bas .oz-alt {
+  margin-top: 2px;
+  font-size: var(--tip-sm);
+  color: var(--muted);
+}
+/* Parçanın markası/kodu satırın içinde ikincil kalır — müşteri için
+   asıl bilgi "ne yapıldı" ve "kaça". */
+.oz-marka {
+  font-family: var(--font-mono);
+  font-size: var(--tip-xs);
+  color: var(--muted);
+}
+
+/* ---- 99-ayarlar.html ---- */
+/* Ayar satırı çekmecede kenardan 12 px içerideydi; kartın kendi
+   dolgusu var, ikinci kez içeri girmesin. */
+#screen-ayarlar .setting-row { padding: 0; }
+#screen-ayarlar .plate-hint { margin: 0; }

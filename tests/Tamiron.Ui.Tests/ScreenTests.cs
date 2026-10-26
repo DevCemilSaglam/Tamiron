@@ -131,6 +131,17 @@ public class RecordScreenTests : TestContext
     }
 
     [Fact]
+    public void Card_opens_its_record()
+    {
+        // G3: kart role=button idi ama hiçbir yere gitmiyordu (D20 iskeleti) — kayıt ekranı geldi.
+        api.Routes["GET /api/records"] = (HttpStatusCode.OK, Liste);
+        var c = RenderComponent<Kayitlar>();
+        c.WaitForAssertion(() => Assert.Equal(2, c.FindAll(".arac-kart").Count));
+        c.FindAll(".arac-kart")[1].Click();
+        Assert.Equal("http://localhost/kayit/00000000-0000-0000-0000-000000000002", Services.GetRequiredService<NavigationManager>().Uri);
+    }
+
+    [Fact]
     public void Dropped_session_clears_the_key_and_goes_to_login()
     {
         api.Routes["GET /api/records"] = (HttpStatusCode.Unauthorized, "{\"title\":\"Oturum açık değil.\"}");

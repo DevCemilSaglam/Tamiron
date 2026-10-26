@@ -1,0 +1,278 @@
+@page "/kayit/{Id:guid}"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G3 · Servis kaydı (EKRANLAR §3 "kalp", prototip 30-kayit, K-058 tek sayfa): künye → Yapılanlar
+  (+ toplam; tür renkli NOKTAYLA, başlık satırı yok) → İşlemler (Teslim et · Parça bekliyor) →
+  Açıklama (+ iş türü). Altta Ekle çubuğu.
+  Her değişiklik API'ye gider; ekran API'nin döndürdüğü kaydı yeniden çizer — toplam, eksikler
+  ("Eksik görünen"), müşteri parçasının toplama girmemesi (K-037) sunucunun hesabı.
+  Satır silme: prototipte sola kaydırma; burada satırdaki çöp düğmesi + "Geri al" (soft-delete).
+  ⚠️ Henüz yok: "Ne oldu" süreci, Sesle/Kamera/Parça sor/Mesaj (G9, G10, G13), alış sorusu
+  (dükkân ayarı, G11), ödeme ve "Düzenle" (G5).
+*@
+<section class="screen active" id="screen-kayit">
+  <div class="screen-head">
+    <span class="eyebrow" id="kayitBaslik">Servis kaydı</span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="kHata"><span class="n-body">@hata</span></div>
+  }
+
+  @if (k is not null)
+  {
+    <div class="card k-kunye">
+      <div id="kayitKunye">
+        <Plate No="@k.PlateNo" Size="plate-lg" />
+        <div class="ak-arac"><span>@($"{arac?.Brand} {arac?.Model}".Trim())</span></div>
+      </div>
+      <div id="kayitMusteri">
+        @if (arac is not null)
+        {
+          <div class="k-kisi"><span class="k-kisi-rol">Sahibi</span><b class="k-kisi-ad">@(arac.OwnerName ?? "yazılmamış")</b></div>
+          @if (!string.IsNullOrWhiteSpace(arac.OwnerPhone))
+          {
+            <a class="btn btn-ghost" href="tel:@Rakam(arac.OwnerPhone)"><svg class="ico"><use href="#i-phone"></use></svg> @arac.OwnerPhone</a>
+          }
+          else
+          {
+            <p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>
+          }
+        }
+      </div>
+    </div>
+
+    <div class="card k-yapilanlar">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Yapılanlar</span></div>
+      <div id="kSatirlar">
+        @if (k.Lines.Count == 0)
+        {
+          <div class="bos-durum">
+            <b>Henüz bir şey yazılmadı</b>
+            <span>Parça ya da işçilik ekle.</span>
+          </div>
+        }
+        else
+        {
+          <div class="tablo-sar"><table class="tablo"><tbody>
+            @foreach (var s in k.Lines)
+            {
+              var parca = s.Kind == "Part";
+              <tr data-satir="@s.Id" @key="s.Id">
+                <td>
+                  <span class="k-satir">
+                    <button class="k-tip @(parca ? "k-tip-parca" : "k-tip-iscilik")" data-satir-tip="@s.Id"
+                            title="@(parca ? "Parça — dokun, işçiliğe çevir" : "İşçilik — dokun, parçaya çevir")"
+                            aria-label="@(parca ? "Parça" : "İşçilik") — türü değiştirmek için dokun"
+                            @onclick="() => TurCevir(s)"></button>
+                    <input value="@s.Name" data-satir-ad="@s.Id" placeholder="@(parca ? "Parça adı" : "Ne yapıldı")"
+                           aria-label="Satır adı" @onchange="e => AdDegisti(s, e)" />
+                    <button class="icon-btn" data-satir-sil="@s.Id" aria-label="Satırı sil" title="Sil" @onclick="() => Sil(s)">
+                      <svg class="ico ico-sm"><use href="#i-x"></use></svg>
+                    </button>
+                  </span>
+                  @if (parca && (s.SuppliedBy == "Customer" || s.Price == 0 || s.Cost is not null))
+                  {
+                    <span class="k-ikincil">
+                      @if (s.SuppliedBy == "Customer")
+                      {
+                        <button class="k-getiren-bilgi" data-getiren="@s.Id" title="Dokun — tutar yazmaya dön" @onclick='() => Getiren(s, "Shop")'>müşteri getirdi</button>
+                      }
+                      else if (s.Price == 0)
+                      {
+                        <button class="k-getiren-sor" data-getiren="@s.Id" @onclick='() => Getiren(s, "Customer")'>müşteri getirdi</button>
+                      }
+                      @if (s.Cost is { } alis)
+                      {
+                        <span class="k-alis">parçacı @Format.Money(alis) ₺</span>
+                      }
+                    </span>
+                  }
+                </td>
+                @if (!s.CountsInTotal)
+                {
+                  <td class="sayi"><span class="k-tutar-yok">—</span></td>
+                }
+                else
+                {
+                  <td class="sayi"><input value="@(s.Price == 0 ? "" : Format.Money(s.Price))" data-satir-fiyat="@s.Id" inputmode="numeric"
+                                          placeholder="0" aria-label="Tutar" @onchange="e => FiyatDegisti(s, e)" /></td>
+                }
+              </tr>
+            }
+            <tr class="genel"><td>Toplam</td><td class="sayi" id="kToplam">@Format.Money(k.Total) ₺</td></tr>
+          </tbody></table></div>
+        }
+      </div>
+      @if (silinen is not null)
+      {
+        <div class="notice" id="kGeriAl">
+          <span class="n-body">Satır silindi — @(string.IsNullOrWhiteSpace(silinen.Name) ? "adsız satır" : silinen.Name).</span>
+          <button class="btn btn-ghost" id="kGeriAlBtn" @onclick="GeriAl">Geri al</button>
+        </div>
+      }
+    </div>
+
+    <div class="card" id="kIslemler">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-wallet"></use></svg> İşlemler</span></div>
+      <div id="kTeslim">
+        @if (k.DeliveredAt is { } t)
+        {
+          <div class="notice ok">
+            <span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>
+            <span class="n-body"><b>Teslim edildi</b> · @Format.Date(t)</span>
+          </div>
+        }
+        else
+        {
+          <button class="btn btn-primary btn-lg" id="kTeslimEt" @onclick='() => Nav.NavigateTo($"/teslim/{Id}")'>
+            <svg class="ico"><use href="#i-wallet"></use></svg> Teslim et
+          </button>
+          @if (k.Warnings.Count > 0)
+          {
+            <p class="plate-hint">Eksik görünen: @string.Join(" · ", k.Warnings). Yine de teslim edebilirsin.</p>
+          }
+        }
+      </div>
+      <div class="section-label with-action">
+        <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> Parça</span>
+        <span class="lbl-eylem">
+          <button class="cip" id="kBekliyor" aria-pressed="@(k.WaitingForPart ? "true" : "false")"
+                  @onclick="() => Yama(waitingForPart: !k.WaitingForPart)">Bekliyor</button>
+        </span>
+      </div>
+      <div id="kBekliyorGovde">
+        @if (k.WaitingForPart)
+        {
+          <div class="notice warn">
+            <span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>
+            <span class="n-body">Bu araç <b>parça bekliyor</b>. Servis kayıtları listesinde de böyle görünüyor.</span>
+          </div>
+          <div class="cip-grup">
+            <button class="cip" id="kBekliyorMusteriye" aria-pressed="@(k.ShowWaitingToCustomer ? "true" : "false")"
+                    @onclick="() => Yama(showWaitingToCustomer: !k.ShowWaitingToCustomer)">Müşterinin sayfasında da göster</button>
+          </div>
+        }
+        else
+        {
+          <p class="plate-hint">Parça sipariş edildi ve yolda ise işaretle.</p>
+        }
+      </div>
+    </div>
+
+    <div class="card k-aciklama">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Açıklama</span></div>
+      <div class="field">
+        <textarea id="kSikayet" rows="3" aria-label="Açıklama" placeholder="Müşteri ne istedi, ne şikâyeti var"
+                  value="@k.Complaint" @onchange="e => Yama(complaint: e.Value?.ToString() ?? string.Empty)"></textarea>
+      </div>
+      <div class="cip-grup" id="kTurGrup" role="group" aria-label="İş türü">
+        @foreach (var (tur, ad) in Turler)
+        {
+          <button class="cip" data-kayit-tur="@tur" aria-pressed="@(k.Type == tur ? "true" : "false")" @onclick="() => Yama(type: tur)">@ad</button>
+        }
+      </div>
+    </div>
+
+    @if (panel)
+    {
+      <div class="card raised" id="ekPanel">
+        <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-plus"></use></svg> Ekle</span></div>
+        <div class="cip-grup" role="group" aria-label="Satır türü">
+          <button class="cip" id="ekTurParca" aria-pressed="@(ekTur == "Part" ? "true" : "false")" @onclick='() => ekTur = "Part"'><span class="k-tip-renk k-tip-parca"></span>Parça</button>
+          <button class="cip" id="ekTurIscilik" aria-pressed="@(ekTur == "Labor" ? "true" : "false")" @onclick='() => ekTur = "Labor"'><span class="k-tip-renk k-tip-iscilik"></span>İşçilik</button>
+        </div>
+        <div class="field"><label for="ekAd">@(ekTur == "Part" ? "Parça adı" : "Ne yapıldı")</label>
+          <input id="ekAd" @bind="ekAd" @bind:event="oninput" /></div>
+        <div class="field"><label for="ekTutar">Tutar (₺)</label>
+          <input id="ekTutar" class="mono" inputmode="numeric" placeholder="0" @bind="ekTutar" @bind:event="oninput" /></div>
+        @if (ekHata is not null)
+        {
+          <div class="notice warn" role="alert" id="ekHata"><span class="n-body">@ekHata</span></div>
+        }
+        <button class="btn btn-primary btn-lg" id="ekKaydet" @onclick="Ekle" disabled="@calisiyor">Ekle</button>
+        <button class="btn btn-ghost" id="ekVazgec" @onclick="() => panel = false">Vazgeç</button>
+      </div>
+    }
+
+    <div class="k-cubuk" id="kCubuk" role="toolbar" aria-label="Servis kaydı işleri">
+      <button id="kParcaEkle" @onclick="PaneliAc"><svg class="ico"><use href="#i-plus"></use></svg>Ekle</button>
+    </div>
+  }
+</section>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    static readonly (string Tur, string Ad)[] Turler = [("Repair", "Tamirat"), ("Maintenance", "Bakım"), ("Both", "Tamirat + Bakım")];
+
+    RecordDetail? k;
+    VehicleCard? arac;
+    LineItem? silinen;
+    string? hata, ekHata;
+    bool panel, calisiyor;
+    string ekTur = "Part", ekAd = "", ekTutar = "";
+
+    static string Rakam(string s) => new(s.Where(char.IsAsciiDigit).ToArray());
+
+    static LineInput Girdi(LineItem s) => new(s.Kind, s.Name, s.Price, s.Cost, s.SuppliedBy);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () =>
+        {
+            k = await Api.RecordAsync(Id);
+            arac = await Api.VehicleAsync(k.VehicleId);
+        });
+    }
+
+    /// <summary>Her işin ortak kabı: oturum düştüyse girişe, hata API'nin Türkçe cümlesi.</summary>
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+
+    Task Yama(string? complaint = null, string? type = null, bool? waitingForPart = null, bool? showWaitingToCustomer = null)
+        => Calis(async () => k = await Api.PatchRecordAsync(Id, complaint, type, waitingForPart, showWaitingToCustomer));
+
+    Task Guncelle(LineItem s, LineInput yeni) => Calis(async () => k = await Api.UpdateLineAsync(Id, s.Id, yeni));
+
+    Task TurCevir(LineItem s) => Guncelle(s, Girdi(s) with { Kind = s.Kind == "Part" ? "Labor" : "Part" });
+
+    Task AdDegisti(LineItem s, ChangeEventArgs e) => Guncelle(s, Girdi(s) with { Name = e.Value?.ToString() ?? "" });
+
+    Task Getiren(LineItem s, string kim) => Guncelle(s, Girdi(s) with { SuppliedBy = kim });
+
+    Task FiyatDegisti(LineItem s, ChangeEventArgs e)
+    {
+        if (Format.ParseMoney(e.Value?.ToString()) is not { } fiyat) { hata = "Tutarı rakamla yaz — ör. 1.200"; return Task.CompletedTask; }
+        return Guncelle(s, Girdi(s) with { Price = fiyat });
+    }
+
+    Task Sil(LineItem s) => Calis(async () => { k = await Api.DeleteLineAsync(Id, s.Id); silinen = s; });
+
+    Task GeriAl() => silinen is not { } s ? Task.CompletedTask
+        : Calis(async () => { k = await Api.RestoreLineAsync(Id, s.Id); silinen = null; });
+
+    void PaneliAc() { panel = true; ekAd = ""; ekTutar = ""; ekHata = null; }
+
+    async Task Ekle()
+    {
+        if (string.IsNullOrWhiteSpace(ekAd)) { ekHata = "Ne yapıldığını ya da parçanın adını yaz."; return; }
+        if (Format.ParseMoney(ekTutar) is not { } fiyat) { ekHata = "Tutarı rakamla yaz — ör. 1.200"; return; }
+        ekHata = null;
+        await Calis(async () =>
+        {
+            k = await Api.AddLineAsync(Id, new LineInput(ekTur, ekAd.Trim(), fiyat, null, null));
+            panel = false;
+        });
+        if (hata is not null) { ekHata = hata; hata = null; }
+    }
+}
