@@ -1,8 +1,7 @@
 # D11 · Backend CI (K-076.11) — derle, test et, prototip eşdeğerliğini doğrula.
 #
-# ⚠️ YALNIZ ELLE TETİKLENİR (workflow_dispatch). Otomatik koşmaz: GitHub Actions özel depoda
-# dakika harcar (Windows dakikası 2 kat sayılır) — para Cemil'in kararı. Açmak için aşağıdaki
-# `on:` bloğuna `push: { branches: [main] }` ve `pull_request:` eklenir (K-076.11).
+# Her push'ta ve PR'da koşar (K-079.6): depo açık, açık depoda standart koşucu dakikası ücretsiz.
+# Depo yeniden özel yapılırsa push/pull_request kaldırılır — özel depoda Windows dakikası para (K-076.11).
 #
 # Neden Windows: testler gerçek MSSQL (LocalDB) üzerinde koşar — kiracı süzgeci, rowversion ve
 # süzgeçli tekil indeks SQLite'ta farklı davranır (ApiFactory). LocalDB yalnız Windows'ta var.
@@ -11,6 +10,9 @@
 name: backend
 
 on:
+  push:
+    branches: [main]
+  pull_request:
   workflow_dispatch:
 
 permissions:

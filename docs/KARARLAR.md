@@ -10,6 +10,52 @@
 
 ---
 
+## K-079 · Backend temel, proje yerelde biter; avans soruları cevaplandı (26.10.2026 — Cemil)
+
+Tur E+F inceleme rehberinin (`INCELEME-TUR-EF.md` §1a) cevapları.
+
+**79.1 · Müşteri avansı — üç öneri de onaylı.** Cemil: (a) *"Evet"* — avans **aracın sahibine**
+bağlı (müşteri araçtan türüyor, A-M1); (b) *"Evet"* — iş kapanınca avans **kendiliğinden düşmez**,
+usta seçer, "avanstan düş" teklif edilir; (c) *"Evet"* — kullanılmayan avans iade edilirse
+**kasadan çıkış** yazılır. Tasarım kapanmadı: ödemeler listesine bir yol olarak girer (K-078);
+sırası kuyrukta, önce akış (CLAUDE.md "tasarım-önce").
+
+**79.2 · ⚠️ ŞARTNAME DEĞİŞTİ — prototip artık davranışın şartnamesi değil.** Cemil: *"Prototip
+artık çok önemli değil. Backend'li projeyi temele alalım."* Bundan sonra:
+- **Yeni davranış backend'de tasarlanır**: kural → `VERI-MODELI.md` → test → kod. Prototipe önce
+  yazılmaz, sonradan da taşınmaz.
+- Var olan eşdeğerlik testleri (`PrototypeEquivalenceTests`, ses korpusu) **gerileme testi olarak
+  kalır**: bugün eşleşen davranışı korurlar. Backend bilerek ayrışırsa o testin beklentisi karar
+  numarasıyla güncellenir — eşdeğerlik artık hedef değil, emniyet kemeri.
+- **K-078.4 kapandı, backend kazanır:** teslimden sonra satır eklenince alınan para değişmez, kalan
+  yeniden hesaplanır. Prototip düzeltilmez.
+- Neden: tamirci sonunda backend'li uygulamayı kullanacak; iki yerde aynı kuralı yazmak her işi
+  ikiye katlıyordu ve ayrışmalar (78.4) zaten prototipin kendi tasarımını çiğnediği yerdeydi.
+
+**79.3 · Sunucu yatırımı yok — proje YERELDE biter.** Cemil: *"Şu an sunucu vb yatırım
+yapamıyoruz. Projeyi localde bitirmek gerekiyor."* "Bitti" = bu makinede (LocalDB + Api + Blazor)
+ana yol baştan sona çalışır. Ertelenenler ertelenmiş kalır: SMS paketi, şirket, alan adı, uzak
+yedek, ForwardedHeaders, sunucu kurulumu. Para isteyen tek açık kalem Gemini ruhsat okuması —
+ruhsat başına yarım kuruş (K-067.2b), önceden yüklenmiş krediden; açık kalır ama varsayılan kapalı
+(`Gemini__Enabled`).
+
+**79.4 · Gemini ilk gerçek okuma — sunucunun kendi okuyucusuyla, bir ruhsatla.** Cemil: *"Zaten
+vardı"* (anahtar kullanıcı ortamında). `GeminiRegistrationReader` depo dışındaki tek seferlik bir
+konsoldan, ölçüm setinin r01 fotoğrafıyla çağrıldı (11,2 sn). Okuyucunun döndürdüğü araç alanlarının **12'si de
+beklenenle aynı** (plaka, marka, ticari ad, model yılı, renk tonu dahil, yakıt, şase, motor no,
+silindir, güç, koltuk, ilk tescil). Sahip alanları (TC/adres) boş döndü — 18.10'daki ölçümde de
+r01 için boştu, davranış değişmedi. Fotoğraf depoya da çıktıya da girmedi; kişisel alanlar
+basılmadı. Okuyucu hâlâ varsayılan kapalı.
+
+**79.5 · Netlify yayını onaylı** (*"Evet"*): plaka kuralı (E7), sesle ödeme düzeltme (E5), elden
+taksit (F1/F7). Prototip artık şartname olmasa da (79.2) telefonda denemek için yayında kalır.
+
+**79.6 · CI her push'ta koşar — depo açık, dakika ücretsiz.** K-076.11 CI'ı elle tetiklemeye
+bağlamıştı: özel depoda Windows dakikası para. Cemil depoyu açtı (tur F başı); açık depoda
+standart koşucular ücretsiz. `on:` bloğuna `push: main` + `pull_request` eklendi — böylece
+"bir kez elle koştur" (*"Evet"*) isteği de bu commit'in kendi koşusuyla karşılanır, kimlik
+gerekmeden açık API'den okunur.
+
 ## K-078 · Kısmi tahsilat koda geçiyor; müşteri avansı ayrı ve sonra (24.10.2026 — lider, Cemil onayına açık)
 
 Cemil kısmi tahsilat tasarımının dört sorusunu cevapladı (TASARIM-E6 §5b: teslimde kısmi
@@ -44,6 +90,7 @@ nakit alınmış işe 500'lük satır eklenirse kalan 500 olur. Prototip tam öd
 için alınan da 3.950'ye çıkar (kalan 0) — kendi tasarım kuralını çiğner. Eşdeğerlik senaryolarında bu
 durum yok, fark testlere yansımıyor. Öneri: prototipte tam ödeme de teslim anında `odemeler`e
 yazılsın (türetme kalksın). Küçük iş ama prototipin veri biçimini değiştirir → Cemil'e soru.
+  → **KAPANDI (K-079.2):** backend kazanır, prototip düzeltilmez.
 
 **78.5 · `Payment.Sequence` — yazılış sırası (F5, ölçümün bulduğu hata).** API testi "son taksiti
 geri al"da YANLIŞ taksitin silindiğini gösterdi: veritabanından yüklenen ödemeler yazılış sırasında

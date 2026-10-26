@@ -1,9 +1,10 @@
 # TAMIRON — Claude Code Talimatı
 
 Tamiron = tamirhane için servis kaydı + parça tedariki + basit ön muhasebe programı.
-**Faz: BACKEND (22.10.2026'dan beri, K-073).** Tasarım/şablon bitti; prototip
-(`prototypes/`) artık **davranışın şartnamesi**, `docs/VERI-MODELI.md` v2 **şemanın
-şartnamesi**. Backend `src/` + `tests/` altında, yığın `MIMARI.md` §2–§4.
+**Faz: BACKEND (22.10.2026'dan beri, K-073).** **Backend temeldir (K-079.2):** yeni davranış
+backend'de tasarlanır (kural → `docs/VERI-MODELI.md` → test → kod); prototip (`prototypes/`)
+artık şartname değil, telefonda denemek için yayında kalan eski bir taslak. Backend `src/` +
+`tests/` altında, yığın `MIMARI.md` §2–§4. **Proje yerelde biter (K-079.3)** — sunucu yatırımı yok.
 
 ## Bu depo 03.09.2026'da sıfırdan başladı
 
@@ -34,14 +35,14 @@ v1 (`github.com/DevCemilSaglam/Tamiron-v1`, 195 commit) bir prototipe kadar gitt
 ## Backend fazının kuralları (K-073)
 
 - **Önce test, sonra kod** (MIMARI §4.4). Para/tarih hesabı = **saf domain servisi**, DB'siz test edilir. Testsiz birleşmez.
-- **Prototipteki kural API'ye taşınırken davranışı korunur.** Kaynak: `VERI-MODELI.md` "İş kuralları" tablosu. Prototipteki fonksiyonun davranışı testin beklenen değeridir; davranış değişecekse önce karar.
+- **Kuralın kaynağı `VERI-MODELI.md` "İş kuralları" tablosu.** Prototipten taşınmış kuralların davranışı korunur; davranış değişecekse önce karar (K-079.2).
 - **Şemaya alan eklemek = önce `VERI-MODELI.md`.** Prototipe alan girerse derleme denetimi 9 yakalar; backend'de aynı disiplin.
 - **Gün-1'de kalabalık yok** (MIMARI §3): yalnız Domain · Application · Infrastructure · Api + testler. UI projeleri, Redis, Docker, Hangfire ihtiyaç anında.
 - Gizli bilgi (bağlantı dizgesi parolası, API anahtarı) **depoya girmez**: geliştirmede LocalDB + Windows kimliği; gerisi kullanıcı ortam değişkeni.
 - Derle ve test et: `dotnet build Tamiron.sln` · `dotnet test Tamiron.sln`.
 - Kuralı koruyan test var mı: `python tools/mutasyon.py <mutasyonlar.json>` — kuralı bozar, en az bir test kırmızı olmalı.
 - İş sırası ve çalışma döngüsü: `docs/BACKEND-KUYRUGU.md`.
-- Prototip ↔ API muhasebe eşdeğerliği: `node tools/muhasebe-esdeger.js` prototipin kendi fonksiyonlarıyla rakamları döker; `PrototypeEquivalenceTests` 0 fark ister. Prototipte muhasebe kuralı değişirse araç yeniden koşulur.
+- Prototip ↔ API eşdeğerliği (`PrototypeEquivalenceTests`, ses korpusu) **gerileme testidir**, hedef değil (K-079.2): bugün eşleşeni korur; backend bilerek ayrışırsa beklenti karar numarasıyla güncellenir. Araçlar: `node tools/muhasebe-esdeger.js`, `node tools/ses-sema-dok.js`.
 
 ## Araçlar
 - `tools/saglik-denetim.js` — prototip sağlık denetimi. **Her testi gerçekten yaşanmış bir hata sınıfını** otomatikleştiriyor; ekranları değil hata türlerini test eder, o yüzden yeni prototipte de geçerli.
