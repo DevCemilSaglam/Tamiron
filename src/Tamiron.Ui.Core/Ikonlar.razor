@@ -1,0 +1,19 @@
+@*
+  G1 · İkon kümesi — prototipin ikonlar.svg'si (Lucide, <symbol>), sayfaya BİR KEZ gömülür;
+  ekranlar <svg class="ico"><use href="#i-..."/></svg> ile kullanır (prototiple aynı yazım).
+*@
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">@((MarkupString)Kume)</svg>
+
+@code {
+    static readonly string Kume = Oku();
+
+    static string Oku()
+    {
+        using var s = typeof(Ikonlar).Assembly.GetManifestResourceStream("Tamiron.Ui.Core.ikonlar.svg")!;
+        return new StreamReader(s).ReadToEnd();
+    }
+
+    /// <summary>Kümede tanımlı ikon adları (testler <c>use href</c>'lerin karşılığını arar).</summary>
+    public static IReadOnlySet<string> Adlar { get; } =
+        System.Text.RegularExpressions.Regex.Matches(Kume, @"id=""([\w-]+)""").Select(m => m.Groups[1].Value).ToHashSet();
+}

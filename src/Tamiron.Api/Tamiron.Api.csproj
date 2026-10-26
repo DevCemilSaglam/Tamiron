@@ -3,6 +3,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Tamiron.Application\Tamiron.Application.csproj" />
     <ProjectReference Include="..\Tamiron.Infrastructure\Tamiron.Infrastructure.csproj" />
+    <!-- G1 · Arayüzü API sunar (K-080.1): tek komut, tek adres. -->
+    <ProjectReference Include="..\Tamiron.Tamirhane.Web\Tamiron.Tamirhane.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -13,6 +15,7 @@
     <!-- D18 · OpenAPI belgesi (yalnız geliştirme/test). .NET 8'de belge üretimi ayrı pakette. -->
     <PackageReference Include="Swashbuckle.AspNetCore.SwaggerGen" Version="6.9.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.9.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.33" />
   </ItemGroup>
 
   <ItemGroup>

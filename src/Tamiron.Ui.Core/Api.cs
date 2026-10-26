@@ -20,6 +20,9 @@ public sealed record RecordListItem(Guid Id, Guid VehicleId, string PlateNo, str
 
 public sealed record RecordList(int InShopCount, int Count, IReadOnlyList<RecordListItem> Items);
 
+public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
+                                 decimal CollectedToday, decimal Receivable, int DueReminderCount);
+
 /// <summary>API'nin Türkçe hatası (Problem Details: code + title). Ekran <see cref="Exception.Message"/>'ı olduğu gibi gösterir.</summary>
 public sealed class ApiException(HttpStatusCode status, string? code, string message) : Exception(message)
 {
@@ -48,6 +51,25 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     }
 
     public async Task<bool> HasSessionAsync() => !string.IsNullOrEmpty(await tokens.GetAsync());
+
+    /// <summary>G1 · Yeni dükkân (D6): kayıtlı olmayan numaraya kod; kod + dükkân adı → oturum.</summary>
+    public async Task RequestSignupCodeAsync(string phone) => await Send(HttpMethod.Post, "api/auth/signup/code", new { phone }, auth: false);
+
+    public async Task<LoginResult> SignUpAsync(string phone, string code, string shopName, string? device)
+    {
+        var r = await Read<LoginResult>(await Send(HttpMethod.Post, "api/auth/signup", new { phone, code, shopName, deviceName = device }, auth: false));
+        await tokens.SetAsync(r.Token);
+        return r;
+    }
+
+    /// <summary>Çıkış bu cihazın oturumunu bitirir (K-074). Sunucuya ulaşılamasa da anahtar burada silinir.</summary>
+    public async Task LogoutAsync()
+    {
+        try { (await Send(HttpMethod.Post, "api/auth/logout", null, auth: true)).Dispose(); }
+        finally { await tokens.SetAsync(null); }
+    }
+
+    public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
     public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
     {

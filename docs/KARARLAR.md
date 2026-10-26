@@ -10,6 +10,38 @@
 
 ---
 
+## K-080 · Yerel kurulum: tek komut, tek adres, kod pencerede (26.10.2026 — lider, Cemil onayına açık)
+
+Tur G'nin ilk işi (G1). K-079.3 "proje yerelde biter"in ne demek olduğunu somutlaştırır.
+
+**80.1 · Tek komut: `tools/yerel-baslat.ps1`.** Uygulamayı `.yerel\` klasörüne derler (depoya girmez),
+**Local** ortamında başlatır, hazır olunca tarayıcıda `http://localhost:5090` açar.
+- **Arayüzü API sunar** (aynı köken, K-076.10): ayrı Blazor sunucusu, CORS, iki adres yok.
+  Tanınmayan `/api/...` yolu arayüz sayfasına düşmez, Türkçe 404 döner (istemci HTML'i JSON sanırdı).
+- **Veritabanı `TamironYerel`** — geliştirmenin `TamironDev`'inden (prototip tohumu) AYRI ve boş.
+  Göçler açılışta uygulanır; dükkânı usta girişteki **"Dükkânımı kaydet"** ile açar (D6'nın ucu
+  artık ekranda).
+- **SMS paketi yok → giriş kodu sunucu penceresinde yazar** ("SMS GÖNDERİLMEDİ (paket yok) — kod
+  burada → …"). Netgsm hesabı tanımlı olsa bile yerelde gönderilmez (para). Seçim `Hosting`'te, testli.
+- Neden: usta tek bir şeye tıklasın; iki program (API + arayüz) açtırmak "karmaşık geldi"nin aynısı.
+
+**80.2 · ⚠️ AÇIK — telefondan erişim.** Şimdilik uygulama yalnız bu bilgisayarın tarayıcısında açılır
+(`localhost`). Aynı Wi-Fi'deki telefondan açmak için uygulamanın ağa dinlemesi ve **Windows güvenlik
+duvarına kural** gerekir — makine ayarı, Cemil'in kararı. Prototip telefonda Netlify'dan denenmeye
+devam eder.
+
+**80.3 · Satır mikrofonları ses işiyle gelir.** Ana menüde prototipteki satır mikrofonları YOK:
+çalışmayan düğme konmaz. Tarayıcının konuşma tanıması (Chrome) sesi Google'a gönderir — ses
+sağlayıcısı "Dokunulmayacaklar"da (Cemil'de, K-067/K-070). Kuyrukta G13, **BEKLİYOR**.
+
+**80.4 · Yalın `.btn` yasak.** Prototipte her düğme bir tür taşır (`btn-primary`, `btn-ghost`); türsüz
+`.btn` renksiz — koyu temada beyaz zemin + açık yazı oldu (tarayıcıda görüldü). Arayüz testi her
+`class="btn…"`in türünü ve her `#i-…` ikonunun kümede olduğunu denetler (prototipte yaşanmış iki hata
+sınıfı). İkonlar prototipin `ikonlar.svg`'sinden gömülür — kopya yok.
+
+**80.5 · `Microsoft.AspNetCore.Components.WebAssembly.Server` 8.0.33.** 8.0.11'in yüksek önemli bir
+açığı var (NuGet uyarısı NU1903); arayüzü sunan paket en son 8.0 yamasıyla girdi.
+
 ## K-079 · Backend temel, proje yerelde biter; avans soruları cevaplandı (26.10.2026 — Cemil)
 
 Tur E+F inceleme rehberinin (`INCELEME-TUR-EF.md` §1a) cevapları.

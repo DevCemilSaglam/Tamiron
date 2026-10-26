@@ -18,6 +18,13 @@ public static class DevSeed
     public static readonly Guid ShopId = Guid.Parse("7a3e0c1e-0000-4000-8000-000000000001");
     public const string DevPhone = "0532 000 00 00";
 
+    /// <summary>YEREL kurulum (G1): yalnız göçler — tohum yok, dükkânı usta kendisi açar (D6).</summary>
+    public static async Task MigrateAsync(IServiceProvider sp)
+    {
+        using var scope = sp.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<TamironDbContext>().Database.MigrateAsync();
+    }
+
     public static async Task RunAsync(IServiceProvider sp)
     {
         using var scope = sp.CreateScope();

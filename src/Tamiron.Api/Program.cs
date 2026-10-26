@@ -30,10 +30,11 @@ var netgsm = NetgsmOptions.From(builder.Configuration);
 var gemini = GeminiOptions.From(builder.Configuration);
 if (gemini is not null)
     builder.Services.AddSingleton<IRegistrationReader>(_ => new GeminiRegistrationReader(new HttpClient { Timeout = TimeSpan.FromSeconds(60) }, gemini));
-if (builder.Environment.IsDevelopment()) builder.Services.AddSingleton<ISmsSender, DevLogSmsSender>();
-else if (netgsm is not null)
-    builder.Services.AddSingleton<ISmsSender>(_ => new NetgsmSmsSender(new HttpClient { Timeout = TimeSpan.FromSeconds(15) }, netgsm));
-else builder.Services.AddSingleton<ISmsSender, NotConfiguredSmsSender>();
+// G1 · Ortama göre seçim Hosting'te (testli): geliştirme ve YEREL kurulumda kod pencereye yazılır (K-080.1).
+var smsType = Hosting.SmsSenderType(builder.Environment.EnvironmentName, netgsm);
+if (smsType == typeof(NetgsmSmsSender))
+    builder.Services.AddSingleton<ISmsSender>(_ => new NetgsmSmsSender(new HttpClient { Timeout = TimeSpan.FromSeconds(15) }, netgsm!));
+else builder.Services.AddSingleton(typeof(ISmsSender), smsType);
 builder.Services.AddProblemDetails();
 // Okunamayan istek SESSİZ 400 yazmasın, istisna atsın: ErrorMiddleware onu Türkçe
 // Problem Details'e çevirir (C7). Varsayılan, geliştirme dışında gövdesiz 400'dü.
@@ -108,8 +109,15 @@ app.MapGet("/health", async (Tamiron.Infrastructure.TamironDbContext db, Cancell
     return up ? Results.Ok(new { status = "ok" }) : Results.Json(new { status = "down" }, statusCode: 503);
 });
 
-if (app.Environment.IsDevelopment())
+if (Hosting.WritesDevSeed(app.Environment.EnvironmentName))
     await DevSeed.RunAsync(app.Services);
+else if (Hosting.MigratesOnStart(app.Environment.EnvironmentName))
+    await DevSeed.MigrateAsync(app.Services);
+
+// G1 · Arayüz API'yle AYNI kökenden (K-076.10, K-080.1): tek komut, tek adres, CORS yok.
+// Blazor dosyaları Tamiron.Tamirhane.Web'den gelir; ekran yolları (/kayitlar …) index.html'e düşer.
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
 
 var api = app.MapGroup("/api");
 
@@ -300,6 +308,11 @@ api.MapPost("/records/{id:guid}/collect/undo", (Guid id, ISender s, Cancellation
 
 api.MapGet("/cash", (PeriodKind period, ISender s, CancellationToken ct) =>
     s.Send(new GetCashSummary(period), ct));
+
+// Tanınmayan /api yolu arayüz sayfasına DÜŞMEZ — istemci HTML'i JSON sanıp bozulurdu.
+app.MapFallback("/api/{**rest}", () => Results.Problem(statusCode: 404, title: "Böyle bir istek yok.",
+    extensions: new Dictionary<string, object?> { ["code"] = "request.not_found" }));
+app.MapFallbackToFile("index.html");
 
 app.Run();
 

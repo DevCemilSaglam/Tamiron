@@ -27,12 +27,12 @@ public sealed class NotConfiguredRegistrationReader : IRegistrationReader
         => throw new ReaderNotConfiguredException();
 }
 
-/// <summary>YALNIZ GELİŞTİRME: SMS gitmez, günlüğe yazılır — usta yok, geliştirici kodu konsoldan okur.</summary>
+/// <summary>GELİŞTİRME ve YEREL kurulum (K-080.1): SMS gitmez, kod sunucu penceresine/günlüğe yazılır.</summary>
 public sealed class DevLogSmsSender(Microsoft.Extensions.Logging.ILogger<DevLogSmsSender> log) : ISmsSender
 {
     public Task SendAsync(string phone, string text, CancellationToken ct)
     {
-        Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(log, "SMS (geliştirme, gönderilmedi) → {Phone}: {Text}", phone, text);
+        Microsoft.Extensions.Logging.LoggerExtensions.LogWarning(log, "SMS GÖNDERİLMEDİ (paket yok) — kod burada → {Phone}: {Text}", phone, text);
         return Task.CompletedTask;
     }
 }

@@ -40,6 +40,7 @@ v1 (`github.com/DevCemilSaglam/Tamiron-v1`, 195 commit) bir prototipe kadar gitt
 - **Gün-1'de kalabalık yok** (MIMARI §3): yalnız Domain · Application · Infrastructure · Api + testler. UI projeleri, Redis, Docker, Hangfire ihtiyaç anında.
 - Gizli bilgi (bağlantı dizgesi parolası, API anahtarı) **depoya girmez**: geliştirmede LocalDB + Windows kimliği; gerisi kullanıcı ortam değişkeni.
 - Derle ve test et: `dotnet build Tamiron.sln` · `dotnet test Tamiron.sln`.
+- Yerelde aç (ustanın kurulumu, K-080): `powershell -ExecutionPolicy Bypass -File tools\yerel-baslat.ps1` → `http://localhost:5090`; giriş kodu pencerede. Geliştirme (tohumlu): `.claude/launch.json` → `api`.
 - Kuralı koruyan test var mı: `python tools/mutasyon.py <mutasyonlar.json>` — kuralı bozar, en az bir test kırmızı olmalı.
 - İş sırası ve çalışma döngüsü: `docs/BACKEND-KUYRUGU.md`.
 - Prototip ↔ API eşdeğerliği (`PrototypeEquivalenceTests`, ses korpusu) **gerileme testidir**, hedef değil (K-079.2): bugün eşleşeni korur; backend bilerek ayrışırsa beklenti karar numarasıyla güncellenir. Araçlar: `node tools/muhasebe-esdeger.js`, `node tools/ses-sema-dok.js`.
