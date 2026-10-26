@@ -78,10 +78,20 @@ internal sealed class GetServiceRecordHandler(ITamironDb db) : IRequestHandler<G
 /// ⚠️ Aynı aracın açık kaydı varken ikinci kayıt ENGELLENMEZ — prototip de
 /// engellemiyor; engellenmesi bir ürün kararı olur, sessizce eklenmez.
 /// </summary>
-public sealed record OpenServiceRecord(string Plate, string? Complaint, ServiceType? Type = null, string? Km = null)
+public sealed record OpenServiceRecord(string Plate, string? Complaint, ServiceType? Type = null, string? Km = null,
+                                       NewVehicleInfo? Vehicle = null)
     : IRequest<ServiceRecordDto>;
 
-internal sealed class OpenServiceRecordHandler(ITamironDb db, ITenantContext tenant) : IRequestHandler<OpenServiceRecord, ServiceRecordDto>
+/// <summary>
+/// G2 · Kayıt açma ekranında KAYITLI OLMAYAN araç için elle yazılanlar (prototip 20-ruhsat araç kartı).
+/// Yalnız araç bu istekte YARATILIYORSA yazılır — kayıtlı aracın bilgisi buradan ezilmez (araç ekranı
+/// düzeltir). Biçim/geçerlilik domain'de (VehicleFields); biri geçersizse ne araç ne kayıt yazılır.
+/// </summary>
+public sealed record NewVehicleInfo(string? Brand = null, string? Model = null, string? Year = null, string? Engine = null,
+                                    string? Color = null, string? FuelType = null, string? Vin = null,
+                                    string? OwnerName = null, string? OwnerPhone = null);
+
+internal sealed class OpenServiceRecordHandler(ITamironDb db, ITenantContext tenant, IClock clock) : IRequestHandler<OpenServiceRecord, ServiceRecordDto>
 {
     public async Task<ServiceRecordDto> Handle(OpenServiceRecord c, CancellationToken ct)
     {
@@ -93,6 +103,18 @@ internal sealed class OpenServiceRecordHandler(ITamironDb db, ITenantContext ten
         if (vehicle is null)
         {
             vehicle = new Vehicle { TenantId = tenant.TenantId, PlateNo = plate };
+            if (c.Vehicle is { } i)
+            {
+                vehicle.Brand = VehicleFields.Text(i.Brand);
+                vehicle.Model = VehicleFields.Text(i.Model);
+                vehicle.Year = VehicleFields.Year(i.Year, clock.Today.Year);
+                vehicle.Engine = VehicleFields.Text(i.Engine);
+                vehicle.Color = VehicleFields.Text(i.Color);
+                vehicle.FuelType = VehicleFields.Text(i.FuelType);
+                vehicle.Vin = VehicleFields.Code(i.Vin);   // K-068: şase ana alanda
+                vehicle.OwnerName = VehicleFields.Text(i.OwnerName);
+                vehicle.OwnerPhone = VehicleFields.Phone(i.OwnerPhone);
+            }
             db.Vehicles.Add(vehicle);
         }
 

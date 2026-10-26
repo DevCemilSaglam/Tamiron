@@ -399,6 +399,8 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Son (sonradan alınan) ödeme geri alınır; teslimdeki teslimle gider | `sonOdemeyiGeriAl` | `ServiceRecord.UndoCollection` · `UndoDelivery` | K-078 · K-078.1 |
 | Göç: var olan teslimli kayda ödeme satırı; kasa önce/sonra aynı | — | `Payments` göçü + `MigrationUpgradeTests` | K-078 |
 | Sesle "x aldım": yalnız kalanı olan iş; fiil + tutar ya da "kalanını"; yol söylenmezse onayda sorulur | `sesOdemeAl` · `odeme-al` şeması | `SesCozumleyici` (`odeme-al`) — cihazda | K-078.7 |
+| Plaka sorusu: geçerli mi (ipucu), kayıtlı araç, açık kaydı (en yeni teslimsiz) | `ruhsatDurum` | `LookupPlate` (`GET /api/vehicles/lookup`) | K-080.6 |
+| Kayıt açarken kayıtsız aracın bilgileri kayıtla tek istekte; biri geçersizse hiçbiri; kayıtlı araç ezilmez | `kaydiAc` (iki ayrı yazım) | `OpenServiceRecord.Vehicle` (`NewVehicleInfo`) | K-080.6 |
 | Alacak bir bakiyedir, döneme tabi değil | muhasebe alacak tablosu | `ListReceivables` (araç süzgeçli: `?vehicleId=`) | 05.09 |
 | Dönem: bugün · bu ay · bu yıl (1 Ocak'tan bugüne) | `donemBasi` · `donemIcinde` | `Period.Of` | 05.09 |
 | Hatırlatma: ay **veya** km, hangisi önce; km ancak iki ölçümle | `hatirlatmaHesapla` · `gunlukKm` | `MaintenanceReminder.Compute` | 03.09 · K-073.9 (ay sonu sapması) |

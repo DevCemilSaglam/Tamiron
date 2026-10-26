@@ -20,6 +20,17 @@ public sealed record RecordListItem(Guid Id, Guid VehicleId, string PlateNo, str
 
 public sealed record RecordList(int InShopCount, int Count, IReadOnlyList<RecordListItem> Items);
 
+/// <summary>G2 · Plaka sorusunun cevabı (API LookupPlate): geçerli mi, ipucu, kayıtlı araç, açık kaydı.</summary>
+public sealed record PlateLookup(string Plate, bool Valid, string? Hint, VehicleBrief? Vehicle, Guid? OpenRecordId);
+
+public sealed record VehicleBrief(Guid Id, string PlateNo, string? Brand, string? Model, string? OwnerName, bool HasPartIdentity);
+
+/// <summary>Kayıtlı olmayan araç için ekranda yazılanlar — kayıtla AYNI istekte gider (API NewVehicleInfo).</summary>
+public sealed record NewVehicleInfo(string? Brand, string? Model, string? Year, string? Engine, string? Color,
+                                    string? FuelType, string? Vin, string? OwnerName, string? OwnerPhone);
+
+public sealed record OpenedRecord(Guid Id, Guid VehicleId, string PlateNo);
+
 public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
                                  decimal CollectedToday, decimal Receivable, int DueReminderCount);
 
@@ -68,6 +79,12 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         try { (await Send(HttpMethod.Post, "api/auth/logout", null, auth: true)).Dispose(); }
         finally { await tokens.SetAsync(null); }
     }
+
+    public async Task<PlateLookup> LookupPlateAsync(string plate)
+        => await Read<PlateLookup>(await Send(HttpMethod.Get, "api/vehicles/lookup?plate=" + Uri.EscapeDataString(plate), null, auth: true));
+
+    public async Task<OpenedRecord> OpenRecordAsync(string plate, NewVehicleInfo? vehicle)
+        => await Read<OpenedRecord>(await Send(HttpMethod.Post, "api/records", new { plate, complaint = "", vehicle }, auth: true));
 
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 

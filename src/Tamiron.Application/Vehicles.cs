@@ -22,6 +22,13 @@ public sealed record VehicleDto(
         v.HasPartIdentity, v.MissingForParts);
 }
 
+/// <summary>
+/// G2 · Kayıt açma ekranının plaka sorusu (prototip ruhsatDurum): plaka geçerli mi (ipucu prototipin
+/// cümlesi), araç kayıtlı mı, serviste AÇIK kaydı var mı ("Açık kayda git"). Ekran karar vermez.
+/// </summary>
+public sealed record PlateLookup(string Plate, bool Valid, string? Hint, VehicleDto? Vehicle, Guid? OpenRecordId);
+public sealed record LookupPlate(string? Plate) : IRequest<PlateLookup>;
+
 public sealed record GetVehicle(Guid Id) : IRequest<VehicleDto>;
 public sealed record FindVehicleByPlate(string Plate) : IRequest<VehicleDto>;
 
@@ -40,8 +47,22 @@ public sealed record PatchVehicle(Guid Id,
 internal sealed class VehicleHandlers(ITamironDb db, IClock clock) :
     IRequestHandler<GetVehicle, VehicleDto>,
     IRequestHandler<FindVehicleByPlate, VehicleDto>,
-    IRequestHandler<PatchVehicle, VehicleDto>
+    IRequestHandler<PatchVehicle, VehicleDto>,
+    IRequestHandler<LookupPlate, PlateLookup>
 {
+    public async Task<PlateLookup> Handle(LookupPlate q, CancellationToken ct)
+    {
+        var p = Plate.Normalize(q.Plate);
+        if (!Plate.IsValid(p))
+            return new(p, false, string.IsNullOrWhiteSpace(p) ? null : "Plaka eksik — ör. 34 ABC 123", null, null);
+        var v = await db.Vehicles.AsNoTracking().FirstOrDefaultAsync(x => x.PlateNo == p, ct);
+        if (v is null) return new(p, true, null, null, null);
+        // Açık kayıt = teslim edilmemiş (K-004). Birden çoksa en yenisi (K-076.4 ile aynı seçim).
+        var open = await db.ServiceRecords.AsNoTracking().Where(r => r.VehicleId == v.Id && r.DeliveredAt == null)
+            .OrderByDescending(r => r.DateTimeCreated).Select(r => (Guid?)r.Id).FirstOrDefaultAsync(ct);
+        return new(p, true, null, VehicleDto.From(v), open);
+    }
+
     public async Task<VehicleDto> Handle(GetVehicle q, CancellationToken ct)
         => VehicleDto.From(await db.Vehicles.AsNoTracking().FirstOrDefaultAsync(v => v.Id == q.Id, ct)
                            ?? throw new NotFoundException("Araç"));

@@ -39,6 +39,18 @@ sağlayıcısı "Dokunulmayacaklar"da (Cemil'de, K-067/K-070). Kuyrukta G13, **B
 `class="btn…"`in türünü ve her `#i-…` ikonunun kümede olduğunu denetler (prototipte yaşanmış iki hata
 sınıfı). İkonlar prototipin `ikonlar.svg`'sinden gömülür — kopya yok.
 
+**80.6 · Kayıt açma ekranı (G2) — plaka sorusu API'de, yeni aracın bilgisi kayıtla tek istekte.**
+- **`GET /api/vehicles/lookup?plate=`**: geçerli mi (+ prototipin ipucu cümlesi), kayıtlı araç, serviste
+  **açık kaydı** (en yeni teslimsiz). Ekran her yazışta sorar, geç gelen eski cevabı atar.
+- **Kayıtlı olmayan aracın elle yazılanları** (marka, model, yıl, motor, renk, yakıt, şase, sahip,
+  telefon) `POST /api/records`'a `vehicle` olarak gider: biri geçersizse (ör. yıl 1890) **ne araç ne
+  kayıt** yazılır. Prototipte araç önce, kayıt sonra ayrı yazılıyordu — sunucuda iki istek yarım kalabilirdi.
+- **Kayıtlı aracın bilgisi bu ekrandan ezilmez** (aynı plakayla gönderilse bile): düzeltme araç ekranında.
+- **"Şase numarası yok" uyarısı parça kimliğine bağlı** (K-068: şase YA DA marka+model+yıl+motor).
+  Prototip yalnız şaseye bakıyordu; dört alanı dolu araca "ruhsat ya da araç seçimi gerekir" demek
+  yanlıştı. Backend temel (K-079.2).
+- Ruhsatı çek sekmesi ayrı iş (**G2b**); km ve tür burada sorulmaz (prototip 07.09, K-033.1).
+
 **80.5 · `Microsoft.AspNetCore.Components.WebAssembly.Server` 8.0.33.** 8.0.11'in yüksek önemli bir
 açığı var (NuGet uyarısı NU1903); arayüzü sunan paket en son 8.0 yamasıyla girdi.
 

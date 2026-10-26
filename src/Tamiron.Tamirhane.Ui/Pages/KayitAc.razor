@@ -1,0 +1,152 @@
+@page "/kayit-ac"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G2 · Servis kaydı ekle (EKRANLAR §2, prototip 20-ruhsat). Plaka kapının kendisi (K-026): her yazışta
+  API'ye sorulur — geçerli mi, kayıtlı mı, açık kaydı var mı (LookupPlate). Ekran yalnız cevabı gösterir.
+  Kayıtlı OLMAYAN araçta araç kartı açılır; yazılanlar kayıtla AYNI istekte gider (yarım kalmaz).
+  Kayıtlı aracın bilgisi burada sorulmaz, ezilmez — araç ekranı düzeltir.
+  Düğme plaka geçerli olmadan YOK (sönük değil, yok — rEylemCiz); varsa her zaman basılır.
+  ⚠️ Henüz yok: "Ruhsatı çek" sekmesi (G2b), sesle söyleme (G13), ruhsatın akordiyondaki alanları
+  (araç ekranında, G9). Tür ve km burada sorulmaz (K-033.1, 07.09) — servis kaydında.
+*@
+<section class="screen active" id="screen-ruhsat">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-plus"></use></svg> Servis kaydı ekle</span>
+  </div>
+
+  <div class="yigin">
+    <div class="card raised">
+      <div class="plate-input-wrap">
+        <div class="plate-field">
+          <span class="tr-tag">TR</span>
+          <input id="rPlaka" type="text" maxlength="11" placeholder="34 ABC 123" autocomplete="off" spellcheck="false"
+                 aria-label="Plaka" value="@plaka" @oninput="PlakaYazildi" />
+        </div>
+        <div class="plate-hint @(cevap?.Hint is not null ? "warn" : "")" id="rPlakaIpucu" role="status">@cevap?.Hint</div>
+      </div>
+    </div>
+
+    <div id="rTanima">
+      @if (cevap is { Valid: true, Vehicle: { } a })
+      {
+        <div class="notice ok">
+          <span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>
+          <span class="n-body"><b>Bu araç kayıtlı</b> — @AracAdi(a).<br>
+            @if (cevap.OpenRecordId is not null) { <text>Zaten <b>serviste</b> ve açık bir kaydı var.</text> }
+            else if (a.HasPartIdentity) { <text>Ruhsat çekmene gerek yok.</text> }
+            else { <text>Şase numarası yok — parça sorarken ruhsat ya da araç seçimi gerekir.</text> }
+          </span>
+        </div>
+        @if (cevap.OpenRecordId is { } acik)
+        {
+          <button class="btn btn-ghost" id="acikKayit" @onclick='() => Nav.NavigateTo($"/kayit/{acik}")'>
+            <svg class="ico"><use href="#i-clipboard-list"></use></svg> Açık kayda git
+          </button>
+        }
+      }
+      else if (cevap is { Valid: true })
+      {
+        <div class="notice warn">
+          <span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>
+          <span class="n-body"><b>Bu araç kayıtlı değil.</b> Ruhsatı çekebilirsin ya da bu aşamayı atlayabilirsin.</span>
+        </div>
+      }
+    </div>
+
+    @if (cevap is { Valid: true, Vehicle: null })
+    {
+      <div class="card" id="rAracKart">
+        <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç bilgileri</span></div>
+        <div class="field-2">
+          <div class="field"><label for="rMarka">Marka</label><input id="rMarka" @bind="marka" @bind:event="oninput" /></div>
+          <div class="field"><label for="rModel">Model</label><input id="rModel" @bind="model" @bind:event="oninput" /></div>
+        </div>
+        <div class="field-2">
+          <div class="field"><label for="rYil">Yıl</label><input id="rYil" class="mono" inputmode="numeric" placeholder="2018" @bind="yil" @bind:event="oninput" /></div>
+          <div class="field"><label for="rMotor">Motor</label><input id="rMotor" placeholder="1.5 dCi" @bind="motor" @bind:event="oninput" /></div>
+        </div>
+        <div class="field-2">
+          <div class="field"><label for="rRenk">Renk</label><input id="rRenk" placeholder="Gri Metalik" @bind="renk" @bind:event="oninput" /></div>
+          <div class="field"><label for="rYakit">Yakıt</label><input id="rYakit" placeholder="Dizel" @bind="yakit" @bind:event="oninput" /></div>
+        </div>
+        <div class="field">
+          <label for="rVin">Şase no</label>
+          <input id="rVin" class="mono" placeholder="VF1RFB00858123456" autocomplete="off" @bind="sase" @bind:event="oninput" />
+          <div class="plate-hint">Ruhsattan okunur. Parça sorarken gerekir.</div>
+        </div>
+        <div class="field">
+          <label for="rSahip">Sahibi</label>
+          <input id="rSahip" placeholder="ad soyad ya da firma" autocomplete="off" @bind="sahip" @bind:event="oninput" />
+        </div>
+        <div class="field">
+          <label for="rTel">Telefon</label>
+          <input id="rTel" class="mono" inputmode="tel" placeholder="0532 000 00 00" autocomplete="off" @bind="tel" @bind:event="oninput" />
+          <div class="plate-hint">Ruhsatta yazmaz — isteğe bağlı. Bakım hatırlatması ve özet buraya gider.</div>
+        </div>
+      </div>
+    }
+
+    @if (hata is not null)
+    {
+      <div class="notice warn" role="alert" id="rHata"><span class="n-body">@hata</span></div>
+    }
+
+    @if (cevap is { Valid: true })
+    {
+      <button class="btn btn-primary btn-lg" id="kaydiAc" @onclick="KaydiAc" disabled="@calisiyor">
+        <svg class="ico"><use href="#i-check"></use></svg> @(cevap.Vehicle is null ? "Ruhsat adımını geç ve kaydı aç" : "Kaydı aç")
+      </button>
+    }
+  </div>
+</section>
+
+@code {
+    string plaka = "";
+    PlateLookup? cevap;
+    string? hata;
+    bool calisiyor;
+    int soru;   // her yazış bir soru; geç gelen eski cevap yenisini ezmesin
+    string marka = "", model = "", yil = "", motor = "", renk = "", yakit = "", sase = "", sahip = "", tel = "";
+
+    static string AracAdi(VehicleBrief a)
+        => string.Join(" · ", new[] { $"{a.Brand} {a.Model}".Trim(), a.OwnerName ?? "" }.Where(x => x.Length > 0));
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) Nav.NavigateTo("/giris");
+    }
+
+    async Task PlakaYazildi(ChangeEventArgs e)
+    {
+        plaka = e.Value?.ToString() ?? "";
+        hata = null;
+        var benim = ++soru;
+        if (string.IsNullOrWhiteSpace(plaka)) { cevap = null; return; }
+        try
+        {
+            var c = await Api.LookupPlateAsync(plaka);
+            if (benim == soru) cevap = c;
+        }
+        catch (ApiException ex) when (ex.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException ex) { if (benim == soru) hata = ex.Message; }
+    }
+
+    async Task KaydiAc()
+    {
+        if (cevap is not { Valid: true }) return;
+        static string? D(string s) => string.IsNullOrWhiteSpace(s) ? null : s;
+        var arac = cevap.Vehicle is null && new[] { marka, model, yil, motor, renk, yakit, sase, sahip, tel }.Any(x => !string.IsNullOrWhiteSpace(x))
+            ? new NewVehicleInfo(D(marka), D(model), D(yil), D(motor), D(renk), D(yakit), D(sase), D(sahip), D(tel))
+            : null;
+        hata = null; calisiyor = true;
+        try
+        {
+            var r = await Api.OpenRecordAsync(plaka, arac);
+            Nav.NavigateTo($"/kayit/{r.Id}");
+        }
+        catch (ApiException ex) when (ex.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException ex) { hata = ex.Message; }
+        finally { calisiyor = false; }
+    }
+}

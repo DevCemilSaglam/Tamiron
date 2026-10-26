@@ -272,6 +272,8 @@ api.MapGet("/vehicles/list", (string? q, ISender s, CancellationToken ct) => s.S
 // Araç (B6). PATCH: null = dokunma, "" = temizle.
 api.MapGet("/vehicles/{id:guid}", (Guid id, ISender s, CancellationToken ct) => s.Send(new GetVehicle(id), ct));
 api.MapGet("/vehicles", (string plate, ISender s, CancellationToken ct) => s.Send(new FindVehicleByPlate(plate), ct));
+// G2 · Kayıt açma ekranının plaka sorusu: geçerli mi, kayıtlı mı, açık kaydı var mı.
+api.MapGet("/vehicles/lookup", (string? plate, ISender s, CancellationToken ct) => s.Send(new LookupPlate(plate), ct));
 api.MapPatch("/vehicles/{id:guid}", (Guid id, PatchVehicle body, ISender s, CancellationToken ct) =>
     s.Send(body with { Id = id }, ct));
 
