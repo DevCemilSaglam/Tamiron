@@ -72,6 +72,18 @@ public class RecordDetailScreenTests : TestContext
     }
 
     [Fact]
+    public void Part_question_is_offered_while_in_shop_only()
+    {
+        // G10 · Parça fiyatı sor kaydın içinden açılır; teslim edilmiş işe parça sorulmaz.
+        var c = Ac(Kayit(IkiSatir, 2000));
+        c.WaitForElement("#kParcaSor").Click();
+        Assert.Equal($"http://localhost/kayit/{Id}/parca-sor", Nav.Uri);
+        var teslim = Ac(Kayit(IkiSatir, 2000, delivered: "\"2026-10-20\""));
+        teslim.WaitForElement("#kayitKunye");
+        Assert.Empty(teslim.FindAll("#kParcaSor"));
+    }
+
+    [Fact]
     public void Empty_record_says_what_to_do()
     {
         var c = Ac(Kayit());

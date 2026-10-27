@@ -1,0 +1,218 @@
+@page "/kayit/{Id:guid}/parca-sor"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@using Microsoft.JSInterop
+@*
+  G10b · Parça fiyatı sor (prototip 40-parca-sor). Sıra: araç kimliği (eksikse — K-068) → sorulacak
+  parçalar → kime → gidecek mesaj → gönder → gelen cevaplar.
+  Ne sorulacak, kimlik tamam mı, metin: API önizlemesi (gönderilenle aynı fonksiyon — gördüğün gider).
+  Düğme her zaman basılır; eksiği API söyler (sırası domain'de: parça · kimlik · parçacı).
+  Her parçacıya AYRI soru (Kol B). WhatsApp ustanın telefonundan açılır — tarayıcı tek dokunuşta tek
+  pencere açtırır, o yüzden ilki açılır, ötekiler kendi düğmesiyle.
+  Cevap: uygulama cevabı okumaz, usta yazar ("cevaplar kayda düşecek" demez). Yazılan fiyat ALIŞ olur;
+  "Müşteriye" yazılırsa satırın tutarı da o olur (K-076.2).
+  ⚠️ Henüz yok: "Ruhsatı çek" (kayıt açarken var), sesle (G13).
+*@
+<section class="screen active" id="screen-parca-sor">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-package"></use></svg> Parça fiyatı sor</span>
+    @if (kayit is not null) { <Plate No="@kayit.PlateNo" Size="plate-sm" /> }
+  </div>
+
+  @if (on is null)
+  {
+    @Bildirimler
+  }
+  else
+  {
+    @if (!on.HasPartIdentity)
+    {
+      <div class="card" id="psAracKart">
+        <div class="notice warn">
+          <span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>
+          <span class="n-body"><b>Şase no yok.</b> Parçacı doğru parçayı bulsun diye aracı yaz. Eksik: @string.Join(", ", on.Missing)</span>
+        </div>
+        <div class="field-2">
+          <div class="field"><label for="psMarka">Marka</label><input id="psMarka" autocomplete="off" value="@marka" @oninput="e => marka = e.Value?.ToString() ?? string.Empty" /></div>
+          <div class="field"><label for="psModel">Model</label><input id="psModel" autocomplete="off" value="@model" @oninput="e => model = e.Value?.ToString() ?? string.Empty" /></div>
+        </div>
+        <div class="field-2">
+          <div class="field"><label for="psYil">Yıl</label><input id="psYil" class="mono" inputmode="numeric" placeholder="2018" value="@yil" @oninput="e => yil = e.Value?.ToString() ?? string.Empty" /></div>
+          <div class="field"><label for="psMotor">Motor</label><input id="psMotor" placeholder="1.5 dCi" autocomplete="off" value="@motor" @oninput="e => motor = e.Value?.ToString() ?? string.Empty" /></div>
+        </div>
+        <button class="btn btn-primary" id="psAracKaydet" disabled="@calisiyor" @onclick="AracKaydet">Aracı kaydet</button>
+      </div>
+    }
+
+    <div class="card">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-package"></use></svg> Sorulacak parçalar</span></div>
+      <div id="psParcalar">
+        @if (on.Lines.Count == 0)
+        {
+          <div class="bos-durum"><b>Sorulacak parça yok</b><span>Fiyatı yazılmamış, senin alacağın bir parça satırı ekle.</span></div>
+          <button class="btn btn-ghost" id="psKayda" @onclick='() => Nav.NavigateTo($"/kayit/{Id}")'>
+            <svg class="ico"><use href="#i-clipboard-list"></use></svg> Servis kaydına dön</button>
+        }
+        @foreach (var l in on.Lines) { <div class="tutar-sat" data-parca="@l.Id">@l.Name</div> }
+      </div>
+    </div>
+
+    <div class="section-label with-action">
+      <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-user"></use></svg> Kime sorulacak?</span>
+      <button class="cip" id="psParcaciDuzenle" @onclick="ParcacilaraGit">Parçacılar</button>
+    </div>
+    @if (parcacilar is { Count: 0 })
+    {
+      <div class="notice">
+        <span class="n-body">Henüz parçacı yok — ad ve telefon yeter.</span>
+        <button class="btn btn-ghost" id="psParcaciEkle" @onclick="ParcacilaraGit"><svg class="ico"><use href="#i-plus"></use></svg> Parçacı ekle</button>
+      </div>
+    }
+    else if (parcacilar is not null)
+    {
+      <div class="cip-grup" id="psParcacilar" role="group" aria-label="Parçacı seç">
+        @foreach (var p in parcacilar)
+        {
+          <button class="cip" data-parcaci="@p.Id" aria-pressed="@(secili.Contains(p.Id) ? "true" : "false")" @onclick="() => Sec(p.Id)">@p.Name</button>
+        }
+      </div>
+    }
+
+    <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Gidecek mesaj</span></div>
+    <div class="notice accent">
+      <span class="n-ic"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg></span>
+      <span class="n-body ps-mesaj" id="psMesaj" style="white-space:pre-line">@on.Text</span>
+    </div>
+
+    @Bildirimler
+    <button class="btn btn-primary btn-lg" id="psGonder" disabled="@calisiyor" @onclick="Gonder">
+      <svg class="ico"><use href="#i-message-square"></use></svg>
+      <span>@(secili.Count > 1 ? $"{secili.Count} parçacıya WhatsApp'tan sor" : "WhatsApp ile gönder")</span>
+    </button>
+  }
+
+  @if (sorular is { Count: > 0 })
+  {
+    <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> Sorulanlar ve cevaplar</span></div>
+    <div id="psCevaplar">
+      @foreach (var s in sorular)
+      {
+        <div class="card" data-soru="@s.Id" @key="s.Id">
+          <div class="section-label with-action">
+            <span class="lbl-txt"><b>@s.SupplierName</b> · @s.SentAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture)</span>
+            <button class="cip" data-ac="@s.Id" @onclick="() => Ac(s)">WhatsApp'ta aç</button>
+          </div>
+          @foreach (var c in s.Replies)
+          {
+            var kullanilan = s.Lines.FirstOrDefault(l => l.SelectedReplyId == c.Id);
+            <div class="tutar-sat" data-cevap="@c.Id">
+              <span>@c.RawText@(kullanilan is null ? "" : $" · kayıtta bu ({kullanilan.Name})")</span>
+              <span class="tv">@(c.ParsedPrice is { } f ? $"{Format.Money(f)} ₺" : "")</span>
+            </div>
+          }
+          @foreach (var l in s.Lines)
+          {
+            var k = $"{s.Id}|{l.Id}";
+            <div class="field-2">
+              <div class="field"><label for="@($"psAlis-{s.Id}-{l.Id}")">@l.Name — parçacı ne dedi?</label>
+                <input id="@($"psAlis-{s.Id}-{l.Id}")" class="mono" inputmode="numeric" placeholder="Alış ₺" data-cevap-fiyat="@k" value="@Al(fiyat, k)" @oninput="e => fiyat[k] = e.Value?.ToString() ?? string.Empty" /></div>
+              <div class="field"><label for="@($"psMusteri-{s.Id}-{l.Id}")">Müşteriye (istersen)</label>
+                <input id="@($"psMusteri-{s.Id}-{l.Id}")" class="mono" inputmode="numeric" placeholder="₺" data-cevap-musteri="@k" value="@Al(musteri, k)" @oninput="e => musteri[k] = e.Value?.ToString() ?? string.Empty" /></div>
+            </div>
+            <button class="btn btn-ghost" data-cevap-yaz="@k" disabled="@calisiyor" @onclick="() => CevapYaz(s, l)">Kayda yaz</button>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    RecordDetail? kayit;
+    PriceQuestionPreview? on;
+    List<Supplier>? parcacilar;
+    List<PriceRequest>? sorular;
+    readonly List<Guid> secili = [];   // seçim sırası korunur: sorular bu sırayla açılır
+    readonly Dictionary<string, string> fiyat = new(), musteri = new();
+    string marka = "", model = "", yil = "", motor = "";
+    string? hata, sonuc;
+    bool calisiyor;
+
+    // Hata / sonuç DÜĞMENİN yanında çizilir: telefonda düğme ekranın dibinde, üstteki bildirim görünmez
+    // (tarayıcıda görüldü). Önizleme gelmediyse ekranın başında.
+    RenderFragment Bildirimler => @<text>
+        @if (hata is not null) { <div class="notice warn" role="alert" id="psHata"><span class="n-body">@hata</span></div> }
+        @if (sonuc is not null) { <div class="notice" role="status" id="psSonuc"><span class="n-body">@sonuc</span></div> }
+    </text>;
+
+    static string Al(Dictionary<string, string> d, string k) => d.GetValueOrDefault(k, "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () =>
+        {
+            kayit = await Api.RecordAsync(Id);
+            await Yenile();
+            parcacilar = await Api.SuppliersAsync();
+            if (!on!.HasPartIdentity)
+            {
+                var v = await Api.VehicleDetailAsync(kayit.VehicleId);
+                marka = v.Brand ?? ""; model = v.Model ?? ""; yil = v.Year ?? ""; motor = v.Engine ?? "";
+            }
+        });
+    }
+
+    async Task Yenile()
+    {
+        on = await Api.PriceQuestionAsync(Id);
+        sorular = await Api.PriceRequestsAsync(Id);
+    }
+
+    void Sec(Guid id) { if (!secili.Remove(id)) secili.Add(id); }
+
+    void ParcacilaraGit() => Nav.NavigateTo("/parcacilar?geri=" + Uri.EscapeDataString($"/kayit/{Id}/parca-sor"));
+
+    Task AracKaydet() => Calis(async () =>
+    {
+        await Api.PatchVehicleAsync(kayit!.VehicleId, new VehiclePatch(Brand: marka, Model: model, Year: yil, Engine: motor));
+        on = await Api.PriceQuestionAsync(Id);   // metin aracın yeni künyesiyle
+    });
+
+    Task Gonder() => Calis(async () =>
+    {
+        var giden = await Api.AskPricesAsync(Id, secili.ToList());
+        await Ac(giden[0]);
+        sonuc = giden.Count == 1
+            ? $"{giden[0].SupplierName} — WhatsApp açılıyor, mesaj hazır."
+            : $"{giden.Count} parçacıya soruldu. İlki açılıyor; ötekini aşağıdan aç. Cevap gelince fiyatı aşağıya yaz.";
+        secili.Clear();
+        await Yenile();
+    });
+
+    async Task Ac(PriceRequest s) => await JS.InvokeVoidAsync("open", Format.WhatsAppLink(s.SupplierPhone, s.SentText), "_blank");
+
+    Task CevapYaz(PriceRequest s, AskedLine l) => Calis(async () =>
+    {
+        var k = $"{s.Id}|{l.Id}";
+        var alis = Format.ParseMoney(Al(fiyat, k));
+        var satis = Al(musteri, k).Trim().Length == 0 ? 0m : Format.ParseMoney(Al(musteri, k));
+        if (alis is null || satis is null) { hata = "Tutarı rakamla yaz — ör. 1.200"; return; }
+        await Api.AddPriceReplyAsync(s.Id, l.Id, Al(fiyat, k).Trim(), alis == 0 ? null : alis, satis == 0 ? null : satis);
+        fiyat.Remove(k); musteri.Remove(k);
+        sonuc = $"{l.Name}: {s.SupplierName} cevabı kayda yazıldı.";
+        await Yenile();
+    });
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}

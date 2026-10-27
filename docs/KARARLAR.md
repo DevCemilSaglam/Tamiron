@@ -10,6 +10,25 @@
 
 ---
 
+## K-085 · Parça fiyatı sor: önizleme API'den, ilk WhatsApp açılır, cevabı usta yazar (27.10.2026 — lider, Cemil onayına açık)
+
+G10 koda geçti (prototip 40-parca-sor; API D1/D2'de hazırdı).
+- **Önizleme ucu** `GET /records/{id}/price-question`: sorulacak satırlar, kimlik tamam mı + eksikler
+  (K-068), gidecek metnin KENDİSİ — gönderilenle aynı fonksiyon (`PartQuestion.Compose`): gördüğün gider.
+- **Düğme her zaman basılır;** eksik olanı API söyler, sırası domain'de (parça · kimlik · parçacı — K-033.3).
+- **Kimlik eksikse ekranda yazılır** (marka/model/yıl/motor → aracın kaydına), önizleme yenilenir.
+  "Ruhsatı çek" bu ekranda yok — kayıt açarken var. **Cemil onayına açık:** buraya da istenirse eklenir.
+- **İki parçacıya sorulunca İLKİNİN WhatsApp'ı açılır, ötekiler kendi düğmesiyle.** Tarayıcı tek
+  dokunuşta tek pencere açtırır (ikincisi engellenir) — prototip "sırayla açılır" diyordu, telefonda
+  mümkün değil. Her parçacı kendi soru kaydını alır (Kol B), yeniden sorulmaz.
+- **Cevabı uygulama okumaz, usta yazar:** "parçacı ne dedi?" = alış (K-076.2); "Müşteriye" yazılırsa
+  satırın tutarı da o olur. Okunamayan tutar gönderilmez. Kayıtta kullanılan cevap işaretli.
+- **Kayıtta "Parça fiyatı sor" yalnız içerideyken** — teslim edilmiş işe parça sorulmaz.
+- **Parçacılar ekranı** ayrı (`/parcacilar`); parça sordan "geri"yle gelinir, geri yolu yalnız uygulama içi.
+  Menüde yeri G11'de (ayarlar).
+- **Tarayıcıda bulunan iki şey (önce test):** hata/sonuç ekranın başındaydı — telefonda dipteki düğmeye
+  basan görmüyordu → düğmenin hemen üstüne; cevap girdilerinin etiketleri bağlı değildi → bağlandı.
+
 ## K-084 · Müşteriye mesaj: ustanın uygulaması açılır, "gönderildi" denmez (27.10.2026 — lider, Cemil onayına açık)
 
 G9c koda geçti (prototip 85-mesaj; API B11/D4'te hazırdı).

@@ -8,7 +8,7 @@
   Her değişiklik API'ye gider; ekran API'nin döndürdüğü kaydı yeniden çizer — toplam, eksikler
   ("Eksik görünen"), müşteri parçasının toplama girmemesi (K-037) sunucunun hesabı.
   Satır silme: prototipte sola kaydırma; burada satırdaki çöp düğmesi + "Geri al" (soft-delete).
-  ⚠️ Henüz yok: "Ne oldu" süreci, Sesle/Kamera/Parça sor/Mesaj (G9, G10, G13), alış sorusu
+  ⚠️ Henüz yok: "Ne oldu" süreci, Sesle/Kamera/Mesaj (G9, G13), alış sorusu
   (dükkân ayarı, G11), ödeme ve "Düzenle" (G5).
 *@
 <section class="screen active" id="screen-kayit">
@@ -136,6 +136,12 @@
           </tbody></table></div>
         }
       </div>
+      @if (k.DeliveredAt is null)
+      {
+        @* Ne sorulacağına parça sor ekranı (API) karar verir; burada yalnız kapı. *@
+        <button class="btn btn-ghost" id="kParcaSor" @onclick='() => Nav.NavigateTo($"/kayit/{Id}/parca-sor")'>
+          <svg class="ico"><use href="#i-package"></use></svg> Parça fiyatı sor</button>
+      }
       @if (silinen is not null)
       {
         <div class="notice" id="kGeriAl">
