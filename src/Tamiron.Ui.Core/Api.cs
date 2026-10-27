@@ -36,6 +36,12 @@ public sealed record VehiclePatch(string? Brand = null, string? Model = null, st
 public sealed record VehicleListItem(Guid Id, string PlateNo, string? Brand, string? Model, string? OwnerName, string? ContactName, bool InShop);
 public sealed record VehicleList(int Count, IReadOnlyList<VehicleListItem> Items);
 
+// G9b · Müşteriler — tablo yok, araçlardan türetilir (API). Anahtar: katlanmış ad + "|" + telefon.
+public sealed record CustomerListItem(string Key, string Name, string? Phone, string DisplayPlate, int VehicleCount, bool InShop, DateOnly? ConsentAt);
+public sealed record CustomerList(int Count, IReadOnlyList<CustomerListItem> Items);
+public sealed record CustomerVehicle(Guid Id, string PlateNo, string? Brand, string? Model, bool InShop);
+public sealed record CustomerDetail(string Key, string Name, string? Phone, DateOnly? ConsentAt, IReadOnlyList<CustomerVehicle> Vehicles);
+
 /// <summary>G2 · Plaka sorusunun cevabı (API LookupPlate): geçerli mi, ipucu, kayıtlı araç, açık kaydı.</summary>
 public sealed record PlateLookup(string Plate, bool Valid, string? Hint, VehicleBrief? Vehicle, Guid? OpenRecordId);
 
@@ -235,6 +241,16 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<VehicleList>(await Send(HttpMethod.Get, "api/vehicles/list" + (string.IsNullOrWhiteSpace(q) ? "" : "?q=" + Uri.EscapeDataString(q)), null, auth: true));
     public async Task<ReceivableList> ReceivablesAsync(Guid vehicleId)
         => await Read<ReceivableList>(await Send(HttpMethod.Get, $"api/receivables?vehicleId={vehicleId}", null, auth: true));
+
+    // G9b · Müşteriler. İzin günü sunucudan — istemci tarih göndermez (izin tarihi ispattır).
+    public async Task<CustomerList> CustomersAsync(string? q = null)
+        => await Read<CustomerList>(await Send(HttpMethod.Get, "api/customers" + (string.IsNullOrWhiteSpace(q) ? "" : "?q=" + Uri.EscapeDataString(q)), null, auth: true));
+    public async Task<CustomerDetail> CustomerAsync(string key)
+        => await Read<CustomerDetail>(await Send(HttpMethod.Get, "api/customers/detail?key=" + Uri.EscapeDataString(key), null, auth: true));
+    public async Task<CustomerDetail> SetConsentAsync(string key, bool granted)
+        => await Read<CustomerDetail>(await Send(HttpMethod.Put, "api/customers/consent", new { key, granted }, auth: true));
+    public async Task<CustomerDetail> UndoConsentAsync(string key)
+        => await Read<CustomerDetail>(await Send(HttpMethod.Post, "api/customers/consent/undo", new { key }, auth: true));
 
     private async Task<HttpResponseMessage> Send(HttpMethod m, string url, object? body, bool auth)
     {

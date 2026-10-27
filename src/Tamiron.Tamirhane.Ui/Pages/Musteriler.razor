@@ -1,0 +1,91 @@
+@page "/musteriler"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G9b · Müşteriler (prototip 90-musteriler). Müşteri TABLOSU YOK: liste araçlardan türetilir, aynı
+  ad + telefon tek satır (A-M1). Süzgeç ve sıra API'de (serviste olanlar üstte — üç listede aynı sıra).
+  Satır "hangi kişi?" sorusunu cevaplar: AD büyük, plaka küçük ikinci satırda (araçlar listesinden farkı).
+  ⚠️ Henüz yok: "Sesle ara" (G13).
+*@
+<section class="screen active" id="screen-musteriler">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-users"></use></svg> Müşteriler
+      @if (liste is not null) { <span class="eb-say" id="msSay">@liste.Count</span> }
+    </span>
+  </div>
+
+  <div class="search-box" id="msArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="msQ" placeholder="Ad, telefon ya da plaka…" aria-label="Müşterilerde ara" autocomplete="off"
+           value="@q" @oninput="Ara" />
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert"><span class="n-body">@hata</span></div>
+  }
+
+  <div id="msListe">
+    @if (liste is { Items.Count: 0 })
+    {
+      <div class="bos-durum">
+        <b>@(string.IsNullOrWhiteSpace(q) ? "Henüz müşteri yok" : "Bulunamadı")</b>
+        <span>@(string.IsNullOrWhiteSpace(q) ? "Müşteri, aracın sahibi olarak kaydolur — kayıt açarken sahibini yaz." : "Başka bir şekilde yazmayı dene.")</span>
+      </div>
+    }
+    else if (liste is not null)
+    {
+      @foreach (var m in liste.Items)
+      {
+        <div class="mus-kart @(m.InShop ? "serviste" : "")" data-musteri="@m.Key" role="button" tabindex="0" @key="m.Key"
+             aria-label="@($"{m.Name} — {m.DisplayPlate}")" @onclick="() => Ac(m.Key)">
+          <div class="mus-ad">@m.Name</div>
+          <div class="mus-arac"><Plate No="@m.DisplayPlate" Size="plate-sm" />
+            @if (m.VehicleCount > 1) { <span class="mus-arac-ad">@m.VehicleCount araç</span> }
+          </div>
+          @if (!string.IsNullOrWhiteSpace(m.Phone))
+          {
+            @* Telefona dokunmak aramadır, detayı açmaz. *@
+            <a class="tel-link" href="tel:@Rakam(m.Phone)" aria-label="@($"{m.Name} ara")" @onclick:stopPropagation="true">
+              <svg class="ico ico-sm"><use href="#i-phone"></use></svg>@m.Phone</a>
+          }
+          else
+          {
+            <div class="mus-arac"><span class="pill warn">telefon yok</span></div>
+          }
+        </div>
+      }
+    }
+  </div>
+</section>
+
+@code {
+    CustomerList? liste;
+    string q = "";
+    string? hata;
+    int soru;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Yukle();
+    }
+
+    async Task Yukle()
+    {
+        var benim = ++soru;
+        try
+        {
+            var l = await Api.CustomersAsync(q);
+            if (benim == soru) { liste = l; hata = null; }   // geç gelen eski cevap yenisini ezmesin
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+    }
+
+    Task Ara(ChangeEventArgs e) { q = e.Value?.ToString() ?? ""; return Yukle(); }
+
+    void Ac(string key) => Nav.NavigateTo("/musteri?key=" + Uri.EscapeDataString(key));
+
+    static string Rakam(string s) => new(s.Where(char.IsAsciiDigit).ToArray());
+}

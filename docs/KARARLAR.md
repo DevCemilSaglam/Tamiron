@@ -10,6 +10,19 @@
 
 ---
 
+## K-083 · Müşteri ekranları: anahtar adreste, izin çipi künyede (27.10.2026 — lider, Cemil onayına açık)
+
+G9b koda geçti (prototip 90-musteriler, 91-musteri); API B10/D5'te hazırdı, yeni uç açılmadı.
+- **Detay adresi `/musteri?key=`** — müşteri tablosu yok (A-M1), kimliği katlanmış ad + "|" + telefon.
+  Anahtar adreste kaçışlanır ("Kaya & Oğulları" sorguyu bölmesin — mutasyonla bulundu). Bedeli:
+  telefon tarayıcı geçmişinde görünür; yerel kurulumda (K-079.3) dışarı çıkmaz. **Cemil onayına açık:**
+  sunucuya geçilirse anahtar yerine kısa bir kimlik konuşulur.
+- **İzin çipi yalnız telefonu olan müşteride** — telefonsuza mesaj zaten gitmez, izin anlamsız.
+- **"Geri al" her iki yönde sunucunun geri alması** (`consent/undo`): kaldırılan izin ESKİ tarihiyle döner.
+- **Satırda telefona dokunmak arar, detayı açmaz.** Çok araçlı müşteride satırda "N araç".
+- **Henüz yok:** "Mesaj gönder" (G9c), "Sesle ara" (G13), aracın ekranından müşteriye bağlantı
+  (araç ekranı anahtarı bilmiyor; gerekirse API `customerKey` döner — istenirse).
+
 ## K-082 · Araç ekranı: geçmiş kimlikle, km ve bakım geçmişten (27.10.2026 — lider, Cemil onayına açık)
 
 G9a koda geçti (EKRANLAR §6, prototip 70-araclar).

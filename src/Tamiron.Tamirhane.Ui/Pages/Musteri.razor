@@ -1,0 +1,151 @@
+@page "/musteri"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G9b · Müşteri detayı (prototip 91-musteri). Usta müşterinin ADINA dokunuyor çünkü aradığı şey müşteri —
+  listeden taşınan ayrıntı burada: künye (ad, araç · kayıt sayısı, aranabilir telefon, ileti izni),
+  araçları (araç ekranını açar), servis geçmişi (her aracın KİMLİĞİYLE; çok araçta plaka başlığıyla).
+  İleti izni (K-071.3): varsayılan YOK, verilir. Gün SUNUCUDAN; "Geri al" eski tarihi izden getirir (D5).
+  Üzerinde YOK: müşteri düzenleme · birleştirme · not — müşteri araçtan türetilen bir görünüm (A-M1).
+  ⚠️ Henüz yok: "Mesaj gönder" (mesaj ekranıyla, G9c).
+*@
+<section class="screen active" id="screen-musteri">
+  <div class="screen-head">
+    <span class="eyebrow" id="mstBaslik"><svg class="ico ico-sm"><use href="#i-user"></use></svg> @(m?.Name ?? "Müşteri")</span>
+  </div>
+
+  @if (yok)
+  {
+    @* Müşteri araçtan türetilir: sahibin adı ya da telefonu değişirse anahtar değişir. Boş ekran yerine ne olduğu. *@
+    <div class="bos-durum"><b>Bu müşteri artık yok</b>
+      <span>Müşteri, aracın sahibi olarak tutuluyor. Ad ya da telefon değiştiyse listede yeni hâliyle duruyor.</span></div>
+    <button class="btn btn-ghost" id="mstListeyeDon" @onclick='() => Nav.NavigateTo("/musteriler")'>
+      <svg class="ico"><use href="#i-users"></use></svg> Müşteri listesine dön</button>
+  }
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="mstHata"><span class="n-body">@hata</span></div>
+  }
+
+  @if (m is not null)
+  {
+    <div class="card">
+      <div id="mstKunye">
+        <div class="ms-bas">
+          <span class="ms-ad">@m.Name</span>
+          <span class="ms-say">@m.Vehicles.Count araç · @KayitSayisi kayıt</span>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(m.Phone))
+        {
+          <a class="tel-link" href="tel:@Rakam(m.Phone)" aria-label="@($"{m.Name} ara")"><svg class="ico ico-sm"><use href="#i-phone"></use></svg>@m.Phone</a>
+          <div class="cip-grup" style="margin-top:12px">
+            <button class="cip" id="mstIzin" aria-pressed="@(m.ConsentAt is not null ? "true" : "false")" disabled="@calisiyor" @onclick="IzinDegistir">
+              Bayram, kampanya mesajı izni</button>
+          </div>
+          <p class="plate-hint">@(m.ConsentAt is { } t
+              ? $"İzin {Format.Date(t)} tarihinde kaydedildi. Toplu mesajlar bu müşteriye gider."
+              : "İzin yok: toplu mesajlar bu müşteriye gitmez. Özet, “aracınız hazır” ve bakım hatırlatması için izin gerekmez.")</p>
+        }
+        else
+        {
+          <p class="plate-hint">Telefon yok — mesaj gönderilemez. Aracın ekranından eklenebilir.</p>
+        }
+      </div>
+      @if (bildirim is not null)
+      {
+        <div class="notice" id="mstGeriAlBildirim"><span class="n-body">@bildirim</span>
+          <button class="btn btn-ghost" id="mstGeriAl" disabled="@calisiyor" @onclick="GeriAl">Geri al</button></div>
+      }
+    </div>
+
+    <div class="card">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçları</span></div>
+      <div id="mstAraclar" class="ms-araclar">
+        @foreach (var v in m.Vehicles)
+        {
+          <button class="ms-arac" data-arac="@v.Id" aria-label="@($"{v.PlateNo} aracını aç")" @onclick='() => Nav.NavigateTo($"/arac/{v.Id}")'>
+            <Plate No="@v.PlateNo" />
+            <span class="ms-arac-ad">@($"{v.Brand} {v.Model}".Trim())</span>
+            <svg class="ico ico-sm"><use href="#i-chevron-right"></use></svg>
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Servis geçmişi</span></div>
+      <div id="mstGecmis">
+        @if (gecmis.Count == m.Vehicles.Count && KayitSayisi == 0)
+        {
+          <div class="bos-durum"><b>Kayıt yok</b><span>Bu müşterinin araçlarına henüz servis kaydı açılmadı.</span></div>
+        }
+        @foreach (var v in m.Vehicles)
+        {
+          if (!gecmis.TryGetValue(v.Id, out var kl) || kl.Count == 0) continue;
+          @* Araç başlığı yalnız birden çok araçta — tek araçta her satırın üstüne plaka bilineni tekrarlar. *@
+          <div data-grup="@v.Id" @key="v.Id">
+          @if (m.Vehicles.Count > 1)
+          {
+            <div class="mst-grup-bas"><Plate No="@v.PlateNo" /><span class="ms-arac-ad">@($"{v.Brand} {v.Model}".Trim())</span></div>
+          }
+          @foreach (var r in kl)
+          {
+            <div class="card" data-kayit="@r.Id" role="button" tabindex="0" @key="r.Id" @onclick='() => Nav.NavigateTo($"/kayit/{r.Id}")'>
+              <b>@r.TypeLabel</b> · @(string.IsNullOrWhiteSpace(r.Complaint) ? "ne yapılacağı yazılmamış" : r.Complaint)
+              <span class="t-alt">@Format.Date(r.DeliveredAt ?? r.OpenedOn) · @(r.DeliveredAt is null ? "Serviste" : "Teslim edildi")</span>
+            </div>
+          }
+          </div>
+        }
+      </div>
+    </div>
+  }
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "key")] public string? Key { get; set; }
+
+    CustomerDetail? m;
+    // Sıra API'de (serviste olan üstte, sonra en yeni — üç listede aynı sıra).
+    readonly Dictionary<Guid, IReadOnlyList<RecordListItem>> gecmis = new();
+    string? hata, bildirim;
+    bool yok, calisiyor;
+
+    int KayitSayisi => gecmis.Values.Sum(x => x.Count);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        if (string.IsNullOrWhiteSpace(Key)) { yok = true; return; }
+        try
+        {
+            m = await Api.CustomerAsync(Key);
+            foreach (var v in m.Vehicles) gecmis[v.Id] = (await Api.RecordsAsync(vehicleId: v.Id)).Items;
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.NotFound) { m = null; yok = true; }
+        catch (ApiException e) { hata = e.Message; }
+    }
+
+    Task IzinDegistir() => Calis(async () =>
+    {
+        var vardi = m!.ConsentAt is not null;
+        m = await Api.SetConsentAsync(m.Key, !vardi);
+        bildirim = vardi ? "İzin kaldırıldı." : "İzin kaydedildi.";
+    });
+
+    // Geri al: kaldırılan izin ESKİ TARİHİYLE döner — tarih izden (sunucu), ekrandan değil.
+    Task GeriAl() => Calis(async () => { m = await Api.UndoConsentAsync(m!.Key); bildirim = null; });
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+
+    static string Rakam(string s) => new(s.Where(char.IsAsciiDigit).ToArray());
+}
