@@ -72,6 +72,7 @@ public interface ITamironDb
     DbSet<ServiceRecord> ServiceRecords { get; }
     DbSet<ServiceLine> ServiceLines { get; }
     DbSet<Payment> Payments { get; }
+    DbSet<Advance> Advances { get; }
     DbSet<Expense> Expenses { get; }
     DbSet<Message> Messages { get; }
     DbSet<Supplier> Suppliers { get; }

@@ -315,6 +315,9 @@ public class ServiceRecord : TenantEntity
     {
         if (DeliveredAt is null)
             throw new DomainException("payment.not_delivered", "Kayıt teslim edilmedi — düzeltilecek ödeme yok.");
+        // G7: avansla nakit/kart arasında çevirmek geriye dönük kasayı ve bakiyeyi değiştirir.
+        if (method == Domain.PaymentMethod.Advance || LastPayment()?.Method == Domain.PaymentMethod.Advance)
+            throw new DomainException("payment.advance_fixed", "Avanstan düşülen ödemenin yolu değişmez — geri al, yeniden yaz.");
         if (LastPayment() is not { } last)
         {
             if (PaymentMethod == method)

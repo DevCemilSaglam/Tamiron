@@ -4,7 +4,8 @@ namespace Tamiron.Domain;
 public enum ServiceType { Repair = 1, Maintenance = 2, Both = 3 }
 
 /// <summary>Adım 7. <c>Unpaid</c> = "Almadım" — bir ödeme yoludur (K-004), alacağın kaynağı.</summary>
-public enum PaymentMethod { Cash = 1, Card = 2, Transfer = 3, Unpaid = 4 }
+/// <summary>Advance: müşteri avansından düşüldü (G7, K-079.1) — kalanı kapatır, kasaya girmez.</summary>
+public enum PaymentMethod { Cash = 1, Card = 2, Transfer = 3, Unpaid = 4, Advance = 5 }
 
 public enum LineKind { Part = 1, Labor = 2 }
 

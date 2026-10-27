@@ -33,10 +33,21 @@ internal static class Map
     /// Dönemde ALINAN para, yola göre (K-078): kasa ödemelerden okunur — kısmi ödemenin her parçası
     /// kendi gününde. Kasa özeti, ana ekran ve CSV aynı süzgeçten.
     /// </summary>
+    /// <remarks>
+    /// G7 (K-079.1): avans alındığı gün kendi yolunda girer, iadesi çıkar; avanstan düşülen ödeme
+    /// kasaya GİRMEZ (para avans günü girmişti). Sonuç yalnız nakit/kart/havale anahtarlarını taşır.
+    /// </remarks>
     public static async Task<Dictionary<PaymentMethod, decimal>> CollectedBetween(ITamironDb db, DateOnly start, DateOnly end, CancellationToken ct)
-        => (await db.Payments.AsNoTracking().Where(p => p.PaidOn >= start && p.PaidOn <= end)
-                .GroupBy(p => p.Method).Select(g => new { g.Key, Sum = g.Sum(p => p.Amount) }).ToListAsync(ct))
-           .ToDictionary(x => x.Key, x => x.Sum);
+    {
+        var paid = await db.Payments.AsNoTracking().Where(p => p.PaidOn >= start && p.PaidOn <= end && p.Method != PaymentMethod.Advance)
+            .GroupBy(p => p.Method).Select(g => new { g.Key, Sum = g.Sum(p => p.Amount) }).ToListAsync(ct);
+        var adv = await db.Advances.AsNoTracking().Where(a => a.On >= start && a.On <= end)
+            .GroupBy(a => a.Method)
+            .Select(g => new { g.Key, Sum = g.Sum(a => a.Kind == AdvanceKind.Received ? a.Amount : -a.Amount) }).ToListAsync(ct);
+        var d = paid.ToDictionary(x => x.Key, x => x.Sum);
+        foreach (var a in adv) d[a.Key] = d.GetValueOrDefault(a.Key) + a.Sum;
+        return d;
+    }
 
     public static ServiceRecordDto ToDto(this ServiceRecord r, Vehicle? v) => new(
         r.Id, r.VehicleId, v?.PlateNo ?? "", r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
@@ -164,6 +175,9 @@ internal sealed class CollectPaymentHandler(ITamironDb db, IClock clock) : IRequ
     {
         var r = await db.ServiceRecords.FirstOrDefaultAsync(x => x.Id == c.RecordId, ct)
                 ?? throw new NotFoundException("Servis kaydı");
+        // G7: avanstan düşülecekse sahibin bakiyesi yetmeli (kalan sınırı domain'de).
+        if (c.Method == PaymentMethod.Advance)
+            AdvanceBalance.EnsureCovers(await Advances.AdvanceQueries.BalanceFor(db, r.VehicleId, ct), c.Amount ?? r.Remaining);
         // Kural domain'de; gün sunucudan, istemciden değil.
         if (c.Amount is { } amount) r.CollectPayment(amount, c.Method, clock.Today);
         else r.CollectPayment(c.Method, clock.Today);

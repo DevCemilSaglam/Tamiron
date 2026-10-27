@@ -18,6 +18,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<ServiceRecord> ServiceRecords => Set<ServiceRecord>();
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
     public DbSet<Payment> Payments => Set<Payment>();
+    public DbSet<Advance> Advances => Set<Advance>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -104,6 +105,15 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.Amount).HasPrecision(18, 2);
             // Kasa dönem süzgeci (F5): dükkân + ödeme günü.
             e.HasIndex(x => new { x.TenantId, x.PaidOn });
+        });
+
+        // G7 · Müşteri avansı (VERI-MODELI §2c).
+        Tenant(b.Entity<Advance>());
+        b.Entity<Advance>(e =>
+        {
+            e.Property(x => x.Amount).HasPrecision(18, 2);
+            e.HasIndex(x => new { x.TenantId, x.VehicleId });
+            e.HasIndex(x => new { x.TenantId, x.On });   // kasa dönem süzgeci
         });
 
         Tenant(b.Entity<ServiceLine>());

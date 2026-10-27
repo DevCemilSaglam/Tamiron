@@ -34,7 +34,7 @@ internal sealed class HomeHandler(ITamironDb db, IClock clock) : IRequestHandler
             RecordCount: await db.ServiceRecords.CountAsync(ct),
             VehicleCount: await db.Vehicles.CountAsync(ct),
             CustomerCount: Domain.Customers.From(owners).Count,
-            CollectedToday: collectedToday.Values.Sum(),
+            CollectedToday: collectedToday.Values.Sum(),   // avanstan düşülen zaten yok (G7)
             Receivable: await Map.UnpaidTotal(db, ct),
             DueReminderCount: maybeDue.Count(r => r.IsReminderDue(today)));
     }

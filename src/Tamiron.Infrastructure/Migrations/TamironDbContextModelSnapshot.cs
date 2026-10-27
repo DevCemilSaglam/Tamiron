@@ -22,6 +22,56 @@ namespace Tamiron.Infrastructure.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("Tamiron.Domain.Advance", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<decimal>("Amount")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Method")
+                        .HasColumnType("int");
+
+                    b.Property<DateOnly>("On")
+                        .HasColumnType("date");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("VehicleId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TenantId");
+
+                    b.HasIndex("TenantId", "On");
+
+                    b.HasIndex("TenantId", "VehicleId");
+
+                    b.ToTable("Advances");
+                });
+
             modelBuilder.Entity("Tamiron.Domain.ConsentEvent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -948,6 +998,15 @@ namespace Tamiron.Infrastructure.Migrations
                         .HasFilter("[DateTimeDeleted] IS NULL");
 
                     b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.Advance", b =>
+                {
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Tamiron.Domain.ConsentEvent", b =>

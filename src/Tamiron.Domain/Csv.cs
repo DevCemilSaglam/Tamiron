@@ -44,6 +44,7 @@ public static class Csv
         PaymentMethod.Card => "Kart",
         PaymentMethod.Transfer => "Havale",
         PaymentMethod.Unpaid => "Alınmadı",
+        PaymentMethod.Advance => "Avanstan",
         _ => ""
     };
 }

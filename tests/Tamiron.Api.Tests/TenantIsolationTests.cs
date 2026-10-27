@@ -40,7 +40,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
     }
 
     sealed record BData(Guid OpenRecord, Guid DeliveredRecord, Guid Line, Guid Vehicle, Guid Supplier, Guid Expense,
-                        Guid PriceRequest, string CustomerKey);
+                        Guid PriceRequest, string CustomerKey, Guid Advance);
 
     async Task<BData> SeedB()
     {
@@ -60,10 +60,12 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         done = await Read<ServiceRecordDto>(await b.PostAsJsonAsync($"/api/records/{done.Id}/lines", new { kind = "Labor", name = Mark, price = 900 }, Json));
         await Read<ServiceRecordDto>(await b.PostAsJsonAsync($"/api/records/{done.Id}/deliver", new { method = "Unpaid" }, Json));
 
+        // G7 · avans: B'nin aracında bakiye 500 (A iade etse, geri alsa ya da avanstan düşse görüntü değişir).
+        var adv = await Read<JsonElement>(await b.PostAsJsonAsync($"/api/vehicles/{open.VehicleId}/advance", new { amount = 500, method = "Cash" }, Json));
         var key = (await Read<CustomerList>(await b.GetAsync("/api/customers?q=" + Mark))).Items.Single().Key;
         await Read<CustomerDetail>(await b.PutAsJsonAsync("/api/customers/consent", new { key, granted = true }, Json));
         return new(open.Id, done.Id, open.Lines[0].Id, open.VehicleId, sup.Id, exp.GetProperty("id").GetGuid(),
-                   pr[0].Id, key);
+                   pr[0].Id, key, adv.GetProperty("items")[0].GetProperty("id").GetGuid());
     }
 
     /// <summary>B'nin bütün satırları: kimlik + RowVersion + silinme. Bir alan bile değişirse görüntü değişir.</summary>
@@ -89,6 +91,8 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         await Add("price-replies", db.PriceReplies);
         await Add("messages", db.Messages);
         await Add("consent", db.ConsentEvents);
+        await Add("advances", db.Advances);
+        await Add("payments", db.Payments);
         return sb.ToString();
     }
 
@@ -119,6 +123,10 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         ["GET /api/vehicles/{id}/message-text"] = _ => null,
         ["PUT /api/suppliers/{id}"] = _ => new { name = "A", phone = "05337009999" },
         ["DELETE /api/suppliers/{id}"] = _ => null,
+        ["GET /api/vehicles/{id}/advance"] = _ => null,
+        ["POST /api/vehicles/{id}/advance"] = _ => new { amount = 1, method = "Cash" },
+        ["POST /api/vehicles/{id}/advance/refund"] = _ => new { amount = 1, method = "Cash" },
+        ["POST /api/advances/{id}/undo"] = _ => null,
         ["DELETE /api/expenses/{id}"] = _ => null,
         ["POST /api/expenses/{id}/restore"] = _ => null,
     };
@@ -130,6 +138,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         _ when route.Contains("/suppliers/") => [d.Supplier],
         _ when route.Contains("/expenses/") => [d.Expense],
         _ when route.Contains("/price-requests/") => [d.PriceRequest],
+        _ when route.Contains("/advances/") => [d.Advance],
         _ => throw new InvalidOperationException(route),
     };
 

@@ -272,6 +272,13 @@ api.MapGet("/vehicles/list", (string? q, ISender s, CancellationToken ct) => s.S
 // Araç (B6). PATCH: null = dokunma, "" = temizle.
 api.MapGet("/vehicles/{id:guid}", (Guid id, ISender s, CancellationToken ct) => s.Send(new GetVehicle(id), ct));
 api.MapGet("/vehicles", (string plate, ISender s, CancellationToken ct) => s.Send(new FindVehicleByPlate(plate), ct));
+// G7 · Müşteri avansı (K-079.1): bakiye sahibe göre; al · iade et · geri al.
+api.MapGet("/vehicles/{id:guid}/advance", (Guid id, ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Advances.GetAdvance(id), ct));
+api.MapPost("/vehicles/{id:guid}/advance", (Guid id, CollectBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Advances.ReceiveAdvance(id, b.Amount ?? 0, b.Method), ct));
+api.MapPost("/vehicles/{id:guid}/advance/refund", (Guid id, CollectBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Advances.RefundAdvance(id, b.Amount ?? 0, b.Method), ct));
+api.MapPost("/advances/{id:guid}/undo", (Guid id, ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Advances.UndoAdvance(id), ct));
 // G2 · Kayıt açma ekranının plaka sorusu: geçerli mi, kayıtlı mı, açık kaydı var mı.
 api.MapGet("/vehicles/lookup", (string? plate, ISender s, CancellationToken ct) => s.Send(new LookupPlate(plate), ct));
 api.MapPatch("/vehicles/{id:guid}", (Guid id, PatchVehicle body, ISender s, CancellationToken ct) =>

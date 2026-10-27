@@ -142,10 +142,23 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
 
         // Tahsilat: ödeme GÜNÜNE göre (K-071.1 · K-078), tarih sırasıyla — kayıt sırası açılış sırasıdır,
         // ödeme sırası değil; aynı gün: kaydın sırası, sonra ödemenin yazılış sırası (prototip donemOdemeleri).
+        // G7: avanstan düşülen ödeme "Tahsilat" değil — para avans günü girdi; muhasebeci iki kez toplamasın.
         rows.AddRange(payments
             .OrderBy(x => x.PaidOn).ThenBy(x => paidRecords[x.ServiceRecordId].DateTimeCreated).ThenBy(x => x.Sequence)
             .Select(x => { var r = paidRecords[x.ServiceRecordId];
-                           return new object?[] { "Tahsilat", x.PaidOn, What(r), Plate(r), Owner(r), Csv.PaymentLabel(x.Method), x.Amount }; }));
+                           return new object?[] { x.Method == PaymentMethod.Advance ? "Avanstan düşüldü" : "Tahsilat", x.PaidOn, What(r),
+                                                  Plate(r), Owner(r), Csv.PaymentLabel(x.Method), x.Amount }; }));
+
+        // G7: avans alındı (+) / iade (−) kendi gününde (K-079.1c: iade kasadan çıkış).
+        var advances = await db.Advances.AsNoTracking().Where(a => a.On >= p.Start && a.On <= p.End)
+            .OrderBy(a => a.On).ThenBy(a => a.DateTimeCreated).ToListAsync(ct);
+        var advVehicles = await db.Vehicles.AsNoTracking().Where(v => advances.Select(a => a.VehicleId).Contains(v.Id)).ToDictionaryAsync(v => v.Id, ct);
+        rows.AddRange(advances.Select(a =>
+        {
+            var v = advVehicles.GetValueOrDefault(a.VehicleId);
+            return new object?[] { a.Kind == AdvanceKind.Received ? "Avans" : "Avans iadesi", a.On, "Müşteri avansı",
+                                   v?.PlateNo ?? "", v?.OwnerName ?? "", Csv.PaymentLabel(a.Method), a.Signed };
+        }));
 
         rows.AddRange((await db.Expenses.AsNoTracking().Where(e => e.Date >= p.Start && e.Date <= p.End)
                 .OrderBy(e => e.Date).ThenBy(e => e.DateTimeCreated).ToListAsync(ct))

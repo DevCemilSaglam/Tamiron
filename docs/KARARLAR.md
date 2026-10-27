@@ -10,6 +10,23 @@
 
 ---
 
+## K-081 · Müşteri avansı — bakiye, sahibe göre; kasaya alındığı gün (27.10.2026 — lider, Cemil onayına açık)
+
+K-079.1'in üç cevabı koda geçti (G7). Tasarım: `TASARIM-G-AVANS.md`; veri: VERI-MODELI §2c.
+- **Bakiye saklanmaz:** alınanlar − iadeler − avanstan düşülen ödemeler (`PaymentMethod.Advance`).
+  Eksiye düşmez: düşülen ve iade edilen tutar bakiyeyi aşamaz; bakiyeyi eksiye düşürecek "geri al"
+  reddedilir (önce o ödeme geri alınır).
+- **Sahibe göre (a):** aynı ad + telefon (müşteriler listesinin anahtarı, A-M1) olan araçların toplamı;
+  sahip yazılmamışsa yalnız o araç. Aynı adın farklı telefonu ayrı müşteridir — **Cemil onayına açık**.
+- **Usta seçer (b):** ödeme yolu "Avanstan" — teslimde ve sonradan tahsilatta; bakiye yetmezse 422,
+  teslim edilmiş görünmez.
+- **İade kasadan çıkış (c):** kendi yolunda, kendi gününde eksi. Kasa: avans alındığı gün girer;
+  avanstan düşülen ödeme kasaya GİRMEZ (para bir kez sayılır). CSV: "Avans" (+), "Avans iadesi" (−),
+  avanstan düşülen ödeme "Avanstan düşüldü" (Tahsilat değil — muhasebeci iki kez toplamasın).
+- **Avanstan düşülen ödemenin yolu düzeltilmez** (nakit ↔ avans çevirmek geriye dönük kasa ve bakiye
+  değiştirir) — geri al, yeniden yaz. **Cemil onayına açık.**
+- Yalıtım testi yeni dört ucu kapsıyor; B'nin avans ve ödeme satırları da anlık görüntüde.
+
 ## K-080 · Yerel kurulum: tek komut, tek adres, kod pencerede (26.10.2026 — lider, Cemil onayına açık)
 
 Tur G'nin ilk işi (G1). K-079.3 "proje yerelde biter"in ne demek olduğunu somutlaştırır.

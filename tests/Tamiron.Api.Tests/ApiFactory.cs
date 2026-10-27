@@ -137,6 +137,26 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         }
     }
 
+    /// <summary>
+    /// Boş, kendine ait bir dükkân + oturum (G7). Kasa gibi dükkân toplamlarını ölçen testler B'yi
+    /// paylaşırsa birbirinin rakamını görür; her biri kendi dükkânında koşar.
+    /// </summary>
+    public async Task<Guid> NewShopAsync()
+    {
+        var shop = Guid.NewGuid();
+        using var scope = Services.CreateScope();
+        scope.ServiceProvider.GetRequiredService<RequestContext>().TenantId = shop;
+        var db = scope.ServiceProvider.GetRequiredService<TamironDbContext>();
+        db.Shops.Add(new Shop(shop) { Name = "Test " + shop.ToString("N")[..6] });
+        var u = User.Create(shop, "053" + Random.Shared.NextInt64(10_000_000, 99_999_999));
+        db.Users.Add(u);
+        var (s, token) = Session.Open(shop, u.Id, "test", Clock.UtcNow);
+        db.Sessions.Add(s);
+        await db.SaveChangesAsync();
+        lock (_tokens) _tokens[shop] = token;
+        return shop;
+    }
+
     async Task IAsyncLifetime.DisposeAsync()
     {
         using (var scope = Services.CreateScope())

@@ -104,7 +104,7 @@ taksit de x miktar aldım şeklinde olur."* Bir işin parası birden çok parça
 |---|---|
 | `ServiceRecordId` | Ödeme bir işe aittir (müşteriye değil — cari hesap YOK, K-022) |
 | `Amount` | Alınan tutar. **> 0, kalandan fazla olamaz** (Cemil: *"Kalandan fazla ödeme olmaz"*) |
-| `Method` | `Cash` \| `Card` \| `Transfer` — `Unpaid` olamaz: alınmayan para ödeme değildir |
+| `Method` | `Cash` \| `Card` \| `Transfer` \| `Advance` (avanstan düşüldü, §2c) — `Unpaid` olamaz: alınmayan para ödeme değildir |
 | `PaidOn` | Paranın geldiği gün — **kasaya bu güne yazılır**, CSV'de ayrı satır (Cemil: *"Ayrı satır"*) |
 | `Sequence` | **Yazılış sırası** (kayıt içinde 1, 2, 3…) — K-078.5. "Son ödemeyi geri al", "son ödemenin yolunu düzelt" ve durum özeti SON ödemeyi bilmek zorunda; veritabanından gelen sıra yazılış sırası değildir (aynı gün iki taksit tarihten de ayrılmaz). `ServiceLine.Position`'ın aynısı |
 | `AtDelivery` | **Teslimde mi alındı** (K-078.1). Teslimdeki para teslimle gider (teslimi geri al); sonradan gelen "ödemeyi geri al"la — yanlış teslimi geri alan usta sonraki tahsilatı farkında olmadan silmesin |
@@ -121,8 +121,28 @@ taksit de x miktar aldım şeklinde olur."* Bir işin parası birden çok parça
 > okunsun); backend her alınan parayı `Payment` satırı olarak tutar. Hesaplar ikisinde de
 > yalnız ödemeleri okur, bu yüzden rakamlar aynıdır (`PrototypeEquivalenceTests`).
 >
-> **Müşteri avansı** (önceden verilen para) bu tabloya **henüz** girmez — ayrı kavram, Cemil'in
-> cevabı bekleniyor (TASARIM-E6 §6, K-078).
+> **Müşteri avansından düşülen ödeme** (G7, K-079.1): `Method = Advance`. İşin kalanını azaltır
+> ama **kasaya yazılmaz** — para avansın alındığı gün girmişti (§2c).
+
+---
+
+## 2c · `Advance` — Müşteri avansı (G7 · 27.10 · K-079.1)
+
+Cemil: *"Hesabına önceden para verebilir."* Avans bir işe değil **aracın sahibine** aittir;
+sonraki işin ödemesinde usta **"avanstan düş"** der. Tasarım: `TASARIM-G-AVANS.md`.
+
+| Alan | Neden var |
+|---|---|
+| `VehicleId` | Alındığı araç. Bakiye **sahibe göre** toplanır: aynı sahip anahtarı (ad + telefon, A-M1) olan araçlar; sahip yazılmamışsa yalnız bu araç |
+| `Kind` | `Received` (alındı, kasaya giriş) \| `Refunded` (iade, kasadan çıkış — K-079.1c) |
+| `Amount` | > 0. İade bakiyeden fazla olamaz |
+| `Method` | `Cash` \| `Card` \| `Transfer` — kasanın hangi satırına |
+| `On` | Paranın geldiği/çıktığı gün — kasaya bu güne |
+
+> **Bakiye** saklanmaz: `Σ Received − Σ Refunded − Σ Payment(Method = Advance)` (sahibin
+> araçlarında). Saklanan bakiye hareketlerle ayrışırdı (kalanın saklanmamasıyla aynı gerekçe).
+> Eksiye düşemez: avanstan düşülen ve iade edilen tutar bakiyeyi aşamaz; bakiyeyi eksiye
+> düşürecek "geri al" reddedilir.
 
 ---
 
@@ -401,6 +421,8 @@ prototiple **0 farkla** aynı sonucu verdiği `PrototypeEquivalenceTests` ile ö
 | Sesle "x aldım": yalnız kalanı olan iş; fiil + tutar ya da "kalanını"; yol söylenmezse onayda sorulur | `sesOdemeAl` · `odeme-al` şeması | `SesCozumleyici` (`odeme-al`) — cihazda | K-078.7 |
 | Plaka sorusu: geçerli mi (ipucu), kayıtlı araç, açık kaydı (en yeni teslimsiz) | `ruhsatDurum` | `LookupPlate` (`GET /api/vehicles/lookup`) | K-080.6 |
 | Kayıt açarken kayıtsız aracın bilgileri kayıtla tek istekte; biri geçersizse hiçbiri; kayıtlı araç ezilmez | `kaydiAc` (iki ayrı yazım) | `OpenServiceRecord.Vehicle` (`NewVehicleInfo`) | K-080.6 |
+| Avans bakiyesi = alınanlar − iadeler − avanstan düşülenler, sahibe göre; eksiye düşmez | — (prototipte yok) | `AdvanceBalance` · `Advances` uçları | K-079.1 · G7 |
+| Kasa: avans alındığı gün girer, iade çıkar; avanstan düşülen ödeme kasaya girmez | — | `Map.CollectedBetween` | K-079.1 · G7 |
 | Alacak bir bakiyedir, döneme tabi değil | muhasebe alacak tablosu | `ListReceivables` (araç süzgeçli: `?vehicleId=`) | 05.09 |
 | Dönem: bugün · bu ay · bu yıl (1 Ocak'tan bugüne) | `donemBasi` · `donemIcinde` | `Period.Of` | 05.09 |
 | Hatırlatma: ay **veya** km, hangisi önce; km ancak iki ölçümle | `hatirlatmaHesapla` · `gunlukKm` | `MaintenanceReminder.Compute` | 03.09 · K-073.9 (ay sonu sapması) |

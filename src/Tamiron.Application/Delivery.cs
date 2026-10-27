@@ -52,6 +52,9 @@ internal sealed class DeliveryHandlers(ITamironDb db, IClock clock, ITenantConte
     public async Task<ServiceRecordDto> Handle(DeliverRecord c, CancellationToken ct)
     {
         var (r, policy, readings) = await Inputs(c.RecordId, tracking: true, ct);
+        // G7: avanstan düşülecekse sahibin bakiyesi yetmeli — teslimden ÖNCE (araç teslim edilmiş görünmesin).
+        if (c.Method == PaymentMethod.Advance)
+            AdvanceBalance.EnsureCovers(await Advances.AdvanceQueries.BalanceFor(db, r.VehicleId, ct), c.Amount ?? r.Total);
         if (c.Amount is { } amount) r.DeliverPartly(amount, c.Method, clock.Today, policy, readings);   // gün sunucudan
         else r.Deliver(c.Method, clock.Today, policy, readings);
         await db.SaveChangesAsync(ct);
