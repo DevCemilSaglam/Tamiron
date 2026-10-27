@@ -43,6 +43,14 @@ public sealed record CustomerVehicle(Guid Id, string PlateNo, string? Brand, str
 public sealed record CustomerDetail(string Key, string Name, string? Phone, DateOnly? ConsentAt, IReadOnlyList<CustomerVehicle> Vehicles);
 
 // G9c · Mesaj. GÖNDERİM YOK — API ne gittiğini KAYDEDER, gönderimi ustanın kendi uygulaması yapar.
+// G10 · Parçacılar ve parça sorma. Mesajı API GÖNDERMEZ — WhatsApp'ı ustanın telefonu açar.
+public sealed record Supplier(Guid Id, string Name, string Phone);
+public sealed record AskedLine(Guid Id, string Name, Guid? SelectedReplyId);
+public sealed record PriceQuestionPreview(IReadOnlyList<AskedLine> Lines, bool HasPartIdentity, IReadOnlyList<string> Missing, string Text);
+public sealed record PriceReply(Guid Id, string RawText, decimal? ParsedPrice, string? ParsedBrand, string? ParsedCode, DateTime ReceivedAt);
+public sealed record PriceRequest(Guid Id, Guid SupplierId, string SupplierName, string SupplierPhone, string SentText, DateTime SentAt,
+                                  IReadOnlyList<AskedLine> Lines, IReadOnlyList<PriceReply> Replies);
+
 public sealed record MessageSetup(IReadOnlyList<MessageTarget> Targets, Guid? CurrentRecordId);
 public sealed record MessageTarget(string Kind, string Name, string? Phone, bool IsDefault);
 public sealed record MessageSuggestion(string Template, string Name, string Text);
@@ -256,6 +264,22 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<CustomerDetail>(await Send(HttpMethod.Get, "api/customers/detail?key=" + Uri.EscapeDataString(key), null, auth: true));
     public async Task<CustomerDetail> SetConsentAsync(string key, bool granted)
         => await Read<CustomerDetail>(await Send(HttpMethod.Put, "api/customers/consent", new { key, granted }, auth: true));
+    // G10 · Parçacılar (ad + telefon; numara dükkânda tekil — API) ve parça sorma.
+    public async Task<List<Supplier>> SuppliersAsync() => await Read<List<Supplier>>(await Send(HttpMethod.Get, "api/suppliers", null, auth: true));
+    public async Task<Supplier> AddSupplierAsync(string name, string phone)
+        => await Read<Supplier>(await Send(HttpMethod.Post, "api/suppliers", new { name, phone }, auth: true));
+    public async Task<Supplier> UpdateSupplierAsync(Guid id, string name, string phone)
+        => await Read<Supplier>(await Send(HttpMethod.Put, $"api/suppliers/{id}", new { name, phone }, auth: true));
+    public async Task DeleteSupplierAsync(Guid id) => (await Send(HttpMethod.Delete, $"api/suppliers/{id}", null, auth: true)).Dispose();
+    public async Task<PriceQuestionPreview> PriceQuestionAsync(Guid recordId)
+        => await Read<PriceQuestionPreview>(await Send(HttpMethod.Get, $"api/records/{recordId}/price-question", null, auth: true));
+    public async Task<List<PriceRequest>> PriceRequestsAsync(Guid recordId)
+        => await Read<List<PriceRequest>>(await Send(HttpMethod.Get, $"api/records/{recordId}/price-requests", null, auth: true));
+    public async Task<List<PriceRequest>> AskPricesAsync(Guid recordId, IReadOnlyList<Guid> supplierIds)
+        => await Read<List<PriceRequest>>(await Send(HttpMethod.Post, $"api/records/{recordId}/price-requests", new { supplierIds }, auth: true));
+    public async Task<RecordDetail> AddPriceReplyAsync(Guid requestId, Guid lineId, string? rawText, decimal? price, decimal? customerPrice)
+        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/price-requests/{requestId}/replies", new { lineId, rawText, price, customerPrice }, auth: true));
+
     // G9c · Mesaj: kurulum (kime, hangi iş), öneriler (hedefe göre hitap), kayıt, arşiv.
     public async Task<MessageSetup> MessageSetupAsync(Guid vehicleId)
         => await Read<MessageSetup>(await Send(HttpMethod.Get, $"api/vehicles/{vehicleId}/message-setup", null, auth: true));

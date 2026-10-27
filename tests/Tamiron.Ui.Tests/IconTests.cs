@@ -24,16 +24,19 @@ public class IconTests
     /// <summary>
     /// Yalın <c>.btn</c> renksizdir (03-bilesen.css): prototipte her düğme bir tür taşır (btn-primary,
     /// btn-ghost …). Türsüz düğme koyu temada beyaz zemin + açık yazı oldu — G1'de tarayıcıda görüldü.
+    /// Tür stil dosyasında TANIMLI olmalı: G10'da "btn-danger" yazıldı, böyle bir tür yok — o da renksizdi.
     /// </summary>
     [Fact]
     public void Every_button_has_a_colour_variant()
     {
         var d = new DirectoryInfo(AppContext.BaseDirectory);
         while (!File.Exists(Path.Combine(d!.FullName, "Tamiron.sln"))) d = d.Parent;
+        var css = string.Concat(Directory.GetFiles(Path.Combine(d.FullName, "src", "Tamiron.Ui.Core", "wwwroot"), "*.css").Select(File.ReadAllText));
+        var variants = Regex.Matches(css, @"\.(btn-[a-z-]+)").Select(m => m.Groups[1].Value).Where(c => c is not "btn-lg" and not "btn-row").ToHashSet();
         var bare = Directory.GetFiles(Path.Combine(d.FullName, "src"), "*.razor", SearchOption.AllDirectories)
             .SelectMany(f => Regex.Matches(File.ReadAllText(f), "class=\"(btn(?: [^\"]*)?)\"")
                 .Select(m => (File: Path.GetFileName(f), Cls: m.Groups[1].Value)))
-            .Where(x => !x.Cls.Split(' ').Any(c => c.StartsWith("btn-") && c is not "btn-lg" and not "btn-row"))
+            .Where(x => !x.Cls.Split(' ').Any(variants.Contains))
             .Select(x => $"{x.File}: class=\"{x.Cls}\"");
         Assert.Empty(bare);
     }

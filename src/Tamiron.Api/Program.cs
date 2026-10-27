@@ -210,6 +210,8 @@ api.MapGet("/o/{code}", (string code, ISender s, CancellationToken ct) =>
 // D2 · Parça sorma: soru (parçacı başına bir kayıt) · liste · cevap (satıra işlenir).
 api.MapPost("/records/{id:guid}/price-requests", (Guid id, Tamiron.Application.PriceRequests.AskBody b, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.PriceRequests.AskForPrices(id, b), ct));
+api.MapGet("/records/{id:guid}/price-question", (Guid id, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.PriceRequests.GetPriceQuestion(id), ct));
 api.MapGet("/records/{id:guid}/price-requests", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.PriceRequests.ListPriceRequests(id), ct));
 api.MapPost("/price-requests/{id:guid}/replies", (Guid id, Tamiron.Application.PriceRequests.ReplyBody b, ISender s, CancellationToken ct) =>

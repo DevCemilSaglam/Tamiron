@@ -1,0 +1,132 @@
+@page "/parcacilar"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G10a · Parçacılar (VERI-MODELI §4: ad + telefon, İKİ alan). Parça fiyatı onlara sorulur (40-parca-sor).
+  Prototipte liste sabitti; usta kendi parçacısını yazamıyordu. Ekle · düzenle · sil (soft — geçmiş soru
+  kime gittiğini kaybetmez). Numara dükkânda tekil, biçim ve sıra API'de.
+  "geri" yalnız uygulama içi yol olabilir ("/..." — dışarıya yönlendirme yok).
+*@
+<section class="screen active" id="screen-parcacilar">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-package"></use></svg> Parçacılar
+      @if (liste is not null) { <span class="eb-say" id="pcSay">@liste.Count</span> }
+    </span>
+  </div>
+
+  @if (GeriYolu is { } g)
+  {
+    <button class="btn btn-ghost" id="pcGeri" @onclick="() => Nav.NavigateTo(g)">
+      <svg class="ico"><use href="#i-chevron-left"></use></svg> Parça sormaya dön</button>
+  }
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="pcHata"><span class="n-body">@hata</span></div>
+  }
+
+  <div id="pcListe">
+    @if (liste is { Count: 0 })
+    {
+      <div class="bos-durum"><b>Henüz parçacı yok</b><span>Parça fiyatını WhatsApp'tan sorduğun yerleri yaz — ad ve telefon yeter.</span></div>
+    }
+    else if (liste is not null)
+    {
+      @foreach (var p in liste)
+      {
+        <div class="card" data-parcaci="@p.Id" @key="p.Id">
+          @if (duzenlenen == p.Id)
+          {
+            <div class="field-2">
+              <div class="field"><label for="pcDuzAd">Ad</label><input id="pcDuzAd" value="@duzAd" @oninput="e => duzAd = e.Value?.ToString() ?? string.Empty" /></div>
+              <div class="field"><label for="pcDuzTel">Telefon</label><input id="pcDuzTel" class="mono" inputmode="tel" value="@duzTel" @oninput="e => duzTel = e.Value?.ToString() ?? string.Empty" /></div>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="pcKaydet" disabled="@calisiyor" @onclick="() => Kaydet(p)">Kaydet</button>
+              <button class="btn btn-ghost" id="pcVazgec" @onclick="() => duzenlenen = null">Vazgeç</button>
+            </div>
+          }
+          else if (silinecek == p.Id)
+          {
+            <p><b>@p.Name</b> silinsin mi? Geçmiş sorular adıyla kalır.</p>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="pcSilEvet" disabled="@calisiyor" @onclick="() => Sil(p)">Sil</button>
+              <button class="btn btn-ghost" id="pcSilHayir" @onclick="() => silinecek = null">Vazgeç</button>
+            </div>
+          }
+          else
+          {
+            <div class="mus-ad">@p.Name</div>
+            <a class="tel-link" href="@Format.TelLink(p.Phone)" aria-label="@($"{p.Name} ara")"><svg class="ico ico-sm"><use href="#i-phone"></use></svg>@p.Phone</a>
+            <div class="btn-row">
+              <button class="btn btn-ghost" data-duzenle="@p.Id" @onclick="() => DuzenleAc(p)">Düzenle</button>
+              <button class="btn btn-ghost" data-sil="@p.Id" @onclick="() => { silinecek = p.Id; duzenlenen = null; }">
+                <svg class="ico"><use href="#i-x"></use></svg> Sil</button>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <div class="card" id="pcYeni">
+    <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-plus"></use></svg> Parçacı ekle</span></div>
+    <div class="field-2">
+      <div class="field"><label for="pcAd">Ad</label><input id="pcAd" placeholder="Öz Parça" autocomplete="off" value="@ad" @oninput="e => ad = e.Value?.ToString() ?? string.Empty" /></div>
+      <div class="field"><label for="pcTel">Telefon</label><input id="pcTel" class="mono" inputmode="tel" placeholder="0533 100 00 01" value="@tel" @oninput="e => tel = e.Value?.ToString() ?? string.Empty" /></div>
+    </div>
+    <button class="btn btn-primary" id="pcEkle" disabled="@calisiyor" @onclick="Ekle">
+      <svg class="ico"><use href="#i-plus"></use></svg> Ekle</button>
+  </div>
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "geri")] public string? Geri { get; set; }
+
+    List<Supplier>? liste;
+    string ad = "", tel = "", duzAd = "", duzTel = "";
+    Guid? duzenlenen, silinecek;
+    string? hata;
+    bool calisiyor;
+
+    // Yalnız uygulama içi yol: "//başka.site" ya da "https://…" dışarı götürürdü.
+    string? GeriYolu => Geri is { Length: > 1 } g && g[0] == '/' && g[1] != '/' ? g : null;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () => liste = await Api.SuppliersAsync());
+    }
+
+    Task Ekle() => Calis(async () =>
+    {
+        await Api.AddSupplierAsync(ad, tel);
+        ad = tel = "";
+        liste = await Api.SuppliersAsync();
+    });
+
+    void DuzenleAc(Supplier p) { duzenlenen = p.Id; silinecek = null; duzAd = p.Name; duzTel = p.Phone; hata = null; }
+
+    Task Kaydet(Supplier p) => Calis(async () =>
+    {
+        await Api.UpdateSupplierAsync(p.Id, duzAd, duzTel);
+        duzenlenen = null;
+        liste = await Api.SuppliersAsync();
+    });
+
+    Task Sil(Supplier p) => Calis(async () =>
+    {
+        await Api.DeleteSupplierAsync(p.Id);
+        silinecek = null;
+        liste = await Api.SuppliersAsync();
+    });
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}

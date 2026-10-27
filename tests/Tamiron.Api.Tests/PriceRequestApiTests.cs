@@ -43,6 +43,37 @@ public class PriceRequestApiTests(ApiFactory f) : IClassFixture<ApiFactory>
         => await Read<SupplierDto>(await api.PostAsJsonAsync("/api/suppliers", new { name, phone }, Json));
 
     [Fact]
+    public async Task Preview_shows_what_will_be_asked_and_the_exact_text()
+    {
+        // G10 · Ekran gönderMEDEN önce neyin, hangi metinle gideceğini gösterir — kural ve metin API'de.
+        var (api, r) = await RecordWithParts("34 PS 020");
+        var p = await Read<PriceQuestionPreview>(await api.GetAsync($"/api/records/{r.Id}/price-question"));
+        Assert.Equal(new[] { "Balata", "Disk" }, p.Lines.Select(l => l.Name));   // işçilik sorulmaz
+        Assert.True(p.HasPartIdentity);
+        Assert.Empty(p.Missing);
+        Assert.Equal("Fiat Egea 2021 · 1.4 Fire\n34 PS 020\n\n· Balata\n· Disk\n\nFiyat verebilir misiniz?", p.Text);
+    }
+
+    [Fact]
+    public async Task Preview_tells_which_identity_fields_are_missing()
+    {
+        var (api, r) = await RecordWithParts("34 PS 021", identity: false);
+        var p = await Read<PriceQuestionPreview>(await api.GetAsync($"/api/records/{r.Id}/price-question"));
+        Assert.False(p.HasPartIdentity);
+        Assert.Equal(new[] { "marka", "model", "yıl", "motor" }, p.Missing);
+    }
+
+    [Fact]
+    public async Task Preview_of_a_priced_part_has_nothing_to_ask()
+    {
+        var (api, r) = await RecordWithParts("34 PS 022");
+        foreach (var l in r.Lines.Where(l => l.Kind.ToString() == "Part"))
+            await Read<ServiceRecordDto>(await api.PutAsJsonAsync($"/api/records/{r.Id}/lines/{l.Id}", new { kind = "Part", name = l.Name, price = 100 }, Json));
+        var p = await Read<PriceQuestionPreview>(await api.GetAsync($"/api/records/{r.Id}/price-question"));
+        Assert.Empty(p.Lines);
+    }
+
+    [Fact]
     public async Task Asking_two_suppliers_makes_two_requests_with_the_same_text()
     {
         var (api, r) = await RecordWithParts("34 PS 010");

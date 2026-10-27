@@ -16,6 +16,13 @@ public sealed record PriceRequestDto(Guid Id, Guid SupplierId, string SupplierNa
 public sealed record AskBody(IReadOnlyList<Guid>? SupplierIds);
 public sealed record ReplyBody(Guid LineId, string? RawText, decimal? Price, string? Brand, string? Code, decimal? CustomerPrice);
 
+/// <summary>
+/// G10 · Gönderilmeden ÖNCE: neyin sorulacağı, araç kimliği tamam mı (K-068; eksikse hangileri) ve
+/// parçacıya gidecek metnin KENDİSİ (gönderilenle aynı fonksiyon — gördüğün gider).
+/// </summary>
+public sealed record GetPriceQuestion(Guid RecordId) : IRequest<PriceQuestionPreview>;
+public sealed record PriceQuestionPreview(IReadOnlyList<AskedLineDto> Lines, bool HasPartIdentity, IReadOnlyList<string> Missing, string Text);
+
 public sealed record AskForPrices(Guid RecordId, AskBody Body) : IRequest<List<PriceRequestDto>>;
 public sealed record ListPriceRequests(Guid RecordId) : IRequest<List<PriceRequestDto>>;
 public sealed record AddPriceReply(Guid RequestId, ReplyBody Body) : IRequest<ServiceRecordDto>;
@@ -23,8 +30,19 @@ public sealed record AddPriceReply(Guid RequestId, ReplyBody Body) : IRequest<Se
 internal sealed class PriceRequestHandlers(ITamironDb db, ITenantContext tenant, IClock clock) :
     IRequestHandler<AskForPrices, List<PriceRequestDto>>,
     IRequestHandler<ListPriceRequests, List<PriceRequestDto>>,
-    IRequestHandler<AddPriceReply, ServiceRecordDto>
+    IRequestHandler<AddPriceReply, ServiceRecordDto>,
+    IRequestHandler<GetPriceQuestion, PriceQuestionPreview>
 {
+    public async Task<PriceQuestionPreview> Handle(GetPriceQuestion q, CancellationToken ct)
+    {
+        var r = await db.ServiceRecords.AsNoTracking().Include(x => x.Lines).FirstOrDefaultAsync(x => x.Id == q.RecordId, ct)
+                ?? throw new NotFoundException("Servis kaydı");
+        var v = await db.Vehicles.AsNoTracking().FirstAsync(x => x.Id == r.VehicleId, ct);
+        var askable = PartQuestion.AskableLines(r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated));
+        return new PriceQuestionPreview(askable.Select(l => new AskedLineDto(l.Id, l.Name, l.SelectedReplyId)).ToList(),
+            v.HasPartIdentity, v.MissingForParts, PartQuestion.Compose(v, askable));
+    }
+
     /// <summary>
     /// Seçilen her parçacıya AYRI soru (Kol B). Kapılar domain'de (K-068); başka dükkânın
     /// parçacısı 404 — süzgeç onu görmez.
