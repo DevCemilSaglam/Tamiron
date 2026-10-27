@@ -64,6 +64,16 @@ sınıfı). İkonlar prototipin `ikonlar.svg`'sinden gömülür — kopya yok.
   sorusu (dükkân ayarı), ödeme ve "Düzenle" (G5). Eylem çubuğunda yalnız çalışan "Ekle" var.
 - **G2b (ruhsat sekmesi) G3'ün arkasına alındı:** kayıt açılınca gidilecek sayfa yoktu — ana yol önce.
 
+**80.8 · Teslim ekranı (G4).** Prototip 50-teslim'in davranışı; kurallar API'de.
+- Fazla ödeme ekranda HESAPLANMAZ: API'nin cümlesi ("Toplam X ₺ — fazlası girilemez.") gösterilir,
+  yazılan tutar silinmez. Ekran yalnız EKSİĞİ sorar (yol seçilmedi, tutar yok, kısmi yol yok).
+- Teslimden sonra **"Kayda dön" · "Ana menü"**. Prototipteki "Müşteriye özet gönder" mesaj ekranıyla
+  gelir (G9) — gönderemeyen düğme konmaz.
+- **Teslimi geri alma bu ekranda YOK.** K-076.13 (aynı gün geri alma) Cemil'in onayını bekliyor ve
+  prototiple çelişiyor ("teslim geri alınamaz"); ucu sunucuda hazır, düğmesi kararla gelir (G5 "Düzenle").
+- Ana yol yerel kurulumda baştan sona çalıştı: kayıt aç → satır → teslim (kısmi 500 ₺ nakit) →
+  ana menü "Bugün 500 ₺ · 1.000 ₺ veresiye".
+
 **80.5 · `Microsoft.AspNetCore.Components.WebAssembly.Server` 8.0.33.** 8.0.11'in yüksek önemli bir
 açığı var (NuGet uyarısı NU1903); arayüzü sunan paket en son 8.0 yamasıyla girdi.
 

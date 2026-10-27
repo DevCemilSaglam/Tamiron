@@ -1,0 +1,179 @@
+@page "/teslim/{Id:guid}"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G4 · Teslim et (EKRANLAR §5, prototip 50-teslim). Ayrı ekran çünkü ayrı an. Ödeme yolu: nakit ·
+  kart · havale · almadım · "Bir kısmını aldım" (K-078: tutar + yol, kalanı veresiye). Düğme kapalı
+  değil, eksikse KONUŞUR (K-040.3). Fazla ödeme, durum, hatırlatma API'de — ekran API'nin cümlesini
+  gösterir. Bakımsa kurulacak hatırlatma önceden söylenir (ay VEYA km, hangisi önce — K-002).
+  "Parça bekliyor" ve fiyatsız satır SÖYLENİR, teslimi kilitlemez (K-034).
+  ⚠️ Henüz yok: teslimden sonra "Müşteriye özet gönder" (mesaj ekranı, G9). Şimdilik "Kayda dön".
+*@
+<section class="screen active" id="screen-teslim">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Teslim et</span>
+  </div>
+
+  @if (k is not null)
+  {
+    <div class="card">
+      <div id="tsKunye">
+        <div class="arac-bas">
+          <Plate No="@k.PlateNo" Size="plate-lg" />
+          <div class="veh-title">@($"{arac?.Brand} {arac?.Model}".Trim())
+            @if (!string.IsNullOrWhiteSpace(arac?.Year)) { <span class="yr">@arac.Year</span> }
+          </div>
+          <div class="spec-strip">
+            <span class="spec-val">@TurAdi(k.Type)</span>
+            @if (!string.IsNullOrWhiteSpace(arac?.Engine))
+            {
+              <span class="spec-sep">·</span><span class="spec-val">@arac.Engine</span>
+            }
+          </div>
+        </div>
+      </div>
+      <div class="tutar-serit" id="tsTutar">
+        <div class="tutar-sat"><span>@k.Lines.Count satır</span>
+          @if (k.Lines.Any(l => l.CountsInTotal && l.Price == 0)) { <span class="pill muted">fiyatı girilmemiş satır var</span> }
+          @if (k.WaitingForPart && k.DeliveredAt is null) { <span class="pill warn">parça bekliyor olarak işaretli</span> }
+        </div>
+        <div class="tutar-sat genel"><span>Alınacak</span><span class="tv">@Format.Money(k.Total) ₺</span></div>
+      </div>
+    </div>
+
+    @if (k.DeliveredAt is null)
+    {
+      <div class="section-label"><span class="lbl-txt">Ödeme nasıl alındı?</span></div>
+      <div class="cip-grup" id="tsOdeme" role="group" aria-label="Ödeme yolu">
+        @foreach (var (yol, ad) in Yollar)
+        {
+          <button class="cip" data-odeme="@yol" aria-pressed="@(secili == yol ? "true" : "false")" @onclick="() => Sec(yol)">@ad</button>
+        }
+      </div>
+      @if (secili == "kismi")
+      {
+        <div id="tsKismi">
+          <div class="field"><label for="tsKismiTutar">Alınan</label>
+            <input id="tsKismiTutar" class="mono" inputmode="numeric" autocomplete="off" placeholder="ör. 2.000"
+                   @bind="kismiTutar" @bind:event="oninput" /></div>
+          <div class="cip-grup" role="group" aria-label="Nasıl alındı">
+            @foreach (var (yol, ad) in Yollar.Take(3))
+            {
+              <button class="cip" data-kismi-yol="@yol" aria-pressed="@(kismiYol == yol ? "true" : "false")" @onclick="() => kismiYol = yol">@ad</button>
+            }
+          </div>
+          <p class="plate-hint">Kalanı kayıtta "Ödeme alındı" ile yazarsın.</p>
+        </div>
+      }
+      @if (hata is not null)
+      {
+        <div class="notice warn" role="alert" id="tsHata"><span class="n-body">@hata</span></div>
+      }
+      <button class="btn btn-primary btn-lg" id="tsTeslim" @onclick="TeslimEt" disabled="@calisiyor">
+        <svg class="ico"><use href="#i-check"></use></svg> Teslim et
+      </button>
+    }
+    else if (hata is not null)
+    {
+      <div class="notice warn" role="alert" id="tsHata"><span class="n-body">@hata</span></div>
+    }
+
+    <div id="tsNot">
+      @if (k.DeliveredAt is { } t && bitti)
+      {
+        <div class="notice ok">
+          <span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>
+          <span class="n-body"><b>@k.PlateNo teslim edildi.</b> Ödeme: @OdemeOzeti(k).
+            @if (k.ReminderDate is { } h) { <br /><text>Bakım hatırlatması <b>@Format.Date(h)</b> için kuruldu.</text> }
+          </span>
+        </div>
+        <button class="btn btn-primary btn-lg" id="tsKayda" @onclick='() => Nav.NavigateTo($"/kayit/{Id}")'>Kayda dön</button>
+        <button class="btn btn-ghost" id="tsMenu" @onclick='() => Nav.NavigateTo("/")'>Ana menü</button>
+      }
+      else if (k.DeliveredAt is { } t2)
+      {
+        <div class="notice ok">
+          <span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>
+          <span class="n-body">Bu iş @(Format.Date(t2))'da teslim edildi. Ödeme: @OdemeOzeti(k).</span>
+        </div>
+        <button class="btn btn-ghost" id="tsKayda" @onclick='() => Nav.NavigateTo($"/kayit/{Id}")'>Kayda dön</button>
+      }
+      else if (onizleme?.Reminder is { } r)
+      {
+        <div class="notice accent">
+          <span class="n-ic"><svg class="ico ico-sm"><use href="#i-clock"></use></svg></span>
+          <span class="n-body">Teslimden sonra <b>@Format.Date(r.Date)</b> için bakım hatırlatması kurulacak@(r.Basis == "Km"
+              ? $" — {Format.Money(dukkan?.MaintenanceKm ?? 0)} km aydan önce doluyor."
+              : $" ({dukkan?.MaintenanceMonths} ay).")</span>
+        </div>
+      }
+    </div>
+  }
+  else if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="tsHata"><span class="n-body">@hata</span></div>
+  }
+</section>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    // Prototip ODEME_YOLLARI — sıra aynı. "kismi" bir yol değil, bir soru: tutar + yol.
+    static readonly (string Yol, string Ad)[] Yollar =
+        [("Cash", "Nakit"), ("Card", "Kart"), ("Transfer", "Havale"), ("Unpaid", "Almadım"), ("kismi", "Bir kısmını aldım")];
+
+    RecordDetail? k;
+    VehicleCard? arac;
+    DeliveryPreview? onizleme;
+    ShopSettings? dukkan;
+    string? secili, kismiYol, hata;
+    string kismiTutar = "";
+    bool calisiyor, bitti;
+
+    static string TurAdi(string t) => t switch { "Maintenance" => "Bakım", "Both" => "Tamirat + Bakım", _ => "Tamirat" };
+
+    // Prototip odemeOzeti: kısmen ödendiyse "X alındı · kalan Y", değilse yolun adı.
+    static string OdemeOzeti(RecordDetail r) => r.Paid > 0 && r.Remaining > 0
+        ? $"{Format.Money(r.Paid)} ₺ alındı · kalan {Format.Money(r.Remaining)} ₺"
+        : Format.PaymentLabel(r.PaymentMethod);
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () =>
+        {
+            k = await Api.RecordAsync(Id);
+            arac = await Api.VehicleAsync(k.VehicleId);
+            if (k.DeliveredAt is null)
+            {
+                onizleme = await Api.DeliveryPreviewAsync(Id);
+                if (onizleme.Reminder is not null) dukkan = await Api.ShopAsync();
+            }
+        });
+    }
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+
+    void Sec(string yol) { secili = yol; hata = null; }
+
+    async Task TeslimEt()
+    {
+        if (secili is null) { hata = "Ödemeyi nasıl aldığını seç — almadıysan \"Almadım\" de."; return; }
+        string yol = secili;
+        decimal? tutar = null;
+        if (secili == "kismi")
+        {
+            if (Format.ParseMoney(kismiTutar) is not { } t || t <= 0) { hata = "Ne kadar aldığını yaz."; return; }
+            if (kismiYol is null) { hata = "Nasıl aldığını seç: nakit, kart ya da havale."; return; }
+            yol = kismiYol; tutar = t;
+        }
+        await Calis(async () => { k = await Api.DeliverAsync(Id, yol, tutar); bitti = true; });
+    }
+}

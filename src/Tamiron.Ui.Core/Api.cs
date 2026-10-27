@@ -35,7 +35,7 @@ public sealed record OpenedRecord(Guid Id, Guid VehicleId, string PlateNo);
 public sealed record RecordDetail(Guid Id, Guid VehicleId, string PlateNo, string Type, string Complaint,
                                   DateOnly? DeliveredAt, bool WaitingForPart, bool ShowWaitingToCustomer,
                                   decimal Total, IReadOnlyList<LineItem> Lines, IReadOnlyList<string> Warnings,
-                                  decimal Paid, decimal Remaining);
+                                  decimal Paid, decimal Remaining, string? PaymentMethod = null, DateOnly? ReminderDate = null);
 
 public sealed record LineItem(Guid Id, string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy, bool CountsInTotal);
 
@@ -43,7 +43,13 @@ public sealed record LineItem(Guid Id, string Kind, string Name, decimal Price, 
 public sealed record LineInput(string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy);
 
 public sealed record VehicleCard(Guid Id, string PlateNo, string? Brand, string? Model, string? OwnerName, string? OwnerPhone,
-                                 string? ContactName, string? ContactPhone);
+                                 string? ContactName, string? ContactPhone, string? Year = null, string? Engine = null);
+
+/// <summary>G4 · Teslimden önce: kurulacak bakım hatırlatması (API DeliveryPreview). Basis: "Month" | "Km".</summary>
+public sealed record DeliveryPreview(Guid RecordId, ReminderPlan? Reminder);
+public sealed record ReminderPlan(DateOnly Date, string Basis, DateOnly MonthDate, int? KmTarget, DateOnly? KmDate);
+
+public sealed record ShopSettings(string Name, int MaintenanceMonths, int MaintenanceKm, bool AskPartCost);
 
 public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
                                  decimal CollectedToday, decimal Receivable, int DueReminderCount);
@@ -111,6 +117,13 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     public async Task<RecordDetail> PatchRecordAsync(Guid id, string? complaint = null, string? type = null, bool? waitingForPart = null, bool? showWaitingToCustomer = null)
         => await Read<RecordDetail>(await Send(HttpMethod.Patch, $"api/records/{id}", new { complaint, type, waitingForPart, showWaitingToCustomer }, auth: true));
 
+    public async Task<DeliveryPreview> DeliveryPreviewAsync(Guid id) => await Read<DeliveryPreview>(await Send(HttpMethod.Get, $"api/records/{id}/delivery-preview", null, auth: true));
+    public async Task<ShopSettings> ShopAsync() => await Read<ShopSettings>(await Send(HttpMethod.Get, "api/shop", null, auth: true));
+
+    /// <summary>Teslim (K-004). <paramref name="amount"/> dolu = "Bir kısmını aldım" (K-078); kural API'de.</summary>
+    public async Task<RecordDetail> DeliverAsync(Guid id, string method, decimal? amount)
+        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/deliver", new { method, amount }, auth: true));
+
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
     public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
@@ -166,5 +179,11 @@ public static class Format
         if (t.Length == 0) return 0;
         return decimal.TryParse(t, NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var d) && d >= 0 ? d : null;
     }
+    /// <summary>Ödeme yolunun Türkçesi (prototip ODEME_ETIKET).</summary>
+    public static string PaymentLabel(string? method) => method switch
+    {
+        "Cash" => "Nakit", "Card" => "Kart", "Transfer" => "Havale", "Unpaid" => "Almadım", _ => "",
+    };
+
     public static string Date(DateOnly d) => d.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 }
