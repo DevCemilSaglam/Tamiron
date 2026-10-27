@@ -10,6 +10,30 @@
 
 ---
 
+## K-086 · Ayarlar ekranı ve kayıtta alış alanı (27.10.2026 — lider, Cemil onayına açık)
+
+G11a koda geçti (prototip 99-ayarlar, K-055.2; API C5'te hazırdı).
+- **Dört sakin:** bakım periyodu (3 · 6 · 12 ay; km 10.000 okunur), parça alış fiyatı (Sorulsun /
+  Sorulmasın — iki düğme, T-18), tema, gizlilik. Dükkân adı/adresi/telefonu **okunur** (C5: düzenleme yok).
+- **Tema cihazda** (`tema.js`, sunucuya gitmez); seçilmemişse işletim sistemine göre. Sayfa çizilmeden
+  önce uygulanır.
+- **Kayıtta alış alanı yalnız ayar "Sorulsun"ken** ve yalnız tamircinin aldığı parçada; boş = bilinmiyor
+  (kâra girmez, sıfır yazılmaz). **Prototipten ayrışma — Cemil onayına açık:** prototip ayar kapalıyken
+  "parçacı 1.200 ₺" yazısını da gizliyordu. Burada okunur kalır: o rakamı usta parça sorda kendisi yazdı;
+  ayar kapalı diye saklamak bilgiyi kaybettirir.
+- **Gizlilik cümlesi bugün doğru olanı söyler:** ruhsat fotoğrafı internetten gönderilir, müşteri bilgisi bu
+  bilgisayarda. Prototipin "90 gün saklanır" sözü YAZILMADI: silme betiği var (K-053.4) ama zamanlanmadı —
+  **Cemil kararı:** betik zamanlanırsa (Windows görev zamanlayıcısı = makine ayarı) cümle geri gelir.
+
+## K-087 · Uygulama sayfası her açılışta yeniden sorulur (27.10.2026 — lider)
+
+Tarayıcıda bulundu: `index.html` önbellek başlığı taşımıyordu, tarayıcı tahminle önbelleğe aldı ve
+güncellemeden sonra ESKİ sayfa açıldı (yeni `tema.js` yüklenmedi). Usta için anlamı: güncellediğimiz
+program telefonda/bilgisayarda eskisi gibi açılır. Çözüm: yalnız `index.html`'e `Cache-Control: no-cache`
+(statik dosya + yedek yol) — her açılışta sorar, değişmediyse ETag'le 304 (ölçüldü: ikinci açılış 300 bayt).
+Öteki dosyalar dokunulmaz. **Bilinen bedel:** düzeltmeden ÖNCE önbelleğe girmiş sayfa, tarayıcının
+tahmini dolana kadar eski kalabilir — ilk kurulumda (K-080) bu sorun yok.
+
 ## K-085 · Parça fiyatı sor: önizleme API'den, ilk WhatsApp açılır, cevabı usta yazar (27.10.2026 — lider, Cemil onayına açık)
 
 G10 koda geçti (prototip 40-parca-sor; API D1/D2'de hazırdı).

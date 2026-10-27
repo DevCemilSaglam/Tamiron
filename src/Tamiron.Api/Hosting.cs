@@ -17,6 +17,16 @@ public static class Hosting
 
     static bool IsDevOrLocal(string env) => env is "Development" or Local;
 
+    /// <summary>
+    /// Uygulama sayfası (index.html) her açılışta yeniden sorulur: başlıksız kalınca tarayıcı tahminle önbelleğe
+    /// alıyor, güncellemeden sonra ESKİ sayfa açılıyordu (G11, tarayıcıda görüldü). Değişmediyse ETag'le 304 — hızlı.
+    /// Öteki dosyalar dokunulmaz.
+    /// </summary>
+    public static void MarkAppPage(Microsoft.AspNetCore.Http.HttpResponse res, string fileName)
+    {
+        if (fileName == "index.html") res.Headers.CacheControl = "no-cache";
+    }
+
     /// <summary>Geliştirmede ve yerelde HEP pencereye/günlüğe — hesap tanımlı olsa bile para harcanmaz.</summary>
     public static Type SmsSenderType(string env, NetgsmOptions? netgsm)
         => IsDevOrLocal(env) ? typeof(DevLogSmsSender)

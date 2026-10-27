@@ -90,7 +90,7 @@ public sealed record VehicleCard(Guid Id, string PlateNo, string? Brand, string?
 public sealed record DeliveryPreview(Guid RecordId, ReminderPlan? Reminder);
 public sealed record ReminderPlan(DateOnly Date, string Basis, DateOnly MonthDate, int? KmTarget, DateOnly? KmDate);
 
-public sealed record ShopSettings(string Name, int MaintenanceMonths, int MaintenanceKm, bool AskPartCost);
+public sealed record ShopSettings(string Name, int MaintenanceMonths, int MaintenanceKm, bool AskPartCost, string? Address = null, string? Phone = null);
 
 /// <summary>G6 · Muhasebe tek çağrı (C8). Period: "Today" | "Month" | "Year".</summary>
 public sealed record AccountingOverview(CashSummary Cash, ExpenseList Expenses, ReceivableList Receivables);
@@ -186,6 +186,11 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<RecordDetail>(await Send(HttpMethod.Patch, $"api/records/{id}", new { complaint, type, waitingForPart, showWaitingToCustomer }, auth: true));
 
     public async Task<DeliveryPreview> DeliveryPreviewAsync(Guid id) => await Read<DeliveryPreview>(await Send(HttpMethod.Get, $"api/records/{id}/delivery-preview", null, auth: true));
+    // G11 · Ayar başına ayrı istek: yalnız değişen alan gider (API kısmi — null = dokunma).
+    public async Task<ShopSettings> SetMaintenanceMonthsAsync(int months)
+        => await Read<ShopSettings>(await Send(HttpMethod.Patch, "api/shop", new { maintenanceMonths = months }, auth: true));
+    public async Task<ShopSettings> SetAskPartCostAsync(bool ask)
+        => await Read<ShopSettings>(await Send(HttpMethod.Patch, "api/shop", new { askPartCost = ask }, auth: true));
     public async Task<ShopSettings> ShopAsync() => await Read<ShopSettings>(await Send(HttpMethod.Get, "api/shop", null, auth: true));
 
     /// <summary>Teslim (K-004). <paramref name="amount"/> dolu = "Bir kısmını aldım" (K-078); kural API'de.</summary>

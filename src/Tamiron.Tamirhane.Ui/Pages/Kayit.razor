@@ -8,8 +8,7 @@
   Her değişiklik API'ye gider; ekran API'nin döndürdüğü kaydı yeniden çizer — toplam, eksikler
   ("Eksik görünen"), müşteri parçasının toplama girmemesi (K-037) sunucunun hesabı.
   Satır silme: prototipte sola kaydırma; burada satırdaki çöp düğmesi + "Geri al" (soft-delete).
-  ⚠️ Henüz yok: "Ne oldu" süreci, Sesle/Kamera/Mesaj (G9, G13), alış sorusu
-  (dükkân ayarı, G11), ödeme ve "Düzenle" (G5).
+  ⚠️ Henüz yok: "Ne oldu" süreci, Sesle/Kamera/Mesaj (G9, G13), ödeme ve "Düzenle" (G5).
 *@
 <section class="screen active" id="screen-kayit">
   <div class="screen-head">
@@ -103,7 +102,7 @@
                       <svg class="ico ico-sm"><use href="#i-x"></use></svg>
                     </button>
                   </span>
-                  @if (parca && (s.SuppliedBy == "Customer" || s.Price == 0 || s.Cost is not null))
+                  @if (parca && (s.SuppliedBy == "Customer" || s.Price == 0 || s.Cost is not null || AlisSorulur(s)))
                   {
                     <span class="k-ikincil">
                       @if (s.SuppliedBy == "Customer")
@@ -114,7 +113,14 @@
                       {
                         <button class="k-getiren-sor" data-getiren="@s.Id" @onclick='() => Getiren(s, "Customer")'>müşteri getirdi</button>
                       }
-                      @if (s.Cost is { } alis)
+                      @if (AlisSorulur(s))
+                      {
+                        @* Müşteriye söylenecek rakam DEĞİL: soluk, küçük, boş bırakılabilir (boş = bilinmiyor, kâra girmez). *@
+                        <label class="k-alis">alış
+                          <input value="@(s.Cost is { } a ? Format.Money(a) : "")" data-satir-alis="@s.Id" inputmode="numeric"
+                                 placeholder="—" aria-label="Alış fiyatı (boş bırakılabilir)" @onchange="e => AlisDegisti(s, e)" /> ₺</label>
+                      }
+                      else if (s.Cost is { } alis)
                       {
                         <span class="k-alis">parçacı @Format.Money(alis) ₺</span>
                       }
@@ -302,6 +308,7 @@
     LineItem? silinen;
     string? hata, ekHata;
     bool panel, calisiyor;
+    ShopSettings? dukkan;
     string ekTur = "Part", ekAd = "", ekTutar = "";
 
     static string Rakam(string s) => new(s.Where(char.IsAsciiDigit).ToArray());
@@ -365,6 +372,17 @@
 
     Task Duzelt(string yol) => Calis(async () => { k = await Api.CorrectPaymentAsync(Id, yol); duzenle = false; tahsilNot = null; });   // eski bildirim yanlış yolu söylerdi
 
+    // G11 · Dükkân ayarı (A-M43): yalnız tamircinin aldığı parçada. Ayar okunamazsa sorulmaz — varsayılan kapalı.
+    bool AlisSorulur(LineItem s) => dukkan?.AskPartCost == true && s.Kind == "Part" && s.SuppliedBy != "Customer";
+
+    Task AlisDegisti(LineItem s, ChangeEventArgs e)
+    {
+        var yazilan = e.Value?.ToString() ?? "";
+        decimal? alis = yazilan.Trim().Length == 0 ? null : Format.ParseMoney(yazilan);
+        if (yazilan.Trim().Length > 0 && alis is null) { hata = "Tutarı rakamla yaz — ör. 1.200"; return Task.CompletedTask; }
+        return Guncelle(s, Girdi(s) with { Cost = alis });
+    }
+
     static LineInput Girdi(LineItem s) => new(s.Kind, s.Name, s.Price, s.Cost, s.SuppliedBy);
 
     protected override async Task OnInitializedAsync()
@@ -377,6 +395,8 @@
             arac = await Api.VehicleAsync(k.VehicleId);
             avans = await Api.AdvanceAsync(k.VehicleId);
         });
+        try { dukkan = await Api.ShopAsync(); } catch (ApiException) { }   // yalnız alış sorusu için; okunamazsa sorulmaz
+
     }
 
     /// <summary>Her işin ortak kabı: oturum düştüyse girişe, hata API'nin Türkçe cümlesi.</summary>

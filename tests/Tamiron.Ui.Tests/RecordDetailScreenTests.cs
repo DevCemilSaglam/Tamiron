@@ -71,6 +71,40 @@ public class RecordDetailScreenTests : TestContext
         Assert.Contains("parçacı 900 ₺", c.Find("#kSatirlar").TextContent);   // alış soluk, müşteriye değil
     }
 
+    const string AlisAcik = "{\"name\":\"Deneme Oto\",\"maintenanceMonths\":6,\"maintenanceKm\":10000,\"askPartCost\":true}";
+
+    [Fact]
+    public void Part_cost_is_asked_only_when_the_shop_wants_it()
+    {
+        // G11 · Ayarlardaki "Parça alış fiyatı: Sorulsun" (A-M43): yalnız tamircinin aldığı parçada, boş bırakılabilir.
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik);
+        var lines = "[" + Satir(L1, "Part", "Balata", 1200, "\"Shop\"", cost: "900") + "," + Satir(L2, "Part", "Yağ", 0, "\"Customer\"") + "]";
+        var c = Ac(Kayit(lines, 1200));
+        c.WaitForAssertion(() => Assert.Equal("900", c.Find($"[data-satir-alis='{L1}']").GetAttribute("value")));
+        Assert.Empty(c.FindAll($"[data-satir-alis='{L2}']"));   // müşterinin parçasının alışı sorulmaz
+    }
+
+    [Fact]
+    public void Written_cost_is_sent_and_empty_clears_it()
+    {
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik);
+        api.Routes[$"PUT /api/records/{Id}/lines/{L1}"] = (HttpStatusCode.OK, Kayit(IkiSatir, 2000));
+        var c = Ac(Kayit(IkiSatir, 2000));
+        c.WaitForElement($"[data-satir-alis='{L1}']").Change("1.050");
+        c.WaitForAssertion(() => Assert.Contains("\"cost\":1050", api.Calls.Last(x => x.Path == $"/api/records/{Id}/lines/{L1}").Body));
+        c.Find($"[data-satir-alis='{L1}']").Change("");
+        c.WaitForAssertion(() => Assert.Contains("\"cost\":null", api.Calls.Last(x => x.Path == $"/api/records/{Id}/lines/{L1}").Body));
+    }
+
+    [Fact]
+    public void Without_the_setting_cost_is_only_read()
+    {
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik.Replace("true", "false"));
+        var c = Ac(Kayit(IkiSatir, 2000));
+        c.WaitForAssertion(() => Assert.Contains("parçacı 900 ₺", c.Find($"[data-satir='{L1}']").TextContent));
+        Assert.Empty(c.FindAll("[data-satir-alis]"));
+    }
+
     [Fact]
     public void Part_question_is_offered_while_in_shop_only()
     {

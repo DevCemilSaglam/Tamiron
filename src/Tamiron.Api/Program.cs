@@ -117,7 +117,8 @@ else if (Hosting.MigratesOnStart(app.Environment.EnvironmentName))
 // G1 · Arayüz API'yle AYNI kökenden (K-076.10, K-080.1): tek komut, tek adres, CORS yok.
 // Blazor dosyaları Tamiron.Tamirhane.Web'den gelir; ekran yolları (/kayitlar …) index.html'e düşer.
 app.UseBlazorFrameworkFiles();
-app.UseStaticFiles();
+var sayfa = new StaticFileOptions { OnPrepareResponse = c => Hosting.MarkAppPage(c.Context.Response, c.File.Name) };
+app.UseStaticFiles(sayfa);
 
 var api = app.MapGroup("/api");
 
@@ -324,7 +325,7 @@ api.MapGet("/cash", (PeriodKind period, ISender s, CancellationToken ct) =>
 // Tanınmayan /api yolu arayüz sayfasına DÜŞMEZ — istemci HTML'i JSON sanıp bozulurdu.
 app.MapFallback("/api/{**rest}", () => Results.Problem(statusCode: 404, title: "Böyle bir istek yok.",
     extensions: new Dictionary<string, object?> { ["code"] = "request.not_found" }));
-app.MapFallbackToFile("index.html");
+app.MapFallbackToFile("index.html", sayfa);
 
 app.Run();
 

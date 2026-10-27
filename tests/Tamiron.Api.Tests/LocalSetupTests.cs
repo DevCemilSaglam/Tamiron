@@ -45,6 +45,20 @@ public class LocalSetupTests(ApiFactory f) : IClassFixture<ApiFactory>
         Assert.False(Hosting.WritesDevSeed("Local"));   // yerelde ustanın kendi dükkânı: boş başlar
     }
 
+    [Theory]
+    [InlineData("index.html", true)]
+    [InlineData("tema.js", false)]
+    [InlineData("04-ekranlar.css", false)]
+    public void Only_the_app_page_is_always_revalidated(string file, bool noCache)
+    {
+        // G11 · Tarayıcıda bulundu: başlıksız index.html tahminle önbelleğe alındı, güncellemeden sonra ESKİ
+        // sayfa (yeni betik yok) açıldı. no-cache: her açılışta sorar; değişmediyse ETag'le yine hızlı.
+        // Test sunucusu arayüz dosyalarını sunmaz — bağlantı tarayıcıda ölçüldü (K-087).
+        var ctx = new Microsoft.AspNetCore.Http.DefaultHttpContext();
+        Hosting.MarkAppPage(ctx.Response, file);
+        Assert.Equal(noCache ? "no-cache" : "", ctx.Response.Headers.CacheControl.ToString());
+    }
+
     [Fact]
     public async Task Unknown_api_path_is_a_turkish_404_not_the_app_page()
     {

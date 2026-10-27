@@ -1,0 +1,132 @@
+@page "/ayarlar"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@using Microsoft.JSInterop
+@*
+  G11a · Ayarlar (prototip 99-ayarlar, K-055.2). Dört sakin: bakım periyodu · parça alış fiyatı · tema ·
+  gizlilik. Native <select> yok — çip (tema uygulanır). Alış sorusu anahtar değil, iki düğme: teknolojiden
+  uzak kullanıcıya anahtarın hangi yönünün "açık" olduğunu sormaktan az şey sorar (T-18).
+  Dükkânın adı/adresi/telefonu OKUNUR (özette, mesaj imzasında) — düzenlemek prototipte yok (C5).
+  Km periyodu sabit (10.000) — okunur. Periyot sınırı (3 · 6 · 12) API'de. Tema cihazda (tema.js).
+*@
+<section class="screen active" id="screen-ayarlar">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-cog"></use></svg> Ayarlar</span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="ayarHata"><span class="n-body">@hata</span></div>
+  }
+  @if (sonuc is not null)
+  {
+    <div class="notice" role="status" id="ayarSonuc"><span class="n-body">@sonuc</span></div>
+  }
+
+  @if (d is not null)
+  {
+    <div class="card" id="ayarDukkan">
+      <div class="setting-row"><span class="sr-txt"><span class="sr-label">@d.Name</span>
+        @if (!string.IsNullOrWhiteSpace(d.Address)) { <span class="sr-sub">@d.Address</span> }
+        @if (!string.IsNullOrWhiteSpace(d.Phone)) { <span class="sr-sub">@d.Phone</span> }
+        <span class="sr-sub">Müşteriye giden özette ve mesajların altında bu yazar.</span>
+      </span></div>
+    </div>
+
+    <div class="card" id="ayarPeriyot">
+      <div class="setting-row"><span class="sr-txt">
+        <span class="sr-label">Bakım periyodu</span>
+        <span class="sr-sub">Teslimden sonra ne kadar süre için hatırlatma kurulsun — ya da @Format.Money(d.MaintenanceKm) km, hangisi önce gelirse.</span>
+      </span></div>
+      <div class="cip-grup" id="periyotGrup" role="group" aria-label="Bakım periyodu">
+        @foreach (var ay in new[] { 3, 6, 12 })
+        {
+          <button class="cip" data-periyot="@ay" aria-pressed="@(d.MaintenanceMonths == ay ? "true" : "false")" disabled="@calisiyor" @onclick="() => Periyot(ay)">@ay ay</button>
+        }
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="setting-row"><span class="sr-txt">
+        <span class="sr-label">Parça alış fiyatı</span>
+        <span class="sr-sub">Parçacıya ödediğini parçanın altına yazmak istersen sorulur. Boş bırakabilirsin — boşsa kâra katılmaz.</span>
+      </span></div>
+      <div class="cip-grup" id="alisGrup" role="group" aria-label="Parça alış fiyatı sorulsun mu">
+        <button class="cip" data-ayar-alis="0" aria-pressed="@(d.AskPartCost ? "false" : "true")" disabled="@calisiyor" @onclick="() => Alis(false)">Sorulmasın</button>
+        <button class="cip" data-ayar-alis="1" aria-pressed="@(d.AskPartCost ? "true" : "false")" disabled="@calisiyor" @onclick="() => Alis(true)">Sorulsun</button>
+      </div>
+    </div>
+  }
+
+  <div class="card">
+    <div class="setting-row"><span class="sr-txt">
+      <span class="sr-label">Tema</span>
+      <span class="sr-sub">Bu cihazda geçerli — öteki telefon kendi seçimini tutar.</span>
+    </span></div>
+    <div class="cip-grup" id="temaGrup" role="group" aria-label="Tema">
+      @foreach (var (deger, ad) in Temalar)
+      {
+        <button class="cip" data-tema="@deger" aria-pressed="@(tema == deger ? "true" : "false")" @onclick="() => TemaSec(deger)">@ad</button>
+      }
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="setting-row"><span class="sr-txt">
+      <span class="sr-label">Gizlilik</span>
+      @* Yalnız bugün DOĞRU olan yazılır: ses yok (G13); 90 günlük silme betiği zamanlanmadı (K-053.4) — söz verilmez. *@
+      <span class="sr-sub" id="ayarGizlilik">Çektiğin ruhsat fotoğrafı, yazıya çevrilmek üzere internet üzerinden gönderilir. Müşteri bilgileri bu bilgisayarda durur.</span>
+    </span></div>
+  </div>
+</section>
+
+@code {
+    static readonly (string Deger, string Ad)[] Temalar = [("", "Telefona göre"), ("light", "Açık"), ("dark", "Koyu")];
+
+    ShopSettings? d;
+    string tema = "";
+    string? hata, sonuc;
+    bool calisiyor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () => d = await Api.ShopAsync());
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        try { tema = await JS.InvokeAsync<string>("tamironTema.al"); StateHasChanged(); }
+        catch (JSException) { }   // eski önbellekte tema.js yoksa: telefona göre
+    }
+
+    Task Periyot(int ay) => Calis(async () =>
+    {
+        d = await Api.SetMaintenanceMonthsAsync(ay);
+        // Değişiklik bundan sonraki teslimlere uygulanır; kurulmuş hatırlatmalar yerinde kalır.
+        sonuc = $"Bakım periyodu {d.MaintenanceMonths} ay oldu.";
+    });
+
+    Task Alis(bool sor) => Calis(async () =>
+    {
+        d = await Api.SetAskPartCostAsync(sor);
+        sonuc = d.AskPartCost ? "Parçaların altında \"alış\" alanı çıkacak — boş bırakabilirsin." : "Alış fiyatı sorulmayacak.";
+    });
+
+    async Task TemaSec(string t)
+    {
+        tema = t;
+        await JS.InvokeVoidAsync("tamironTema.yaz", t);
+    }
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; sonuc = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}
