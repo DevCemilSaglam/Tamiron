@@ -49,6 +49,11 @@
         {
           <button class="cip" data-odeme="@yol" aria-pressed="@(secili == yol ? "true" : "false")" @onclick="() => Sec(yol)">@ad</button>
         }
+        @if (avans is { Balance: > 0 } av)
+        {
+          @* G8 · K-079.1(b): usta seçer; bakiye yetmezse API söyler, araç teslim edilmiş görünmez. *@
+          <button class="cip" data-odeme="Advance" aria-pressed="@(secili == "Advance" ? "true" : "false")" @onclick='() => Sec("Advance")'>Avanstan (@Format.Money(av.Balance) ₺)</button>
+        }
       </div>
       @if (secili == "kismi")
       {
@@ -60,6 +65,10 @@
             @foreach (var (yol, ad) in Yollar.Take(3))
             {
               <button class="cip" data-kismi-yol="@yol" aria-pressed="@(kismiYol == yol ? "true" : "false")" @onclick="() => kismiYol = yol">@ad</button>
+            }
+            @if (avans is { Balance: > 0 })
+            {
+              <button class="cip" data-kismi-yol="Advance" aria-pressed="@(kismiYol == "Advance" ? "true" : "false")" @onclick='() => kismiYol = "Advance"'>Avanstan</button>
             }
           </div>
           <p class="plate-hint">Kalanı kayıtta "Ödeme alındı" ile yazarsın.</p>
@@ -125,6 +134,7 @@
     RecordDetail? k;
     VehicleCard? arac;
     DeliveryPreview? onizleme;
+    AdvanceView? avans;
     ShopSettings? dukkan;
     string? secili, kismiYol, hata;
     string kismiTutar = "";
@@ -148,6 +158,7 @@
             {
                 onizleme = await Api.DeliveryPreviewAsync(Id);
                 if (onizleme.Reminder is not null) dukkan = await Api.ShopAsync();
+                avans = await Api.AdvanceAsync(k.VehicleId);
             }
         });
     }
@@ -171,7 +182,7 @@
         if (secili == "kismi")
         {
             if (Format.ParseMoney(kismiTutar) is not { } t || t <= 0) { hata = "Ne kadar aldığını yaz."; return; }
-            if (kismiYol is null) { hata = "Nasıl aldığını seç: nakit, kart ya da havale."; return; }
+            if (kismiYol is null) { hata = "Nasıl aldığını seç: nakit, kart ya da havale."; return; }   // avans varsa çipi de görünür
             yol = kismiYol; tutar = t;
         }
         await Calis(async () => { k = await Api.DeliverAsync(Id, yol, tutar); bitti = true; });

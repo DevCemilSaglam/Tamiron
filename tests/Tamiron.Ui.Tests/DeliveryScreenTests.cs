@@ -23,6 +23,7 @@ public class DeliveryScreenTests : TestContext
     {
         Services.AddSingleton<ITokenStore>(tokens);
         Services.AddSingleton(new TamironApi(new HttpClient(api) { BaseAddress = new Uri("http://api.test/") }, tokens));
+        api.Routes[$"GET /api/vehicles/{Vid}/advance"] = (HttpStatusCode.OK, "{\"balance\":0,\"items\":[]}");   // G8: avans yok
         api.Routes[$"GET /api/vehicles/{Vid}"] = (HttpStatusCode.OK,
             $"{{\"id\":\"{Vid}\",\"plateNo\":\"06 TMR 07\",\"brand\":\"Fiat\",\"model\":\"Egea\",\"year\":\"2019\",\"engine\":\"1.3 Multijet\",\"ownerPhone\":\"0532 111 22 33\"}}");
         api.Routes["GET /api/shop"] = (HttpStatusCode.OK, "{\"name\":\"Usta\",\"maintenanceMonths\":6,\"maintenanceKm\":10000,\"askPartCost\":false}");

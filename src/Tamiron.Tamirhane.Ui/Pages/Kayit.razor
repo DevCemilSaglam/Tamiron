@@ -42,6 +42,36 @@
           }
         }
       </div>
+      @* G8 · Avans (K-081): sahibin bakiyesi; al · iade et · geri al. Yeni ekran yok (A-2). *@
+      <div id="kAvans">
+        @if (avans is { Balance: > 0 } av)
+        {
+          <p class="plate-hint">Avans: <b>@Format.Money(av.Balance) ₺</b></p>
+        }
+        <span class="btn-row">
+          <button class="btn btn-ghost" id="kAvansAl" @onclick='() => AvansFormu("al")'><svg class="ico"><use href="#i-wallet"></use></svg> Avans al</button>
+          @if (avans is { Balance: > 0 })
+          {
+            <button class="btn btn-ghost" id="kAvansIade" @onclick='() => AvansFormu("iade")'>İade et</button>
+          }
+        </span>
+        @if (avansFormu is not null)
+        {
+          <div class="field"><label for="kAvansTutar">@(avansFormu == "al" ? "Alınan avans" : "İade edilen")</label>
+            <input id="kAvansTutar" class="mono" inputmode="numeric" autocomplete="off" @bind="avansTutar" @bind:event="oninput" /></div>
+          <div class="cip-grup" role="group" aria-label="Nasıl">
+            @foreach (var (yol, ad) in Yollar)
+            {
+              <button class="cip" data-avans-yol="@yol" @onclick="() => AvansYaz(yol)" disabled="@calisiyor">@ad</button>
+            }
+          </div>
+        }
+        @if (avansNot is not null)
+        {
+          <div class="notice" id="kAvansNot"><span class="n-body">@avansNot</span>
+            <button class="btn btn-ghost" id="kAvansGeriAl" @onclick="AvansGeriAl">Geri al</button></div>
+        }
+      </div>
     </div>
 
     <div class="card k-yapilanlar">
@@ -143,6 +173,11 @@
               {
                 <button class="cip" data-tahsil="@yol" @onclick="() => TahsilEt(yol)" disabled="@calisiyor">@ad</button>
               }
+              @if (avans is { Balance: > 0 } av2)
+              {
+                @* K-079.1(b): avans kendiliğinden düşmez — usta bu çipi seçer. *@
+                <button class="cip" data-tahsil="Advance" @onclick='() => TahsilEt("Advance")' disabled="@calisiyor">Avanstan (@Format.Money(av2.Balance) ₺)</button>
+              }
             </div>
           }
           @if (tahsilNot is not null)
@@ -152,7 +187,8 @@
               <button class="btn btn-ghost" id="kTahsilGeriAl" @onclick="TahsilGeriAl">Geri al</button>
             </div>
           }
-          @if (k.Paid > 0)
+          @* K-081: avanstan düşülen ödemenin yolu düzeltilmez — düzeltecek bir şey yoksa giriş de yok. *@
+          @if (k.Paid > 0 && k.Payments?.LastOrDefault()?.Method != "Advance")
           {
             <button class="btn btn-ghost" id="kDuzenle" aria-expanded="@(duzenle ? "true" : "false")" @onclick="() => duzenle = !duzenle">
               <svg class="ico"><use href="#i-wrench"></use></svg> Düzenle
@@ -287,13 +323,39 @@
         await Calis(async () =>
         {
             k = await Api.CollectAsync(Id, yol, tutar);
+            if (yol == "Advance") { avans = await Api.AdvanceAsync(k.VehicleId); avansNot = null; sonAvans = null; }   // bakiye düştü; eski "geri al" artık reddedilir
             tahsilNot = $"{Format.Money(tutar)} ₺ alındı · {Format.PaymentLabel(yol)}"
                       + (k.Remaining > 0 ? $" · kalan {Format.Money(k.Remaining)} ₺." : ".");
             KalaniDoldur();
         });
     }
 
-    Task TahsilGeriAl() => Calis(async () => { k = await Api.UndoCollectAsync(Id); tahsilNot = null; KalaniDoldur(); });
+    Task TahsilGeriAl() => Calis(async () => { k = await Api.UndoCollectAsync(Id); tahsilNot = null; KalaniDoldur(); avans = await Api.AdvanceAsync(k.VehicleId); });
+
+    // G8 · Avans (K-081).
+    AdvanceView? avans;
+    string? avansFormu, avansNot;
+    string avansTutar = "";
+    Guid? sonAvans;
+
+    void AvansFormu(string tur) { avansFormu = avansFormu == tur ? null : tur; avansTutar = ""; hata = null; }
+
+    async Task AvansYaz(string yol)
+    {
+        if (Format.ParseMoney(avansTutar) is not { } tutar || tutar <= 0) { hata = "Avansın tutarını yaz."; return; }
+        var al = avansFormu == "al";
+        await Calis(async () =>
+        {
+            var once = avans?.Items.Select(i => i.Id).ToHashSet() ?? [];
+            avans = al ? await Api.ReceiveAdvanceAsync(k!.VehicleId, tutar, yol) : await Api.RefundAdvanceAsync(k!.VehicleId, tutar, yol);
+            sonAvans = avans.Items.FirstOrDefault(i => !once.Contains(i.Id))?.Id;
+            avansNot = $"{Format.Money(tutar)} ₺ avans {(al ? "alındı" : "iade edildi")} · {Format.PaymentLabel(yol)}.";
+            avansFormu = null; avansTutar = "";
+        });
+    }
+
+    Task AvansGeriAl() => sonAvans is not { } id ? Task.CompletedTask
+        : Calis(async () => { avans = await Api.UndoAdvanceAsync(id); avansNot = null; sonAvans = null; });
 
     Task Duzelt(string yol) => Calis(async () => { k = await Api.CorrectPaymentAsync(Id, yol); duzenle = false; tahsilNot = null; });   // eski bildirim yanlış yolu söylerdi
 
@@ -307,6 +369,7 @@
             k = await Api.RecordAsync(Id);
             KalaniDoldur();
             arac = await Api.VehicleAsync(k.VehicleId);
+            avans = await Api.AdvanceAsync(k.VehicleId);
         });
     }
 

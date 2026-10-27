@@ -78,6 +78,10 @@ public sealed record RegistrationResult(string Outcome, string? TypedPlate, stri
 
 public sealed record RegistrationVehicle(Guid Id, string PlateNo);
 
+/// <summary>G8 · Sahibin avans bakiyesi ve hareketleri (API AdvanceView). Kind: "Received" | "Refunded".</summary>
+public sealed record AdvanceView(decimal Balance, IReadOnlyList<AdvanceItem> Items);
+public sealed record AdvanceItem(Guid Id, string Kind, decimal Amount, string Method, DateOnly On, string PlateNo);
+
 public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
                                  decimal CollectedToday, decimal Receivable, int DueReminderCount);
 
@@ -191,6 +195,13 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     public async Task<RegistrationResult> SaveRegistrationAsync(string plate, JsonElement read)
         => await Read<RegistrationResult>(await Send(HttpMethod.Post, "api/registrations/save", new { plate, read }, auth: true));
 
+    public async Task<AdvanceView> AdvanceAsync(Guid vehicleId) => await Read<AdvanceView>(await Send(HttpMethod.Get, $"api/vehicles/{vehicleId}/advance", null, auth: true));
+    public async Task<AdvanceView> ReceiveAdvanceAsync(Guid vehicleId, decimal amount, string method)
+        => await Read<AdvanceView>(await Send(HttpMethod.Post, $"api/vehicles/{vehicleId}/advance", new { amount, method }, auth: true));
+    public async Task<AdvanceView> RefundAdvanceAsync(Guid vehicleId, decimal amount, string method)
+        => await Read<AdvanceView>(await Send(HttpMethod.Post, $"api/vehicles/{vehicleId}/advance/refund", new { amount, method }, auth: true));
+    public async Task<AdvanceView> UndoAdvanceAsync(Guid advanceId) => await Read<AdvanceView>(await Send(HttpMethod.Post, $"api/advances/{advanceId}/undo", null, auth: true));
+
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
     public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
@@ -251,7 +262,7 @@ public static class Format
     /// <summary>Ödeme yolunun Türkçesi (prototip ODEME_ETIKET).</summary>
     public static string PaymentLabel(string? method) => method switch
     {
-        "Cash" => "Nakit", "Card" => "Kart", "Transfer" => "Havale", "Unpaid" => "Almadım", _ => "",
+        "Cash" => "Nakit", "Card" => "Kart", "Transfer" => "Havale", "Unpaid" => "Almadım", "Advance" => "Avanstan", _ => "",
     };
 
     static readonly string[] Aylar = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
