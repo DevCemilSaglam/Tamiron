@@ -74,6 +74,11 @@ sınıfı). İkonlar prototipin `ikonlar.svg`'sinden gömülür — kopya yok.
 - Ana yol yerel kurulumda baştan sona çalıştı: kayıt aç → satır → teslim (kısmi 500 ₺ nakit) →
   ana menü "Bugün 500 ₺ · 1.000 ₺ veresiye".
 
+**80.9 · Kayıtta ödeme (G5).** Kalanı olan teslimli işte "Alınan" kalanla dolu gelir; ödeme yolu
+çipine dokunmak ödemeyi yazar ve "Geri al" bildirimi çıkar (yanlış çip kasaya olmayan parayı
+yazmasın — prototip balonGeriAl). Ödeme yolu düzeltme **"Düzenle"** altında, yalnız ödemesi olan işte
+(K-077.2: veresiye düzeltilmez). "Almadım" tahsilat yolu değil — çiplerde yalnız nakit/kart/havale.
+
 **80.5 · `Microsoft.AspNetCore.Components.WebAssembly.Server` 8.0.33.** 8.0.11'in yüksek önemli bir
 açığı var (NuGet uyarısı NU1903); arayüzü sunan paket en son 8.0 yamasıyla girdi.
 

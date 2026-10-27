@@ -35,7 +35,11 @@ public sealed record OpenedRecord(Guid Id, Guid VehicleId, string PlateNo);
 public sealed record RecordDetail(Guid Id, Guid VehicleId, string PlateNo, string Type, string Complaint,
                                   DateOnly? DeliveredAt, bool WaitingForPart, bool ShowWaitingToCustomer,
                                   decimal Total, IReadOnlyList<LineItem> Lines, IReadOnlyList<string> Warnings,
-                                  decimal Paid, decimal Remaining, string? PaymentMethod = null, DateOnly? ReminderDate = null);
+                                  decimal Paid, decimal Remaining, string? PaymentMethod = null, DateOnly? ReminderDate = null,
+                                  IReadOnlyList<PaymentItem>? Payments = null);
+
+/// <summary>Alınan ödeme (K-078). AtDelivery: teslimde alındı — teslimle gider, "geri al"la değil.</summary>
+public sealed record PaymentItem(Guid Id, decimal Amount, string Method, DateOnly PaidOn, bool AtDelivery);
 
 public sealed record LineItem(Guid Id, string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy, bool CountsInTotal);
 
@@ -123,6 +127,14 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     /// <summary>Teslim (K-004). <paramref name="amount"/> dolu = "Bir kısmını aldım" (K-078); kural API'de.</summary>
     public async Task<RecordDetail> DeliverAsync(Guid id, string method, decimal? amount)
         => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/deliver", new { method, amount }, auth: true));
+
+    /// <summary>Sonradan tahsilat (K-078): tutar + yol; fazlası API'de reddedilir.</summary>
+    public async Task<RecordDetail> CollectAsync(Guid id, string method, decimal amount)
+        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/collect", new { method, amount }, auth: true));
+    public async Task<RecordDetail> UndoCollectAsync(Guid id) => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/collect/undo", null, auth: true));
+    /// <summary>E1 · Ödeme yolunu düzelt (K-077.2): son ödemenin yolu; gün korunur.</summary>
+    public async Task<RecordDetail> CorrectPaymentAsync(Guid id, string method)
+        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/payment", new { method }, auth: true));
 
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 

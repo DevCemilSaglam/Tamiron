@@ -122,8 +122,55 @@
         {
           <div class="notice ok">
             <span class="n-ic"><svg class="ico ico-sm"><use href="#i-circle-check"></use></svg></span>
-            <span class="n-body"><b>Teslim edildi</b> · @Format.Date(t)</span>
+            <span class="n-body"><b>Teslim edildi</b> · @Format.Date(t) · @OdemeOzeti(k)</span>
           </div>
+          @if (k.Payments is { Count: > 0 } odemeler)
+          {
+            <ul class="k-odemeler" id="kOdemeler">
+              @foreach (var o in odemeler)
+              {
+                <li>@Format.Date(o.PaidOn) · @Format.Money(o.Amount) ₺ · @Format.PaymentLabel(o.Method)@(o.AtDelivery ? " · teslimde" : "")</li>
+              }
+            </ul>
+          }
+          @if (k.Remaining > 0)
+          {
+            <p class="plate-hint">Para sonradan geldiyse ne kadar, nasıl ödendi?</p>
+            <div class="field"><label for="kTahsilTutar">Alınan</label>
+              <input id="kTahsilTutar" class="mono" inputmode="numeric" autocomplete="off" @bind="tahsilTutar" @bind:event="oninput" /></div>
+            <div class="cip-grup" id="kTahsil" role="group" aria-label="Nasıl ödendi">
+              @foreach (var (yol, ad) in Yollar)
+              {
+                <button class="cip" data-tahsil="@yol" @onclick="() => TahsilEt(yol)" disabled="@calisiyor">@ad</button>
+              }
+            </div>
+          }
+          @if (tahsilNot is not null)
+          {
+            <div class="notice" id="kTahsilNot">
+              <span class="n-body">@tahsilNot</span>
+              <button class="btn btn-ghost" id="kTahsilGeriAl" @onclick="TahsilGeriAl">Geri al</button>
+            </div>
+          }
+          @if (k.Paid > 0)
+          {
+            <button class="btn btn-ghost" id="kDuzenle" aria-expanded="@(duzenle ? "true" : "false")" @onclick="() => duzenle = !duzenle">
+              <svg class="ico"><use href="#i-wrench"></use></svg> Düzenle
+            </button>
+            @if (duzenle)
+            {
+              <div id="kDuzenleGovde">
+                <p class="plate-hint">Ödeme yolunu düzelt — son ödemenin yolu değişir, günü değişmez.</p>
+                <div class="cip-grup" role="group" aria-label="Ödeme yolu">
+                  @foreach (var (yol, ad) in Yollar)
+                  {
+                    <button class="cip" data-odeme-duzelt="@yol" aria-pressed="@(k.Payments?.LastOrDefault()?.Method == yol ? "true" : "false")"
+                            @onclick="() => Duzelt(yol)" disabled="@calisiyor">@ad</button>
+                  }
+                </div>
+              </div>
+            }
+          }
         }
         else
         {
@@ -217,6 +264,39 @@
 
     static string Rakam(string s) => new(s.Where(char.IsAsciiDigit).ToArray());
 
+    // G5 · Para ancak nakit, kart ya da havaleyle ALINIR ("almadım" bir ödeme değil).
+    static readonly (string Yol, string Ad)[] Yollar = [("Cash", "Nakit"), ("Card", "Kart"), ("Transfer", "Havale")];
+
+    string tahsilTutar = "";
+    string? tahsilNot;
+    bool duzenle;
+
+    // Prototip odemeOzeti: kısmen ödendiyse "X alındı · kalan Y", değilse yolun adı.
+    static string OdemeOzeti(RecordDetail r) => r.Paid > 0 && r.Remaining > 0
+        ? $"{Format.Money(r.Paid)} ₺ alındı · kalan {Format.Money(r.Remaining)} ₺"
+        : Format.PaymentLabel(r.PaymentMethod);
+
+    /// <summary>Kalanı olan işte "Alınan" kalanla dolu gelir — tamamını alan yalnız yola dokunur (F1).</summary>
+    void KalaniDoldur() => tahsilTutar = k is { Remaining: > 0 } r ? Format.Money(r.Remaining) : "";
+
+    protected override void OnParametersSet() => duzenle = false;
+
+    async Task TahsilEt(string yol)
+    {
+        if (Format.ParseMoney(tahsilTutar) is not { } tutar || tutar <= 0) { hata = "Ne kadar aldığını yaz."; return; }
+        await Calis(async () =>
+        {
+            k = await Api.CollectAsync(Id, yol, tutar);
+            tahsilNot = $"{Format.Money(tutar)} ₺ alındı · {Format.PaymentLabel(yol)}"
+                      + (k.Remaining > 0 ? $" · kalan {Format.Money(k.Remaining)} ₺." : ".");
+            KalaniDoldur();
+        });
+    }
+
+    Task TahsilGeriAl() => Calis(async () => { k = await Api.UndoCollectAsync(Id); tahsilNot = null; KalaniDoldur(); });
+
+    Task Duzelt(string yol) => Calis(async () => { k = await Api.CorrectPaymentAsync(Id, yol); duzenle = false; tahsilNot = null; });   // eski bildirim yanlış yolu söylerdi
+
     static LineInput Girdi(LineItem s) => new(s.Kind, s.Name, s.Price, s.Cost, s.SuppliedBy);
 
     protected override async Task OnInitializedAsync()
@@ -225,6 +305,7 @@
         await Calis(async () =>
         {
             k = await Api.RecordAsync(Id);
+            KalaniDoldur();
             arac = await Api.VehicleAsync(k.VehicleId);
         });
     }
