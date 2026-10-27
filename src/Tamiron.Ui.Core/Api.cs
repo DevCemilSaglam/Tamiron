@@ -51,6 +51,9 @@ public sealed record PriceReply(Guid Id, string RawText, decimal? ParsedPrice, s
 public sealed record PriceRequest(Guid Id, Guid SupplierId, string SupplierName, string SupplierPhone, string SentText, DateTime SentAt,
                                   IReadOnlyList<AskedLine> Lines, IReadOnlyList<PriceReply> Replies);
 
+// G11b · Tarihi gelmiş, gönderilmemiş bakım hatırlatmaları (B12) — çekmecenin bildirimleri ve menü rozeti.
+public sealed record DueReminder(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string? Phone, DateOnly ReminderDate, int DaysOverdue);
+
 public sealed record MessageSetup(IReadOnlyList<MessageTarget> Targets, Guid? CurrentRecordId);
 public sealed record MessageTarget(string Kind, string Name, string? Phone, bool IsDefault);
 public sealed record MessageSuggestion(string Template, string Name, string Text);
@@ -269,6 +272,8 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<CustomerDetail>(await Send(HttpMethod.Get, "api/customers/detail?key=" + Uri.EscapeDataString(key), null, auth: true));
     public async Task<CustomerDetail> SetConsentAsync(string key, bool granted)
         => await Read<CustomerDetail>(await Send(HttpMethod.Put, "api/customers/consent", new { key, granted }, auth: true));
+    public async Task<List<DueReminder>> DueRemindersAsync() => await Read<List<DueReminder>>(await Send(HttpMethod.Get, "api/reminders/due", null, auth: true));
+
     // G10 · Parçacılar (ad + telefon; numara dükkânda tekil — API) ve parça sorma.
     public async Task<List<Supplier>> SuppliersAsync() => await Read<List<Supplier>>(await Send(HttpMethod.Get, "api/suppliers", null, auth: true));
     public async Task<Supplier> AddSupplierAsync(string name, string phone)

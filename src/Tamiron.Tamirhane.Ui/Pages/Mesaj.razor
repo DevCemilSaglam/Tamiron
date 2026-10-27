@@ -129,6 +129,8 @@
 
 @code {
     [SupplyParameterFromQuery(Name = "arac")] public Guid? Arac { get; set; }
+    // G11b · Bildirimden gelinince hangi mesaj: yalnız bu işe ÖNERİLİYORSA seçilir (öneri kuralı API'de).
+    [SupplyParameterFromQuery(Name = "sablon")] public string? Sablon { get; set; }
 
     VehicleList? liste;
     List<MessageItem>? arsiv, gecmis;
@@ -163,6 +165,7 @@
             kurulum = await Api.MessageSetupAsync(id);
             gecmis = await Api.MessagesAsync(id);
             oneriler = await Api.MessageSuggestionsAsync(id, null);
+            if (oneriler.FirstOrDefault(o => o.Template == Sablon) is { } secilen) SablonSec(secilen);
         });
     }
 

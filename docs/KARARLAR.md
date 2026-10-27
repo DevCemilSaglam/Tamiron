@@ -10,6 +10,21 @@
 
 ---
 
+## K-088 · Kabuk: rozetli menü, çekmecede hatırlatmalar (27.10.2026 — lider, Cemil onayına açık)
+
+G11b koda geçti (prototip kabuk.html, K-009; API B12'de hazırdı).
+- **Üst çubuk:** menü (rozetli) + logo (ana menü). Rozet = tarihi gelmiş, gönderilmemiş bakım hatırlatması
+  sayısı; boşken görünmez — sahte sayı yok. Her ekran değişiminde tazelenir (hatırlatma mesajı gidince düşer).
+- **Çekmece:** Bildirimler (yalnız hatırlatma varsa) · Servis kaydı ekle · Servis kayıtları · **Parçacılar** ·
+  Ayarlar. Ana menüye satır eklenmedi (A-M8). Parçacılar prototipin çekmecesinde yoktu (orada liste sabitti);
+  menüde yeri burası — **Cemil onayına açık.**
+- **Bildirime dokunmak** aracın mesaj ekranını "Bakım hatırlatması" seçili açar — yalnız API o işe öneriyorsa;
+  zorla seçilmez. Hatırlatma gönderilince (arama dahil) API kapatır, rozet düşer.
+- **Yok:** üst çubukta geri/ileri tuşları ve alt gezinme (prototipte vardı) — telefonun ve tarayıcının kendi geri
+  tuşu var; "Plaka ara" — her listenin kendi arama kutusu var. **Cemil onayına açık.**
+- **Düzen `.device`:** tek kayan alan ekran gövdesi (prototip 02-kabuk). Telefon genişliğinde (375) ölçüldü.
+- Kabuk oturum yokken çizilmez; hatırlatma okunamazsa sayfa durmaz.
+
 ## K-086 · Ayarlar ekranı ve kayıtta alış alanı (27.10.2026 — lider, Cemil onayına açık)
 
 G11a koda geçti (prototip 99-ayarlar, K-055.2; API C5'te hazırdı).

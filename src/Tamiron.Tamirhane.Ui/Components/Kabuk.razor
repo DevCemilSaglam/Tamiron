@@ -1,0 +1,114 @@
+@implements IDisposable
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G11b · Kabuk (prototip kabuk.html, K-009): üst çubuk = menü (rozetli) + logo. Çekmece = bildirimler +
+  "Araç ve iş" + Parçacılar + Ayarlar — ana menüye satır eklenmedi (A-M8), ekran bütçesi aynı.
+  BİLDİRİM = BAKIM HATIRLATMASI (yedinci iş): yalnız tarihi gelmiş, gönderilmemiş olanlar; tek kaynak
+  GET /api/reminders/due (B12). Rozet boşken görünmez (.badge:empty) — sahte sayı yok. Her ekran
+  değişiminde tazelenir (hatırlatma mesajı gidince rozet düşer).
+  Oturum yoksa (giriş) kabuk çizilmez. Hatırlatma okunamazsa sayfa durmaz, rozet boş kalır.
+  ⚠️ Geri/ileri tuşları yok — telefonun ve tarayıcının kendi geri tuşu var; "Plaka ara" yok — her listenin
+  kendi arama kutusu var.
+*@
+@if (!oturum)
+{
+  @ChildContent
+}
+else
+{
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="icon-btn" id="menuBtn" aria-label="Menü" aria-haspopup="true" aria-expanded="@(acik ? "true" : "false")"
+              aria-controls="drawer" title="Menü" @onclick="() => acik = true">
+        <svg class="ico"><use href="#i-menu"></use></svg>
+        <span class="badge" id="menuBadge" aria-hidden="true">@(hatirlatmalar.Count > 0 ? hatirlatmalar.Count.ToString() : "")</span>
+      </button>
+      <span class="brand-logo" id="brandHome" role="button" tabindex="0" title="Ana menü" aria-label="Ana menü" @onclick='() => Git("/")'>
+        <Tamiron.Ui.Core.Logo />
+      </span>
+    </div>
+    <span class="spacer"></span>
+  </header>
+
+  @ChildContent
+
+  <div class="drawer-overlay @(acik ? "open" : "")" id="drawerOverlay" @onclick="() => acik = false"></div>
+  <aside class="drawer @(acik ? "open" : "")" id="drawer" role="dialog" aria-modal="true" aria-label="Menü"
+         aria-hidden="@(acik ? "false" : "true")" inert="@(!acik)">
+    <div class="drawer-head">
+      <span class="drawer-title">Menü</span>
+      <button class="icon-btn" id="drawerClose" aria-label="Menüyü kapat" title="Kapat" @onclick="() => acik = false">
+        <svg class="ico"><use href="#i-x"></use></svg></button>
+    </div>
+    <div class="drawer-body">
+      @if (hatirlatmalar.Count > 0)
+      {
+        <section id="notifSection">
+          <div class="drawer-sec-label"><svg class="ico ico-sm"><use href="#i-bell"></use></svg> Bildirimler
+            <span class="notif-count" id="notifCount">@hatirlatmalar.Count</span></div>
+          <div class="notif-list" id="notifList">
+            @foreach (var h in hatirlatmalar)
+            {
+              <button class="notif-item" data-hatirlatma="@h.RecordId" @key="h.RecordId"
+                      @onclick='() => Git($"/mesaj?arac={h.VehicleId}&sablon=hatirlatma")'>
+                <span class="ni-ic warn"><svg class="ico ico-sm"><use href="#i-calendar-clock"></use></svg></span>
+                <span class="ni-body">
+                  <span class="ni-title">Bakım zamanı geldi</span>
+                  <span class="ni-sub">@Alt(h)</span>
+                </span>
+              </button>
+            }
+          </div>
+          <hr class="divider" />
+        </section>
+      }
+      <div class="drawer-sec-label"><svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç ve iş</div>
+      <button class="drawer-item" id="drawerEkle" @onclick='() => Git("/kayit-ac")'>
+        <span class="di-ic"><svg class="ico"><use href="#i-plus"></use></svg></span> Servis kaydı ekle</button>
+      <button class="drawer-item" id="drawerKayitlar" @onclick='() => Git("/kayitlar")'>
+        <span class="di-ic"><svg class="ico"><use href="#i-clipboard-list"></use></svg></span> Servis kayıtları</button>
+      <button class="drawer-item" id="drawerParcacilar" @onclick='() => Git("/parcacilar")'>
+        <span class="di-ic"><svg class="ico"><use href="#i-package"></use></svg></span> Parçacılar</button>
+      <hr class="divider" />
+      <button class="drawer-item" id="drawerAyarlar" @onclick='() => Git("/ayarlar")'>
+        <span class="di-ic"><svg class="ico"><use href="#i-cog"></use></svg></span> Ayarlar</button>
+    </div>
+  </aside>
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+
+    bool oturum, acik;
+    List<DueReminder> hatirlatmalar = [];
+
+    static string Alt(DueReminder h) => string.Join(" · ", new[]
+    {
+        h.PlateNo, h.OwnerName, h.DaysOverdue == 0 ? "bugün" : $"{h.DaysOverdue} gün geçti",
+    }.Where(x => !string.IsNullOrWhiteSpace(x)));
+
+    protected override async Task OnInitializedAsync()
+    {
+        Nav.LocationChanged += Degisti;
+        await Tazele();
+    }
+
+    async void Degisti(object? s, Microsoft.AspNetCore.Components.Routing.LocationChangedEventArgs e)
+    {
+        await InvokeAsync(async () => { await Tazele(); StateHasChanged(); });
+    }
+
+    async Task Tazele()
+    {
+        // Giriş/çıkış ekran değişimiyle olur: oturum her seferinde yeniden sorulur.
+        oturum = await Api.HasSessionAsync();
+        if (!oturum) { hatirlatmalar = []; acik = false; return; }
+        try { hatirlatmalar = await Api.DueRemindersAsync(); }
+        catch (ApiException) { hatirlatmalar = []; }   // kabuk sayfayı durdurmaz; sayfa kendi hatasını söyler
+    }
+
+    void Git(string yol) { acik = false; Nav.NavigateTo(yol); }
+
+    public void Dispose() => Nav.LocationChanged -= Degisti;
+}

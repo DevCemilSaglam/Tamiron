@@ -143,6 +143,26 @@ public class MessageScreenTests : TestContext
     }
 
     [Fact]
+    public void Template_from_the_link_is_already_chosen()
+    {
+        // G11b · Çekmecedeki "Bakım zamanı geldi" aracın mesajını hatırlatma seçili açar — usta yalnız gönderir.
+        Nav.NavigateTo($"/mesaj?arac={Vid}&sablon=hazir");
+        var c = RenderComponent<Mesaj>();
+        c.WaitForAssertion(() => Assert.Equal("Ali Bey, aracınız hazır.", c.Find("#msjMetin").GetAttribute("value")));
+        Assert.Equal("true", c.Find("[data-sablon='hazir']").GetAttribute("aria-pressed"));
+    }
+
+    [Fact]
+    public void Template_not_suggested_for_this_job_is_not_forced()
+    {
+        Nav.NavigateTo($"/mesaj?arac={Vid}&sablon=hatirlatma");   // öneride yok (API kuralı) → seçilmez
+        var c = RenderComponent<Mesaj>();
+        c.WaitForElement("#msjMetin");
+        Assert.Equal("", c.Find("#msjMetin").GetAttribute("value") ?? "");
+        Assert.Empty(c.FindAll("[data-sablon][aria-pressed='true']"));
+    }
+
+    [Fact]
     public void Empty_text_cannot_be_sent_and_says_why()
     {
         var c = Yaz();
