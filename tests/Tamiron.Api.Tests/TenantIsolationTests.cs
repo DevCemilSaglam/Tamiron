@@ -121,6 +121,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         ["PATCH /api/vehicles/{id}"] = _ => new { note = "A yazdı" },
         ["GET /api/vehicles/{id}/message-suggestions"] = _ => null,
         ["GET /api/vehicles/{id}/message-text"] = _ => null,
+        ["GET /api/vehicles/{id}/message-setup"] = _ => null,
         ["PUT /api/suppliers/{id}"] = _ => new { name = "A", phone = "05337009999" },
         ["DELETE /api/suppliers/{id}"] = _ => null,
         ["GET /api/vehicles/{id}/advance"] = _ => null,

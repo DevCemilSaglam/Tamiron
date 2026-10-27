@@ -7,7 +7,6 @@
   araçları (araç ekranını açar), servis geçmişi (her aracın KİMLİĞİYLE; çok araçta plaka başlığıyla).
   İleti izni (K-071.3): varsayılan YOK, verilir. Gün SUNUCUDAN; "Geri al" eski tarihi izden getirir (D5).
   Üzerinde YOK: müşteri düzenleme · birleştirme · not — müşteri araçtan türetilen bir görünüm (A-M1).
-  ⚠️ Henüz yok: "Mesaj gönder" (mesaj ekranıyla, G9c).
 *@
 <section class="screen active" id="screen-musteri">
   <div class="screen-head">
@@ -58,6 +57,13 @@
           <button class="btn btn-ghost" id="mstGeriAl" disabled="@calisiyor" @onclick="GeriAl">Geri al</button></div>
       }
     </div>
+
+    @if (!string.IsNullOrWhiteSpace(m.Phone) && m.Vehicles.Count > 0)
+    {
+      @* Mesaj ARACA gider (hitap ve şablon araçtan üretilir); müşterinin telefonu bütün araçlarında aynı. *@
+      <button class="btn btn-primary btn-lg" id="mstMesaj" @onclick='() => Nav.NavigateTo($"/mesaj?arac={m.Vehicles[0].Id}")'>
+        <svg class="ico"><use href="#i-message-square"></use></svg> Mesaj gönder</button>
+    }
 
     <div class="card">
       <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçları</span></div>

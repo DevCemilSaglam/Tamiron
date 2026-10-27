@@ -10,6 +10,25 @@
 
 ---
 
+## K-084 · Müşteriye mesaj: ustanın uygulaması açılır, "gönderildi" denmez (27.10.2026 — lider, Cemil onayına açık)
+
+G9c koda geçti (prototip 85-mesaj; API B11/D4'te hazırdı).
+- **Gönderim yok, kayıt var (WHATSAPP.md A yolu):** düğme önce API'ye ne gittiğini yazar, sonra ustanın
+  kendi WhatsApp'ını / mesaj uygulamasını / telefonunu metin hazır açar. Ekran "açılıyor" der, asla
+  "gönderildi" demez — gönderen usta. Para yok, dış servis yok.
+- **Kime / varsayılan / hangi iş API'de:** yeni uç `GET /vehicles/{id}/message-setup` — hedefler
+  (aracı getiren + ruhsat sahibi), varsayılan = telefonu olan ilk kişi (A-M2), mesajın bağlanacağı iş =
+  açık kayıt, yoksa son kayıt (önerilerin baktığı iş — iki yerde iki kural olmasın). Bağlanmasaydı "özet"
+  gönderildikten sonra yine önerilirdi.
+- **Hedef değişince öneriler o kişi için yeniden istenir** (hitap); usta metni elle değiştirdiyse korunur.
+- **wa.me ülke koduyla:** "0532…", "532…", "+90 532…" → "90532…". SMS/arama yerel numarayla.
+- **"Ara" da kaydolur** (API: hatırlatma telefonla da yapılmış sayılır, B12). Metin boşsa "Telefonla
+  arandı." yazılır — arşivde "Arandı" diye görünür. **Cemil onayına açık:** prototip aramayı arşive
+  yazmıyordu (yalnız hatırlatmayı kapatıyordu); backend temel olduğu için API'nin kaydı korundu.
+- **Araç ve müşteri ekranında "Mesaj"** → `/mesaj?arac=`; müşteride ilk araç (telefon bütün araçlarında aynı).
+- **Henüz yok:** toplu mesaj (bayram — yalnız izinliye, API hazır; WhatsApp'ta toplu gönderim usta için
+  tek tek açmak demek, ekranı ayrıca konuşulmalı), "Yapay zeka düzeltsin" (para harcar), sesle (G13).
+
 ## K-083 · Müşteri ekranları: anahtar adreste, izin çipi künyede (27.10.2026 — lider, Cemil onayına açık)
 
 G9b koda geçti (prototip 90-musteriler, 91-musteri); API B10/D5'te hazırdı, yeni uç açılmadı.

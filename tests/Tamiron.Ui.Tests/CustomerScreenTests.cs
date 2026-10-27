@@ -199,12 +199,22 @@ public class CustomerScreenTests : TestContext
     }
 
     [Fact]
+    public void Message_button_opens_the_message_screen_with_the_first_vehicle()
+    {
+        api.Routes["GET /api/customers/detail"] = (HttpStatusCode.OK, Detay(null, iki: true));
+        var c = Ac();
+        c.WaitForElement("#mstMesaj").Click();
+        Assert.Equal($"http://localhost/mesaj?arac={V1}", Nav.Uri);
+    }
+
+    [Fact]
     public void Without_phone_no_consent_chip_and_says_why()
     {
         api.Routes["GET /api/customers/detail"] = (HttpStatusCode.OK, Detay(null, iki: false, tel: null));
         var c = Ac();
         c.WaitForAssertion(() => Assert.Contains("Telefon yok — mesaj gönderilemez.", c.Find("#mstKunye").TextContent));
         Assert.Empty(c.FindAll("#mstIzin"));
+        Assert.Empty(c.FindAll("#mstMesaj"));
     }
 
     [Fact]

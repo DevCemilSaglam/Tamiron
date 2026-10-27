@@ -1,0 +1,15 @@
+@*
+  G9c · Gönderilmiş bir mesajın satırı (arşiv ve "son mesajlar" — iki yerde AYNI satır).
+  Kanal yazılır: "Ara" bir mesaj değil ama kaydı var; usta neyi nasıl yaptığını görsün.
+*@
+<div class="tutar-sat" data-mesaj="@M.Id">
+  <span><b>@M.RecipientName</b> · @Kanal(M.Channel)@(M.IsBulk ? " · toplu" : "")
+    <span class="t-alt">@M.SentAt.ToString("dd.MM.yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture)</span></span>
+  <span class="tv">@M.Body</span>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public MessageItem M { get; set; } = default!;
+
+    static string Kanal(string c) => c switch { "WhatsApp" => "WhatsApp", "Sms" => "SMS", "Call" => "Arandı", _ => c };
+}

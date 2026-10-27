@@ -170,6 +170,14 @@ public class VehicleScreenTests : TestContext
     }
 
     [Fact]
+    public void Message_button_opens_the_message_screen_for_this_vehicle()
+    {
+        var c = Ac();
+        c.WaitForElement("#arMesaj").Click();
+        Assert.Equal($"http://localhost/mesaj?arac={Vid}", Nav.Uri);
+    }
+
+    [Fact]
     public void History_lists_jobs_and_opens_them()
     {
         api.Routes["GET /api/records"] = (HttpStatusCode.OK, Gecmis(acik: true));

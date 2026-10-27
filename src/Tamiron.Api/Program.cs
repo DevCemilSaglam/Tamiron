@@ -166,6 +166,7 @@ api.MapGet("/vehicles/{id:guid}/message-suggestions", (Guid id, MessageTargetKin
     s.Send(new GetMessageSuggestions(id, target), ct));
 api.MapGet("/vehicles/{id:guid}/message-text", (Guid id, string template, MessageTargetKind? target, ISender s, CancellationToken ct) =>
     s.Send(new GetMessageText(id, template, target), ct));
+api.MapGet("/vehicles/{id:guid}/message-setup", (Guid id, ISender s, CancellationToken ct) => s.Send(new GetMessageSetup(id), ct));
 api.MapGet("/messages/bulk-preview", (ISender s, CancellationToken ct) => s.Send(new GetBulkPreview(), ct));
 api.MapPost("/messages/bulk", (SendBulk cmd, ISender s, CancellationToken ct) => s.Send(cmd, ct));
 

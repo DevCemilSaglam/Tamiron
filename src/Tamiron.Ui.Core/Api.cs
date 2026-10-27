@@ -42,6 +42,13 @@ public sealed record CustomerList(int Count, IReadOnlyList<CustomerListItem> Ite
 public sealed record CustomerVehicle(Guid Id, string PlateNo, string? Brand, string? Model, bool InShop);
 public sealed record CustomerDetail(string Key, string Name, string? Phone, DateOnly? ConsentAt, IReadOnlyList<CustomerVehicle> Vehicles);
 
+// G9c · Mesaj. GÖNDERİM YOK — API ne gittiğini KAYDEDER, gönderimi ustanın kendi uygulaması yapar.
+public sealed record MessageSetup(IReadOnlyList<MessageTarget> Targets, Guid? CurrentRecordId);
+public sealed record MessageTarget(string Kind, string Name, string? Phone, bool IsDefault);
+public sealed record MessageSuggestion(string Template, string Name, string Text);
+public sealed record MessageItem(Guid Id, Guid VehicleId, Guid? ServiceRecordId, DateTime SentAt, string RecipientName,
+                                 string RecipientPhone, string Channel, string Template, bool IsBulk, string Body);
+
 /// <summary>G2 · Plaka sorusunun cevabı (API LookupPlate): geçerli mi, ipucu, kayıtlı araç, açık kaydı.</summary>
 public sealed record PlateLookup(string Plate, bool Valid, string? Hint, VehicleBrief? Vehicle, Guid? OpenRecordId);
 
@@ -249,6 +256,15 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<CustomerDetail>(await Send(HttpMethod.Get, "api/customers/detail?key=" + Uri.EscapeDataString(key), null, auth: true));
     public async Task<CustomerDetail> SetConsentAsync(string key, bool granted)
         => await Read<CustomerDetail>(await Send(HttpMethod.Put, "api/customers/consent", new { key, granted }, auth: true));
+    // G9c · Mesaj: kurulum (kime, hangi iş), öneriler (hedefe göre hitap), kayıt, arşiv.
+    public async Task<MessageSetup> MessageSetupAsync(Guid vehicleId)
+        => await Read<MessageSetup>(await Send(HttpMethod.Get, $"api/vehicles/{vehicleId}/message-setup", null, auth: true));
+    public async Task<List<MessageSuggestion>> MessageSuggestionsAsync(Guid vehicleId, string? target)
+        => await Read<List<MessageSuggestion>>(await Send(HttpMethod.Get, $"api/vehicles/{vehicleId}/message-suggestions" + (target is null ? "" : "?target=" + target), null, auth: true));
+    public async Task<MessageItem> RecordMessageAsync(Guid vehicleId, string channel, string? template, string body, Guid? serviceRecordId, string? target)
+        => await Read<MessageItem>(await Send(HttpMethod.Post, "api/messages", new { vehicleId, channel, template, body, serviceRecordId, target }, auth: true));
+    public async Task<List<MessageItem>> MessagesAsync(Guid? vehicleId = null)
+        => await Read<List<MessageItem>>(await Send(HttpMethod.Get, "api/messages" + (vehicleId is { } v ? "?vehicleId=" + v : ""), null, auth: true));
     public async Task<CustomerDetail> UndoConsentAsync(string key)
         => await Read<CustomerDetail>(await Send(HttpMethod.Post, "api/customers/consent/undo", new { key }, auth: true));
 
@@ -312,4 +328,16 @@ public static class Format
     public static string MonthName(DateTime d) => Aylar[d.Month - 1];
 
     public static string Date(DateOnly d) => d.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
+
+    // G9c · Gönderimi USTANIN uygulaması yapar (WHATSAPP.md A yolu): biz metni hazır hâlde açarız.
+    static string Digits(string tel) => new(tel.Where(char.IsAsciiDigit).ToArray());
+    /// <summary>wa.me ülke koduyla ister: "0532…" / "532…" / "+90 532…" → "90532…".</summary>
+    public static string WhatsAppLink(string tel, string text)
+    {
+        var d = Digits(tel);
+        var n = d.StartsWith("90") && d.Length == 12 ? d : d.StartsWith('0') ? "90" + d[1..] : "90" + d;
+        return $"https://wa.me/{n}?text={Uri.EscapeDataString(text)}";
+    }
+    public static string SmsLink(string tel, string text) => $"sms:{Digits(tel)}?body={Uri.EscapeDataString(text)}";
+    public static string TelLink(string tel) => $"tel:{Digits(tel)}";
 }

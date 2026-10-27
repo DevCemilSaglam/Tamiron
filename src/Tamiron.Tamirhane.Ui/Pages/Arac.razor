@@ -6,7 +6,7 @@
   ödeme durumu → ruhsat (açılır) → kilometre (açılır, yalnız tarih + km — K-019.5) → bakım → geçmiş.
   Geçmiş aracın KİMLİĞİYLE (GET /api/records?vehicleId); alacak muhasebeyle AYNI kaynaktan
   (receivables?vehicleId). Kayıtlı aracın bilgisi burada düzeltilir (K-080.6) — biçim API'de.
-  ⚠️ Henüz yok: "Mesaj" (mesaj ekranıyla, G9c), "Sesle" (G13), renk kutucuğu (renk adı yazılır).
+  ⚠️ Henüz yok: "Sesle" (G13), renk kutucuğu (renk adı yazılır).
 *@
 <section class="screen active" id="screen-arac">
   <div class="screen-head">
@@ -71,6 +71,8 @@
         <button class="btn btn-primary" id="arYeniKayit" @onclick='() => Nav.NavigateTo("/kayit-ac?plaka=" + Uri.EscapeDataString(a.PlateNo))'>
           <svg class="ico"><use href="#i-plus"></use></svg> Kayıt aç</button>
       }
+      <button class="btn btn-ghost" id="arMesaj" @onclick='() => Nav.NavigateTo($"/mesaj?arac={Id}")'>
+        <svg class="ico"><use href="#i-message-square"></use></svg> Mesaj</button>
     </div>
 
     <div class="card">

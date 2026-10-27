@@ -101,10 +101,29 @@ public sealed record MessageSuggestion(string Template, string Name, string Text
 public sealed record GetMessageSuggestions(Guid VehicleId, MessageTargetKind? Target = null) : IRequest<List<MessageSuggestion>>;
 public sealed record GetMessageText(Guid VehicleId, string Template, MessageTargetKind? Target = null) : IRequest<MessageSuggestion>;
 
+/// <summary>
+/// G9c · Mesaj ekranının kurulumu: kime gidebilir, varsayılan kim (telefonu olan ilk kişi — A-M2) ve mesaj
+/// hangi işe bağlanır (önerilerin baktığı iş: açık kayıt, yoksa son kayıt). Kural burada; ekran gösterir.
+/// </summary>
+public sealed record GetMessageSetup(Guid VehicleId) : IRequest<MessageSetup>;
+public sealed record MessageSetup(IReadOnlyList<MessageTargetDto> Targets, Guid? CurrentRecordId);
+public sealed record MessageTargetDto(MessageTargetKind Kind, string Name, string? Phone, bool IsDefault);
+
 internal sealed class MessageSuggestionHandlers(ITamironDb db, ITenantContext tenant) :
     IRequestHandler<GetMessageSuggestions, List<MessageSuggestion>>,
-    IRequestHandler<GetMessageText, MessageSuggestion>
+    IRequestHandler<GetMessageText, MessageSuggestion>,
+    IRequestHandler<GetMessageSetup, MessageSetup>
 {
+    public async Task<MessageSetup> Handle(GetMessageSetup q, CancellationToken ct)
+    {
+        var v = await db.Vehicles.AsNoTracking().FirstOrDefaultAsync(x => x.Id == q.VehicleId, ct) ?? throw new NotFoundException("Araç");
+        var recs = await db.ServiceRecords.AsNoTracking().Where(r => r.VehicleId == v.Id).OrderBy(r => r.DateTimeCreated)
+            .Select(r => new { r.Id, r.DeliveredAt }).ToListAsync(ct);
+        var current = (recs.LastOrDefault(r => r.DeliveredAt == null) ?? recs.LastOrDefault())?.Id;   // Context() ile aynı iş
+        var def = v.DefaultTarget();
+        return new MessageSetup(v.MessageTargets().Select(t => new MessageTargetDto(t.Kind, t.Name, t.Phone, t.Kind == def?.Kind)).ToList(), current);
+    }
+
     /// <summary>
     /// Aracın şu anki işi (açık kayıt varsa en yenisi, yoksa son kayıt) üzerinden öneri.
     /// Metin ÖNERİDİR — usta mesaj ekranında düzenler; gönderilen hâli POST /messages kaydeder.

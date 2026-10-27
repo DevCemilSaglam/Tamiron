@@ -1,0 +1,215 @@
+@page "/mesaj"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@inject IJSRuntime JS
+@using Microsoft.JSInterop
+@*
+  G9c · Müşteriye mesaj (prototip 85-mesaj). İki adım: KİME (arama + liste + gönderilenler) → YAZ.
+  GÖNDERİM YOK (WHATSAPP.md A yolu): API ne gittiğini KAYDEDER, ekran ustanın kendi uygulamasını metin
+  hazır açar — o yüzden "gönderildi" DEMEZ, "açılıyor" der. Üç kanal aynı metni taşır.
+  Kime / varsayılan kim / mesaj hangi işe bağlanır: API (message-setup). Öneriler hedefe göre (hitap).
+  ⚠️ Henüz yok: toplu mesaj (bayram — izinli müşterilere, K-071.3), "Yapay zeka düzeltsin" (para), sesle (G13).
+*@
+<section class="screen active" id="screen-mesaj">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Müşteriye mesaj</span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="msjHata"><span class="n-body">@hata</span></div>
+  }
+  @if (sonuc is not null)
+  {
+    <div class="notice" id="msjSonuc" role="status"><span class="n-body">@sonuc</span></div>
+  }
+
+  @if (Arac is null)
+  {
+    <div id="msjSecim" class="yigin">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-users"></use></svg> Kime?</span></div>
+      <div class="search-box" id="msjArama">
+        <svg class="ico"><use href="#i-search"></use></svg>
+        <input type="search" id="msjQ" placeholder="Plaka, ad ya da telefon…" aria-label="Müşteri ara" autocomplete="off"
+               value="@q" @oninput="Ara" />
+      </div>
+      <div id="msjListe">
+        @if (liste is { Items.Count: 0 })
+        {
+          <div class="bos-durum"><b>Bulunamadı</b><span>Başka bir şekilde yazmayı dene.</span></div>
+        }
+        else if (liste is not null)
+        {
+          @foreach (var v in liste.Items)
+          {
+            <div class="mus-kart @(v.InShop ? "serviste" : "")" data-mesaj-arac="@v.Id" role="button" tabindex="0" @key="v.Id"
+                 aria-label="@($"{v.OwnerName ?? v.ContactName ?? "Sahibi yazılmamış"} — {v.PlateNo}")"
+                 @onclick='() => Nav.NavigateTo($"/mesaj?arac={v.Id}")'>
+              <div class="mus-ad">@(v.OwnerName ?? v.ContactName ?? "Sahibi yazılmamış")</div>
+              <div class="mus-arac"><Plate No="@v.PlateNo" Size="plate-sm" /><span class="mus-arac-ad">@($"{v.Brand} {v.Model}".Trim())</span></div>
+            </div>
+          }
+        }
+      </div>
+      <div id="msjArsiv">
+        @if (arsiv is { Count: > 0 })
+        {
+          @* Başvuru listesi — usta "şunu göndermiş miydim" diye bakar; kapalı, sayısı başlıkta. *@
+          <details class="card">
+            <summary class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> Gönderilenler (@arsiv.Count)</span></summary>
+            @foreach (var m in arsiv) { <MesajSatiri M="m" /> }
+          </details>
+        }
+      </div>
+    </div>
+  }
+  else if (kurulum is not null)
+  {
+    <div id="msjYazim" class="yigin">
+      @* Seçim, seçimin sonucundan ÖNCE görünür: yanlış kişiyle açılan ekranda usta metni okumadan anlasın. *@
+      <div class="section-label with-action">
+        <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-user"></use></svg> Kime gidiyor</span>
+        <button class="cip" id="msjBaskasi" @onclick='() => Nav.NavigateTo("/mesaj")'>Değiştir</button>
+      </div>
+      <div class="card" id="msjKunye">
+        @if (arac is not null) { <div class="mus-arac"><Plate No="@arac.PlateNo" Size="plate-sm" /><span class="mus-arac-ad">@($"{arac.Brand} {arac.Model}".Trim())</span></div> }
+        <div class="mus-ad">@Hedef.Name</div>
+        @if (Hedef.Phone is { Length: > 0 } tel) { <a class="tel-link" href="@Format.TelLink(tel)"><svg class="ico ico-sm"><use href="#i-phone"></use></svg>@tel</a> }
+        @if (kurulum.Targets.Count > 1)
+        {
+          <div class="cip-grup" style="margin-top:12px" role="group" aria-label="Kime">
+            @foreach (var t in kurulum.Targets)
+            {
+              <button class="cip" data-hedef="@t.Kind" aria-pressed="@(t.Kind == Hedef.Kind ? "true" : "false")" @onclick="() => HedefSec(t)">
+                @(t.Kind == "Contact" ? "Getiren" : "Ruhsat sahibi") · @t.Name</button>
+            }
+          </div>
+        }
+      </div>
+
+      <div id="msjGecmis">
+        @if (gecmis is { Count: > 0 })
+        {
+          @* Kapalı açılır: usta yazmaya geldi; ama "bunu yazmış mıydım" gönderMEDEN önce sorulur. *@
+          <details class="card">
+            <summary class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clock"></use></svg> Son mesajlar (@gecmis.Count)</span></summary>
+            @foreach (var m in gecmis.Take(5)) { <MesajSatiri M="m" /> }
+          </details>
+        }
+      </div>
+
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-message-square"></use></svg> Ne yazılsın?</span></div>
+      <div class="cip-grup" id="msjSablon" role="group" aria-label="Mesaj şablonu">
+        @foreach (var s in oneriler)
+        {
+          <button class="cip" data-sablon="@s.Template" aria-pressed="@(s.Template == sablon ? "true" : "false")" @onclick="() => SablonSec(s)">@s.Name</button>
+        }
+      </div>
+
+      <div class="card">
+        <div class="section-label"><span class="lbl-txt">Mesaj</span></div>
+        <div class="field">
+          <textarea id="msjMetin" rows="6" aria-label="Mesaj metni" value="@metin" @oninput="e => metin = e.Value?.ToString() ?? string.Empty"></textarea>
+        </div>
+      </div>
+
+      <div id="msjUyari" class="plate-hint">@Uyari</div>
+
+      <button class="btn btn-primary btn-lg" id="msjGonder" aria-describedby="msjUyari" disabled="@(Uyari is not null || calisiyor)" @onclick='() => Gonder("WhatsApp")'>
+        <svg class="ico"><use href="#i-message-square"></use></svg> WhatsApp ile gönder</button>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="msjSms" aria-describedby="msjUyari" disabled="@(Uyari is not null || calisiyor)" @onclick='() => Gonder("Sms")'>
+          <svg class="ico"><use href="#i-message-square"></use></svg> SMS</button>
+        <button class="btn btn-ghost" id="msjAra" aria-describedby="msjUyari" disabled="@(TelYok || calisiyor)" @onclick='() => Gonder("Call")'>
+          <svg class="ico"><use href="#i-phone"></use></svg> Ara</button>
+      </div>
+    </div>
+  }
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "arac")] public Guid? Arac { get; set; }
+
+    VehicleList? liste;
+    List<MessageItem>? arsiv, gecmis;
+    VehicleDetail? arac;
+    MessageSetup? kurulum;
+    MessageTarget? hedef;
+    List<MessageSuggestion> oneriler = [];
+    string q = "", metin = "";
+    string? sablon, hata, sonuc;
+    bool calisiyor;
+    int soru;
+
+    MessageTarget Hedef => hedef ?? kurulum!.Targets.First(t => t.IsDefault);
+    bool TelYok => string.IsNullOrWhiteSpace(Hedef.Phone);
+    // Düğme kapalıysa NEDENİ yazılı (aria-describedby ile düğmeye bağlı) — metinleri API'ninkiyle aynı.
+    string? Uyari => TelYok ? "Telefon yok — mesaj gönderilemez. Araç kaydına telefon ekle."
+                   : string.IsNullOrWhiteSpace(metin) ? "Gidecek mesajı yaz." : null;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        hata = null; kurulum = null; hedef = null; sablon = null; metin = ""; oneriler = [];
+        await Calis(async () =>
+        {
+            if (Arac is not { } id)
+            {
+                await Listele();
+                arsiv = await Api.MessagesAsync();
+                return;
+            }
+            arac = await Api.VehicleDetailAsync(id);
+            kurulum = await Api.MessageSetupAsync(id);
+            gecmis = await Api.MessagesAsync(id);
+            oneriler = await Api.MessageSuggestionsAsync(id, null);
+        });
+    }
+
+    async Task Listele()
+    {
+        var benim = ++soru;
+        var l = await Api.VehiclesAsync(q);
+        if (benim == soru) liste = l;   // geç gelen eski cevap yenisini ezmesin
+    }
+
+    Task Ara(ChangeEventArgs e) { q = e.Value?.ToString() ?? ""; return Calis(Listele); }
+
+    void SablonSec(MessageSuggestion s) { sablon = s.Template; metin = s.Text; }
+
+    // Hedef değişince hitap değişir: öneriler o kişi için yeniden istenir. Usta metni ELLE değiştirdiyse korunur.
+    Task HedefSec(MessageTarget t) => Calis(async () =>
+    {
+        var uretilmis = oneriler.FirstOrDefault(s => s.Template == sablon)?.Text;
+        hedef = t;
+        oneriler = await Api.MessageSuggestionsAsync(Arac!.Value, t.Kind);
+        if (sablon is not null && metin == uretilmis) metin = oneriler.FirstOrDefault(s => s.Template == sablon)?.Text ?? metin;
+    });
+
+    Task Gonder(string kanal) => Calis(async () =>
+    {
+        var h = Hedef;
+        // Arama da kaydolur (API: "hatırlatma" aramayla da yapılmış sayılır); metin yoksa ne yapıldığı yazılır.
+        var govde = kanal == "Call" && string.IsNullOrWhiteSpace(metin) ? "Telefonla arandı." : metin;
+        await Api.RecordMessageAsync(Arac!.Value, kanal, sablon ?? "serbest", govde, kurulum!.CurrentRecordId, h.Kind);
+        var tel = h.Phone!;
+        var (link, hedefPencere, ne) = kanal switch
+        {
+            "WhatsApp" => (Format.WhatsAppLink(tel, metin), "_blank", "WhatsApp açılıyor"),
+            "Sms" => (Format.SmsLink(tel, metin), "_self", "Mesaj uygulaması açılıyor"),
+            _ => (Format.TelLink(tel), "_self", "Aranıyor"),
+        };
+        await JS.InvokeVoidAsync("open", link, hedefPencere);
+        sonuc = $"{ne} — {h.Name} · {tel}" + (kanal == "Call" ? "." : ", mesaj hazır.");
+        gecmis = await Api.MessagesAsync(Arac.Value);
+    });
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}
