@@ -1,0 +1,211 @@
+@page "/muhasebe"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+@*
+  G6 · Muhasebe — prototip 95-muhasebe'nin "Basit" görünümü, tek çağrı (C8, GET /api/accounting).
+  Dönem çipi (Bugün · ay · yıl) kasayı ve gideri süzer; ALACAK döneme tabi DEĞİL — bakiye (Cemil, 05.09).
+  Rakamların hepsi API'den; ekran toplamaz. Gider: açıklama + tutar, × ile silinir, "Geri al".
+  CSV API'den (B9, bayt bayt prototiple eşdeğer) — tarayıcıya tamironIndir ile kaydettirilir.
+  ⚠️ Henüz yok: "Detaylı" sekmesi (modül menüsü), yazdır, sesle gider (G13).
+*@
+<section class="screen active" id="screen-muhasebe">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Muhasebe
+      <span class="eb-say" id="muhSay">@DonemAdi(donem)</span></span>
+  </div>
+
+  <div class="yigin">
+    <div class="cip-grup" id="muhDonem" role="group" aria-label="Dönem">
+      @foreach (var d in Donemler)
+      {
+        <button class="cip" data-donem="@d" aria-pressed="@(donem == d ? "true" : "false")" @onclick="() => DonemSec(d)">@DonemAdi(d)</button>
+      }
+    </div>
+
+    @if (hata is not null)
+    {
+      <div class="notice warn" role="alert" id="muhHata"><span class="n-body">@hata</span></div>
+    }
+
+    @if (o is not null)
+    {
+      <div class="card">
+        <div class="section-label"><span id="muhOzetBaslik">@DonemAdi(donem)</span></div>
+        <div class="tutar-serit" id="muhOzet">
+          <div class="tutar-sat"><span>Teslim edilen</span><span class="tv">@o.Cash.DeliveredCount araç</span></div>
+          <div class="tutar-sat"><span>Nakit</span><span class="tv">@Format.Money(o.Cash.Cash) ₺</span></div>
+          <div class="tutar-sat"><span>Kart</span><span class="tv">@Format.Money(o.Cash.Card) ₺</span></div>
+          <div class="tutar-sat"><span>Havale</span><span class="tv">@Format.Money(o.Cash.Transfer) ₺</span></div>
+          <div class="tutar-sat genel"><span>Tahsil edilen</span><span class="tv">@Format.Money(o.Cash.Collected) ₺</span></div>
+        </div>
+      </div>
+
+      <div class="section-label with-action">
+        <span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-receipt"></use></svg> Gider</span>
+        <span class="lbl-eylem">
+          @if (!form)
+          {
+            <button class="daire-btn ghost" id="muhGiderEkle" aria-label="Gider ekle" title="Gider ekle" @onclick="() => { form = true; hata = null; }">
+              <svg class="ico"><use href="#i-plus"></use></svg>
+            </button>
+          }
+        </span>
+      </div>
+      @if (form)
+      {
+        <div class="card" id="muhGiderForm">
+          <div class="field"><label for="muhGiderAd">Açıklama</label>
+            <input id="muhGiderAd" placeholder="ör. elektrik faturası, kira, çay ocağı" autocomplete="off" @bind="giderAd" @bind:event="oninput" /></div>
+          <div class="field"><label for="muhGiderTutar">Tutar (₺)</label>
+            <input id="muhGiderTutar" class="mono" inputmode="numeric" placeholder="0" autocomplete="off" @bind="giderTutar" @bind:event="oninput" /></div>
+          <div class="btn-row">
+            <button class="btn btn-primary" id="muhGiderKaydet" @onclick="GiderEkle" disabled="@calisiyor">Ekle</button>
+            <button class="btn btn-ghost" id="muhGiderVazgec" @onclick="FormKapat">Vazgeç</button>
+          </div>
+        </div>
+      }
+      <div id="muhGiderler">
+        @if (o.Expenses.Items.Count == 0)
+        {
+          <div class="bos-durum">
+            <b>Gider yazılmamış</b>
+            <span>Araç işleri dışındaki giderler buraya: kira, elektrik, çay ocağı. Parça alışı servis kaydından düşülüyor, buraya yazılmaz.</span>
+          </div>
+        }
+        else
+        {
+          <div class="card"><div class="tablo-sar"><table class="tablo">
+            <thead><tr><th>Açıklama</th><th class="sayi">Tutar</th><th></th></tr></thead>
+            <tbody>
+              @foreach (var g in o.Expenses.Items.Reverse())
+              {
+                <tr @key="g.Id">
+                  <td>@g.Description<span class="t-alt">@Format.Date(g.Date)</span></td>
+                  <td class="sayi">@Format.Money(g.Amount) ₺</td>
+                  <td><button class="icon-btn" data-gider-sil="@g.Id" aria-label="Gideri sil" title="Sil" @onclick="() => GiderSil(g)">
+                    <svg class="ico ico-sm"><use href="#i-x"></use></svg></button></td>
+                </tr>
+              }
+              <tr class="genel"><td>Toplam</td><td class="sayi">@Format.Money(o.Expenses.Total) ₺</td><td></td></tr>
+            </tbody>
+          </table></div></div>
+        }
+        @if (silinen is not null)
+        {
+          <div class="notice"><span class="n-body">Gider silindi — @silinen.Description.</span>
+            <button class="btn btn-ghost" id="muhGiderGeriAl" @onclick="GiderGeriAl">Geri al</button></div>
+        }
+      </div>
+
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Alacak</span></div>
+      <div id="muhAlacak">
+        @if (o.Receivables.Items.Count == 0)
+        {
+          <div class="bos-durum"><b>Alacak yok</b><span>Teslim edilen her işin parası alınmış.</span></div>
+        }
+        else
+        {
+          <div class="card"><div class="tablo-sar"><table class="tablo">
+            <thead><tr><th>Müşteri</th><th class="sayi">Tutar</th></tr></thead>
+            <tbody>
+              @foreach (var a in o.Receivables.Items)
+              {
+                <tr data-kayit="@a.RecordId" role="button" tabindex="0" @key="a.RecordId" @onclick='() => Nav.NavigateTo($"/kayit/{a.RecordId}")'>
+                  <td>@(a.OwnerName ?? "sahip yazılmamış")
+                    <span class="t-alt"><Plate No="@a.PlateNo" />@if (a.DeliveredAt is { } t) { <span class="t-tarih">@Format.Date(t)</span> }</span></td>
+                  <td class="sayi">@Format.Money(a.Remaining) ₺
+                    @if (a.Paid > 0) { <span class="t-alt">@Format.Money(a.Paid) ₺ alındı</span> }</td>
+                </tr>
+              }
+              <tr class="genel"><td>Toplam alacak</td><td class="sayi">@Format.Money(o.Receivables.Total) ₺</td></tr>
+            </tbody>
+          </table></div></div>
+        }
+      </div>
+
+      <div class="btn-row" id="muhDisa">
+        <button class="btn btn-ghost" id="muhCsv" @onclick="CsvIndir" disabled="@calisiyor">
+          <svg class="ico"><use href="#i-download"></use></svg> Excel dosyası (CSV)
+        </button>
+      </div>
+      <p class="plate-hint" id="muhDisaNot"><b>@DonemAdi(donem)</b> tahsilatı ve gideri, bugünkü alacakla birlikte. Excel dosyası muhasebeciye gönderilebilir.</p>
+    }
+  </div>
+</section>
+
+@code {
+    static readonly string[] Donemler = ["Today", "Month", "Year"];
+
+    AccountingOverview? o;
+    ExpenseItem? silinen;
+    string donem = "Today";
+    string giderAd = "", giderTutar = "";
+    string? hata;
+    bool form, calisiyor;
+
+    // Prototip donemAdi: "Bugün" · ayın adı · yıl.
+    static string DonemAdi(string d) => d switch
+    {
+        "Month" => Format.MonthName(DateTime.Today),
+        "Year" => DateTime.Today.Year.ToString(System.Globalization.CultureInfo.InvariantCulture),
+        _ => "Bugün",
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Yukle();
+    }
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+
+    Task Yukle() => Calis(async () => o = await Api.AccountingAsync(donem));
+
+    Task DonemSec(string d) { donem = d; silinen = null; return Yukle(); }
+
+    void FormKapat() { form = false; giderAd = ""; giderTutar = ""; hata = null; }
+
+    async Task GiderEkle()
+    {
+        if (string.IsNullOrWhiteSpace(giderAd) || Format.ParseMoney(giderTutar) is not { } tutar || tutar <= 0)
+        {
+            hata = "Gider için hem açıklama hem tutar gerekiyor.";
+            return;
+        }
+        await Calis(async () =>
+        {
+            await Api.AddExpenseAsync(giderAd.Trim(), tutar);
+            FormKapat();
+            o = await Api.AccountingAsync(donem);
+        });
+    }
+
+    Task GiderSil(ExpenseItem g) => Calis(async () =>
+    {
+        var l = await Api.DeleteExpenseAsync(g.Id, donem);
+        o = o! with { Expenses = l };
+        silinen = g;
+    });
+
+    Task GiderGeriAl() => silinen is not { } g ? Task.CompletedTask : Calis(async () =>
+    {
+        var l = await Api.RestoreExpenseAsync(g.Id, donem);
+        o = o! with { Expenses = l };
+        silinen = null;
+    });
+
+    Task CsvIndir() => Calis(async () =>
+    {
+        var (ad, icerik) = await Api.CashCsvAsync(donem);
+        await JS.InvokeVoidAsync("tamironIndir", ad, Convert.ToBase64String(icerik));
+    });
+}

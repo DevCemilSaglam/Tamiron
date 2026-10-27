@@ -55,6 +55,16 @@ public sealed record ReminderPlan(DateOnly Date, string Basis, DateOnly MonthDat
 
 public sealed record ShopSettings(string Name, int MaintenanceMonths, int MaintenanceKm, bool AskPartCost);
 
+/// <summary>G6 · Muhasebe tek çağrı (C8). Period: "Today" | "Month" | "Year".</summary>
+public sealed record AccountingOverview(CashSummary Cash, ExpenseList Expenses, ReceivableList Receivables);
+public sealed record CashSummary(string Period, DateOnly Start, DateOnly End, int DeliveredCount,
+                                 decimal Cash, decimal Card, decimal Transfer, decimal Collected, decimal Receivable);
+public sealed record ExpenseList(string Period, decimal Total, IReadOnlyList<ExpenseItem> Items);
+public sealed record ExpenseItem(Guid Id, DateOnly Date, string Description, decimal Amount);
+public sealed record ReceivableList(decimal Total, IReadOnlyList<ReceivableItem> Items);
+public sealed record ReceivableItem(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string Description,
+                                    DateOnly? DeliveredAt, decimal Total, decimal Paid, decimal Remaining);
+
 public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
                                  decimal CollectedToday, decimal Receivable, int DueReminderCount);
 
@@ -136,6 +146,24 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     public async Task<RecordDetail> CorrectPaymentAsync(Guid id, string method)
         => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/payment", new { method }, auth: true));
 
+    public async Task<AccountingOverview> AccountingAsync(string period)
+        => await Read<AccountingOverview>(await Send(HttpMethod.Get, $"api/accounting?period={period}", null, auth: true));
+    public async Task AddExpenseAsync(string description, decimal amount)
+        => (await Send(HttpMethod.Post, "api/expenses", new { description, amount }, auth: true)).Dispose();
+    public async Task<ExpenseList> DeleteExpenseAsync(Guid id, string period)
+        => await Read<ExpenseList>(await Send(HttpMethod.Delete, $"api/expenses/{id}?period={period}", null, auth: true));
+    public async Task<ExpenseList> RestoreExpenseAsync(Guid id, string period)
+        => await Read<ExpenseList>(await Send(HttpMethod.Post, $"api/expenses/{id}/restore?period={period}", null, auth: true));
+
+    /// <summary>Muhasebeci dosyası (B9): API'nin ürettiği CSV baytları ve dosya adı.</summary>
+    public async Task<(string FileName, byte[] Content)> CashCsvAsync(string period)
+    {
+        using var res = await Send(HttpMethod.Get, $"api/export/cash.csv?period={period}", null, auth: true);
+        var name = res.Content.Headers.ContentDisposition?.FileNameStar ?? res.Content.Headers.ContentDisposition?.FileName?.Trim('"')
+                   ?? $"tamiron-kasa-{period}.csv";
+        return (name, await res.Content.ReadAsByteArrayAsync());
+    }
+
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
     public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
@@ -196,6 +224,10 @@ public static class Format
     {
         "Cash" => "Nakit", "Card" => "Kart", "Transfer" => "Havale", "Unpaid" => "Almadım", _ => "",
     };
+
+    static readonly string[] Aylar = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
+    /// <summary>Prototip AYLAR — dönem çipinin adı ("Ekim").</summary>
+    public static string MonthName(DateTime d) => Aylar[d.Month - 1];
 
     public static string Date(DateOnly d) => d.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 }

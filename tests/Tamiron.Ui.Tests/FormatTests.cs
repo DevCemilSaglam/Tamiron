@@ -36,4 +36,12 @@ public class FormatTests
         var src = File.ReadAllText(Path.Combine(dir!.FullName, "src", "Tamiron.Ui.Core", "Api.cs"));
         Assert.DoesNotContain("GetCultureInfo(\"tr-TR\")", src);
     }
+
+    /// <summary>G6 · Dönem çipinin adı (prototip AYLAR). Mutasyonla bulundu: ekran testi aynı fonksiyonla karşılaştırıyordu.</summary>
+    [Theory]
+    [InlineData(1, "Ocak")]
+    [InlineData(10, "Ekim")]
+    [InlineData(12, "Aralık")]
+    public void Month_names_are_turkish(int month, string expected)
+        => Assert.Equal(expected, Format.MonthName(new DateTime(2026, month, 15)));
 }
