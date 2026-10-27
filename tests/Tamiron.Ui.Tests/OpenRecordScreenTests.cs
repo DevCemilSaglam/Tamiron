@@ -50,6 +50,17 @@ public class OpenRecordScreenTests : TestContext
     }
 
     [Fact]
+    public void Plate_from_the_vehicle_screen_is_filled_and_asked()
+    {
+        // G9: araç ekranındaki "Kayıt aç" plakayı getirir — usta ikinci kez yazmasın.
+        api.Routes["GET /api/vehicles/lookup"] = (HttpStatusCode.OK, KayitliSasesiz);
+        Nav.NavigateTo("/kayit-ac?plaka=34%20VR%20123");
+        var c = RenderComponent<KayitAc>();
+        c.WaitForAssertion(() => Assert.Equal("Kaydı aç", c.Find("#kaydiAc").TextContent.Trim()));
+        Assert.Equal("34 VR 123", c.Find("#rPlaka").GetAttribute("value"));
+    }
+
+    [Fact]
     public void Nothing_to_press_before_a_plate()
     {
         var c = RenderComponent<KayitAc>();

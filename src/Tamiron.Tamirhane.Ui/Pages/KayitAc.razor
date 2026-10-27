@@ -210,9 +210,13 @@
     static string AracAdi(VehicleBrief a)
         => string.Join(" · ", new[] { $"{a.Brand} {a.Model}".Trim(), a.OwnerName ?? "" }.Where(x => x.Length > 0));
 
+    /// <summary>G9 · Araç ekranındaki "Kayıt aç" plakayı getirir — usta ikinci kez yazmasın.</summary>
+    [SupplyParameterFromQuery(Name = "plaka")] public string? GelenPlaka { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        if (!await Api.HasSessionAsync()) Nav.NavigateTo("/giris");
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        if (!string.IsNullOrWhiteSpace(GelenPlaka)) await PlakaYazildi(new ChangeEventArgs { Value = GelenPlaka });
     }
 
     async Task PlakaYazildi(ChangeEventArgs e)

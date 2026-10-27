@@ -13,11 +13,13 @@ namespace Tamiron.Application.Lists;
 public sealed record RecordListItem(Guid Id, Guid VehicleId, string PlateNo, ServiceType Type, string TypeLabel,
                                     string Complaint, DateOnly OpenedOn, DateOnly? DeliveredAt,
                                     PaymentMethod? PaymentMethod, bool WaitingForPart, decimal Total,
-                                    string? Brand, string? Model, string? OwnerName);
+                                    string? Brand, string? Model, string? OwnerName,
+                                    string? Km = null, DateOnly? ReminderDate = null);
 
 public sealed record RecordList(int InShopCount, int Count, IReadOnlyList<RecordListItem> Items);
 
-public sealed record ListRecords(string? Q = null, bool InShop = false) : IRequest<RecordList>;
+/// <param name="VehicleId">G9 · Araç ekranının geçmişi: aracın KİMLİĞİYLE (plaka metin araması "06 AB 123"te "06 AB 1234"ü de bulurdu).</param>
+public sealed record ListRecords(string? Q = null, bool InShop = false, Guid? VehicleId = null) : IRequest<RecordList>;
 
 public sealed record VehicleListItem(Guid Id, string PlateNo, string? Brand, string? Model,
                                      string? OwnerName, string? ContactName, bool InShop);
@@ -38,6 +40,7 @@ internal sealed class ListHandlers(ITamironDb db, IClock clock) :
         var items = records
             // Süzgeç önce: "yalnız servistekiler" dendiyse arama boş olsa da liste daralır.
             .Where(r => !q.InShop || r.DeliveredAt is null)
+            .Where(r => q.VehicleId is null || r.VehicleId == q.VehicleId)
             .Where(r =>
             {
                 vehicles.TryGetValue(r.VehicleId, out var v);
@@ -51,7 +54,7 @@ internal sealed class ListHandlers(ITamironDb db, IClock clock) :
                 vehicles.TryGetValue(r.VehicleId, out var v);
                 return new RecordListItem(r.Id, r.VehicleId, v?.PlateNo ?? "", r.Type, ServiceTypeGuess.Label(r.Type),
                     r.Complaint, clock.LocalDate(r.DateTimeCreated), r.DeliveredAt, r.PaymentMethod, r.WaitingForPart,
-                    r.Total, v?.Brand, v?.Model, v?.OwnerName);
+                    r.Total, v?.Brand, v?.Model, v?.OwnerName, r.Km, r.ReminderDate);
             }).ToList();
 
         return new RecordList(items.Count(i => i.DeliveredAt is null), items.Count, items);

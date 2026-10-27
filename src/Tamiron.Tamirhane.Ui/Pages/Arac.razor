@@ -1,0 +1,274 @@
+@page "/arac/{Id:guid}"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G9 · Araç (EKRANLAR §6, prototip 60-arac). Sıra (K-019.4, Cemil 04.09): künye → eylemler → not →
+  ödeme durumu → ruhsat (açılır) → kilometre (açılır, yalnız tarih + km — K-019.5) → bakım → geçmiş.
+  Geçmiş aracın KİMLİĞİYLE (GET /api/records?vehicleId); alacak muhasebeyle AYNI kaynaktan
+  (receivables?vehicleId). Kayıtlı aracın bilgisi burada düzeltilir (K-080.6) — biçim API'de.
+  ⚠️ Henüz yok: "Mesaj" (mesaj ekranıyla, G9c), "Sesle" (G13), renk kutucuğu (renk adı yazılır).
+*@
+<section class="screen active" id="screen-arac">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-car"></use></svg> Araç</span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="arHata"><span class="n-body">@hata</span></div>
+  }
+
+  @if (a is not null)
+  {
+    <div class="card">
+      <div id="arKunye">
+        <div class="arac-bas">
+          <Plate No="@a.PlateNo" Size="plate-lg" />
+          <div class="veh-title">@($"{a.Brand} {a.Model}".Trim())
+            @if (!string.IsNullOrWhiteSpace(a.Year)) { <span class="yr">@a.Year</span> }
+          </div>
+          <div class="spec-strip">
+            @foreach (var (s, i) in new[] { a.Engine, a.FuelType, a.Color }.Where(x => !string.IsNullOrWhiteSpace(x)).Select((x, i) => (x, i)))
+            {
+              if (i > 0) { <span class="spec-sep">·</span> }
+              <span class="spec-val">@s</span>
+            }
+          </div>
+        </div>
+      </div>
+      <div id="arIletisim">
+        <div class="tl-veri"><span>Sahibi <b>@(a.OwnerName ?? "yazılmamış")</b></span></div>
+        @if (!string.IsNullOrWhiteSpace(a.OwnerPhone))
+        {
+          <a class="btn btn-ghost" href="tel:@Rakam(a.OwnerPhone)"><svg class="ico"><use href="#i-phone"></use></svg> @a.OwnerPhone</a>
+        }
+        else
+        {
+          <p class="plate-hint">Telefon yok — özet ve hatırlatma gönderilemez.</p>
+        }
+        @if (!string.IsNullOrWhiteSpace(a.ContactName) || !string.IsNullOrWhiteSpace(a.ContactPhone))
+        {
+          <div class="ak-kisi">
+            <span class="ak-kisi-ad">İletişim: <b>@(a.ContactName ?? "ad yazılmamış")</b></span>
+            @if (!string.IsNullOrWhiteSpace(a.ContactPhone))
+            {
+              <a class="btn btn-ghost" href="tel:@Rakam(a.ContactPhone)"><svg class="ico"><use href="#i-phone"></use></svg> @a.ContactPhone</a>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    <div id="arEylem" class="btn-row tek-satir">
+      @if (gecmis?.Items.FirstOrDefault(r => r.DeliveredAt is null) is { } acik)
+      {
+        @* İçerideyse "kayıt aç" değil AÇIK KAYDA GİT: aynı araca ikinci kayıt, iki yerde iş demek. *@
+        <button class="btn btn-primary" id="arAcikKayit" @onclick='() => Nav.NavigateTo($"/kayit/{acik.Id}")'>
+          <svg class="ico"><use href="#i-clipboard-list"></use></svg> Açık kayıt</button>
+      }
+      else
+      {
+        <button class="btn btn-primary" id="arYeniKayit" @onclick='() => Nav.NavigateTo("/kayit-ac?plaka=" + Uri.EscapeDataString(a.PlateNo))'>
+          <svg class="ico"><use href="#i-plus"></use></svg> Kayıt aç</button>
+      }
+    </div>
+
+    <div class="card">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Not</span></div>
+      <div class="field">
+        <textarea id="arNot" rows="3" aria-label="Araç notu" placeholder="Bu araçla ilgili hatırlanacak bir şey"
+                  value="@a.Note" @onchange="NotDegisti"></textarea>
+      </div>
+    </div>
+
+    @if (alacak is { Items.Count: > 0 })
+    {
+      <div class="card" id="arOdeme">
+        <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Ödeme durumu</span></div>
+        <div class="tutar-serit">
+          @foreach (var r in alacak.Items)
+          {
+            <div class="tutar-sat" role="button" tabindex="0" @onclick='() => Nav.NavigateTo($"/kayit/{r.RecordId}")'>
+              <span>@r.Description@(r.DeliveredAt is { } t ? " · " + Format.Date(t) : "")</span>
+              <span class="tv">@Format.Money(r.Remaining) ₺</span></div>
+          }
+          <div class="tutar-sat genel"><span>Alacak</span><span class="tv">@Format.Money(alacak.Total) ₺</span></div>
+        </div>
+      </div>
+    }
+
+    <div class="akordiyon">
+      <button class="akd-bas" id="arRuhsatBas" aria-expanded="@(ruhsatAcik ? "true" : "false")" @onclick="() => ruhsatAcik = !ruhsatAcik">
+        <svg class="ico ico-sm"><use href="#i-file-text"></use></svg> Ruhsat bilgileri
+        <span class="akd-say">@(RuhsatAlanlari.Count > 0 ? $"{RuhsatAlanlari.Count} alan" : "boş")</span>
+        <svg class="ico ico-sm akd-ok"><use href="#i-chevron-down"></use></svg>
+      </button>
+      @if (ruhsatAcik)
+      {
+        <div class="akd-govde" id="arRuhsatGovde">
+          @if (duzenle)
+          {
+            @foreach (var (alan, ad) in DuzenAlanlari)
+            {
+              <div class="field"><label for="ad@(alan)">@ad</label>
+                <input id="ad@(alan)" value="@form[alan]" @oninput="e => form[alan] = e.Value?.ToString() ?? string.Empty" /></div>
+            }
+            <div class="btn-row">
+              <button class="btn btn-primary" id="adKaydet" @onclick="Kaydet" disabled="@calisiyor">Kaydet</button>
+              <button class="btn btn-ghost" id="adVazgec" @onclick="() => { duzenle = false; hata = null; }">Vazgeç</button>
+            </div>
+          }
+          else
+          {
+            @if (RuhsatAlanlari.Count > 0)
+            {
+              <div class="tutar-serit">
+                @foreach (var (ad, deger) in RuhsatAlanlari)
+                {
+                  <div class="tutar-sat"><span>@ad</span><span class="tv">@deger</span></div>
+                }
+              </div>
+            }
+            else
+            {
+              <p class="plate-hint">Ruhsat okunmamış — bilgiler boş.</p>
+            }
+            <button class="btn btn-ghost" id="arDuzenle" @onclick="DuzenleAc"><svg class="ico"><use href="#i-wrench"></use></svg> Düzenle</button>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="akordiyon">
+      <button class="akd-bas" id="arKmBas" aria-expanded="@(kmAcik ? "true" : "false")" @onclick="() => kmAcik = !kmAcik">
+        <svg class="ico ico-sm"><use href="#i-clock"></use></svg> Kilometre
+        <span class="akd-say">@(KmOlcumleri.Count > 0 ? $"{KmOlcumleri.Count} ölçüm" : "yok")</span>
+        <svg class="ico ico-sm akd-ok"><use href="#i-chevron-down"></use></svg>
+      </button>
+      @if (kmAcik)
+      {
+        <div class="akd-govde" id="arKmGovde">
+          @if (KmOlcumleri.Count == 0)
+          {
+            <div class="bos-durum"><b>Kilometre yazılmamış</b><span>Kayıt açarken kilometre girilirse burada birikir.</span></div>
+          }
+          @foreach (var (gun, km) in KmOlcumleri)
+          {
+            <div class="km-sat"><span class="km-tarih">@Format.Date(gun)</span><span class="km-deger">@km km</span></div>
+          }
+        </div>
+      }
+    </div>
+
+    <div class="card" id="arBakim">
+      <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-calendar-clock"></use></svg> Bakım bilgileri</span></div>
+      @if (SonBakim is { } sb)
+      {
+        <div class="tutar-serit">
+          <div class="tutar-sat"><span>Son bakım</span><span class="tv">@Format.Date(sb.DeliveredAt!.Value)@(sb.Km is null ? "" : $" · {sb.Km} km")</span></div>
+          @if (sb.ReminderDate is { } h)
+          {
+            <div class="tutar-sat"><span>Sıradaki bakım</span><span class="tv">@Format.Date(h)</span></div>
+          }
+        </div>
+      }
+      else
+      {
+        <p class="plate-hint">Bu araca bakım yapılmamış.</p>
+      }
+    </div>
+
+    <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> Geçmiş</span></div>
+    <div id="arGecmis">
+      @if (gecmis is { Items.Count: > 0 })
+      {
+        @foreach (var r in gecmis.Items)
+        {
+          <div class="card" data-kayit="@r.Id" role="button" tabindex="0" @key="r.Id" @onclick='() => Nav.NavigateTo($"/kayit/{r.Id}")'>
+            <b>@r.TypeLabel</b> · @(string.IsNullOrWhiteSpace(r.Complaint) ? "ne yapılacağı yazılmamış" : r.Complaint)
+            <span class="t-alt">@Format.Date(r.DeliveredAt ?? r.OpenedOn) · @(r.DeliveredAt is null ? "Serviste" : "Teslim edildi")</span>
+          </div>
+        }
+      }
+      else if (gecmis is not null)
+      {
+        <div class="bos-durum"><b>Geçmiş yok</b><span>Bu araca henüz servis kaydı açılmamış.</span></div>
+      }
+    </div>
+  }
+</section>
+
+@code {
+    [Parameter] public Guid Id { get; set; }
+
+    VehicleDetail? a;
+    RecordList? gecmis;
+    ReceivableList? alacak;
+    string? hata;
+    bool calisiyor, ruhsatAcik, kmAcik, duzenle;
+    readonly Dictionary<string, string> form = [];
+
+    static string Rakam(string s) => new(s.Where(char.IsAsciiDigit).ToArray());
+
+    // Prototip 60-arac ruhsat alanları — yalnız dolu olanlar.
+    IReadOnlyList<(string Ad, string Deger)> RuhsatAlanlari => a is null ? [] : new (string, string?)[]
+    {
+        ("Şasi no (VIN)", a.Vin), ("Motor no", a.EngineNo),
+        ("Motor hacmi", a.Displacement is { } d ? d + " cc" : null), ("Motor gücü", a.PowerKw is { } p ? p + " kW" : null),
+        ("Yakıt", a.FuelType), ("Renk", a.Color), ("Koltuk", a.Seats),
+        ("İlk tescil", a.FirstRegistrationDate is { } t ? Format.Date(t) : null),
+        ("Yakıt deposu", a.FuelTankLiters is { } l ? l + " litre" : null),
+    }.Where(x => !string.IsNullOrWhiteSpace(x.Item2)).Select(x => (x.Item1, x.Item2!)).ToList();
+
+    // Düzeltilebilen alanlar — kayıt açma ekranındaki araç kartıyla aynı (K-080.6).
+    static readonly (string Alan, string Ad)[] DuzenAlanlari =
+    [
+        ("Marka", "Marka"), ("Model", "Model"), ("Yil", "Yıl"), ("Motor", "Motor"), ("Renk", "Renk"), ("Yakit", "Yakıt"),
+        ("Sase", "Şase no"), ("Sahip", "Sahibi"), ("Tel", "Telefon"), ("IletisimAd", "İletişim (ad)"), ("IletisimTel", "İletişim (telefon)"),
+    ];
+
+    // Km: yalnız tarih + km (K-019.5 — tahmin yok); kaydın teslim günü yoksa açılış günü.
+    IReadOnlyList<(DateOnly Gun, string Km)> KmOlcumleri => gecmis is null ? []
+        : gecmis.Items.Where(r => r.Km is not null).Select(r => (r.DeliveredAt ?? r.OpenedOn, r.Km!)).OrderByDescending(x => x.Item1).ToList();
+
+    RecordListItem? SonBakim => gecmis?.Items.Where(r => r.DeliveredAt is not null && r.Type is "Maintenance" or "Both")
+        .OrderByDescending(r => r.DeliveredAt).FirstOrDefault();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () =>
+        {
+            a = await Api.VehicleDetailAsync(Id);
+            gecmis = await Api.RecordsAsync(vehicleId: Id);
+            alacak = await Api.ReceivablesAsync(Id);
+        });
+    }
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+
+    Task NotDegisti(ChangeEventArgs e) => Calis(async () => a = await Api.PatchVehicleAsync(Id, new VehiclePatch(Note: e.Value?.ToString() ?? "")));
+
+    void DuzenleAc()
+    {
+        form["Marka"] = a!.Brand ?? ""; form["Model"] = a.Model ?? ""; form["Yil"] = a.Year ?? ""; form["Motor"] = a.Engine ?? "";
+        form["Renk"] = a.Color ?? ""; form["Yakit"] = a.FuelType ?? ""; form["Sase"] = a.Vin ?? ""; form["Sahip"] = a.OwnerName ?? "";
+        form["Tel"] = a.OwnerPhone ?? ""; form["IletisimAd"] = a.ContactName ?? ""; form["IletisimTel"] = a.ContactPhone ?? "";
+        duzenle = true; hata = null;
+    }
+
+    // Boş bırakılan alan "" gider = TEMİZLE (API sözleşmesi); hepsi gönderilir, biçimi API düzeltir.
+    Task Kaydet() => Calis(async () =>
+    {
+        a = await Api.PatchVehicleAsync(Id, new VehiclePatch(form["Marka"], form["Model"], form["Yil"], form["Motor"], form["Renk"],
+            form["Yakit"], form["Sase"], form["Sahip"], form["Tel"], form["IletisimAd"], form["IletisimTel"]));
+        duzenle = false;
+    });
+}

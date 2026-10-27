@@ -265,8 +265,8 @@ api.MapPost("/expenses/{id:guid}/restore", (Guid id, PeriodKind? period, ISender
     s.Send(new RestoreExpense(id, period ?? PeriodKind.Month), ct));
 
 // Listeler (B7): serviste olanlar üstte; arama Türkçe katlamalı.
-api.MapGet("/records", (string? q, bool? inShop, ISender s, CancellationToken ct) =>
-    s.Send(new ListRecords(q, inShop ?? false), ct));
+api.MapGet("/records", (string? q, bool? inShop, Guid? vehicleId, ISender s, CancellationToken ct) =>
+    s.Send(new ListRecords(q, inShop ?? false, vehicleId), ct));
 api.MapGet("/vehicles/list", (string? q, ISender s, CancellationToken ct) => s.Send(new ListVehicles(q), ct));
 
 // Araç (B6). PATCH: null = dokunma, "" = temizle.

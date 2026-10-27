@@ -16,9 +16,25 @@ public sealed record LoginResult(string Token, string ShopName, string? UserName
 public sealed record RecordListItem(Guid Id, Guid VehicleId, string PlateNo, string Type, string TypeLabel,
                                     string Complaint, DateOnly OpenedOn, DateOnly? DeliveredAt,
                                     string? PaymentMethod, bool WaitingForPart, decimal Total,
-                                    string? Brand, string? Model, string? OwnerName);
+                                    string? Brand, string? Model, string? OwnerName,
+                                    string? Km = null, DateOnly? ReminderDate = null);
 
 public sealed record RecordList(int InShopCount, int Count, IReadOnlyList<RecordListItem> Items);
+
+/// <summary>G9 · Araç ekranı (API VehicleDto'nun ekranın okuduğu kısmı).</summary>
+public sealed record VehicleDetail(Guid Id, string PlateNo, string? Brand, string? Model, string? Year, string? Engine, string? Vin,
+                                   string? Color, string? FuelType, string? EngineNo, string? Displacement, string? PowerKw, string? Seats,
+                                   DateOnly? FirstRegistrationDate, string? FuelTankLiters, string? OwnerName, string? OwnerPhone,
+                                   string? ContactName, string? ContactPhone, string? TaxOrNationalId, string? Address, string? TaxOffice,
+                                   string? Note);
+
+/// <summary>Araç düzeltmesi (API PatchVehicle): null = dokunma, "" = temizle. Biçim ve geçerlilik API'de.</summary>
+public sealed record VehiclePatch(string? Brand = null, string? Model = null, string? Year = null, string? Engine = null,
+                                  string? Color = null, string? FuelType = null, string? Vin = null, string? OwnerName = null,
+                                  string? OwnerPhone = null, string? ContactName = null, string? ContactPhone = null, string? Note = null);
+
+public sealed record VehicleListItem(Guid Id, string PlateNo, string? Brand, string? Model, string? OwnerName, string? ContactName, bool InShop);
+public sealed record VehicleList(int Count, IReadOnlyList<VehicleListItem> Items);
 
 /// <summary>G2 · Plaka sorusunun cevabı (API LookupPlate): geçerli mi, ipucu, kayıtlı araç, açık kaydı.</summary>
 public sealed record PlateLookup(string Plate, bool Valid, string? Hint, VehicleBrief? Vehicle, Guid? OpenRecordId);
@@ -204,11 +220,21 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
 
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
-    public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
+    public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false, Guid? vehicleId = null)
     {
-        var url = "api/records?inShop=" + (inShop ? "true" : "false") + (string.IsNullOrWhiteSpace(q) ? "" : "&q=" + Uri.EscapeDataString(q));
+        var url = "api/records?inShop=" + (inShop ? "true" : "false") + (string.IsNullOrWhiteSpace(q) ? "" : "&q=" + Uri.EscapeDataString(q))
+                + (vehicleId is { } v ? "&vehicleId=" + v : "");
         return await Read<RecordList>(await Send(HttpMethod.Get, url, null, auth: true));
     }
+
+    // G9 · Araç ve araçlar.
+    public async Task<VehicleDetail> VehicleDetailAsync(Guid id) => await Read<VehicleDetail>(await Send(HttpMethod.Get, $"api/vehicles/{id}", null, auth: true));
+    public async Task<VehicleDetail> PatchVehicleAsync(Guid id, VehiclePatch p)
+        => await Read<VehicleDetail>(await Send(HttpMethod.Patch, $"api/vehicles/{id}", p, auth: true));
+    public async Task<VehicleList> VehiclesAsync(string? q = null)
+        => await Read<VehicleList>(await Send(HttpMethod.Get, "api/vehicles/list" + (string.IsNullOrWhiteSpace(q) ? "" : "?q=" + Uri.EscapeDataString(q)), null, auth: true));
+    public async Task<ReceivableList> ReceivablesAsync(Guid vehicleId)
+        => await Read<ReceivableList>(await Send(HttpMethod.Get, $"api/receivables?vehicleId={vehicleId}", null, auth: true));
 
     private async Task<HttpResponseMessage> Send(HttpMethod m, string url, object? body, bool auth)
     {

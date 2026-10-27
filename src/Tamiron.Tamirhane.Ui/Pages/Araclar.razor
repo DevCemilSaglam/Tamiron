@@ -1,0 +1,75 @@
+@page "/araclar"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  G9 · Araçlar (prototip 70-araclar). Sıra API'de: serviste olanlar üstte (B7 — üç listede aynı sıra).
+  Arama API'de (Türkçe katlamalı TextSearch: plaka, marka, model, sahip, ikinci iletişim).
+*@
+<section class="screen active" id="screen-araclar">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-car"></use></svg> Araçlar
+      @if (liste is not null) { <span class="eb-say" id="arcSay">@liste.Count</span> }
+    </span>
+  </div>
+
+  <div class="search-box" id="arcArama">
+    <svg class="ico"><use href="#i-search"></use></svg>
+    <input type="search" id="arcQ" placeholder="Plaka, marka ya da sahip…" aria-label="Araç ara" autocomplete="off"
+           value="@q" @oninput="Ara" />
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert"><span class="n-body">@hata</span></div>
+  }
+
+  <div id="arcListe">
+    @if (liste is { Items.Count: 0 })
+    {
+      <div class="bos-durum">
+        <b>@(string.IsNullOrWhiteSpace(q) ? "Henüz araç yok" : "Bulunamadı")</b>
+        <span>@(string.IsNullOrWhiteSpace(q) ? "Servis kaydı açtığın her araç burada birikir." : "Başka bir şekilde yazmayı dene.")</span>
+      </div>
+    }
+    else if (liste is not null)
+    {
+      @foreach (var v in liste.Items)
+      {
+        <div class="arac-kart @(v.InShop ? "icerde" : "")" data-arac="@v.Id" role="button" tabindex="0" @key="v.Id"
+             @onclick='() => Nav.NavigateTo($"/arac/{v.Id}")'>
+          <div class="ak-ust"><Plate No="@v.PlateNo" Size="plate-lg" /></div>
+          <div class="ak-arac"><span>@($"{v.Brand} {v.Model}".Trim())</span></div>
+          @if (!string.IsNullOrWhiteSpace(v.OwnerName)) { <div class="ak-sahip"><b>@v.OwnerName</b></div> }
+          @if (v.InShop) { <span class="pill warn">Serviste</span> }
+        </div>
+      }
+    }
+  </div>
+</section>
+
+@code {
+    VehicleList? liste;
+    string q = "";
+    string? hata;
+    int soru;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Yukle();
+    }
+
+    async Task Yukle()
+    {
+        var benim = ++soru;
+        try
+        {
+            var l = await Api.VehiclesAsync(q);
+            if (benim == soru) { liste = l; hata = null; }   // geç gelen eski cevap yenisini ezmesin
+        }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+    }
+
+    Task Ara(ChangeEventArgs e) { q = e.Value?.ToString() ?? ""; return Yukle(); }
+}

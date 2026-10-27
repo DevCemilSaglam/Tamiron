@@ -10,6 +10,19 @@
 
 ---
 
+## K-082 · Araç ekranı: geçmiş kimlikle, km ve bakım geçmişten (27.10.2026 — lider, Cemil onayına açık)
+
+G9a koda geçti (EKRANLAR §6, prototip 70-araclar).
+- **Geçmiş aracın kimliğiyle süzülür** (`GET /api/records?vehicleId=`): plaka metin araması "06 AB 123"te
+  "06 AB 1234"ü de getirirdi. Liste satırına km ve hatırlatma günü eklendi; ayrı uç açılmadı.
+- **Km bölümü yalnız tarih + km** (K-019.5 — tahmin yok): teslim edilmişse teslim günü, içerideyse açılış.
+- **Son bakım = teslim edilmiş en yeni Bakım/Bakım+Tamirat kaydı**; içerideki bakım ve sonraki tamirat
+  sayılmaz. Sıradaki bakım = o kaydın hatırlatma günü (ayrı hesap yok).
+- **İçerideyse "Kayıt aç" yerine "Açık kayıt"** — aynı araca ikinci kayıt iki yerde iş demek.
+  "Kayıt aç" plakayı `kayit-ac?plaka=` ile taşır, usta ikinci kez yazmaz.
+- **Ruhsat düzenleme: boş bırakılan alan temizlenir** (alanlar hep gönderilir, "" = sil). Not alandan
+  çıkınca kaydedilir — ayrı düğme yok. **Cemil onayına açık:** not için "Kaydet" düğmesi istenirse eklenir.
+
 ## K-081 · Müşteri avansı — bakiye, sahibe göre; kasaya alındığı gün (27.10.2026 — lider, Cemil onayına açık)
 
 K-079.1'in üç cevabı koda geçti (G7). Tasarım: `TASARIM-G-AVANS.md`; veri: VERI-MODELI §2c.
