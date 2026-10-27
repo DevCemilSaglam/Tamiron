@@ -65,6 +65,19 @@ public sealed record ReceivableList(decimal Total, IReadOnlyList<ReceivableItem>
 public sealed record ReceivableItem(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string Description,
                                     DateOnly? DeliveredAt, decimal Total, decimal Paid, decimal Remaining);
 
+/// <summary>
+/// G2b · Ruhsat okuma sonucu (API RegistrationResult). Outcome: "Save" | "PlateConflict" | "NoPlate".
+/// <see cref="Read"/> HAM tutulur: çatışmada seçilen plakayla API'ye olduğu gibi geri gider (alan kaybolmasın).
+/// </summary>
+public sealed record RegistrationResult(string Outcome, string? TypedPlate, string? ReadPlate, JsonElement Read,
+                                        bool VinRead, bool Created, RegistrationVehicle? Vehicle)
+{
+    public string? Field(string name) => Read.ValueKind == JsonValueKind.Object && Read.TryGetProperty(name, out var v)
+                                         && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+}
+
+public sealed record RegistrationVehicle(Guid Id, string PlateNo);
+
 public sealed record HomeSummary(int InShopCount, int RecordCount, int VehicleCount, int CustomerCount,
                                  decimal CollectedToday, decimal Receivable, int DueReminderCount);
 
@@ -164,6 +177,20 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         return (name, await res.Content.ReadAsByteArrayAsync());
     }
 
+    /// <summary>Ruhsat fotoğrafı (D8): çok parçalı "photo" + ustanın yazdığı plaka (K-069).</summary>
+    public async Task<RegistrationResult> ReadRegistrationAsync(byte[] image, string mediaType, string? typedPlate)
+    {
+        var form = new MultipartFormDataContent();
+        var foto = new ByteArrayContent(image);
+        foto.Headers.ContentType = new MediaTypeHeaderValue(mediaType);
+        form.Add(foto, "photo", "ruhsat");
+        if (!string.IsNullOrWhiteSpace(typedPlate)) form.Add(new StringContent(typedPlate), "plate");
+        return await Read<RegistrationResult>(await Send(HttpMethod.Post, "api/registrations/read", form, auth: true));
+    }
+
+    public async Task<RegistrationResult> SaveRegistrationAsync(string plate, JsonElement read)
+        => await Read<RegistrationResult>(await Send(HttpMethod.Post, "api/registrations/save", new { plate, read }, auth: true));
+
     public async Task<HomeSummary> HomeAsync() => await Read<HomeSummary>(await Send(HttpMethod.Get, "api/home", null, auth: true));
 
     public async Task<RecordList> RecordsAsync(string? q = null, bool inShop = false)
@@ -175,7 +202,9 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     private async Task<HttpResponseMessage> Send(HttpMethod m, string url, object? body, bool auth)
     {
         using var req = new HttpRequestMessage(m, url);
-        if (body is not null) req.Content = JsonContent.Create(body, options: Json);
+        // Fotoğraf gibi çok parçalı gövde olduğu gibi gider; gerisi JSON.
+        if (body is HttpContent icerik) req.Content = icerik;
+        else if (body is not null) req.Content = JsonContent.Create(body, options: Json);
         if (auth && await tokens.GetAsync() is { Length: > 0 } t) req.Headers.Authorization = new AuthenticationHeaderValue("Bearer", t);
         HttpResponseMessage res;
         try { res = await http.SendAsync(req); }

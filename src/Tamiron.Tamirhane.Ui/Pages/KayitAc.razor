@@ -1,6 +1,7 @@
 @page "/kayit-ac"
 @inject TamironApi Api
 @inject NavigationManager Nav
+@using Microsoft.AspNetCore.Components.Forms
 @*
   G2 · Servis kaydı ekle (EKRANLAR §2, prototip 20-ruhsat). Plaka kapının kendisi (K-026): her yazışta
   API'ye sorulur — geçerli mi, kayıtlı mı, açık kaydı var mı (LookupPlate). Ekran yalnız cevabı gösterir.
@@ -15,6 +16,48 @@
     <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-plus"></use></svg> Servis kaydı ekle</span>
   </div>
 
+  <div class="tab-grup" role="tablist" aria-label="Araç bilgisi nasıl girilecek">
+    <button class="tab" id="sekPlaka" role="tab" aria-selected="@(ruhsatSekmesi ? "false" : "true")" @onclick="() => ruhsatSekmesi = false">
+      <svg class="ico"><use href="#i-file-text"></use></svg> Plakayı yaz
+    </button>
+    <button class="tab" id="sekRuhsat" role="tab" aria-selected="@(ruhsatSekmesi ? "true" : "false")" @onclick="() => { ruhsatSekmesi = true; hata = null; }">
+      <svg class="ico"><use href="#i-camera"></use></svg> Ruhsatı çek
+    </button>
+  </div>
+
+  @if (okuma is not null)
+  {
+    <div class="notice ok" id="rOkuma"><span class="n-body">@okuma</span></div>
+  }
+  @if (catisma is not null)
+  {
+    <div class="notice warn" id="rPlakaCatisma">
+      <span class="n-ic"><svg class="ico ico-sm"><use href="#i-triangle-alert"></use></svg></span>
+      <span class="n-body"><b>Plakalar farklı.</b> Sen <b>@catisma.TypedPlate</b> yazdın, ruhsatta <b>@catisma.ReadPlate</b> okundu. Hangisi doğru?
+        <span class="btn-row">
+          <button class="btn btn-ghost" id="rPlakaBenim" @onclick="() => PlakaSec(catisma.TypedPlate!)">@catisma.TypedPlate</button>
+          <button class="btn btn-ghost" id="rPlakaRuhsat" @onclick="() => PlakaSec(catisma.ReadPlate!)">@catisma.ReadPlate</button>
+        </span></span>
+    </div>
+  }
+
+  @if (ruhsatSekmesi)
+  {
+    <div id="sekmeRuhsat" class="yigin">
+      @* "Ruhsatı çek" DEĞİL "Kamerayı aç" (prototip 06.09): ikinci düğme galeriden seçer. *@
+      <label class="btn btn-primary btn-lg"><svg class="ico"><use href="#i-camera"></use></svg> Kamerayı aç
+        <InputFile OnChange="FotoSecildi" accept="image/*" capture="environment" hidden /></label>
+      <label class="btn btn-ghost"><svg class="ico"><use href="#i-image"></use></svg> Galeriden seç
+        <InputFile OnChange="FotoSecildi" accept="image/*" hidden /></label>
+      @if (calisiyor) { <p class="plate-hint">Ruhsat okunuyor…</p> }
+      @if (hata is not null)
+      {
+        <div class="notice warn" role="alert" id="rHata"><span class="n-body">@hata</span></div>
+      }
+    </div>
+  }
+  else
+  {
   <div class="yigin">
     <div class="card raised">
       <div class="plate-input-wrap">
@@ -99,6 +142,7 @@
       </button>
     }
   </div>
+  }
 </section>
 
 @code {
@@ -108,6 +152,60 @@
     bool calisiyor;
     int soru;   // her yazış bir soru; geç gelen eski cevap yenisini ezmesin
     string marka = "", model = "", yil = "", motor = "", renk = "", yakit = "", sase = "", sahip = "", tel = "";
+
+    // G2b · Ruhsat sekmesi (prototip ruhsatOku / ruhsatKaydet).
+    bool ruhsatSekmesi;
+    string? okuma;
+    RegistrationResult? catisma;
+
+    async Task FotoSecildi(InputFileChangeEventArgs e)
+    {
+        okuma = null; catisma = null; hata = null; calisiyor = true;
+        try
+        {
+            byte[] bayt;
+            // Sınır API'de de var (10 MB); burada yalnız tarayıcının okuyabileceği kadarı.
+            await using (var akis = e.File.OpenReadStream(10 * 1024 * 1024))
+            using (var ms = new MemoryStream()) { await akis.CopyToAsync(ms); bayt = ms.ToArray(); }
+            var r = await Api.ReadRegistrationAsync(bayt, e.File.ContentType, string.IsNullOrWhiteSpace(plaka) ? null : plaka);
+            await Sonuc(r);
+        }
+        catch (ApiException ex) when (ex.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException ex) { hata = ex.Message; }
+        catch (IOException) { hata = "Fotoğraf çok büyük. Yeniden çek."; }
+        finally { calisiyor = false; }
+    }
+
+    /// <summary>Okumanın üç sonucu — karar API'de (RegistrationIntake.Decide), ekran yalnız söyler.</summary>
+    async Task Sonuc(RegistrationResult r)
+    {
+        if (r.Outcome == "PlateConflict") { catisma = r; return; }
+        if (r.Outcome == "NoPlate")
+        {
+            // Okunanlar kaybolmasın: araç kartına yazılır, plaka yazılınca araç onlarla açılır.
+            marka = r.Field("brand") ?? marka; model = r.Field("model") ?? model; yil = r.Field("year") ?? yil;
+            motor = r.Field("engine") ?? motor; renk = r.Field("color") ?? renk; yakit = r.Field("fuelType") ?? yakit;
+            sase = r.Field("vin") ?? sase;
+            okuma = "Plaka okunamadı — plakayı yaz, araç öyle kaydedilir.";
+            ruhsatSekmesi = false;
+            return;
+        }
+        okuma = r.Created && !r.VinRead ? "Ruhsat okundu, araç kaydedildi — şase okunamadı."
+              : r.Created ? "Ruhsat okundu, araç kaydedildi — yanlış varsa araç ekranından düzelt."
+              : "Ruhsat okundu — bu araç zaten kayıtlı.";
+        ruhsatSekmesi = false;
+        await PlakaYazildi(new ChangeEventArgs { Value = r.Vehicle?.PlateNo ?? r.ReadPlate });
+    }
+
+    async Task PlakaSec(string secilen)
+    {
+        if (catisma is not { } c) return;
+        calisiyor = true;
+        try { catisma = null; await Sonuc(await Api.SaveRegistrationAsync(secilen, c.Read)); }
+        catch (ApiException ex) when (ex.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException ex) { hata = ex.Message; catisma = c; }
+        finally { calisiyor = false; }
+    }
 
     static string AracAdi(VehicleBrief a)
         => string.Join(" · ", new[] { $"{a.Brand} {a.Model}".Trim(), a.OwnerName ?? "" }.Where(x => x.Length > 0));
