@@ -8,12 +8,14 @@ namespace Tamiron.Application.Auth;
 
 public sealed record RequestLoginCode(string Phone) : IRequest;
 public sealed record VerifyLoginCode(string Phone, string Code, string? DeviceName = null) : IRequest<LoginResult>;
-public sealed record LoginResult(string Token, string ShopName, string? UserName);
+/// <summary>H6 · <paramref name="Kind"/>: hangi uygulama açılacak (tamirhane / yedek parça — K-091).</summary>
+public sealed record LoginResult(string Token, string ShopName, string? UserName, ShopKind Kind = ShopKind.Tamirhane);
 
 /// <summary>D6 · Yeni dükkân: kayıtlı OLMAYAN numaraya kod (K-076.6).</summary>
 public sealed record RequestSignupCode(string Phone) : IRequest;
 /// <summary>D6 · Kod + dükkân adı → dükkân, ilk kullanıcı ve oturum tek adımda.</summary>
-public sealed record SignUp(string Phone, string Code, string? ShopName, string? UserName = null, string? DeviceName = null) : IRequest<LoginResult>;
+public sealed record SignUp(string Phone, string Code, string? ShopName, string? UserName = null, string? DeviceName = null,
+                           ShopKind Kind = ShopKind.Tamirhane) : IRequest<LoginResult>;
 
 public sealed record Logout : IRequest;
 /// <summary>"Bütün cihazlardan çık" — kaybolan telefonun karşılığı (K-074.2).</summary>
@@ -70,7 +72,7 @@ internal sealed class AuthHandlers(ITamironDb db, IClock clock, ISmsSender sms, 
     {
         var phone = Phone(c.Phone);
         // Ad kod denemesinden ÖNCE: eksik ad deneme hakkı yakmasın.
-        var shop = Shop.Register(c.ShopName, phone);
+        var shop = Shop.Register(c.ShopName, phone, c.Kind);
         if (await db.Users.AnyAsync(u => u.Phone == phone, ct))
             throw new DomainException("auth.phone_registered", "Bu numara zaten kayıtlı — giriş yap.");
         var now = clock.UtcNow;
@@ -82,7 +84,7 @@ internal sealed class AuthHandlers(ITamironDb db, IClock clock, ISmsSender sms, 
         db.Users.Add(user);
         db.Sessions.Add(session);
         await db.SaveChangesAsync(ct);   // tek işlem: dükkân, kullanıcı, oturum birlikte ya da hiç
-        return new LoginResult(token, shop.Name, user.Name);
+        return new LoginResult(token, shop.Name, user.Name, shop.Kind);
     }
 
     /// <summary>Son verilen kod geçerlidir; yanlış deneme de YAZILIR (deneme sınırı sıfırlanmasın).</summary>
@@ -104,8 +106,8 @@ internal sealed class AuthHandlers(ITamironDb db, IClock clock, ISmsSender sms, 
         var (session, token) = Session.Open(user.TenantId, user.Id, c.DeviceName, now);
         db.Sessions.Add(session);
         await db.SaveChangesAsync(ct);
-        var shop = await db.Shops.IgnoreQueryFilters().Where(s => s.Id == user.TenantId).Select(s => s.Name).FirstAsync(ct);
-        return new LoginResult(token, shop, user.Name);
+        var shop = await db.Shops.IgnoreQueryFilters().Where(s => s.Id == user.TenantId).Select(s => new { s.Name, s.Kind }).FirstAsync(ct);
+        return new LoginResult(token, shop.Name, user.Name, shop.Kind);
     }
 
     public async Task Handle(Logout c, CancellationToken ct)

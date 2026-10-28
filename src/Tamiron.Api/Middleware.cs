@@ -14,6 +14,8 @@ public sealed class RequestContext : ITenantContext, ICurrentSession
     public Guid TenantId { get; set; }
     public Guid UserId { get; set; }
     public Guid SessionId { get; set; }
+    /// <summary>H6 · Oturumun dükkân türü (K-091) — hangi uçları kullanabileceği.</summary>
+    public ShopKind ShopKind { get; set; } = ShopKind.Tamirhane;
 }
 
 /// <summary>
@@ -47,6 +49,17 @@ public sealed class SessionMiddleware(RequestDelegate next)
         rc.UserId = session.UserId;
         rc.SessionId = session.Id;
         if (session.Touch(clock.UtcNow)) await db.SaveChangesAsync();
+
+        // H6 · Her tür yalnız KENDİ uygulamasının uçlarını kullanır (K-091). Oturum uçları ortak. Yetki API'de.
+        rc.ShopKind = await db.Shops.IgnoreQueryFilters().Where(s => s.Id == session.TenantId).Select(s => s.Kind).FirstAsync();
+        var parts = path.StartsWithSegments("/api/parts", StringComparison.OrdinalIgnoreCase);
+        var common = path.StartsWithSegments("/api/auth", StringComparison.OrdinalIgnoreCase);
+        if (!common && parts != (rc.ShopKind == ShopKind.YedekParca))
+        {
+            await Results.Problem(statusCode: 403, title: "Bu işlem senin dükkânının uygulamasında yok.",
+                extensions: new Dictionary<string, object?> { ["code"] = "app.wrong_kind" }).ExecuteAsync(ctx);
+            return;
+        }
         await next(ctx);
     }
 }

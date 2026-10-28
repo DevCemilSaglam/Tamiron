@@ -14,7 +14,7 @@ namespace Tamiron.Api.Tests;
 /// </summary>
 public class SignupApiTests(ApiFactory f) : IClassFixture<ApiFactory>
 {
-    static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web) { Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() } };
 
     string LastCode(string phone) => Regex.Match(f.Sms.Sent.Last(s => s.Phone == phone).Text, @"\b\d{6}\b").Value;
 

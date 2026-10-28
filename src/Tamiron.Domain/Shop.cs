@@ -1,5 +1,8 @@
 namespace Tamiron.Domain;
 
+/// <summary>H6 · Dükkânın türü (K-091): hangi uygulamanın uçlarını kullanır. Var olan dükkânlar tamirhanedir.</summary>
+public enum ShopKind { Tamirhane = 1, YedekParca = 2 }
+
 /// <summary>
 /// Dükkân = kiracı. <see cref="Entity.Id"/> öteki tablolardaki TenantId'dir;
 /// kendisi TenantId taşımaz (VERI-MODELI §8).
@@ -14,12 +17,15 @@ public class Shop : Entity
     /// Kendi kendine kayıt (D6): ad zorunlu, telefon ustanın numarası — mesaj imzası ilk
     /// günden doğru çıksın (sonra ayarlardan değişir). Gerisi varsayılan.
     /// </summary>
-    public static Shop Register(string? name, string phone)
+    public static Shop Register(string? name, string phone, ShopKind kind = ShopKind.Tamirhane)
     {
         name = (name ?? "").Trim();
         if (name.Length == 0) throw new DomainException("shop.name_required", "Dükkânının adını yaz — mesajların altında bu ad görünür.");
-        return new Shop { Name = name, Phone = phone };
+        return new Shop { Name = name, Phone = phone, Kind = kind };
     }
+
+    /// <summary>H6 · Tamirhane ya da yedek parça (K-091). Kayıtta seçilir.</summary>
+    public ShopKind Kind { get; set; } = ShopKind.Tamirhane;
 
     public string Name { get; set; } = "";
     public string? Address { get; set; }

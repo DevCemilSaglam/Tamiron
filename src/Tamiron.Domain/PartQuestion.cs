@@ -52,8 +52,18 @@ public class PriceReply : TenantEntity
     public string? ParsedBrand { get; private set; }
     public string? ParsedCode { get; private set; }
     public DateTime ReceivedAt { get; private set; }
+    /// <summary>H6 · Parçacının kendi yazdığı cevaptan mı ("Bunu kullan" — K-091). Null = usta yazdı.</summary>
+    public Guid? SupplierAnswerId { get; private set; }
 
     private PriceReply() { }   // EF
+
+    /// <summary>H6 · Parçacının cevabını tamirhaneye kopyalar — ham metin cevabın kendisi (T-13 sırası).</summary>
+    public static PriceReply FromAnswer(SupplierAnswer a, DateTime at)
+    {
+        var r = Create(a.PriceRequestId, a.Text, a.Price, a.Brand, a.Code, at);
+        r.SupplierAnswerId = a.Id;
+        return r;
+    }
 
     public static PriceReply Create(Guid requestId, string? rawText, decimal? price, string? brand, string? code, DateTime at)
     {

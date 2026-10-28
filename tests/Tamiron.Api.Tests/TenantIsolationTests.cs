@@ -40,7 +40,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
     }
 
     sealed record BData(Guid OpenRecord, Guid DeliveredRecord, Guid Line, Guid Vehicle, Guid Supplier, Guid Expense,
-                        Guid PriceRequest, string CustomerKey, Guid Advance, Guid SupplierPayment);
+                        Guid PriceRequest, string CustomerKey, Guid Advance, Guid SupplierPayment, Guid SupplierAnswer);
 
     async Task<BData> SeedB()
     {
@@ -68,11 +68,16 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         await Read<ServiceRecordDto>(await b.PatchAsJsonAsync($"/api/records/{open.Id}/lines/{open.Lines[0].Id}/purchase",
             new { supplierId = sup.Id, onCredit = true }, Json));
         var debts = await Read<JsonElement>(await b.PostAsJsonAsync($"/api/suppliers/{sup.Id}/payments", new { amount = 100, method = "Cash" }, Json));
+        // H6 · B'nin parçacısı (05337001133) yedek parça uygulamasından cevap yazdı — cevap PARÇACININ kiracısında.
+        var parcaci = f.For(await f.NewShopAsync(Tamiron.Domain.ShopKind.YedekParca, "05337001133"));
+        var inbox = await Read<JsonElement>(await parcaci.PostAsJsonAsync($"/api/parts/requests/{pr[0].Id}/answers",
+            new { lines = new[] { new { lineId = open.Lines[0].Id, price = 250, brand = Mark } } }, Json));
+        var answerId = inbox.GetProperty("items")[0].GetProperty("lines")[0].GetProperty("answers")[0].GetProperty("id").GetGuid();
         var key = (await Read<CustomerList>(await b.GetAsync("/api/customers?q=" + Mark))).Items.Single().Key;
         await Read<CustomerDetail>(await b.PutAsJsonAsync("/api/customers/consent", new { key, granted = true }, Json));
         return new(open.Id, done.Id, open.Lines[0].Id, open.VehicleId, sup.Id, exp.GetProperty("id").GetGuid(),
                    pr[0].Id, key, adv.GetProperty("items")[0].GetProperty("id").GetGuid(),
-                   debts.GetProperty("items")[0].GetProperty("payments")[0].GetProperty("id").GetGuid());
+                   debts.GetProperty("items")[0].GetProperty("payments")[0].GetProperty("id").GetGuid(), answerId);
     }
 
     /// <summary>B'nin bütün satırları: kimlik + RowVersion + silinme. Bir alan bile değişirse görüntü değişir.</summary>
@@ -136,6 +141,8 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         ["PATCH /api/records/{id}/lines/{lineId}/purchase"] = d => new { supplierId = d.Supplier, onCredit = false },
         ["POST /api/suppliers/{id}/payments"] = _ => new { amount = 1, method = "Cash" },
         ["POST /api/supplier-payments/{id}/undo"] = _ => null,
+        ["POST /api/supplier-answers/{id}/use"] = _ => new { onCredit = false },
+        ["POST /api/parts/requests/{id}/answers"] = d => new { lines = new[] { new { lineId = d.Line, price = 1 } } },
         ["GET /api/vehicles/{id}/advance"] = _ => null,
         ["POST /api/vehicles/{id}/advance"] = _ => new { amount = 1, method = "Cash" },
         ["POST /api/vehicles/{id}/advance/refund"] = _ => new { amount = 1, method = "Cash" },
@@ -153,6 +160,8 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         _ when route.Contains("/price-requests/") => [d.PriceRequest],
         _ when route.Contains("/advances/") => [d.Advance],
         _ when route.Contains("/supplier-payments/") => [d.SupplierPayment],
+        _ when route.Contains("/supplier-answers/") => [d.SupplierAnswer],
+        _ when route.Contains("/parts/requests/") => [d.PriceRequest],
         _ => throw new InvalidOperationException(route),
     };
 

@@ -19,6 +19,8 @@ H5 tasarımı: `TASARIM-H-YEDEK-PARCA.md`. MIMARI §1–2'deki ayrı uygulama, e
   bilgisi, başka parçacının cevabı, fiyat geçmişi YOK.
 - **Cevap satır başına** (fiyat · marka · OEM kodu · not); sonradan değişmez, yenisi yazılır.
 - **Cevap satıra kendiliğinden işlenmez** (Kol B): usta parça sorda **"Bunu kullan"** der — yazmadan.
+- **H6'da düzeltme:** cevap parçacının KİRACISINDA (`SupplierAnswer`) — altyapı başka dükkânın kiracısına yazmayı
+  yasaklıyor ve bu kural gevşetilmez. "Bunu kullan" cevabı tamirhaneye kopyalar.
 - **WhatsApp kalmaz değil, KALIR:** soru yine WhatsApp'la gider; uygulama ek yol.
 - **Ustaya yeni ekran yok;** parçacıya iki ekran (giriş + gelen sorular). Parçacı muhasebesi/stok/katalog YOK.
 - **Bir telefon iki türden dükkân açamaz** — Cemil onayına açık (hem tamir hem parça satan dükkân?).

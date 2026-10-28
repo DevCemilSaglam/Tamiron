@@ -224,6 +224,12 @@ api.MapPost("/suppliers/{id:guid}/payments", (Guid id, Tamiron.Application.Suppl
     s.Send(new Tamiron.Application.SupplierDebts.PaySupplier(id, b.Amount, b.Method), ct));
 api.MapPost("/supplier-payments/{id:guid}/undo", (Guid id, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.SupplierDebts.UndoSupplierPayment(id), ct));
+// H6 · Yedek Parça (K-091): parçacının gelen soruları ve cevabı; tamirhanede "Bunu kullan".
+api.MapGet("/parts/inbox", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Parts.GetInbox(), ct));
+api.MapPost("/parts/requests/{id:guid}/answers", (Guid id, Tamiron.Application.Parts.AnswerBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Parts.AnswerRequest(id, b), ct));
+api.MapPost("/supplier-answers/{id:guid}/use", (Guid id, Tamiron.Application.Parts.UseBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.Parts.UseSupplierAnswer(id, b), ct));
 api.MapGet("/suppliers", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Suppliers.ListSuppliers(), ct));
 api.MapPost("/suppliers", (Tamiron.Application.Suppliers.SupplierBody b, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.Suppliers.AddSupplier(b), ct));

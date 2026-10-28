@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Tamiron.Application.Parts;
 using Tamiron.Application.ServiceRecords;
 using Tamiron.Domain;
 
@@ -11,7 +12,8 @@ namespace Tamiron.Application.PriceRequests;
 public sealed record AskedLineDto(Guid Id, string Name, Guid? SelectedReplyId);
 public sealed record PriceReplyDto(Guid Id, string RawText, decimal? ParsedPrice, string? ParsedBrand, string? ParsedCode, DateTime ReceivedAt);
 public sealed record PriceRequestDto(Guid Id, Guid SupplierId, string SupplierName, string SupplierPhone, string SentText, DateTime SentAt,
-                                     IReadOnlyList<AskedLineDto> Lines, IReadOnlyList<PriceReplyDto> Replies);
+                                     IReadOnlyList<AskedLineDto> Lines, IReadOnlyList<PriceReplyDto> Replies,
+                                     IReadOnlyList<SupplierAnswerDto>? SupplierAnswers = null);
 
 public sealed record AskBody(IReadOnlyList<Guid>? SupplierIds);
 public sealed record ReplyBody(Guid LineId, string? RawText, decimal? Price, string? Brand, string? Code, decimal? CustomerPrice, bool OnCredit = false);
@@ -105,6 +107,16 @@ internal sealed class PriceRequestHandlers(ITamironDb db, ITenantContext tenant,
             .Where(s => supIds.Contains(s.Id) && s.TenantId == tenant.TenantId).ToDictionaryAsync(s => s.Id, ct);
         var lines = await db.ServiceLines.AsNoTracking().Where(l => l.ServiceRecordId == recordId).ToDictionaryAsync(l => l.Id, ct);
 
+        // H6 · Parçacının kendi uygulamasından yazdığı cevaplar (PARÇACININ kiracısında, K-091): yalnız bu dükkânın
+        // sorularına ve yalnız cevabı yazan dükkânın numarası sorulan numaraysa. Süzgeç kapalı — koşullar açık.
+        var answers = await db.SupplierAnswers.IgnoreQueryFilters().AsNoTracking()
+            .Where(a => reqIds.Contains(a.PriceRequestId) && a.DateTimeDeleted == null).OrderBy(a => a.AnsweredAt).ToListAsync(ct);
+        var phones = await CrossTenant.PhonesOf(db, answers.Select(a => a.TenantId), ct);
+        var used = (await db.PriceReplies.AsNoTracking().Where(p => p.SupplierAnswerId != null && reqIds.Contains(p.PriceRequestId))
+                        .Select(p => p.SupplierAnswerId!.Value).ToListAsync(ct)).ToHashSet();
+        bool FromAsked(SupplierAnswer a, PriceRequest r)
+            => phones.TryGetValue(a.TenantId, out var p) && p.Contains(sups[r.SupplierId].Phone);
+
         // Aynı anda gönderilen sorular seçim sırasıyla döner (SentAt eşit; Create sırası = liste sırası).
         if (only is not null) reqs = only.Select(id => reqs.First(x => x.Id == id)).ToList();
         return reqs.Select(x => new PriceRequestDto(
@@ -114,7 +126,9 @@ internal sealed class PriceRequestHandlers(ITamironDb db, ITenantContext tenant,
                    .OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated)
                    .Select(l => new AskedLineDto(l.Id, l.Name, l.SelectedReplyId)).ToList(),
             replies.Where(p => p.PriceRequestId == x.Id)
-                   .Select(p => new PriceReplyDto(p.Id, p.RawText, p.ParsedPrice, p.ParsedBrand, p.ParsedCode, p.ReceivedAt)).ToList()
+                   .Select(p => new PriceReplyDto(p.Id, p.RawText, p.ParsedPrice, p.ParsedBrand, p.ParsedCode, p.ReceivedAt)).ToList(),
+            answers.Where(a => a.PriceRequestId == x.Id && FromAsked(a, x))
+                   .Select(a => new SupplierAnswerDto(a.Id, a.ServiceLineId, a.Price, a.Brand, a.Code, a.Note, a.AnsweredAt, used.Contains(a.Id))).ToList()
         )).ToList();
     }
 }

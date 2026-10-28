@@ -59,12 +59,18 @@ sequenceDiagram
 
 ## 3 · Veri modeli — eklenenler
 
+> ⚠️ **H6'da düzeltildi:** ilk taslak parçacının cevabını tamirhanenin kiracısına yazıyordu. Altyapı bunu
+> **yasaklıyor** ("başka dükkânın kiracısına satır yazılamaz" — doğru kural, gevşetilmez). Düzeltme: her taraf
+> yalnız KENDİ kiracısına yazar.
+
 - `Shop.Kind` — `Tamirhane` (varsayılan, var olan dükkânlar) · `YedekParca`. Kayıt sırasında seçilir.
-- `PriceReply.ServiceLineId` (null — eski cevaplar satırsız) — **cevap hangi satır için.** Bugün cevap satıra
-  işlenince bağ yalnız `ServiceLine.SelectedReplyId`'de; parçacının işlenmemiş cevabı için satır bağı şart.
-- `PriceReply.Source` — `Shop` (usta yazdı, bugünkü) · `Supplier` (parçacı yazdı) · `PriceReply.Note` (kısa).
-- Parçacı tarafında **yeni tablo yok**: cevap tamirhanenin sorusuna bağlı satır olarak tamirhanenin kiracısında
-  durur (soruyu soran dükkânın verisi). Parçacının "gönderdiklerim" listesi aynı tablodan okunur.
+- **`SupplierAnswer`** — **parçacının kiracısında**: `PriceRequestId`, `ServiceLineId` (sorulan satır),
+  `Price`, `Brand`, `Code`, `Note`, `AnsweredAt`. Parçacının verdiği cevap parçacının verisidir; "gönderdiklerim"
+  buradan okunur. Kimlikler başka kiracının satırlarını gösterir (yabancı anahtar yok — kiracılar arası).
+- **Okuma sınırları:** parçacı yalnız `Supplier.Phone` = kendi numarası olan soruları okur; tamirhane yalnız
+  **kendi sorularına** gelen cevapları okur. İki okuma da süzgeci açıkça kapatıp koşulu AÇIKÇA yazar (yalıtım testi).
+- `PriceReply.SupplierAnswerId` (null) — "Bunu kullan" cevabı **tamirhanenin kiracısına** bugünkü `PriceReply`
+  olarak kopyalar ve satıra işler; hangi parçacı cevabından geldiği bu alanda.
 
 ## 4 · Ekranlar
 

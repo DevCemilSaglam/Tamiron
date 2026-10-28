@@ -20,6 +20,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Advance> Advances => Set<Advance>();
     public DbSet<SupplierPayment> SupplierPayments => Set<SupplierPayment>();
+    public DbSet<SupplierAnswer> SupplierAnswers => Set<SupplierAnswer>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -272,6 +273,19 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.ParsedCode).HasMaxLength(100);
             e.HasIndex(x => x.PriceRequestId);
             e.HasOne<PriceRequest>().WithMany().HasForeignKey(x => x.PriceRequestId).OnDelete(DeleteBehavior.Restrict);
+            e.HasIndex(x => x.SupplierAnswerId).HasFilter("[SupplierAnswerId] IS NOT NULL");
+        });
+
+        // H6 · Parçacının cevabı PARÇACININ kiracısında (K-091). Soru/satır kimlikleri tamirhanenin — yabancı anahtar
+        // YOK (kiracılar arası); bağı okuma koşulları kurar.
+        Tenant(b.Entity<SupplierAnswer>());
+        b.Entity<SupplierAnswer>(e =>
+        {
+            e.Property(x => x.Price).HasPrecision(18, 2);
+            e.Property(x => x.Brand).HasMaxLength(100);
+            e.Property(x => x.Code).HasMaxLength(100);
+            e.Property(x => x.Note).HasMaxLength(300);
+            e.HasIndex(x => x.PriceRequestId);
         });
     }
 

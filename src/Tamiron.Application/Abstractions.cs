@@ -74,6 +74,7 @@ public interface ITamironDb
     DbSet<Payment> Payments { get; }
     DbSet<Advance> Advances { get; }
     DbSet<SupplierPayment> SupplierPayments { get; }
+    DbSet<SupplierAnswer> SupplierAnswers { get; }
     DbSet<Expense> Expenses { get; }
     DbSet<Message> Messages { get; }
     DbSet<Supplier> Suppliers { get; }

@@ -392,12 +392,18 @@ namespace Tamiron.Infrastructure.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("rowversion");
 
+                    b.Property<Guid?>("SupplierAnswerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
                     b.HasIndex("PriceRequestId");
+
+                    b.HasIndex("SupplierAnswerId")
+                        .HasFilter("[SupplierAnswerId] IS NOT NULL");
 
                     b.HasIndex("TenantId");
 
@@ -716,6 +722,9 @@ namespace Tamiron.Infrastructure.Migrations
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<int>("Kind")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(200)
@@ -781,6 +790,63 @@ namespace Tamiron.Infrastructure.Migrations
                         .HasFilter("[DateTimeDeleted] IS NULL");
 
                     b.ToTable("Suppliers");
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.SupplierAnswer", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("AnsweredAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Brand")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Code")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("DateTimeCreated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeDeleted")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DateTimeUpdated")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<decimal?>("Price")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("PriceRequestId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .IsRequired()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid>("ServiceLineId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PriceRequestId");
+
+                    b.HasIndex("TenantId");
+
+                    b.ToTable("SupplierAnswers");
                 });
 
             modelBuilder.Entity("Tamiron.Domain.SupplierPayment", b =>
@@ -1237,6 +1303,15 @@ namespace Tamiron.Infrastructure.Migrations
                 });
 
             modelBuilder.Entity("Tamiron.Domain.Supplier", b =>
+                {
+                    b.HasOne("Tamiron.Domain.Shop", null)
+                        .WithMany()
+                        .HasForeignKey("TenantId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Tamiron.Domain.SupplierAnswer", b =>
                 {
                     b.HasOne("Tamiron.Domain.Shop", null)
                         .WithMany()

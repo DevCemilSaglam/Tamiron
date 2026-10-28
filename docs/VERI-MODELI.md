@@ -237,9 +237,7 @@ Akıştaki yeri: **Adım 4** · Ekran 4
 | `RawText` | **Parçacının yazdığı, olduğu gibi.** Ayrıştırma yanlışsa dönülecek tek yer |
 | `ParsedPrice` · `ParsedBrand` · `ParsedCode` | Çıkarılabildiyse |
 | `ReceivedAt` | Ne zaman geldi |
-| `ServiceLineId` | **Hangi satır için** (H6 · 28.10 · K-091). Null = eski cevap (satırla bağı yalnız `ServiceLine.SelectedReplyId`). Parçacının işlenmemiş cevabı için şart |
-| `Source` | `Shop` = usta yazdı (bugünkü, satıra hemen işlenir) · `Supplier` = parçacı kendi uygulamasından yazdı (işlenmez; usta "Bunu kullan" der — Kol B) |
-| `Note` | Parçacının kısa notu (*"yarın gelir"*) — yalnız `Supplier` cevabında |
+| `SupplierAnswerId` | **Parçacının kendi yazdığı cevaptan mı** (H6 · K-091). Null = usta yazdı. "Bunu kullan" parçacının cevabını (§6b, parçacının kiracısında) tamirhanenin kiracısına bu tabloya kopyalar |
 
 > **`ParsedPrice` = parçacının verdiği fiyat = ustanın ALIŞI** (K-076.2). Cevap satıra
 > işlenince `ServiceLine.Cost` olur; müşteriye söylenen fiyatı usta ayrıca yazar (T-9:
@@ -247,6 +245,22 @@ Akıştaki yeri: **Adım 4** · Ekran 4
 > rakamı kendi girer (prototip balonu: *"Cevap gelince fiyatı sen yaz"*).
 
 > **`RawText` en kritik alan.** v1 dersi: türetilmiş veriyi saklayıp kaynağı atmak, ayrıştırma hatasını **kalıcı** yapıyor.
+
+---
+
+## 6b · `SupplierAnswer` — Parçacının kendi cevabı (H6 · 28.10 · K-091)
+
+**Parçacının kiracısında** (`Shop.Kind = YedekParca`). Tasarım: `TASARIM-H-YEDEK-PARCA.md`.
+
+| Alan | Neden var |
+|---|---|
+| `PriceRequestId` · `ServiceLineId` | Hangi soru, hangi satır — **tamirhanenin** kayıtları (kiracılar arası, yabancı anahtar yok). Yazarken: soru bu parçacının numarasına sorulmuş, satır o soruda sorulmuş olmalı |
+| `Price` · `Brand` · `Code` | Parçacının verdiği (T-13: ürün adı · marka · OEM kodu). Hepsi boş olabilir ama cevap boş olamaz |
+| `Note` | *"Yok"*, *"yarın gelir"* |
+| `AnsweredAt` | Ne zaman |
+
+> Cevap **değişmez**; yenisi yazılır. Tamirhane yalnız kendi sorusuna gelen cevabı okur; satıra kendiliğinden
+> işlenmez (Kol B) — usta "Bunu kullan" der, cevap `PriceReply` olarak tamirhaneye kopyalanır.
 
 ---
 
