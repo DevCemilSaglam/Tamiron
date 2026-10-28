@@ -19,6 +19,7 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
     public DbSet<ServiceLine> ServiceLines => Set<ServiceLine>();
     public DbSet<Payment> Payments => Set<Payment>();
     public DbSet<Advance> Advances => Set<Advance>();
+    public DbSet<SupplierPayment> SupplierPayments => Set<SupplierPayment>();
     public DbSet<Expense> Expenses => Set<Expense>();
     public DbSet<Message> Messages => Set<Message>();
     public DbSet<Supplier> Suppliers => Set<Supplier>();
@@ -116,6 +117,15 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.HasIndex(x => new { x.TenantId, x.On });   // kasa dönem süzgeci
         });
 
+        // H3 · Parçacıya ödeme (VERI-MODELI §4b, K-090).
+        Tenant(b.Entity<SupplierPayment>());
+        b.Entity<SupplierPayment>(e =>
+        {
+            e.Property(x => x.Amount).HasPrecision(18, 2);
+            e.HasIndex(x => new { x.TenantId, x.SupplierId });
+            e.HasIndex(x => new { x.TenantId, x.PaidOn });   // CSV dönem süzgeci
+        });
+
         Tenant(b.Entity<ServiceLine>());
         b.Entity<ServiceLine>(e =>
         {
@@ -123,6 +133,8 @@ public class TamironDbContext(DbContextOptions<TamironDbContext> options, ITenan
             e.Property(x => x.Price).HasPrecision(18, 2);
             e.Property(x => x.Cost).HasPrecision(18, 2);   // nullable: null ≠ 0 (K-057)
             e.Property(x => x.VatRate).HasPrecision(5, 2);  // yüzde; yalnız YER (C6)
+            // H3 · parçacıya borç: yalnız veresiye satırlar (azınlık) — süzgeçli indeks küçük kalır.
+            e.HasIndex(x => new { x.TenantId, x.SupplierId }).HasFilter("[OnCredit] = 1");
             e.Property(x => x.PartBrand).HasMaxLength(100);
             e.Property(x => x.PartCode).HasMaxLength(100);
             e.Ignore(x => x.CountsInTotal);

@@ -13,13 +13,27 @@ public sealed record AddLine(Guid RecordId, LineBody Line) : IRequest<ServiceRec
 public sealed record UpdateLine(Guid RecordId, Guid LineId, LineBody Line) : IRequest<ServiceRecordDto>;
 public sealed record DeleteLine(Guid RecordId, Guid LineId) : IRequest<ServiceRecordDto>;
 public sealed record RestoreLine(Guid RecordId, Guid LineId) : IRequest<ServiceRecordDto>;
+/// <summary>H3 · Parça kimden alındı + veresiye mi (K-090). Parçacı bu dükkânın olmalı (süzgeç; yoksa 404).</summary>
+public sealed record SetLinePurchase(Guid RecordId, Guid LineId, Guid? SupplierId, bool OnCredit) : IRequest<ServiceRecordDto>;
+public sealed record PurchaseBody(Guid? SupplierId, bool OnCredit);
 
 internal sealed class LineHandlers(ITamironDb db, ITenantContext tenant) :
     IRequestHandler<AddLine, ServiceRecordDto>,
     IRequestHandler<UpdateLine, ServiceRecordDto>,
     IRequestHandler<DeleteLine, ServiceRecordDto>,
-    IRequestHandler<RestoreLine, ServiceRecordDto>
+    IRequestHandler<RestoreLine, ServiceRecordDto>,
+    IRequestHandler<SetLinePurchase, ServiceRecordDto>
 {
+    public async Task<ServiceRecordDto> Handle(SetLinePurchase c, CancellationToken ct)
+    {
+        var r = await Record(c.RecordId, ct);
+        if (c.SupplierId is { } sid && !await db.Suppliers.AnyAsync(s => s.Id == sid, ct))
+            throw new NotFoundException("Parçacı");
+        Line(r, c.LineId).SetPurchase(c.SupplierId, c.OnCredit);
+        await db.SaveChangesAsync(ct);
+        return await Map.LoadDto(db, r.Id, ct);
+    }
+
     private async Task<ServiceRecord> Record(Guid id, CancellationToken ct)
         => await db.ServiceRecords.Include(r => r.Lines).FirstOrDefaultAsync(r => r.Id == id, ct)
            ?? throw new NotFoundException("Servis kaydı");

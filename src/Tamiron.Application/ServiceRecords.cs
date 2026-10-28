@@ -7,7 +7,7 @@ namespace Tamiron.Application.ServiceRecords;
 // ---- Okuma modeli ----
 
 public sealed record ServiceLineDto(Guid Id, LineKind Kind, string Name, decimal Price, decimal? Cost,
-                                    PartSupplier? SuppliedBy, bool CountsInTotal);
+                                    PartSupplier? SuppliedBy, bool CountsInTotal, Guid? SupplierId = null, bool OnCredit = false);
 
 /// <summary>Alınan ödeme (K-078). <paramref name="AtDelivery"/>: teslimde alındı — teslimle gider, "geri al"la değil.</summary>
 public sealed record PaymentDto(Guid Id, decimal Amount, PaymentMethod Method, DateOnly PaidOn, bool AtDelivery);
@@ -53,7 +53,7 @@ internal static class Map
         r.Id, r.VehicleId, v?.PlateNo ?? "", r.Type, r.TypeSetManually, r.Complaint, r.Km, r.DeliveredAt, r.PaymentMethod,
         r.PaymentCollectedAt, r.CollectedOn, r.WaitingForPart, r.WaitingSince, r.ShowWaitingToCustomer,
         r.ReminderDate, r.ReminderSent, r.Total,
-        r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal)).ToList(),
+        r.Lines.OrderBy(l => l.Position).ThenBy(l => l.DateTimeCreated).Select(l => new ServiceLineDto(l.Id, l.Kind, l.Name, l.Price, l.Cost, l.SuppliedBy, l.CountsInTotal, l.SupplierId, l.OnCredit)).ToList(),
         // Eksikler DOMAIN'de (kEksikler); arayüz yalnız gösterir.
         r.DeliveryWarnings(v?.HasPhone ?? false),
         // K-078 · Kalan DOMAIN'de hesaplanır; arayüz "x alındı · kalan y" yazar, hesaplamaz.

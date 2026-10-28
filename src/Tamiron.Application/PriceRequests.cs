@@ -14,7 +14,7 @@ public sealed record PriceRequestDto(Guid Id, Guid SupplierId, string SupplierNa
                                      IReadOnlyList<AskedLineDto> Lines, IReadOnlyList<PriceReplyDto> Replies);
 
 public sealed record AskBody(IReadOnlyList<Guid>? SupplierIds);
-public sealed record ReplyBody(Guid LineId, string? RawText, decimal? Price, string? Brand, string? Code, decimal? CustomerPrice);
+public sealed record ReplyBody(Guid LineId, string? RawText, decimal? Price, string? Brand, string? Code, decimal? CustomerPrice, bool OnCredit = false);
 
 /// <summary>
 /// G10 · Gönderilmeden ÖNCE: neyin sorulacağı, araç kimliği tamam mı (K-068; eksikse hangileri) ve
@@ -84,7 +84,8 @@ internal sealed class PriceRequestHandlers(ITamironDb db, ITenantContext tenant,
                    ?? throw new NotFoundException("Satır");
 
         var reply = PriceReply.Create(req.Id, c.Body.RawText, c.Body.Price, c.Body.Brand, c.Body.Code, clock.UtcNow);
-        line.ApplyReply(reply, c.Body.CustomerPrice);
+        // H3: parça bu parçacıdan alındı; "veresiye" denirse borç doğar (K-090).
+        line.ApplyReply(reply, c.Body.CustomerPrice, req.SupplierId, c.Body.OnCredit);
         db.PriceReplies.Add(reply);
         await db.SaveChangesAsync(ct);
         return await Map.LoadDto(db, req.ServiceRecordId, ct);

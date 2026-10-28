@@ -218,6 +218,12 @@ api.MapGet("/records/{id:guid}/price-requests", (Guid id, ISender s, Cancellatio
 api.MapPost("/price-requests/{id:guid}/replies", (Guid id, Tamiron.Application.PriceRequests.ReplyBody b, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.PriceRequests.AddPriceReply(id, b), ct));
 
+// H3 · Parçacıya borç (K-090): borç saklanmaz; ödeme ≤ borç, geri alınır.
+api.MapGet("/supplier-debts", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.SupplierDebts.ListSupplierDebts(), ct));
+api.MapPost("/suppliers/{id:guid}/payments", (Guid id, Tamiron.Application.SupplierDebts.PayBody b, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.SupplierDebts.PaySupplier(id, b.Amount, b.Method), ct));
+api.MapPost("/supplier-payments/{id:guid}/undo", (Guid id, ISender s, CancellationToken ct) =>
+    s.Send(new Tamiron.Application.SupplierDebts.UndoSupplierPayment(id), ct));
 api.MapGet("/suppliers", (ISender s, CancellationToken ct) => s.Send(new Tamiron.Application.Suppliers.ListSuppliers(), ct));
 api.MapPost("/suppliers", (Tamiron.Application.Suppliers.SupplierBody b, ISender s, CancellationToken ct) =>
     s.Send(new Tamiron.Application.Suppliers.AddSupplier(b), ct));
@@ -309,6 +315,9 @@ api.MapPut("/records/{id:guid}/lines/{lineId:guid}", (Guid id, Guid lineId, Line
     s.Send(new UpdateLine(id, lineId, body), ct));
 api.MapDelete("/records/{id:guid}/lines/{lineId:guid}", (Guid id, Guid lineId, ISender s, CancellationToken ct) =>
     s.Send(new DeleteLine(id, lineId), ct));
+// H3 · Parça kimden alındı + veresiye mi (K-090).
+api.MapPatch("/records/{id:guid}/lines/{lineId:guid}/purchase", (Guid id, Guid lineId, PurchaseBody body, ISender s, CancellationToken ct) =>
+    s.Send(new SetLinePurchase(id, lineId, body.SupplierId, body.OnCredit), ct));
 api.MapPost("/records/{id:guid}/lines/{lineId:guid}/restore", (Guid id, Guid lineId, ISender s, CancellationToken ct) =>
     s.Send(new RestoreLine(id, lineId), ct));
 

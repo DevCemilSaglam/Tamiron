@@ -21,12 +21,16 @@ public class ServiceLine : TenantEntity
     public decimal? VatRate { get; private set; }
     /// <summary>Kol B · hangi parçacının cevabı kullanıldı (prototip satirlar.kaynak). Boş = seçilmedi, akış durmaz.</summary>
     public Guid? SelectedReplyId { get; private set; }
+    /// <summary>H3 · Parça kimden alındı (K-090). Parça sordan otomatik, elle de seçilir. Borcun kime olduğu.</summary>
+    public Guid? SupplierId { get; private set; }
+    /// <summary>H3 · Veresiye aldım (K-090). Varsayılan false = parayı ödedim; borç yalnız bundan doğar.</summary>
+    public bool OnCredit { get; private set; }
 
     /// <summary>
     /// Parçacının cevabını satıra yazar (D2): verdiği fiyat ALIŞ olur, marka/kod gelirse yazılır,
     /// müşteri fiyatını usta söylerse o da. Gelmeyen alan satırda olanı SİLMEZ.
     /// </summary>
-    public void ApplyReply(PriceReply reply, decimal? customerPrice)
+    public void ApplyReply(PriceReply reply, decimal? customerPrice, Guid? supplierId = null, bool onCredit = false)
     {
         if (Kind != LineKind.Part)
             throw new DomainException("reply.not_a_part", "Parçacının cevabı yalnız parça satırına yazılır.");
@@ -37,6 +41,21 @@ public class ServiceLine : TenantEntity
         if (reply.ParsedBrand is not null) PartBrand = reply.ParsedBrand;
         if (reply.ParsedCode is not null) PartCode = reply.ParsedCode;
         SelectedReplyId = reply.Id;
+        // Parça bu cevabın parçacısından alındı (H3) — usta ikinci kez söylemesin.
+        if (supplierId is not null) SetPurchase(supplierId, onCredit);
+    }
+
+    /// <summary>
+    /// H3 · Parça kimden alındı ve veresiye mi (K-090). Veresiye yalnız tamircinin aldığı, alışı yazılı,
+    /// parçacısı belli parçada: alışı bilinmeyen borç uydurur, parçacısız borç kime?
+    /// </summary>
+    public void SetPurchase(Guid? supplierId, bool onCredit)
+    {
+        if (onCredit && !(Kind == LineKind.Part && SuppliedBy == PartSupplier.Shop && Cost > 0 && supplierId is not null))
+            throw new DomainException("line.credit_not_possible",
+                "Veresiye için parçanın alışı ve kimden alındığı yazılı olmalı — müşterinin getirdiği parçada borç olmaz.");
+        SupplierId = Kind == LineKind.Part ? supplierId : null;
+        OnCredit = onCredit;
     }
 
     /// <summary>
@@ -81,12 +100,15 @@ public class ServiceLine : TenantEntity
         {
             SuppliedBy = null;
             Cost = null;
+            SupplierId = null;
         }
         else
         {
             SuppliedBy = suppliedBy ?? PartSupplier.Shop;
             Cost = cost;   // müşteri getirse de silinmez: "ne kadara alabileceği" bilgisi (03.09)
         }
+        // Veresiye koşulu bozulduysa borç da düşer (müşteri getirdi, alış silindi, işçiliğe döndü — K-090).
+        if (!(Kind == LineKind.Part && SuppliedBy == PartSupplier.Shop && Cost > 0 && SupplierId is not null)) OnCredit = false;
     }
 
     /// <summary>

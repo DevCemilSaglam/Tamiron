@@ -164,6 +164,16 @@ internal sealed class AccountingHandlers(ITamironDb db, IClock clock, ITenantCon
                 .OrderBy(e => e.Date).ThenBy(e => e.DateTimeCreated).ToListAsync(ct))
             .Select(e => new object?[] { "Gider", e.Date, e.Description, "", "", "", e.Amount }));
 
+        // H3 · Parçacıya ödeme (K-090): gider değil (alış iş başına farktan düşülüyor), kasa tahsilatı değil —
+        // kendi Türüyle, muhasebeci süzsün. Silinmiş parçacının adı da yazılır.
+        var supPays = await db.SupplierPayments.AsNoTracking().Where(x => x.PaidOn >= p.Start && x.PaidOn <= p.End)
+            .OrderBy(x => x.PaidOn).ThenBy(x => x.DateTimeCreated).ToListAsync(ct);
+        var supIds = supPays.Select(x => x.SupplierId).Distinct().ToList();
+        var supNames = await db.Suppliers.IgnoreQueryFilters().AsNoTracking()
+            .Where(x => supIds.Contains(x.Id) && x.TenantId == tenant.TenantId).ToDictionaryAsync(x => x.Id, x => x.Name, ct);
+        rows.AddRange(supPays.Select(x => new object?[] { "Parçacıya ödeme", x.PaidOn, supNames.GetValueOrDefault(x.SupplierId, ""),
+                                                           "", "", Csv.PaymentLabel(x.Method), x.Amount }));
+
         rows.AddRange(unpaid
             .OrderBy(r => r.DeliveredAt).ThenBy(r => r.DateTimeCreated)
             .Select(r => new object?[] { "Alacak", r.DeliveredAt, What(r), Plate(r), Owner(r), Csv.PaymentLabel(PaymentMethod.Unpaid), r.Remaining }));

@@ -40,7 +40,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
     }
 
     sealed record BData(Guid OpenRecord, Guid DeliveredRecord, Guid Line, Guid Vehicle, Guid Supplier, Guid Expense,
-                        Guid PriceRequest, string CustomerKey, Guid Advance);
+                        Guid PriceRequest, string CustomerKey, Guid Advance, Guid SupplierPayment);
 
     async Task<BData> SeedB()
     {
@@ -62,10 +62,17 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
 
         // G7 · avans: B'nin aracında bakiye 500 (A iade etse, geri alsa ya da avanstan düşse görüntü değişir).
         var adv = await Read<JsonElement>(await b.PostAsJsonAsync($"/api/vehicles/{open.VehicleId}/advance", new { amount = 500, method = "Cash" }, Json));
+        // H3 · parçacıya borç: B'nin parçası veresiye (alış 300), 100 ödenmiş.
+        await Read<ServiceRecordDto>(await b.PutAsJsonAsync($"/api/records/{open.Id}/lines/{open.Lines[0].Id}",
+            new { kind = "Part", name = Mark + " balata", price = 0, cost = 300 }, Json));
+        await Read<ServiceRecordDto>(await b.PatchAsJsonAsync($"/api/records/{open.Id}/lines/{open.Lines[0].Id}/purchase",
+            new { supplierId = sup.Id, onCredit = true }, Json));
+        var debts = await Read<JsonElement>(await b.PostAsJsonAsync($"/api/suppliers/{sup.Id}/payments", new { amount = 100, method = "Cash" }, Json));
         var key = (await Read<CustomerList>(await b.GetAsync("/api/customers?q=" + Mark))).Items.Single().Key;
         await Read<CustomerDetail>(await b.PutAsJsonAsync("/api/customers/consent", new { key, granted = true }, Json));
         return new(open.Id, done.Id, open.Lines[0].Id, open.VehicleId, sup.Id, exp.GetProperty("id").GetGuid(),
-                   pr[0].Id, key, adv.GetProperty("items")[0].GetProperty("id").GetGuid());
+                   pr[0].Id, key, adv.GetProperty("items")[0].GetProperty("id").GetGuid(),
+                   debts.GetProperty("items")[0].GetProperty("payments")[0].GetProperty("id").GetGuid());
     }
 
     /// <summary>B'nin bütün satırları: kimlik + RowVersion + silinme. Bir alan bile değişirse görüntü değişir.</summary>
@@ -93,6 +100,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         await Add("consent", db.ConsentEvents);
         await Add("advances", db.Advances);
         await Add("payments", db.Payments);
+        await Add("supplier-payments", db.SupplierPayments);
         return sb.ToString();
     }
 
@@ -125,6 +133,9 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         ["GET /api/vehicles/{id}/message-setup"] = _ => null,
         ["PUT /api/suppliers/{id}"] = _ => new { name = "A", phone = "05337009999" },
         ["DELETE /api/suppliers/{id}"] = _ => null,
+        ["PATCH /api/records/{id}/lines/{lineId}/purchase"] = d => new { supplierId = d.Supplier, onCredit = false },
+        ["POST /api/suppliers/{id}/payments"] = _ => new { amount = 1, method = "Cash" },
+        ["POST /api/supplier-payments/{id}/undo"] = _ => null,
         ["GET /api/vehicles/{id}/advance"] = _ => null,
         ["POST /api/vehicles/{id}/advance"] = _ => new { amount = 1, method = "Cash" },
         ["POST /api/vehicles/{id}/advance/refund"] = _ => new { amount = 1, method = "Cash" },
@@ -141,6 +152,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
         _ when route.Contains("/expenses/") => [d.Expense],
         _ when route.Contains("/price-requests/") => [d.PriceRequest],
         _ when route.Contains("/advances/") => [d.Advance],
+        _ when route.Contains("/supplier-payments/") => [d.SupplierPayment],
         _ => throw new InvalidOperationException(route),
     };
 
@@ -192,7 +204,7 @@ public class TenantIsolationTests(ApiFactory f) : IClassFixture<ApiFactory>
             "/api/expenses?period=Year", "/api/suppliers", "/api/receivables", $"/api/receivables?vehicleId={d.Vehicle}",
             "/api/home", "/api/accounting?period=Year", "/api/cash?period=Year", "/api/profit?period=Year",
             "/api/part-purchases?period=Year", "/api/export/cash.csv?period=Year", "/api/reminders/due",
-            "/api/messages/bulk-preview", "/api/vehicles?plate=06%20GZL%2099", "/api/shop",
+            "/api/messages/bulk-preview", "/api/vehicles?plate=06%20GZL%2099", "/api/shop", "/api/supplier-debts",
         })
         {
             var res = await a.GetAsync(url);
