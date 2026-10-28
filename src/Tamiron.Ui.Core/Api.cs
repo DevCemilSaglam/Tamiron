@@ -50,7 +50,10 @@ public sealed record AskedLine(Guid Id, string Name, Guid? SelectedReplyId);
 public sealed record PriceQuestionPreview(IReadOnlyList<AskedLine> Lines, bool HasPartIdentity, IReadOnlyList<string> Missing, string Text);
 public sealed record PriceReply(Guid Id, string RawText, decimal? ParsedPrice, string? ParsedBrand, string? ParsedCode, DateTime ReceivedAt);
 public sealed record PriceRequest(Guid Id, Guid SupplierId, string SupplierName, string SupplierPhone, string SentText, DateTime SentAt,
-                                  IReadOnlyList<AskedLine> Lines, IReadOnlyList<PriceReply> Replies);
+                                  IReadOnlyList<AskedLine> Lines, IReadOnlyList<PriceReply> Replies,
+                                  IReadOnlyList<SupplierAnswer>? SupplierAnswers = null);
+/// <summary>H8 · Parçacının kendi uygulamasından yazdığı cevap (K-091); Used = usta "Bunu kullan" dedi.</summary>
+public sealed record SupplierAnswer(Guid Id, Guid LineId, decimal? Price, string? Brand, string? Code, string? Note, DateTime AnsweredAt, bool Used);
 
 // G11b · Tarihi gelmiş, gönderilmemiş bakım hatırlatmaları (B12) — çekmecenin bildirimleri ve menü rozeti.
 public sealed record DueReminder(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string? Phone, DateOnly ReminderDate, int DaysOverdue);
@@ -313,6 +316,10 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<List<PriceRequest>>(await Send(HttpMethod.Post, $"api/records/{recordId}/price-requests", new { supplierIds }, auth: true));
     public async Task<RecordDetail> AddPriceReplyAsync(Guid requestId, Guid lineId, string? rawText, decimal? price, decimal? customerPrice, bool onCredit = false)
         => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/price-requests/{requestId}/replies", new { lineId, rawText, price, customerPrice, onCredit }, auth: true));
+
+    // H8 · Parçacının cevabını kullan (Kol B): yazmadan kayda — istersen müşteri fiyatı ve veresiye (K-091).
+    public async Task<RecordDetail> UseSupplierAnswerAsync(Guid answerId, decimal? customerPrice, bool onCredit)
+        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/supplier-answers/{answerId}/use", new { customerPrice, onCredit }, auth: true));
 
     // H4 · Parçacıya borç (K-090): satırda kimden alındı + veresiye; borç listesi, öde, geri al.
     public async Task<RecordDetail> SetLinePurchaseAsync(Guid id, Guid lineId, Guid? supplierId, bool onCredit)

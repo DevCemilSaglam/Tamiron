@@ -208,6 +208,49 @@ public class PartQuestionScreenTests : TestContext
         Assert.False(b.RootElement.GetProperty("onCredit").GetBoolean());
     }
 
+    // H8 · K-091: parçacı kendi uygulamasından yazdıysa cevap burada; usta YAZMADAN "Bunu kullan" der (Kol B).
+    const string Y1 = "99999999-9999-9999-9999-999999999991";
+
+    static string ParcaciCevapli(bool kullanildi) => Soru(Q1, S1, "Öz Parça", "0533 100 00 01")[..^1]
+        + $",\"supplierAnswers\":[{{\"id\":\"{Y1}\",\"lineId\":\"{L1}\",\"price\":1150,\"brand\":\"Bosch\",\"code\":\"0986494104\",\"note\":null,"
+        + $"\"answeredAt\":\"2026-10-28T11:00:00Z\",\"used\":{(kullanildi ? "true" : "false")}}}]}}";
+
+    [Fact]
+    public void Supplier_written_answer_shows_and_is_used_without_typing()
+    {
+        api.Routes[$"GET /api/records/{Rid}/price-requests"] = (HttpStatusCode.OK, "[" + ParcaciCevapli(false) + "]");
+        api.Routes[$"POST /api/supplier-answers/{Y1}/use"] = (HttpStatusCode.OK, api.Routes[$"GET /api/records/{Rid}"].Body);
+        var c = Ac();
+        var kart = c.Find($"[data-parcaci-cevap='{Y1}']");
+        Assert.Contains("Balata", kart.TextContent);
+        Assert.Contains("1.150 ₺ · Bosch · 0986494104", kart.TextContent);
+        // Müşteri fiyatı ve veresiye aynı satırın alanlarından (usta isterse yazar).
+        c.Find($"[data-cevap-musteri='{Q1}|{L1}']").Input("1.500");
+        c.Find($"[data-cevap-veresiye='{Q1}|{L1}']").Click();
+        api.Routes[$"GET /api/records/{Rid}/price-requests"] = (HttpStatusCode.OK, "[" + ParcaciCevapli(true) + "]");
+        c.Find($"[data-kullan='{Y1}']").Click();
+        c.WaitForAssertion(() => Assert.Contains(api.Calls, x => x.Path == $"/api/supplier-answers/{Y1}/use"));
+        using var b = JsonDocument.Parse(api.Calls.Single(x => x.Path == $"/api/supplier-answers/{Y1}/use").Body!);
+        Assert.Equal(1500m, b.RootElement.GetProperty("customerPrice").GetDecimal());
+        Assert.True(b.RootElement.GetProperty("onCredit").GetBoolean());
+        c.WaitForAssertion(() => Assert.Contains("kayıtta bu", c.Find($"[data-parcaci-cevap='{Y1}']").TextContent));
+        Assert.Empty(c.FindAll($"[data-kullan='{Y1}']"));
+        Assert.Contains("Balata: Öz Parça cevabı kayda yazıldı.", c.Find("#psSonuc").TextContent);
+    }
+
+    [Fact]
+    public void Using_without_customer_price_sends_none()
+    {
+        api.Routes[$"GET /api/records/{Rid}/price-requests"] = (HttpStatusCode.OK, "[" + ParcaciCevapli(false) + "]");
+        api.Routes[$"POST /api/supplier-answers/{Y1}/use"] = (HttpStatusCode.OK, api.Routes[$"GET /api/records/{Rid}"].Body);
+        var c = Ac();
+        c.Find($"[data-kullan='{Y1}']").Click();
+        c.WaitForAssertion(() => Assert.Contains(api.Calls, x => x.Path == $"/api/supplier-answers/{Y1}/use"));
+        using var b = JsonDocument.Parse(api.Calls.Single(x => x.Path == $"/api/supplier-answers/{Y1}/use").Body!);
+        Assert.Equal(JsonValueKind.Null, b.RootElement.GetProperty("customerPrice").ValueKind);
+        Assert.False(b.RootElement.GetProperty("onCredit").GetBoolean());
+    }
+
     [Fact]
     public void Unreadable_amount_is_told_and_nothing_is_sent()
     {

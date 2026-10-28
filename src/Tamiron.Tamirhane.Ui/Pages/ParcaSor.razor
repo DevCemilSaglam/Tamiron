@@ -103,6 +103,18 @@
             <span class="lbl-txt"><b>@s.SupplierName</b> · @s.SentAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture)</span>
             <button class="cip" data-ac="@s.Id" @onclick="() => Ac(s)">WhatsApp'ta aç</button>
           </div>
+          @foreach (var y in s.SupplierAnswers ?? [])
+          {
+            @* H8 · Parçacı kendi uygulamasından yazdı (K-091): usta YAZMADAN kullanır. Kendiliğinden işlenmez (Kol B). *@
+            var satir = s.Lines.FirstOrDefault(l => l.Id == y.LineId);
+            <div class="tutar-sat" data-parcaci-cevap="@y.Id">
+              <span><b>@(satir?.Name)</b> — @s.SupplierName yazdı: @YCevap(y)@(y.Used ? " · kayıtta bu" : "")</span>
+              @if (!y.Used && satir is not null)
+              {
+                <button class="btn btn-primary" data-kullan="@y.Id" disabled="@calisiyor" @onclick="() => Kullan(s, satir, y)">Bunu kullan</button>
+              }
+            </div>
+          }
           @foreach (var c in s.Replies)
           {
             var kullanilan = s.Lines.FirstOrDefault(l => l.SelectedReplyId == c.Id);
@@ -207,6 +219,23 @@
         if (alis is null || satis is null) { hata = "Tutarı rakamla yaz — ör. 1.200"; return; }
         await Api.AddPriceReplyAsync(s.Id, l.Id, Al(fiyat, k).Trim(), alis == 0 ? null : alis, satis == 0 ? null : satis, veresiye.Contains(k));
         fiyat.Remove(k); musteri.Remove(k); veresiye.Remove(k);
+        sonuc = $"{l.Name}: {s.SupplierName} cevabı kayda yazıldı.";
+        await Yenile();
+    });
+
+    static string YCevap(SupplierAnswer y) => string.Join(" · ", new[]
+    {
+        y.Price is { } p ? Format.Money(p) + " ₺" : null, y.Brand, y.Code, y.Note,
+    }.Where(x => !string.IsNullOrWhiteSpace(x)));
+
+    // "Kayda yaz"ın yazmadan hâli: alış/marka/kod parçacıdan; müşteri fiyatı ve veresiye o satırın alanlarından.
+    Task Kullan(PriceRequest s, AskedLine l, SupplierAnswer y) => Calis(async () =>
+    {
+        var k = $"{s.Id}|{l.Id}";
+        var satis = Al(musteri, k).Trim().Length == 0 ? 0m : Format.ParseMoney(Al(musteri, k));
+        if (satis is null) { hata = "Tutarı rakamla yaz — ör. 1.200"; return; }
+        await Api.UseSupplierAnswerAsync(y.Id, satis == 0 ? null : satis, veresiye.Contains(k));
+        musteri.Remove(k); veresiye.Remove(k);
         sonuc = $"{l.Name}: {s.SupplierName} cevabı kayda yazıldı.";
         await Yenile();
     });
