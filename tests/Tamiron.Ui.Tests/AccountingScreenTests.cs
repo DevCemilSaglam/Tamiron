@@ -52,10 +52,10 @@ public class AccountingScreenTests : TestContext
         Assert.Equal("true", c.Find("#muhSekDetay").GetAttribute("aria-selected"));
         Assert.Empty(c.FindAll("#muhOzet"));   // iki gövde aynı anda görünmez
         var kutular = c.FindAll("#muhModuller .modul-kutu");
-        Assert.Equal(new[] { "Kasa", "Raporlar", "SMS" }, kutular.Take(3).Select(k => k.QuerySelector(".mk-ad")!.TextContent));
-        Assert.All(kutular.Skip(3), k => Assert.True(k.HasAttribute("disabled")));
-        Assert.All(kutular.Skip(3), k => Assert.Equal("yazılmadı", k.QuerySelector(".mk-alt")!.TextContent));
-        Assert.All(kutular.Take(3), k => Assert.False(k.HasAttribute("disabled")));
+        Assert.Equal(new[] { "Kasa", "Raporlar", "SMS", "Cari" }, kutular.Take(4).Select(k => k.QuerySelector(".mk-ad")!.TextContent));
+        Assert.All(kutular.Skip(4), k => Assert.True(k.HasAttribute("disabled")));
+        Assert.All(kutular.Skip(4), k => Assert.Equal("yazılmadı", k.QuerySelector(".mk-alt")!.TextContent));
+        Assert.All(kutular.Take(4), k => Assert.False(k.HasAttribute("disabled")));
     }
 
     [Fact]
@@ -83,6 +83,10 @@ public class AccountingScreenTests : TestContext
         c2.WaitForElement("#muhSekDetay").Click();
         c2.Find("[data-muhmodul='sms']").Click();
         Assert.Equal("http://localhost/mesaj", Nav.Uri);
+        var c3 = RenderComponent<Muhasebe>();
+        c3.WaitForElement("#muhSekDetay").Click();
+        c3.Find("[data-muhmodul='cari']").Click();   // H4 · K-090: alacak + parçacıya borç
+        Assert.Equal("http://localhost/cari", Nav.Uri);
     }
 
     [Fact]

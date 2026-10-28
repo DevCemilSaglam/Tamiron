@@ -119,6 +119,27 @@
                         <label class="k-alis">alış
                           <input value="@(s.Cost is { } a ? Format.Money(a) : "")" data-satir-alis="@s.Id" inputmode="numeric"
                                  placeholder="—" aria-label="Alış fiyatı (boş bırakılabilir)" @onchange="e => AlisDegisti(s, e)" /> ₺</label>
+                        @* H4 · K-090: varsayılan "ödedim"; borç yalnız "veresiye" denince. Kimden alındığı yazılı. *@
+                        @if (s.SupplierId is { } sid && parcacilar?.FirstOrDefault(p => p.Id == sid) is { } pc)
+                        {
+                          <span class="k-alis" data-satir-parcaci="@s.Id">@pc.Name</span>
+                        }
+                        <button class="cip" data-satir-veresiye="@s.Id" aria-pressed="@(s.OnCredit ? "true" : "false")" disabled="@calisiyor"
+                                @onclick="() => VeresiyeDegisti(s)">veresiye</button>
+                        @if (kimden == s.Id)
+                        {
+                          @* Kime borçlu olduğu bilinmeden borç yazılmaz: önce kimden alındığı. *@
+                          <span class="cip-grup" role="group" aria-label="Kimden alındı">
+                            @foreach (var p in parcacilar ?? [])
+                            {
+                              <button class="cip" data-satir-kimden="@p.Id" @onclick="() => KimdenSecildi(s, p)">@p.Name</button>
+                            }
+                            @if (parcacilar is not { Count: > 0 })
+                            {
+                              <button class="cip" id="kParcaciEkle" @onclick='() => Nav.NavigateTo("/parcacilar?geri=" + Uri.EscapeDataString($"/kayit/{Id}"))'>Parçacı ekle</button>
+                            }
+                          </span>
+                        }
                       }
                       else if (s.Cost is { } alis)
                       {
@@ -375,6 +396,21 @@
     // G11 · Dükkân ayarı (A-M43): yalnız tamircinin aldığı parçada. Ayar okunamazsa sorulmaz — varsayılan kapalı.
     bool AlisSorulur(LineItem s) => dukkan?.AskPartCost == true && s.Kind == "Part" && s.SuppliedBy != "Customer";
 
+    Guid? kimden;
+    List<Supplier>? parcacilar;
+
+    Task VeresiyeDegisti(LineItem s)
+    {
+        if (!s.OnCredit && s.SupplierId is null) { kimden = s.Id; return Task.CompletedTask; }
+        return Calis(async () => k = await Api.SetLinePurchaseAsync(Id, s.Id, s.SupplierId, !s.OnCredit));
+    }
+
+    Task KimdenSecildi(LineItem s, Supplier p) => Calis(async () =>
+    {
+        k = await Api.SetLinePurchaseAsync(Id, s.Id, p.Id, true);
+        kimden = null;
+    });
+
     Task AlisDegisti(LineItem s, ChangeEventArgs e)
     {
         var yazilan = e.Value?.ToString() ?? "";
@@ -396,6 +432,8 @@
             avans = await Api.AdvanceAsync(k.VehicleId);
         });
         try { dukkan = await Api.ShopAsync(); } catch (ApiException) { }   // yalnız alış sorusu için; okunamazsa sorulmaz
+        if (dukkan?.AskPartCost == true)
+            try { parcacilar = await Api.SuppliersAsync(); } catch (ApiException) { }   // veresiyede kimden alındığı (K-090)
 
     }
 

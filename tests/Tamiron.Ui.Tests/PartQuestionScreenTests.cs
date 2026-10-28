@@ -178,6 +178,37 @@ public class PartQuestionScreenTests : TestContext
     }
 
     [Fact]
+    public void Reply_can_be_written_as_bought_on_credit()
+    {
+        // H4 · K-090: varsayılan "ödedim"; usta "veresiye" derse borç o parçacıya yazılır.
+        api.Routes[$"GET /api/records/{Rid}/price-requests"] = (HttpStatusCode.OK, "[" + Soru(Q1, S1, "Öz Parça", "0533 100 00 01") + "]");
+        api.Routes[$"POST /api/price-requests/{Q1}/replies"] = (HttpStatusCode.OK, api.Routes[$"GET /api/records/{Rid}"].Body);
+        var c = Ac();
+        var k = $"{Q1}|{L1}";
+        Assert.Equal("false", c.Find($"[data-cevap-veresiye='{k}']").GetAttribute("aria-pressed"));
+        c.Find($"[data-cevap-fiyat='{k}']").Input("1.200");
+        c.Find($"[data-cevap-veresiye='{k}']").Click();
+        Assert.Equal("true", c.Find($"[data-cevap-veresiye='{k}']").GetAttribute("aria-pressed"));
+        c.Find($"[data-cevap-yaz='{k}']").Click();
+        c.WaitForAssertion(() => Assert.Contains(api.Calls, x => x.Path == $"/api/price-requests/{Q1}/replies"));
+        using var b = JsonDocument.Parse(api.Calls.Single(x => x.Path == $"/api/price-requests/{Q1}/replies").Body!);
+        Assert.True(b.RootElement.GetProperty("onCredit").GetBoolean());
+    }
+
+    [Fact]
+    public void Reply_is_paid_on_the_spot_by_default()
+    {
+        api.Routes[$"GET /api/records/{Rid}/price-requests"] = (HttpStatusCode.OK, "[" + Soru(Q1, S1, "Öz Parça", "0533 100 00 01") + "]");
+        api.Routes[$"POST /api/price-requests/{Q1}/replies"] = (HttpStatusCode.OK, api.Routes[$"GET /api/records/{Rid}"].Body);
+        var c = Ac();
+        c.Find($"[data-cevap-fiyat='{Q1}|{L1}']").Input("1.200");
+        c.Find($"[data-cevap-yaz='{Q1}|{L1}']").Click();
+        c.WaitForAssertion(() => Assert.Contains(api.Calls, x => x.Path == $"/api/price-requests/{Q1}/replies"));
+        using var b = JsonDocument.Parse(api.Calls.Single(x => x.Path == $"/api/price-requests/{Q1}/replies").Body!);
+        Assert.False(b.RootElement.GetProperty("onCredit").GetBoolean());
+    }
+
+    [Fact]
     public void Unreadable_amount_is_told_and_nothing_is_sent()
     {
         api.Routes[$"GET /api/records/{Rid}/price-requests"] = (HttpStatusCode.OK, "[" + Soru(Q1, S1, "Öz Parça", "0533 100 00 01") + "]");

@@ -1,0 +1,127 @@
+@page "/cari"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  H4 · Cari (K-090, TASARIM-H-MUHASEBE §4) — muhasebe "Detaylı"daki Cari kutusu. OtoMix'in Cari modülünün
+  yedi işe hizmet eden iki parçası: MÜŞTERİDEN ALACAĞIM (muhasebedeki alacakla AYNI kaynak — receivables)
+  ve PARÇACILARA BORCUM (veresiye alışlar − ödemeler; API hesaplar, ekran toplamaz).
+  Tam cari (ekstre, mutabakat, vade) YOK — T-1, K-022. Müşteri avansı burada değil, kayıt künyesinde.
+*@
+<section class="screen active" id="screen-cari">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-users"></use></svg> Cari</span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="cariHata"><span class="n-body">@hata</span></div>
+  }
+
+  @if (alacak is not null)
+  {
+    <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-wallet"></use></svg> Müşteriden alacağım</span>
+      <span class="eb-say" id="cariAlacakToplam">@Format.Money(alacak.Total) ₺</span></div>
+    <div class="card" id="cariAlacak">
+      @if (alacak.Items.Count == 0)
+      {
+        <p class="plate-hint">Alacak yok — her iş ödenmiş.</p>
+      }
+      @foreach (var a in alacak.Items)
+      {
+        <div class="tutar-sat" data-kayit="@a.RecordId" role="button" tabindex="0" @key="a.RecordId" @onclick='() => Nav.NavigateTo($"/kayit/{a.RecordId}")'>
+          <span><b>@a.PlateNo</b>@(string.IsNullOrWhiteSpace(a.OwnerName) ? "" : $" · {a.OwnerName}")<span class="t-alt">@a.Description</span></span>
+          <span class="tv">@Format.Money(a.Remaining) ₺</span>
+        </div>
+      }
+    </div>
+  }
+
+  @if (borc is not null)
+  {
+    <div class="section-label"><span class="lbl-txt"><svg class="ico ico-sm"><use href="#i-package"></use></svg> Parçacılara borcum</span>
+      <span class="eb-say" id="cariBorcToplam">@Format.Money(borc.Total) ₺</span></div>
+    <div id="cariBorc">
+      @if (borc.Items.Count == 0)
+      {
+        <div class="bos-durum"><b>Parçacıya borcun yok</b>
+          <span>Parçayı veresiye aldıysan servis kaydında parçanın altında "veresiye"ye dokun — borç burada birikir.</span></div>
+      }
+      @foreach (var p in borc.Items)
+      {
+        <div class="card" data-parcaci-borc="@p.SupplierId" @key="p.SupplierId">
+          <div class="tutar-sat"><span><b>@p.Name</b></span><span class="tv">@Format.Money(p.Debt) ₺</span></div>
+          @foreach (var l in p.Lines)
+          {
+            <div class="t-alt" data-borc-satir="@l.LineId">@($"{l.PlateNo} · {l.Name} · {Format.Money(l.Cost)} ₺")</div>
+          }
+          @foreach (var o in p.Payments)
+          {
+            <div class="tutar-sat" data-odeme="@o.Id">
+              <span class="t-alt">@($"{Format.Date(o.PaidOn)} · {Format.PaymentLabel(o.Method)} · {Format.Money(o.Amount)} ₺") ödendi</span>
+              <button class="btn btn-ghost" data-odeme-geri="@o.Id" disabled="@calisiyor" @onclick="() => GeriAl(o)">Geri al</button>
+            </div>
+          }
+          @if (odenen == p.SupplierId)
+          {
+            <div class="field"><label for="cariOdeTutar">Ödenen</label>
+              <input id="cariOdeTutar" class="mono" inputmode="numeric" autocomplete="off" value="@tutar" @oninput="e => tutar = e.Value?.ToString() ?? string.Empty" /></div>
+            <div class="cip-grup" role="group" aria-label="Nasıl ödedin">
+              @foreach (var (yol, ad) in Yollar)
+              {
+                <button class="cip" data-ode-yol="@yol" disabled="@calisiyor" @onclick="() => Ode(p, yol)">@ad</button>
+              }
+            </div>
+            <button class="btn btn-ghost" id="cariOdeVazgec" @onclick="() => odenen = null">Vazgeç</button>
+          }
+          else if (p.Debt > 0)
+          {
+            <button class="btn btn-primary" data-ode="@p.SupplierId" @onclick="() => OdeAc(p)">
+              <svg class="ico"><use href="#i-wallet"></use></svg> Öde</button>
+          }
+        </div>
+      }
+    </div>
+  }
+</section>
+
+@code {
+    static readonly (string Yol, string Ad)[] Yollar = [("Cash", "Nakit"), ("Card", "Kart"), ("Transfer", "Havale")];
+
+    ReceivableList? alacak;
+    SupplierDebtList? borc;
+    Guid? odenen;
+    string tutar = "";
+    string? hata;
+    bool calisiyor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        await Calis(async () =>
+        {
+            alacak = await Api.AllReceivablesAsync();
+            borc = await Api.SupplierDebtsAsync();
+        });
+    }
+
+    // Tutar borçla dolu gelir: tamamını ödeyen yalnız yola dokunur, bir kısmını ödeyen rakamı değiştirir.
+    void OdeAc(SupplierDebtItem p) { odenen = p.SupplierId; tutar = Format.Money(p.Debt); hata = null; }
+
+    Task Ode(SupplierDebtItem p, string yol) => Calis(async () =>
+    {
+        if (Format.ParseMoney(tutar) is not { } t) { hata = "Tutarı rakamla yaz — ör. 1.200"; return; }
+        borc = await Api.PaySupplierAsync(p.SupplierId, t, yol);
+        odenen = null;
+    });
+
+    Task GeriAl(SupplierPaymentItem o) => Calis(async () => borc = await Api.UndoSupplierPaymentAsync(o.Id));
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}

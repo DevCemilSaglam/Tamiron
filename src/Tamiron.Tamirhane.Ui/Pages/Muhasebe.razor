@@ -177,7 +177,7 @@
         new("kasa", "i-wallet", "Kasa", "Tahsilat, gider, alacak"),
         new("rapor", "i-clipboard-list", "Raporlar", "İş başına fark, parça alışı"),
         new("sms", "i-message-square", "SMS", "Özet ve bakım hatırlatması"),
-        new(null, "i-users", "Cari", "Müşteri ve parçacı bakiyesi"),
+        new("cari", "i-users", "Cari", "Müşteriden alacak, parçacıya borç"),
         new(null, "i-file-text", "Fatura", "Satış faturası, e-Arşiv"),
         new(null, "i-wallet", "Banka", "Hesap hareketleri"),
         new(null, "i-receipt", "Çek", "Alınan ve verilen çekler"),
@@ -195,6 +195,7 @@
             case "kasa": kip = "basit"; break;   // Kasa basit görünümün KENDİSİ — ikinci kasa ekranı yok
             case "rapor": Nav.NavigateTo("/is-basina?donem=" + donem); break;   // dönem iki ekranda aynı
             case "sms": Nav.NavigateTo("/mesaj"); break;
+            case "cari": Nav.NavigateTo("/cari"); break;   // H4 · K-090
         }
     }
 

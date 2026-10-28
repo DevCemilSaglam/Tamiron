@@ -120,6 +120,9 @@
               <div class="field"><label for="@($"psMusteri-{s.Id}-{l.Id}")">Müşteriye (istersen)</label>
                 <input id="@($"psMusteri-{s.Id}-{l.Id}")" class="mono" inputmode="numeric" placeholder="₺" data-cevap-musteri="@k" value="@Al(musteri, k)" @oninput="e => musteri[k] = e.Value?.ToString() ?? string.Empty" /></div>
             </div>
+            @* H4 · K-090: varsayılan "ödedim"; "veresiye" denirse borç bu parçacıya yazılır. *@
+            <button class="cip" data-cevap-veresiye="@k" aria-pressed="@(veresiye.Contains(k) ? "true" : "false")"
+                    @onclick="() => { if (!veresiye.Remove(k)) veresiye.Add(k); }">veresiye</button>
             <button class="btn btn-ghost" data-cevap-yaz="@k" disabled="@calisiyor" @onclick="() => CevapYaz(s, l)">Kayda yaz</button>
           }
         </div>
@@ -137,6 +140,7 @@
     List<PriceRequest>? sorular;
     readonly List<Guid> secili = [];   // seçim sırası korunur: sorular bu sırayla açılır
     readonly Dictionary<string, string> fiyat = new(), musteri = new();
+    readonly HashSet<string> veresiye = [];
     string marka = "", model = "", yil = "", motor = "";
     string? hata, sonuc;
     bool calisiyor;
@@ -201,8 +205,8 @@
         var alis = Format.ParseMoney(Al(fiyat, k));
         var satis = Al(musteri, k).Trim().Length == 0 ? 0m : Format.ParseMoney(Al(musteri, k));
         if (alis is null || satis is null) { hata = "Tutarı rakamla yaz — ör. 1.200"; return; }
-        await Api.AddPriceReplyAsync(s.Id, l.Id, Al(fiyat, k).Trim(), alis == 0 ? null : alis, satis == 0 ? null : satis);
-        fiyat.Remove(k); musteri.Remove(k);
+        await Api.AddPriceReplyAsync(s.Id, l.Id, Al(fiyat, k).Trim(), alis == 0 ? null : alis, satis == 0 ? null : satis, veresiye.Contains(k));
+        fiyat.Remove(k); musteri.Remove(k); veresiye.Remove(k);
         sonuc = $"{l.Name}: {s.SupplierName} cevabı kayda yazıldı.";
         await Yenile();
     });

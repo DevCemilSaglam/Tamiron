@@ -73,6 +73,68 @@ public class RecordDetailScreenTests : TestContext
 
     const string AlisAcik = "{\"name\":\"Deneme Oto\",\"maintenanceMonths\":6,\"maintenanceKm\":10000,\"askPartCost\":true}";
 
+    // H4 · Veresiye (K-090): alış alanının yanında; parça kimden alındıysa adı yazılı. Varsayılan "ödedim".
+    const string S1 = "55555555-5555-5555-5555-555555555551";
+    const string Parcacilar = "[{\"id\":\"" + S1 + "\",\"name\":\"Öz Parça\",\"phone\":\"0533 100 00 01\"}]";
+
+    static string ParcaciliSatir(bool veresiye, string? parcaci = S1)
+    {
+        var s = Satir(L1, "Part", "Balata", 1200, "\"Shop\"", cost: "900");
+        return "[" + s[..^1] + $",\"supplierId\":{(parcaci is null ? "null" : $"\"{parcaci}\"")},\"onCredit\":{(veresiye ? "true" : "false")}}}" + "]";
+    }
+
+    [Fact]
+    public void Credit_chip_marks_the_known_supplier_and_says_who()
+    {
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik);
+        api.Routes["GET /api/suppliers"] = (HttpStatusCode.OK, Parcacilar);
+        api.Routes[$"PATCH /api/records/{Id}/lines/{L1}/purchase"] = (HttpStatusCode.OK, Kayit(ParcaciliSatir(true), 1200));
+        var c = Ac(Kayit(ParcaciliSatir(false), 1200));
+        c.WaitForAssertion(() => Assert.Contains("Öz Parça", c.Find($"[data-satir-parcaci='{L1}']").TextContent));
+        Assert.Equal("false", c.Find($"[data-satir-veresiye='{L1}']").GetAttribute("aria-pressed"));
+        c.Find($"[data-satir-veresiye='{L1}']").Click();
+        c.WaitForAssertion(() => Assert.Equal("true", c.Find($"[data-satir-veresiye='{L1}']").GetAttribute("aria-pressed")));
+        using var b = System.Text.Json.JsonDocument.Parse(api.Calls.Single(x => x.Path == $"/api/records/{Id}/lines/{L1}/purchase").Body!);
+        Assert.Equal(S1, b.RootElement.GetProperty("supplierId").GetString());
+        Assert.True(b.RootElement.GetProperty("onCredit").GetBoolean());
+    }
+
+    [Fact]
+    public void Credit_without_a_known_supplier_asks_whom_first()
+    {
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik);
+        api.Routes["GET /api/suppliers"] = (HttpStatusCode.OK, Parcacilar);
+        api.Routes[$"PATCH /api/records/{Id}/lines/{L1}/purchase"] = (HttpStatusCode.OK, Kayit(ParcaciliSatir(true), 1200));
+        var c = Ac(Kayit(ParcaciliSatir(false, parcaci: null), 1200));
+        c.WaitForElement($"[data-satir-veresiye='{L1}']").Click();
+        Assert.DoesNotContain(api.Calls, x => x.Path.EndsWith("/purchase"));   // kime borçlu olduğu bilinmeden borç yazılmaz
+        c.WaitForElement($"[data-satir-kimden='{S1}']").Click();
+        c.WaitForAssertion(() => Assert.Contains(api.Calls, x => x.Path == $"/api/records/{Id}/lines/{L1}/purchase"));
+        Assert.Contains($"\"supplierId\":\"{S1}\"", api.Calls.Single(x => x.Path.EndsWith("/purchase")).Body);
+        Assert.Contains("\"onCredit\":true", api.Calls.Single(x => x.Path.EndsWith("/purchase")).Body);
+    }
+
+    [Fact]
+    public void Credit_can_be_taken_back()
+    {
+        // Mutasyonla bulundu: ikinci dokunuş veresiyeyi kaldırmıyordu — yanlış dokunan usta borcu silemezdi.
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik);
+        api.Routes["GET /api/suppliers"] = (HttpStatusCode.OK, Parcacilar);
+        api.Routes[$"PATCH /api/records/{Id}/lines/{L1}/purchase"] = (HttpStatusCode.OK, Kayit(ParcaciliSatir(false), 1200));
+        var c = Ac(Kayit(ParcaciliSatir(true), 1200));
+        c.WaitForElement($"[data-satir-veresiye='{L1}']").Click();
+        c.WaitForAssertion(() => Assert.Contains("\"onCredit\":false", api.Calls.Single(x => x.Path.EndsWith("/purchase")).Body));
+    }
+
+    [Fact]
+    public void No_credit_chip_when_cost_is_not_asked()
+    {
+        api.Routes["GET /api/shop"] = (HttpStatusCode.OK, AlisAcik.Replace("true", "false"));
+        var c = Ac(Kayit(ParcaciliSatir(false), 1200));
+        c.WaitForElement($"[data-satir='{L1}']");
+        Assert.Empty(c.FindAll("[data-satir-veresiye]"));
+    }
+
     [Fact]
     public void Part_cost_is_asked_only_when_the_shop_wants_it()
     {

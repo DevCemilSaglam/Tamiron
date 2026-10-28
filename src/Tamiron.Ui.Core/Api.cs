@@ -60,6 +60,12 @@ public sealed record JobProfitItem(Guid RecordId, string PlateNo, string Type, s
 public sealed record JobProfitList(string Period, DateOnly Start, DateOnly End, decimal Received, decimal PartsCost, decimal Outside,
                                    int UnknownCount, decimal Difference, bool AskPartCost, IReadOnlyList<JobProfitItem> Items);
 
+// H4 · Parçacıya borç (K-090): borç saklanmaz — veresiye alışlar − ödemeler (API).
+public sealed record DebtLine(Guid RecordId, Guid LineId, string PlateNo, string Name, decimal Cost);
+public sealed record SupplierPaymentItem(Guid Id, decimal Amount, string Method, DateOnly PaidOn);
+public sealed record SupplierDebtItem(Guid SupplierId, string Name, string Phone, decimal Debt, IReadOnlyList<DebtLine> Lines, IReadOnlyList<SupplierPaymentItem> Payments);
+public sealed record SupplierDebtList(decimal Total, IReadOnlyList<SupplierDebtItem> Items);
+
 public sealed record MessageSetup(IReadOnlyList<MessageTarget> Targets, Guid? CurrentRecordId);
 public sealed record MessageTarget(string Kind, string Name, string? Phone, bool IsDefault);
 public sealed record MessageSuggestion(string Template, string Name, string Text);
@@ -87,7 +93,8 @@ public sealed record RecordDetail(Guid Id, Guid VehicleId, string PlateNo, strin
 /// <summary>Alınan ödeme (K-078). AtDelivery: teslimde alındı — teslimle gider, "geri al"la değil.</summary>
 public sealed record PaymentItem(Guid Id, decimal Amount, string Method, DateOnly PaidOn, bool AtDelivery);
 
-public sealed record LineItem(Guid Id, string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy, bool CountsInTotal);
+public sealed record LineItem(Guid Id, string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy, bool CountsInTotal,
+                              Guid? SupplierId = null, bool OnCredit = false);
 
 /// <summary>API'ye giden satır (LineBody). Kind: "Part" | "Labor"; SuppliedBy: null | "Shop" | "Customer".</summary>
 public sealed record LineInput(string Kind, string Name, decimal Price, decimal? Cost, string? SuppliedBy);
@@ -295,8 +302,18 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
         => await Read<List<PriceRequest>>(await Send(HttpMethod.Get, $"api/records/{recordId}/price-requests", null, auth: true));
     public async Task<List<PriceRequest>> AskPricesAsync(Guid recordId, IReadOnlyList<Guid> supplierIds)
         => await Read<List<PriceRequest>>(await Send(HttpMethod.Post, $"api/records/{recordId}/price-requests", new { supplierIds }, auth: true));
-    public async Task<RecordDetail> AddPriceReplyAsync(Guid requestId, Guid lineId, string? rawText, decimal? price, decimal? customerPrice)
-        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/price-requests/{requestId}/replies", new { lineId, rawText, price, customerPrice }, auth: true));
+    public async Task<RecordDetail> AddPriceReplyAsync(Guid requestId, Guid lineId, string? rawText, decimal? price, decimal? customerPrice, bool onCredit = false)
+        => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/price-requests/{requestId}/replies", new { lineId, rawText, price, customerPrice, onCredit }, auth: true));
+
+    // H4 · Parçacıya borç (K-090): satırda kimden alındı + veresiye; borç listesi, öde, geri al.
+    public async Task<RecordDetail> SetLinePurchaseAsync(Guid id, Guid lineId, Guid? supplierId, bool onCredit)
+        => await Read<RecordDetail>(await Send(HttpMethod.Patch, $"api/records/{id}/lines/{lineId}/purchase", new { supplierId, onCredit }, auth: true));
+    public async Task<SupplierDebtList> SupplierDebtsAsync() => await Read<SupplierDebtList>(await Send(HttpMethod.Get, "api/supplier-debts", null, auth: true));
+    public async Task<SupplierDebtList> PaySupplierAsync(Guid supplierId, decimal amount, string method)
+        => await Read<SupplierDebtList>(await Send(HttpMethod.Post, $"api/suppliers/{supplierId}/payments", new { amount, method }, auth: true));
+    public async Task<SupplierDebtList> UndoSupplierPaymentAsync(Guid paymentId)
+        => await Read<SupplierDebtList>(await Send(HttpMethod.Post, $"api/supplier-payments/{paymentId}/undo", null, auth: true));
+    public async Task<ReceivableList> AllReceivablesAsync() => await Read<ReceivableList>(await Send(HttpMethod.Get, "api/receivables", null, auth: true));
 
     // G9c · Mesaj: kurulum (kime, hangi iş), öneriler (hedefe göre hitap), kayıt, arşiv.
     public async Task<MessageSetup> MessageSetupAsync(Guid vehicleId)
