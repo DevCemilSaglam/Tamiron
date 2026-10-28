@@ -12,15 +12,16 @@
 #
 # -Derlemeden: kod değişmediyse derlemeyi atla (daha hızlı açılır).
 # -TarayicisizAc: tarayıcıyı açma (deneme/önizleme için).
+# -Klasor / -Port: ikinci bir kopya (ör. usta 5090'da çalışırken deneme 5091'de) — aynı veritabanı.
 
-param([switch]$Derlemeden, [switch]$TarayicisizAc)
+param([switch]$Derlemeden, [switch]$TarayicisizAc, [string]$Klasor = '.yerel', [int]$Port = 5090)
 
 $ErrorActionPreference = 'Stop'
 # Türkçe harfler pencerede bozulmasın (PowerShell 5.1 varsayılanı OEM kod sayfası).
 [Console]::OutputEncoding = [Text.Encoding]::UTF8
 $kok = Split-Path -Parent $PSScriptRoot
-$cikti = Join-Path $kok '.yerel'
-$adres = 'http://localhost:5090'
+$cikti = Join-Path $kok $Klasor
+$adres = "http://localhost:$Port"
 
 if (-not $Derlemeden -or -not (Test-Path (Join-Path $cikti 'Tamiron.Api.exe'))) {
     Write-Host 'Tamiron derleniyor...'

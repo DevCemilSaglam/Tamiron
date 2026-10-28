@@ -50,6 +50,24 @@
         "-TarayicisizAc"
       ],
       "port": 5090
+    },
+    {
+      "name": "yerel-deneme",
+      "runtimeExecutable": "powershell",
+      "runtimeArgs": [
+        "-NoProfile",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "tools/yerel-baslat.ps1",
+        "-Derlemeden",
+        "-TarayicisizAc",
+        "-Klasor",
+        ".yerel-deneme",
+        "-Port",
+        "5091"
+      ],
+      "port": 5091
     }
   ]
 }

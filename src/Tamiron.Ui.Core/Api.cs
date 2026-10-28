@@ -54,6 +54,12 @@ public sealed record PriceRequest(Guid Id, Guid SupplierId, string SupplierName,
 // G11b · Tarihi gelmiş, gönderilmemiş bakım hatırlatmaları (B12) — çekmecenin bildirimleri ve menü rozeti.
 public sealed record DueReminder(Guid RecordId, Guid VehicleId, string PlateNo, string? OwnerName, string? Phone, DateOnly ReminderDate, int DaysOverdue);
 
+// H1 · İş başına fark (API ListJobProfits): alınan − parça alışı; bilinmeyen alış "hesap dışı" (K-057).
+public sealed record JobProfitItem(Guid RecordId, string PlateNo, string Type, string TypeLabel, string? Brand, DateOnly DeliveredAt,
+                                   decimal Received, decimal PartsCost, decimal Outside, int UnknownCount, decimal Difference);
+public sealed record JobProfitList(string Period, DateOnly Start, DateOnly End, decimal Received, decimal PartsCost, decimal Outside,
+                                   int UnknownCount, decimal Difference, bool AskPartCost, IReadOnlyList<JobProfitItem> Items);
+
 public sealed record MessageSetup(IReadOnlyList<MessageTarget> Targets, Guid? CurrentRecordId);
 public sealed record MessageTarget(string Kind, string Name, string? Phone, bool IsDefault);
 public sealed record MessageSuggestion(string Template, string Name, string Text);
@@ -208,6 +214,8 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     public async Task<RecordDetail> CorrectPaymentAsync(Guid id, string method)
         => await Read<RecordDetail>(await Send(HttpMethod.Post, $"api/records/{id}/payment", new { method }, auth: true));
 
+    public async Task<JobProfitList> ProfitAsync(string period)
+        => await Read<JobProfitList>(await Send(HttpMethod.Get, "api/profit?period=" + period, null, auth: true));
     public async Task<AccountingOverview> AccountingAsync(string period)
         => await Read<AccountingOverview>(await Send(HttpMethod.Get, $"api/accounting?period={period}", null, auth: true));
     public async Task AddExpenseAsync(string description, decimal amount)
@@ -360,6 +368,14 @@ public static class Format
     static readonly string[] Aylar = ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran", "Temmuz", "Ağustos", "Eylül", "Ekim", "Kasım", "Aralık"];
     /// <summary>Prototip AYLAR — dönem çipinin adı ("Ekim").</summary>
     public static string MonthName(DateTime d) => Aylar[d.Month - 1];
+
+    /// <summary>Prototip donemAdi: "Bugün" · ayın adı · yıl — rakam kendi tarihini taşısın ("bu ay" demez).</summary>
+    public static string PeriodName(string period, DateTime today) => period switch
+    {
+        "Month" => MonthName(today),
+        "Year" => today.Year.ToString(CultureInfo.InvariantCulture),
+        _ => "Bugün",
+    };
 
     public static string Date(DateOnly d) => d.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 

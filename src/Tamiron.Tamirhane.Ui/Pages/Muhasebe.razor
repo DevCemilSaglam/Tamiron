@@ -8,7 +8,8 @@
   Dönem çipi (Bugün · ay · yıl) kasayı ve gideri süzer; ALACAK döneme tabi DEĞİL — bakiye (Cemil, 05.09).
   Rakamların hepsi API'den; ekran toplamaz. Gider: açıklama + tutar, × ile silinir, "Geri al".
   CSV API'den (B9, bayt bayt prototiple eşdeğer) — tarayıcıya tamironIndir ile kaydettirilir.
-  ⚠️ Henüz yok: "Detaylı" sekmesi (modül menüsü), yazdır, sesle gider (G13).
+  H1 · "Detaylı" sekmesi: OtoMix'in modül tahtası; Raporlar → iş başına (aynı dönemle).
+  ⚠️ Henüz yok: yazdır, sesle gider (G13).
 *@
 <section class="screen active" id="screen-muhasebe">
   <div class="screen-head">
@@ -16,6 +17,15 @@
       <span class="eb-say" id="muhSay">@DonemAdi(donem)</span></span>
   </div>
 
+  <div class="tab-grup" role="tablist" aria-label="Muhasebe görünümü">
+    <button class="tab" id="muhSekBasit" role="tab" aria-selected="@(kip == "basit" ? "true" : "false")" @onclick='() => kip = "basit"'>
+      <svg class="ico"><use href="#i-wallet"></use></svg> Basit</button>
+    <button class="tab" id="muhSekDetay" role="tab" aria-selected="@(kip == "detay" ? "true" : "false")" @onclick='() => kip = "detay"'>
+      <svg class="ico"><use href="#i-receipt"></use></svg> Detaylı</button>
+  </div>
+
+  @if (kip == "basit")
+  {
   <div class="yigin">
     <div class="cip-grup" id="muhDonem" role="group" aria-label="Dönem">
       @foreach (var d in Donemler)
@@ -133,10 +143,60 @@
       <p class="plate-hint" id="muhDisaNot"><b>@DonemAdi(donem)</b> tahsilatı ve gideri, bugünkü alacakla birlikte. Excel dosyası muhasebeciye gönderilebilir.</p>
     }
   </div>
+  }
+  else
+  {
+    @* OtoMix'in modül tahtası (Cemil: "Detaylı alanda muhasebe modüllerine gidebilsin. Menü şeklinde olsun").
+       Yazılmamış modül AÇILIR GİBİ DURMAZ: devre dışı ve "yazılmadı" der — usta "bu program bunu yapıyor" sanmasın.
+       Sıra Tamiron'un: çalışanlar önce. *@
+    <div id="muhDetayGovde" class="yigin">
+      <div class="modul-grid" id="muhModuller" role="group" aria-label="Muhasebe modülleri">
+        @foreach (var m in Moduller)
+        {
+          <button class="modul-kutu" data-muhmodul="@m.Anahtar" disabled="@(m.Anahtar is null)"
+                  aria-label="@($"{m.Ad} — {(m.Anahtar is null ? "yazılmadı" : m.Alt)}")" @onclick="() => ModulAc(m.Anahtar)">
+            <span class="mk-ic"><svg class="ico"><use href="#@m.Ikon"></use></svg></span>
+            <span class="mk-ad">@m.Ad</span>
+            <span class="mk-alt">@(m.Anahtar is null ? "yazılmadı" : m.Alt)</span>
+          </button>
+        }
+      </div>
+      <p class="plate-hint" id="muhModulNot">Soluk duran modüller ustadan <b>yeni veri</b> ister; kapsam kararı verilmeden yazılmıyor.
+        Tahtada yerleri duruyor ki neyin nereye geleceği belli olsun.</p>
+    </div>
+  }
 </section>
 
 @code {
     static readonly string[] Donemler = ["Today", "Month", "Year"];
+
+    record Modul(string? Anahtar, string Ikon, string Ad, string Alt);
+    // Anahtarı olmayan = yazılmadı (devre dışı). Hedefler aşağıda LİTERAL (ModulAc) — kodda birleştirilmez.
+    static readonly Modul[] Moduller =
+    [
+        new("kasa", "i-wallet", "Kasa", "Tahsilat, gider, alacak"),
+        new("rapor", "i-clipboard-list", "Raporlar", "İş başına fark, parça alışı"),
+        new("sms", "i-message-square", "SMS", "Özet ve bakım hatırlatması"),
+        new(null, "i-users", "Cari", "Müşteri ve parçacı bakiyesi"),
+        new(null, "i-file-text", "Fatura", "Satış faturası, e-Arşiv"),
+        new(null, "i-wallet", "Banka", "Hesap hareketleri"),
+        new(null, "i-receipt", "Çek", "Alınan ve verilen çekler"),
+        new(null, "i-receipt", "POS", "Kart tahsilat dökümü"),
+        new(null, "i-package", "Stok", "Parça deposu, sayım"),
+        new(null, "i-file-text", "Teklif", "Müşteriye fiyat teklifi"),
+    ];
+
+    string kip = "basit";
+
+    void ModulAc(string? anahtar)
+    {
+        switch (anahtar)
+        {
+            case "kasa": kip = "basit"; break;   // Kasa basit görünümün KENDİSİ — ikinci kasa ekranı yok
+            case "rapor": Nav.NavigateTo("/is-basina?donem=" + donem); break;   // dönem iki ekranda aynı
+            case "sms": Nav.NavigateTo("/mesaj"); break;
+        }
+    }
 
     AccountingOverview? o;
     ExpenseItem? silinen;
@@ -145,13 +205,7 @@
     string? hata;
     bool form, calisiyor;
 
-    // Prototip donemAdi: "Bugün" · ayın adı · yıl.
-    static string DonemAdi(string d) => d switch
-    {
-        "Month" => Format.MonthName(DateTime.Today),
-        "Year" => DateTime.Today.Year.ToString(System.Globalization.CultureInfo.InvariantCulture),
-        _ => "Bugün",
-    };
+    static string DonemAdi(string d) => Format.PeriodName(d, DateTime.Today);
 
     protected override async Task OnInitializedAsync()
     {

@@ -48,3 +48,4 @@ TestResults/
 
 # G1 · yerel kurulumun derlemesi (tools/yerel-baslat.ps1)
 .yerel/
+.yerel-deneme/

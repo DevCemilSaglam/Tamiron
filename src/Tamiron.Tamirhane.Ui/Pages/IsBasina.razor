@@ -1,0 +1,110 @@
+@page "/is-basina"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  H1 · İş başına (prototip 96-is-basina) — muhasebe "Detaylı" → Raporlar. Teslim edilen her işin FARKI =
+  alınan − parça alışı (API ListJobProfits). Satır iki sütun: iş (plaka; tür · marka · gün; alınan · parça ·
+  hesap dışı) ve fark — 320 px'te sağa kaymasın diye ayrıntı plakanın ALTINDA.
+  Bilinmeyen alış kâra girmez (K-057) ama SÖYLENİR; çözümü yanında (alış sorulmuyorsa Ayarlar'a götürür).
+  Dönem muhasebeden gelir (?donem=) — iki ekranda iki ayrı dönem olmasın.
+*@
+<section class="screen active" id="screen-is-basina">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-clipboard-list"></use></svg> İş başına
+      @if (l is not null) { <span class="eb-say" id="ibSay">@($"{l.Items.Count} teslim · {Ad(donem).ToLower(Tr)}")</span> }
+    </span>
+  </div>
+
+  <div class="cip-grup" id="ibDonem" role="group" aria-label="Dönem">
+    @foreach (var d in Donemler)
+    {
+      <button class="cip" data-donem="@d" aria-pressed="@(donem == d ? "true" : "false")" disabled="@calisiyor" @onclick="() => DonemSec(d)">@Ad(d)</button>
+    }
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="ibHata"><span class="n-body">@hata</span></div>
+  }
+
+  @if (l is { Items.Count: 0 })
+  {
+    <div class="bos-durum" id="ibBos"><b>Bu dönemde teslim edilmiş iş yok</b><span>Dönemi genişletirsen geçmiş işler görünür.</span></div>
+  }
+  else if (l is not null)
+  {
+    <div class="card">
+      <div class="tablo-sar">
+        <table class="tablo" id="ibTablo">
+          <thead><tr><th>İş</th><th class="sayi">Fark</th></tr></thead>
+          <tbody>
+            @foreach (var i in l.Items)
+            {
+              <tr data-kayit="@i.RecordId" role="button" tabindex="0" @key="i.RecordId" @onclick='() => Nav.NavigateTo($"/kayit/{i.RecordId}")'>
+                <td><b>@i.PlateNo</b>
+                  <span class="t-alt">@i.TypeLabel@(string.IsNullOrWhiteSpace(i.Brand) ? "" : $" · {i.Brand}") · @Format.Date(i.DeliveredAt)</span>
+                  <span class="t-alt">@Detay(i.Received, i.PartsCost, i.UnknownCount, i.Outside)</span></td>
+                <td class="sayi">@Format.Money(i.Difference) ₺</td>
+              </tr>
+            }
+            <tr class="genel">
+              <td>Toplam<span class="t-alt">@Detay(l.Received, l.PartsCost, l.UnknownCount, l.Outside)</span></td>
+              <td class="sayi">@Format.Money(l.Difference) ₺</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="ibDisarida">
+      @if (l.UnknownCount > 0)
+      {
+        @* Eksik olduğu SÖYLENMELİ — yoksa usta farkı tam sanar. *@
+        <div class="notice"><span class="n-ic"><svg class="ico ico-sm"><use href="#i-info"></use></svg></span>
+          <span class="n-body"><b>@l.UnknownCount parçanın alışı yazılmamış.</b> Satışı (@Format.Money(l.Outside) ₺) farka katılmadı — bilinmeyen alış kâr sayılmaz.
+            @(l.AskPartCost ? "Alışı servis kaydında parçanın altına yazabilirsin." : "Alış fiyatı bugün sorulmuyor.")</span></div>
+        @if (!l.AskPartCost)
+        {
+          <button class="btn btn-ghost" id="ibAyarlar" @onclick='() => Nav.NavigateTo("/ayarlar")'>
+            <svg class="ico"><use href="#i-cog"></use></svg> Alış fiyatını sor</button>
+        }
+      }
+    </div>
+  }
+</section>
+
+@code {
+    [SupplyParameterFromQuery(Name = "donem")] public string? Donem { get; set; }
+
+    static readonly string[] Donemler = ["Today", "Month", "Year"];
+    static readonly System.Globalization.CultureInfo Tr = new("tr-TR");
+
+    JobProfitList? l;
+    string donem = "Month";
+    string? hata;
+    bool calisiyor;
+
+    static string Ad(string d) => Format.PeriodName(d, DateTime.Today);
+
+    // Prototip: "alınan 5.000 · parça 1.200 · 800 hesap dışı" — fark neden "alınan − parça" etmiyor, orada görünür.
+    static string Detay(decimal alinan, decimal parca, int bilinmeyen, decimal disarida)
+        => $"alınan {Format.Money(alinan)} · parça {Format.Money(parca)}" + (bilinmeyen > 0 ? $" · {Format.Money(disarida)} hesap dışı" : "");
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("/giris"); return; }
+        donem = Donemler.Contains(Donem) ? Donem! : "Month";   // bilinmeyen dönem API'ye gitmez
+        await Yukle();
+    }
+
+    Task DonemSec(string d) { donem = d; return Yukle(); }
+
+    async Task Yukle()
+    {
+        hata = null; calisiyor = true;
+        try { l = await Api.ProfitAsync(donem); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("/giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}

@@ -39,6 +39,52 @@ public class AccountingScreenTests : TestContext
     static readonly string Alacak = $"[{{\"recordId\":\"{R1}\",\"vehicleId\":\"22222222-2222-2222-2222-222222222222\",\"plateNo\":\"34 ABC 123\","
                                   + "\"ownerName\":null,\"description\":\"Balata\",\"deliveredAt\":\"2026-10-26\",\"total\":1500,\"paid\":900,\"remaining\":600}]";
 
+    // H1 · OtoMix görünümü (prototip "Detaylı"): modül tahtası. Yazılmamış modül AÇILIR GİBİ DURMAZ — devre dışı
+    // ve "yazılmadı" der (ölü uç, 27. test). Sıra Tamiron'un: çalışanlar önce.
+    [Fact]
+    public void Detailed_tab_shows_the_module_board_working_ones_first()
+    {
+        api.Routes["GET /api/accounting"] = (HttpStatusCode.OK, Ozet());
+        var c = RenderComponent<Muhasebe>();
+        c.WaitForElement("#muhOzet");
+        Assert.Empty(c.FindAll("#muhModuller"));
+        c.Find("#muhSekDetay").Click();
+        Assert.Equal("true", c.Find("#muhSekDetay").GetAttribute("aria-selected"));
+        Assert.Empty(c.FindAll("#muhOzet"));   // iki gövde aynı anda görünmez
+        var kutular = c.FindAll("#muhModuller .modul-kutu");
+        Assert.Equal(new[] { "Kasa", "Raporlar", "SMS" }, kutular.Take(3).Select(k => k.QuerySelector(".mk-ad")!.TextContent));
+        Assert.All(kutular.Skip(3), k => Assert.True(k.HasAttribute("disabled")));
+        Assert.All(kutular.Skip(3), k => Assert.Equal("yazılmadı", k.QuerySelector(".mk-alt")!.TextContent));
+        Assert.All(kutular.Take(3), k => Assert.False(k.HasAttribute("disabled")));
+    }
+
+    [Fact]
+    public void Kasa_module_is_the_simple_tab_itself()
+    {
+        api.Routes["GET /api/accounting"] = (HttpStatusCode.OK, Ozet());
+        var c = RenderComponent<Muhasebe>();
+        c.WaitForElement("#muhSekDetay").Click();
+        c.Find("[data-muhmodul='kasa']").Click();
+        Assert.Equal("true", c.Find("#muhSekBasit").GetAttribute("aria-selected"));
+        Assert.NotNull(c.Find("#muhOzet"));
+    }
+
+    [Fact]
+    public void Reports_open_per_job_with_the_same_period_and_sms_opens_messages()
+    {
+        // Dönem iki ekranda AYNI: muhasebede "Bu ay" seçip rapora gelen "Bugün" bulmasın (prototip muhDonemSecili).
+        api.Routes["GET /api/accounting"] = (HttpStatusCode.OK, Ozet());
+        var c = RenderComponent<Muhasebe>();
+        c.WaitForElement("[data-donem='Month']").Click();
+        c.Find("#muhSekDetay").Click();
+        c.Find("[data-muhmodul='rapor']").Click();
+        Assert.Equal("http://localhost/is-basina?donem=Month", Nav.Uri);
+        var c2 = RenderComponent<Muhasebe>();
+        c2.WaitForElement("#muhSekDetay").Click();
+        c2.Find("[data-muhmodul='sms']").Click();
+        Assert.Equal("http://localhost/mesaj", Nav.Uri);
+    }
+
     [Fact]
     public void Without_session_goes_to_login()
     {

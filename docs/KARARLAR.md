@@ -10,6 +10,21 @@
 
 ---
 
+## K-089 · Tur H açıldı; muhasebe "Detaylı" = OtoMix modül tahtası (28.10.2026 — lider, Cemil onayına açık)
+
+Cemil: *"Otomix'i örnek alacak muhasebe alanı tamam olabilir mesela. Yedek parça satıcısı için alan
+yapılabilir."* Kuyrukta tur H (H1–H9). Dayanak `arastirma/MUHASEBE-KAPSAM-OTOMIX.md`: OtoMix'in altı
+modülünün hepsi DEĞİL (T-1 ile çelişir) — Faz 1'in kalanı + Faz 2 "parçacıya borç". Yedek parça: MIMARI
+§1–2'deki ayrı uygulama, önce tasarım.
+- **H1 (koda geçti):** muhasebede **Basit / Detaylı** sekmeleri (prototip 95-muhasebe). Detaylı = OtoMix'in
+  modül tahtası: Kasa (basitin kendisi) · Raporlar · SMS çalışır; Cari · Fatura · Banka · Çek · POS · Stok ·
+  Teklif **soluk ve "yazılmadı"** — açılır gibi durmaz (ölü uç). Yerleri duruyor ki neyin nereye geleceği belli.
+- **Raporlar = İş başına** (`/is-basina`, prototip 96): alınan − parça alışı; bilinmeyen alış "hesap dışı",
+  nedeni ve çözümü yanında. Dönem muhasebeden taşınır (iki ekranda iki ayrı dönem olmasın).
+- **Ertelendi:** muhasebe yazdır/PDF — CSV muhasebeciye zaten gidiyor; ustanın yazdırma ihtiyacı sorulmadı.
+- `tools/yerel-baslat.ps1`'e `-Klasor` / `-Port`: usta 5090'da çalışırken deneme 5091'de (aynı veritabanı,
+  ayrı dükkân hesabı). Varsayılan değişmedi.
+
 ## K-088 · Kabuk: rozetli menü, çekmecede hatırlatmalar (27.10.2026 — lider, Cemil onayına açık)
 
 G11b koda geçti (prototip kabuk.html, K-009; API B12'de hazırdı).
