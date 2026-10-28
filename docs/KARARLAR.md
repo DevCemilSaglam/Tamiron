@@ -10,6 +10,19 @@
 
 ---
 
+## K-090 · Parçacıya borç: veresiye işaretli parçadan doğar, bakiye saklanmaz (28.10.2026 — lider, Cemil onayına açık)
+
+H2 tasarımı: `TASARIM-H-MUHASEBE.md`. OtoMix'in "Cari" modülünün yedi işe hizmet eden tek parçası.
+- **Borç yalnız ustanın "veresiye aldım" dediği parçadan doğar;** varsayılan "ödedim". Girilmezse borç
+  sıfır görünür — eksik söyler, uydurmaz (K-013).
+- **Parça kimden alındı** satırda (`SupplierId`): parça sordan otomatik, elle de seçilebilir.
+- **Bakiye saklanmaz:** veresiye alışlar − ödemeler (avansla aynı ilke). Ödeme ≤ borç; kısmi olabilir.
+- **Ödeme gider değil, kasa tahsilatı değil;** CSV'de "Parçacıya ödeme". Gerekçe: alış iş başına farktan
+  zaten düşülüyor, gider de olsa aynı para iki kez düşerdi. **Cemil onayına açık:** kasada görünsün mü?
+- **Ekran:** Detaylı'daki soluk **Cari** kutusu canlanır (`/cari`): müşteriden alacak + parçacılara borç.
+  Yeni menü satırı yok.
+- Açık soru (MUHASEBE-KAPSAM §4.4): parçacıya veresiye yaygın mı? Varsayım: evet.
+
 ## K-089 · Tur H açıldı; muhasebe "Detaylı" = OtoMix modül tahtası (28.10.2026 — lider, Cemil onayına açık)
 
 Cemil: *"Otomix'i örnek alacak muhasebe alanı tamam olabilir mesela. Yedek parça satıcısı için alan

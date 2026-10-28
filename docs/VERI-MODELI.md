@@ -163,6 +163,8 @@ Akıştaki yeri: **Adım 2, 4, 5, 6** · Ekran 3
 | `VatRate` | **KDV oranı (yüzde) — yalnız YER (C6, Faz 3 için).** Satır eklenirken dükkânın varsayılanından (`Shop.DefaultVatRate`, 20) yazılır ve **donar**: oran devlet kararıyla değişir, geçmiş iş kendi oranıyla yeniden basılabilmeli (KDV.md §1, A-K1). Ekranda yok, hesapta yok |
 | `Position` | **Satırın sırası** — ustanın yazdığı sıra (prototipte dizinin sırası). Silinip geri alınan satır **yerine** döner (prototip: `splice(i, 0, silinen)`). Kimlik Guid olduğu ve aynı anda eklenen satırların oluşturulma anı eşit olabildiği için sıra ayrı tutulur (B3, 22.10) |
 | `SelectedReplyId` | **Kol B · hangi parçacının cevabı kullanıldı.** Birden fazla parçacıya sorulmuşsa usta birini seçiyor; seçmezse boş kalır ve akış durmaz (03.09). **Backend (D2):** cevap satıra işlenince dolar (`ServiceLine.ApplyReply`) |
+| `SupplierId` | **Parça kimden alındı** (H3 · 28.10 · K-090). Null olabilir. Parça sorda cevap satıra işlenince o cevabın parçacısı yazılır; usta elle seçebilir. Parçacıya borcun kime olduğu buradan |
+| `OnCredit` | **Veresiye aldım** (K-090). Varsayılan `false` = parayı ödedim. Yalnız tamircinin aldığı, alışı yazılı, parçacısı belli parçada `true` olabilir; borç yalnız bundan doğar |
 
 > `SuppliedBy` yalnız `Kind = Part` için anlamlı. İşçilikte boş.
 >
@@ -181,6 +183,23 @@ Akıştaki yeri: **Adım 3** · Ekran 4, Ayarlar
 | `Phone` | **WhatsApp buraya gider** (T-12b) |
 
 İki alan. Cari hesap, adres, vergi no, ödeme vadesi — **yok.** Tamircinin istediği: *"Yerel parçacının tel belli. Bunları eklememiz gerekecek."*
+
+---
+
+## 4b · `SupplierPayment` — Parçacıya ödeme (H3 · 28.10 · K-090)
+
+Akıştaki yeri: Muhasebe · Detaylı · Cari. Tasarım: `TASARIM-H-MUHASEBE.md`.
+
+| Alan | Neden var |
+|---|---|
+| `SupplierId` | Kime ödendi — silinmiş parçacı da adıyla kalır |
+| `PaidOn` | Hangi gün (dönem süzgeci, CSV) |
+| `Amount` | > 0, ≤ o anki borç |
+| `Method` | `Cash` · `Card` · `Transfer` — "Almadım"/"Avanstan" yok |
+
+> **Borç saklanmaz:** parçacı başına = `OnCredit` satırların `Cost` toplamı − ödemeler. Silinen (soft) satır
+> ve ödeme hesaba girmez. **Gider değildir** (§9 — alış iş başına farktan düşülüyor), **kasa tahsilatına girmez**;
+> CSV'de kendi Türüyle: "Parçacıya ödeme".
 
 ---
 
