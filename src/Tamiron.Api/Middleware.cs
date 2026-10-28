@@ -48,7 +48,13 @@ public sealed class SessionMiddleware(RequestDelegate next)
         rc.TenantId = session.TenantId;
         rc.UserId = session.UserId;
         rc.SessionId = session.Id;
-        if (session.Touch(clock.UtcNow)) await db.SaveChangesAsync();
+        if (session.Touch(clock.UtcNow))
+        {
+            // Saat dolunca aynı anda gelen istekler hepsi yazmak ister; biri yazar, ötekiler çatışır. Son görülmeyi
+            // öteki istek zaten yazdı — çatışan istek işine devam eder (bir OKUMA 409 dönmesin; H7'de görüldü).
+            try { await db.SaveChangesAsync(); }
+            catch (DbUpdateConcurrencyException) { db.Entry(session).State = EntityState.Unchanged; }
+        }
 
         // H6 · Her tür yalnız KENDİ uygulamasının uçlarını kullanır (K-091). Oturum uçları ortak. Yetki API'de.
         rc.ShopKind = await db.Shops.IgnoreQueryFilters().Where(s => s.Id == session.TenantId).Select(s => s.Kind).FirstAsync();

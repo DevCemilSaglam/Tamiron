@@ -1,0 +1,10 @@
+<Router AppAssembly="@typeof(App).Assembly" AdditionalAssemblies="new[] { typeof(Tamiron.YedekParca.Ui.Pages.Sorular).Assembly }">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <section class="screen active"><p role="alert">Bu sayfa yok.</p></section>
+        </LayoutView>
+    </NotFound>
+</Router>

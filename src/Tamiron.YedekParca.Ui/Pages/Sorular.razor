@@ -1,0 +1,142 @@
+@page "/"
+@inject TamironApi Api
+@inject NavigationManager Nav
+@*
+  H7 · Yedek Parça — gelen sorular (K-091, TASARIM-H-YEDEK-PARCA §4). Tamirhanelerin BU numaraya sorduğu parçalar:
+  dükkân (aranabilir), araç kimliği (uyum — T-14), parçalar. Satır başına fiyat · marka · OEM kodu · not (T-13).
+  Müşteri bilgisi YOK (API vermez). Cevap değişmez; yenisi yazılır. Usta kayda alınca işlenir — burada "işlendi"
+  denmez. Uygulama /parca/ altında: yollar GÖRELİ ("giris", "").
+*@
+<section class="screen active" id="screen-sorular">
+  <div class="screen-head">
+    <span class="eyebrow"><svg class="ico ico-sm"><use href="#i-package"></use></svg> Gelen sorular
+      @if (kutu is not null) { <span class="eb-say" id="psoSay">@kutu.Items.Count</span> }
+    </span>
+  </div>
+
+  @if (hata is not null)
+  {
+    <div class="notice warn" role="alert" id="psoHata"><span class="n-body">@hata</span></div>
+  }
+  @if (sonuc is not null)
+  {
+    <div class="notice" role="status" id="psoSonuc"><span class="n-body">@sonuc</span></div>
+  }
+
+  @if (kutu is not null)
+  {
+    <div id="psoListe">
+      @if (kutu.Items.Count == 0)
+      {
+        <div class="bos-durum"><b>Sana sorulmuş parça yok</b>
+          <span>Bir tamirhane bu numarayı parçacı olarak ekleyip fiyat sorduğunda soru burada görünür. WhatsApp'tan gelen soru da buraya düşer.</span></div>
+      }
+      @foreach (var s in kutu.Items)
+      {
+        <div class="card" data-soru="@s.RequestId" @key="s.RequestId">
+          <div class="section-label with-action">
+            <span class="lbl-txt"><b>@s.ShopName</b> · @s.SentAt.ToLocalTime().ToString("dd.MM.yyyy HH:mm", System.Globalization.CultureInfo.InvariantCulture)</span>
+            @if (!string.IsNullOrWhiteSpace(s.ShopPhone))
+            {
+              <a class="tel-link" href="@Format.TelLink(s.ShopPhone)" aria-label="@($"{s.ShopName} ara")"><svg class="ico ico-sm"><use href="#i-phone"></use></svg>@s.ShopPhone</a>
+            }
+          </div>
+          <div class="mus-arac"><Plate No="@s.PlateNo" Size="plate-sm" /><span class="mus-arac-ad">@Arac(s)</span></div>
+          @if (!string.IsNullOrWhiteSpace(s.Vin)) { <div class="t-alt">Şase: @s.Vin</div> }
+
+          @foreach (var l in s.Lines)
+          {
+            <div class="yigin" @key="l.LineId">
+              <div class="section-label" data-parca="@l.LineId"><b>@l.Name</b></div>
+              @foreach (var a in l.Answers)
+              {
+                <div class="t-alt" data-cevap="@a.Id">Yazdığın: @Cevap(a)</div>
+              }
+              <div class="field-2">
+                <div class="field"><label for="@($"psoF-{l.LineId}")">Fiyat ₺</label>
+                  <input id="@($"psoF-{l.LineId}")" class="mono" inputmode="numeric" data-fiyat="@l.LineId" value="@Al(fiyat, l.LineId)" @oninput="e => fiyat[l.LineId] = Yaz(e)" /></div>
+                <div class="field"><label for="@($"psoM-{l.LineId}")">Marka</label>
+                  <input id="@($"psoM-{l.LineId}")" data-marka="@l.LineId" value="@Al(marka, l.LineId)" @oninput="e => marka[l.LineId] = Yaz(e)" /></div>
+              </div>
+              <div class="field-2">
+                <div class="field"><label for="@($"psoK-{l.LineId}")">OEM kodu</label>
+                  <input id="@($"psoK-{l.LineId}")" class="mono" data-kod="@l.LineId" value="@Al(kodlar, l.LineId)" @oninput="e => kodlar[l.LineId] = Yaz(e)" /></div>
+                <div class="field"><label for="@($"psoN-{l.LineId}")">Not</label>
+                  <input id="@($"psoN-{l.LineId}")" placeholder="yok · yarın gelir" data-not="@l.LineId" value="@Al(notlar, l.LineId)" @oninput="e => notlar[l.LineId] = Yaz(e)" /></div>
+              </div>
+            </div>
+          }
+          <button class="btn btn-primary" data-gonder="@s.RequestId" disabled="@calisiyor" @onclick="() => Gonder(s)">
+            <svg class="ico"><use href="#i-message-square"></use></svg> Cevabı gönder</button>
+        </div>
+      }
+    </div>
+  }
+
+  <button class="btn btn-ghost" id="psoCikis" @onclick="Cikis">Çıkış yap</button>
+</section>
+
+@code {
+    Inbox? kutu;
+    readonly Dictionary<Guid, string> fiyat = new(), marka = new(), kodlar = new(), notlar = new();
+    string? hata, sonuc;
+    bool calisiyor;
+
+    static string Al(Dictionary<Guid, string> d, Guid k) => d.GetValueOrDefault(k, "");
+    static string Yaz(ChangeEventArgs e) => e.Value?.ToString() ?? "";
+    static string Arac(InboxItem s)
+    {
+        var bas = string.Join(" ", new[] { s.Brand, s.Model, s.Year }.Where(x => !string.IsNullOrWhiteSpace(x)));
+        return string.IsNullOrWhiteSpace(s.Engine) ? bas : $"{bas} · {s.Engine}";
+    }
+    static string Cevap(InboxAnswer a) => string.Join(" · ", new[]
+    {
+        a.Price is { } p ? Format.Money(p) + " ₺" : null, a.Brand, a.Code, a.Note,
+    }.Where(x => !string.IsNullOrWhiteSpace(x)));
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await Api.HasSessionAsync()) { Nav.NavigateTo("giris"); return; }
+        await Calis(async () => kutu = await Api.PartsInboxAsync());
+    }
+
+    Task Gonder(InboxItem s) => Calis(async () =>
+    {
+        sonuc = null;
+        var satirlar = new List<AnswerLine>();
+        foreach (var l in s.Lines)
+        {
+            var f = Al(fiyat, l.LineId).Trim();
+            string? B(Dictionary<Guid, string> d) => Al(d, l.LineId).Trim() is { Length: > 0 } x ? x : null;
+            if (f.Length == 0 && B(marka) is null && B(kodlar) is null && B(notlar) is null) continue;
+            decimal? tutar = null;
+            if (f.Length > 0)
+            {
+                if (Format.ParseMoney(f) is not { } t) { hata = $"{l.Name}: Tutarı rakamla yaz — ör. 1.200"; return; }
+                tutar = t;
+            }
+            satirlar.Add(new AnswerLine(l.LineId, tutar, B(marka), B(kodlar), B(notlar)));
+        }
+        if (satirlar.Count == 0) { hata = "En az bir parçaya fiyat, marka, kod ya da not yaz — parça yoksa \"yok\" yaz."; return; }
+        kutu = await Api.AnswerPartsAsync(s.RequestId, satirlar);
+        foreach (var l in s.Lines) { fiyat.Remove(l.LineId); marka.Remove(l.LineId); kodlar.Remove(l.LineId); notlar.Remove(l.LineId); }
+        // "İşlendi" DENMEZ: usta parça sorma ekranında görür, "Bunu kullan" derse kayda girer (Kol B).
+        // Dükkân adına ek getirilmez ("Kaya Oto Servis'ya" olmasın) — ad ayrı yazılır.
+        sonuc = $"Cevabın iletildi: {s.ShopName}. Usta parça sorma ekranında görecek.";
+    });
+
+    async Task Cikis()
+    {
+        await Api.LogoutAsync();
+        Nav.NavigateTo("giris");
+    }
+
+    async Task Calis(Func<Task> is_)
+    {
+        hata = null; calisiyor = true;
+        try { await is_(); }
+        catch (ApiException e) when (e.Status == System.Net.HttpStatusCode.Unauthorized) { Nav.NavigateTo("giris"); }
+        catch (ApiException e) { hata = e.Message; }
+        finally { calisiyor = false; }
+    }
+}

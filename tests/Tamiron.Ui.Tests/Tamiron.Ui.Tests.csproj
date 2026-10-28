@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Tamiron.Tamirhane.Ui\Tamiron.Tamirhane.Ui.csproj" />
+    <ProjectReference Include="..\..\src\Tamiron.YedekParca.Ui\Tamiron.YedekParca.Ui.csproj" />
   </ItemGroup>
 
 </Project>

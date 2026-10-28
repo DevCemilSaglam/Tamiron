@@ -47,6 +47,24 @@ public class LoginScreenTests : TestContext
     }
 
     [Fact]
+    public void Parts_shop_number_is_turned_away_from_the_workshop_app()
+    {
+        // H7 · K-091: iki uygulama aynı adreste; parçacının numarası tamirhaneye girerse oturum kapanır, yolu söylenir.
+        api.Routes["POST /api/auth/code"] = (HttpStatusCode.Accepted, "");
+        api.Routes["POST /api/auth/verify"] = (HttpStatusCode.OK, "{\"token\":\"t-9\",\"shopName\":\"Öz Parça\",\"userName\":null,\"kind\":\"YedekParca\"}");
+        api.Routes["POST /api/auth/logout"] = (HttpStatusCode.NoContent, "");
+        Nav.NavigateTo("/giris");
+        var c = RenderComponent<Giris>();
+        c.Find("#grTel").Input("0533 100 00 01");
+        c.Find("#grKodIste").Click();
+        c.WaitForElement("#grKod").Input("123456");
+        c.Find("#grGiris").Click();
+        c.WaitForAssertion(() => Assert.Contains("Parçacı uygulamasından gir: /parca/", c.Find("#grHata").TextContent));
+        Assert.Null(tokens.Token);
+        Assert.Equal("http://localhost/giris", Nav.Uri);
+    }
+
+    [Fact]
     public void Api_error_title_is_shown_as_is()
     {
         api.Routes["POST /api/auth/code"] = (HttpStatusCode.UnprocessableEntity, "{\"code\":\"auth.unknown_phone\",\"title\":\"Bu numarayla kayıtlı dükkân yok.\"}");

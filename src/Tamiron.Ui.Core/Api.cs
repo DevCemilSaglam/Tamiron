@@ -11,7 +11,8 @@ namespace Tamiron.Ui.Core;
 // söylediğini gösterir (CLAUDE.md "iş mantığı API'de"). DTO'lar burada küçük kopyalar —
 // Application'a başvurmak tarayıcıya EF Core taşırdı.
 
-public sealed record LoginResult(string Token, string ShopName, string? UserName);
+/// <summary>H7 · Kind: "Tamirhane" ya da "YedekParca" — hangi uygulama (K-091).</summary>
+public sealed record LoginResult(string Token, string ShopName, string? UserName, string Kind = "Tamirhane");
 
 public sealed record RecordListItem(Guid Id, Guid VehicleId, string PlateNo, string Type, string TypeLabel,
                                     string Complaint, DateOnly OpenedOn, DateOnly? DeliveredAt,
@@ -65,6 +66,14 @@ public sealed record DebtLine(Guid RecordId, Guid LineId, string PlateNo, string
 public sealed record SupplierPaymentItem(Guid Id, decimal Amount, string Method, DateOnly PaidOn);
 public sealed record SupplierDebtItem(Guid SupplierId, string Name, string Phone, decimal Debt, IReadOnlyList<DebtLine> Lines, IReadOnlyList<SupplierPaymentItem> Payments);
 public sealed record SupplierDebtList(decimal Total, IReadOnlyList<SupplierDebtItem> Items);
+
+// H7 · Yedek Parça (K-091): parçacının gelen soruları — müşteri bilgisi YOK; cevap satır başına.
+public sealed record InboxAnswer(Guid Id, Guid LineId, decimal? Price, string? Brand, string? Code, string? Note, DateTime AnsweredAt);
+public sealed record InboxLine(Guid LineId, string Name, IReadOnlyList<InboxAnswer> Answers);
+public sealed record InboxItem(Guid RequestId, string ShopName, string? ShopPhone, string PlateNo, string? Brand, string? Model,
+                               string? Year, string? Engine, string? Vin, DateTime SentAt, IReadOnlyList<InboxLine> Lines);
+public sealed record Inbox(IReadOnlyList<InboxItem> Items);
+public sealed record AnswerLine(Guid LineId, decimal? Price, string? Brand, string? Code, string? Note);
 
 public sealed record MessageSetup(IReadOnlyList<MessageTarget> Targets, Guid? CurrentRecordId);
 public sealed record MessageTarget(string Kind, string Name, string? Phone, bool IsDefault);
@@ -170,9 +179,9 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     /// <summary>G1 · Yeni dükkân (D6): kayıtlı olmayan numaraya kod; kod + dükkân adı → oturum.</summary>
     public async Task RequestSignupCodeAsync(string phone) => await Send(HttpMethod.Post, "api/auth/signup/code", new { phone }, auth: false);
 
-    public async Task<LoginResult> SignUpAsync(string phone, string code, string shopName, string? device)
+    public async Task<LoginResult> SignUpAsync(string phone, string code, string shopName, string? device, string kind = "Tamirhane")
     {
-        var r = await Read<LoginResult>(await Send(HttpMethod.Post, "api/auth/signup", new { phone, code, shopName, deviceName = device }, auth: false));
+        var r = await Read<LoginResult>(await Send(HttpMethod.Post, "api/auth/signup", new { phone, code, shopName, deviceName = device, kind }, auth: false));
         await tokens.SetAsync(r.Token);
         return r;
     }
@@ -314,6 +323,11 @@ public sealed class TamironApi(HttpClient http, ITokenStore tokens)
     public async Task<SupplierDebtList> UndoSupplierPaymentAsync(Guid paymentId)
         => await Read<SupplierDebtList>(await Send(HttpMethod.Post, $"api/supplier-payments/{paymentId}/undo", null, auth: true));
     public async Task<ReceivableList> AllReceivablesAsync() => await Read<ReceivableList>(await Send(HttpMethod.Get, "api/receivables", null, auth: true));
+
+    // H7 · Yedek Parça: gelen sorular + cevap (parçacı oturumu; tamirhane oturumu 403 alır).
+    public async Task<Inbox> PartsInboxAsync() => await Read<Inbox>(await Send(HttpMethod.Get, "api/parts/inbox", null, auth: true));
+    public async Task<Inbox> AnswerPartsAsync(Guid requestId, IReadOnlyList<AnswerLine> lines)
+        => await Read<Inbox>(await Send(HttpMethod.Post, $"api/parts/requests/{requestId}/answers", new { lines }, auth: true));
 
     // G9c · Mesaj: kurulum (kime, hangi iş), öneriler (hedefe göre hitap), kayıt, arşiv.
     public async Task<MessageSetup> MessageSetupAsync(Guid vehicleId)

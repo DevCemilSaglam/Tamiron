@@ -5,6 +5,8 @@
     <ProjectReference Include="..\Tamiron.Infrastructure\Tamiron.Infrastructure.csproj" />
     <!-- G1 · Arayüzü API sunar (K-080.1): tek komut, tek adres. -->
     <ProjectReference Include="..\Tamiron.Tamirhane.Web\Tamiron.Tamirhane.Web.csproj" />
+    <!-- H7 · Yedek parça uygulaması aynı adresten /parca/ altında (K-091). -->
+    <ProjectReference Include="..\Tamiron.YedekParca.Web\Tamiron.YedekParca.Web.csproj" />
   </ItemGroup>
 
   <ItemGroup>

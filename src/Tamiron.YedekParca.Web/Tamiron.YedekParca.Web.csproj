@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <!-- H7 · Aynı adresten /parca/ altında sunulur (K-091): tamirhanenin _framework'üyle çakışmasın. -->
+    <StaticWebAssetBasePath>parca</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Tamiron.YedekParca.Ui\Tamiron.YedekParca.Ui.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.11" PrivateAssets="all" />
+  </ItemGroup>
+
+</Project>

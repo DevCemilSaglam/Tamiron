@@ -10,6 +10,23 @@
 
 ---
 
+## K-092 · Yedek Parça uygulaması /parca/ altında; giriş formu ortak; oturum dokunuşu çatışmada sessiz (28.10.2026 — lider)
+
+H7 koda geçti.
+- **Aynı adres, iki uygulama:** `Tamiron.YedekParca.Ui` + `.Web` (MIMARI §2), API `/parca/` altında sunar
+  (`StaticWebAssetBasePath=parca`, kendi `_framework`'ü). Tek komut, tek adres (K-080) bozulmadı. Ortak tasarım
+  dosyaları kökten (`/_content`). Yedek yol `nonfile` kısıtlı — kısıtsızken dosya istekleri yakalanıp 500 dönüyordu
+  (tarayıcıda görüldü).
+- **Oturum anahtarı uygulama başına** (`tamiron.parca.oturum`): iki uygulama aynı tarayıcı deposunu paylaşır;
+  biri ötekinin oturumunu almasın.
+- **Giriş formu ortak** (`Ui.Core/GirisFormu`): form hangi tür için olduğunu bilir; başka türün numarası girerse
+  oturumu kapatır ve nereden gireceğini söyler (yetki API'de de var — 403).
+- **Parçacının iki ekranı:** giriş + gelen sorular (satır başına fiyat · marka · OEM kodu · not; yazılan cevap
+  listede kalır; "işlendi" denmez — usta seçer). Menü/çekmece yok.
+- **⚠️ Tarayıcıda bulunan, önceden var olan hata:** oturumun "son görülme"si saatte bir yazılıyor; saat dolunca aynı
+  anda giden iki istek (G11b'deki rozet + ana sayfa) çatışıyor, bir OKUMA 409 dönüyordu. Artık çatışan istek
+  yazmayı bırakıp devam ediyor (testli: 12 paralel istek, 5 tur).
+
 ## K-091 · Yedek Parça: parçacı kendi numarasıyla girer, soruyu cevaplar; usta "Bunu kullan" der (28.10.2026 — lider, Cemil onayına açık)
 
 H5 tasarımı: `TASARIM-H-YEDEK-PARCA.md`. MIMARI §1–2'deki ayrı uygulama, en dar hâliyle.
