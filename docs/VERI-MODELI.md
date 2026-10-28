@@ -237,6 +237,9 @@ Akıştaki yeri: **Adım 4** · Ekran 4
 | `RawText` | **Parçacının yazdığı, olduğu gibi.** Ayrıştırma yanlışsa dönülecek tek yer |
 | `ParsedPrice` · `ParsedBrand` · `ParsedCode` | Çıkarılabildiyse |
 | `ReceivedAt` | Ne zaman geldi |
+| `ServiceLineId` | **Hangi satır için** (H6 · 28.10 · K-091). Null = eski cevap (satırla bağı yalnız `ServiceLine.SelectedReplyId`). Parçacının işlenmemiş cevabı için şart |
+| `Source` | `Shop` = usta yazdı (bugünkü, satıra hemen işlenir) · `Supplier` = parçacı kendi uygulamasından yazdı (işlenmez; usta "Bunu kullan" der — Kol B) |
+| `Note` | Parçacının kısa notu (*"yarın gelir"*) — yalnız `Supplier` cevabında |
 
 > **`ParsedPrice` = parçacının verdiği fiyat = ustanın ALIŞI** (K-076.2). Cevap satıra
 > işlenince `ServiceLine.Cost` olur; müşteriye söylenen fiyatı usta ayrıca yazar (T-9:
@@ -271,6 +274,7 @@ Akıştaki yeri: akışta **yok** — arkada birikir. `PARCA-TANIMLAMA.md` §4
 | `DefaultMaintenanceKm` | Aynı periyodun km yarısı — varsayılan **10.000**. Ay **veya** km, hangisi önce gelirse (Cemil, 03.09) |
 | `DefaultVatRate` | KDV varsayılanı, yüzde — **20** (KDV.md karar önerisi `AYAR.kdvVarsayilan`). Yeni satır bunu alır ve dondurur. Yalnız YER (C6); ayar ekranı yok |
 | `AskPartCost` | Ayarlar: parça alış fiyatı sorulsun mu (A-M43). Varsayılan **kapalı** — *"Zorunlu ya da beklenen alan olmamalı."* |
+| `Kind` | `Tamirhane` (varsayılan) · `YedekParca` (H6 · K-091). Kayıtta seçilir; hangi uygulamanın uçlarını kullanacağını belirler. Bir telefon iki türden dükkân açamaz |
 | `PrivacyNoticeShownAt` | Gizlilik notu (A-M33) bir kez gösterildi mi — ilk ses ya da ruhsat çekiminde. Prototipte bayrak; backend'de tarih (kime, ne zaman gösterildi) |
 
 > **Tema bu tabloda değil:** cihazın tercihi, cihazda kalır (K-010).

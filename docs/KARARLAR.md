@@ -10,6 +10,21 @@
 
 ---
 
+## K-091 · Yedek Parça: parçacı kendi numarasıyla girer, soruyu cevaplar; usta "Bunu kullan" der (28.10.2026 — lider, Cemil onayına açık)
+
+H5 tasarımı: `TASARIM-H-YEDEK-PARCA.md`. MIMARI §1–2'deki ayrı uygulama, en dar hâliyle.
+- **Kimlik = telefon (K-074).** Tamirhanenin parçacı kaydındaki numara, parçacının giriş numarasıysa sorular ona
+  görünür — davet/eşleştirme yok. Kiracı süzgecinin dışına çıkan TEK okuma; sınırı numara çizer.
+- **Parçacı yalnız** soruyu soran dükkânı, araç kimliğini (uyum — T-14) ve sorulan parçaları görür. Müşteri
+  bilgisi, başka parçacının cevabı, fiyat geçmişi YOK.
+- **Cevap satır başına** (fiyat · marka · OEM kodu · not); sonradan değişmez, yenisi yazılır.
+- **Cevap satıra kendiliğinden işlenmez** (Kol B): usta parça sorda **"Bunu kullan"** der — yazmadan.
+- **WhatsApp kalmaz değil, KALIR:** soru yine WhatsApp'la gider; uygulama ek yol.
+- **Ustaya yeni ekran yok;** parçacıya iki ekran (giriş + gelen sorular). Parçacı muhasebesi/stok/katalog YOK.
+- **Bir telefon iki türden dükkân açamaz** — Cemil onayına açık (hem tamir hem parça satan dükkân?).
+- **Sınır (K-079.3):** yerelde gerçek parçacı bağlanamaz — sunucu ya da telefondan erişim kararı Cemil'de.
+- **Açık soru:** parçacılar uygulama kullanır mı? Ustaya sorulmalı; "hayır"sa H6–H8 geri alınır.
+
 ## K-090 · Parçacıya borç: veresiye işaretli parçadan doğar, bakiye saklanmaz (28.10.2026 — lider, Cemil onayına açık)
 
 H2 tasarımı: `TASARIM-H-MUHASEBE.md`. OtoMix'in "Cari" modülünün yedi işe hizmet eden tek parçası.
